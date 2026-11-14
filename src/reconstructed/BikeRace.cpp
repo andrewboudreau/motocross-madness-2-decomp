@@ -285,7 +285,7 @@ static inline int UnknownFunctionRacerCount() {
     return g_TrackGame->mode.raceSettings.multiplayerAiRacerCount + g_TrackGame->playerCount;
 }
 
-static inline float UnknownFunctionMax(float a, float b) {
+static inline float MaxFloat(float a, float b) {
     return a > b ? a : b;
 }
 
@@ -729,7 +729,7 @@ int BikeRace::Tick(float frameTime) {
                                     model->detailDistances[0] += 0.05f;
                                 } else {
                                     model->detailDistances[0] -= 0.05f;
-                                    model->detailDistances[0] = UnknownFunctionMax(model->detailDistances[0], 0.0f);
+                                    model->detailDistances[0] = MaxFloat(model->detailDistances[0], 0.0f);
                                 }
                             }
                             break;
@@ -739,7 +739,7 @@ int BikeRace::Tick(float frameTime) {
                                     model->detailDistances[1] += 0.05f;
                                 } else {
                                     model->detailDistances[1] -= 0.05f;
-                                    model->detailDistances[1] = UnknownFunctionMax(model->detailDistances[1], 0.0f);
+                                    model->detailDistances[1] = MaxFloat(model->detailDistances[1], 0.0f);
                                 }
                             }
                             break;
@@ -749,7 +749,7 @@ int BikeRace::Tick(float frameTime) {
                                     model->detailDistances[2] += 0.05f;
                                 } else {
                                     model->detailDistances[2] -= 0.05f;
-                                    model->detailDistances[2] = UnknownFunctionMax(model->detailDistances[2], 0.0f);
+                                    model->detailDistances[2] = MaxFloat(model->detailDistances[2], 0.0f);
                                 }
                             }
                             break;
@@ -759,7 +759,7 @@ int BikeRace::Tick(float frameTime) {
                                     model->detailDistances[3] += 0.05f;
                                 } else {
                                     model->detailDistances[3] -= 0.05f;
-                                    model->detailDistances[3] = UnknownFunctionMax(model->detailDistances[3], 0.0f);
+                                    model->detailDistances[3] = MaxFloat(model->detailDistances[3], 0.0f);
                                 }
                             }
                             break;

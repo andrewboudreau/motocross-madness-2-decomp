@@ -139,7 +139,7 @@ int UnknownBikeRaceModel::ReplaceMaterialTexture(int index, const char* name, in
     return reinterpret_cast<D3DIMSoultreeObject*>(this)->ReplaceMaterialTexture(index, name, textures);
 }
 
-static inline Vec3 UnknownAsVec3(const Vector3& v)
+static inline Vec3 Vector3AsVec3(const Vector3& v)
 {
     Vec3 result;
     result.x = v.x;
@@ -165,8 +165,8 @@ GameObject* UnknownBikeRaceRacer::Load(void* owner, const char* engineName, cons
     void* skillWord = *reinterpret_cast<void**>(&skill);
     return reinterpret_cast<KrustyBike*>(this)->Load(
         (int)owner, (int)engineName, bikeFile, reinterpret_cast<const SoultreeLoadDesc*>(riderFile),
-        (int)lights, (int)textures, UnknownAsVec3(position), UnknownAsVec3(direction),
-        UnknownAsVec3(up), (int)terrain, reinterpret_cast<VehicleInputMap*>(control),
+        (int)lights, (int)textures, Vector3AsVec3(position), Vector3AsVec3(direction),
+        Vector3AsVec3(up), (int)terrain, reinterpret_cast<VehicleInputMap*>(control),
         (unsigned char)ai, (unsigned char)remote, reinterpret_cast<KbRace*>(race), (int)name, b,
         id, reinterpret_cast<const KbBikeSetup*>(setup), gasGyroOption, brakeGyroOption, particles, (int)scene,
         reinterpret_cast<KbRecorder*>(vcr), skillWord, withRider);

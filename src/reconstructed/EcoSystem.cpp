@@ -62,7 +62,7 @@ static int s_drawEnabled = 1;                // 0x0056a12c: drawing enabled (slo
 // Inline helper (shape only; the retail header is not attested): the
 // squared length, summed as z + (x + y) (the only order VC6 compiles to
 // the retail load sequence).
-static inline float UnknownSquareMagnitude(const Vector3* v) {
+static inline float EcoSquareMagnitude(const Vector3* v) {
     return v->z * v->z + (v->x * v->x + v->y * v->y);
 }
 
@@ -420,7 +420,7 @@ void Vegetation::SetBillboard(int billboard, int fade) {
                 normal.x = c * source->normal.x - s * source->normal.z;
                 normal.y = source->normal.y;
                 normal.z = s * source->normal.x + c * source->normal.z;
-                length = UnknownSquareMagnitude(&normal);
+                length = EcoSquareMagnitude(&normal);
                 if (length == 0.0f) {
                     normal = kVec3Zero;
                 } else {
@@ -969,7 +969,7 @@ void EcoSystem::LightingChanged() {
     lightDirection.x = light->direction.x;
     lightDirection.y = 0.0f;
     lightDirection.z = light->direction.z;
-    float length = UnknownSquareMagnitude(&lightDirection);
+    float length = EcoSquareMagnitude(&lightDirection);
     if (length == 0.0f) {
         lightDirection = kVec3Zero;
         return;

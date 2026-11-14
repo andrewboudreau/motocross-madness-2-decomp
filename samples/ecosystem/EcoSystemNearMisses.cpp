@@ -102,8 +102,8 @@
 //               test as `isBillboard >= lodCount` (0xff000000 first);
 //               `next++` in the for increment; verticesBefore, camera,
 //               trianglesBefore declaration order; the page store through
-//               a local; and the lean as UnknownEcoLean(&side,
-//               UnknownEcoScaleXZ(back, 0.1f)) per side, a returned
+//               a local; and the lean as EcoLean(&side,
+//               EcoScaleXZ(back, 0.1f)) per side, a returned
 //               vector passed by value, which gives retail's duplicated
 //               x product and the twice-copied z temporary (and the
 //               0xf0 frame). Remaining: the first loop guard compares
@@ -163,7 +163,7 @@ static UnknownEcoDetailBand* g_UnknownGlobal59af14; // 0x0059af14
 
 // The identity matrix as the collision builders store it (inline shape
 // only; the out-of-line IdentityMatrix 0x004a1410 is not what retail calls).
-static inline void UnknownSetIdentity(Matrix4* m) {
+static inline void EcoSetIdentity(Matrix4* m) {
     memset(m, 0, sizeof(Matrix4));
     (*m)(3, 3) = 1.0f;
     (*m)(2, 2) = 1.0f;
@@ -173,15 +173,15 @@ static inline void UnknownSetIdentity(Matrix4* m) {
 
 // By-value component read: it makes VC6 load the other operand first
 // (0x004567e0, now exact in the src unit, needs the same).
-static inline float UnknownEcoZ(const Vector3& v) {
+static inline float EcoComponentZ(const Vector3& v) {
     return v.z;
 }
 
 // The vector sum as 0x00458246 computes it (a value-returning inline in
 // operator+ form). Retail sums z vertex-first (`fld [vertex.z]; fadd
 // [start.z]`); only the by-value read of the vertex's z gives that order.
-static inline Vector3 UnknownEcoOffset(const Vector3& a, const Vector3& b) {
-    return Vector3(a.x + b.x, a.y + b.y, a.z + UnknownEcoZ(b));
+static inline Vector3 EcoSum(const Vector3& a, const Vector3& b) {
+    return Vector3(a.x + b.x, a.y + b.y, a.z + EcoComponentZ(b));
 }
 
 // 0x00456890: whether the object is beyond the detail band's 3D distance
@@ -375,7 +375,7 @@ void EcoSystem::BuildCollisionObjects(VegetationDefinition* definition) {
             definition->collisionObjects[i]->ownerType = 0x3e9;
             definition->collisionObjects[i]->SetTriangleMeshHullShape(hull, hullIndices, definition->modelIndexCount[0] / 3,
                                                                definition->modelVertexCount[0]);
-            UnknownSetIdentity(&((UnknownEcoHullShape*)definition->collisionObjects[i]->shapeData)->transform);
+            EcoSetIdentity(&((UnknownEcoHullShape*)definition->collisionObjects[i]->shapeData)->transform);
             delete hull;
             delete hullIndices;
         } else if (shape->type == 2) {
@@ -392,7 +392,7 @@ void EcoSystem::BuildCollisionObjects(VegetationDefinition* definition) {
                 vertices[j + 16].y = 0.0f;
             }
             for (j = 0; j < 32; j++)
-                vertices[j] = UnknownEcoOffset(shape->start, vertices[j]);
+                vertices[j] = EcoSum(shape->start, vertices[j]);
             for (j = 0; j < 16; j++) {
                 int next = j + 1;
                 if (next >= 16)
@@ -405,7 +405,7 @@ void EcoSystem::BuildCollisionObjects(VegetationDefinition* definition) {
                 indices[j * 6 + 5] = j + 16;
             }
             definition->collisionObjects[i]->SetTriangleMeshHullShape(vertices, indices, 32, 32);
-            UnknownSetIdentity(&((UnknownEcoHullShape*)definition->collisionObjects[i]->shapeData)->transform);
+            EcoSetIdentity(&((UnknownEcoHullShape*)definition->collisionObjects[i]->shapeData)->transform);
         }
     }
     g_MemTagStack->Pop(category);
@@ -440,7 +440,7 @@ void EcoSystem::WriteListing(const char* path) {
 
 // A random number in 0..1 (inline shape only: the helper boundary is what
 // keeps VC6 from folding the scale into the generator's other constants).
-static inline float UnknownEcoRandom() {
+static inline float EcoRandomUnit() {
     return rand() * (1.0f / 32768.0f);
 }
 
@@ -468,7 +468,7 @@ static inline float UnknownEcoSampleTga(TgaFile* tga, float x, float z) {
 }
 
 // Whether the probability TGA is nonzero at the terrain position.
-static inline int UnknownEcoTgaIsSet(TgaFile* tga, float x, float z) {
+static inline int EcoTgaIsSet(TgaFile* tga, float x, float z) {
     float worldX = g_collisionQuadTree->extentX;
     int width = tga->width;
     int column = (int)(x / worldX * width);
@@ -572,11 +572,11 @@ int EcoSystem::GenerateObjects(int checkCodes) {
                 break;
             }
         }
-        position.x = UnknownEcoRandom() * rangeX;
+        position.x = EcoRandomUnit() * rangeX;
         int clusterCount = 1;
         Vector3* cluster = 0;
         position.y = 0.0f;
-        position.z = UnknownEcoRandom() * rangeZ;
+        position.z = EcoRandomUnit() * rangeZ;
         if (mode == 5) {
             if (attempt % 3 == 0) {
                 clusterCount = 16;
@@ -621,7 +621,7 @@ int EcoSystem::GenerateObjects(int checkCodes) {
         if (checkCodes && !g_collisionQuadTree->IsValidCode(code))
             continue;
         // The named local keeps VC6 from folding the two scales into one.
-        float random = UnknownEcoRandom();
+        float random = EcoRandomUnit();
         float threshold = random * 3.0f;
         float probability;
         if (tga)
@@ -651,9 +651,9 @@ int EcoSystem::GenerateObjects(int checkCodes) {
             continue;
         for (j = 1; j < clusterCount; j++) {
             probe = Vector3(position.x + cluster[j].x, cluster[j].y, position.z + cluster[j].z);
-            if (tga && !UnknownEcoTgaIsSet(tga, probe.x, probe.z))
+            if (tga && !EcoTgaIsSet(tga, probe.x, probe.z))
                 break;
-            if (tgas[selected] && !UnknownEcoTgaIsSet(tgas[selected], probe.x, probe.z))
+            if (tgas[selected] && !EcoTgaIsSet(tgas[selected], probe.x, probe.z))
                 break;
         }
         if (j != clusterCount)
@@ -685,7 +685,7 @@ int EcoSystem::GenerateObjects(int checkCodes) {
 
 // An xz direction normalised in place (the y component is cleared), zero
 // when it has no length. Inline shape only.
-static inline void UnknownEcoNormalizeXZ(Vector3* v) {
+static inline void EcoNormalizeXZ(Vector3* v) {
     float length = v->x * v->x + v->z * v->z;
     if (length == 0.0f) {
         *v = kVec3Zero;
@@ -699,13 +699,13 @@ static inline void UnknownEcoNormalizeXZ(Vector3* v) {
 
 // The lit colour (no alpha) of a billboard face whose normal has the light
 // intensity `intensity`. Inline shape only.
-static inline float UnknownEcoMin1(float v) {
+static inline float EcoMinOne(float v) {
     return v < 1.0f ? v : 1.0f;
 }
-static inline unsigned int UnknownEcoLitColor(const EcoSystem* eco, float intensity) {
-    float r = UnknownEcoMin1(intensity * eco->lightColor.x + eco->ambientLight.x);
-    float g = UnknownEcoMin1(intensity * eco->lightColor.y + eco->ambientLight.y);
-    float b = UnknownEcoMin1(intensity * eco->lightColor.z + eco->ambientLight.z);
+static inline unsigned int EcoLitColor(const EcoSystem* eco, float intensity) {
+    float r = EcoMinOne(intensity * eco->lightColor.x + eco->ambientLight.x);
+    float g = EcoMinOne(intensity * eco->lightColor.y + eco->ambientLight.y);
+    float b = EcoMinOne(intensity * eco->lightColor.z + eco->ambientLight.z);
     return ((int)(r * 255.0f) << 16) | ((int)(g * 255.0f) << 8) | (int)(b * 255.0f);
 }
 
@@ -713,8 +713,8 @@ static inline unsigned int UnknownEcoLitColor(const EcoSystem* eco, float intens
 // normalise below clears it). Inline shape only: retail's lean keeps the
 // x product on the x87 stack and spills the z product to a by-value
 // temporary that is copied once more, which is what a returned vector
-// passed by value to UnknownEcoLean produces.
-static inline Vector3 UnknownEcoScaleXZ(const Vector3& v, float s) {
+// passed by value to EcoLean produces.
+static inline Vector3 EcoScaleXZ(const Vector3& v, float s) {
     Vector3 r;
     r.x = v.x * s;
     r.z = v.z * s;
@@ -722,14 +722,14 @@ static inline Vector3 UnknownEcoScaleXZ(const Vector3& v, float s) {
 }
 
 // `v` moved back by `lean` in the xz plane. Inline shape only.
-static inline void UnknownEcoLean(Vector3* v, Vector3 lean) {
+static inline void EcoLean(Vector3* v, Vector3 lean) {
     v->x = v->x - lean.x;
     v->z = v->z - lean.z;
 }
 
 // The light falling on a face with normal `n` (the dot product is summed
-// as z + (x + y), the order VC6 emits for retail; see UnknownSquareMagnitude).
-static inline float UnknownEcoLightOn(const EcoSystem* eco, const Vector3* n) {
+// as z + (x + y), the order VC6 emits for retail; see EcoSquareMagnitude).
+static inline float EcoLightIntensity(const EcoSystem* eco, const Vector3* n) {
     return -(n->z * eco->lightDirection.z + (n->x * eco->lightDirection.x + n->y * eco->lightDirection.y));
 }
 
@@ -781,24 +781,24 @@ int EcoSystem::Render3D() {
     left.z = -camera->direction.x;
     back.x = -camera->direction.x;
     back.z = -camera->direction.z;
-    UnknownEcoLean(&right, UnknownEcoScaleXZ(back, 0.1f));
-    UnknownEcoLean(&left, UnknownEcoScaleXZ(back, 0.1f));
-    UnknownEcoNormalizeXZ(&right);
-    UnknownEcoNormalizeXZ(&left);
-    UnknownEcoNormalizeXZ(&back);
+    EcoLean(&right, EcoScaleXZ(back, 0.1f));
+    EcoLean(&left, EcoScaleXZ(back, 0.1f));
+    EcoNormalizeXZ(&right);
+    EcoNormalizeXZ(&left);
+    EcoNormalizeXZ(&back);
     // The light on each face.
-    float rightLight = UnknownEcoLightOn(this, &right);
+    float rightLight = EcoLightIntensity(this, &right);
     if (rightLight < 0.0f)
         rightLight = 0.0f;
-    float leftLight = UnknownEcoLightOn(this, &left);
+    float leftLight = EcoLightIntensity(this, &left);
     if (leftLight < 0.0f)
         leftLight = 0.0f;
-    float backLight = UnknownEcoLightOn(this, &back);
+    float backLight = EcoLightIntensity(this, &back);
     if (backLight < 0.0f)
         backLight = 0.0f;
-    unsigned int backColor = UnknownEcoLitColor(this, backLight);
-    unsigned int rightColor = UnknownEcoLitColor(this, rightLight);
-    unsigned int leftColor = UnknownEcoLitColor(this, leftLight);
+    unsigned int backColor = EcoLitColor(this, backLight);
+    unsigned int rightColor = EcoLitColor(this, rightLight);
+    unsigned int leftColor = EcoLitColor(this, leftLight);
     float inverse = FastInvSqrtEstimate(camera->direction.x * camera->direction.x
                                           + camera->direction.z * camera->direction.z);
     float sine = inverse * camera->direction.x;

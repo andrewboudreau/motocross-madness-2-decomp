@@ -14,12 +14,12 @@ static const Vector3 kVec3XAxis = Vector3(1.0f, 0.0f, 0.0f);
 static const Vector3 kVec3YAxis = Vector3(0.0f, 1.0f, 0.0f);
 static const Vector3 kVec3ZAxis = Vector3(0.0f, 0.0f, 1.0f);
 
-static inline float UnknownMin(float a, float b)
+static inline float MinFloat(float a, float b)
 {
     return a < b ? a : b;
 }
 
-static inline float UnknownMax(float a, float b)
+static inline float MaxFloat(float a, float b)
 {
     return a > b ? a : b;
 }
@@ -150,7 +150,7 @@ EngineGearbox::EngineGearbox(const char* name, float unused, int* torqueTable, i
         float bestDifference = 3.4028235e+38f;
         float bestRpm;
         for (int j = peakPowerPoint + 1; j < curvePointCount; j++) {
-            currentRpm = UnknownMin(step * curveRpm[j], curveRpm[peakPowerPoint]);
+            currentRpm = MinFloat(step * curveRpm[j], curveRpm[peakPowerPoint]);
             float difference = curvePower[j] - PowerAtCurrentRpm();
             if (difference < 0) {
                 difference = -difference;
@@ -161,8 +161,8 @@ EngineGearbox::EngineGearbox(const char* name, float unused, int* torqueTable, i
             }
         }
         if (bestDifference != 3.4028235e+38f) {
-            shiftRanges[gear].lowerRpm = UnknownMax(bestRpm - 100.0f, 0.0f);
-            shiftRanges[gear].upperRpm = UnknownMin(bestRpm + 100.0f, rpmHighLimit);
+            shiftRanges[gear].lowerRpm = MaxFloat(bestRpm - 100.0f, 0.0f);
+            shiftRanges[gear].upperRpm = MinFloat(bestRpm + 100.0f, rpmHighLimit);
             shiftWindowWidths[gear] = shiftRanges[gear].upperRpm - shiftRanges[gear].lowerRpm;
         } else {
             sprintf(message, "Unable to find optimum shift range for GEAR=%d\n", gear);
@@ -189,13 +189,13 @@ void EngineGearbox::UpdateThrottle(float dt, int engaged, unsigned char disengag
         driveCut = disengaged;
         if (throttleFraction < 1.0f) {
             throttleFraction += dt / throttleTimeScale * throttleRiseRate;
-            throttleFraction = UnknownMin(throttleFraction, 1.0f);
+            throttleFraction = MinFloat(throttleFraction, 1.0f);
         }
     } else {
         driveCut = 1;
         if (throttleFraction > 0.0f) {
             throttleFraction -= (shiftTimer != 0.0f ? dt * throttleFallRate * 0.2f : dt * throttleFallRate * 0.6f);
-            throttleFraction = UnknownMax(throttleFraction, 0.0f);
+            throttleFraction = MaxFloat(throttleFraction, 0.0f);
         }
     }
     currentRpm = rpmHighLimit * throttleFraction;
@@ -210,7 +210,7 @@ void EngineGearbox::AutoShift(int throttleOn, float speed)
     }
     if (currentRpm >= lastUpdateRpm && currentRpm > upShiftRpm && currentGear < gearCount - 1) {
         currentGear++;
-        throttleFraction = UnknownMin(gearRatios[currentGear] * throttleFraction / gearRatios[currentGear - 1], 1.0f);
+        throttleFraction = MinFloat(gearRatios[currentGear] * throttleFraction / gearRatios[currentGear - 1], 1.0f);
         currentRpm = throttleFraction * rpmHighLimit;
         if (currentRpm > upShiftRpm && currentGear == gearCount - 1) {
             currentRpm = upShiftRpm;
@@ -220,7 +220,7 @@ void EngineGearbox::AutoShift(int throttleOn, float speed)
         upShiftRpm = random * shiftWindowWidths[currentGear] + shiftRanges[currentGear].lowerRpm;
     } else if (currentGear > 0 && (currentRpm < lastUpdateRpm || currentRpm == 0.0f) && currentRpm < downShiftRpm) {
         currentGear--;
-        throttleFraction = UnknownMin(gearRatios[currentGear] * throttleFraction / gearRatios[currentGear + 1], 1.0f);
+        throttleFraction = MinFloat(gearRatios[currentGear] * throttleFraction / gearRatios[currentGear + 1], 1.0f);
         currentRpm = throttleFraction * rpmHighLimit;
         shiftTimer = shiftTime;
         float random = UNKNOWN_RANDOM_UNIT();

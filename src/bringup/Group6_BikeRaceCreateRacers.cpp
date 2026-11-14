@@ -83,7 +83,7 @@ static inline Vector3 operator-(const Vector3& a, const Vector3& b) {
 
 // A racer's skill, written into `skill`: `base` moved up or down by at most
 // `range`, closer to `base` more often.
-static inline void UnknownRandomSkill(float& skill, const float& base, const float& range) {
+static inline void RandomSkill(float& skill, const float& base, const float& range) {
     float r = rand() * (1.0f / 32768.0f);
     skill = (float)((1.0 - exp(-r * r)) * range);
     if (rand() * (1.0f / 32768.0f) > 0.5f)
@@ -264,7 +264,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, TextureContext* te
                     setup.presetCurve[k] = g_TrackGame->ui->standardCurves[bikeClass][0][k];
                 setup.rpmStep = (setup.rpmUpperLimit - setup.rpmLowerLimit) / 10;
                 setup.weight = g_TrackGame->ui->weight[bikeClass];
-                UnknownRandomSkill(skill, aiSettings[0], aiSettings[1]);
+                RandomSkill(skill, aiSettings[0], aiSettings[1]);
                 aiRacers[n - 1] = new(__FILE__, 0x47c) UnknownBikeRaceRacer(1);
                 aiRacers[n - 1]->Load(owner, empty, bikeFile, riderFile, lights, textures,
                                                           position, direction, up, terrain, 0, 1, 0, this,
@@ -595,9 +595,9 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, TextureContext* te
                         engineSize = UiBike(bikes[n]).engineSize;
                         fourStroke = UiBike(bikes[n]).fourStroke;
                         if (g_TrackGame->mode.raceSettings.eventType == 0)
-                            UnknownRandomSkill(skill, aiSettings[5], aiSettings[6]);
+                            RandomSkill(skill, aiSettings[5], aiSettings[6]);
                         else
-                            UnknownRandomSkill(skill, aiSettings[0], aiSettings[1]);
+                            RandomSkill(skill, aiSettings[0], aiSettings[1]);
                     }
                     float r = rand() * (1.0f / 32768.0f);
                     plate = 101 - (int)(r * -898.0f);

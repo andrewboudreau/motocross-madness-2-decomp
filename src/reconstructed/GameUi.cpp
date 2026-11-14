@@ -40,8 +40,8 @@ static const Vector3 kVec3ZAxis = Vector3(0.0f, 0.0f, 1.0f);
 
 // The smaller and the larger of two ints (inline helpers; the drag and
 // progress code computes each operand once).
-static inline int UnknownMinInt(int a, int b) { return a < b ? a : b; }
-static inline int UnknownMaxInt(int a, int b) { return a < b ? b : a; }
+static inline int MinInt(int a, int b) { return a < b ? a : b; }
+static inline int MaxInt(int a, int b) { return a < b ? b : a; }
 
 // The same as macros, evaluating an operand twice (0x00479a00 calls slot 62
 // again for the chosen operand).
@@ -4474,10 +4474,10 @@ int UIScrollBar::Draw() {
         int redraw = redrawFrames;
         rect = *(CameraRect*)screenArea;
         if (controlType == 8) {
-            rect.top += UnknownMaxInt((screenArea[3] - screenArea[1] - track->textureHeight) / 2, 0);
+            rect.top += MaxInt((screenArea[3] - screenArea[1] - track->textureHeight) / 2, 0);
             rect.bottom = track->textureHeight + rect.top;
         } else {
-            rect.left += UnknownMaxInt((screenArea[2] - screenArea[0] - track->textureWidth) / 2, 0);
+            rect.left += MaxInt((screenArea[2] - screenArea[0] - track->textureWidth) / 2, 0);
             rect.right = track->textureWidth + rect.left;
         }
         if (ownerDialog->dialogBackground)
@@ -4528,8 +4528,8 @@ int UIScrollBar::ButtonDown(int button, int position) {
         UIControl* list;
         if (controlType == 8) {
             if (snapSteps) {
-                thumbOffset = (float)UnknownMinInt(GetWidth() - thumbWidth,
-                                                         UnknownMaxInt(((int*)position)[0] - screenArea[0], 0));
+                thumbOffset = (float)MinInt(GetWidth() - thumbWidth,
+                                                         MaxInt(((int*)position)[0] - screenArea[0], 0));
             } else {
                 float x = (float)((int*)position)[0];
                 float left = (float)screenArea[0];
@@ -4557,8 +4557,8 @@ int UIScrollBar::ButtonDown(int button, int position) {
             }
         } else {
             if (snapSteps) {
-                thumbOffset = (float)UnknownMinInt(GetHeight() - thumbHeight,
-                                                         UnknownMaxInt(((int*)position)[1] - screenArea[1], 0));
+                thumbOffset = (float)MinInt(GetHeight() - thumbHeight,
+                                                         MaxInt(((int*)position)[1] - screenArea[1], 0));
             } else {
                 float y = (float)((int*)position)[1];
                 float top = (float)screenArea[1];
@@ -4602,18 +4602,18 @@ void UIScrollBar::ButtonHeld(int button, int* position) {
         RequestRedraw();
         if (controlType == 8) {
             if (snapSteps)
-                thumbOffset = (float)UnknownMinInt(width - thumbWidth,
-                                                       UnknownMaxInt(position[0] - screenArea[0], 0));
+                thumbOffset = (float)MinInt(width - thumbWidth,
+                                                       MaxInt(position[0] - screenArea[0], 0));
             else
-                thumbOffset = (float)UnknownMinInt(width - thumbWidth,
-                                                       UnknownMaxInt(position[0] - screenArea[0] - thumbWidth / 2, 0));
+                thumbOffset = (float)MinInt(width - thumbWidth,
+                                                       MaxInt(position[0] - screenArea[0] - thumbWidth / 2, 0));
         } else {
             if (snapSteps != 0.0f)
-                thumbOffset = (float)UnknownMinInt(height - thumbHeight,
-                                                       UnknownMaxInt(position[1] - screenArea[1], 0));
+                thumbOffset = (float)MinInt(height - thumbHeight,
+                                                       MaxInt(position[1] - screenArea[1], 0));
             else
-                thumbOffset = (float)UnknownMinInt(height - thumbHeight,
-                                                       UnknownMaxInt(position[1] - screenArea[1] - thumbHeight / 2, 0));
+                thumbOffset = (float)MinInt(height - thumbHeight,
+                                                       MaxInt(position[1] - screenArea[1] - thumbHeight / 2, 0));
         }
         if (snapSteps)
             SetThumbPosition(ScaleThumbPosition(snapSteps), snapSteps);
@@ -4880,18 +4880,18 @@ void UIDDLScrollBar::ButtonHeld(int button, int* position) {
         RequestRedraw();
         if (controlType == 8) {
             if (snapSteps)
-                thumbOffset = (float)UnknownMinInt(width - thumbWidth,
-                                                       UnknownMaxInt(position[0] - screenArea[0], 0));
+                thumbOffset = (float)MinInt(width - thumbWidth,
+                                                       MaxInt(position[0] - screenArea[0], 0));
             else
-                thumbOffset = (float)UnknownMinInt(width - thumbWidth,
-                                                       UnknownMaxInt(position[0] - screenArea[0] - thumbWidth / 2, 0));
+                thumbOffset = (float)MinInt(width - thumbWidth,
+                                                       MaxInt(position[0] - screenArea[0] - thumbWidth / 2, 0));
         } else {
             if (snapSteps != 0.0f)
-                thumbOffset = (float)UnknownMinInt(height - thumbHeight,
-                                                       UnknownMaxInt(position[1] - screenArea[1], 0));
+                thumbOffset = (float)MinInt(height - thumbHeight,
+                                                       MaxInt(position[1] - screenArea[1], 0));
             else
-                thumbOffset = (float)UnknownMinInt(height - thumbHeight,
-                                                       UnknownMaxInt(position[1] - screenArea[1] - thumbHeight / 2, 0));
+                thumbOffset = (float)MinInt(height - thumbHeight,
+                                                       MaxInt(position[1] - screenArea[1] - thumbHeight / 2, 0));
         }
         if (snapSteps)
             SetThumbPosition(ScaleThumbPosition(snapSteps), snapSteps);
@@ -5005,7 +5005,7 @@ void UIDropDownList::SetCornerImage(UIAnim* image) {
 void UIProgressBar::StepProgress(int redraw) {
     int total = stepCount;
     if (total) {
-        stepsDone = UnknownMinInt(stepsDone + 1, total);
+        stepsDone = MinInt(stepsDone + 1, total);
         progressFraction = (float)stepsDone / total;
     }
     if (redraw && ownerGui)
@@ -5235,7 +5235,7 @@ void UIListBox::ScrollBy(int delta) {
         int last = count - visibleRowCount;
         if (last < first)
             first = last;
-        firstVisibleRow = UnknownMaxInt(first, 0);
+        firstVisibleRow = MaxInt(first, 0);
     }
     if (visibleRowCount == 1) {
         SetSelectedRow(firstVisibleRow);

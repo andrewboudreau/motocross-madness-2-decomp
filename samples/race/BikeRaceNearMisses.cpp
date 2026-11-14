@@ -128,7 +128,7 @@
 // 20 and 21 accesses each). Three retail facts fixed it: the 0x40-byte own
 // texture names are function-scope (they never share with the network
 // block's), `ranking` is function-scope, and the `used` memset (rep stosd at
-// 0x41a456) sits inside the multiplayer block. UnknownRandomSkill takes
+// 0x41a456) sits inside the multiplayer block. RandomSkill takes
 // `const float&` because retail reads base and range from memory after the
 // rand() calls (fmul [ebp+0x94]; by-value parameters are copied to temps).
 // The pro circuit block caches g_TrackGame in a local (retail holds it in
@@ -157,7 +157,7 @@
 // its UI else branch loaded bikes[n] before ui->bikes). Two retail facts
 // fix the scalars below 0x6c: the network block's `i` is a function-scope
 // local that the network AI loop reuses (retail homes both loops' index in
-// one slot at 0), and UnknownRandomSkill writes the skill through a
+// one slot at 0), and RandomSkill writes the skill through a
 // `float&` (retail spills the random offset into skill's own slot before
 // the second rand() and adds base to it; with a returned value VC6 homes the
 // pro circuit's offset in the riders/circuit slot, which then ranks too
@@ -587,7 +587,7 @@ static inline float VectorLength(const Vector3& v) {
     return (float)sqrt(lengthSquared);
 }
 
-static inline Vector3 UnknownScaled(const Vector3& v, float scale) {
+static inline Vector3 ScaledVector(const Vector3& v, float scale) {
     return Vector3(v.x * scale, v.y * scale, v.z * scale);
 }
 
@@ -790,13 +790,13 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
             boxOffset = Vector3(girlOffset.x - 1.22f, 4.0f, girlOffset.z + 1.2f);
             float angle = (float)atan2(direction.x, direction.z);
             D3DRMVectorRotate(&turned, &girlOffset, (Vector3*)&kVec3YAxis, angle);
-            girlOffset = UnknownScaled(turned, VectorLength(girlOffset));
+            girlOffset = ScaledVector(turned, VectorLength(girlOffset));
             ground = point + girlOffset;
             terrain->QueryGround(&ground, 0, 0, 0);
             float height = ground.y - point.y;
             girlPosition = point + girlOffset;
             D3DRMVectorRotate(&turned, &boxOffset, (Vector3*)&kVec3YAxis, angle);
-            boxOffset = UnknownScaled(turned, VectorLength(boxOffset));
+            boxOffset = ScaledVector(turned, VectorLength(boxOffset));
             boxPosition = point + boxOffset;
             girlPosition.y += height;
             boxPosition.y += height;
@@ -985,7 +985,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
 
 // A racer's skill, written into `skill`: `base` moved up or down by at most
 // `range`, closer to `base` more often.
-static inline void UnknownRandomSkill(float& skill, const float& base, const float& range) {
+static inline void RandomSkill(float& skill, const float& base, const float& range) {
     float r = rand() * (1.0f / 32768.0f);
     skill = (float)((1.0 - exp(-r * r)) * range);
     if (rand() * (1.0f / 32768.0f) > 0.5f)
@@ -1166,7 +1166,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, TextureContext* te
                     setup.presetCurve[k] = g_TrackGame->ui->standardCurves[bikeClass][0][k];
                 setup.rpmStep = (setup.rpmUpperLimit - setup.rpmLowerLimit) / 10;
                 setup.weight = g_TrackGame->ui->weight[bikeClass];
-                UnknownRandomSkill(skill, aiSettings[0], aiSettings[1]);
+                RandomSkill(skill, aiSettings[0], aiSettings[1]);
                 aiRacers[n - 1] = new(__FILE__, 0x47c) UnknownBikeRaceRacer(1);
                 aiRacers[n - 1]->Load(owner, empty, bikeFile, riderFile, lights, textures,
                                                           position, direction, up, terrain, 0, 1, 0, this,
@@ -1497,9 +1497,9 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, TextureContext* te
                         engineSize = UiBike(bikes[n]).engineSize;
                         fourStroke = UiBike(bikes[n]).fourStroke;
                         if (g_TrackGame->mode.raceSettings.eventType == 0)
-                            UnknownRandomSkill(skill, aiSettings[5], aiSettings[6]);
+                            RandomSkill(skill, aiSettings[5], aiSettings[6]);
                         else
-                            UnknownRandomSkill(skill, aiSettings[0], aiSettings[1]);
+                            RandomSkill(skill, aiSettings[0], aiSettings[1]);
                     }
                     float r = rand() * (1.0f / 32768.0f);
                     plate = 101 - (int)(r * -898.0f);

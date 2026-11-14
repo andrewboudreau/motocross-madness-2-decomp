@@ -30,7 +30,7 @@ UnknownOptGarageSettings g_EditedGarageSettings;
 char g_EditedMessages[10][128];
 
 // The list box of a drop-down list control.
-static inline UIListBox* UnknownDropDownList(UIControl* dropDown)
+static inline UIListBox* DropDownListBox(UIControl* dropDown)
 {
     return static_cast<UIDropDownList*>(dropDown)->listPart;
 }
@@ -188,9 +188,9 @@ void OptGraphicsDlg::HandleEvent(DialogEvent* event)
 void OptGraphicsDlg::SyncValues(int save)
 {
     if (save)
-        g_EditedGraphicsSettings.resolutionRow = UnknownDropDownList(FindControl("DisplayResolutionDropDown", 6))->GetRowData(-1);
+        g_EditedGraphicsSettings.resolutionRow = DropDownListBox(FindControl("DisplayResolutionDropDown", 6))->GetRowData(-1);
     else
-        UnknownDropDownList(FindControl("DisplayResolutionDropDown", 6))->SelectRowByData(g_EditedGraphicsSettings.resolutionRow);
+        DropDownListBox(FindControl("DisplayResolutionDropDown", 6))->SelectRowByData(g_EditedGraphicsSettings.resolutionRow);
 }
 
 // 0x004b26c0
@@ -357,7 +357,7 @@ void OptControlsDlg::HandleEvent(DialogEvent* event)
             g_TrackGame->LoadResourceString(0x192 + i, text, 128);
             actions->AddRow(text, i, 0);
         }
-        UIListBox* devices = UnknownDropDownList(FindControl("InputDeviceDDL", 6));
+        UIListBox* devices = DropDownListBox(FindControl("InputDeviceDDL", 6));
         devices->RemoveAllRows();
         for (i = 0; i < 8; i++) {
             g_TrackGame->LoadResourceString(0x1cc + i, text, 128);
@@ -409,7 +409,7 @@ void OptControlsDlg::HandleEvent(DialogEvent* event)
             break;
         if (_stricmp("InputDeviceDDL", event->controlName) == 0) {
             g_TrackGame->controlSetup->currentDevice =
-                UnknownDropDownList(FindControl("InputDeviceDDL", 6))->GetRowData(-1);
+                DropDownListBox(FindControl("InputDeviceDDL", 6))->GetRowData(-1);
             ListMappedKeys();
         } else if (_stricmp("MapKeyListBox", event->controlName) == 0 || _stricmp("ActionListBox", event->controlName) == 0) {
             int row = static_cast<UIListBox*>(event->control)->GetSelectedRow();
@@ -458,9 +458,9 @@ void OptControlsDlg::SyncValues(int save)
     if (save) {
         if (g_TrackGame->controlSetup)
             g_TrackGame->controlSetup->currentDevice =
-                UnknownDropDownList(FindControl("InputDeviceDDL", 6))->GetRowData(-1);
+                DropDownListBox(FindControl("InputDeviceDDL", 6))->GetRowData(-1);
     } else if (g_TrackGame->controlSetup) {
-        UnknownDropDownList(FindControl("InputDeviceDDL", 6))->SelectRowByData(g_TrackGame->controlSetup->currentDevice);
+        DropDownListBox(FindControl("InputDeviceDDL", 6))->SelectRowByData(g_TrackGame->controlSetup->currentDevice);
         ListMappedKeys();
     }
 }
@@ -1041,12 +1041,12 @@ void OptGarageDlg::HandleEvent(DialogEvent* event)
     }
     case kDialogCommand:
         if (_stricmp("CurveLeft", event->controlName) == 0) {
-            UIListBox* curves = UnknownDropDownList(FindControl("DDLCurves", 6));
+            UIListBox* curves = DropDownListBox(FindControl("DDLCurves", 6));
             int rows = curves->rowCount;
             curves->SelectRow((curves->GetSelectedRow() + rows - 1) % rows);
             curves->ReportClick(0);
         } else if (_stricmp("CurveRight", event->controlName) == 0) {
-            UIListBox* curves = UnknownDropDownList(FindControl("DDLCurves", 6));
+            UIListBox* curves = DropDownListBox(FindControl("DDLCurves", 6));
             int rows = curves->rowCount;
             curves->SelectRow((curves->GetSelectedRow() + 1) % rows);
             curves->ReportClick(0);
@@ -1103,7 +1103,7 @@ void OptGarageDlg::FillCurveList()
     sprintf(engine, format, g_BikeClassEngineSizes[BikeClassOf(g_EditedGarageSettings.engineSize)]);
     g_TrackGame->LoadResourceString(0x146b, standard, 127);
     g_TrackGame->LoadResourceString(0x146c, custom, 127);
-    UIListBox* curves = UnknownDropDownList(FindControl("DDLCurves", 6));
+    UIListBox* curves = DropDownListBox(FindControl("DDLCurves", 6));
     curves->RemoveAllRows();
     for (int i = 0; i < 6; i++) {
         if (i < 3)
@@ -1125,7 +1125,7 @@ void OptGarageDlg::EqSliderMoved(UIControl* slider)
     int level = __min(g_EditedGarageSettings.eqBands[band] + (g_TrackGame->ui->hpSum[bikeClass] - curveSum),
                       __min(value, g_TrackGame->ui->bandMaxima[bikeClass][band]));
     g_EditedGarageSettings.eqBands[band] = level;
-    int custom = UnknownDropDownList(FindControl("DDLCurves", 6))->GetRowData(-1) - 3;
+    int custom = DropDownListBox(FindControl("DDLCurves", 6))->GetRowData(-1) - 3;
     g_TrackGame->mode.customGarageCurves[bikeClass][custom][band] = level;
     ShowCurve();
 }
@@ -1137,7 +1137,7 @@ void OptGarageDlg::ShowCurve()
     char text[128];
     int bikeClass = BikeClassOf(g_EditedGarageSettings.engineSize);
     curveSum = 0;
-    int curve = UnknownDropDownList(FindControl("DDLCurves", 6))->GetRowData(-1);
+    int curve = DropDownListBox(FindControl("DDLCurves", 6))->GetRowData(-1);
     if (curve < 3) {
         FindControl("TxtUnused", 0)->Show(0, 1);
         FindControl("HPUnused", 0)->Show(0, 1);

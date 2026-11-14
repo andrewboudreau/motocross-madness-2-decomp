@@ -22384,7 +22384,7 @@ CASES = [
         'symbol': '?ScrollBy@UIListBox@@QAEXH@Z',
         'target_va': '0x00477730',
         'target_size': 190,
-        'reason': 'called from UIScrollCtl slot 60; clamp via UnknownMaxInt',
+        'reason': 'called from UIScrollCtl slot 60; clamp via MaxInt',
     },
     {
         'name': 'gameui.cpp UIListBox::slot56',

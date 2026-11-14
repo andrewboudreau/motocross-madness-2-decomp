@@ -115,7 +115,7 @@ static inline float VectorLength(const Vector3& v) {
     return (float)sqrt(lengthSquared);
 }
 
-static inline Vector3 UnknownScaled(const Vector3& v, float scale) {
+static inline Vector3 ScaledVector(const Vector3& v, float scale) {
     return Vector3(v.x * scale, v.y * scale, v.z * scale);
 }
 
@@ -318,13 +318,13 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
             boxOffset = Vector3(girlOffset.x - 1.22f, 4.0f, girlOffset.z + 1.2f);
             float angle = (float)atan2(direction.x, direction.z);
             D3DRMVectorRotate(&turned, &girlOffset, (Vector3*)&kVec3YAxis, angle);
-            girlOffset = UnknownScaled(turned, VectorLength(girlOffset));
+            girlOffset = ScaledVector(turned, VectorLength(girlOffset));
             ground = point + girlOffset;
             terrain->QueryGround(&ground, 0, 0, 0);
             float height = ground.y - point.y;
             girlPosition = point + girlOffset;
             D3DRMVectorRotate(&turned, &boxOffset, (Vector3*)&kVec3YAxis, angle);
-            boxOffset = UnknownScaled(turned, VectorLength(boxOffset));
+            boxOffset = ScaledVector(turned, VectorLength(boxOffset));
             boxPosition = point + boxOffset;
             girlPosition.y += height;
             boxPosition.y += height;

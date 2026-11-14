@@ -58,7 +58,7 @@ static const Vector3 kVec3YAxis = Vector3(0.0f, 1.0f, 0.0f);
 static const Vector3 kVec3ZAxis = Vector3(0.0f, 0.0f, 1.0f);
 
 // Whether `path` can be opened.
-static inline int UnknownFileExists(const char* path)
+static inline int FileExists(const char* path)
 {
     FILE* file = fopen(path, "r");
     if (file) {
@@ -191,7 +191,7 @@ void PCStartupDlg::HandleEvent(DialogEvent* event)
             // The first free CircuitNNN.pc.
             int number = 1;
             sprintf(path, "%s\\%s\\Circuit%03d.pc", "ui\\profile", g_TrackGame->mode.profileName, number);
-            while (UnknownFileExists(path))
+            while (FileExists(path))
                 sprintf(path, "%s\\%s\\Circuit%03d.pc", "ui\\profile", g_TrackGame->mode.profileName, ++number);
             strcpy(g_TrackGame->careerFile, path);
             g_TrackGame->proCircuit->Save(g_TrackGame->careerFile);

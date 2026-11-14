@@ -87,7 +87,7 @@ Source forms the promoted functions needed (each one byte-exact only this way):
   cases 1, 4, 5, 9 and 10 (the retail index table maps type 2 to default).
 - UIScrollBar `0x004753c0`: `float limit = travel` before the division, so
   the unsigned travel is converted once and held on the FPU stack.
-- UIListBox `ScrollBy` (`0x00477730`): the clamp is `UnknownMaxInt(first, 0)`;
+- UIListBox `ScrollBy` (`0x00477730`): the clamp is `MaxInt(first, 0)`;
   the ternary and `max` forms and the result through another register.
 - UIListBox slot 21 (`0x00478040`): VK_END compares and selects
   `rowCount - 1` twice (VC6 keeps it in a `lea`); a local gives `dec`.
