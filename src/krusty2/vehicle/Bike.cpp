@@ -1550,6 +1550,11 @@ int Bike::EvaluateCrash(float dt, float noseOverLimit, int impact, float impulse
 // 0x004060c0 PARTIAL (1677/1678, one SIB order; docs/NEAR_MISS_INDEX.md).  Session 17:
 // BikeContactDistance for one or both wheel distances (3/5) and BikeWheelDistance in the
 // contact loop (55/79) are worse.
+// Round 15, all 1677 unless noted: i, active or total cleared early (function top or after
+// contactTotal, 12 combinations); `active = 0` before `total = 0.0f` 1676; `last`
+// initialised 71-184; an inline element accessor over (list, i), (i, list), (this, i),
+// (i, this) or a byte offset, in the first, the second or both loops; a list local in
+// the second loop.
 static inline void BikeSteerToward(BikeA640* p, float target, float dt)
 {
     float step = BikeMin(dt, p->l_0x4);

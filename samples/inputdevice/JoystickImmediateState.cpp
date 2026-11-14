@@ -42,6 +42,22 @@
 // `(state.buttons[i] >> 7) == 0` or `& 0x80` (321-326), a `changed` local
 // first (328), `if (previous)` (370), pressed before previous (372) and
 // the member as the argument (348).
+// Round 15, all 453 or worse (retail's rotation is ecx, edx in the release
+// arm, eax, ecx in the press arm and edx, eax, ecx, edx for the POV copies):
+// dead statements take no turn (dead int, member, global or parameter reads
+// before the loop, in it or in the release arm: 373); the axis block and/or
+// the button loop as static inline helpers 373; the tail duplicated with a
+// return in the subtype arm 16 (602 bytes); the two release-time stores
+// chained, the stored zero as the argument (`releaseTime = 0` or an `int
+// time` chain) and the times stored from `pressed` 371-372 (451 with
+// `pressed` as the argument); `pressed` spelled `(b & 0x80) >> 7`, `/ 128`,
+// through casts or a byte/unsigned/int temporary, reassigned, declared
+// before `previous` or with the declaration split 373; `previous != pressed`
+// 372, xor/sub compares 332, a `changed` local 328; argument expressions on
+// the chained copy: `-pressed` 354, `<< 1`/`* 2` 348, `pressed | 0`/`+ 0`
+// 453, `pressed - pressed`, `^` or a comparison 373; release tests `<= 0`
+// 372/452, `< 1` 400/337, `0 == pressed`, `!(pressed != 0)`, `== false`
+// 373/453, `(pressed & 1) == 0` 371/451.
 int PCJoystickDevice::ReadImmediateState(int value) {
     DIJoyState state;
     if (!device)

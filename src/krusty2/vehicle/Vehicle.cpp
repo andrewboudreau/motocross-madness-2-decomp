@@ -2347,6 +2347,17 @@ void Vehicle::PlaceWheels()
 // of the zero vector's constructor (841 each), `Vec3(0.0f)` (837), `wheel->normalLoad =
 // load = 0.0f` (840) and a plain struct assignment with the store on either side (336,
 // lea again).
+// Round 15, also no gain: the SoulTreePhysics 0x00501e90 lever (the dot product kept in
+// wheel->normalLoad with the test, negation and scale reading the member, no `load` local)
+// gives 841 with the zero store first (store after the third temporary load, fstp st(0)
+// two early) and 840 with it last; a `load` local for the test only 841, for the negation
+// only 322; the inverted branch 374.  Every struct-assignment spelling of the zero copy
+// (plain, reference/by-value/wheel helpers, a named zero, a zero-returning inline) gives
+// the same 336 (lea edx, [esi + 0x120]).  Ruler: k stores to an extern int array at the
+// head of the arm sink below all three temporary pairs with the zero store for k = 1..6;
+// at k = 7 the whole function's register allocation changes, and there the store does
+// sit between the y load and the z store as in retail, so the placement is a distance
+// effect of the block, not a statement-order one.
 // Wheel drive and contact impulse pass (tier 3 reading).  Counts the in-contact
 // wheels with a nonzero +0x2a0 and, unless crashed, lets each wheel apply its share of the
 // drive (0x00514170).  Then for every wheel in contact: the load pushing into the ground

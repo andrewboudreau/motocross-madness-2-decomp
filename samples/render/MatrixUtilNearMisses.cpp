@@ -48,6 +48,12 @@
 //   with only the source one), an index loop with `i * stride` (171), the
 //   target cursor stepped first (171), `while (count-- > 0)` (24) and
 //   `for (i = count; i > 0; i--)` (122).
+//   Round 15, all 171: the source and target cursors typed apart (Vector3,
+//   float* or char* each, eight pairings), the last z read through
+//   `(&srcPoint->x)[2]` or a float cast (alone or in every row), the cursor
+//   declarations or increments swapped, the source increment commuted,
+//   through `&srcPoint->x` or as int arithmetic. Retail schedules `add ecx,
+//   edi` right after the product that differs, as the candidate does.
 //
 // TriangleNormal 0x004a11e0 and ViewMatrix 0x004a1500 are exact in
 // src/reconstructed/MatrixUtil.cpp (parenthesised products).

@@ -35,6 +35,14 @@
 // Remap-pass index casts ((unsigned), (unsigned long), (long), (int)) and keep/remap declared as
 // unsigned int*, long* or unsigned long* are inert (1622); (unsigned short) is 1467.  An inline
 // remap helper is 1622 as a for loop, 1470 with a corner local and 1370 as a pointer walk.
+// Round 15, with `remap = 0;` (all 1626 unless noted): keep/remap/corners pointer aliases taken
+// before the loop; each of the other 18 locals cleared before `remap = 0` or after `numTris = 0`
+// (keep, or numCorners before remap, 1622); `numTris = 0` first; a late-folded flag test at
+// four positions (inert, scratch only); inline TreeIsKept accessors in either parameter order,
+// int or bool; `0 !=`, `!!`, `!(== 0)`, `!= false` (`>= 1`/`== true` 1624, `& 1` 1623, `< 1`
+// 1483); a corner local used in one of the three reads (with the test and another read 1478);
+// an `int* corner = &corners[k]` local in four use patterns; the else arm first 1609, a
+// two-step remap 1583, the remap read first 1485.
 void GatherModelTriangles(TreeModelSource* model, TreeSceneNode* frame, int* triCount,
                           int* vertCount, int** indices, TreeVec3** verts)
 {
