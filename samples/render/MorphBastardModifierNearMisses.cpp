@@ -98,6 +98,30 @@
 // 0x004a3c80, 0x004a4c60 have the same code at every count, so their
 // differences are not a declaration-count effect (docs/VC6_OPERAND_ORDER.md
 // section 2).
+// Big-gap pass on 0x004a3c80 (strict 230 -> 564 of 3878, frame 0x1b4 ->
+// 0x1f0 of retail's 0x1fc, `channel` now in ebx like retail). First
+// divergence was the frame size at offset 2 and the register holding
+// `channel` at offset 7, one cause: retail has one from/to/cross/axis set
+// per axis block (tools/frame_layout.py voted two or three retail homes
+// for each of them; offsets below esp+0x1fc: x block from 0x3c, to 0xe0,
+// axis 0x14; y block from 0x10c, to 0xf4, cross 0x124, axis 0x30; z
+// block from 0x118, to 0x100, cross 0x130, axis 0x24; two scalars at
+// 0xec/0xf0). One set reused by all three blocks packs the frame and
+// takes ebx for something else. Partial splits: y and z sharing a set
+// 521, x and y sharing 275, from/to only 440, from/to/axis 548, cross
+// only 240, axis only 354, no axis 483.
+// Left: 0xc of frame. Retail keeps the x block's `to` (controller row 0)
+// as a copy at 0xe0, loaded with from through ecx/edx/eax, and pushes
+// AngleBetween's operands from the copies; VC6 propagates our read-only
+// copy away and pushes from the controller row. Tried on the split base
+// and flat (564-573, frame 0x1f0): AngleBetween through a reference or
+// pointer inline, pointer-taking inline dot/cross helpers, a `toPtr`
+// local, `to = to`, memcpy rows, an inline row getter returning the
+// cast row, the cross product written on the matrix elements. An inline
+// row getter building Vector3(m[r][0], m[r][1], m[r][2]) aligns more
+// instructions (806 of 896 against 770) but copies through x87 where
+// retail uses integer moves and drops strict to 497; the angle taken
+// before the cross product 338.
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -508,38 +532,38 @@ void MorphBastardModifier::ControllerAngles(MorphBastardChannel* channel, Matrix
         angleX = -angleX;
 
     // The y axes.
-    from = *(Vector3*)&identity.m[1][0];
-    to = *(Vector3*)&controller.m[1][0];
-    axis = CrossProduct(&from, &to);
-    angle = AngleBetween(from, to);
-    if (axis.x == 0.0f && axis.y == 0.0f && axis.z == 0.0f)
-        axis = Vector3(0.0f, 1.0f, 0.0f);
+    Vector3 fromY = *(Vector3*)&identity.m[1][0];
+    Vector3 toY = *(Vector3*)&controller.m[1][0];
+    Vector3 axisY = CrossProduct(&fromY, &toY);
+    angle = AngleBetween(fromY, toY);
+    if (axisY.x == 0.0f && axisY.y == 0.0f && axisY.z == 0.0f)
+        axisY = Vector3(0.0f, 1.0f, 0.0f);
     else
-        NormalizeOrZero(axis);
-    AxisAngleMatrix(&rotation, axis.x, axis.y, axis.z, angle);
+        NormalizeOrZero(axisY);
+    AxisAngleMatrix(&rotation, axisY.x, axisY.y, axisY.z, angle);
     CollisionMatrixMultiply(&aligned, &identity, &rotation);
-    cross = CrossProduct(&Matrix4Row(&aligned, 2), &Matrix4Row(&controller, 2));
+    Vector3 crossY = CrossProduct(&Matrix4Row(&aligned, 2), &Matrix4Row(&controller, 2));
     float angleY = AngleBetween(Matrix4Row(&aligned, 2), Matrix4Row(&controller, 2)) *
                    57.2957764f;
-    if (Vec3Dot(&to, &cross) < 0.0f)
+    if (Vec3Dot(&toY, &crossY) < 0.0f)
         angleY = -angleY;
 
     // The z axes.
-    from = Matrix4Row(&identity, 2);
-    to = Matrix4Row(&controller, 2);
-    axis = CrossProduct(&from, &to);
-    angle = AngleBetween(from, to);
-    if (axis.x == 0.0f && axis.y == 0.0f && axis.z == 0.0f)
-        axis = Vector3(0.0f, 0.0f, 1.0f);
+    Vector3 fromZ = Matrix4Row(&identity, 2);
+    Vector3 toZ = Matrix4Row(&controller, 2);
+    Vector3 axisZ = CrossProduct(&fromZ, &toZ);
+    angle = AngleBetween(fromZ, toZ);
+    if (axisZ.x == 0.0f && axisZ.y == 0.0f && axisZ.z == 0.0f)
+        axisZ = Vector3(0.0f, 0.0f, 1.0f);
     else
-        NormalizeOrZero(axis);
-    AxisAngleMatrix(&rotation, axis.x, axis.y, axis.z, angle);
+        NormalizeOrZero(axisZ);
+    AxisAngleMatrix(&rotation, axisZ.x, axisZ.y, axisZ.z, angle);
     CollisionMatrixMultiply(&aligned, &identity, &rotation);
-    cross = CrossProduct(&Matrix4Row(&aligned, 0), &Matrix4Row(&controller, 0));
+    Vector3 crossZ = CrossProduct(&Matrix4Row(&aligned, 0), &Matrix4Row(&controller, 0));
     Vec3Dot(&Matrix4Row(&aligned, 0), &Matrix4Row(&controller, 0));
     float angleZ = AngleBetween(Matrix4Row(&aligned, 0), Matrix4Row(&controller, 0)) *
                    57.2957764f;
-    if (Vec3Dot(&to, &cross) < 0.0f)
+    if (Vec3Dot(&toZ, &crossZ) < 0.0f)
         angleZ = -angleZ;
 
     channel->currentValue = -angleX;
