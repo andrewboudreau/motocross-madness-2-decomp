@@ -940,7 +940,9 @@ try on similar code. None is a rule.
   sums row x x-first, later uses sum every row x-first, and direct uses keep
   the reverse source order. Term order inside the helper does not move it. A
   sweep over the 2^n direct/`xf` choices per call (n = 8) found both
-  functions' best forms.
+  functions' best forms. HullVsHull later became exact (962/962) without
+  `xf`: the contact normal is copied by value into a `normal` local and all
+  three rotations use the one helper; the same form scores 176 in HullVsHullSwept.
 
 ## Levers from session 14
 
