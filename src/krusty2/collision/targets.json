@@ -476,7 +476,7 @@
     "target_va": "0x00437ef0",
     "target_size": 906,
     "expect": "partial",
-    "notes": "847/906: swept variant; the model box is copied into locals that 0x004290d0 grows in place, then stored to +0x108/+0x114 and passed by value (frame 0x7c like retail); mean as ModelVsHull. Left: scheduling of the two box copies, one push and the mean copy registers.",
+    "notes": "847/906: swept variant; the model box is copied into locals that 0x004290d0 grows in place, then stored to +0x108/+0x114 and passed by value (frame 0x7c like retail); mean as ModelVsHull. Left: scheduling of the two box copies, one push and the mean copy registers. Session 24: tools/frame_layout.py reports the candidate slot order equal to retail's; the center +9 / half +8 / sum +5 / count +1 use-count suggestion is an artifact. The diffs are the load/store pairing of the center and half copies and one `sub esp, 0xc`. Vec3-typed locals by initialiser or assignment are inert (857); a pointer-indexed copy 404, a constructor from components 402, a memberwise copy 414. 0..8 dead initialised locals are inert.",
     "bindings": "CollisionObject.bindings.json"
   },
   {

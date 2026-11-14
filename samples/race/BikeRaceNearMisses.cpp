@@ -1020,6 +1020,13 @@ static inline UnknownBikeRaceUiModel& UiRider(int i) {
 }
 
 // 0x00419970
+// Declaration-count window (session 24, after the PCVideoCard field split): k typedefs
+// prepended to this unit give only 13390 or 13396 of 13428 for k = 0..63; 13396 at k = 5, 6,
+// 7, 9, 10, 17, 20, 22, 23, 24, 29..32, 34, 36, 41, 42, 44, 48, 49, 53, 54 and 60.  The count
+// alone therefore cannot make the function exact: the other 32 bytes are independent of it.
+// With CreateRacers compiled in retail address order (src/reconstructed/BikeRace.cpp through
+// the destructor, then Create, the helpers and this function) k = 0 is still 13390 and 13396
+// needs k = 6..11 or 16 (scanned 0..16).  No evidence-backed declaration was found to add.
 int BikeRace::CreateRacers(void* owner, LightManager* lights, TextureContext* textures,
                                     UnknownBikeRaceProjector* terrain, RaceGateEvent* event) {
     char path[0x104];
