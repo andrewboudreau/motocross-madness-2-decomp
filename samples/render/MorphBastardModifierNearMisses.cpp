@@ -39,6 +39,11 @@
 // base 1634); writing every product's operands the other way round
 // changes nothing.
 //
+// s22, leaf-age copies in the channel inverse: m[0][0] and/or m[0][1]
+// copied into float locals before the Vector3 (retail loads them before
+// m[3][0] in the x and y sums) cost a 5-byte spill each and move the frame
+// (masked 1146-1175 of 1743, base 1638 of 1738); m[3][0] in a local 910-930.
+//
 // MorphBastardModifier::ModifyMesh (0x004a4c60, 1568 bytes): blends
 // the target deltas of every channel into the copied mesh. The control flow,
 // calls and the signed /32 vertex base match; register allocation of the

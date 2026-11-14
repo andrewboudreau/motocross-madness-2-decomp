@@ -5,6 +5,10 @@
 // rect.left + ..., a per-branch length, a racer local in the "%.3f" branch, a (double)
 // cast, `!= 0`, one or two dead int locals in the cue or the else branch (so not a
 // round-robin register state); dropping the inner `size` shadow is worse (933).
+// s22, also 966: the scale through an inline accessor (pointer, reference or double
+// result), a float or double local, `(*racers[index]).`, `(*(racers + index))->`,
+// `this->racers`, a `char*` alias of `text`, `&text[0]`, the format in a local and a
+// TrackGame local in the positions block; without the position branch's racer local 964.
 #include <stdio.h>
 #include <string.h>
 #include "../../src/reconstructed/TrackOverlay.h"

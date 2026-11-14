@@ -38,6 +38,12 @@
 //   locals (SoultreeObject::WorldToLocalDirection), these indirect operands
 //   are not aged by code that VC6 removes (session 18).
 //
+//   Leaf-age copies (s22, the form that made Griddraw 0x0047e600 exact): one
+//   operand of a z-row product copied into a float local just before the
+//   row is a live local here, not a folded one: m[2][2] 147, srcPoint->z
+//   121, both 115, the x or y operands or the translation 113..142, and
+//   m[2][2] copied at the loop top or before the loop 53 and 39.
+//
 // TriangleNormal 0x004a11e0 and ViewMatrix 0x004a1500 are exact in
 // src/reconstructed/MatrixUtil.cpp (parenthesised products).
 // k-scan (s22): compiled behind 0..63 prepended typedefs, 0x004a1a50 has the

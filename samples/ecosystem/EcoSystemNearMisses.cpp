@@ -45,7 +45,26 @@
 //               the `j` spill store; parentheses on the angle, the cos/sin
 //               casts and products and the height (216 combinations), a
 //               `(float)j`, every order of the five loop statements and
-//               split cos/sin locals give 1105 or (mostly much) worse
+//               split cos/sin locals give 1105 or (mostly much) worse.
+//               s22: retail holds the height in edx from the top of the
+//               body to the store after the z stores, so it is read early
+//               and carried in an integer register. A float local read at
+//               the top of the body (block or function scope, register,
+//               const, a one-member struct, a Vector3 member or a
+//               one-element array) is carried on the x87 stack instead
+//               (`fld` before the fild, `fstp` for the store; same size);
+//               read after the angle it spills the angle (10 bytes
+//               longer). Inline helpers do the same or worse: a y setter
+//               (reference or pointer), a top/bottom y setter, a rim
+//               helper taking the angle, the radius or the shape and the
+//               height by value in every parameter order (48 forms), one
+//               taking x, y and z by value in every order (24 forms; the
+//               height then goes through an integer register and a frame
+//               slot, 10 to 22 bytes longer), Vector3 constructor forms
+//               (62 bytes longer) and a height accessor. An int-typed
+//               carrier (evidence only) reproduces this loop but flips
+//               `start.x + vertices[j].x` in the next loop, so the two
+//               loops are coupled through the age of their leaves.
 //   0x00458da0  four `[eax + esi]` operands come out as `[esi + eax]`
 //               (457/461). Also unchanged: inline helpers for the
 //               terminator, the clamped copy, the length clamp or the
