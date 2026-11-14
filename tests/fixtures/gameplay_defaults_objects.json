@@ -14,7 +14,7 @@
     "src/krusty2/vehicle/Vehicle.cpp": {
       "sections": 151,
       "relocations": 720,
-      "sha256": "7ee608b98e4f31011dac1f7c45f39fcf28fa263eaeda3692fbdc11418e14c10a"
+      "sha256": "0142aaed9acaeb921eb9095c99ff10856e32cda254363d98617db7d965cbcf3d"
     },
     "src/reconstructed/VehicleDefaults.cpp": {
       "sections": 13,

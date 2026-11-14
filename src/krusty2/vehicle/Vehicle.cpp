@@ -396,11 +396,17 @@ static inline float VehAbs(float x)
 // (arg c, or the average wheel contact normal) is projected perpendicular to the axis and
 // normalised; the angle is asin(|axis-perp-normal x right-vector-side|) signed by the
 // handedness, stored in leanAngle; its cosine goes to leanCos when b is set.
-// 0x005286a0 PARTIAL (754/784): 7 frame-slot and 6 operand-order differences.  Session 17:
+// 0x005286a0 PARTIAL (762/784): two products of the side cross load their multiplicands in
+// the other order (retail x row side.y * forward.z, y row forward.x * side.z).  Session 17:
 // pointer parameters to VehCross56 are inert; a reference or pointer to sideAxis or
 // *forward, the VehV3 Cross/CrossB members (15) and the cross written out with or without
-// a component alias (44..50, size 765) are worse.  As a diagnostic, 0..15 dead locals fix
-// at most one more cross row (11) and never the frame slots.
+// a component alias (44..50, size 765) are worse.
+// The four named intermediates (facing, root, sine, cosine) are worth 754 -> 762.  What the
+// bytes show is their number, not which values are named: the score follows the count of
+// initialised locals with period 8 (0..7 extra: 754 750 758 758 762 762 762 746), the same
+// for dead locals at every statement position and for any four of seven named values or
+// constants tried, and no count fixes the last two products (all 64 operand orders and
+// parenthesisations of the cross are inert at this count too).
 static inline float VehDotI(const Vec3* a, const Vec3* b)
 {
     return a->y * b->y + a->x * b->x + a->z * b->z;
@@ -454,18 +460,22 @@ void Vehicle::UpdateLeanFromNormal(Vec3* forward, int updateLeanCos, Vec3* up)
         Vec3 side = VehNormalizedD(scratchVector);
         scratchVector = ((VehV3&)scratchVector2).Cross(side);
         float sign = -1.0f;
-        if (VehDotG(*forward, scratchVector) < 0.0f)
+        float facing = VehDotG(*forward, scratchVector);
+        if (facing < 0.0f)
             sign = 1.0f;
         float len2 = VehLen2(scratchVector);
         float len;
         if (len2 != 1.0f) {
-            len = VehMinF56((float)sqrt(len2), 1.0f);
+            float root = (float)sqrt(len2);
+            len = VehMinF56(root, 1.0f);
         } else
             len = 1.0f;
-        double angle = asin(len * sign);
+        float sine = len * sign;
+        double angle = asin(sine);
         leanAngle = (float)angle;
+        float cosine = (float)cos(angle);
         if (updateLeanCos)
-            leanCos = (float)cos(angle);
+            leanCos = cosine;
         return;
     }
     leanAngle = savedRoll;
