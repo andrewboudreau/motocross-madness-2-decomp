@@ -211,7 +211,7 @@
   "?OnEnable@GameObject@@UAEXXZ": "0x00469070",
   "?SetRenderContext@GameObject@@UAEPAV1@PAX@Z": "0x004692f0",
   "?SetRenderContext@HiResMeter@@UAEPAVGameObject@@PAX@Z": "0x00488440",
-  "?UnknownVirtualSlot9@GameObject@@UAEHH@Z": "0x00469430",
+  "?PreTick@GameObject@@UAEHH@Z": "0x00469430",
   "?g_MemTagStack@@3PAVMemTagStack@@A": "0x0056df04",
   "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
   "?g_TickTime@@3HA": "0x0065b534",

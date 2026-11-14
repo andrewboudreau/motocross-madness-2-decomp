@@ -59,7 +59,7 @@
   "?OnEnable@GameObject@@UAEXXZ": "0x00469070",
   "?SetRenderContext@GameObject@@UAEPAV1@PAX@Z": "0x004692f0",
   "?SetRenderContext@LightManager@@UAEPAVGameObject@@PAX@Z": "0x004452e0",
-  "?UnknownVirtualSlot9@GameObject@@UAEHH@Z": "0x00469430",
+  "?PreTick@GameObject@@UAEHH@Z": "0x00469430",
   "_$E1": "0x0049dd40",
   "_$E10": "0x0049de30",
   "_$E11": "0x0049de20",

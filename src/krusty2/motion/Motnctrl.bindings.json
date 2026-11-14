@@ -85,7 +85,7 @@
   "?OnDisable@GameObject@@UAEXXZ": "0x00469050",
   "?OnEnable@GameObject@@UAEXXZ": "0x00469070",
   "?SetRenderContext@GameObject@@UAEPAV1@PAX@Z": "0x004692f0",
-  "?UnknownVirtualSlot9@GameObject@@UAEHH@Z": "0x00469430",
+  "?PreTick@GameObject@@UAEHH@Z": "0x00469430",
   "?GetFloat@ParameterBlock@@QAEHPBDMPAM@Z": "0x004b7f40",
   "?GetInt@ParameterBlock@@QAEHPBDHPAH@Z": "0x004b7f10",
   "?GetString@ParameterBlock@@QAEHPBD0PADH@Z": "0x004b7ec0",

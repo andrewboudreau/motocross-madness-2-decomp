@@ -152,7 +152,7 @@
   "?Enable@GameObject@@UAEXXZ": "0x004690b0",
   "?OnDisable@GameObject@@UAEXXZ": "0x00469050",
   "?OnEnable@GameObject@@UAEXXZ": "0x00469070",
-  "?UnknownVirtualSlot9@GameObject@@UAEHH@Z": "0x00469430",
+  "?PreTick@GameObject@@UAEHH@Z": "0x00469430",
   "__except_list": "0x00000000",
   "?Release@UIDialog@@UAEHXZ": "0x0046a010",
   "?RenderPre3D@UIDialog@@UAEHXZ": "0x0046f1c0",

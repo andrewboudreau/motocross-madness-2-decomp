@@ -201,7 +201,7 @@ struct VehicleSparkEmitter {
     virtual void UnknownVirtualSlot0(); virtual void AddRef(); virtual void Release();
     virtual void GetRefCount(); virtual void Disable(); virtual void Enable();
     virtual void OnDisable(); virtual void OnEnable(); virtual void SetRenderContext();
-    virtual void UnknownVirtualSlot9(); virtual void Tick(); virtual void Step();
+    virtual void PreTick(); virtual void Tick(); virtual void Step();
     virtual void PrepareGeometry(); virtual void RenderPre3D(); virtual void Render3D();
     virtual void RenderPost3D(); virtual void SetPaused(); virtual void OnDeactivate();
     virtual void OnActivate(); virtual void OnInputEvent(); virtual void OnChar();

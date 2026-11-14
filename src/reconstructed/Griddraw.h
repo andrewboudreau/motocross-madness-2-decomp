@@ -306,7 +306,7 @@ public:
                                       void* boundsMin, void* boundsMax) { return 0; }   // 0x004806e0
     virtual void SelectTexture(float a) {}                // 0x004806f0 (shared)
     virtual void RequestTextureSize(int a) {}                  // 0x004806f0 (shared)
-    virtual void UnknownVirtualSlot5(FileStream* stream) {} // 0x004806f0 (shared)
+    virtual void ReadExtraData(FileStream* stream) {} // 0x004806f0 (shared)
     virtual void BindNodeTexture() {}                       // 0x0044d710 (shared)
     virtual void BindBlockTexture(int a) {}                  // 0x004806f0 (shared)
     virtual int GetBlockTextureSize(int a) { return 0; }        // 0x004da550 (shared)

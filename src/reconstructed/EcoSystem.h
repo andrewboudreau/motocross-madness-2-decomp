@@ -125,7 +125,7 @@ public:
     virtual void OnDisable();
     virtual void OnEnable();
     virtual void SetRenderContext();
-    virtual void UnknownVirtualSlot9();
+    virtual void PreTick();
     virtual void Tick();
     virtual void Step();
     virtual void PrepareGeometry();

@@ -17,7 +17,7 @@ from tools.match import compare
 ROOT = Path(__file__).resolve().parents[1]
 PROVIDERS = (
     ('ZoneInterfaceLifetime', '??0MSZoneInterfaceBase@@QAE@XZ', 0x4676a0, 16),
-    ('BackgroundImageHooks', '?UnknownVirtualSlot27@BackgroundImage@@UAEHPAUDirectDrawSurface@@@Z', 0x4627f0, 8),
+    ('BackgroundImageHooks', '?DrawBackground@BackgroundImage@@UAEHPAUDirectDrawSurface@@@Z', 0x4627f0, 8),
 )
 
 

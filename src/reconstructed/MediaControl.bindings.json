@@ -46,7 +46,7 @@
   "?OnDisable@GameObject@@UAEXXZ": "0x00469050",
   "?OnEnable@GameObject@@UAEXXZ": "0x00469070",
   "?SetRenderContext@GameObject@@UAEPAV1@PAX@Z": "0x004692f0",
-  "?UnknownVirtualSlot9@GameObject@@UAEHH@Z": "0x00469430",
+  "?PreTick@GameObject@@UAEHH@Z": "0x00469430",
   "_CLSID_FilterGraph": "0x00558ee0",
   "_IID_IGraphBuilder": "0x00558ef0",
   "__except_list": "0x00000000",

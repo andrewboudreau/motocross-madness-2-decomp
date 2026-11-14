@@ -489,7 +489,7 @@
   "?OnDisable@GameObject@@UAEXXZ": "0x00469050",
   "?OnEnable@GameObject@@UAEXXZ": "0x00469070",
   "?SetRenderContext@GameObject@@UAEPAV1@PAX@Z": "0x004692f0",
-  "?UnknownVirtualSlot9@GameObject@@UAEHH@Z": "0x00469430",
+  "?PreTick@GameObject@@UAEHH@Z": "0x00469430",
   "?UpdateBoundValues@UIDialog@@QAEXH@Z": "0x0046ecc0",
   "?UpdateBoundValues@UIDialog@@QAEXH@Z$ehhandler": "0x0054b04b",
   "?UpdateScrollBars@UIListBox@@QAEXXZ": "0x00477bc0",

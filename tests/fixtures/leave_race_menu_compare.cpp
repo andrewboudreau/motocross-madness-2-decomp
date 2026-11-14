@@ -68,7 +68,7 @@ int GameObject::AppendSibling(GameObject* child,int value){Fail(88);return 0;}
 #define FAIL_VOID(cls,name,args) void cls::name args {Fail(88);}
 FAIL_VOID(GameObject,Disable,()) FAIL_VOID(GameObject,Enable,())
 FAIL_VOID(GameObject,OnDisable,()) FAIL_VOID(GameObject,OnEnable,())
-FAIL_INT(GameObject,UnknownVirtualSlot9,(int)) FAIL_INT(GameObject,Tick,(float))
+FAIL_INT(GameObject,PreTick,(int)) FAIL_INT(GameObject,Tick,(float))
 FAIL_INT(GameObject,Step,(float)) FAIL_INT(GameObject,PrepareGeometry,())
 FAIL_INT(GameObject,RenderPre3D,()) FAIL_INT(GameObject,Render3D,()) FAIL_INT(GameObject,RenderPost3D,())
 FAIL_INT(GameObject,SetPaused,(int)) FAIL_INT(GameObject,OnDeactivate,()) FAIL_INT(GameObject,OnActivate,())

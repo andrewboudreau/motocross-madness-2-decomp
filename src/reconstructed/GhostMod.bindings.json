@@ -35,7 +35,7 @@
   "?OnDisable@GameObject@@UAEXXZ": "0x00469050",
   "?OnEnable@GameObject@@UAEXXZ": "0x00469070",
   "?SetRenderContext@D3DIMSoultreeModifier@@UAEPAVGameObject@@PAX@Z": "0x004452e0",
-  "?UnknownVirtualSlot9@GameObject@@UAEHH@Z": "0x00469430",
+  "?PreTick@GameObject@@UAEHH@Z": "0x00469430",
   "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
   "__ftol": "0x00534a88",
   "__real@4@00000000000000000000": "0x00550484",

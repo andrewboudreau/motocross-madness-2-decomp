@@ -299,7 +299,7 @@
   "?OnEnable@GameObject@@UAEXXZ": "0x00469070",
   "?OnEnable@Scene@@UAEXXZ": "0x004eaab0",
   "?SetRenderContext@GameObject@@UAEPAV1@PAX@Z": "0x004692f0",
-  "?UnknownVirtualSlot9@GameObject@@UAEHH@Z": "0x00469430",
+  "?PreTick@GameObject@@UAEHH@Z": "0x00469430",
   "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
   "?g_NonBladeLodSettings@@3PAUSoultreeLodSetting@@A": "0x00574428",
   "?g_BladeLodSettings@@3PAUSoultreeLodSetting@@A": "0x005744c8",

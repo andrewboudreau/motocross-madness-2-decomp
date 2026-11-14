@@ -11,15 +11,15 @@
 // count, and exhaustion/Stop decrements it; mutation methods test it before work.
 int g_ActiveGameObjectIterators;
 
-// Object at owner(field_0x18)+0x04 used by slot 10: byte +0x70 bit 2 gates a
-// call to its virtual slot 4.
-class UnknownGameObjectOwnerPart {
+// The render target's display (RenderTarget +0x04, a VideoCard) as Tick sees
+// it: +0x70 bit 2 (lastFlipFailed) gates a RetryFlip(0) call (slot 4).
+class RenderTargetDisplayView {
 public:
     virtual void UnknownVirtualSlot0();
-    virtual void UnknownVirtualSlot1();
-    virtual void UnknownVirtualSlot2();
-    virtual void UnknownVirtualSlot3();
-    virtual void UnknownVirtualSlot4(int value);
+    virtual void ReleaseResources();
+    virtual void SetDisplayMode();
+    virtual void Present();
+    virtual void RetryFlip(int value);
 };
 
 // Methods from gameobj.cpp, in retail address order. Child walks visit
@@ -146,11 +146,11 @@ int GameObject::Tick(float frameTime) {
         for (GameObject* child = firstChild; child; child = child->nextSibling) {
             if (child->isEnabled && !child->isPaused && !child->pendingRelease) {
                 child->Tick(frameTime);
-                char* owner = static_cast<char*>(renderContext);
-                if (owner) {
-                    UnknownGameObjectOwnerPart* part = *reinterpret_cast<UnknownGameObjectOwnerPart**>(owner + 0x04);
-                    if (reinterpret_cast<unsigned char*>(part)[0x70] & 0x04)
-                        part->UnknownVirtualSlot4(0);
+                char* target = static_cast<char*>(renderContext);
+                if (target) {
+                    RenderTargetDisplayView* display = *reinterpret_cast<RenderTargetDisplayView**>(target + 0x04);
+                    if (reinterpret_cast<unsigned char*>(display)[0x70] & 0x04)
+                        display->RetryFlip(0);
                 }
             }
         }
@@ -159,11 +159,11 @@ int GameObject::Tick(float frameTime) {
 }
 
 // 0x00469430
-int GameObject::UnknownVirtualSlot9(int value) {
+int GameObject::PreTick(int value) {
     if (childFlags & 0x01) {
         for (GameObject* child = firstChild; child; child = child->nextSibling) {
             if (child->isEnabled && !child->isPaused && !child->pendingRelease)
-                child->UnknownVirtualSlot9(value);
+                child->PreTick(value);
         }
     }
     return 1;

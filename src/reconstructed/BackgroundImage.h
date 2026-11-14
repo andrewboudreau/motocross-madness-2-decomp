@@ -41,9 +41,9 @@ public:
     virtual int RenderPre3D();            // 0x00403dc0: restores the background
     virtual int RenderPost3D();           // 0x00403ec0: draws the image
     virtual int OnActivate();             // 0x00404de0
-    // Slot 27 (shared `return 1` body 0x004627f0): called with the surface
-    // the background is restored into.
-    virtual int UnknownVirtualSlot27(DirectDrawSurface* surface);
+    // Slot 27 (shared `return 1` body 0x004627f0): draws the background into
+    // `surface` (the off-screen copy, or the target for a full restore).
+    virtual int DrawBackground(DirectDrawSurface* surface);
 
     void SetImage(PCTextureMap* image);                // 0x004040b0: sets the image
     int AllocRegion(int owner);               // 0x004040f0: allocates a region

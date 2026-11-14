@@ -86,7 +86,7 @@
   "?OnDisable@GameObject@@UAEXXZ": "0x00469050",
   "?OnEnable@GameObject@@UAEXXZ": "0x00469070",
   "?SetRenderContext@GameObject@@UAEPAV1@PAX@Z": "0x004692f0",
-  "?UnknownVirtualSlot9@GameObject@@UAEHH@Z": "0x00469430",
+  "?PreTick@GameObject@@UAEHH@Z": "0x00469430",
   "?CrossProductCall@@YA?AUVec3@@ABU1@0@Z": "0x00515600",
   "?Vec3Normalize@@YA?AUVec3@@ABU1@@Z": "0x005087b0",
   "?WreckerSubtractValue@@YA?AUVector3@@ABU1@0@Z": "0x00421d00",

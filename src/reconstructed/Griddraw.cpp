@@ -307,7 +307,7 @@ allocated:
     extent.z = center.z - data->gridMinZ * terrain->gridCellSize;
     if (parent)
         terrain = parent->terrain;
-    UnknownVirtualSlot5(stream);
+    ReadExtraData(stream);
     if (loadChildren && childListOffset) {
         childOffsets = new (__FILE__, 776) int[256];
         children = new (__FILE__, 777) GridNode*[256];

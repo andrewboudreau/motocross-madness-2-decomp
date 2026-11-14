@@ -25,9 +25,9 @@ int main() {
         memcpy(imageExpected.bytes, image.bytes, sizeof(image.bytes));
         BackgroundImage* background = reinterpret_cast<BackgroundImage*>(image.bytes + 16);
         // Qualified call tests this exact default without invoking an invented vtable.
-        if (background->BackgroundImage::UnknownVirtualSlot27(0) != 1 ||
-            background->BackgroundImage::UnknownVirtualSlot27(reinterpret_cast<DirectDrawSurface*>(1)) != 1 ||
-            background->BackgroundImage::UnknownVirtualSlot27(reinterpret_cast<DirectDrawSurface*>(image.bytes)) != 1)
+        if (background->BackgroundImage::DrawBackground(0) != 1 ||
+            background->BackgroundImage::DrawBackground(reinterpret_cast<DirectDrawSurface*>(1)) != 1 ||
+            background->BackgroundImage::DrawBackground(reinterpret_cast<DirectDrawSurface*>(image.bytes)) != 1)
             return 2;
         if (memcmp(image.bytes, imageExpected.bytes, sizeof(image.bytes))) return 3;
     }

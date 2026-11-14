@@ -1026,7 +1026,7 @@
         },
         {
           "slot": 9,
-          "symbol": "?UnknownVirtualSlot9@GameObject@@UAEHH@Z",
+          "symbol": "?PreTick@GameObject@@UAEHH@Z",
           "va": "0x469430",
           "source": "src/reconstructed/GameObject.cpp",
           "extent": 65,
@@ -1231,7 +1231,7 @@
         },
         {
           "slot": 9,
-          "symbol": "?UnknownVirtualSlot9@GameObject@@UAEHH@Z",
+          "symbol": "?PreTick@GameObject@@UAEHH@Z",
           "va": "0x469430",
           "source": "src/reconstructed/GameObject.cpp",
           "extent": 65,
@@ -1436,7 +1436,7 @@
         },
         {
           "slot": 9,
-          "symbol": "?UnknownVirtualSlot9@GameObject@@UAEHH@Z",
+          "symbol": "?PreTick@GameObject@@UAEHH@Z",
           "va": "0x469430",
           "source": "src/reconstructed/GameObject.cpp",
           "extent": 65,
@@ -1641,7 +1641,7 @@
         },
         {
           "slot": 9,
-          "symbol": "?UnknownVirtualSlot9@GameObject@@UAEHH@Z",
+          "symbol": "?PreTick@GameObject@@UAEHH@Z",
           "va": "0x469430",
           "source": "src/reconstructed/GameObject.cpp",
           "extent": 65,

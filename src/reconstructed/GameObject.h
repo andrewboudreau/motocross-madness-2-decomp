@@ -46,13 +46,13 @@ public:
     // Slot 11 is Step: Wrecker slot 10 calls slot 11 of its gravity model, rigid
     // body and collision model with the sub-step length, and the physics models'
     // Tick overrides call their own slot 11 with the frame time.
-    // Slot 9 keeps a placeholder name; slot 19 is named after Game slot 12, its only caller (tier 3).
+    // Slot 9 (PreTick) is Tick's walk without a caller (tier 3); slot 19 is named after Game slot 12 (tier 3).
     virtual void Disable();
     virtual void Enable();
     virtual void OnDisable();
     virtual void OnEnable();
     virtual GameObject* SetRenderContext(void* context);
-    virtual int UnknownVirtualSlot9(int value);
+    virtual int PreTick(int value);
     virtual int Tick(float frameTime);
     // Physics overrides 0x0043ba70 and 0x004f9890 consume a float timestep;
     // the shared base body 0x004da540 ignores its four-byte argument.

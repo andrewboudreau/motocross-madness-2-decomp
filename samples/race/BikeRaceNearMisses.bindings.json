@@ -285,7 +285,7 @@
   "?OnDisable@GameObject@@UAEXXZ": "0x00469050",
   "?OnEnable@GameObject@@UAEXXZ": "0x00469070",
   "?SetRenderContext@GameObject@@UAEPAV1@PAX@Z": "0x004692f0",
-  "?UnknownVirtualSlot9@GameObject@@UAEHH@Z": "0x00469430",
+  "?PreTick@GameObject@@UAEHH@Z": "0x00469430",
   "?g_MemTagStack@@3PAVMemTagStack@@A": "0x0056df04",
   "?g_LodDebugSelectedRow@@3HA": "0x00567a88",
   "?g_BikeClassEngineSizes@@3PAHA": "0x0056cb6c",
