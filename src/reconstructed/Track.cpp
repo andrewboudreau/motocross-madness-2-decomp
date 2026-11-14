@@ -917,10 +917,10 @@ int Track::SegmentDirection(TrackSegment* segment, TrackVec3* out)
 // (0x00415326, 0x0041535c).
 int Track::DistanceToStripEdge(TrackVec3 p, TrackSegment* segment, float* out, int mode)
 {
-    TrackVec3 a;
-    TrackVec3 d;
-    TrackVec3 a2;
-    TrackVec3 d2;
+    TrackVec3 startA;
+    TrackVec3 directionA;
+    TrackVec3 startB;
+    TrackVec3 directionB;
     TrackVec3 n;
     TrackVec3 q;
     float t;
@@ -930,58 +930,58 @@ int Track::DistanceToStripEdge(TrackVec3 p, TrackSegment* segment, float* out, i
     TrackSegment* next = segment->next;
     switch (mode) {
     case 17:
-        a = *(TrackVec3*)&segment->edgeAX;
-        d = *(TrackVec3*)&next->edgeAX - *(TrackVec3*)&segment->edgeAX;
-        a2 = *(TrackVec3*)&segment->edgeBX;
-        d2 = *(TrackVec3*)&next->edgeBX - *(TrackVec3*)&segment->edgeBX;
+        startA = *(TrackVec3*)&segment->edgeAX;
+        directionA = *(TrackVec3*)&next->edgeAX - *(TrackVec3*)&segment->edgeAX;
+        startB = *(TrackVec3*)&segment->edgeBX;
+        directionB = *(TrackVec3*)&next->edgeBX - *(TrackVec3*)&segment->edgeBX;
         break;
     case 11:
-        a = *(TrackVec3*)&segment->edgeBX;
-        d = *(TrackVec3*)&next->edgeBX - *(TrackVec3*)&segment->edgeBX;
+        startA = *(TrackVec3*)&segment->edgeBX;
+        directionA = *(TrackVec3*)&next->edgeBX - *(TrackVec3*)&segment->edgeBX;
         break;
     case 10:
-        a = *(TrackVec3*)&segment->edgeAX;
-        d = *(TrackVec3*)&next->edgeAX - *(TrackVec3*)&segment->edgeAX;
+        startA = *(TrackVec3*)&segment->edgeAX;
+        directionA = *(TrackVec3*)&next->edgeAX - *(TrackVec3*)&segment->edgeAX;
         break;
     }
-    if (d.x == 0.0f && d.z == 0.0f) {
-        if (d.y == 0.0f)
+    if (directionA.x == 0.0f && directionA.z == 0.0f) {
+        if (directionA.y == 0.0f)
             return 0;
-        n.x = d.z;
-        n.z = -d.y;
-        IntersectLines(a.y, a.z, d.y, d.z, p.y, p.z, n.x, n.z, &t, &u);
+        n.x = directionA.z;
+        n.z = -directionA.y;
+        IntersectLines(startA.y, startA.z, directionA.y, directionA.z, p.y, p.z, n.x, n.z, &t, &u);
     } else {
-        n.x = d.z;
-        n.z = -d.x;
-        IntersectLines(a.x, a.z, d.x, d.z, p.x, p.z, n.x, n.z, &t, &u);
+        n.x = directionA.z;
+        n.z = -directionA.x;
+        IntersectLines(startA.x, startA.z, directionA.x, directionA.z, p.x, p.z, n.x, n.z, &t, &u);
     }
     if (t < 0.0f)
         t = 0.0f;
     else if (t > 1.0f)
         t = 1.0f;
-    d = d * t;
-    a += d;
-    a.x -= p.x;
-    a.y -= p.y;
-    a.z -= p.z;
-    *out = a.x * a.x + a.z * a.z;
+    directionA = directionA * t;
+    startA += directionA;
+    startA.x -= p.x;
+    startA.y -= p.y;
+    startA.z -= p.z;
+    *out = startA.x * startA.x + startA.z * startA.z;
     if (mode == 17) {
-        if (d2.x == 0.0f && d2.z == 0.0f) {
-            if (d2.y == 0.0f)
+        if (directionB.x == 0.0f && directionB.z == 0.0f) {
+            if (directionB.y == 0.0f)
                 return 0;
-            n.x = d2.z;
-            n.z = -d2.y;
-            IntersectLines(a2.y, a2.z, d2.y, d2.z, p.y, p.z, n.x, n.z, &t, &u);
+            n.x = directionB.z;
+            n.z = -directionB.y;
+            IntersectLines(startB.y, startB.z, directionB.y, directionB.z, p.y, p.z, n.x, n.z, &t, &u);
         } else {
-            n.x = d2.z;
-            n.z = -d2.x;
-            IntersectLines(a2.x, a2.z, d2.x, d2.z, p.x, p.z, n.x, n.z, &t, &u);
+            n.x = directionB.z;
+            n.z = -directionB.x;
+            IntersectLines(startB.x, startB.z, directionB.x, directionB.z, p.x, p.z, n.x, n.z, &t, &u);
         }
         if (t < 0.0f)
             t = 0.0f;
         else if (t > 1.0f)
             t = 1.0f;
-        q = d2 * t + a2;
+        q = directionB * t + startB;
         float dx = q.x - p.x;
         float dz = q.z - p.z;
         u = dx * dx;
