@@ -95,6 +95,9 @@
 // together they raise the linked masked metric from 0.891 to 0.898 (this copy:
 // 473 differing, 1422 aligned).
 //
+// k-scan (s22): compiled behind 0..63 prepended typedefs, 0x00440f30,
+// 0x00443aa0 have the same code at every count, so their differences are not
+// a declaration-count effect (docs/VC6_OPERAND_ORDER.md section 2).
 #include "../../src/reconstructed/D3DIMSoulTree.h"
 #include "../../src/reconstructed/Camera.h"
 #include "../../src/reconstructed/D3DIMSoultreeModifier.h"

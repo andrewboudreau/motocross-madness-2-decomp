@@ -12,6 +12,10 @@
 // and computes proj + q with fxch/fadd instead of fld/faddp st(2).
 // Declaration order, operand order of the distance sums and the store order
 // of the result do not change it.
+// k-scan (s22): compiled behind 0..63 prepended typedefs, 0x00519a20,
+// 0x0051bed0, 0x0051c4f0, 0x0051c720, 0x0051d730, 0x0051e3f0 have the same
+// code at every count, so their differences are not a declaration-count
+// effect (docs/VC6_OPERAND_ORDER.md section 2).
 
 // ChatOverlay::CollectRacers (0x0051d730, 586 bytes, 44%): the
 // candidate is 587 bytes with the same instructions. Retail keeps the zero
@@ -66,6 +70,12 @@
 // the pushes only when the first-declared difference is squared first:
 // with dz declared before dx the loads swap too (1121-1135). Retail loads
 // x first and squares z first. Double casts are far worse (393).
+// Also 1129: the sum in an inline helper taking the two positions (by
+// reference or pointer, as an argument or through a distance local) or
+// the two differences; named squares `zz`/`xx` in either order; in-place
+// `dz *= dz; dx *= dx;`. A named `xx = dx * dx` used in the sum gives 1143
+// like the bracketed form; the helper called with the two differences
+// written in the call gives 1139 with 5 differing instructions.
 
 #include <math.h>
 #include <stdio.h>

@@ -87,6 +87,10 @@
 // ebp is pushed, the order of the y loop's pointer setup and its rotated
 // loop entry jump.
 //
+// k-scan (s22): compiled behind 0..63 prepended typedefs, 0x004cdf10,
+// 0x004ce420, 0x004cee30, 0x004cf2a0 have the same code at every count, so
+// their differences are not a declaration-count effect
+// (docs/VC6_OPERAND_ORDER.md section 2).
 #include <stdlib.h>
 #include <string.h>
 

@@ -61,6 +61,10 @@
 // bytes (retail computes `line` first here). A declaration-order sweep
 // found `dst` before `src` in the head copy and `done` before `tileStride`:
 // strict 216 -> 227, differing instructions 176 -> 158.
+// k-scan (s22): compiled behind 0..63 prepended typedefs, 0x0047caa0,
+// 0x0047d470, 0x0047d780 have the same code at every count, so their
+// differences are not a declaration-count effect (docs/VC6_OPERAND_ORDER.md
+// section 2).
 
 #include "../../src/reconstructed/Grid1.h"
 

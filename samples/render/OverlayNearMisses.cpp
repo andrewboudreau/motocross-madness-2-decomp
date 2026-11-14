@@ -1,6 +1,9 @@
 // Overlay::RestoreRect, complete retail 0x004b6710..0x004b687c (365 bytes).
 // Reviewed functional candidate; emitted code remains nonexact. See
 // docs/OVERLAY_RESTORE_RECT.md for the ordered-read repair and finite proof.
+// k-scan (s22): compiled behind 0..63 prepended typedefs, 0x004b6710 has the
+// same code at every count, so its difference is not a declaration-count
+// effect (docs/VC6_OPERAND_ORDER.md section 2).
 #include <string.h>
 
 #include "../../src/reconstructed/Overlay.h"

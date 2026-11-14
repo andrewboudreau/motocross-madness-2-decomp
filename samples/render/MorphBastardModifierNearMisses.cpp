@@ -89,6 +89,10 @@
 // 0x004a4ce9) and leaves group uninitialised like retail: the missing
 // callee is gone, masked 0.909 -> 0.908; group at function scope is the
 // same score.
+// k-scan (s22): compiled behind 0..63 prepended typedefs, 0x004a33b0,
+// 0x004a3c80, 0x004a4c60 have the same code at every count, so their
+// differences are not a declaration-count effect (docs/VC6_OPERAND_ORDER.md
+// section 2).
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>

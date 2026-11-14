@@ -118,6 +118,10 @@
 //               and a double factor. Other permutations of the three
 //               field locals, dropping uRight or vTop and removing the
 //               offset1/2/3/5 locals are all worse.
+// k-scan (s22): compiled behind 0..63 prepended typedefs, 0x00456890,
+// 0x004570a0, 0x00457480, 0x00457ed0, 0x00458da0, 0x00459ce0, 0x0045b060
+// have the same code at every count, so their differences are not a
+// declaration-count effect (docs/VC6_OPERAND_ORDER.md section 2).
 
 #include "../../src/reconstructed/TrackGameGlobal.h"
 #include <float.h>

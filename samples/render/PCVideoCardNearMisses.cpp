@@ -60,6 +60,10 @@
 //   0x004cac5c. Left: the `this` and first-texture frame slots are swapped,
 //   the texture is cached in ebx instead of keeping ebx as the zero register,
 //   and retail places the CreateTextureSurface success arm after the `ret`.
+// k-scan (s22): compiled behind 0..63 prepended typedefs, 0x004ca520,
+// 0x004ca5a0, 0x004cab00, 0x004cb330 have the same code at every count, so
+// their differences are not a declaration-count effect
+// (docs/VC6_OPERAND_ORDER.md section 2).
 #include "../../src/reconstructed/PCVideoCard.cpp"
 
 #include <string.h>

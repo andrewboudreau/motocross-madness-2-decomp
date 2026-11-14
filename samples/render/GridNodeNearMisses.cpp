@@ -52,6 +52,9 @@
 // Remaining: retail keeps p1 in its argument slot (`mov edx, [ebp+0xc] ; fld st(0) ;
 // fcomp [edx]`, the asm helper's register cost) and nx/ny in ebx/edi, and its four
 // fistp sites are inline where GridRoundToInt is a call.
+// k-scan (s22): compiled behind 0..63 prepended typedefs, 0x00483d40 has the
+// same code at every count, so its difference is not a declaration-count
+// effect (docs/VC6_OPERAND_ORDER.md section 2).
 #include "../../src/reconstructed/Griddraw.h"
 #include "../../src/reconstructed/MatrixUtil.h"
 #include "../../src/bringup/X87FloatToInt.h"

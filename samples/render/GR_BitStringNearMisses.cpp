@@ -23,6 +23,9 @@
 // (11 diffs, 439 bytes); `src--` in the for increment drops the bottom
 // decrement only (11, 435); `i > 0`, `while (--i)`, an upward count and
 // src derived from `data + i - 1` inside the loop are no better (s14).
+// k-scan (s22): compiled behind 0..63 prepended typedefs, 0x004239c0,
+// 0x00423b70 have the same code at every count, so their differences are not
+// a declaration-count effect (docs/VC6_OPERAND_ORDER.md section 2).
 
 #include "../../src/reconstructed/GR_BitString.cpp"
 

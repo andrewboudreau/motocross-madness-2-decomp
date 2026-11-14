@@ -40,6 +40,9 @@
 //
 // TriangleNormal 0x004a11e0 and ViewMatrix 0x004a1500 are exact in
 // src/reconstructed/MatrixUtil.cpp (parenthesised products).
+// k-scan (s22): compiled behind 0..63 prepended typedefs, 0x004a1a50 has the
+// same code at every count, so its difference is not a declaration-count
+// effect (docs/VC6_OPERAND_ORDER.md section 2).
 #include "../../src/reconstructed/MatrixUtil.h"
 
 // 0x004a1a50: `count` points transformed by `matrix` with the perspective

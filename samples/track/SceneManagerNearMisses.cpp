@@ -19,6 +19,9 @@
 // extra parentheses, a count-plus-pointer form, char* arithmetic,
 // `&...[0]` in the strncpy and the /G3-/G6, /GB, /Gy, /Gf, /Zp, /Op, /Ox,
 // /vm* flags leave it.
+// k-scan (s22): compiled behind 0..63 prepended typedefs, 0x004ecd60,
+// 0x004edfe0 have the same code at every count, so their differences are not
+// a declaration-count effect (docs/VC6_OPERAND_ORDER.md section 2).
 
 //
 // Scene::ReadAnimations (0x004edfe0, 5335 bytes): the "Animations"

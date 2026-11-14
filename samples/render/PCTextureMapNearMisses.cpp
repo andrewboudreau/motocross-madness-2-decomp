@@ -30,6 +30,10 @@
 // also changes which blocks interleave their array stores with the pushes.
 // if/else, nested negated ifs, switch, goto-to-label, return/goto mixes,
 // aggregate initializers and an inline helper all keep VC6's order.
+// k-scan (s22): compiled behind 0..63 prepended typedefs, 0x004c69c0,
+// 0x004c71c0, 0x004c7b40 have the same code at every count, so their
+// differences are not a declaration-count effect (docs/VC6_OPERAND_ORDER.md
+// section 2).
 
 #include <stdio.h>
 #include <string.h>

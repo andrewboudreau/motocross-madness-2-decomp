@@ -49,6 +49,9 @@
 // was 206); the size is 5020 as retail's. Declaration order,
 // block scopes around the arrays and the memset order do not move the
 // arrays; computing `managedTexels` at its row is worse.
+// k-scan (s22): compiled behind 0..63 prepended typedefs, 0x0050c960,
+// 0x0050dad0 have the same code at every count, so their differences are not
+// a declaration-count effect (docs/VC6_OPERAND_ORDER.md section 2).
 
 #include <stdio.h>
 #include <stdlib.h>

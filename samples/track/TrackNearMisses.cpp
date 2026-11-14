@@ -26,6 +26,9 @@
 // out-of-memory FreeWorkList exit sits (inside the walk loop here, after it in
 // retail).
 //
+// k-scan (s22): compiled behind 0..63 prepended typedefs, 0x00517340 has the
+// same code at every count, so its difference is not a declaration-count
+// effect (docs/VC6_OPERAND_ORDER.md section 2).
 #include <math.h>
 #include <stdio.h>
 #include <string.h>

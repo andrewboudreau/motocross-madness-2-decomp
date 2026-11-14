@@ -29,6 +29,9 @@
 // `if (!Create) return 0; return 1;`, `if (Create) return 1; return 0;` or
 // `?:` give 33, and also testing a loaded texture first gives 43.
 //
+// k-scan (s22): compiled behind 0..63 prepended typedefs, 0x00447a00 has the
+// same code at every count, so its difference is not a declaration-count
+// effect (docs/VC6_OPERAND_ORDER.md section 2).
 #include <windows.h>
 #include <string.h>
 

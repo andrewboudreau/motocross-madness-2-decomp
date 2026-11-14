@@ -29,6 +29,10 @@
 // CharacterCell::GetRect (0x0050beb0, the out-of-line copy of
 // FontTexture.h's inline) is emitted only in a TU that calls it, so it is
 // compiled (and matches exactly) in this file.
+// k-scan (s22): compiled behind 0..63 prepended typedefs, 0x0050b080,
+// 0x0050b400, 0x0050b700, 0x0050ba00 have the same code at every count, so
+// their differences are not a declaration-count effect
+// (docs/VC6_OPERAND_ORDER.md section 2).
 
 // The canonical translation unit comes first.
 #include "../../src/reconstructed/TextService.cpp"

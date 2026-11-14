@@ -71,6 +71,9 @@
 //   294/586 (the loop head is copied to the back edge); with the first
 //   loop's `if (result) return 0;` ahead of it 250/590; zeroed locals plus
 //   `result = Blt; break` 277/614.
+// k-scan (s22): compiled behind 0..63 prepended typedefs, 0x005102d0 has the
+// same code at every count, so its difference is not a declaration-count
+// effect (docs/VC6_OPERAND_ORDER.md section 2).
 
 #include <string.h>
 

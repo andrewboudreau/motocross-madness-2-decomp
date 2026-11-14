@@ -18,6 +18,9 @@
 // is eliminated. Retail homes the ResourceItem temporary in the dead
 // `flags` argument slot ([esp + 0x2c]); QuarryStuntEvent 0x004de590 (also a
 // near miss) shows the same new-temporary homing.
+// k-scan (s22): compiled behind 0..63 prepended typedefs, 0x004e9030 has the
+// same code at every count, so its difference is not a declaration-count
+// effect (docs/VC6_OPERAND_ORDER.md section 2).
 
 #include <string.h>
 #include "../../src/reconstructed/ResourceManager.h"

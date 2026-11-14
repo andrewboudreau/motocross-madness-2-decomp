@@ -39,6 +39,14 @@
 //
 // 0x0043e0b0 matched with the same per-face running cell index and is in
 // src/reconstructed/CubeDraw.cpp.
+// k-scan (s22): compiled behind 0..63 prepended typedefs, 0x0043dc60 has the
+// same code at every count, so its difference is not a declaration-count
+// effect (docs/VC6_OPERAND_ORDER.md section 2).
+// s22 spellings (all 1100, VC6 canonicalises them): `column * 128 - 256` as
+// `-(256 - column * 128)`, `128 * column - 256`, `(column << 7) - 256` or
+// `column * 128 + -256`, each with `256 - column * 128` as
+// `-(column * 128 - 256)`, `(2 - column) * 128`, `256 - 128 * column` or
+// `256 + column * -128`. `256 - (column << 7)` is far off (94).
 
 #include <string.h>
 

@@ -2,6 +2,9 @@
 // is unproven. Retail and VC6 bodies are both 678 bytes, with 115 matching
 // positions after all relocation bindings. Zero-register allocation and DC
 // return-block placement still differ. See docs/BACKGROUND_DC.md.
+// k-scan (s22): compiled behind 0..63 prepended typedefs, 0x004049d0 has the
+// same code at every count, so its difference is not a declaration-count
+// effect (docs/VC6_OPERAND_ORDER.md section 2).
 
 #include <string.h>
 

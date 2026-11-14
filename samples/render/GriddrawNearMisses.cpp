@@ -125,6 +125,10 @@
 //   same: the child case reaches it with size 0. Two separate tests scored
 //   0.632; ordering `size == 16 ||` first 0.721 (larger body); a split or
 //   goto form 0.620-0.638.
+// k-scan (s22): compiled behind 0..63 prepended typedefs, 0x0047de90,
+// 0x0047e600, 0x0047f210, 0x004815e0, 0x00481de0 have the same code at every
+// count, so their differences are not a declaration-count effect
+// (docs/VC6_OPERAND_ORDER.md section 2).
 
 #include <float.h>
 #include <string.h>
