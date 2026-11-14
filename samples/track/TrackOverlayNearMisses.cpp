@@ -59,6 +59,13 @@
 // of the name address and the pushes (1143, one hunk) but computes dx*dx
 // first where retail does dz*dz first, and aligns one instruction fewer;
 // not kept. Square helpers, casts and other bracket placements do not move.
+// s22: a 256-form sweep of the sum (term order, brackets on each product,
+// each factor and the whole sum) has no exact form; 1143 comes only from
+// `(dx * dx) + dz * dz` (factor brackets make no difference) and from
+// `distance = dx * dx; distance += dz * dz;`. The products move ahead of
+// the pushes only when the first-declared difference is squared first:
+// with dz declared before dx the loads swap too (1121-1135). Retail loads
+// x first and squares z first. Double casts are far worse (393).
 
 #include <math.h>
 #include <stdio.h>

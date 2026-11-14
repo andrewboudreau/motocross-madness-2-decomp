@@ -53,6 +53,24 @@
 // with the label in the Blt arm; tails with no extra code, `if (0) {
 // failed: return 0; }`, or `goto upload; failed: return 0; upload:`. More
 // matching bytes than the kept form but more differing instructions.
+// s22. Retail's shape: the first loop's failure and the test after it both
+// jump to one `return 0` block placed right after the second loop, whose
+// latch is `jle upload; jmp top` with no `result` store or test, and the
+// second loop's GetAttachedSurface failures go to the upload. Tried:
+// - a constant failure flag (`if (Blt) { result = 1; break; }` or an `ok`
+//   flag, then `if (result) return 0;`) in a `while`: 466, 9 instructions.
+//   VC6 threads the flag away (no store, no test) but puts the `return 0`
+//   after the upload arm's `ret` and keeps `jg top`.
+// - `if (!result) { while { if (Blt) goto failed; ... } } else { failed:
+//   return 0; }`, and the body as `if (!Blt) { ...; continue; } return 0;`:
+//   462, 9 instructions.
+// - `if (sourceSide > 0) do { ... } while (sourceSide > 0);` with the Blt
+//   failure as `return 0`, as `result = Blt; if (result) return 0;`, as an
+//   if/else body, with the constant flag, as a bottom-tested `for (;;)`,
+//   or with `sourceResult`/`destinationResult` zeroed at the loop top:
+//   294/586 (the loop head is copied to the back edge); with the first
+//   loop's `if (result) return 0;` ahead of it 250/590; zeroed locals plus
+//   `result = Blt; break` 277/614.
 
 #include <string.h>
 
