@@ -15,6 +15,9 @@
 // overlay pointer, or s_DebugPage non-static or address-taken. Retail
 // does not keep the overlay pointer from the null test (the sibling
 // BikeRace 0x0041f5e0 does), which frees ecx for the page.
+// Session 25: 0..5 dead initialised locals and `down`/`up` declared at
+// the top (either order) and assigned later are unchanged; 6 or more dead
+// locals grow the frame.
 #include <stdio.h>
 #include <string.h>
 

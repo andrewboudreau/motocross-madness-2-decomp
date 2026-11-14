@@ -101,6 +101,11 @@ void TrackGameMode::ResetDefaults() {
     difficulty = 2;
 }
 
+// Session 25 for 0x005238f0 (192 forms, none above 190/357): the fopen
+// assigned in the condition, `first`/`second` result locals, inline
+// OpenText/CloseFile helpers, a `found` copy, `!= NULL`, an early `return 0`
+// after the second fopen, six spellings of the found block, and 0..8 dead
+// initialised locals.
 // 0x005238f0 (TrackGame slot 18): finds `name` under the installed data
 // directory, else on the CD.
 int TrackGameMode::FindDataFile(const char* name, char* path) {

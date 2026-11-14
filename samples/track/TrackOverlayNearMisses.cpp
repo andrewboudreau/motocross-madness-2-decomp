@@ -30,6 +30,12 @@
 // which leaves a redundant compare on the mismatch path and swaps edi and
 // ebp for `this` and the view. A goto out of the loop, a flag, drawing
 // inside the loop and separate loop variables spill the index instead.
+// Session 25: `i > row`, a `&&` while/for condition and a repeated test
+// are unchanged (605). Returning 1 from inside the loop or a goto out of it
+// gives retail's `return 1` after the loop and edi/ebp (23 differing
+// instructions) but spills the index and keeps `this` in edi (540, 1012
+// bytes), whichever of the three loops own the variable. `i == row + 1`
+// gives a 1002-byte body with 98 differing instructions.
 
 // ChatOverlay::DrawNameTag is included from ChatNameTagDraw.cpp below.
 // Its complete 974-byte candidate has 966 matching retail positions;

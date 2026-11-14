@@ -68,6 +68,10 @@ static inline NetMessage& MessageAt(NetMessage* messages, int offset)
     return *(NetMessage*)((char*)messages + offset);
 }
 
+// Session 25 for 0x004aced0 (all 361, or the known 232/197 families): six
+// spellings of the `from` test times four pointer spellings with data/type
+// read through MessageAt (96 forms), 0..7 dead initialised locals and a
+// named player local for RemovePlayer.
 // 0x004aced0: dispatches the received messages in ring order.
 void NetworkInterface::DispatchMessages(int value)
 {
