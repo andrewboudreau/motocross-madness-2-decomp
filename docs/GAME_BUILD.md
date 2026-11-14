@@ -908,7 +908,7 @@ masked scores from `linked_accuracy.py`, before and after.
 | 0x004a1b00 | `TransformPoints` | Group0_Math | 0.275 | 0.336 | 67/76 |
 | 0x004d0d40 | `Convert555To8Fast` | Group0_Pixtrans | 0.369 | 0.418 | 51/83 |
 | 0x0043dc60 | `DrawableCube::BuildFaceGeometry` | CubeDrawNearMisses | 0.622 | 0.622 | 240/252 |
-| 0x004f3720 | `MultiPlayerDlg::AddChatLine` | Group5_MultiPlayerDlg | 0.804 | 0.804 | 110/114 |
+| 0x004f3720 | `MultiPlayerDlg::AddChatLine` | SelectGamePicProcs | 0.804 | 1.000 | 114/114 |
 
 - **Behaviour fix, WalkVisibilityQuadrants.** After the four quadrant calls
   the count test compared `depth + 1 == 8`. Retail reloads `esi` from the
@@ -928,8 +928,11 @@ masked scores from `linked_accuracy.py`, before and after.
 
   Retail's `bswap`, its ebp frames and its packed stores look hand-written
   (inference), so these scores are capped.
-- **BuildFaceGeometry and AddChatLine.** Every switch case, call, string and
-  format was checked; they agree with retail. What remains is block layout.
+- **BuildFaceGeometry.** Every switch case, call, string and format was
+  checked; they agree with retail. What remains is block layout.
+- **AddChatLine** is now strict exact in `src/reconstructed/SelectGamePicProcs.cpp`:
+  the name lookup is its own early return ahead of the system/player split,
+  which gives VC6 retail's flow graph before jump threading.
 - **Halve555/Halve565** (0.715/0.709) were not changed. An earlier audit
   found no behaviour difference; the gap is the packed path.
 
