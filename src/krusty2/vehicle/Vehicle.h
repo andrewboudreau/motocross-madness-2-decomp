@@ -244,7 +244,9 @@ struct VehicleShock {
     Vec3 spring;                     // +0x58 spring force (Suspension.h name); ApplyShockForces projects it on the ground normal
     char pad_0x64[0x10];
     Vec3 displacement;               // +0x74 Suspension.h name; scaled by impulseScale and projected on the Y axis
-    char pad_0x80[0x14];
+    char pad_0x80[0xc];
+    float prevLength;                // +0x8c Suspension.h name; UpdateWheelsInContact resets it from clearedLength while the wheel is off the ground
+    float clearedLength;             // +0x90 Suspension.h name (ClearForces copies length here)
     float impulseScale;              // +0x94 one-shot scale of the displacement impulse: Bike slot 65 sets it on a fast pitch-input rise; ApplyShockForces adds the Y part of displacement * it (times leanCos) and zeroes it
     void ClearForces();                                         // 0x004f9c70
     // 0x004f9d30 (ret 0x10): Suspension.h's Shock::ApplyDamping; ApplyShockDamping passes the
@@ -280,8 +282,8 @@ struct VehicleRotatingShock : VehicleShock {
 // Object at VehicleWheel+0x2a8: Bike's loader passes engineState (the gearbox) for driven wheels.
 struct VehicleWheelAux {             // object at VehicleWheel+0x2a8 (provisional view)
     char pad_0x00[0x8C];
-    int field_0x8c;
-    int field_0x90;
+    float throttleTimeScale;         // +0x8c EngineGearbox throttleTimeScale (GearRatios.h)
+    int gearCount;                   // +0x90 EngineGearbox gearCount
 };
 // The wheel's collision point (VehicleWheel+0xb8, the CollisionPoint base of Tire): only its
 // virtual slot 1 (friction update) is called here, by ApplyWheelDriveAndFriction.  Provisional view.
@@ -363,7 +365,7 @@ struct VehicleWheel {
     float leanCos;                 // +0x2a4 Tire.h leanCos
     VehicleWheelAux* aux;          // +0x2a8 Tire.h engine (TireAux)
     int secondaryAux;  // +0x2ac same use as primaryAux, the fallback when it is null (UpdateWheelsInContact, ApplyShockDamping)
-    int primaryAux;  // +0x2b0 AddWheel stores an attachment here; UpdateWheelsInContact treats it as an object whose +0x8c is reset from +0x90
+    int primaryAux;  // +0x2b0 AddWheel stores an attachment here; UpdateWheelsInContact treats it as a VehicleShock (prevLength reset from clearedLength)
     char pad_0x2B4[0x4];
     float driveShare;  // +0x2B8 UpdateDriveShare (0x00513f90) stores the drive share here (fst [esi+0x2b8]; 1.0 on the other path)
     float driveShareComplement;  // +0x2BC UpdateDriveShare (0x00513f90) stores 1 - driveShare here (0 on the other path)

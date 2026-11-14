@@ -98,9 +98,11 @@ struct KbNetDelta {
 // The state a message is decoded into (BikeRace.h's RacerStateMessage; the names
 // follow that view and the KrustyBike delta bases 0x004933e0 copies in).
 struct KbNetState {
-    short field_0x00;
+    char type;                   // +0x00 KbBikeMessage type (the message's type byte)
+    unsigned char finishPosition;  // +0x01 KbBikeMessage finishPosition
     unsigned short step;         // +0x02
-    int field_0x04;
+    short lapCount;              // +0x04 KbBikeMessage lapCount
+    short gatesPassed;           // +0x06 KbBikeMessage gatesPassed
     Vec3 position;               // +0x08 KrustyBike+0x1364 deltaBasePosition
     float roll;                  // +0x14 +0x137c deltaBaseRoll
     float pitch;                 // +0x18 +0x1380 deltaBasePitch
@@ -458,8 +460,8 @@ struct KbObj128 {
 // ControlInterface's activeJoystick; see Vehicle.h).  The slots they call are its force
 // feedback methods: 6 CreateConstantForce, 7 SetConstantForce, 11 StopEffect, 12 StartEffect;
 // +0x0c is InputDevice's deviceKind.  KbEffectParams is SetConstantForce's direction array
-// (0x4650 = 180 degrees in DirectInput hundredths).
-struct KbEffectParams { int angle; int field_0x4; };
+// (0x4650 = 180 degrees in DirectInput hundredths; with DIEFF_POLAR the last element is reserved and must be 0).
+struct KbEffectParams { int angle; int reserved; };
 struct KbPad {
     virtual void RemoveBindings();
     virtual void UnknownVirtualSlot1();

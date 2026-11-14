@@ -1937,12 +1937,12 @@ void Vehicle::UpdateWheelsInContact()
             if (wheel->pointInContact)
                 wheelPointInContact = 1;
         } else if (wheel->primaryAux) {
-            VehicleWheelAux* aux = (VehicleWheelAux*)wheel->primaryAux;
-            aux->field_0x8c = aux->field_0x90;
+            VehicleShock* shock = (VehicleShock*)wheel->primaryAux;
+            shock->prevLength = shock->clearedLength;
         } else {
-            VehicleWheelAux* aux = (VehicleWheelAux*)wheel->secondaryAux;
-            if (aux)
-                aux->field_0x8c = aux->field_0x90;
+            VehicleShock* shock = (VehicleShock*)wheel->secondaryAux;
+            if (shock)
+                shock->prevLength = shock->clearedLength;
         }
     }
 }
