@@ -457,8 +457,8 @@ void SinglePlayerDlg::HandleEvent(DialogEvent* event) {
                        sizeof(g_TrackGame->mode.racerChoiceBackup));
                 g_TrackGame->mode.savedDifficulty = g_TrackGame->mode.difficulty;
                 if (g_TrackGame->mode.raceSettings.raceMode == 4 && g_TrackGame->mode.ghostFile[0]) {
-                    // KrustyUI+0x4e8 holds a copy of the race settings.
-                    memcpy(&g_TrackGame->mode.raceSettings, (unsigned char*)g_TrackGame->ui + 0x4e8,
+                    // The ghost's header (KrustyUI+0x4b4) holds the settings it was raced with.
+                    memcpy(&g_TrackGame->mode.raceSettings, g_TrackGame->ui->ghostRaceSettings,
                            sizeof(g_TrackGame->mode.savedSettings));
                 } else {
                     g_TrackGame->mode.ghostFile[0] = 0;

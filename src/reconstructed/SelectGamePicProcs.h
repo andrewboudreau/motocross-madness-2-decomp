@@ -76,7 +76,28 @@ struct SelectGameD3DIMSoultreeCharacterView : virtual public GameObject {
 
     unsigned char sltFile[0x0c - 0x08]; // +0x08: D3DIMSoultreeCharacter::sltFile (bytes kept)
     int motionFinished;                       // +0x0c: the motion has finished
-    unsigned char field_0x010[0x1a0 - 0x10];
+    float motionTime;                         // +0x010 Character motionTime
+    int motionCount;                          // +0x014 Character motionCount
+    void* currentMotion;                      // +0x018 Character currentMotion (a Motion*)
+    void* currentFrame;                       // +0x01c Character currentFrame (a MotionPoseList*)
+    void* blendFromMotion;                    // +0x020 Character blendFromMotion (a Motion*)
+    void* lastFrame;                          // +0x024 Character lastFrame (a MotionPoseList*)
+    float lastFrameTime;                      // +0x028 Character lastFrameTime
+    float blendFromTime;                      // +0x02c Character blendFromTime
+    float blendDuration;                      // +0x030 Character blendDuration
+    int blendActive;                          // +0x034 Character blendActive
+    unsigned char field_0x038[0x3c - 0x38];
+    char sltPath[0x50];                       // +0x03c Character sltPath
+    char vutFilename[0x50];                   // +0x08c Character vutFilename
+    char mirFilename[0x50];                   // +0x0dc Character mirFilename
+    char contentDirectory[0x50];              // +0x12c Character contentDirectory
+    int keepMotions;                          // +0x17c Character keepMotions
+    void** motions;                           // +0x180 Character motions (Motion**)
+    int nodeCount;                            // +0x184 Character nodeCount
+    void* nodeNames;                          // +0x188 Character nodeNames (a NodeNameEntry*)
+    int* mirrorMap;                           // +0x18c Character mirrorMap
+    unsigned char poseList[0x19c - 0x190];    // +0x190 Character poseList (a MotionPoseList; bytes kept)
+    int vutLoaded;                            // +0x19c Character vutLoaded
     void* plateTexture;                       // +0x1a0: the texture the plate number goes on
 };
 
@@ -108,7 +129,9 @@ struct SelectGameRaceSettingsView {
     unsigned char series[0x0c - 0x08]; // +0x08: RaceSettings::series (bytes kept)
     int races;                                // +0x0c: races (+0x2d7c)
     int treeCollision;                        // +0x10: tree collision (+0x2d80)
-    unsigned char field_0x14[0x20 - 0x14];
+    int riderCollision;                       // +0x14 TrackGame.h RaceSettings+0x14 riderCollision
+    int shortTimeLimit;                       // +0x18 TrackGame.h RaceSettings+0x18 shortTimeLimit
+    int maxBikeClass;                         // +0x1c TrackGame.h RaceSettings+0x1c maxBikeClass
     int laps;                                 // +0x20: laps (+0x2d90)
     int opponents;                            // +0x24: opponents (+0x2d94)
     int multiplayerAiRacerCount;  // +0x28  TrackGame.h RaceSettings+0x28 (the same 0x1ec block)
@@ -125,7 +148,8 @@ struct SelectGameRaceSettingsView {
     float minutes;                            // +0x140: minutes (+0x2eb0)
     int tagBall;                              // +0x144: tag ball (+0x2eb4)
     int stuntMode;                            // +0x148: stunt mode (+0x2eb8)
-    unsigned char field_0x14c[0x1ec - 0x14c];
+    unsigned char gridOrder[0x18c - 0x14c];   // +0x14c TrackGame.h RaceSettings::gridOrder (bytes kept)
+    unsigned char lobbySlots[0x1ec - 0x18c];  // +0x18c TrackGame.h RaceSettings::lobbySlots
 };
 
 // One lobby slot (MultiPlayerDlg+0x7f68 holds eight).

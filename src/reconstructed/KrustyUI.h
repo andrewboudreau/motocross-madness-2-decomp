@@ -134,7 +134,16 @@ public:
     int playingDemo;                          // +0x4a8: the attract demo plays "ui\demo.rpl" with the credits.dtm dialog (bikerace.cpp 0x00417ed0); LeaveMenusForRace clears it
     int field_0x4ac;
     int userNameDialogOpen;                   // +0x4b0: set while UserNameDlg is open (DlgProcs.cpp)
-    unsigned char field_0x4b4[0x634 - 0x4b4];
+    // +0x4b4..+0x1364: the header of the ghost raced against, a 0xeb0-byte
+    // KrustyVCRHeader (DlgProcs.h). SPEventDlg::SyncValues (0x0044e6c0) copies the chosen
+    // ghost's header here whole; the members below are at header offset - 0x4b4.
+    unsigned char field_0x4b4[0x4c4 - 0x4b4];
+    char ghostDescription[0x20];              // +0x4c4 KrustyVCRHeader description (+0x10)
+    float ghostLengthSeconds;                 // +0x4e4 KrustyVCRHeader lengthSeconds (+0x30)
+    // +0x4e8: the header's RaceSettings copy (KrustyVCRHeader +0x34) up to its
+    // gridOrder (bytes kept). SinglePlayerDlg::HandleEvent (0x0044cf20) copies
+    // it to TrackGame+0x2d70 for a ghost race.
+    unsigned char ghostRaceSettings[0x634 - 0x4e8];
     KrustyUIGridEntryView gridOrder[8];         // +0x634: header +0x180, RaceSettings::gridOrder
-    unsigned char field_0x674[0x1364 - 0x674];
+    unsigned char field_0x674[0x1364 - 0x674]; // header +0x1c0 on: lobbySlots; riderName at +0x6dd, engineSize +0x7f0, fourStroke +0x7f4
 };

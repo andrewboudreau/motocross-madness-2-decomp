@@ -344,17 +344,24 @@ struct KrustyVCRHeader {
     int raceMode;                             // +0x34: the race mode (TrackGame+0x2d70)
     int eventType;                            // +0x38: the event type (TrackGame+0x2d74)
     int series;                               // +0x3c: the series (TrackGame+0x2d78)
-    unsigned char field_0x40[0x54 - 0x40];
+    int races;                                // +0x40: RaceSettings races (TrackGame+0x2d7c)
+    int treeCollision;                        // +0x44: RaceSettings treeCollision (TrackGame+0x2d80)
+    int riderCollision;                       // +0x48: RaceSettings riderCollision (TrackGame+0x2d84)
+    int shortTimeLimit;                       // +0x4c: RaceSettings shortTimeLimit (TrackGame+0x2d88)
+    int maxBikeClass;                         // +0x50: RaceSettings maxBikeClass (TrackGame+0x2d8c)
     int laps;                                 // +0x54: laps (TrackGame+0x2d90)
-    unsigned char field_0x58[0x60 - 0x58];
+    int aiRacerCount;                         // +0x58: RaceSettings aiRacerCount (TrackGame+0x2d94)
+    int multiplayerAiRacerCount;              // +0x5c: RaceSettings multiplayerAiRacerCount (TrackGame+0x2d98)
     unsigned char randomGates;                // +0x60: random gates (TrackGame+0x2d9c)
-    unsigned char field_0x61[0x64 - 0x61];
+    unsigned char gateCount;                  // +0x61: RaceSettings gateCount (TrackGame+0x2d9d)
+    unsigned char field_0x62[0x64 - 0x62];
     int eventNumber;                          // +0x64: the event number shown with the track
     unsigned char trackIndex;                 // +0x68: the track index (TrackGame+0x2da4)
     unsigned char networkPlayerCount;        // +0x69: RaceSettings+0x35 (TrackGame+0x2da5)
     char trackName[0x180 - 0x6a];             // +0x6a: the track (TrackGame+0x2da6)
     KrustyUIGridEntryView gridOrder[8];         // +0x180: RaceSettings::gridOrder (TrackGame+0x2ebc)
-    unsigned char field_0x1c0[0x229 - 0x1c0];
+    unsigned char lobbySlots[0x220 - 0x1c0];  // +0x1c0: RaceSettings lobbySlots (TrackGame+0x2efc)
+    unsigned char field_0x220[0x229 - 0x220];
     char riderName[0x33c - 0x229];            // +0x229: the rider
     int engineSize;                           // +0x33c: garage engine size, copied to TrackGame+0x1550
     int fourStroke;                           // +0x340: garage 4-stroke flag (TrackGame+0x1554)

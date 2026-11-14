@@ -37,9 +37,17 @@ void OpenCareerDialog();
 struct ProCircuitRacerResultView {
     int racer;                                // +0x00: the circuit racer
     int position;                             // +0x04: finishing position
-    unsigned char field_0x08[0x28 - 0x08];
+    float fastestLap;                         // +0x08: RacerResult fastestLap
+    int largestStuntPoints;                   // +0x0c: RacerResult largestStuntPoints
+    int totalTrickTime;                       // +0x10: RacerResult totalTrickTime
+    float totalRunningTime;                   // +0x14: RacerResult totalRunningTime
+    float bestTagRun;                         // +0x18: RacerResult bestTagRun
+    float totalTagRun;                        // +0x1c: RacerResult totalTagRun
+    int finished;                             // +0x20: RacerResult finished
+    int outOfRace;                            // +0x24: RacerResult outOfRace
     int points;                               // +0x28: points
-    unsigned char field_0x2c[0x34 - 0x2c];
+    float score;                              // +0x2c: RacerResult score
+    unsigned char field_0x30[0x34 - 0x30];    // +0x30 RacerResult aiIndex, not split: declaration counter
     float repairs;                            // +0x34: repairs (times 500 is the cost)
     float medical;                            // +0x38: medical (times 250)
     float stunts;                             // +0x3c: stunts (times 400)
