@@ -256,7 +256,7 @@ DrawableGridNode* DrawableGridNode::ReadNode(FileStream* stream, int a1,
     extra->blockRecords = 0;
 allocated:
     extra->textureReference = header;
-    extra->field_0x10 = 0;
+    extra->builtTexture = 0;
     data->vertexBuffer = 0;
     data->vertexBufferBytes = 0;
     data->indexBufferBytes = 0;

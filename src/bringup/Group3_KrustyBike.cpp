@@ -904,7 +904,7 @@ void KrustyBike::InterpolateNetworkState(float dt, int copyRaceProgress)
                     }
                 }
             } else {
-                if (!states[0]->field_0x5c)
+                if (!states[0]->fullState)
                     states[0]->lapCount = (short)((lapCount & 0xff00) | states[0]->lapGate);
                 if ((unsigned short)lapCount == (unsigned short)states[0]->lapCount - 1)
                     forceGatePass = 1;
@@ -913,7 +913,7 @@ void KrustyBike::InterpolateNetworkState(float dt, int copyRaceProgress)
                 if (copyRaceProgress)
                     lapCount = states[0]->lapCount;
             }
-            if (states[0]->field_0x5c) {
+            if (states[0]->fullState) {
                 lastLapTime = states[0]->lastLapTime;
                 fastestLap = states[0]->fastestLap;
                 if (copyRaceProgress) {
@@ -999,7 +999,7 @@ void KrustyBike::InterpolateNetworkState(float dt, int copyRaceProgress)
                     }
                 }
             } else {
-                if (!interpSource->field_0x5c)
+                if (!interpSource->fullState)
                     interpSource->lapCount = (short)((lapCount & 0xff00) | interpSource->lapGate);
                 if ((unsigned short)lapCount == (unsigned short)interpSource->lapCount - 1)
                     forceGatePass = 1;
@@ -1008,7 +1008,7 @@ void KrustyBike::InterpolateNetworkState(float dt, int copyRaceProgress)
                 if (copyRaceProgress)
                     lapCount = interpSource->lapCount;
             }
-            if (interpSource->field_0x5c) {
+            if (interpSource->fullState) {
                 lastLapTime = interpSource->lastLapTime;
                 fastestLap = interpSource->fastestLap;
                 if (copyRaceProgress) {

@@ -52,7 +52,7 @@ LightEmitter::LightEmitter(int flags) : GameObject(flags) {
     spotInnerAngle = 0.7853982f;
     lightIndex = -1;
     manager = 0;
-    field_0xa8 = 0;
+    lastColor = 0;
 }
 
 // 0x0049dfc0
@@ -72,7 +72,7 @@ unsigned int LightEmitter::PackedColor() {
 
 // 0x0049e020
 void LightEmitter::SetColor(unsigned int color) {
-    if (color == field_0xa8)
+    if (color == lastColor)
         return;
     colorRGBA[0] = (float)((color >> 16) & 0xff) * (1.0f / 255.0f);
     colorRGBA[1] = (float)((color >> 8) & 0xff) * (1.0f / 255.0f);

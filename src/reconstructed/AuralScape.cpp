@@ -713,7 +713,7 @@ int AuralScape::Tick(float frameTime) {
         Vector3 position = ((UnknownAuralScapeTarget*)renderContext)->currentCamera->eyePosition;
         reinterpret_cast<Terrain*>(groundSubject)->QueryGround(reinterpret_cast<TerrainVec3*>(&position), 0, 0, &material);
         zone = (material >> 4) & 3;
-        environment = reverbOwner->field_0xa4->field_0x410[zone];
+        environment = reverbOwner->environment->enviroID[zone];
         SoundSystem()->SetEAXEnvironment(environment);
     }
 

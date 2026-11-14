@@ -66,7 +66,7 @@ public:
     UnknownLightEmitterTarget* linkedTarget; // +0x9c ctor 0; SetColor and SetPosition forward the colour and position to it
     int lightIndex;                         // +0xa0 Create's last argument, -1 by default
     LightManager* manager;                  // owner (set by 0x0049e470)
-    unsigned int field_0xa8;                // compared, never written here
+    unsigned int lastColor;                 // +0xa8 SetColor returns early when the colour equals it; only the constructor writes it (0)
 };
 
 class LightManager : public GameObject {

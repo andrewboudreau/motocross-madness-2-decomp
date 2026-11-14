@@ -272,7 +272,7 @@ struct GridNodeExtra {
     void* data;                                // +0x04 DebugMalloc'd, byteCount bytes
     GridManagedTexture* texture;               // +0x08 tested before slot 4(-1)
     int textureReference;  // +0xC  stream header; Grid1NodeExtra packs own bit and texture table index
-    int field_0x10;
+    int builtTexture;                          // +0x10 Grid1.h's builtTexture: the node texture BuildNodeTexture takes from Terrain's pool
     unsigned char field_0x14[0x28 - 0x14];
     float mappingScale;  // +0x28  RemapTexCoordsIfMoved scale; 1.0 after a rebuild
     float mappingOffsetU;  // +0x2C  RemapTexCoordsIfMoved offsetU; 0 after a rebuild

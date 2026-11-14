@@ -116,7 +116,7 @@ public:
 // reverb presets (tier 3).
 struct UnknownAuralScapeReverbTable {
     unsigned char field_0x000[0x410];
-    unsigned long field_0x410[4];
+    unsigned long enviroID[4];                // +0x410 SceneEnvironment::enviroID, per reverb zone
 };
 
 // GameObject+0x18 as AuralScape's slot 10 reads it: +0x08 points at an
@@ -133,7 +133,7 @@ struct UnknownAuralScapeTarget {
 
 struct UnknownAuralScapeReverbOwner {
     unsigned char field_0x00[0xa4];
-    UnknownAuralScapeReverbTable* field_0xa4;
+    UnknownAuralScapeReverbTable* environment; // +0xa4 Scene::environment
 };
 
 // RTTI: AuralScape : GameObject. Created by QuarryStuntEvent.cpp

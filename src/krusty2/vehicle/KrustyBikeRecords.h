@@ -49,7 +49,7 @@ struct KbBikeMessage {
 
 struct KbBikeNetState : KbBikeMessage {
     unsigned int timeReceived;           // +0x58 local clock when it arrived
-    int field_0x5c;                      // +0x5c set when the lap/race fields are valid
+    int fullState;                       // +0x5c 1 for a full state (message 1), 0 after a delta (13): the lap/race fields are valid
 };
 
 struct KbBikeState {
