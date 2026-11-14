@@ -8,7 +8,7 @@
   "aggregate": {
     "sections": 27,
     "relocations": 111,
-    "sha256": "c3c093f2658671f41e1a8e1a972eb911cb2b6f937de18d4eb44cb7c91932e577"
+    "sha256": "080884ee78a8a52af2a93d15d9b87f1d624d11a492ae80df7498cea6171578d2"
   },
   "baseline": "Published ed3d06ce source baseline; round50 flag exposure is documented separately. Round51 StatsOverlay::DrawStandings extraction: the published old aggregate pin was independently reproduced; all 37 sections and 162 relocations preserve exactly under only its two iterator-call targets (function offsets 172 and 220) joining existing BikeRace::NextBike. Other aggregate functions and the canonical TrackOverlay record are unchanged."
 }

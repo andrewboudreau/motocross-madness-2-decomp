@@ -34,9 +34,10 @@ constructor and 242-byte `Create` method are strict. The decoded
 `CollectRacers` producer allocates `0x174`, calls those methods, and stores the
 returned primary pointer into `nameTags`, starting at `ChatOverlay+0x2d8`.
 The extra cue-tag chain stores the same kind of pointer at the count index.
-`CollectRacers` remains a nonexact sample: these instruction/producer facts do
-not admit its whole behavior. Field names and the partial racer view remain
-provisional; the regression pins the actual used layouts independently.
+`CollectRacers` is a strict-exact sample (586 bytes); it stays in the near-miss
+file and these instruction/producer facts are checked independently of it.
+Field names and the partial racer view remain provisional; the regression
+pins the actual used layouts independently.
 
 ## One shared mutable flag
 

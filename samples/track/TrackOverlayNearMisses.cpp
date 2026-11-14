@@ -17,12 +17,11 @@
 // code at every count, so their differences are not a declaration-count
 // effect (docs/VC6_OPERAND_ORDER.md section 2).
 
-// ChatOverlay::CollectRacers (0x0051d730, 586 bytes, 44%): the
-// candidate is 587 bytes with the same instructions. Retail keeps the zero
-// in ebx and the incremented count in ebp; VC6 here swaps them, which
-// shifts later register choices. The racer loop written as in RadarOverlay
-// 0x0051baf0, a post-increment index, a for loop and every order of the
-// three initial assignments do not change it.
+// ChatOverlay::CollectRacers (0x0051d730, 586 bytes): strict exact. Both
+// Create calls read `renderContext` in the argument list. Through the
+// inline Target() accessor VC6 loaded it ahead of the other arguments, which
+// swapped ebx/ebp for the zero and the count and made the body 587 bytes
+// (261 matching).
 
 // StatsOverlay::DrawStandings (0x00519a20, 1002 bytes): written
 // like the exact 0x0051aa40, the candidate is 1004 bytes. Retail keeps the
@@ -194,13 +193,15 @@ int ChatOverlay::CollectRacers(UnknownChatView* view)
     }
     for (int i = 0; i < racerCount; i++) {
         nameTags[i] = (new(__FILE__, 2369) NameOverlay(1))->Create(
-            Target(), overlayTexture, &nameTagRects[i], 0, &nameTagRects[i], (UnknownEventRacer*)racers[i],
+            (RenderTarget*)renderContext, overlayTexture, &nameTagRects[i], 0, &nameTagRects[i],
+            (UnknownEventRacer*)racers[i],
             (UnknownNameOverlayWorld*)chatView, i);
         AppendChild(nameTags[i], -1);
     }
     if (g_TrackGame->mode.raceSettings.eventType == 0) {
         nameTags[racerCount] = (new(__FILE__, 2376) NameOverlay(1))->Create(
-            Target(), overlayTexture, &nameTagRects[racerCount], 0, &nameTagRects[racerCount], 0,
+            (RenderTarget*)renderContext, overlayTexture, &nameTagRects[racerCount], 0,
+            &nameTagRects[racerCount], 0,
             (UnknownNameOverlayWorld*)chatView, i);
         AppendChild(nameTags[racerCount], -1);
         if (nameTags[racerCount]) {

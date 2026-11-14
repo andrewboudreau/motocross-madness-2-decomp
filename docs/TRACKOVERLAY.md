@@ -125,8 +125,8 @@ linkage so the standalone uses the same mutable DWORD as `RenderPre3D`.
 - `0x00519a20` (standings, 1002 bytes; candidate 1004): retail keeps the row
   comparison index in edx and `this` in its spill slot. VC6 here does that
   only when the index is read after the loop, which adds a redundant compare.
-- `0x0051d730` (racer name tags, 586 bytes; candidate 587): the zero and the
-  incremented count swap ebx and ebp.
+- `0x0051d730` (racer name tags, 586 bytes): strict exact once both `Create`
+  calls read `renderContext` directly instead of through `Target()`.
 - `0x0051c4f0` (line/circle intersection, 560 bytes; candidate 550): frame
   slot assignment of the float temporaries differs.
 - `0x0051c720` (track outline, 1016 bytes; candidate 1002): walks the
