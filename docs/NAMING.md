@@ -3118,3 +3118,379 @@ Left for later:
   fields, CarProcedural's Create arguments, PhysicsBody `field_0x180`/`field_0x184`,
   Camera `field_0x1e8..field_0x1fc`, VideoCard, TextureMapManager, UIDialog,
   Game and RaceSound constructor stores, and others).
+
+## Wave 28: the remaining Unknown types, the 0x464e90 hooks and the last view pads
+
+Wave 28 is the leftovers wave. It worked the remaining `UnknownVirtualSlotN`
+slots, the `Unknown*` types, functions and methods, the `field_0xNN`
+placeholders in samples/ that a canonical src/ view settles, and the Wave 27
+leftover list. Names only: no declaration, typedef or member was added,
+removed or reordered, and every edited file keeps its line count. No static,
+global or type of a static was renamed, and no type whose RTTI descriptor is
+emitted.
+
+Counts over `src` and `samples` (`git grep -ohE`, work/naming/w28/counts.py):
+
+| Placeholder | Before (b28e75a1) | After |
+| --- | --- | --- |
+| `\bUnknownVirtualSlot[0-9]+` | 74 uses, 17 names | 74 uses, 17 names |
+| placeholder methods (`UnknownVirtualSlotN`, `UnknownMethodN`, `Method_`, `Fn_`) | 85 uses | 85 uses |
+| `\bUnknown[A-Za-z0-9_]*` | 1317 uses, 217 names | 573 uses, 86 names |
+| `\bfield_0x[0-9a-fA-F]+` | 1288 uses, 326 spellings | 1274 uses, 326 spellings |
+| `field_0x` in samples/ only | 118 uses | 113 uses |
+
+The `Unknown*` count includes the 74 `UnknownVirtualSlotN` uses, which did not
+change, and the `UnknownNodeVirtualSlotN` names of CarProceduralNode, which
+did. That is why the placeholder-method count stays the same.
+
+| Tier | Renames |
+| --- | --- |
+| 1 | 0 |
+| 2 | 118: 109 types, typedefs and functions, and 9 members |
+| 3 | 24: 12 types and functions, the three per-class names of the shared `0x00464e90` stub, and CarProceduralNode slots 0-8 |
+
+Method:
+
+- work/naming/w28/triage.py listed every remaining `Unknown*` name with its
+  definitions and uses (work/naming/w28/triage.txt). Three groups worked
+  through them:
+  - R covered render, soultree, texture, camera, input and the ecosystem
+    (work/naming/w28/specR.py, editR.py, leftR.txt).
+  - G covered game, UI, race, podium, recorder, network and audio
+    (specG.py, editG.py, leftG.txt).
+  - F covered the samples field placeholders and the Wave 27 leftovers
+    (editF.py, leftF.txt).
+- Views follow Wave 25's `<Consumer><Class>View` convention. The class is
+  fixed by bound method addresses, offsets that agree with the named class at
+  several members, or the same retail pointer. Records, helpers and callbacks
+  take role names.
+- The type and function renames (121 names, work/naming/w28/map.json) were
+  applied tree-wide with work/naming/rename.py. The run skipped
+  docs/NEAR_MISS_INDEX.md, docs/REBUILD_GAPS.md,
+  docs/DECOMPILATION_PROGRESS.md and config/decompilation_progress.json.
+  It also updated the `.bindings.json` mangled keys, tools/run_calibration.py
+  and the test text and fixtures that spell those names. Two cases were edited
+  separately with count-checked substitutions (work/naming/sub.py):
+  - The per-class renames of the shared stub spelling and the CarProceduralNode
+    slots (editR.py).
+  - The members (editG.py and editF.py).
+- The functions being matched at the same time were left alone. No rename
+  touches the bodies of:
+  - Scene::ReadStaticModels `0x004ecd60`
+  - Bike `0x004060c0`
+  - PCJoystickDevice `0x004c3790`
+  - CubeDraw `0x0043dc60`
+  - MatrixUtil `0x004a1a50`
+  - BoundingBoxTreeBuild `0x0042c260`
+  - SoultreeBounds `0x004fd340`
+
+  The names used there were deferred. These are
+  `UnknownSceneLodObject`, `UnknownFunction464e80`, `UnknownFunction4de580`,
+  `UnknownFolded4de580`, the Scene emitter and keyword views, and
+  `UnknownWreckerCharacter`.
+
+Scope A, the virtual slots: no slot that is not a destructor gained evidence.
+None of them is the same retail slot, at the same `object_offset`, as a named
+method, and none has a named or bound target:
+
+- UIDialog slot 30 has no override and no UIDialog caller.
+- BaseQuarryEvent slot 28 is not an attach step: Create3DObjects appends its
+  child itself.
+- Slot 34 has no new evidence.
+- PhysicsBody slots 31 and 32 have none either. Their `+0x180` and `+0x184`
+  are written only by the constructor, at `0x004cbd1f` and `0x004cbd50`.
+- Vehicle slots 78 and 79 have no retail caller.
+- ConstraintMethodCollisionModel slot 2, KbSink slots 2-5 and
+  ConnectionInfoType slot 1 have no new evidence.
+- `UnknownVirtualSlot0` (26 uses) is always the destructor slot of a view of
+  GameObject, RenderTarget, Game, ArcadeObject, ControlInterface or
+  QuadTreeObject. The InputDevice views' slot 1 is also the destructor. Both
+  stay placeholders under the policy of Waves 4, 12, 21, 22 and 23.
+
+`0x00464e90` is one shared `RET`. Each class's name for it comes from that
+class's own call sites only, so the names are tier 3:
+
+- GUIManager: `OnPaletteChanged`
+- DrawableGridNode: `OnMaskCleared`
+- ManagedTextureGroup: `OnOutOfPageSpace`
+
+CarProceduralNode slots 0-8 take the QuadTreeObject and SoultreeObject slot
+names of the class it views. It has no constructor or virtual definition, so
+no vtable is emitted and the calls go by offset.
+
+Two proposed renames were reverted:
+
+- `UnknownEventGraphicsTest` → `GraphicsTest` (tier 1, from RTTI).
+  EventManager.cpp already sees the real `GraphicsTest` class through
+  src/krusty2/core/GraphicsTest.h, so the local view became a redefinition
+  (C2011, COMPILE-FAIL in the proof). Using the real class means deleting the
+  local declaration, which is outside a names-only wave.
+- `UnknownSoultreeClipper` → `D3DIMSoultreeVisibilityClipperView` (tier 2).
+  Its only method, TestBox `0x0052f570`, is bound as `VisibilityClipper::TestBox`,
+  and the object is the clipper at `0x00575a98`. The unit was NAME-ONLY. But
+  the type is the type of the extern global `g_visibilityClipper`, so the
+  global's decorated name changed. test_clipper_global_connections could then
+  no longer resolve it to retail (`RelocationError: unresolved symbol`).
+  Renaming the type of a global is excluded, so it was reverted.
+
+A check of every old object (work/naming/w28/datasyms.py, rttisyms.py) found
+that no data, RTTI, vtable or guard symbol name contains a renamed name.
+
+Result: one proof from b28e75a1 to the renamed tree covered every unit whose
+closure reaches a changed file: 361 units. The map was the old→new decorated
+spellings (`Old@` → `New@`, 133 entries, work/naming/w28/proofmap.json). The
+EventManager.cpp revert and the D3DIMSoulTreeNearMisses.cpp revert were
+proved again on their own (work/naming/w28/report-fix.txt). The final verdicts
+are in work/naming/w28/report-final.txt:
+
+| Verdict | Units |
+| --- | --- |
+| IDENTICAL | 286 |
+| IDENTICAL-COMDAT-ORDER | 8 (Group4_DlgMain.cpp, Group5_PCBailoutDlg.cpp, Group6_BikeRaceCreate.cpp, DlgProcs.cpp, KrustyUI.cpp, OptionProcs.cpp, ProCircuitProcs.cpp, SelectGamePicProcs.cpp) |
+| NAME-ONLY | 65 |
+| NAME-ONLY+COMDAT-ORDER | 2 (DlgProcsNearMisses.cpp, SelectGamePicProcsNearMisses.cpp) |
+| DIFF, compile failure | 0 |
+
+Negative controls (work/naming/w28/negcontrol.txt):
+
+1. Three NAME-ONLY units were compared again without the map, and each gave
+   DIFF:
+   - D3DIMSoulTreeNearMisses.cpp: the relocations of
+     `?PrepareGeometry@D3DIMSoultreeObject@@UAEHXZ` differ.
+   - GUIManagerHooks.cpp: `?UnknownFunction464e90@GUIManager@@QAEXXZ` exists
+     only in the old object.
+   - EventManagerNearMisses.cpp: the relocations of `CreatePodiumScene` differ.
+2. One edit was made in the new tree only. ProjectedShadow::Init was changed to
+   store `textureOwner` instead of `target` into the renamed `renderTarget`.
+   The proof gave DIFF in the `.text` of
+   `?Init@ProjectedShadow@@QAEPAV1@PAVShadowRenderTarget@@PAX@Z`.
+
+Fixture pins: the whole-object digests of 22 NAME-ONLY units changed, which
+made 24 test modules fail. They were repinned with
+work/naming/w22/repin_all.py, which runs repin.py and then repin2.py:
+
+- 38 digest swaps (30 distinct old/new pairs) in 22 tests/fixtures files.
+  The logs are work/naming/w28/repin.log and repin2.log.
+- Every repinned unit is NAME-ONLY or NAME-ONLY+COMDAT-ORDER in the report.
+- Where a pin records relocation and section counts, they did not change.
+- No digest in a test-module tuple changed.
+
+The other edits under tests/ and tools/ change the spelling of a renamed
+name. They cover:
+
+- mangled names in tests/test_empty_lifecycle_providers.py and
+  tools/run_calibration.py, for the GUIManager hook;
+- view and type names in the test texts and the compare fixtures.
+
+130 test modules reach a changed file, a renamed name, a NAME-ONLY unit or a
+changed digest (work/naming/w28/pick_tests.py and pinmods.py). All 139 of
+their tests pass; the log is work/naming/w28/tests-final.log.
+tools/static_check.py passes.
+
+### Types, typedefs and functions
+
+| Old | New | Tier | Evidence |
+| --- | --- | --- | --- |
+| `UnknownAuralScapeReverbOwner` | `AuralScapeSceneView` | 2 | +0xa4 is Scene::environment |
+| `UnknownAuralScapeReverbTable` | `AuralScapeSceneEnvironmentView` | 2 | +0x410 enviroID[4] is SceneEnvironment::enviroID |
+| `UnknownAuralScapeTarget` | `AuralScapeRenderTargetView` | 2 | GameObject+0x18 renderContext (RenderTarget); +0x08 currentCamera |
+| `UnknownAuralScapeViewer` | `AuralScapeCameraView` | 2 | RenderTarget currentCamera; +0x170 is Camera eyePosition (Camera.h:90) |
+| `UnknownBackgroundCamera` | `BackgroundCameraView` | 2 | BackgroundImage.h view of the render target camera; offsets are Camera.h members |
+| `UnknownBackgroundRegion` | `BackgroundRegion` | 2 | BackgroundImage.h: one tracked dirty region (0x40 bytes, a DebugMalloc array at BackgroundImage+0x50) |
+| `UnknownBikeAIPath` | `BikeAIRacingLine` | 2 | KrustyBike+0x838 aiPath "racing line rebuilt by 0x00414370 each frame" (KrustyBikeCore.h:201) |
+| `UnknownBlitSource` | `BlitPCTextureMapView` | 2 | PCRenderTarget::Blit 0x004c53f0 reads +0x70 = PCTextureMap::systemSurface (PCTextureMap.h +0x70); GameUi passes textures as sources |
+| `UnknownBltEffects` | `BltFillEffects` | 2 | ManagedTextureGroup.cpp: DDBLTFX layout (dwSize +0, dwFillColor +0x50, 0x64 bytes) for the DDBLT_COLORFILL (0x400) Blt |
+| `UnknownBltRect` | `BltDestinationRect` | 2 | ManagedTextureGroup.cpp: RECT layout passed as the destination of DirectDrawSurface::Blt |
+| `UnknownCreateOverlayIconService` | `CreateOverlayIconService` | 2 | OverlayIconService.h inline: new OverlayIconService(10) at OverlayIconService.h line 90, inlined by Overlay 0x004b5f50 |
+| `UnknownCubeCameraView` | `CubeCameraView` | 2 | CubeDraw.h: +0xac view matrix and +0x170 eye position = Camera.h viewMatrix/eyePosition |
+| `UnknownCubeClipper` | `CubeVisibilityClipperView` | 2 | CubeDraw.h methods TransformPoints 0x0052f0a0, CanFaceCamera 0x0052f140, IsQuadOnScreen 0x0052f4d0 are VisibilityClipper TransformVectors/TestDot/CullQuad (tests/fixtures/visibility_connections_objects.json joins) |
+| `UnknownCubeFace` | `CubeFace` | 2 | Cube.h: the 0xf8-byte per-face record of DrawableCube |
+| `UnknownCubeTextureContext` | `CubeTextureContextView` | 2 | Cube.h {manager, textureGroup}: the TextureContext pair DrawableCube::Load and SkyCube::Create receive |
+| `UnknownCueOwner` | `VisualCueRenderTargetView` | 2 | GameObject+0x18 renderContext is a RenderTarget; +0x08 is RenderTarget currentCamera (RenderTarget.h:48) |
+| `UnknownCursorAnimation` | `CursorUIAnimView` | 2 | GUIManager.h cursor animation; AdvancePastSounds joined to UIAnim::AdvancePastSounds (tests/test_uianim_connections.py RENAMES) |
+| `UnknownCursorPosition` | `CursorPixelPosition` | 2 | GameCursor.h: {x, y} in pixels returned by GameCursor::CursorPosition 0x0043f100 |
+| `UnknownDialogImage` | `DialogUIAnimView` | 2 | GameUi.h: "DlgProcs.h's UnknownDialogImage is the same object" as UIAnim; GetCurrentTexture 0x00472f90 joined to UIAnim::GetCurrentTexture (tests/fixtures/uianim_connection_objects.json) |
+| `UnknownEcoCoordinates` | `EcoQuantizedPosition` | 2 | EcoCoordinates.h {x,y,z} ushorts: Vegetation::quantizedPosition (unitsPerCoordinate units), the 6-byte record EcoSystem::PlaceStoredObjects reads |
+| `UnknownEcoSampleTga` | `SampleEcoProbabilityTga` | 2 | Group4_EcoSystem.cpp static inline: the green channel of a probability TGA at terrain (x,z), scaled 0..1 |
+| `UnknownEcoSampleTgaWeighted` | `SampleEcoProbabilityTgaWeighted` | 2 | Group4_EcoSystem.cpp static inline: the same sample times `weight` in retail's multiply order |
+| `UnknownEulaProc` | `EulaEntryProc` | 2 | typedef of EBUEula.dll's entry point (TrackGame.cpp) |
+| `UnknownFollowCameraPoint` | `FollowCameraPoint` | 2 | FollowCamera.h: element of the points table at FollowCamera+0x2e4 |
+| `UnknownFollowCameraProjector` | `FollowCameraVisibilityClipperView` | 2 | FollowCamera.h ProjectPoint 0x0052f340 = VisibilityClipper::ProjectPoint; object at 0x00575a98 |
+| `UnknownFollowedRacerSlots` | `FollowRacerKrustyBikeView` | 2 | the racer's own vtable (KrustyBike slot names); FollowRacer 0x004a9e80 calls slot 50 |
+| `UnknownFunctionRacerAt` | `RacerAtIndex` | 2 | BikeRace inline: localRacer for index 0 single player, else the racer slot (Group1_BikeRaceCamera.cpp:157) |
+| `UnknownFunctionRacerCount` | `CountRaceRacers` | 2 | static inline body: own + AI racers single player (playerCount in mode 4), own + remote multiplayer |
+| `UnknownGameUiState` | `UIMultiStateEntry` | 2 | UIMultiState+0x1f4 stateTable entries, 32 bytes each |
+| `UnknownGridEntry` | `SelectGameGridEntryView` | 2 | view of TrackGame.h GridEntry at RaceSettings +0x14c (gridOrder), qsorted by points |
+| `UnknownGuiRgb` | `FilledTexturePixel` | 2 | GUIManager.cpp: the 24-bit pixel {red, green, blue} GUIManager::CreateFilledTexture 0x00486740 fills |
+| `UnknownInlineArchiveUsed` | `IsArchiveInUse` | 2 | ResourceManager.h inline: 1 when any item's archive == `archive` (ResourceManager.cpp:100 deletes the old archive only when unused) |
+| `UnknownInlineButton` | `GetButtonPart` | 2 | inline returning UIDropDownList buttonPart |
+| `UnknownInlineFrame` | `GetFrameAt` | 2 | inline returning frameList[index] |
+| `UnknownInlineIdle` | `IsSubjectUncrashed` | 2 | VehicleCamera.h inline: !vehicleMode \|\| vehicle->crashState == 0, the complement of sibling IsSubjectCrashed |
+| `UnknownInlineSetField18` | `StoreRenderContext` | 2 | inline storing renderContext (+0x18) |
+| `UnknownIsEnabled` | `IsCueRacerEnabled` | 2 | inline returning GameObject isEnabled for a cue racer |
+| `UnknownJoystickBoolView` | `FollowCameraJoystickDeviceView` | 2 | FollowCamera.h: FollowCamera view of the active JoystickDevice at ControlInterface+0x0c (slot 4 read as bool); no ctor, vtable not emitted |
+| `UnknownKeyboardBoolView` | `FollowCameraKeyboardDeviceView` | 2 | ControlInterface.h: FollowCamera view of the KeyboardDevice at ControlInterface+0x34 (slot 5 IsButtonDown read as bool); no ctor, vtable not emitted |
+| `UnknownKrustyBike` | `KrustyBikeCameraKrustyBikeView` | 2 | KrustyBikeCamera+0x3b4; every member sits at a KrustyBike offset with a matching use (KrustyBikeCamera.h) |
+| `UnknownKrustyBikeAxis` | `KrustyBikeCameraBikeWheelView` | 2 | KrustyBike+0x5f4 rearWheel is a BikeWheel; +0x150 penetration |
+| `UnknownKrustyUIEntry` | `KrustyUITrackEntry` | 2 | 0x54-byte KrustyUI+0x60 list appended by AddEntry 0x0049ba70 (directory index, scene, series, file time/size, .env name) |
+| `UnknownKrustyUIGui` | `KrustyUIGuiManager` | 2 | typedef GUIManager (KrustyUI.h:14; +0x2c built by GUIManager ctor 0x00485190); typedefs are not mangled |
+| `UnknownKrustyUIGuiLayer` | `KrustyUIGuiUser` | 2 | typedef GUIUser (KrustyUI.h:15) |
+| `UnknownKrustyUIModelObject` | `SelectGameD3DIMSoultreeCharacterView` | 2 | KrustyUI.cpp:388 casts new D3DIMSoultreeCharacter(0) to it; slots carry Character names (SelectGamePicProcs.h:63) |
+| `UnknownKrustyUISlot` | `KrustyUIGridEntryView` | 2 | KrustyUI+0x634 and DlgProcs.h header +0x180 are RaceSettings::gridOrder; layout = TrackGame.h GridEntry (playerId, points) |
+| `UnknownKrustyUISoultree` | `KrustyUISoultreeObjectView` | 2 | SetPosition 0x004fc660 / SetAxes 0x004fbd10 are SoultreeObject methods (KrustyUI.cpp:54) |
+| `UnknownKrustyUIToolTipView` | `KrustyUIToolTipView` | 2 | +0x5c enabled is GUIManager.h ToolTip::enabled; GUIManagerCore.h +0xc0 userToolTip is a ToolTip* |
+| `UnknownModelTexture` | `DialogSoultreeObjectView` | 2 | DlgProcs.h: ReplaceMaterialTexture joined to D3DIMSoultreeObject::ReplaceMaterialTexture (tests/fixtures/garage_material_objects.json); the object is the bike/rider model |
+| `UnknownNumberOwner` | `NumberRenderTargetView` | 2 | GameObject+0x18 renderContext is a RenderTarget; +0x08 is RenderTarget currentCamera (RenderTarget.h:48) |
+| `UnknownOptKrustyUIRecord` | `OptionsBikeRecord` | 2 | KrustyUI+0x50 0x94-byte bike records (KrustyUI.h 'each manufacturer's bikes'); +0x8c engineSize as BikeRace.h BikeRaceBikeRecord |
+| `UnknownPickCamera` | `PickerCameraView` | 2 | ObjectPicker.h view; its offsets are Camera.h members (Camera +0xac viewMatrix, +0x170 eyePosition, +0x1a0 viewport) |
+| `UnknownPodiumArcade` | `PodiumArcadeObjectView` | 2 | SetPosition 0x004014f0 / SetAxes 0x00401520 are ArcadeObject.h methods; Group1_PodiumViews.cpp casts to ArcadeObject |
+| `UnknownPodiumContext` | `PodiumTextureContextView` | 2 | Game+0x1c resource context as the podium characters' slot 11 takes it; laid out like TextureMap.h TextureContext |
+| `UnknownPodiumGrid` | `PodiumSceneView` | 2 | reached through BaseQuarryEvent+0x2c eventScene; reads Scene podiumPosition +0x8c / podiumDirection +0x98 / environment +0xa4 (SceneManager.h) |
+| `UnknownPodiumModel` | `PodiumSceneEnvironmentView` | 2 | Scene+0xa4 environment; the field read at +0x398 is SceneEnvironment terrainBreadth (SceneManager.h) |
+| `UnknownPodiumNode` | `PodiumSoultreeObjectView` | 2 | methods bound to SoultreeObject (0x004fc970 / 0x004fc4f0 / 0x004fc660 / 0x004fbd10); Group1_PodiumViews.cpp casts to SoultreeObject |
+| `UnknownPodiumNodeOwner` | `PodiumStartGateView` | 2 | BikeRace+0x64 startGate (BikeRaceCore.h); its model node is read for GetPosition |
+| `UnknownPodiumOwner` | `PodiumBaseQuarryEventView` | 2 | FindRaceMode() result; offsets read are BaseQuarryEvent.h members (eventScene +0x2c, raceView +0x34, lightManager +0x7c, texture groups +0x94/+0x98) |
+| `UnknownPodiumRacer` | `PodiumKrustyBikeView` | 2 | racer list entries; +0x784 finishPosition (KrustyBikeCore.h:160) and +0x5c4 riderCharacter (BikeCore.h:131) |
+| `UnknownPodiumRacerModel` | `PodiumRiderView` | 2 | Bike+0x5c4 riderCharacter (BikeCore.h:131) as the podium reads it |
+| `UnknownPodiumSoultree` | `PodiumD3DIMSoultreeObjectView` | 2 | calls 0x004444c0 D3DIMSoultreeObject::SetUseLighting; ArcadeObject+0x2c arcadeModel is a D3DIMSoultreeObject* |
+| `UnknownPodiumSound` | `PodiumSoundView` | 2 | ctor 0x004bba10, Load 0x004bc320 and PlayWithOptions 0x004bc6b0 are PCAudio.h Sound methods |
+| `UnknownPodiumTextureEntry` | `PodiumSoultreeMaterialView` | 2 | entries of D3DIMSoultreeObject+0x290 materialTable (SoultreeMaterial**, D3DIMSoulTree.h:307); +0x2c texture name = SoultreeMaterial::textureName (first member after GameObject 0x2c) |
+| `UnknownPodiumTrackObject` | `PodiumTerrainView` | 2 | BikeRace+0x4c raceTerrain; +0x40 is BikeRaceTerrainView gridCellSize; Group1_PodiumViews.cpp reinterprets it as Terrain |
+| `UnknownPodiumViewFields` | `PodiumBikeRaceView` | 2 | BaseQuarryEvent+0x34 raceView; +0x4c raceTerrain and +0x64 startGate match BikeRaceCore.h |
+| `UnknownProCircuitResult` | `ProCircuitRacerResultView` | 2 | view of EventManager's 0x50-byte RacerResult entries (eventManager->results) |
+| `UnknownProjector` | `OverlayVisibilityClipperView` | 2 | TrackOverlay.h ProjectPoint 0x0052f340 is bound as VisibilityClipper::ProjectPoint; FollowCamera.h says it views the same pointer 0x00575a98 |
+| `UnknownRaceSettings` | `SelectGameRaceSettingsView` | 2 | TrackGame+0x2d70 = mode.raceSettings (TrackGame.h RaceSettings, 0x1ec bytes) |
+| `UnknownRadarView` | `RadarBikeRaceView` | 2 | TrackOverlay.h radarView is EventBikeRaceView*; +0x48 Track* is BikeRaceCore.h raceTrack |
+| `UnknownRecorderCallback` | `RecorderCallbackProc` | 2 | typedef of the VCRInterface+0x80 cdecl callback; BikeRace 0x004230e0 is passed as one (typedef not mangled) |
+| `UnknownRecorderOwner` | `RecorderVCRFileView` | 2 | VCRInterface+0xac: the worker calls VCRFile methods on it and +0x23c is VCRFile memory (Recorder.h) |
+| `UnknownRecorderThread` | `RecorderWorkerThread` | 2 | 0x004e6f80 is the _beginthreadex start routine of VCRInterface 0x004e7a90 (docs/RECORDER.md worker thread) |
+| `UnknownRegionStep` | `CacheRegionWalkStep` | 2 | CacheTexture.cpp: {region, index} step of CacheTexture::ReserveRegions 0x0050f9b0's depth-first walk |
+| `UnknownRenderStateEntry` | `CachedRenderState` | 2 | PCRenderTarget.h: {state, value} of the 300-entry SetRenderState cache at +0x264 (PCRenderTarget.cpp:262 compares value) |
+| `UnknownRenderStatePair` | `TextureRenderState` | 2 | TextureMap.h: {state, value} pairs at +0x48 applied through RenderTarget::SetRenderState (ManagedTexture.cpp:120, PCTextureMap.cpp:290) |
+| `UnknownReplayTapeHeader` | `ReplayTapeHeader` | 2 | "VCRtape.dat" header, 0xeb0 bytes, RaceSettings at +0x34 |
+| `UnknownScoreBoard` | `EventKbScoreBoardView` | 2 | EventBikeRaceView+0xbc; ShowValue 0x0048d1e0 is KbScoreBoard::ShowValue (KrustyBikeTypes.h:327) |
+| `UnknownScreenX` | `ScreenXFraction` | 2 | returns the cue's screenX fraction (LoadVisualCue's screenXFraction) |
+| `UnknownScreenY` | `ScreenYFraction` | 2 | returns the cue's screenY fraction (LoadVisualCue's screenYFraction) |
+| `UnknownSkyCubeCamera` | `SkyCubeCameraView` | 2 | SkyCube.cpp: +0x170 eyePosition = Camera.h eyePosition (comment: Camera +0x170 is its position) |
+| `UnknownSkyCubeTarget` | `SkyCubeRenderTargetView` | 2 | SkyCube.cpp: renderContext cast, +0x08 currentCamera = RenderTarget +0x08 current Camera |
+| `UnknownSoultreeCameraView` | `D3DIMSoultreeCameraView` | 2 | D3DIMSoulTree.h: +0xec viewMatrix, +0x170 position, +0x17c viewDirection, +0x198 imagePlaneDistance, +0x1a0 viewport = Camera.h screenMatrix/eyePosition/viewDirection/focalLength/viewport |
+| `UnknownSoultreeMatrix` | `SoultreeD3DMatrix` | 2 | D3DIMSoulTree draw samples: a 4x4 with D3DMATRIX element names |
+| `UnknownSoultreeMesh` | `ModifierSoultreeSurfaceView` | 2 | MorphBastardModifier.h: 0x38-byte record whose members mirror SoultreeSurface (D3DIMSoulTree.h:159) offset for offset |
+| `UnknownSoultreeNodeView` | `DrawSoultreeObjectView` | 2 | derives SoultreeObject in the D3DIMSoulTree draw samples; GetMatrixIn 0x004fca80, GetPositionIn 0x004fc9a0, WorldToLocalDirection 0x004fd710 are soultree.cpp SoultreeObject helpers |
+| `UnknownSoultreeScreenRect` | `SoultreeScreenRect` | 2 | D3DIMSoulTree.h: screen rectangles at +0x298/+0x2a8 |
+| `UnknownTexturePalette` | `TextureColorMapperView` | 2 | GetColors/GetIndexFrom555/GetIndexFrom565 0x004de270/80/90 are ColorMapper methods (Quantize.h, RTTI ColorMapper vtable 0x00557658); entries +0x10, entries555 +0x310, entries565 +0x510, indexFrom555 +0x710 match ColorMapper; Quantize.h says TextureMap.h views the same object |
+| `UnknownThreadProc` | `RefillThreadProc` | 2 | 0x004bb630, started by StartRefillThread 0x004bb740; refills the half that finished playing |
+| `UnknownTrackGameModeOptions6ac` | `TrackGameInterfaceOptions` | 2 | TrackGameMode+0x6ac; ResetInterfaceOptions 0x00522720; members are OptionProcs interface check boxes |
+| `UnknownTrackGameModeOptions6ac360` | `GarageCurveChoice` | 2 | the member is garageCurveChoice (+0x360 of the interface block): one chosen curve row per bike class |
+| `UnknownTrackGameModeOptionsA20` | `TrackGameSoundOptions` | 2 | TrackGameMode+0xa20; ResetSoundOptions 0x00522780; CD audio, sound, EAX, volumes |
+| `UnknownTrackGameModeOptionsA4c` | `TrackGameGraphicsOptions` | 2 | TrackGameMode+0xa4c; ResetGraphicsOptions 0x005227d0; display mode, shadows, particles, sky cube, detail |
+| `UnknownTrackGameModeOptionsA68` | `TrackGameControlOptions` | 2 | TrackGameMode+0xa68; ResetControlOptions 0x00522800; response sliders, feedback, joystick, gyros |
+| `UnknownTrackGameModeOptionsFd8` | `TrackGameGarageOptions` | 2 | TrackGameMode+0xfd8/+0x1034/+0x1090; ResetGarageOptions 0x00522cb0 / ResetEngineOptions / ResetSuspension / CopyGarageTables |
+| `UnknownTrackGameObject56cItem` | `TrackGameUIDialogView` | 2 | returned by 0x00485df0 GUIManager::FindInputDialog (UIDialog*); slot bound 0x0046ff30 UIDialog::EndDialog |
+| `UnknownTrackGameSessionList` | `SessionList` | 2 | TrackGameMode+0xa98 sessions: SessionInfoType entries[5] (NetProcs.cpp enumerates sessions into it) |
+| `UnknownTrackGameViewEntry` | `TrackGameRaceGateView` | 2 | RaceGateEvent+0x420 gates (BikeRace.h RaceGateObject); SelectLapGates 0x00404df0 toggles each gate +0x58 object +0x44 flag |
+| `UnknownTrackGameViewOwnerDc` | `TrackGameTagBallView` | 2 | TrackGameViewOwner+0xdc ball ("FREE BALL!" in StatsOverlay 0x0051aa40); BikeRace.cpp reads the same object as BikeRace.h TagBall |
+| `UnknownTrackGameViewPart` | `TrackGameSceneView` | 2 | BaseQuarryEvent+0x2c eventScene as TrackGame.h reads it (Scene members by offset) |
+| `UnknownTrackRecordListBox` | `TrackRecordUIListBoxView` | 2 | only slot 66 is called, UIListBox::ReportClick 0x00477d30 (TrackRecordDlg.h) |
+| `UnknownUpdateDistances` | `UpdateListenerDistances` | 2 | inline: calls UpdateListenerDistance on every emitter |
+| `UnknownWreckerMatrix` | `WreckerD3DMatrix` | 2 | Wrecker.h: 4x4 with D3DMATRIX element names _11.._44 (64 bytes, tests/fixtures/camera_wrecker_math_layout.cpp) |
+| `UnknownWreckerMotion` | `WreckerMotionView` | 2 | Wrecker.h: frameCount +0xa8, fps +0xb4 = Motion (Motnctrl.h), asserted by tests/fixtures/wrecker_model_layout.cpp |
+| `UnknownWreckerParticle` | `WreckerParticleView` | 2 | Wrecker.h: layout of ParticleManager.h Particle (position, color, frame, age, lifetime, size, growth, flags +0x34, velocity +0x38); sibling WreckerParticleManagerView |
+| `UnknownZonePlayerRecord` | `ZonePlayerRecord` | 2 | MSZoneInterfaceBase+0x08 players[8], reported by 0x004aa670 (MSZoneInterface.cpp) |
+| `UnknownZoneRaceRecord` | `ZoneRaceRecord` | 2 | one racer's line of the race status; labels from 0x0049c770's debug messages |
+| `UnknownZoneRaceStatus` | `ZoneRaceStatus` | 2 | MSZoneInterfaceBase+0x2a4 raceStatus, sent through 0x004aa670 by 0x0049c770 with size 0x88 |
+| `UnknownZoneScore` | `ZoneScoreInterface` | 2 | CoCreateInstance(g_ZoneScoreClassGuid, ..., g_ZoneScoreInterfaceGuid, &score) (MSZoneInterface.cpp:179): the COM interface of that IID |
+| `UnknownBikeAIPointOwner` | `BikeAIDirectionObstacle` | 3 | CollisionObject::ownerObject for ownerType 0x69 (direction +0x40); roles tier 3 |
+| `UnknownBikeAISegmentOwner` | `BikeAISegmentObstacle` | 3 | CollisionObject::ownerObject for ownerType 0x64/0x65 (start +0x0c, direction +0x64); roles tier 3 |
+| `UnknownFunction4ea7e0` | `AttachSceneManager` | 3 | 0x004ea7e0: stores the SceneArchiveFinder owner, aural scape and probe mask, adds the SoundGroup child |
+| `UnknownGridDraw` | `GridDrawKey` | 3 | a racer's 12-byte random grid key sorted by CompareGridDraws 0x004f20a0 |
+| `UnknownPlace` | `PlaceCue` | 3 | the placement block slot 10 repeats; places the cue at its screen position in front of the camera |
+| `UnknownPlaceEmitter` | `ApplyNearestListenerVolume` | 3 | static inline: the emitter's volume from its nearest listener (pan always 0) |
+| `UnknownRecorderRecord` | `RecorderRecordHeader` | 3 | head of the VCRInterface+0x7c record buffer: slot 10 reads time and count from it |
+| `UnknownReset` | `ClearCurveChoices` | 3 | uncalled in-class inline that zeroes the five curve choices |
+| `UnknownSceneTextureInfo` | `SceneTextureRecord` | 3 | SceneManager.h: the record CountTexture 0x004f00e0 reads (texture name +0x2c), built on the stack by its two callers |
+| `UnknownSoundNotifier` | `SoundRefillNotifier` | 3 | 0x1c-byte helper at Sound+0x3c whose thread refills the buffer halves on DirectSound notifications |
+| `UnknownVideoDecoder` | `VfwDecompressor` | 3 | VfwDeco.h: vfwdeco.cpp TU; destructor 0x0052d050 ICClose/ICDecompressExEnd on its HIC; held at PCTextureMap+0x7c (class name unproven) |
+| `UnknownWreckerFrame` | `WreckerPoseFrame` | 3 | Wrecker.h: 4x4 read as right/up/forward/position rows; Wrecker::lastPose +0x6c and slot 10's pose local |
+
+### Methods and virtual slots
+
+| Owner | Old | New | Tier | Evidence |
+| --- | --- | --- | --- | --- |
+| GUIManager | `UnknownFunction464e90` | `OnPaletteChanged` | 3 | GUIManager::Tick 0x00485870 calls it after clearing paletteChanged (+0x1f0); ~UIDialog 0x0046a070 calls it in 8-bit mode unless the palette is locked |
+| DrawableGridNode | `UnknownFunction464e90` | `OnMaskCleared` | 3 | Griddraw: all three calls follow childMask becoming 0 (child->childMask = 0, or oldMask != 0 && childMask == 0) |
+| ManagedTextureGroup | `UnknownFunction464e90` | `OnOutOfPageSpace` | 3 | placement loop calls it when cachePages.Next() returns no page; TextureMapManager.h already notes "out of page space" |
+| CarProceduralNode | `UnknownNodeVirtualSlot0` | `ComputeSortKey` | 3 | QuadTreeObject slot 0 (EcoQuadTreeObject.h) |
+| CarProceduralNode | `UnknownNodeVirtualSlot1` | `ComputeQuadTreeCode` | 3 | QuadTreeObject slot 1 (EcoQuadTreeObject.h) |
+| CarProceduralNode | `UnknownNodeVirtualSlot2` | `LoadHierarchy` | 3 | SoultreeObject slot 2, 0x004fdc00 |
+| CarProceduralNode | `UnknownNodeVirtualSlot3` | `LoadHierarchyFromParameters` | 3 | SoultreeObject slot 3, 0x004fddc0 |
+| CarProceduralNode | `UnknownNodeVirtualSlot4` | `CreateNode` | 3 | SoultreeObject slot 4, 0x004fe020 |
+| CarProceduralNode | `UnknownNodeVirtualSlot5` | `UpdateLocalBounds` | 3 | SoultreeObject slot 5 (shared empty 0x00464e90) |
+| CarProceduralNode | `UnknownNodeVirtualSlot6` | `ResetLocalMatrices` | 3 | SoultreeObject slot 6, 0x004fec70 |
+| CarProceduralNode | `UnknownNodeVirtualSlot7` | `CloneFrom` | 3 | SoultreeObject slot 7, 0x004feb10 |
+| CarProceduralNode | `UnknownNodeVirtualSlot8` | `CopySubtree` | 3 | SoultreeObject slot 8, 0x004feb30 |
+
+### Fields
+
+| Owner | Old | New | Tier | Evidence |
+| --- | --- | --- | --- | --- |
+| podium Scene environment view (Group1_PodiumScene.cpp, EventManagerNearMisses.cpp) | `racerCount` | `terrainBreadth` | 2 | Scene+0xa4 environment +0x398 is SceneEnvironment terrainBreadth (SceneManager.h) |
+| podium terrain view (Group1_PodiumScene.cpp, EventManagerNearMisses.cpp) | `gridSpacing` | `gridCellSize` | 2 | BikeRace+0x4c raceTerrain +0x40 is Terrain gridCellSize (BikeRace.h BikeRaceTerrainView) |
+| PodiumSoultreeMaterialView (was UnknownPodiumTextureEntry) | `field_0x2c` | `textureName` | 2 | The podium materialTable entries are SoultreeMaterial objects, whose +0x2c is char textureName[0x40] (SoultreeMaterial : GameObject); the only uses pass it as ReplaceMaterialTexture's texture name (EventManagerNearMisses.cpp:341, Group1_PodiumScene.cpp:311). |
+| PodiumBaseQuarryEventView (was UnknownPodiumOwner) | `field_0x30[0x34 - 0x30]` | `skyCube[0x34 - 0x30] (bytes kept)` | 2 | Exact-size view pad of BaseQuarryEvent +0x30 skyCube; the view (commented TrackGameViewOwner) agrees with BaseQuarryEvent at +0x34 raceView, +0x7c lights and +0x94 opaqueTextureGroup. |
+| TrackGameViewOwner | `field_0x30[0x34 - 0x30]` | `skyCube[0x34 - 0x30] (bytes kept)` | 2 | Exact-size view pad of BaseQuarryEvent +0x30 skyCube; the view agrees with BaseQuarryEvent at +0x2c eventScene, +0x34 raceView, +0x3c raceCamera, +0x5c..+0x6c overlays and +0x9c auralScape (its own comments cite them). No TrackGameViewOwner method has a skyCube parameter or local; nothing derives from it. |
+| TrackGameViewOwner | `field_0x38[0x3c - 0x38]` | `visualCue[0x3c - 0x38] (bytes kept)` | 2 | Exact-size view pad of BaseQuarryEvent +0x38 visualCue (VisualCue*); same view agreement as skyCube. |
+| QuerySweepRecord | `field_0x0c[0x0c]` | `contactNormal[0x0c] (bytes kept)` | 2 | The struct comment names it CollisionShapeTests.h's CollisionSweepQuery (same pointer as g_CollisionBoxResult); that struct has +0x0c contactNormal and agrees at +0x00 offset/contactOffset, +0x18 contact, +0x28 count/contactCount. |
+| KbTrackRec | `field_0x00` | `position` | 2 | bajaEnduroEvent[lapGate + 9] is gates[lapGate] at +0xd8 (24-byte records, KrustyBikeTypes.h:219 comment); the gate record is Krusty3DObjects.h CueCourseGate, whose +0x0 is Vector3 position. KbTrackRec has no methods. |
+| ProjectedShadow | `field_0x5c` | `renderTarget` | 2 | Write-only. Init 0x004da7b0 stores its ShadowRenderTarget* argument here right after SetRenderContext(target); the ctor clears it; no retail reader. Named like wave 27's Overlay pixelFormat (write-only copy of a named value). Not `target` (Init's parameter); no renderTarget identifier in the shadow units and ProjectedShadow has no derived classes. |
+
+### What remains and why
+
+This was the last planned naming wave. The placeholders it leaves fall into
+groups, and the reason for each group decides whether another wave would help.
+
+The 573 remaining `Unknown*` uses (86 names), grouped by work/naming/w28/remain.py:
+
+| Uses | Names | Group | Why it remains | What would clear it |
+| --- | --- | --- | --- | --- |
+| 197 | 12 | Scene loader: the `Scene::UnknownFunction4de580` key setters, the `Scene::UnknownFunction464e80` message hook, `UnknownFolded4de580` and the SceneManagerNearMisses.cpp views (`UnknownSceneLodObject`, the emitter, physics-body and keyword views) | Their uses are in Scene::ReadStaticModels `0x004ecd60`, which is being matched. `0x004de580` and `0x00464e80` are also shared empty bodies, so their names can be tier 3 at most. | A small follow-up once that function is free. `UnknownSceneLodObject` → `SceneSoultreeObjectView` (tier 2) is ready: SetAxesPtr `0x004fbd70` and SetPosition `0x004fc660` are SoultreeObject methods. That rename must also update config/game_build.json and the view tuple in test_model_render_state_connections. |
+| 177 | 25 | Types of statics or globals, and their accessors: the options `UnknownOpt*Settings` statics and their `Unknown*SettingsOf` / `UnknownMessagesOf` accessors, `UnknownStatic65b478` / `UnknownFontTextureManager`, the `UnknownTimer` fixture static, the KrustyUI and soultree static vectors, `UnknownEcoDetailBand`, `UnknownVisibilityStatic`, `UnknownBonusKey`, `UnknownFilterKeys`, `UnknownBikeAIFilter`, `UnknownCubeTextureMapping`, `UnknownSoultreeClipper`, `UnknownSceneKeyword` | A static's decorated name includes its type. That name changes the .bss/.data placement or the retail symbol resolution (see `UnknownSoultreeClipper` above). | A wave whose proof also compares the section layout and the resolved retail addresses, not the object alone. Several names are ready: `UnknownTimer` is a PeakHold view (`0x004cb670/90/b0`), and `UnknownSoultreeClipper` is a VisibilityClipper view. |
+| 87 | 30 | `UnknownVirtualSlotN`, `UnknownMethodN` (ZoneScore slots 5 and 7-14), `UnknownRacerVirtualSlot26/78/79` | 34 uses are destructor slots: slot 0 of the views and slot 1 of InputDevice. The rest have no retail caller and no override, or point at shared stubs. No slot was the same retail slot as a named method. | For the destructors, one mechanical pass with a convention name such as `DeletingDestructor`, if the policy is changed (about 34 uses). For the rest, only new retail evidence. |
+| 46 | 7 | Typedef aliases of named classes (`UnknownResourceEntry` = ResourceItem, `UnknownSceneResourceManager` = ResourceManager, `UnknownParameterStream` = FileStream, `UnknownPickCallback` = CollisionCallback, `UnknownWreckerSkeleton` = SoultreeObject, `UnknownWreckerCharacter` = D3DIMSoultreeCharacter, `UnknownVehiclePart` = SoultreeObject) | The target is already known. A role name would only add a second name for the same class. | Spell the target at the uses and drop the typedef. That is a declaration edit, not a rename. |
+| 33 | 5 | Retired or comment-only names (`UnknownQuarry`, `UnknownBikeRaceOverlay19c`, `UnknownBikeRaceNewRacer`, `UnknownProCircuitSkinned`) and the retail string literal `"Unknown"` (23 uses, not a placeholder) | Some old names are asserted absent by tests, or are stale bindings keys. `UnknownProCircuitSkinned` is an unused declaration. | Clean up the comments and stale keys. Deleting `UnknownProCircuitSkinned` needs its fixture pin moved. |
+| 20 | 4 | Class or role not established (`UnknownLightEmitterTarget`, `UnknownTrackGameViewEntryTarget`, `UnknownAxisSettle_4cb6e0`, `UnknownEventPlayerMessage`) | No constructor, vtable, binding or offset join fixes the class. A name would be a guess. | New retail evidence. |
+| 11 | 2 | `UnknownEcoQuadTreeObject`, `UnknownSoultreeQuadTreeObject` | Polymorphic bases whose `??_R0` type descriptors and base-class arrays are emitted in .data. | None by renaming. Retail RTTI would name them if they had RTTI of their own. |
+| 2 | 1 | `UnknownEventGraphicsTest` | The RTTI name `GraphicsTest` collides with the real class that EventManager.cpp includes. | Delete the local view and use GraphicsTest.h (a declaration edit). |
+
+The 1274 remaining `field_0x` uses fall into these groups
+(work/naming/w28/leftF.txt and the Wave 27 left lists):
+
+- **Padding arrays that span several members of the viewed class.** These are
+  the podium, Quarry loader, DDSURFACEDESC2 colour-key and EventManager AI
+  table pads. They need a split into members, which changes declarations.
+- **Members that are only written.** Examples are Vehicle `field_0x4e8`
+  (tier-3 candidate `scaledTurnRadius`), SoultreePhysicsBaseObjectCore
+  `field_0x28` (candidate `inverseLoadMass`), CacheTexture `field_0x188`,
+  Terrain `field_0xc94`/`field_0xc98` and QuadTree `field_0x58`. They stay by
+  the write-only precedent, except where a write copies a named value.
+- **Int/float union arms.** These are the Griddraw unlit colour arms and the
+  UIEditBox, UIScrollBar and UIListBox arms. Wave 24 keeps alias arms as
+  placeholders on purpose.
+- **The tag ball `field_0x10a`.** The ball's class is not established.
+- **Members inside SceneManagerNearMisses.cpp.** That file is deferred with
+  the Scene loader.
+
+Is another wave worth it? Probably not a general naming wave. Waves 25-28
+took the placeholders that a view, a binding or a shared layout settles. What
+is left is blocked by one of four things:
+
+- **Concurrency.** The Scene loader group, about 200 uses, is ready for a
+  small follow-up once Scene::ReadStaticModels is matched.
+- **The static and global rule.** About 180 uses. These need a proof that also
+  checks the layout and the resolved symbols, not a bigger rename.
+- **Declaration edits.** The typedef aliases and the padding-array splits.
+  This is layout work that needs fixture repins, not renaming.
+- **Policy.** The destructor-slot convention and the union arms. One decision
+  on each would clear them mechanically.
+
+The rest has no new evidence and should wait for matching work to produce it.
