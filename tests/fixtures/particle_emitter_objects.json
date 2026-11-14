@@ -3,37 +3,37 @@
     "src/krusty2/vehicle/Bike.cpp": {
       "sections": 243,
       "relocations": 1105,
-      "sha256": "1166c39578e8e7b26c7fe9ed6964445c950e418b3d89597a1f47a63c37e43908"
+      "sha256": "df5b5fbe400bb84004926eeb6a18094b9c050ddeeefbd1098e8ee6dc7ce664ab"
     },
     "src/krusty2/vehicle/Vehicle.cpp": {
       "sections": 151,
       "relocations": 720,
-      "sha256": "43e7d2054529291123476739bdab2186a89ae42f9d4fcf62dbb790f11f90f687"
+      "sha256": "7de530a24f4159de9f04fe4383e4727854ae808e83ba570ef6fb950f2398a76e"
     },
     "src/reconstructed/DustParticleEmitter.cpp": {
       "sections": 28,
       "relocations": 65,
-      "sha256": "9520278028224cc8a7054a411bf1c1d5083a6570007375616c944481dd797c32"
+      "sha256": "6a4f26317c3929d20202acef173205004624910013aab71805a26c326e2c2903"
     },
     "src/reconstructed/DirtChunkParticleEmitter.cpp": {
       "sections": 22,
       "relocations": 63,
-      "sha256": "de1f02efc665e14c27f7f2c6a687fd178cdb458dcff02dce4f44acf145bd6f15"
+      "sha256": "553e3999be5b611490e710b14830bee444b8d998b3f11ded4c8404a84bf468c2"
     },
     "src/reconstructed/SteamParticleEmitter.cpp": {
       "sections": 26,
       "relocations": 61,
-      "sha256": "46693bdf38a3832d7bf28efbfabb9c3dca40335475b7b93dad354abe3fa8d75f"
+      "sha256": "5016427fc94b809ed2e6f073308cb3034b3fc0d1927d22f02a20da3124e7789b"
     },
     "src/reconstructed/SparkParticleEmitter.cpp": {
       "sections": 25,
       "relocations": 67,
-      "sha256": "7376a298764a1db62810de8ae5acdbe492578b8d78494a1b2863e925d4543963"
+      "sha256": "a69f5fcd84d9def232dd49377dffd541ca73a5f7038fa00b8f22b311d3d1880b"
     },
     "src/reconstructed/DirtSprayParticleEmitter.cpp": {
       "sections": 23,
       "relocations": 59,
-      "sha256": "5add6250f6a52b65cf8d4789543f02f4a888e9f69aa525a2b4453e85cff114f4"
+      "sha256": "0e3150659ab9dc756fbe9dc74fdc5ec53108312f3f1aecaa54afcf51f72066c9"
     }
   },
   "renames": {
@@ -747,7 +747,7 @@
     },
     {
       "source": "src/krusty2/vehicle/Vehicle.cpp",
-      "symbol": "Method_005293E0",
+      "symbol": "ApplyShockDamping",
       "target_va": "0x005293e0",
       "target_size": 104,
       "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
@@ -950,7 +950,7 @@
     },
     {
       "source": "src/krusty2/vehicle/Vehicle.cpp",
-      "symbol": "Method_00529450@Vehicle",
+      "symbol": "ApplyShockForces@Vehicle",
       "target_va": "0x00529450",
       "target_size": 1415,
       "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
@@ -1026,7 +1026,7 @@
         },
         {
           "slot": 9,
-          "symbol": "?UnknownVirtualSlot9@GameObject@@UAEHH@Z",
+          "symbol": "?PreTick@GameObject@@UAEHH@Z",
           "va": "0x469430",
           "source": "src/reconstructed/GameObject.cpp",
           "extent": 65,
@@ -1098,7 +1098,7 @@
         },
         {
           "slot": 19,
-          "symbol": "?UnknownVirtualSlot19@GameObject@@UAEHH@Z",
+          "symbol": "?OnInputEvent@GameObject@@UAEHH@Z",
           "va": "0x469530",
           "source": "src/reconstructed/GameObject.cpp",
           "extent": 68,
@@ -1231,7 +1231,7 @@
         },
         {
           "slot": 9,
-          "symbol": "?UnknownVirtualSlot9@GameObject@@UAEHH@Z",
+          "symbol": "?PreTick@GameObject@@UAEHH@Z",
           "va": "0x469430",
           "source": "src/reconstructed/GameObject.cpp",
           "extent": 65,
@@ -1303,7 +1303,7 @@
         },
         {
           "slot": 19,
-          "symbol": "?UnknownVirtualSlot19@GameObject@@UAEHH@Z",
+          "symbol": "?OnInputEvent@GameObject@@UAEHH@Z",
           "va": "0x469530",
           "source": "src/reconstructed/GameObject.cpp",
           "extent": 68,
@@ -1436,7 +1436,7 @@
         },
         {
           "slot": 9,
-          "symbol": "?UnknownVirtualSlot9@GameObject@@UAEHH@Z",
+          "symbol": "?PreTick@GameObject@@UAEHH@Z",
           "va": "0x469430",
           "source": "src/reconstructed/GameObject.cpp",
           "extent": 65,
@@ -1508,7 +1508,7 @@
         },
         {
           "slot": 19,
-          "symbol": "?UnknownVirtualSlot19@GameObject@@UAEHH@Z",
+          "symbol": "?OnInputEvent@GameObject@@UAEHH@Z",
           "va": "0x469530",
           "source": "src/reconstructed/GameObject.cpp",
           "extent": 68,
@@ -1641,7 +1641,7 @@
         },
         {
           "slot": 9,
-          "symbol": "?UnknownVirtualSlot9@GameObject@@UAEHH@Z",
+          "symbol": "?PreTick@GameObject@@UAEHH@Z",
           "va": "0x469430",
           "source": "src/reconstructed/GameObject.cpp",
           "extent": 65,
@@ -1713,7 +1713,7 @@
         },
         {
           "slot": 19,
-          "symbol": "?UnknownVirtualSlot19@GameObject@@UAEHH@Z",
+          "symbol": "?OnInputEvent@GameObject@@UAEHH@Z",
           "va": "0x469530",
           "source": "src/reconstructed/GameObject.cpp",
           "extent": 68,
