@@ -6,7 +6,7 @@
     "target_va": "0x004919a0",
     "target_size": 229,
     "expect": "partial",
-    "notes": "66.5% (size 230/229). Only register allocation differs: retail keeps the KbGame pointer in eax and the 60c index in edx in the else arm (a1 form), and loads 60c before the setne in the true arm; every source form tried compiles to the same bytes.",
+    "notes": "66.5% (size 230/229). Only register allocation differs: retail keeps the KbGame pointer in eax and the 60c index in edx in the else arm (a1 form), and loads 60c before the setne in the true arm; every source form tried compiles to the same bytes. Session 21 (151 unless noted, sweeps of 168 and 84 variants): the g_TrackGame->mode.raceSettings.eventType / mode.difficulty reads without the KbGame view; a function-scope int level assigned in both arms, with or without an int type, in either order (level initialised once above the test: 20-22); named or inline speed gain; the index spelled b[type != 3][level - 1], three flat (&b[0][0])[...] sums, (b[0] - 1)[...], level + -1, (b[row] - 1)[level] and *(b[row] + level - 1); the row cast to unsigned, bool or char, as ? 1 : 0 or !(== 3), and the level as unsigned, short, long or with 1u/1L (char row with short level scores 155 with nine differing instructions, not a real gain). Retail's true arm loads eventType into esi and the difficulty into the game register before the xor/cmp, then adds the tripled setne into the difficulty register.",
     "bindings": "KrustyBikeNearMisses.bindings.json"
   },
   {

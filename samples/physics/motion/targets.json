@@ -76,7 +76,7 @@
     "target_va": "0x004a7dc0",
     "target_size": 523,
     "expect": "partial",
-    "notes": "cdecl; slot 7 helper. 90.66%: the two Vec3Normalize result temporaries sit at a different stack slot (retail esp+0x70/0x7c, ours reuses the axisX/position slot) and one fld is scheduled earlier pose/rotation declared in a block opened after the normalisations (or only pose there) leaves 476: the temporaries stay in the low slots.",
+    "notes": "cdecl; slot 7 helper. 90.66%: the two Vec3Normalize result temporaries sit at a different stack slot (retail esp+0x70/0x7c, ours reuses the axisX/position slot) and one fld is scheduled earlier pose/rotation declared in a block opened after the normalisations (or only pose there) leaves 476: the temporaries stay in the low slots. Session 21: retail puts all three return temporaries (both Vec3Normalize and the cross product) in one dedicated slot at frame 0x70 and keeps axisX/position alone in the lowest slot; here only the cross temporary is at 0x70 and the Vec3Normalize ones take the axisX/position slot, so retail ranks the temporaries ahead of axisX. No change (476): an inline PoseUnit wrapper around Vec3Normalize returning a named local (initialised or assigned), returning the call directly, or normalising in place through a Vec3&; axisX in its own block with row 0 (alone or with rows 1-2), read or written through a Vec3* in that block, and position plus the tail of the function in a sibling block, directly or through a Vec3* (all the same bytes). Worse (162 masked): row 0 written as one Vec3 struct copy into pose.m[0], with or without rows 1-2 as struct copies or position chained from it.",
     "bindings": "Motnctrl.bindings.json"
   },
   {
