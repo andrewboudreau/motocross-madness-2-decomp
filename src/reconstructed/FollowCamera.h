@@ -71,7 +71,7 @@ struct FollowCameraEase {
 // 44-byte record in the table at FollowCamera+0x2e4 (count at +0x2e0,
 // capacity at +0x2dc), written by 0x00463450 and 0x00463520. 0x00463140
 // resets both vectors to the zero vector; slot 38 compares +0x28 (the z of
-// field_0x20). The Vector3 members give the record an empty constructor, which
+// screenPoint). The Vector3 members give the record an empty constructor, which
 // leaves a dead loop counter in 0x00463140's `new[]`.
 struct UnknownFollowCameraPoint {
     Vector3 position;

@@ -66,7 +66,7 @@ class TireNode;
 #include "../../reconstructed/TireAttachmentViews.h"
 
 // Provisional area-local stand-ins for two scene-side classes only known by their calls.
-class TireNode {                                       // scene node, MovingPart::field_0x40
+class TireNode {                                       // scene node, MovingPart::sceneNode
 public:
     void GetPositionIn(TireNode* parent, CollisionVec3* out);                        // world position
     void GetLocalBounds(CollisionVec3* a, CollisionVec3* b);                          // extents, b.y = wheel radius
@@ -246,7 +246,7 @@ public:
     int field_0x298;
     float rampLevel;  // +0x29c 0x005143d0 unwinds the roll angle by (1 - rampLevel) while set
     float driveStrength;  // +0x2a0 ctor arg a10; ApplyDrive 0x00514170 scales the push by it
-    float field_0x2a4;
+    float leanCos;  // +0x2a4 1.0 default; Bike stores its leanCos, InlineShock::Retract divides by it
     TireAux* engine;  // +0x2a8 Vehicle calls EngineGearbox::DriveForce on it, Bike's loader stores engineState; UpdateRoll scales the roll angle by its throttle in (0, 1)
     TireAttachB* rotatingShock;             // +0x2ac RotatingShock (SolveContact 0x004fac60); released by the dtor when inlineShock is null
     TireAttachA* inlineShock;               // +0x2b0 InlineShock (SolveContact 0x004fa400); released first (dtor 0x004f9f80)

@@ -1976,7 +1976,7 @@ void Vehicle::ResetWheelContacts()
 {
     for (int i = 0; i < wheelCount; i++) {
         VehicleWheel* wheel = wheelList[i];
-        wheel->field_0x2a4 = 1.0f;
+        wheel->leanCos = 1.0f;
         wheel->slipVector = kVec3Zero;
         wheel->driveForce = kVec3Zero;
         wheel->driveMagnitude = 0.0f;

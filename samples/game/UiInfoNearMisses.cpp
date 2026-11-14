@@ -4,7 +4,7 @@
 // TrackGameMode::ResetDefaults (0x00522440, 427 bytes): restores the
 // default settings. Calls, constants and stores all match; 383 of 427 bytes.
 // The leading +0x27f8 store order 0x30, 0x0c, 0x10, 0x00, 0x14 gives
-// retail's ecx = 1 / edx = 2 constants and &field_0x27f8 setup, and an
+// retail's ecx = 1 / edx = 2 constants and &raceSettings setup, and an
 // explicit zeroing loop for bonusTrackUnlocked (not memset) gives retail's rep
 // stosd placement. Left: retail schedules the +0x2828 store after `mov
 // edx, 2` and places the second 0x1ec-byte rep movsd after the +0x196c
@@ -14,7 +14,7 @@
 // second memcpy x memset/loop zeroing; memcpy vs struct assignment for
 // both copies at every position (moving the second copy later costs
 // 100+ bytes). Earlier passes also tried a reference or pointer alias of
-// field_0x27f8 for the stores and the memcpy sources (32 combinations).
+// raceSettings for the stores and the memcpy sources (32 combinations).
 // An inline settings-reset helper over the 13 stores (720 variants) turns
 // them into [eax + N] stores (174, 394 bytes).
 // Session 21 (60 forms, best 383): chained stores for the three 1s

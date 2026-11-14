@@ -221,7 +221,7 @@ static const ConStaticVec3 g_ConYAxis = ConStaticVec3(0.0f, 1.0f, 0.0f);
 static const ConStaticVec3 g_ConZAxis = ConStaticVec3(0.0f, 0.0f, 1.0f);
 
 // ---- Contact callback (0x0043b800) ----------------------------------------------
-// Stored into field_0x88 by slot 8 (with 0x464e90 in field_0x8c). cdecl; self is the
+// Stored into onHitCallback by slot 8 (with 0x464e90 in onHitByCallback). cdecl; self is the
 // constraint model, b the other collision object. The contact record at a->contactRecord
 // (+0x5c) is the CollisionSweepQuery of CollisionShapeTests.h viewed with a float fraction;
 // tier 3 semantics.

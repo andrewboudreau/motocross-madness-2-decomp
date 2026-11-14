@@ -171,15 +171,15 @@ public:
     void ResetWheelContacts();           // 0x00525a90, resets every wheel's contact state and vectors
 
     // Inherited members whose canonical types are still separate classes are viewed
-    // through casts at the use site (MIGRATION.md rule 6): field_0x12c as
-    // VehicleContact**, field_0x128 as
-    // VehicleContactSet*, field_0x1f0 as VehicleMaterialSet*.  Inline accessor functions
+    // through casts at the use site (MIGRATION.md rule 6): collisionPoints as
+    // VehicleContact**, collisionObject as
+    // VehicleContactSet*, track as VehicleMaterialSet*.  Inline accessor functions
     // were tried; VC6 schedules their loads differently (slots 4, 19, 35 and 49 lost
     // bytes, Bike slot 8 lost its exact match), so the casts are written out.
 
     float forwardSpeed;  // +0x434  velocity along bodyForward (BikeAI dot; UpdateContactPatch out); KrustyBike compares it with 60 mph in ft/s
     float referenceSpeed;                     // +0x438  LoadVehicle sets 180; Bike slot 59 scales the steer limit by prevSpeed / referenceSpeed; the bike cameras use it in place of 180 (tier 2)
-    float turnRate;  // +0x43c = turnAngle * field_0x140 (1/dt) in slot 72: velocity deflection angle per second; reset to 0 whenever no wheel drives it
+    float turnRate;  // +0x43c = turnAngle * invStepTime (1/dt) in slot 72: velocity deflection angle per second; reset to 0 whenever no wheel drives it
     int movingForward;  // +0x440 slot 85 passes +dt when set and -dt when clear to every wheel; slot 74 flips the sign of its result on it; slot 1 resets it to 1
     int crashState;  // +0x444 nonzero disables input (slots 52/62/64/60 test ==0), switches solver vectors (+0xf0, 0.1 scale, 1,1,1 mask); Bike slot 99 writes it and runs the crash timer 0x454 while set
     int crashDirection;          // +0x448 Bike slot 99 (0x00409b30) stores small codes (1..5)
@@ -203,8 +203,8 @@ public:
     VehicleSteerState* steerState;  // +0x47c VehicleSteerState*: node plus steer angle; slots 53/60/73/36 use it
     VehicleSpeedState* engineState;  // +0x480 VehicleSpeedState*: 6-entry per-gear tables, advanced by UpdateThrottle/AutoShift with throttle/brake flags and speed in slot 49 (provisional)
     int justLanded;  // +0x484 slot 49 clears it per frame; slot 71 sets it to 1 when the airborne flag 0x108 drops (landing)
-    Vec3 takeoffPosition;  // +0x488 slot 71 copies position field_0x0c here when the vehicle leaves the ground
-    Vec3 takeoffVelocity;  // +0x494 slot 71 copies velocity field_0x64 here when the vehicle leaves the ground
+    Vec3 takeoffPosition;  // +0x488 slot 71 copies position position here when the vehicle leaves the ground
+    Vec3 takeoffVelocity;  // +0x494 slot 71 copies velocity velocity here when the vehicle leaves the ground
     int outOfRace;  // +0x4A0  set to 1 by slot 44; EventManager counts the racer done, KrustyBike's nearest-bike search skips it
     float driveForceScale;                    // +0x4A4  the constructor sets 1.0; slot 86 (and KrustyBike's) passes it as the gearbox DriveForce scale
     int wheelsInContact;  // +0x4a8 slot 54 divides the wheel normal sum by it; slot 49: 0x5a8 = (it == wheel count), 0x5a4 = (it != 0); slots 46/7 branch on 0/1/2
@@ -214,7 +214,7 @@ public:
     float turnAngle;  // +0x4b8 result of slot 74 (signed deflection angle of the velocity), see turnRate
     float steerRate;  // +0x4bc slot 60: -(steerAxis*maxAngle) - steerAngle divided by (steps*dt+...); slot 53 feeds steerRate*dt to the steer state
     Vec3 tiltAxisLocal;  // +0x4c0 slot 49: WorldToLocalDirection of the lift axis, used as the RotateAboutPoint axis
-    Vec3 sideAxis;  // +0x4cc slots 34/35: cross product of the two basis vectors field_0x88 and field_0x94
+    Vec3 sideAxis;  // +0x4cc slots 34/35: cross product of the two basis vectors bodyForward and bodyUp
     float suspensionWeightScale;              // +0x4D8  LoadVehicle's float argument after the weight (Bike passes 0.9); slot 0 multiplies baseWeight by it (provisional)
     float suspensionMass;                     // +0x4DC  slot 0: = (suspensionWeightScale * baseWeight + arg) / 32.2 (weight to slugs); ApplyShockDamping passes it to Shock::ApplyDamping as the mass factor of the critical damping (tier 2)
     float targetLeanAngle;  // +0x4e0 Bike clamps it to +-maxLeanAngle and subtracts it from the current lean (slot 57)
@@ -222,7 +222,7 @@ public:
     float field_0x4e8;
     float wheelBase;  // +0x4ec slot 73 returns wheelBase / sin(steer angle) (bicycle-model turn radius)
     int spawnProtected;  // +0x4f0 slot 50 stores protect here, slot 51 returns it; slot 33 (respawn) sets it using slot 45 (3.0)
-    float spawnProtectTimer;   // +0x4f4 tier 2: countdown; slot 49 tests > 0 and subtracts field_0x13c (frame dt), slot 50 stores it
+    float spawnProtectTimer;   // +0x4f4 tier 2: countdown; slot 49 tests > 0 and subtracts stepTime (frame dt), slot 50 stores it
     VehicleAxis* steerAxis;  // +0x4f8 slot 63 reads its value into steerInput and 0x504.x
     VehicleAxis* leanAxis;  // +0x4fc slot 63 reads -value into controlInput.y
     VehicleAxis* throttleAxis;  // +0x500 slot 63 reads its value into throttleInput (dead zone 0.2)
@@ -244,7 +244,7 @@ public:
     int earlyTickerCapacity;               // +0x564 capacity of earlyTickers
     int earlyTickerCount;               // +0x568 count of earlyTickers
     int auxWheelCount;               // +0x56c wheels added with an aux object (AddWheel)
-    int contactTotal;  // +0x570 = field_0x1cc + wheelsInContact (body contacts plus wheels in contact) in slot 7; slot 49 branches on > 0
+    int contactTotal;  // +0x570 = touchingPointCount + wheelsInContact (body contacts plus wheels in contact) in slot 7; slot 49 branches on > 0
     Vec3 crashHeading;     // +0x574 horizontal forward (x, 0, z) stored on a crash (Bike slot 100, Vehicle::CheckCrash) and by the Bike and KrustyBike loaders (no reader decoded)
     float maxLeanAngle;  // +0x580 Bike clamps the target lean to +-maxLeanAngle
     float maxLeanRate;  // +0x584 Bike limits the lean error change to maxLeanRate * dt

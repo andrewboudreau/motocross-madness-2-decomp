@@ -1612,7 +1612,7 @@ inline void BikeAIClampUnit(float& v)
 // Retail shapes reproduced (654 -> 2044 strict, candidate size 4114): the crash flag
 // +0x464 as a `?:` (retail `mov eax, 1` / `xor eax, eax` and one store), airborneOut as an
 // unsigned char (retail zero-extends it with `and ecx, 0xff` for slot 71), the travel
-// argument written as `-field_0x7f8` twice (retail keeps the negated value with `fst` and
+// argument written as `-lookAheadFrontTravel` twice (retail keeps the negated value with `fst` and
 // scales with `fld st(0); fmul mem`), `if (!airborne)` first for +0x5a4 (retail's branch
 // layout), the ground-branch lean clamp written on the assignment `(lean = pitch) > 1.0f`,
 // `float height = position.y;` before BIKEAI_ABS (retail loads it once and fchs's it) and

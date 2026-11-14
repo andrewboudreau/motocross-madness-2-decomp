@@ -40,7 +40,7 @@ public:
     // 0x004e8f40: when an item named like `item` exists, moves `item`'s
     // location onto it (deleting the old archive when unused) and returns
     // 1; 0 when there is none or the existing item's archive chain has a
-    // nonzero field_0x08.
+    // nonzero fileEncoded.
     int MergeWithExisting(ResourceItem* item);
     // 0x004e9010: records `object` on `entry`; drops the entry when both
     // the object and its archive are gone.

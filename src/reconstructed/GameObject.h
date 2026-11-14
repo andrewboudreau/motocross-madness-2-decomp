@@ -152,7 +152,7 @@ public:
     // Read directly by non-member collision queries; original access is unknown.
     unsigned char isEnabled : 1;              // +0x25 bit 0: cleared by Disable (slot 4), set by Enable (slot 5)
 protected:
-    unsigned char field_0x25_bit1 : 1;        // +0x25 bit 1: set and cleared with bit 0; gates OnNetworkMessage (slot 24)
+    unsigned char receivesNetworkMessages : 1; // +0x25 bit 1: set and cleared with bit 0; gates OnNetworkMessage (slot 24)
     unsigned char isPaused : 1;               // +0x25 bit 2: stored by SetPaused (slot 16)
     unsigned char pendingRelease : 1;         // +0x25 bit 3: set by MarkPendingRelease (slot 26); ReleaseDetached releases the marked children
     char* classNames;                         // +0x28 DebugMalloc'd string, starts empty; see 0x00469ce0

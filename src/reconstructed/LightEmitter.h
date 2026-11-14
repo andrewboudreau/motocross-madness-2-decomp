@@ -99,7 +99,7 @@ public:
     int field_0x108;
     int field_0x10c;
     int vertexCapacity;                     // capacity in vertices
-    int field_0x114;
+    int storeVertexColors;                  // LightVertices: colour array passed; keep per-vertex RGB
     int changeCount;                        // change counter
 };
 

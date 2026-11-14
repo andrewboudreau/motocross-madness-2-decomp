@@ -140,7 +140,7 @@ struct BikeWheel {
     char pad_0x298[4];
     float rampLevel;  // +0x29c Tire.h/VehicleWheel rampLevel
     char pad_0x2a0[4];
-    float w_0x2a4;
+    float leanCos;  // +0x2a4 Tire.h leanCos
     BikeWheelQ* aux;  // +0x2a8 VehicleWheel aux (Tire.h TireAux)
     BikeQ* secondaryAux;  // +0x2ac VehicleWheel secondaryAux (the fallback when primaryAux is null)
     BikeQ* primaryAux;  // +0x2b0 VehicleWheel primaryAux (attachment AddWheel stores)
@@ -256,7 +256,7 @@ struct BikeA38 {
     void SnapPlacement();  // 0x00435fe0: unused view of CollisionObject::SnapPlacement (docs/NAMING.md)
 };
 
-// The scene node (d3d_field_0x1a0, field_0x42c, BikeA1A0::d_0x140) is SoultreeObject
+// The scene node (d3d_field_0x1a0, poseNode, BikeA1A0::d_0x140) is SoultreeObject
 // (../common/SoultreeObject.h).
 
 struct BikeGlobal_0056e26c { char pad_0x000[0x2f0]; float g_0x2f0; };

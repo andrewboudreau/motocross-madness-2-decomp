@@ -9,13 +9,13 @@
 // Everything lines up except that VC6 here keeps the constant 1 in ebp and
 // the copy in ebx (retail: ebx and ebp), which also moves the 8-bit key
 // expansion's scratch registers. The shape that gets this close: the
-// cached flag normalised to 0/1 (`(field_0x68 & 1) != 0`, stored in the
+// cached flag normalised to 0/1 (`(mapFlags & 1) != 0`, stored in the
 // slot the `new` temporary reuses), the manager in a local before each
 // `new`, the copy assigned directly (a separate ManagedTexture local
 // assigns ebp before the registration call; retail after), the two
 // caps-derived flags as separate `if`s, and the ManagedTexture `new`
-// first (its EH state is 0). `int cached = field_0x68 & 1` keeps the
-// store but not the constant register; `if (field_0x68 & 1)` keeps the
+// first (its EH state is 0). `int cached = mapFlags & 1` keeps the
+// store but not the constant register; `if (mapFlags & 1)` keeps the
 // register but tests the byte in place.
 // A bool/char `cached` gets retail's ebx/ebp split (the byte `and al, bl`
 // needs a byte register) but takes its own byte slot and grows the frame;

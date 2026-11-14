@@ -94,7 +94,7 @@ public:
 };
 struct TerrainSurfaceDesc {
     TextureMapManager* manager;                                // +0x00 passed to PCTextureMap/ManagedTexture constructors
-    TerrainSurfaceRegistry* registry;                          // +0x04 copied to Terrain::field_0x38 by Terrain::Load
+    TerrainSurfaceRegistry* registry;                          // +0x04 copied to Terrain::surfaceRegistry by Terrain::Load
     char pad_0x08[0x10];
 };
 
@@ -149,7 +149,7 @@ public:
     // casts the grid-space segment (a, b) against the terrain; on a hit writes the grid-space hit
     // point to *out.  The last three ints are forwarded from Terrain::CastSegment (tier 3 role).
     virtual int CastSegment(TerrainVec3* a, TerrainVec3* b, TerrainVec3* out, int p3, int p4, int p5);
-    // 0x00483910 (thiscall, ret 0x14; tier 2: field_0x44 is the same object the dtor shuts
+    // 0x00483910 (thiscall, ret 0x14; tier 2: heightField is the same object the dtor shuts
     // down).  Fetches the four corners of grid cell (ix, iz): heights[4], optional normals[4]
     // and per-corner surface bytes[4] (three output arrays, see Terrain::QueryGround).
     void GetCellCorners(int ix, int iz, float* heights, TerrainVec3* normals,
@@ -174,10 +174,10 @@ struct TerrainMatrix {
     float m[16];
 };
 
-// PROVISIONAL: 16-byte entries of the table at *0x0068a32c indexed by Terrain::field_0xbf0
+// PROVISIONAL: 16-byte entries of the table at *0x0068a32c indexed by Terrain::qualityIndex
 // (`shl eax,4`, fields at +0, +4, +8, +0xc read by 0x00507960; tier 2 layout, tier 3 use).
 struct TerrainQualityEntry {
-    int drawDistanceSetting;  // +0x00 SelectQuality passes it to SetField0xbec (the >=0 clamped value stored in Terrain::field_0xbec, ctor 1000)
+    int drawDistanceSetting;  // +0x00 SelectQuality passes it to SetField0xbec (the >=0 clamped value stored in Terrain::drawDistance, ctor 1000)
     int closeUpDetailLimit;  // +0x4  copied to Terrain::qualityParamA; Griddraw draws close-up (detail texcoords, white) when node detail exceeds it
     int perspectiveLimit;  // +0x8  copied to qualityParamB; Griddraw enables TEXTUREPERSPECTIVE (software) when node detail exceeds it
     int hasDetailPass;  // +0xC  copied to g_terrainQualityValue, which gates slot 14's detail-texture pass
@@ -378,8 +378,8 @@ public:
     int field_0xc98;                                            // +0xc98 Load: 6
     unsigned int unlitColor;  // +0xC9C  Load/slot 14: grey from detailAverageColor's alpha; Griddraw copies it into far unlit vertices' colour
     unsigned int unlitSpecular;  // +0xCA0  Load/slot 14: detailAverageColor RGB scaled by alpha; Griddraw copies it into far unlit vertices' specular
-    int qualityParamA;  // +0xca4 SelectQuality: table[index].field_0x04 (or table[9] when lowestQualityOverride)
-    int qualityParamB;  // +0xca8 SelectQuality: table[index].field_0x08
+    int qualityParamA;  // +0xca4 SelectQuality: table[index].closeUpDetailLimit (or table[9] when lowestQualityOverride)
+    int qualityParamB;  // +0xca8 SelectQuality: table[index].perspectiveLimit
     int canSinglePassDual;  // +0xCAC  slot 14: registry CanRenderDualTextureInSinglePass / ValidateDevice probe; printed "CanSinglePassDual"
     int lowestQualityOverride;  // +0xcb0 slot 23 key 2 toggles it; when set qualityParamA comes from table[9]; slot 14 prints it as "SinglePassDual" and then draws the detail texture in stage 1
     int closeUpStateSet;  // +0xCB4  GridTerrain: set when Griddraw applies the close-up stage-1 filters; slot 14 clears it

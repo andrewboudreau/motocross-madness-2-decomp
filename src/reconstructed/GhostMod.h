@@ -12,7 +12,7 @@
 // the member names are ours (tier 3).
 //
 // What it does (tier 3): StartFade starts a fade of `duration`
-// seconds (0: none, both fields FLT_MAX); slot 10 counts field_0x40 down by
+// seconds (0: none, both fields FLT_MAX); slot 10 counts timeRemaining down by
 // the frame time and slot 27 sets the alpha byte of every vertex colour to
 // 200 - 100 * remaining / duration while time remains.
 

@@ -26,20 +26,20 @@
 
 class SoultreeObject;
 
-class SoultreeContact;    // elements of the field_0x12c array
-class CollisionObject;    // pointed to by field_0x128 (collision/CollisionObject.h (src/krusty2))
+class SoultreeContact;    // elements of the collisionPoints array
+class CollisionObject;    // pointed to by collisionObject (collision/CollisionObject.h (src/krusty2))
 struct SoultreeLight; // defined in SoulTreePhysics.cpp (slot 21)
-// Object probed for ray hits (field_0x1f4); only the members the base uses are modelled.
+// Object probed for ray hits (terrain); only the members the base uses are modelled.
 struct SoultreeProbe {
     char pad_0x00[0x40];
-    float worldScale;              // +0x40 copied to field_0x1f8 by slot 2
+    float worldScale;              // +0x40 copied to terrainScale by slot 2
     // thiscall, callee pops 6 args
     int CastSegment(const Vec3* from, const Vec3* to, Vec3* out, int a, int b,
                   int c);
 };
 class SoultreeSlot1f0;
 class SoultreeAttachTarget;
-class SoultreeAttachment; // 40-byte records in the field_0x1d4 array
+class SoultreeAttachment; // 40-byte records in the attachments array
 
 #include "../core/GameObject.h"   // BaseObject, GameObject
 

@@ -261,7 +261,7 @@ public:
     void SetFlag14c();
     void ClearFlag14c();
 
-    // 0x004fdb60, ret 8, EH: creates the parameter block field_0x1a0 (__FILE__ line 0x346),
+    // 0x004fdb60, ret 8, EH: creates the parameter block parameterBlock (__FILE__ line 0x346),
     // opens it on 'stream' (0x004b77a0, index 1), loads through slot 3 and deletes the block.
     // The stream type is the one src/reconstructed/Parameterblocks.h names.
     void LoadFromParameters(FileStream* stream, int offset);
@@ -283,11 +283,11 @@ public:
     void GetWorldBounds(Vec3* lo, Vec3* hi);
 
     // 0x004fecd0: inserts this node in the global quadtree (0x0068aba4) or updates its range,
-    // using GetWorldBounds; the quadtree code is kept in field_0x198 (15 = none).
+    // using GetWorldBounds; the quadtree code is kept in quadtreeCell (15 = none).
     void UpdateQuadtreeCell();
 
-    // 0x004fed70: removes this node from the quadtree when field_0x194 is set and resets
-    // field_0x194 / field_0x198.
+    // 0x004fed70: removes this node from the quadtree when inQuadtree is set and resets
+    // inQuadtree / quadtreeCell.
     void RemoveFromQuadtree();
 
     // 0x004fefb0 is the out-of-line copy of an inline 3x3 transpose (cdecl, Matrix4*).
@@ -333,7 +333,7 @@ public:
     int localBoundsValid;          // 0x154, 0 makes 0x004fe0a0 call slot 5 first
     Vec3 localBoundsCenter;        // 0x158, returned by 0x004fe0a0
     Vec3 localBoundsHalfExtent;    // 0x164, half size per axis
-    int field_0x170;               // 0x170
+    int subtreeBoundsValid;        // 0x170
     Vec3 subtreeBoundsA;           // 0x174, returned by 0x004fe850 (refreshed when subtreeDirty)
     Vec3 subtreeBoundsB;           // 0x180
     int subtreeDirty;              // 0x18c, set on self and all ancestors by 0x004fdab0

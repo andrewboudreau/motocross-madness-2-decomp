@@ -476,7 +476,7 @@ int BonusObjectManager::CreateFrameNode(void* context, int lights, int options) 
     strcpy(baseFrame->nodeName, "Base Bonus Frame");
     baseFrame->subtreeBoundsCenter = kVec3Zero;
     baseFrame->subtreeBoundsHalfExtent = Vector3(0.9f, 0.22f, 0.09f);
-    baseFrame->field_0x170 = 1;
+    baseFrame->subtreeBoundsValid = 1;
     baseFrame->localBoundsCenter = kVec3Zero;
     baseFrame->localBoundsHalfExtent = Vector3(0.9f, 0.22f, 0.09f);
     baseFrame->localBoundsValid = 1;

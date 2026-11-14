@@ -546,7 +546,7 @@ struct RaceGatePose {
 struct RaceGateObject {
     unsigned char field_0x00[0x50];
     float width;  // +0x50  BuildNodeList passes it as AppendNode's scale (the node's width)
-    int field_0x54;
+    int height;  // +0x54 BuildNodeList passes it as AppendNode's height
 };
 
 // The gate event as 0x0041d170 walks it: +0xac counts the entries at

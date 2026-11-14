@@ -2,7 +2,7 @@
 //
 // Shape payload views (all tier 3, offsets are confirmed by the decoded accesses):
 //
-//   CollisionObject::field_0x50 selects the payload hung off field_0x54:
+//   CollisionObject::shapeType selects the payload hung off shape:
 //     0 = oriented-box "hull" (0x198 bytes)   1 = "model", an array of hulls
 //     2 = static mesh                         3 = capsule      4 = sphere
 //   The dispatch tables at 0x00438bf0 (hull) and 0x00438c70 (model) map the OTHER
@@ -16,11 +16,11 @@
 #include "math/Math3D.h"
 #include "bvh/BoundingBoxTreeQueryFunctions.h"
 
-// Box bounds object at CollisionHullShape::field_0x188: two vec3s read as
+// Box bounds object at CollisionHullShape::triangleTree: two vec3s read as
 // (+4, +0x10) by every caller of the broad-phase test 0x00424730 (center, half extents;
 // the extent role is from 0x00436100 where |M| * extents gives the world half size).
 struct CollisionBoxBounds {
-    int field_0x00;
+    int volume;  // +0x00 BoxTreeNode volume (a float there)
     CollisionVec3 center;          // +0x04
     CollisionVec3 halfExtents;     // +0x10
     void* child[2];                // +0x1c, +0x20: the root is a 0x24-byte tree node; 0x004392c0's
@@ -30,7 +30,7 @@ struct CollisionBoxBounds {
 // View of a type-0 hull payload (0x198 bytes, the same payload as CollisionHullShape,
 // which only names part of it).  Five 4x4 matrices sit at +0x08, +0x48, +0x88, +0xc8,
 // +0x108, +0x148 (six 0x40-byte slots); the tests use +0x48 as the current transform and
-// +0xc8 / +0x108 as history.  field_0x00 is a mode flag selecting the swept variant.
+// +0xc8 / +0x108 as history.  swept is a mode flag selecting the swept variant.
 struct CollisionHullBody {
     int swept;                // +0x00 nonzero: use the swept/matrix-history test
     void* sceneNode;              // +0x04 scene node; 0x004fc9a0 reads its world position

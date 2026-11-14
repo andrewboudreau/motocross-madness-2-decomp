@@ -51,7 +51,7 @@ public:
     //  * a4 is a descriptor pointer (`test byte [a4+0x25],1`).
     //  * a1, a3, a4, a5 go to LoadCharacter as (a1, a3, a4, a5, 1, 1).
     //  * Slot 2 (0x00500c50) stores the rest:
-    //      a9 -> 0x1f4 (pointer; +0x40 read into field_0x1f8), a10 -> 0x124, a11 -> 0x150,
+    //      a9 -> 0x1f4 (pointer; +0x40 read into terrainScale), a10 -> 0x124, a11 -> 0x150,
     //      a12 -> 0x1c8 (element count of the 0x12c array), a14 -> 0x1f0 (pointer),
     //      a15 -> 0x1e4, a16 -> 0x1ec, a17 -> 0x148, a18 -> 0x14c, a19 -> 0x210,
     //      a20 -> byte 0x20f.

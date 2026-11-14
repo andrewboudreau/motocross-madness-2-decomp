@@ -4,7 +4,7 @@
 // Scene::ReadStaticModels (0x004ecd60, 4543 bytes; 4534 of 4536 compared
 // positions): the "StaticModels" reader. Everything but one store lines up,
 // including the frame, the jump table and the EH states. The model name's
-// terminator `field_0xb8->field_0x04[i].field_0x10[count] = 0` is
+// terminator `staticModels->casters[i].fileName[count] = 0` is
 // `add edx,ebx; mov [edx+esi+0x10],0` in retail (element offset first) and
 // `add edx,esi; mov [edx+ebx+0x10],0` here. Pointer and index spellings,
 // the clamp forms, function-scope declarations, inline helpers and an

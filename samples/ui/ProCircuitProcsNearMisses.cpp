@@ -5,7 +5,7 @@
 //
 // PCLastRaceDlg::PayOutRace (0x004d8c40, 883 bytes): the same
 //   flow, calls and x87 code; in the per-racer update retail loads +0x0c
-//   before +0x08 for `field_0x30 += stunt - medical - repairs - fee +
+//   before +0x08 for `money += stunt - medical - repairs - fee +
 //   winnings` and then adds +0x0c into +0x24 in memory, VC6 here loads +0x08
 //   first. Reassociating or splitting the expression compiles the same
 //   (all 120 orders of the five terms give one object); reordering the

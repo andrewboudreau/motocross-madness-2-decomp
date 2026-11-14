@@ -42,7 +42,7 @@ extern Vec3 g_VehZeroVec3_005778c8;
 
 // ---- provisional collaborator types (layout only what the code touches) ----
 
-// The scene node (d3d_field_0x1a0, field_0x218, SteeringControl::node) is
+// The scene node (d3d_field_0x1a0, centerNode, SteeringControl::node) is
 // SoultreeObject (../common/SoultreeObject.h).
 // Free helpers (cdecl) used by the vehicle code. Retail addresses; names are tier 3.
 // 0x005004a0 (slot 4's solver helper) is ContactSolveImpulse, declared in
@@ -195,7 +195,7 @@ struct VehicleAxis {                 // objects at Vehicle+0x4f8/0x4fc/0x500 (pr
 // 0x60c bytes; src/reconstructed/ParticleEmitters.h).  LoadVehicle builds it and hands the
 // result of its virtual slot 27 to GameObject::AppendChild; the impact handlers view
 // it as VehicleImpactSink.  Provisional view; Vehicle and Bike slot 38 store (0, 12, 0) at +0x78 and
-// set +0x60 after SetPosition, matching SparkParticleEmitter::launchVelocity / field_0x60.
+// set +0x60 after SetPosition, matching SparkParticleEmitter::launchVelocity / burstPending.
 struct VehicleSparkEmitter {
     explicit VehicleSparkEmitter(int flags);
     virtual void UnknownVirtualSlot0(); virtual void AddRef(); virtual void Release();
@@ -345,7 +345,7 @@ struct VehicleWheel {
     Vec3 driveForce;                          // +0x248  DriveForce's force output (slot 86); AccumulateWheelContacts adds it and its moment; ResetWheelContacts clears it
     Vec3 field_0x254;
     int inContact;  // +0x260 selects wheels touching the ground (slots 7, 54, 72, 75-86); count equals Vehicle::wheelsInContact
-    int reportContactOutputs;  // +0x264 (Tire.h name) PlaceWheels sets it on the first in-contact wheel without field_0x1c0 (else on wheel 0)
+    int reportContactOutputs;  // +0x264 (Tire.h name) PlaceWheels sets it on the first in-contact wheel without ownerRef (else on wheel 0)
     int shockEngaged;                         // +0x268  Tire 0x00513c70 sets it after a shock solve; ApplyShockDamping damps and ApplyShockForces applies the spring only while set
     int shockExtending;                       // +0x26C  Tire 0x00513c70 copies the shock's extending flag here (Tire.h); ResetWheelContacts clears it
     char pad_0x270[8];
@@ -360,7 +360,7 @@ struct VehicleWheel {
     char pad_0x298[0x4];
     float rampLevel;               // +0x29c 0 selects a flag passed to slot 77 (slot 83)
     float driveStrength;           // +0x2a0 Tire.h ctor arg a10, read by 0x00514170; ApplyWheelDriveAndFriction counts the in-contact wheels where it is nonzero
-    float field_0x2a4;
+    float leanCos;                 // +0x2a4 Tire.h leanCos
     VehicleWheelAux* aux;          // +0x2a8 Tire.h engine (TireAux)
     int secondaryAux;  // +0x2ac same use as primaryAux, the fallback when it is null (UpdateWheelsInContact, ApplyShockDamping)
     int primaryAux;  // +0x2b0 AddWheel stores an attachment here; UpdateWheelsInContact treats it as an object whose +0x8c is reset from +0x90

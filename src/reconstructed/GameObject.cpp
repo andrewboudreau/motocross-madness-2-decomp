@@ -35,7 +35,7 @@ GameObject::GameObject(int flags) {
     renderContext = 0;
     parent = 0;
     isEnabled = flags;
-    field_0x25_bit1 = flags;
+    receivesNetworkMessages = flags;
     isPaused = 0;
     pendingRelease = 0;
     ownFlags = 0;
@@ -70,14 +70,14 @@ void GameObject::OnEnable() {
 // 0x004690a0: clears bits 0 and 1, then slot 6.
 void GameObject::Disable() {
     isEnabled = 0;
-    field_0x25_bit1 = 0;
+    receivesNetworkMessages = 0;
     OnDisable();
 }
 
 // 0x004690b0: sets bits 0 and 1, then slot 7.
 void GameObject::Enable() {
     isEnabled = 1;
-    field_0x25_bit1 = 1;
+    receivesNetworkMessages = 1;
     OnEnable();
 }
 
@@ -246,7 +246,7 @@ int GameObject::OnControlPress(ControlEvent* event, InputButtonState* entry) {
 int GameObject::OnNetworkMessage(int type, void* data, int from, int to, int flags) {
     if (childFlags & 0x800) {
         for (GameObject* child = firstChild; child; child = child->nextSibling) {
-            if (child->field_0x25_bit1 && !child->pendingRelease) {
+            if (child->receivesNetworkMessages && !child->pendingRelease) {
                 if (child->OnNetworkMessage(type, data, from, to, flags))
                     return 1;
             }
@@ -285,7 +285,7 @@ int GameObject::Release() {
     return BaseObject::Release();
 }
 
-// 0x00469720: hands the value to every child, then stores it in field_0x18.
+// 0x00469720: hands the value to every child, then stores it in renderContext.
 int GameObject::AttachRenderContext(void* context) {
     GameObject* child = firstChild;
     while (child) {

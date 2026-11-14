@@ -41,12 +41,12 @@ public:
     virtual unsigned int ComputeQuadTreeCode(QuadTree* tree) { return 15; }  // 0x00434ce0 (ret 4); Vegetation overrides it with the object's quadtree code (0x00456720)
 
     QuadTreeObject() { queryStamp = 0; objectTypeId = (char)0xff; }
-    short queryStamp;  // +0x04 Quadtree query code (NextObject) skips an object whose short at +4 equals the query counter (field_0x6c) and otherwise stores the counter there (Quadtree.cpp lines 568/612/676); Insert zeroes it
+    short queryStamp;  // +0x04 Quadtree query code (NextObject) skips an object whose short at +4 equals the query counter (queryStamp) and otherwise stores the counter there (Quadtree.cpp lines 568/612/676); Insert zeroes it
     short sortKey;                           // +0x06 not touched by the inlined ctor; keeps objectTypeId at +8
     char objectTypeId;  // +0x08 ctor 0x00431e70 stores TypeRegistry::FindTypeId(CollisionObject) (0x00521ea0) here; 0x00438e70 compares [candidate+8] with the cached CollisionObject (0x568610) and Vegetation (0x568611) ids
 };
 
-// Shape payloads hung off CollisionObject::field_0x54, discriminated by field_0x50.
+// Shape payloads hung off CollisionObject::shape, discriminated by shapeType.
 // Sizes come from the allocation sizes in the shape setup functions; member names
 // are provisional (tier 3).
 struct CollisionHullShape {                // type 0, 0x198 bytes (0x004328b0, 0x00432720)

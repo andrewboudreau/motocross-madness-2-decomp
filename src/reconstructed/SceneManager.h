@@ -53,7 +53,7 @@ public:
     unsigned char field_0x214[0x268 - 0x214];
 };
 
-// What SceneAnimation::field_0x08 holds for procedural entries (without
+// What SceneAnimation::proceduralObject holds for procedural entries (without
 // bit 3): CarProcedural (0x22c bytes), a GameObject whose slot 10 0x004eb040
 // calls. Only what the scene uses is declared.
 class SceneCarProceduralView : public GameObject {
@@ -131,7 +131,7 @@ class ProjectedShadow;
 class UnknownScenePhysicsObject;
 class SceneCollisionObjectView;
 
-// 0x28-byte element of SceneStaticModels::field_0x04: a static model
+// 0x28-byte element of SceneStaticModels::casters: a static model
 // ("Model<n>", 0x004ecd60), also a shadow caster (0x004edf20 attaches a
 // D3DIMSoultreeShadow to each).
 struct SceneStaticModel {
@@ -169,7 +169,7 @@ struct UnknownSceneTextureInfo {
     char textureName[0x40];
 };
 
-// 0x8c-byte element of Scene::field_0xac, filled by 0x004eb570 from the
+// 0x8c-byte element of Scene::sceneLights, filled by 0x004eb570 from the
 // "Light<n>" sections. Names follow the section keys.
 struct SceneLight {
     LightEmitter* emitter;                    // +0x00 the emitter 0x004efb20 creates

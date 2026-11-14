@@ -54,8 +54,8 @@ int CollisionCharacter::Tick(float dt)
 
     if (collisionObject && collisionObject->QueryCollisions()) {
         const Vec3* rec = (const Vec3*)collisionObject->contactRecord;
-        field_0x248 = rec[2];
-        field_0x254 = rec[1];
+        contactPoint = rec[2];
+        contactNormal = rec[1];
         if (collisionObject->shapeType == 1) {
             CollisionModelBody* model = (CollisionModelBody*)collisionObject->shape;
             for (int i = 0; i < model->elementCount; i++) {
@@ -78,7 +78,7 @@ int CollisionCharacter::Tick(float dt)
 // desc, loadInfo, useOptions, unused), then creates the CollisionObject for it (new(0xb8, __FILE__, 27),
 // ctor 0x00431e70 with 1) and gives it a shape: from the .col file colPath when one was
 // supplied, otherwise from the scene node.  The character becomes the object's owner with
-// tag 0x2711.  Returns the result of GameObject slot 8 (stores context in field_0x18 and returns
+// tag 0x2711.  Returns the result of GameObject slot 8 (stores context in renderContext and returns
 // the GameObject).  The 'Collision' allocation category is selected around the new.
 GameObject* CollisionCharacter::Load(int context, const char* name, const char* colPath,
                                      const SoultreeLoadDesc* desc, int loadInfo, int useOptions, int unused)

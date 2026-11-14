@@ -695,7 +695,7 @@ public:
     void SetCornerImage(UIAnim* image); // 0x0047ab20: the corner image; lays the parts out around it
     int IsPart(UIControl* control); // 0x0047a800: whether `control` is a part
     // Inline: the button. SelectGamePicProcs.cpp reads it through this
-    // accessor; reading field_0x1ec directly lets VC6 merge the two branches
+    // accessor; reading buttonPart directly lets VC6 merge the two branches
     // of 0x004f3260 and 0x004f8700, which retail does not. Defined after the
     // class (an in-class body flips ProCircuitProcsNearMisses' 0x004d59a0).
     UIDDLButton* UnknownInlineButton();

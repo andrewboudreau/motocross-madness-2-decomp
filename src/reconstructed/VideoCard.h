@@ -23,7 +23,7 @@ public:
     virtual void RetryFlip(int value) = 0;           // called with 0 and 1 around a frame
 
     // 0x0052d250: sorts the modes and returns the index of the matching one
-    // (a zero `a`/`refreshRate` matches any mode field_0x10/refresh rate), or -1.
+    // (a zero `a`/`refreshRate` matches any mode bufferCount/refresh rate), or -1.
     int FindDisplayMode(int width, int height, int bitDepth, int a, int refreshRate);
 
     // Inline (PCVideoCard.cpp): time since the last present and the
@@ -65,5 +65,5 @@ public:
 };
 
 // 0x0052d120 (cdecl qsort comparator): orders modes by depth, height,
-// width, field_0x10, then refresh rate.
+// width, bufferCount, then refresh rate.
 int CompareDisplayModes(const void* first, const void* second);

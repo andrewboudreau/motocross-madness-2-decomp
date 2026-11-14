@@ -317,7 +317,7 @@ void MorphBastardModifier::ModifyMesh(D3DIMSoultreeObject* object, UnknownSoultr
             deltaMinimums = new (__FILE__, 542) Vector3[mesh->vertexCount];
             deltaMaximums = new (__FILE__, 543) Vector3[mesh->vertexCount];
         }
-        int base = ((int)group->field_0x08 - (int)mesh->vertices) / 32;
+        int base = ((int)group->sourceVertices - (int)mesh->vertices) / 32;
         memset(deltaSums, 0, group->vertexCount * sizeof(Vector3));
         memset(deltaMinimums, 0, group->vertexCount * sizeof(Vector3));
         memset(deltaMaximums, 0, group->vertexCount * sizeof(Vector3));
@@ -327,9 +327,9 @@ void MorphBastardModifier::ModifyMesh(D3DIMSoultreeObject* object, UnknownSoultr
             if (channel->axis == 0)
                 value = channel->currentValue;
             else if (channel->axis == 1)
-                value = channel->field_0x64;
+                value = channel->currentValue1;
             else if (channel->axis == 2)
-                value = channel->field_0x68;
+                value = channel->currentValue2;
 
             float weight = 0.0f;
             float upper = 0.0f;
@@ -567,6 +567,6 @@ void MorphBastardModifier::ControllerAngles(MorphBastardChannel* channel, Matrix
         angleZ = -angleZ;
 
     channel->currentValue = -angleX;
-    channel->field_0x64 = -angleZ;
-    channel->field_0x68 = -angleY;
+    channel->currentValue1 = -angleZ;
+    channel->currentValue2 = -angleY;
 }

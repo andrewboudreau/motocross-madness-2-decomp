@@ -44,7 +44,7 @@ int CrossesGate(Vector3* from, Vector3* to, RaceGate* gate, int direction)
     dy = from->y - to->y;
     // +0x28 holds the gate's height as a float (BikeRace.h declares it int
     // because 0x0041d0d0 copies it from an int argument).
-    if (dy * t + to->y - gate->center.y > *(float*)&gate->field_0x28) {
+    if (dy * t + to->y - gate->center.y > *(float*)&gate->height) {
         return 0;
     }
     if (direction) {

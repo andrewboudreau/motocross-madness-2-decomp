@@ -202,7 +202,7 @@ void EngineGearbox::UpdateThrottle(float dt, int engaged, unsigned char disengag
 }
 
 // 0x004d3030: shifts up past the randomised shift rpm and down below
-// field_0x7c.  Vehicle passes (throttleOn, linearSpeed); neither is read.
+// downShiftRpm.  Vehicle passes (throttleOn, linearSpeed); neither is read.
 void EngineGearbox::AutoShift(int throttleOn, float speed)
 {
     if (shiftTimer != 0.0f) {

@@ -421,7 +421,7 @@ void GridVertexSink::LightOne(const Matrix4* matrix, int count, void* normals, v
 
 // One vertex of 0x0049f8d0: ambient plus the other light's rounded term where
 // the vertex faces it (`dot` > 0), otherwise the ambient colour alone. When a
-// colour array is pending (field_0x114) the clamped sums are kept per vertex
+// colour array is pending (storeVertexColors) the clamped sums are kept per vertex
 // too. __forceinline: retail expands it in each of the three loops.
 static __forceinline void Group4Vis_LightOverAmbient(LightManager* manager, void* buffer, int i,
                                                     float dot, int r, int g, int b,
@@ -434,14 +434,14 @@ static __forceinline void Group4Vis_LightOverAmbient(LightManager* manager, void
         int blue = Group4Vis_Round((float)b * facing) + ambientB;
         *Group4Vis_VertexDiffuse(buffer, i) = Group4Vis_PackOpaque(
             Group4Vis_Clamp255(red), Group4Vis_Clamp255(green), Group4Vis_Clamp255(blue));
-        if (manager->field_0x114) {
+        if (manager->storeVertexColors) {
             manager->vertexRed[i] = Group4Vis_Clamp255(red);
             manager->vertexGreen[i] = Group4Vis_Clamp255(green);
             manager->vertexBlue[i] = Group4Vis_Clamp255(blue);
         }
     } else {
         *Group4Vis_VertexDiffuse(buffer, i) = ambientColor;
-        if (manager->field_0x114) {
+        if (manager->storeVertexColors) {
             manager->vertexRed[i] = ambientR;
             manager->vertexGreen[i] = ambientG;
             manager->vertexBlue[i] = ambientB;
@@ -556,9 +556,9 @@ void GridVertexSink::LightVertices(void* matrix, int count, void* vertices, void
     LightManager* manager = reinterpret_cast<LightManager*>(this);
     void* colors = (void*)flags;
     if (colors)
-        manager->field_0x114 = 1;
+        manager->storeVertexColors = 1;
     else
-        manager->field_0x114 = 0;
+        manager->storeVertexColors = 0;
 
     if (count > manager->vertexCapacity) {
         if (manager->vertexRed)

@@ -69,7 +69,7 @@ public:
     void RankByPoints(int* order);
     // 0x0041d0d0: appends a node for `source[index]` at `*tail`.
     int AppendNode(int index, RaceGatePose* source,
-                   RaceGate*** tail, float scale, int value);
+                   RaceGate*** tail, float scale, int height);
     // 0x0041d170: one node per entry of `owner`; 0 when an allocation fails.
     int BuildNodeList(RaceGateEvent* owner);
     // 0x0041d1e0: sets +0x189 from the track distance between +0xf8 and +0x134.

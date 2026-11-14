@@ -105,7 +105,7 @@ void MorphBastardModifier::CopyMesh(UnknownSoultreeMesh* mesh)
     meshCopy->drawnVertices = new (__FILE__, 859) MorphBastardVertex[meshCopy->vertexCount];
     meshCopy->normals = new (__FILE__, 860) Vector3[meshCopy->vertexCount];
     meshCopy->indices = new (__FILE__, 861) MorphBastardFace[meshCopy->faceCount];
-    meshCopy->field_0x20 = mesh->field_0x20;
+    meshCopy->materials = mesh->materials;
     meshCopy->uvs = new (__FILE__, 863) int[meshCopy->vertexCount * 2];
     memcpy(meshCopy->vertices, mesh->vertices, meshCopy->vertexCount * sizeof(MorphBastardVertex));
     memcpy(meshCopy->drawnVertices, mesh->drawnVertices, meshCopy->vertexCount * sizeof(MorphBastardVertex));
@@ -117,9 +117,9 @@ void MorphBastardModifier::CopyMesh(UnknownSoultreeMesh* mesh)
     for (int i = 0; i < meshCopy->groupCount; i++) {
         meshCopy->groups[i].node = mesh->groups[i].node;
         meshCopy->groups[i].vertexCount = mesh->groups[i].vertexCount;
-        meshCopy->groups[i].field_0x08 = meshCopy->vertices + offset;
-        meshCopy->groups[i].field_0x0c = meshCopy->drawnVertices + offset;
-        meshCopy->groups[i].field_0x10 = meshCopy->normals + offset;
+        meshCopy->groups[i].sourceVertices = meshCopy->vertices + offset;
+        meshCopy->groups[i].transformedVertices = meshCopy->drawnVertices + offset;
+        meshCopy->groups[i].normals = meshCopy->normals + offset;
         offset += meshCopy->groups[i].vertexCount;
     }
 }

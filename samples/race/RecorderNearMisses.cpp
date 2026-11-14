@@ -12,7 +12,7 @@
 // merges the tail suffixes of cases 1 and 2 into case 4; a shared
 // `headerWriteError` label for cases 1 and 9 removes the hoist but not the
 // merge, and `strcpy; goto` (label after case 2's strcpy) keeps the hoist.
-// Left: case 2's "field_0xc8 = 1; LeaveCriticalSection" suffix still
+// Left: case 2's "workerAcknowledged = 1; LeaveCriticalSection" suffix still
 // cross-jumps into case 4 (retail keeps it, after scheduling `push esi`
 // above the stores), and with one `name` use fewer `name` and `headerSize`
 // trade stack slots (0x08/0x10; declaration order does not move them).

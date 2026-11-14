@@ -10,9 +10,9 @@
 // declaration order, `tail = list` for the first node and an unsigned index
 // leave that allocation, as do (72 combinations, all 168 of 519) `index = 1`
 // after the first calloc or before it with `index` as its count, `tail`
-// started from `&(*list)->field_0x50`, the race-mode test against `index`,
+// started from `&(*list)->next`, the race-mode test against `index`,
 // `++index` in the node store, and the link written as `tail =
-// &(*tail)->field_0x50` or `tail = &(*tail = status)->field_0x50`.
+// &(*tail)->next` or `tail = &(*tail = status)->next`.
 
 #include "../../src/reconstructed/RaceStatus.h"
 

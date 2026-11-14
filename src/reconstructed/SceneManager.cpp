@@ -727,7 +727,7 @@ int Scene::ReadLight(int index)
     return 1;
 }
 
-// 0x004ebdb0: creates field_0xb0 from the "Fog" section. Retail range-checks
+// 0x004ebdb0: creates fog from the "Fog" section. Retail range-checks
 // the visibility value again where it reads the haziness.
 int Scene::ReadFog()
 {
@@ -989,7 +989,7 @@ void Scene::AttachCasterShadows(ProjectedShadow* shadow, int flags)
 
 // 0x004ef4c0: reads the "Sounds" section: whether a crowd is present and
 // the "StaticSound<n>" sections, each an emitter placed in the scene or a
-// plain sound added to field_0xc8. Needs the AuralScape (field_0xc0).
+// plain sound added to sounds. Needs the AuralScape (auralScape).
 int Scene::ReadSounds()
 {
     int count;
@@ -1096,7 +1096,7 @@ int Scene::Render3D()
     return 1;
 }
 
-// 0x004f0060: control 5 toggles field_0x7bc; other events go to GameObject.
+// 0x004f0060: control 5 toggles visible; other events go to GameObject.
 int Scene::OnControlRelease(ControlEvent* event, InputButtonState* entry)
 {
     if (TestInputEvent(5, 0, event, 0x80)) {
@@ -1112,7 +1112,7 @@ int Scene::OnControlPress(ControlEvent* event, InputButtonState* entry)
     return GameObject::OnControlPress(event, entry) != 0;
 }
 
-// 0x004efb20: loads the scene file into field_0xdc and reads the
+// 0x004efb20: loads the scene file into parameters and reads the
 // "SceneInfo" positions, the environment and the "Lights" section, creating
 // an emitter in `lights` for each light that emits; then the fog, resource
 // files, stadium and the 0x004ecd60/0x004edfe0/0x004ef4c0 parts. Returns 0
@@ -1341,7 +1341,7 @@ int CountModelTextures(const char* path, UnknownSceneResourceManager* resources,
             entry->archive->Read(&node->localBoundsValid, 4, 1);
             entry->archive->Read(&node->localBoundsCenter, 0xc, 1);
             entry->archive->Read(&node->localBoundsHalfExtent, 0xc, 1);
-            entry->archive->Read(&node->field_0x170, 4, 1);
+            entry->archive->Read(&node->subtreeBoundsValid, 4, 1);
             entry->archive->Read(&node->subtreeBoundsCenter, 0xc, 1);
             entry->archive->Read(&node->subtreeBoundsHalfExtent, 0xc, 1);
         }
@@ -1424,7 +1424,7 @@ int CountModelTextures(const char* path, UnknownSceneResourceManager* resources,
     return 1;
 }
 
-// 0x004f0d20: loads the scene file into field_0xdc and sets *count to its
+// 0x004f0d20: loads the scene file into parameters and sets *count to its
 // static model plus animation count (at least 1).
 int Scene::CountObjects(int* count)
 {

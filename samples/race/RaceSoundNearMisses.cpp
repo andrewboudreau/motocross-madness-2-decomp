@@ -5,7 +5,7 @@
 // 0x004e4d10 (2032 bytes, the half-buffer refill; 0x004e39b0 is exact in
 // RaceSound.cpp): every block but two matches. (1) First half, next-sample
 // path: retail reloads the remainder from its stack slot for the final
-// `field_0x18 = rest` (so that store is cross-jumped with the other two
+// `sampleOffset = rest` (so that store is cross-jumped with the other two
 // arms' stores); VC6 here keeps the loaded remainder in eax across the two
 // copies. (2) Second half, looping path: retail keeps half in ebp and the
 // remainder in edx and spills the available byte count, VC6 here spills a

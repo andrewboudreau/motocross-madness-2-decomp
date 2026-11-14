@@ -144,7 +144,7 @@ int BaseQuarryEvent::EstimateModelTextureBytes(int* counts) {
 
 // 0x004e0560: the race memory estimate (counts of eligible bikes and
 // opponents, capped by the circuit's +0x460). The sum is a local and the
-// field_0x560 constant an if/else assignment: VC6 still emits the branchless
+// bajaEnduroEvent constant an if/else assignment: VC6 still emits the branchless
 // neg/sbb/and/add last, and with the ternary inside the return it keeps
 // g_TrackGame in a register across the first loop and spills a count (22/331).
 int BaseQuarryEvent::EstimateRaceBytes() {

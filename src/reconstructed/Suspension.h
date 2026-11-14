@@ -96,7 +96,7 @@ public:
     float stiffnessMax;              // +0xa0
     float dampingRatio;              // +0xa4
     float speedThreshold;            // +0xa8
-    float retractScale;              // +0xac Retract divides the retraction by carrier->field_0x2a4 * it
+    float retractScale;              // +0xac Retract divides the retraction by carrier->leanCos * it
     ShockVec3 velocity;              // +0xb0
     float speed;                     // +0xbc
 };
@@ -105,7 +105,7 @@ public:
 // Object whose float at +0x2a4 scales InlineShock::Retract (caller 0x00528f1c, wrecker.cpp).
 struct ShockCarrier {
     char field_0x00[0x2a4];
-    float field_0x2a4;
+    float leanCos;  // +0x2a4 the wheel's leanCos (Tire.h)
 };
 
 class InlineShock : public Shock {

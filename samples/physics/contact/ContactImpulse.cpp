@@ -26,13 +26,13 @@ static inline Vec3 ContactCrossParen(const Vec3& a, const Vec3& b)
 }
 
 // 0x005004a0 (1062 bytes).  Impulse between two bodies A and B at a contact.
-//   restitution  first argument (SoultreePhysicsBaseObject::field_0x14c)
+//   restitution  first argument (SoultreePhysicsBaseObject::restitution)
 //   n            contact normal
-//   invMassA     inverse mass of A (field_0x24)
+//   invMassA     inverse mass of A (invMass)
 //   nodeA/nodeB  scene-graph frames used to move directions between world and local space
 //   dispA/dispB  displacement of the contact point of A / B over the step
 //   rA/rB        lever arms from each body centre to the contact
-//   invInertiaA/B  diagonal inverse inertia (field_0xe4 / slot 2's inertia vector)
+//   invInertiaA/B  diagonal inverse inertia (invInertia / slot 2's inertia vector)
 //   angVelA/velA velocity accumulators updated for A (angular in local space, linear)
 //   angVelB/velB same for B (only when velB != 0)
 //   outJ         receives the impulse magnitude j.

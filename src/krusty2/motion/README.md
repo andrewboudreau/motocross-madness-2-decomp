@@ -72,7 +72,7 @@ read/seek calls now use the supplied implementations directly.
 - Owns `0x00504b60..0x005051ec`: ctor, destructor, SetAxisFromDirection, SetAngle, AddAngle, SetAxisFromPoints and
   eight `$E` pairs. Retail has two sets of the four `Vec3` constants here; `Math3D.h` supplies the first and
   `SteeringControl.cpp` declares the second locally (`kSecondVec3*`).
-- SteeringControl has no RTTI (no virtuals). Layout: `node` +0 (SoultreeObject*), `angle` +4, `field_0x08`, `axis` +0xc.
+- SteeringControl has no RTTI (no virtuals). Layout: `node` +0 (SoultreeObject*), `angle` +4, `maxAngle`, `axis` +0xc.
 - Promoted to `src/krusty2/motion/SteeringControl.cpp` with `SteeringControl.bindings.json`: 22 strict exact
   (6 methods + 16 `$E`). SetAxisFromPoints `0x00504d30` reads y and z through copies taken after the
   inverse length, which keeps d.x on the x87 stack across the scale like retail.

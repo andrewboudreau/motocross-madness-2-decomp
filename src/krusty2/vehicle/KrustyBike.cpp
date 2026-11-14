@@ -462,7 +462,7 @@ void KrustyBike::ApplyWorldTorque(const Vec3* worldTorque, Vec3* angularAccel)
     UnknownAxisSettle_4cb6e0(&angularVelocity.x, &angularAccel->x, &localAccel.x, stepTime, 0);
 }
 
-// Slot 48: field_0x0c update from the (field_0x64*3 - field_0x7c) * 0.5 * dt step.
+// Slot 48: position update from the (velocity*3 - prevVelocity) * 0.5 * dt step.
 void KrustyBike::AdvancePosition()
 {
     if (race->isRacing) {
@@ -477,7 +477,7 @@ void KrustyBike::AdvancePosition()
 }
 
 // Slot 86: per-frame wheel-contact update (provisional semantics).  When the race context
-// flag (field_0x740+0x18a) is set, a lookup ramp derived from backUpPhase (0.12..0.4762,
+// flag (race+0x18a) is set, a lookup ramp derived from backUpPhase (0.12..0.4762,
 // scaled by 360 / 0.3562 = 1010.66815f, the float retail holds, so 360 at 0.12) feeds the
 // wheel's helper object, and in one game mode the wheel's two force accumulators are
 // halved; the wheel is then always updated.
@@ -561,7 +561,7 @@ void KrustyBike::InitControlResponses()
 
 // Slot 28 (0x0048da50): per-frame hook.  In mode 4 (tier 3: a spectator/replay mode) it
 // re-targets the session's player record onto this bike, then runs the base update and,
-// while airborne (field_0x444 set, field_0x5b4 clear), jitters the two 0x7ac/0x7b0
+// while airborne (crashState set, prevCrashState clear), jitters the two 0x7ac/0x7b0
 // accumulators with random noise (0.15 scale for an aiKind bike, 0.667 otherwise).
 int KrustyBike::ResolveSubstepCollisions(int steps)
 {
@@ -600,9 +600,9 @@ int KrustyBike::ResolveSubstepCollisions(int steps)
 }
 
 // Slot 99 (0x004916a0): tier 3 -- out-of-bounds / off-track recovery.  When slot 12 reports
-// the bike outside the track box it aims field_0x1ac at the track centre (20 units up),
+// the bike outside the track box it aims scratchVector at the track centre (20 units up),
 // sets velocity to a 0.055 fraction of the offset, and gives a small random kick to
-// field_0xd8; otherwise it may enter recovery states 2 (both wheels loaded past -3.5)
+// angularVelocity; otherwise it may enter recovery states 2 (both wheels loaded past -3.5)
 // or 1/3/4/5/9, and falls through to the base handler when nothing applies.
 int KrustyBike::EvaluateCrash(float dt, float noseOverLimit, int impact, float impulse)
 {
@@ -1720,7 +1720,7 @@ KrustyBike::KrustyBike(int flags) : GameObject(1), Bike(flags)
 //  * `Vec3 points[2]` lives at function scope next to `localFlag` (frame slot 0x40, frame
 //    0xbc) and is cleared with two memsets: block scope moved it to 0x14, named locals or
 //    brace-init produced immediates or temporary copies;
-//  * the dead `cmp g->field_0x2d74, 0` survives as an if/else with identical 100.0f arms
+//  * the dead `cmp g->eventType, 0` survives as an if/else with identical 100.0f arms
 //    (tail-merged), which also restores the register rotation of the whole tail;
 //  * a local `BikeA640* axis` keeps the steer axis in one register for its three stores and
 //    0.42210004f is needed for retail's 0x3ed81d7f (0.4221f rounds to 0x3ed81d7e);
@@ -2052,7 +2052,7 @@ GameObject* KrustyBike::Load(int context, int engineName, const char* modelPath,
         aiTricksEnabled = 0;
     }
 
-    // Retail keeps a dead `cmp g_kbGame->field_0x2d74, 0` here: two arms that store the
+    // Retail keeps a dead `cmp g_kbGame->eventType, 0` here: two arms that store the
     // same constant, tail-merged by VC6 (the original values were presumably tuned equal).
     if (reinterpret_cast<KbGame*>(g_TrackGame)->eventType == 0)
         aiCrashImpactLimit = 100.0f;

@@ -1053,7 +1053,7 @@ static inline float KbMinF(float a, float b) { return a < b ? a : b; }
 // constant and store match.  Measured: `int remote = a || b;` (not if/assign) gives retail's
 // `cmp [g+0x3428], ebp`; the rider pose-16 test on the member poseIndex (the bike-side test
 // reloads it) stops VC6 threading the idx == 16 path past the 11..13 test; the head-turn
-// look value is computed after each join (a per-arm `field_0x1554 * 0.71f` folds 0.24 * 0.71)
+// look value is computed after each join (a per-arm `headTurnAngle * 0.71f` folds 0.24 * 0.71)
 // and the turning value is a local (retail's dt-slot temporary); `(x * 0.36963f) * 0.7f`
 // keeps the two multiplies.  Left: (1) VC6 cross-jumps the head-turn arms differently: retail
 // keeps the + side hold block (the - side jumps into it after `fld head`) and the - side

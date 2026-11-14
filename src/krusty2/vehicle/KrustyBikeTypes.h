@@ -347,7 +347,7 @@ struct KbTrackItem {
     KbTrackItem* previous;         // +0x08
     KbTrackItem* next;             // +0x0c
 };
-// The race's Track (src/reconstructed/Track.h; tier 3 view): field_0x0 is the start node.
+// The race's Track (src/reconstructed/Track.h; tier 3 view): startNode is the start node.
 // Positions on the track are KbRaw3 {node, segment, t} passed by value.
 struct KbRaceSub {
     int* startNode;  // +0x0  Track+0x00 startNode (KbRaceSub is the Track at BikeRace+0x48); slot 43 seeds the ghost block from it
@@ -507,7 +507,7 @@ struct KbPlayer {
     // is a vehicle (tested and read at +0x75c); tell sends message 0x87 through SendFollowedRacer.
     void SetFollowedRacer(Vehicle* racer, Vehicle* previous, int tell);
 };
-// Bounds/collision body at Vehicle::field_0x128 (canonical: CollisionObject::TestMeshBounds).
+// Bounds/collision body at Vehicle::collisionObject (canonical: CollisionObject::TestMeshBounds).
 struct KbBody { int TestMeshBounds(KbBody* other); };
 
 // ---- loader (0x0048fc80) support ----

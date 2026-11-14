@@ -45,7 +45,7 @@ struct ProCircuitRacer {
 struct ProCircuitTrack {
     char* trackKey;                           // +0x00 the "Track_%d" value
     char* displayName;                        // +0x04 its display name
-    char* keyCopy;                            // +0x08 a copy of field_0x00
+    char* keyCopy;                            // +0x08 a copy of trackKey
 };
 
 // One PCSched.pb section (16 bytes). ProCircuit.cpp fills Baja (1),

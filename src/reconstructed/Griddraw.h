@@ -253,11 +253,11 @@ public:
     int* childOffsets;                        // +0x30 child stream offsets (0x400 bytes)
 };
 
-// 0x2c-byte records at GridNodeExtra::field_0x38 (one per 4 x 4 block);
+// 0x2c-byte records at GridNodeExtra::blockRecords (one per 4 x 4 block);
 // +0 comes from the node's stream header, +4 starts at 0.
 struct GridBlockRecord {
     int textureReference;  // +0x0  stream header word; Grid1BlockTexture packs own bit and table index (0xfffe/0xffff: none)
-    int field_0x04;
+    int texture;  // +0x4 Grid1BlockTexture texture (Grid1.h)
     unsigned char field_0x08[0x1c - 0x08];
     float mappingScale;  // +0x1C  RemapTexCoordsIfMoved scale; 1.0 after a rebuild (0x0047f210)
     float mappingOffsetU;  // +0x20  RemapTexCoordsIfMoved offsetU; 0 after a rebuild

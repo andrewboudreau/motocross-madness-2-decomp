@@ -80,8 +80,8 @@ struct MorphBastardChannel {
     float maximumValue;               // largest target value
     int field_0x5c;                   // -1
     float currentValue;               // current value per axis (0x004a3c80)
-    float field_0x64;
-    float field_0x68;
+    float currentValue1;
+    float currentValue2;
 };
 
 // One morph object (0x4c bytes). The empty constructor (from Matrix4's)
@@ -111,14 +111,14 @@ struct MorphBastardFace {
 struct MorphBastardMeshGroup {
     MorphBastardNode* node;           // the node the group belongs to
     int vertexCount;                  // vertex count
-    MorphBastardVertex* field_0x08;
-    MorphBastardVertex* field_0x0c;
-    Vector3* field_0x10;
+    MorphBastardVertex* sourceVertices;
+    MorphBastardVertex* transformedVertices;
+    Vector3* normals;
 };
 
 struct MorphBastardMeshPair {
-    int field_0x00;
-    int field_0x04;
+    int materialCount;
+    int materialIndices;
 };
 
 // The mesh slot 27 receives and returns (0x38 bytes).
@@ -131,11 +131,11 @@ struct UnknownSoultreeMesh {
     MorphBastardVertex* drawnVertices;  // +0x14  SoultreeSurface+0x14 drawn vertices
     Vector3* normals;  // +0x18  SoultreeSurface+0x18 normals
     MorphBastardFace* indices;  // +0x1C  SoultreeSurface+0x1c indices, three per face
-    MorphBastardMeshPair field_0x20;  // copied as one 8-byte value
+    MorphBastardMeshPair materials;  // +0x20 SoultreeSurface materialCount/materialIndices, copied as one 8-byte value
     int* uvs;  // +0x28  SoultreeSurface+0x28 texture coordinates
-    int field_0x2c;
-    int field_0x30;
-    int field_0x34;
+    int mappingScale;  // +0x2c SoultreeSurface mappingScale (a float there)
+    int mappingOffsetU;
+    int mappingOffsetV;
 };
 
 // The D3DIMSoultreeObject passed to slot 27, seen from this file: only its

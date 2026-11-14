@@ -60,14 +60,14 @@ public:
     char field_0x38[0x2d8 - 0x38];            // starts with the model name (0x0042fa00)
 };
 
-// Rigid body reached through CarProceduralCollision::field_0x54.
+// Rigid body reached through CarProceduralCollision::shape.
 struct CarProceduralBody {
     int swept;                                // +0x0  hull payload +0x00; HullVsHull forwards to HullVsHullSwept when nonzero
     unsigned char field_0x04[0xf8 - 0x04];
     Vector3 position;                         // +0xF8  hull payload translation row of its current transform (CollisionObject::GetShapePosition 0x00436000 reads hull +0xf8); slot 10 pushes it out by the contact offset
 };
 
-// Contact record reached through CarProceduralCollision::field_0x5c (the
+// Contact record reached through CarProceduralCollision::contactRecord (the
 // collision object's +0x5c, a void* in src/krusty2/collision). Slot 10
 // reads +0x00 as the push-out vector of the body collider (scaled by 1.005,
 // off the body hull's position), and from the sensor collider the float at +0
@@ -78,7 +78,7 @@ struct CarProceduralContact {
     Vector3 contactPoint;                     // +0x18  CollisionSweepQuery::contact
 };
 
-// Ground query provider at CarProcedural::field_0x20c (0x00507c10, thiscall,
+// Ground query provider at CarProcedural::groundProvider (0x00507c10, thiscall,
 // ret 0x10: snaps *position to the surface and writes its normal; other
 // units declare the same function on their own views of the terrain).
 class CarProceduralTerrain {

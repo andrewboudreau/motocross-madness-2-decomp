@@ -100,7 +100,7 @@ public:
     int resultCapacity;                 // +0x870 result capacity
 };
 
-extern float g_quadTreeInvScale;     // 0x00689b74: 1 / field_0x0c set by Init
+extern float g_quadTreeInvScale;     // 0x00689b74: 1 / quantScale set by Init
 // The persistent collision tree and the current traversal can differ.
 extern QuadTree* g_collisionQuadTree; // 0x0068aba4; VisibilityQuadTree lifetime
 extern QuadTree* g_pQuadTree;        // 0x00689b78: the "current" tree

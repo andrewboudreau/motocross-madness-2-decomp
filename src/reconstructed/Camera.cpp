@@ -89,7 +89,7 @@ int Camera::RenderPre3D() {
 // minimum/maximum depth 0.0f/1.0f), submits the viewport through the
 // owner's slot 14 and derives the height/width ratio from it.
 // Retail keeps the display-mode table in a register but reads the current
-// index again for the height: the height goes through owner->field_0x04,
+// index again for the height: the height goes through owner->targetDisplay,
 // which VC6 does not merge with the `display` index read for the width
 // (both reads through `display` share one index load).
 int Camera::UpdateViewport() {

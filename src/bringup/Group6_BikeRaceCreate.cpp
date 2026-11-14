@@ -135,7 +135,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
     Vector3 point;
 
     GameObject::SetRenderContext(owner);
-    field_0x25_bit1 = 1;
+    receivesNetworkMessages = 1;
     statusList = 0;
     aiSettings[0] = 50.0f;
     aiSettings[1] = 10.0f;

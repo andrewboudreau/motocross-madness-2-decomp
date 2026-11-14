@@ -7,7 +7,7 @@
 
 #include "collision/CollisionTypes.h"
 
-// The object a contact point belongs to (CollisionPoint::field_0x04).  Only one method
+// The object a contact point belongs to (CollisionPoint::ownerNode).  Only one method
 // is used: 0x004fd660 (thiscall, ret 8), which the scene node class (SoultreeObject)
 // also has, so this is a provisional view of that node.  Tier 3 name.
 class CollisionContactOwner {

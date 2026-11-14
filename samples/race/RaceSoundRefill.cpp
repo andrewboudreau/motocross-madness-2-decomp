@@ -5,8 +5,8 @@
 #include <string.h>
 
 // 0x004e4d10: once the play cursor has crossed into the other half, refills
-// the half just played from the sample, looping it (field_0x20 0) or going
-// on to a random sample of the set field_0x20 names.
+// the half just played from the sample, looping it (nextSampleKind 0) or going
+// on to a random sample of the set nextSampleKind names.
 void RaceSound::RefillStream() {
     void* first;
     unsigned long write;

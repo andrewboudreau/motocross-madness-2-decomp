@@ -24,7 +24,7 @@
 // 155 = retail, candidate 478 bytes; `for (;;)` is rotated, 162
 // instructions and 491 bytes, though it scores 95 strict bytes against 91
 // here). Left: register allocation. Retail keeps ebp = audio,
-// ebx = &audio->field_0x0c then `loaded`, edi = &sound->field_0x48, and
+// ebx = &audio->queueLock then `loaded`, edi = &sound->bufferLock, and
 // spills `ready`/`bytes` to one frame slot (frame 0xc); VC6 here caches the
 // EnterCriticalSection pointer in ebx, spills `loaded` (frame 8). Tried
 // without gain: context macro instead of the `audio` local, `loaded = 0`

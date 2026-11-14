@@ -155,7 +155,7 @@ void SoultreePhysicsBaseObject::UpdateLocalCenterOfMass()
 }
 
 // slot 9 (0x00501ce0): fixed-timestep accumulator (tier 3 reading; the arithmetic is decoded).
-// field_0x1e4 is the fixed step, field_0x1e0 the carried remainder, field_0x1ec the cap on
+// fixedStepTime is the fixed step, stepRemainder the carried remainder, maxStepsPerFrame the cap on
 // steps per frame.  steps = floor((dt + remainder) / step), remainder' = leftover time; when
 // less than one step has elapsed the frame runs as a single variable-length step of dt (or
 // of one nominal step when dt is 0).  stepTime = step length used, invStepTime = 1/step.
@@ -611,7 +611,7 @@ void SoultreePhysicsBaseObject::ApplyCollisionEvent(int notify, int eventKind, v
 // ---- slot 21 (0x005024f0) -------------------------------------------------------------
 // Local views of objects reached through the attachment records / probe (tier 3 names,
 // offsets decoded from slot 21 only).
-struct SoultreeLightList {          // field_0x08->+0x1bc: count at +0x2c, items from +0x30
+struct SoultreeLightList {          // sceneNode->+0x1bc: count at +0x2c, items from +0x30
     char pad_0x00[0x2c];
     int count;
     struct SoultreeLight* items[1];
@@ -627,7 +627,7 @@ struct SoultreePadObject {         // attachment slideEmitter / scrapeEmitter ta
     char pad_0x00[0x60];
     int activeThisFrame;  // +0x60 slot 21 clears it every frame for type-2/3 targets, like SoultreeAttachedObject::activeThisFrame
 };
-struct SoultreeSinkObject {        // attachment field_0x14 target (type 4)
+struct SoultreeSinkObject {        // attachment pointEmitter target (type 4)
     char pad_0x00[0x48];
     Vec3 currentPosition;  // +0x48 set by 0x004ba2c0 in slot 21; copied to previousPosition on a trail reset
     Vec3 previousPosition;  // +0x54 slot 21: previousPosition = currentPosition when the attachment's resetTrail is set
@@ -640,7 +640,7 @@ struct SoultreeSinkObject {        // attachment field_0x14 target (type 4)
     void SetColor(int r, int g, int b);  // 0x004ba360: +0x478 = (r << 16) | (g << 8) | (b & 0xff)
 };
 
-// The type-4 attachment target (field_0x14).  Slot 21 reloads it at every use; caching it
+// The type-4 attachment target (pointEmitter).  Slot 21 reloads it at every use; caching it
 // in a local changes register allocation.
 static inline SoultreeSinkObject* AttachmentSink(const SoultreeAttachment* a)
 {
@@ -651,8 +651,8 @@ static inline SoultreeSinkObject* AttachmentSink(const SoultreeAttachment* a)
 // reading: (1) pick a tracked object from the node's list (kind 2 or 4); (2) on the
 // slot 22 cadence, probe from the body position (+1.5 up) along the tracked object's
 // velocity * -3000 (kind 2) or its own position, and when the probe result flips relative to
-// field_0x1fc retint every type 1/4 attachment (0x40 vs 0xff) and toggle flag 0x800;
-// (3) advance the field_0x208 cadence counter (wraps after 5); (4) reset each attachment,
+// inShadow retint every type 1/4 attachment (0x40 vs 0xff) and toggle flag 0x800;
+// (3) advance the staggerCounter cadence counter (wraps after 5); (4) reset each attachment,
 // re-running the slot 18/19/20 updaters, or for type 4 moving the sink to the node-local
 // point and calling its 4ba300/4ba320 depending on slots 24/25; (5) finally clear field_0x60
 // of every attachment when attachmentResetPending was set.
@@ -773,7 +773,7 @@ void SoultreePhysicsBaseObject::UpdateAttachmentEffects()
 // D:\aardvark\VC\krusty2\SoulTreePhysics.cpp, so the file argument is that literal.
 #define SP_FILE "D:\\aardvark\\VC\\krusty2\\SoulTreePhysics.cpp"
 
-extern int g_SoultreeInstanceCounter;      // 0x00689f14: cycles 0..5 (field_0x204 takes the old value)
+extern int g_SoultreeInstanceCounter;      // 0x00689f14: cycles 0..5 (staggerPhase takes the old value)
 
 // cdecl 0x004b5a60 is OrientationAnglesFromVectors (../common/Math3D.h).
 
@@ -910,8 +910,8 @@ GameObject* SoultreePhysicsBaseObject::InitializePhysics(int renderContext, int 
 
 // ---- collision callbacks (0x00500c00, 0x00500c30) ----------------------------------------
 // Installed into the CollisionObject at collisionObject (+0x128) by InstallCollisionCallbacks (+0x88 / +0x8c).  The
-// collision object's field_0x60 is its owner (this body) and the other object's field_0x64
-// its type tag (0x68 = another physics body).  The tag is recorded in field_0x134 and
+// collision object's ownerObject is its owner (this body) and the other object's ownerType
+// its type tag (0x68 = another physics body).  The tag is recorded in lastCollisionType and
 // forwarded to slot 38 together with the other collision object (tier 1 data flow).
 static void SoultreeCollisionCallback(CollisionObject* self, CollisionObject* other)
 {
@@ -992,7 +992,7 @@ SoultreePhysicsBaseObject::~SoultreePhysicsBaseObject()
 // linearSpeed < 2) and its angularVelocity is small on every axis, with at least
 // restContactThreshold - 1 active contacts (touchingPointCount), the timer restTimer runs; after 0.5 s,
 // on more than one contact or on a single near-flat one (normal y > 0.95), the body is put
-// to sleep: velocities zeroed and field_0x10a set (GameObject slot 10 then skips the step).
+// to sleep: velocities zeroed and asleep set (GameObject slot 10 then skips the step).
 // A body slower than 5 with enough contacts is damped instead (angular 0.95 per frame, and
 // after 3 s angular 0.5 and linear 0.95).
 static inline float AbsF(float v)
@@ -1049,9 +1049,9 @@ void SoultreePhysicsBaseObject::UpdateRestState()
 int SoultreeRefreshContacts(int enabled, int* activeCount, int count, SoultreeContact** contacts,
                             SoultreeProbe* terrain, Vec3* center, int mode, float radius);
 
-// Per-frame update: skipped while asleep (field_0x10a); otherwise slot 9 splits dt into
+// Per-frame update: skipped while asleep (asleep); otherwise slot 9 splits dt into
 // fixed steps, slot 30 clears the contact flags, slot 39 handles a pending reset, the
-// contacts are refreshed (field_0x1d0 = any contact active), RunSteps runs the steps and
+// contacts are refreshed (pointsTouching = any contact active), RunSteps runs the steps and
 // slot 21 refreshes the attachments.  Tier 2 for the call structure.
 int SoultreePhysicsBaseObject::Tick(float dt)
 {
@@ -1120,7 +1120,7 @@ extern ResourceManager* g_ResourceManager; // pointer stored at 0x00572b44
 // SoultreePhysicsObject slot 40 (0x00503970, `ret 0x70`).  Loads the model through the
 // D3DIM object base (slot 9) and runs the physics setup (slot 2).  If the ".col" file is
 // found it becomes the collision shape, otherwise the hull comes from the node (0x00432720).
-// SoultreePhysicsObject has two GameObjects, so field_0x08 and the GameObject call are
+// SoultreePhysicsObject has two GameObjects, so sceneNode and the GameObject call are
 // qualified.
 GameObject* SoultreePhysicsObject::LoadPhysicsModel(int renderContext, const char* modelPath,
                                                         const SoultreeLoadDesc* desc, int options,

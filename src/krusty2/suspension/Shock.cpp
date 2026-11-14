@@ -151,7 +151,7 @@ void InlineShock::ClampAndStep(float maxDelta, float dt, ShockVec3& pos)
 void InlineShock::Retract(float amount, const ShockCarrier* carrier)
 {
     if (ratio != 0.0f) {
-        float retraction = amount * (minLength / (carrier->field_0x2a4 * retractScale));
+        float retraction = amount * (minLength / (carrier->leanCos * retractScale));
         if (!_finite(retraction) || retraction < 0.0f)
             return;
         if (retraction >= length) {
@@ -271,7 +271,7 @@ RotatingShock::~RotatingShock()
 void RotatingShock::Retract(float amount, const ShockCarrier* carrier)
 {
     if (ratio != 0.0f) {
-        float retraction = amount * (chord / (carrier->field_0x2a4 * retractScale));
+        float retraction = amount * (chord / (carrier->leanCos * retractScale));
         if (!_finite(retraction) || retraction < 0.0f)
             return;
         if (retraction >= length) {

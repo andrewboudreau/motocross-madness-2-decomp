@@ -45,9 +45,9 @@ public:
     virtual short QuadTreeVirtualSlot0();
     virtual unsigned int QuadTreeVirtualSlot1(void* tree);
 
-    short field_0x04;
-    short field_0x06;
-    char field_0x08;
+    short queryStamp;
+    short sortKey;
+    char objectTypeId;
 };
 
 // RTTI SoultreeObject: constructor 0x004fb2b0 (ret 4), destructor core
@@ -118,7 +118,7 @@ public:
     int localBoundsValid;                      // +0x154 local bounds valid
     Vector3 localBoundsCenter;                 // +0x158 local bounds centre
     Vector3 localBoundsHalfExtent;             // +0x164 local bounds half extent
-    int field_0x170;                           // Krusty3DObjects.cpp 0x0048c8a0 sets 1
+    int subtreeBoundsValid;                    // Krusty3DObjects.cpp 0x0048c8a0 sets 1
     Vector3 subtreeBoundsCenter;               // +0x174 subtree bounds centre (0x004fe0f0; Krusty3DObjects.cpp 0x0048c8a0)
     Vector3 subtreeBoundsHalfExtent;           // +0x180 subtree bounds half extent (0x004fe0f0)
     int subtreeDirty;                          // +0x18c subtree bounds dirty (set up the parent chain by 0x004fdab0)
@@ -139,7 +139,7 @@ struct SoultreeVertex {
 };
 
 // One 0x14-byte vertex group of a surface: the vertices one node moves.
-// 0x00440d40 transforms field_0x04 vertices by the node's world matrix.
+// 0x00440d40 transforms vertexCount vertices by the node's world matrix.
 struct SoultreeVertexGroup {
     SoultreeObject* node;                      // node
     int vertexCount;                           // vertex count

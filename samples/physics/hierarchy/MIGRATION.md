@@ -38,7 +38,7 @@ The committed files under `samples/physics/` are now the hand-edited source of t
 - **Base classes.** Vehicle, Bike and KrustyBike derive from the canonical classes. All three vtable_counts checks print `ok` (97/12/27 for Vehicle; 103/12/27 for Bike and KrustyBike). `sizeof` is asserted in each header.
 - **Slot conflicts (table below).** All 12 are resolved in `SoultreePhysicsBaseObject.h`, and each carries a tier comment. Slot 14's `a1` is non-const, because KrustyBike 0x004965e0 writes `a1->x` and `a1->z`.
 - **Vehicle slot 64 is `void(float)`.** Retail 0x00528e50 materialises no return value, and it is byte-exact as `void`. Slot 63 keeps `int(float)`.
-- **`field_0x1f8` is `float`.** Tier 1: KrustyBike slot 12 (0x0048de20) does `fld`/`fmul` on it.
+- **`terrainScale` is `float`.** Tier 1: KrustyBike slot 12 (0x0048de20) does `fld`/`fmul` on it.
 - **Cast at the use site.** Do not use inline accessor functions for rule 6. VC6 schedules the load differently when the cast is inside an inline accessor. Bike slot 8 lost its exact match that way, and Vehicle slots 4, 19, 35 and 49 lost bytes.
 
 ## Status (collision, constraint migrated)
@@ -80,9 +80,9 @@ No generators wrote into `collision/` or `constraint/`. The scripts in `work/b2_
 ## General rules
 
 1. **No `field_0x04`.** Offset +4 is the vbptr. Never declare it or a stand-in for it.
-2. **Reach GameObject members through the virtual base.** Code in derived classes names GameObject members directly, for example `field_0x18`. VC6 then emits `mov r,[this+4]; mov r,[r+4]; ... [r+this+4+disp]`.
+2. **Reach GameObject members through the virtual base.** Code in derived classes names GameObject members directly, for example `renderContext`. VC6 then emits `mov r,[this+4]; mov r,[r+4]; ... [r+this+4+disp]`.
    - The displacement in that retail code is **GameObject offset + 4**, because it is relative to the vbptr at +4.
-   - So retail `[ecx+esi+0x1c]` is `GameObject::field_0x18`, not `field_0x1c`.
+   - So retail `[ecx+esi+0x1c]` is `GameObject::renderContext`, not `field_0x1c`.
    - **Bike slot 97 fix:** this is the Bike "+4" problem. `BikeGameObject::go_0x1c` is really `GameObject+0x18`. `field_0x4.AppendChild` is really `GameObject::AppendChild`, with `this` equal to the GameObject itself (`lea ecx,[edx+esi+4]`).
    - The vtordisp does **not** cause the Bike problem. VC6 puts the stand-in Bike's GameObject at 0x738 too (`sizeof` 0x758 − 0x20).
 3. **Override signatures must match the base declaration exactly.** VC6 does not report a parameter-list mismatch. The function silently becomes a new virtual and the vtable grows.
@@ -100,7 +100,7 @@ No generators wrote into `collision/` or `constraint/`. The scripts in `work/b2_
 ## Required edits to `soultree_base/SoultreePhysicsBaseObject.h` first (Agent A)
 
 1. **GameObject slot signatures.** These come from the constraint area's retail evidence and from `ret N`:
-   - `virtual GameObject* SetRenderContext(int a);` (0x004692f0: `field_0x18 = a; return this`).
+   - `virtual GameObject* SetRenderContext(int a);` (0x004692f0: `renderContext = a; return this`).
    - `virtual int Tick(float dt);` (0x004693d0 and every override use `ret 4`: 0x005036f0, 0x00504210, 0x0052a830, 0x004977a0).
    - `virtual int GameObjectVirtualSlot11(float dt);` (0x004da540: `mov eax,1; ret 4`).
    - After this change, update the SoultreePhysicsBaseObject slot-10 override, and the SoultreePhysicsCharacter one in `hierarchy/SoultreePhysicsCharacter.h`, to `int Tick(float dt)`. Both are currently `void()` to match the shared header.

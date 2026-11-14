@@ -38,7 +38,7 @@ struct Motion;          // 0xcc-byte motion record of the MotionManager (src/kru
 struct CharacterPose;   // 0x2c-byte pose record; defined by users that need the layout (src/krusty2/motion/MotionPose.h)
 
 // {int, records, count} list of pose records: Character's rest pose list (+0x190) and each frame of a
-// Motion (0xc-byte elements of Motion::frames).  field_0x00 is the frame number in motion frames
+// Motion (0xc-byte elements of Motion::frames).  frameIndex is the frame number in motion frames
 // (the advance helpers 0x004a56d0/0x004a5750 read it).  Names tier 3.
 struct MotionPoseList {
     int frameIndex;                           // +0x0  the frame's index in Motion::frames (LoadMot 0x004a5c30 stores i); AdvanceLooping/AdvanceClamped step from it and AdvanceMotion 0x004a6bb0 returns it
@@ -90,7 +90,7 @@ public:
     // the 0x2c-byte records (tier 1 decode); D3DIM slot 2 passes the address of its pose list.
     void SortPoseList(void* poseList);
     // 0x004a6910, thiscall, ret 8: calls GameObject slot 8's body (0x004692f0, stores its argument in
-    // field_0x18) with the first argument; the second argument is unused (tier 1 decode).
+    // renderContext) with the first argument; the second argument is unused (tier 1 decode).
     void SetCharacterRenderContext(int renderContext, int unused);  // name tier 2 (decoded body)
     // 0x004a62d0 and 0x004a6500, thiscall, no arguments (plain ret). Both reference Motnctrl.cpp's
     // __FILE__ (0x0056e034) with debug new (lines 0x26b, 0x29d) and use the name strings at +0x8c / +0xdc /
@@ -147,7 +147,7 @@ public:
 
 // Descriptor passed to the D3DIM loaders (D3DIMSoultreeCharacter slot 11, D3DIMSoultreeObject
 // slot 9) and tested by both slot 40 loaders: `test byte [p+0x25],1` selects a
-// field_0x08->SetUseLighting(1) call (tier 1 offset; the type and its meaning are tier 3).
+// sceneNode->SetUseLighting(1) call (tier 1 offset; the type and its meaning are tier 3).
 struct SoultreeLoadDesc {
     char field_0x00[0x25];
     unsigned char field_0x25;
@@ -184,7 +184,7 @@ public:
     // D3DIM's own data 0x1a0..0x210 (then vtordisp at 0x210, GameObject at 0x214).
     // modelNode is the pointer that SoultreePhysicsCharacter code reads at the
     // absolute offset 0x3bc (0x21c + 0x1a0); its type is shared with
-    // SoultreePhysicsBaseObject::field_0x08 in the collision area (tier 3).
+    // SoultreePhysicsBaseObject::sceneNode in the collision area (tier 3).
     SoultreeObject* modelNode;
     char d3d_field_0x1a4[0x6c];
 };

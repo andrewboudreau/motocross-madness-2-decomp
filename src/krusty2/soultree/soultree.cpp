@@ -152,7 +152,7 @@ SoultreeObject::SoultreeObject(int flags)
     localBoundsHalfExtent.x = 0;
     localBoundsHalfExtent.y = 0;
     localBoundsHalfExtent.z = 0;
-    field_0x170 = 0;
+    subtreeBoundsValid = 0;
     subtreeBoundsA.x = 0;
     subtreeBoundsA.y = 0;
     subtreeBoundsA.z = 0;
@@ -814,7 +814,7 @@ void SoultreeObject::LoadHierarchy(FileStream* stream)
         stream->Read(&nodes[i]->localBoundsValid, 4, 1);
         stream->Read(&nodes[i]->localBoundsCenter, 0xc, 1);
         stream->Read(&nodes[i]->localBoundsHalfExtent, 0xc, 1);
-        stream->Read(&nodes[i]->field_0x170, 4, 1);
+        stream->Read(&nodes[i]->subtreeBoundsValid, 4, 1);
         stream->Read(&nodes[i]->subtreeBoundsA, 0xc, 1);
         stream->Read(&nodes[i]->subtreeBoundsB, 0xc, 1);
         nodes[i]->parent = 0;

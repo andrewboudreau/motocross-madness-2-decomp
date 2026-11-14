@@ -221,7 +221,7 @@ int BikeRace::SetPaused(int value) {
 
 // 0x0041d0d0
 int BikeRace::AppendNode(int index, RaceGatePose* source,
-                         RaceGate*** tail, float scale, int value) {
+                         RaceGate*** tail, float scale, int height) {
     RaceGate* node =
         (RaceGate*)DebugCalloc(1, sizeof(RaceGate), __FILE__, 0x840);
     if (node == 0) {
@@ -235,7 +235,7 @@ int BikeRace::AppendNode(int index, RaceGatePose* source,
     node->direction.y = record->direction.y;
     node->direction.z = record->direction.z;
     node->width = scale;
-    node->field_0x28 = value;
+    node->height = height;
     node->halfExtents.y = 0.0f;
     node->halfExtents.x = scale * node->direction.z * 0.5f;
     node->halfExtents.z = scale * node->direction.x * -0.5f;
@@ -251,7 +251,7 @@ int BikeRace::BuildNodeList(RaceGateEvent* owner) {
     RaceGate** tail = &gateList;
     for (int i = 0; i < count; i++) {
         RaceGateObject* entry = owner->gateEntries[i];
-        if (!AppendNode(i, sources, &tail, entry->width, entry->field_0x54)) {
+        if (!AppendNode(i, sources, &tail, entry->width, entry->height)) {
             return 0;
         }
     }

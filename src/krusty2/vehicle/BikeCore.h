@@ -121,10 +121,10 @@ public:
     float IntegrateSteerTorque();
 
     // Inherited members whose canonical types are still generic are viewed through
-    // casts at the use site (MIGRATION.md rule 6): field_0x12c as BikeElem**, field_0x1f4
+    // casts at the use site (MIGRATION.md rule 6): collisionPoints as BikeElem**, terrain
     // as BikeA1F4*.  Inline accessor
     // functions were tried and cost the exact match of slot 8 (0x00406750): VC6 then
-    // loads field_0x42c before the float arguments instead of after them.
+    // loads poseNode before the float arguments instead of after them.
 
     int gasGyro;  // +0x5BC  0 from the constructor, LoadBike's gasGyroOption: TrackGameMode gasGyro (key 0x22, reset 0)
     int brakeGyro;  // +0x5C0  1 from the constructor, LoadBike's brakeGyroOption: TrackGameMode brakeGyro (key 0x30, reset 1)
@@ -163,12 +163,12 @@ public:
     int crossoverPose;                        // +0x6FC  slot 89 sets it while airborne with both wheels clear and picks poses 11..13 (CrosOv1..3); slot 41 clears it when slot 89 leaves that branch (tier 2)
     int frontWheelLifted;                     // +0x700  = wheelsInContact > 0 and frontWheel->penetration < -2.5 (front wheel clear while another touches); slot 62 returns 2 on it
     float poseSmoothTime;                     // +0x704  0.55; the poseSmoother's smoothing time (constructor argument, reloaded when the crossover pose starts)
-    float sideLieThreshold;  // +0x708 slot 38 tail: compared with |dot(kVec3YAxis, field_0xa0)|; if smaller 'bike is lying on its side' branch
+    float sideLieThreshold;  // +0x708 slot 38 tail: compared with |dot(kVec3YAxis, savedForward)|; if smaller 'bike is lying on its side' branch
     float field_0x70c;             // +0x70c loader: 0.85f
     float crashGraceTime;                     // +0x710  the loader sets crashTimerReload - 0.5; slot 39 clears wrecker +0xac while crashTimer is still above it (provisional)
-    float wobbleTime;  // +0x714 slot 91 wobble: wobbleTime += field_0x13c each frame, cubed (t*t*t*0.3578) to cap amplitude, halved on sign flip, zeroed by slot 71
-    float wobbleSign;  // +0x718 slot 91 wobble: sign of field_0x2c; compared with new sign to detect flip; set in slot 71 from sign of field_0x48
-    float wobbleOffset;  // +0x71c slot 91 wobble: added into field_0xd8.z, decays *0.9 per frame, reloaded from field_0xd8.z on flip/slot 71
+    float wobbleTime;  // +0x714 slot 91 wobble: wobbleTime += stepTime each frame, cubed (t*t*t*0.3578) to cap amplitude, halved on sign flip, zeroed by slot 71
+    float wobbleSign;  // +0x718 slot 91 wobble: sign of bodyRoll; compared with new sign to detect flip; set in slot 71 from sign of savedRoll
+    float wobbleOffset;  // +0x71c slot 91 wobble: added into angularVelocity.z, decays *0.9 per frame, reloaded from angularVelocity.z on flip/slot 71
     int wobbleStage;  // +0x720 slot 91 wobble: cycles 1..2 on each sign flip, loop active only while 1..2; slot 71 sets to 1
     float leanSpeedThreshold;                 // +0x724  32.0; slot 57 returns savedRoll as the lean while not crashed and prevSpeed is below it (provisional)
     BikeDustEmitter* dustEmitter;  // +0x728  BikeDustEmitter built by the loader (Bike.cpp new line 0x70f), attached as type 1 on the rear wheel

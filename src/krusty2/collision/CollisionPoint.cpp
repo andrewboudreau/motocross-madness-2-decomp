@@ -378,8 +378,8 @@ int SoultreeRefreshContacts(void* enabled, int* penetrating, int count, Collisio
     return 1;
 }
 
-// 0x0043aff0: refreshes the world position (field_0x14) of every owned, active contact point from the
-// owner's transform of its local position (field_0x08).
+// 0x0043aff0: refreshes the world position (worldPosition) of every owned, active contact point from the
+// owner's transform of its local position (localPosition).
 // Bike passes primary scene nodes to AddCollisionPoint; the canonical Vec3
 // return uses the same hidden 12-byte result buffer as the old call view.
 void UpdateCollisionPointWorldPositions(int count, CollisionPoint** points) {

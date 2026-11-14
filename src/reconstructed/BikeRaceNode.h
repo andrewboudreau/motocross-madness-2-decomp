@@ -15,7 +15,7 @@ struct RaceGate {
     Vector3 direction;                        // +0x0c direction
     Vector3 halfExtents;                      // +0x18 half extents (across the direction for gates)
     float width;  // +0x24  AppendNode's scale; halfExtents = scale*dir*0.5; Create scales the finish arch by it / modelWidth
-    int field_0x28;
+    int height;  // +0x28 a float in GameUiHelpers' crossing test; AppendNode stores its int argument
     TrackPos trackPos;                        // +0x2c position along the track (DistanceAlong/PlaceNear operand, 0x004e6a50)
     RaceGate* nextGate;                       // +0x38 next gate
 };

@@ -6,7 +6,7 @@
 #include "soultree/SoultreePhysicsTypes.h"
 #include "collision/CollisionObject.h"
 
-// Element of SoultreePhysicsBaseObject::field_0x12c (count in field_0x130).
+// Element of SoultreePhysicsBaseObject::collisionPoints (count in collisionPointCount).
 // Has a vfptr at +0 (slot 1 is called with no arguments by slot 13).  Tier 3 names.
 // Slot 0 is the deleting destructor: the SoultreePhysicsBaseObject destructor 0x00501260
 // deletes each element with `push 1; call [vptr]` (tier 1).  This is a stand-in view of
@@ -68,7 +68,7 @@ public:
     Vec3 anchorPosition;  // +0x20 slot 17 sums anchorPosition over the attachments' anchors and divides by their count
 };
 
-// 40-byte record of SoultreePhysicsBaseObject::field_0x1d4 (slot 37 builds them).
+// 40-byte record of SoultreePhysicsBaseObject::attachments (slot 37 builds them).
 // type 1..4 selects which of field_0x04/08/0c/14 receives the argument.
 class SoultreeAttachment {
 public:
@@ -82,7 +82,7 @@ public:
     char resetTrail;  // +0x24 slot 21: resetTrail |= justReset; when set, slots 18/21 copy the target's current position over its previous one, then clear it
 };
 
-// Object at SoultreePhysicsBaseObject::field_0x1f0 (slot 18: byte table at +0x400 of *(+0xa4)).
+// Object at SoultreePhysicsBaseObject::track (slot 18: byte table at +0x400 of *(+0xa4)).
 class SoultreeFlagBlock {
 public:
     char field_0x00[0x400];
@@ -91,7 +91,7 @@ public:
 class SoultreeSlot1f0 {
 public:
     char field_0x00[0xa4];
-    SoultreeFlagBlock* trackData;  // +0xa4 slot 18 reads trackData->field_0x400[materialId] to decide whether a contact may spawn the effect
+    SoultreeFlagBlock* trackData;  // +0xa4 slot 18 reads trackData->materialEffectFlags[materialId] to decide whether a contact may spawn the effect
 };
 
 #endif

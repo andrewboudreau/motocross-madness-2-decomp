@@ -355,8 +355,8 @@ void Bike::UpdateLeanFromNormal(Vec3* forward, int updateLeanCos, Vec3* up)
 {
     Vehicle::UpdateLeanFromNormal(forward, updateLeanCos, up);
     if (updateLeanCos) {
-        rearWheel->w_0x2a4 = leanCos;
-        frontWheel->w_0x2a4 = leanCos;
+        rearWheel->leanCos = leanCos;
+        frontWheel->leanCos = leanCos;
     }
 }
 
@@ -1544,7 +1544,7 @@ int Bike::EvaluateCrash(float dt, float noseOverLimit, int impact, float impulse
 }
 
 // Slot 7: distributes an applied force/direction over the tyre contacts.
-// Mode field_0x1d0: weights the active contact elements by distance.
+// Mode pointsTouching: weights the active contact elements by distance.
 // Otherwise splits the force between front and rear wheel.
 // 0x004060c0 PARTIAL (1677/1678, one SIB order; docs/NEAR_MISS_INDEX.md).  Session 17:
 // BikeContactDistance for one or both wheel distances (3/5) and BikeWheelDistance in the
@@ -1705,7 +1705,7 @@ void Bike::ApplyAirControl()
     }
     // operator*= keeps the wobbleStage load below the decay stores
     angularVelocity *= 0.9f;
-    // wobble: ramps a short-lived oscillation on field_0xd8.z (cnt 1..2)
+    // wobble: ramps a short-lived oscillation on angularVelocity.z (cnt 1..2)
     float elapsed = wobbleTime + stepTime;
     int cnt = wobbleStage;
     wobbleTime = elapsed;
@@ -1744,7 +1744,7 @@ static inline Vec3 BikeOolHalf(const Vec3& v)
 }
 
 // Slot 46: focus/anchor point of the bike in local space.  Airborne or flagged
-// bikes return the stored anchor (field_0x194); otherwise it is the front
+// bikes return the stored anchor (rotationPivot); otherwise it is the front
 // wheel position (slideAngle != 0) or a blend toward the rear wheel, relative to the
 // body, mapped through the transform.
 Vec3* Bike::ComputeRotationPivot(Vec3* out, float slideAngle)
@@ -1816,7 +1816,7 @@ static inline Vec3 BikeScale92(const Vec3& v, float k)
 }
 
 // Slot 92: steering-torque limiter.  Derives a target steering angle from
-// speed/lean terms, clamps it (rider lean, field_0x580), computes the residual
+// speed/lean terms, clamps it (rider lean, maxLeanAngle), computes the residual
 // vs the current angle (slot 57) and applies a corrective force through the
 // transform, then bleeds off the accumulated lean impulses.
 // RotateAboutPoint takes the pivot (*point) first and the local axis second, as retail
@@ -2113,10 +2113,10 @@ void Bike::ApplyCollisionEvent(int notify, int eventKind, void* event)
 
 // ---- slot 89: rider pose blend (tier 3 names) ----
 // Reached from slot 90 (and Vehicle's per-frame code) with the frame time.  Derives a lean
-// value from the wheel state, picks a pose pair (field_0x650/field_0x658) with a blend weight
-// (field_0x654/field_0x660) from the animation parameter at field_0x640, then advances a
-// smoothed value (field_0x644) toward field_0x504 and maps it through a small 5-state machine
-// (steerPoseState) to field_0x65c.  Retail converts the pose index with an inlined fistp helper
+// value from the wheel state, picks a pose pair (poseIndex/poseState) with a blend weight
+// (poseBlend/poseLeanBlend) from the animation parameter at steerAxis, then advances a
+// smoothed value (poseSmoother) toward field_0x504 and maps it through a small 5-state machine
+// (steerPoseState) to poseParam.  Retail converts the pose index with an inlined fistp helper
 // (round-to-nearest after the -0.5); BikeFloatToInt gives the same index in ordinary C++
 // (a plain (int) truncated it, one index too low with poseBlend above 1 for half the steer range).
 // The clamps are small inline helpers: retail copies each memory limit into a frame temp

@@ -79,7 +79,7 @@ Terrain::Terrain(int flags)
     closeUpStateSet = 0;
 }
 
-// 0x005057d0.  Moves `object` out of the live prefix of field_0xcb8[] (swap with the last live
+// 0x005057d0.  Moves `object` out of the live prefix of ownedObjectArray[] (swap with the last live
 // element, shrink the live count), keeping the pointer just behind the new end.
 void Terrain::RetireOwnedObject(BaseObject* object)
 {
@@ -636,7 +636,7 @@ int Terrain::OnControlRelease(ControlEvent*, InputButtonState*)
     return 0;
 }
 
-// 0x00507930: clamps at zero, marks field_0xbf4 (a dirty flag, tier 3) when the value changes.
+// 0x00507930: clamps at zero, marks drawDistanceDirty (a dirty flag, tier 3) when the value changes.
 void Terrain::SetField0xbec(int value)
 {
     if (value < 0)
@@ -847,7 +847,7 @@ static inline TerrainVec3 TerrainNormalize(const TerrainVec3& v)
     return v * FastInvSqrt(lenSq);
 }
 
-// 0x00507c10 (tier 3 names throughout).  x/z are scaled by field_0xc30 (grid units per world
+// 0x00507c10 (tier 3 names throughout).  x/z are scaled by invGridCellSize (grid units per world
 // unit), rounded after subtracting 0.5 to a cell (ix, iz), and the four corners
 // are fetched. The result follows the active rounding mode, including tie-to-even.  The point's offsets
 // (u, v) inside the cell give a squared distance to each corner (w[0..3]); the smallest picks
@@ -1030,7 +1030,7 @@ inline TerrainVec3 TerrainClipRayToPlaneX(TerrainVec3& origin, const TerrainVec3
 }
 
 // 0x00506e90 (tier 3 names).  Callers: SoultreePhysicsBaseObject slot 21 (0x00502632) and
-// the TerrainShadow / projected-shadow code.  The world segment is divided by field_0x40 into
+// the TerrainShadow / projected-shadow code.  The world segment is divided by gridCellSize into
 // grid space, each axis is clipped so both ends lie inside the box [0, W] x [yLo, yHi] x [0, W]
 // (W = 16 << shift; the start point is advanced along the direction, the end point along the
 // reversed direction), trivially rejected if both ends are on the outside of a face, then y and

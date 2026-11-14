@@ -19,9 +19,9 @@ public:
     static ColorMapper* LoadShared(const char* name);
 
     void Build16BitTables();                             // 0x004ddec0: builds the 16-bit tables
-    unsigned char* GetColors();              // 0x004de270: &field_0x10
-    unsigned char* GetIndexFrom555();              // 0x004de280: &field_0x710
-    unsigned char* GetIndexFrom565();              // 0x004de290: &field_0x8710
+    unsigned char* GetColors();              // 0x004de270: &entries
+    unsigned char* GetIndexFrom555();              // 0x004de280: &indexFrom555
+    unsigned char* GetIndexFrom565();              // 0x004de290: &indexFrom565
 
     int firstIndex;                     // first palette index used
     int entryCount;                     // number of palette entries

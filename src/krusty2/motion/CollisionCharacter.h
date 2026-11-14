@@ -41,8 +41,8 @@ public:
     Vec3 lastNodePosition;       // +0x218 last node position (updated by slot 10)
     Vec3 nodeVelocity;        // +0x224 velocity = (position - last position) / dt
     char field_0x230[0x18];         // not accessed by any target in this file
-    Vec3 field_0x248;       // copy of *(Vec3*)(contact record + 0x18)
-    Vec3 field_0x254;       // copy of *(Vec3*)(contact record + 0x0c)
+    Vec3 contactPoint;      // copy of *(Vec3*)(contact record + 0x18)
+    Vec3 contactNormal;     // copy of *(Vec3*)(contact record + 0x0c)
     int field_0x260;
 };
 

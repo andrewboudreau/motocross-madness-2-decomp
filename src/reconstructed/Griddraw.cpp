@@ -245,7 +245,7 @@ DrawableGridNode* DrawableGridNode::ReadNode(FileStream* stream, int loadChildre
             extra->blockRecords = (GridBlockRecord*)((char*)extra + 0x40);
             for (int j = 0; j < 16; j++) {
                 extra->blockRecords[j].textureReference = words[j];
-                extra->blockRecords[j].field_0x04 = 0;
+                extra->blockRecords[j].texture = 0;
             }
             goto allocated;
         }

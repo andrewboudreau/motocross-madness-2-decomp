@@ -198,7 +198,7 @@ public:
     float timeSinceRedraw;                    // seconds since the last redraw
     TrackOverlayRect rowRects[8];
     char drawnRowText[8][0x80];               // +0x1b0 the rows last drawn; a row is redrawn when its text changes
-    char rowText[8][0x80];                    // the text drawn into field_0x130[i]
+    char rowText[8][0x80];                    // the text drawn into rowRects[i]
     Win32Size rowExtent;              // extent of the first row (GetTextExtentPoint32A)
 };
 
@@ -460,7 +460,7 @@ public:
     int nameChanged;                          // name changed
     ChatKrustyBikeView* racers[11];
     int racerCount;                           // +0x198 entries in racers; also the extra name tag's index
-    int lastRacerValues[11];                  // racers[i]->field_0x784 last seen
+    int lastRacerValues[11];                  // racers[i]->position last seen
     Overlay* leftPanel;                       // +0x1c8 side panel left of chatRect on wide screens (0x0051cf80)
     Overlay* rightPanel;                      // +0x1cc side panel right of chatRect
     float cueSquaredDistance;                 // +0x1d0 drawn as its square root (0x0051e800)

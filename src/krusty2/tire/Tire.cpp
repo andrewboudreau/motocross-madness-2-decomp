@@ -24,8 +24,8 @@ static const CollisionVec3 kVec3XAxis = TireVec3(1.0f, 0.0f, 0.0f);
 static const CollisionVec3 kVec3YAxis = TireVec3(0.0f, 1.0f, 0.0f);
 static const CollisionVec3 kVec3ZAxis = TireVec3(0.0f, 0.0f, 1.0f);
 
-// Callback stored in CollisionObject::field_0x88 by slot 8 (0x00512e30).  self is the
-// tire's own CollisionObject (field_0x60 = owner, the Tire), other is the object that was hit.
+// Callback stored in CollisionObject::onHitCallback by slot 8 (0x00512e30).  self is the
+// tire's own CollisionObject (ownerObject = owner, the Tire), other is the object that was hit.
 static void TireCollisionCallback(CollisionObject* self, CollisionObject* other)
 {
     Tire* tire = (Tire*)self->ownerObject;
@@ -177,14 +177,14 @@ Tire::~Tire()
         delete rotatingShock;
 }
 
-// Slot 8 (base GameObject::slot 8 stores its argument in field_0x18 and returns this).
+// Slot 8 (base GameObject::slot 8 stores its argument in renderContext and returns this).
 // Tier 3 semantics: sets up the collision shape as a half-circle polyline of 8 points in
-// the wheel's y/z plane, radius field_0x274 (0x274 is the tire radius: the ctor stores the
+// the wheel's y/z plane, radius wheelRadius (0x274 is the tire radius: the ctor stores the
 // y extent of the wheel node there), running from angle pi/2 to 3*pi/2:
 //   angle = i/7 * pi + pi/2,  point = (0, -cos(angle)*r, sin(angle)*r)
 // Each element is 24 bytes: a zero vector followed by the point.  The shape is installed
-// with CollisionObject 0x00432ab0 (type 2), the owner pointer (field_0x60) is this tire
-// and field_0x88/field_0x8c get the contact callback and no second callback.
+// with CollisionObject 0x00432ab0 (type 2), the owner pointer (ownerObject) is this tire
+// and onHitCallback/onHitByCallback get the contact callback and no second callback.
 GameObject* Tire::SetRenderContext(void* context)
 {
     struct TirePoint {
@@ -232,15 +232,15 @@ static inline CollisionVec3 TireScaled(const CollisionVec3& v, float s)
 // CollisionPoint slot 1 override (0x00515b50, compiled with this = the CollisionPoint
 // subobject at +0xb8, hence the +0xb8 Tire offsets 0x230.. behind CollisionPoint-relative
 // disassembly displacements).  The base implementation (0x0043b240) computes the contact
-// force magnitude field_0x84 = -friction(field_0x88) * field_0x8c * field_0x74 and applies
-// it along the tangent field_0x50.  The tire replaces the single friction coefficient by an
+// force magnitude frictionMagnitude = -friction(normalForce) * surfaceGrip * frictionCoefficient and applies
+// it along the tangent frictionDirection.  The tire replaces the single friction coefficient by an
 // anisotropic one (tier 3 reading):
-//   cosA = |field_0x50 . field_0x230|      (tangent against the tire's rolling axis)
+//   cosA = |frictionDirection . rollDirection|      (tangent against the tire's rolling axis)
 //   sinA = sqrt(1 - cosA^2)
-//   force = -(mu_a*cosA + mu_b*sinA) * field_0x74 * field_0x8c,  mu_a = field_0x270*field_0x1d0,
-//                                                               mu_b = field_0x1cc*field_0x1d4
-// The force vector field_0x78 = field_0x50 * force and field_0x84 is stored as |force|.
-// The cos/sin pair is kept in field_0x28c / field_0x288.
+//   force = -(mu_a*cosA + mu_b*sinA) * frictionCoefficient * surfaceGrip,  mu_a = rollFriction*rollFrictionScale,
+//                                                               mu_b = sideFriction*sideFrictionScale
+// The force vector frictionForce = frictionDirection * force and frictionMagnitude is stored as |force|.
+// The cos/sin pair is kept in tangentCos / tangentSin.
 void Tire::ComputeFrictionForce()
 {
     if (!(CollisionPoint::tangentSpeed > 0.001f) && !(CollisionPoint::spinSpeed > 0.001f)) {
@@ -327,14 +327,14 @@ static inline Vec3 TireCrossCtor(const CollisionVec3& a, const CollisionVec3& b)
 
 // 0x005135f0.  Semantics are tier 3.  `this` is the complete Tire; the CollisionPoint
 // members are addressed through the subobject (+0xb8).
-//   field_0x38 = contact position - *center, rotationalVelocity = angularVelocity x field_0x38;
-//   field_0x218 = (n (angularVelocity . n)) x field_0x38 with n = the contact normal field_0x2c.
+//   relativePosition = contact position - *center, rotationalVelocity = angularVelocity x relativePosition;
+//   normalLeverCross = (n (angularVelocity . n)) x relativePosition with n = the contact normal surfaceNormal.
 // When speed > 0.001, `velocity` is rejected from the normal into `tangent` (0x0043b190)
-// and renormalised, field_0x90 = tangent . velocity and the slip vector field_0x1e8 =
-// field_0x90 * tangent + field_0x218; otherwise (or when that dot is <= 0.001, which
-// also zeroes field_0x90) field_0x1e8 = field_0x218.
-// field_0x50 is field_0x1e8 normalised, field_0x94 its length, and the outputs report
-// |field_0x50 . field_0x230| scaled by that length in field_0x27c plus its sign.
+// and renormalised, tangentSpeed = tangent . velocity and the slip vector slipVector =
+// tangentSpeed * tangent + normalLeverCross; otherwise (or when that dot is <= 0.001, which
+// also zeroes tangentSpeed) slipVector = normalLeverCross.
+// frictionDirection is slipVector normalised, spinSpeed its length, and the outputs report
+// |frictionDirection . rollDirection| scaled by that length in slipSpeed plus its sign.
 // Near miss, 1630 of 1664 bytes (strict, full length). `tangent` is a local so VC6 homes
 // it (and the projection) in the dead `angularVelocity` argument slot like retail; `(-c) * x` keeps
 // retail's fchs-then-fmul where `-c * x` lets VC6 hoist c * x above the branch. The slip
@@ -475,11 +475,11 @@ void TireTransformDirection(CollisionVec3* out, const CollisionVec3* v, const Co
 void TireBuildFrame(CollisionMatrix4* out, const CollisionVec3* pos, const CollisionVec3* zAxis,
                     const CollisionVec3* yAxis, int orthogonalize, int keepZ);
 
-// Wheel/owner record reached through MovingPart::field_0x44 (first member is the node).
+// Wheel/owner record reached through MovingPart::ownerRef (first member is the node).
 struct TireOwnerRef {
     TireNode* node;
 };
-// Record behind CollisionPoint::field_0xc0 (offset 0xa4 -> per-surface-kind tables).
+// Record behind CollisionPoint::surfaceOwner (offset 0xa4 -> per-surface-kind tables).
 struct TireSurfaceTables {
     char pad[0x3a0];
     float gripScale[16];       // 0x3a0
@@ -489,7 +489,7 @@ struct TireSurfaceRef {
     char pad[0xa4];
     TireSurfaceTables* tables;
 };
-// Bounds record behind CollisionObject::field_0x5c: scale at +0, box pointer at +4 (min[3], max[3]),
+// Bounds record behind CollisionObject::contactRecord: scale at +0, box pointer at +4 (min[3], max[3]),
 // and +8 a normal.
 struct TireBox {
     float min[3];
@@ -890,7 +890,7 @@ Tire::Tire(void* name, int root, float rollFriction_, float sideFriction_, int f
     shockExtending = 0;
     contactObjectVelocity = kVec3Zero;
     hasContactObjectVelocity = 0;
-    field_0x2a4 = 1.0f;
+    leanCos = 1.0f;
     normalLeverCross = kVec3Zero;
 }
 

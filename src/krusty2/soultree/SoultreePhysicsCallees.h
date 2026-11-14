@@ -8,7 +8,7 @@
 #include "contact/ContactImpulse.h"
 #include "contact/ObjectPlacement.h"
 
-// The node at SoultreePhysicsBaseObject::field_0x08 / field_0x218 is SoultreeObject
+// The node at SoultreePhysicsBaseObject::sceneNode / centerNode is SoultreeObject
 // (../common/SoultreeObject.h, included through Math3D.h).
 
 // cdecl helpers outside this class.
