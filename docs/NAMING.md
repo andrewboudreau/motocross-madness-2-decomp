@@ -4033,3 +4033,256 @@ Multi-member pads that need a declaration split, not a rename:
     StartObjectColliderBase `field_0x04` (queryStamp + sortKey);
   - CarProcedural model `field_0x38`.
 - KbNetState `field_0x00` and `field_0x04`.
+
+## Wave 31: multi-member pads split by the class they view
+
+Wave 31 works through the Wave 30 lists "Multi-member pads that need a
+declaration split" and "Left for wave 31". A pad is split only where every
+new member has evidence of one of these kinds:
+
+- the canonical class names that offset (CodeView layouts,
+  work/naming/cv/layouts.json; work/naming/w31/padmap.py lists the canonical
+  members inside each pad);
+- another view of the same object names it;
+- an SDK layout fixes it.
+
+Gaps without evidence stay as smaller `field_0xNN` pads, so every size and
+offset is unchanged. A member whose type the view cannot spell keeps a byte
+array named after the member, with "(bytes kept)" (the Wave 27 rule). No
+static, global, type of a static, or type with an emitted RTTI descriptor was
+renamed. No union arm was touched. No real class changed member order or
+size. Some splits are in declarations that are not views: SoultreeObject in
+D3DIMSoulTree.h, CarProceduralNode, KbNetState and VehicleShock. They keep
+every member offset and the size.
+
+The helpers and the edit specs are in work/naming/w31/:
+
+- edit.py (exact replacement that keeps CRLF) and spec/*.py;
+- padmap.py;
+- prove.sh, try1.sh and kscan.py (the counter scan below);
+- negcontrol.sh and negmutate.py.
+
+Counts over `src` and `samples` (`git grep -ohE`, work/naming/w28/counts.py):
+
+| Placeholder | Before (1011ac65) | After |
+| --- | --- | --- |
+| `\bUnknownVirtualSlot[0-9]+` | 74 uses, 17 names | 74 uses, 17 names |
+| placeholder methods | 85 uses | 85 uses |
+| `\bUnknown[A-Za-z0-9_]*` | 376 uses, 74 names | 376 uses, 74 names |
+| `\bfield_0x[0-9a-fA-F]+` | 1214 uses, 322 spellings | 1167 uses, 316 spellings |
+| `field_0x` in samples/ only | 112 uses | 106 uses |
+| `field_0x` declarations (`\bfield_0x[0-9a-fA-F]+(\[[^]]*\])?;`) | 815 | 776 |
+
+The wave adds 127 named member declarations from splits and renames five
+members:
+
+- `carriedFlagPosition` -> `centerOfMass`;
+- `bikeName` -> `texture`;
+- VehicleWheelAux `field_0x8c`/`field_0x90` -> `throttleTimeScale`/`gearCount`;
+- KbEffectParams `field_0x4` -> `reserved`.
+
+The splits leave four new residual pads: BikeRace.h and TrackOverlay.h
+`field_0x0fc`, GUIManager.h `field_0x126`, and DDSurfaceDesc2
+`field_0x28[0x40 - 0x28]`. They also shorten two pads: VehicleShock
+`pad_0x80` and Group1ParticleCamera `field_0x12c`. The edited files gain 86
+lines.
+
+### Splits
+
+Tier 2 throughout, except where the row says otherwise. "SPBO" is
+SoultreePhysicsBaseObject, the KrustyBike/Vehicle base that the canonical
+layout puts at those offsets.
+
+| Struct (file) | Old pad | New members | Tier | Evidence |
+| --- | --- | --- | --- | --- |
+| EventKrustyBikeView (RaceView.h) | `field_0x018[0x50 - 0x18]` | centerOfMass, invMass, inverseLoadMass, bodyRoll, bodyPitch, bodyYaw, bodySinRoll, bodyCosRoll, bodySinPitch, bodyCosPitch, savedRoll, savedPitch | 2 | SPBO layout +0x18..+0x4c |
+| EventKrustyBikeView | `field_0x070` | acceleration, prevVelocity | 2 | SPBO +0x70, +0x7c |
+| EventKrustyBikeView | `field_0x094[0xb8 - 0x94]` | bodyUp, savedForward, savedUp | 2 | SPBO +0x94..+0xac |
+| EventKrustyBikeView | `field_0x488` | takeoffPosition, takeoffVelocity | 2 | Vehicle +0x488, +0x494 |
+| BikeRaceKrustyBikeView (BikeRace.h) | `field_0x008` | sceneNode (bytes kept), position | 2 | SPBO +0x8, +0xc; RaceView.h names both |
+| BikeRaceKrustyBikeView | `field_0x070` | acceleration, prevVelocity | 2 | SPBO |
+| BikeRaceKrustyBikeView | `field_0x094` | bodyUp, savedForward, savedUp, prevSpeed | 2 | SPBO +0x94..+0xb8 |
+| BikeRaceKrustyBikeView | `field_0x0c0[0x109 - 0xc0]` | angularAcceleration, worldAngularVelocity, angularVelocity, invInertia, shapeInvInertia, `field_0x0fc[0x108 - 0xfc]`, airborne | 2 | SPBO +0xc0..+0x108; +0xfc is a pad in the canonical class too |
+| BikeRaceKrustyBikeView | `field_0x10a[2]` | asleep (+0x10b is padding) | 2 | SPBO +0x10a |
+| BikeRaceKrustyBikeView | `field_0x5c8[0x5f0 - 0x5c8]` | loadInfo (bytes kept), riderName | 2 | Bike +0x5c8 (BikeA5C8), +0x5e0; EventKrustyBikeView racerName |
+| BikeRaceKrustyBikeCameraView | `field_0x398` | cachedTargetHeading, cachedTargetPoint | 2 | VehicleCamera.h; the flags at +0x391/+0x392 guard them |
+| StartD3DIMSoultreeObjectView | `field_0x278` | lowestLod, currentLod, autoLodDistances, inverseLodThreshold, useAutoLod | 2 | D3DIMSoultreeObject layout |
+| RacerD3DIMSoultreeObjectView | `field_0x284` | inverseLodThreshold, useAutoLod | 2 | D3DIMSoultreeObject layout |
+| StartObjectColliderBase | `int field_0x04` | short queryStamp, short sortKey | 2 | QuadTreeObject (CollisionObject.h, D3DIMSoulTree.h) |
+| BikeRaceBikeRecord | `char bikeName[0x44]` | char texture[0x40], int engineSizeSelectable | 2 | KrustyUIBikeRecord (SelectGamePicProcs.h): "BikeTexture_%02d" fills +0x48, and DlgProcs/MPBikeRiderDlg read +0x88; CreateRacers resolves it to the AI bike's texture |
+| VehicleCameraVehicleView (VehicleCamera.h) | `field_0x070`, `field_0x094` | acceleration, prevVelocity; bodyUp, savedForward, savedUp, prevSpeed | 2 | SPBO |
+| BikeCameraBikeView (BikeCamera.h) | `field_0x5c8[0x604 - 0x5c8]` | loadInfo, riderName, frontWheel, rearWheel, leftBarContact, rightBarContact (bytes kept), tailContact | 2 | Bike layout +0x5c8..+0x600 |
+| InstrumentKrustyBikeView (TrackOverlay.h) | `field_0x0c0` | the five angular Vector3s, `field_0x0fc` | 2 | SPBO |
+| ArcadeCameraView, BonusCameraView, PickerCameraView | `field_0x17c` | viewDirection, upDirection, roll | 2 | Camera layout +0x17c..+0x194 |
+| D3DIMSoultreeCameraView (D3DIMSoulTree.h) | `field_0x188` | upDirection, roll | 2 | Camera |
+| SoultreeObject (D3DIMSoulTree.h) | `field_0x194` | inQuadtree, quadtreeCell, loadedNodeCount | 2 | canonical SoultreeObject (src/krusty2/core) |
+| EcoCameraView (EcoSystem.h) | `field_0xec` | Matrix4 screenMatrix[2], fieldOfView | 2 | Camera; EcoSystem.cpp passes `&camera->screenMatrix` to the clipper, which the old comment called "the clipper's matrix" |
+| Group1ParticleCamera (Group1_ParticleRender.cpp) | `field_0x12c[0x170 - 0x12c]` | `field_0x12c[0x16c - 0x12c]` (screenMatrix[1]), fieldOfView | 2 | Camera |
+| Group1ParticleCamera | `field_0x19c` | displayAspect, viewport[6], heightWidthRatio | 2 | Camera |
+| ParticleCornerVertex (ParticleManager.h) | `field_0x0c` | rhw, color, specular, tu, tv | 2 | FVF 0x1c4 = XYZRHW, DIFFUSE, SPECULAR, TEX1, which is the D3DTLVERTEX layout; Group1CornerColor reads color |
+| QuarryLoadKrustyBikeView (Group3_QuarryLoad.cpp, QuarryStuntEventLoaderNearMiss.cpp) | `field_0x5c8` | loadInfo (bytes kept), riderName | 2 | Bike |
+| QuarryLoadKrustyBikeCameraView (same two files) | `field_0x398` | cachedTargetHeading, cachedTargetPoint | 2 | VehicleCamera.h |
+| CarProceduralNode (CarProcedural.h), BikeQuadTreeHead (Bike.cpp) | `int field_0x04` | short queryStamp, short sortKey | 2 | QuadTreeObject |
+| KbNetState (KrustyBikeTypes.h) | `short field_0x00`, `int field_0x04` | char type, unsigned char finishPosition; short lapCount, short gatesPassed | 2 | KbBikeMessage (KrustyBikeRecords.h), whose fields the state is decoded from |
+| DDSurfaceDesc2 (RenderInterfaces.h) | `field_0x28[0x48 - 0x28]` | `field_0x28[0x40 - 0x28]`, srcBltColorKey[2] | 2 | DDSURFACEDESC2 +0x40 ddckCKSrcBlt; ControlHitTest.cpp compares the surface with it (it spelled `field_0x28[0x18]`) |
+| CursorUIAnimView (GUIManager.h) | `field_0x14` | passesLeft, passCountdown, frameDelay | 2 | UIAnim |
+| GuiControlView (GUIManager.h) | `field_0xc0[0xf0 - 0xc0]` | controlText, textColor, dropColor, currentTextColor, controlTextLength, textDrop, textAlign, textExtent[2], textLines, textLeftMargin, textTopMargin | 2 | UIControl layout |
+| GuiControlView | `field_0xf4[0x130 - 0xf4]` | controlName[0x32], `field_0x126[2]`, fontHandle, ownsFont | 2 | UIControl layout |
+| VehicleShock (Vehicle.h) | `pad_0x80[0x14]` | `pad_0x80[0xc]`, prevLength, clearedLength | 2 | Suspension.h Shock |
+
+### Decisions requested by the brief
+
+- VehicleWheelAux and the shock pointers. VehicleShock gets prevLength
+  (+0x8c) and clearedLength (+0x90), the Suspension.h Shock names.
+  UpdateWheelsInContact (`0x00529a20`) now casts the wheel's
+  secondaryAux/primaryAux pointers to `VehicleShock*` and copies
+  clearedLength into prevLength. VehicleWheelAux keeps typing only the
+  gearbox pointer at wheel+0x2a8. Its two members take the EngineGearbox
+  names throttleTimeScale and gearCount (GearRatios.h:62-63), which
+  tests/fixtures/vehicle_gearbox_boundaries.cpp already equated. The float
+  copy instead of the old int copy compiles to the same bytes: Vehicle.cpp
+  is IDENTICAL. VehicleWheel `secondaryAux`/`primaryAux` stay `int`;
+  retyping them is left.
+- KbEffectParams `field_0x4` -> `reserved` (tier 2). With DIEFF_POLAR the
+  DirectInput documentation ("Effect Direction" and DIEFFECT) says the last
+  element of rglDirection is reserved and must be 0. SetDirection
+  (`0x004c3db0`) passes flags 0x22 with two axes.
+- KrustyUISoultreeObjectView::SetAxes `float g` -> `int orthogonalize`. This
+  matches SoultreeObject::SetAxes `0x004fbd10` (D3DIMSoulTree.h:80). The view
+  declaration has no caller; the callers cast to SoultreeObject. KrustyUI.cpp
+  is NAME-ONLY-LABELS.
+- BikeRaceBikeRecord `bikeName[0x44]` -> `texture[0x40]` +
+  `engineSizeSelectable`, as in KrustyUIBikeRecord. CreateRacers and
+  BikeRaceNearMisses.cpp now pass `.texture` to ResolveBikeFile.
+- BikeRaceKrustyBikeView `carriedFlagPosition` -> `centerOfMass`. The
+  canonical class has centerOfMass at +0x18, which RaceView.h also names. Its
+  only reader (BikeRace.cpp) puts the "you" indicator 4.25 above it.
+
+### Reverted or tuned edits
+
+Proof run "a" gave four DIFFs. All four were the declaration-count lottery
+of Wave 18. Every new member adds 1 to the count of each unit that includes
+its header. No member's code changed.
+
+work/naming/w31/kscan.py compiles a unit behind k typedefs (k = 0..63) and
+lists the k whose function bytes equal the base. That gives the shifts that
+restore each function:
+
+- `?MapReference@@` in tests/fixtures/game_tick_compare.cpp. It reaches only
+  RenderInterfaces.h. The full DDSurfaceDesc2 split (+4) was a DIFF, and so
+  were the four DDCOLORKEYs alone (+3) and alpha + reserved + srcBltColorKey
+  (+2). srcBltColorKey alone (+1) is IDENTICAL, and it is the one member
+  code reads. Reverted: alphaBitDepth/reserved (+0x1c) and
+  destOverlayColorKey, destBltColorKey and srcOverlayColorKey.
+- `?Check@@` in tests/fixtures/vegetation_collision_compare.cpp. It reaches
+  only EcoSystem.h. The base table holds k = 0, 1, 27, 28, 42 and 52..63.
+  The edit was +2, so it gave DIFF. Reverted: EcoCameraView `field_0x188`
+  (upDirection + roll), which leaves the screenMatrix split at +1. That is
+  IDENTICAL.
+- `?CreateRacers@BikeRace@@` (0x00419970) in BikeRaceNearMisses.cpp and
+  Group6_BikeRaceCreateRacers.cpp. This is the Wave 18 `xor edi,edi` /
+  `mov ebx,1` order at body offset 0x21a. After the two reverts above, the
+  scan showed that one more declaration (+1) in their shared closure restores
+  both units. The BikeRaceKrustyBikeView `field_0x008` split (sceneNode +
+  position, both named in RaceView.h and the canonical class) supplies it.
+  Both units are then IDENTICAL or IDENTICAL-COMDAT-ORDER.
+
+### Proof
+
+work/naming/w31/prove.sh final, from 1011ac65 to the final tree, over every
+unit whose closure reaches a changed file: 325 units. The map is empty: no
+decorated name changed.
+
+| Verdict | Units |
+| --- | --- |
+| IDENTICAL | 272 |
+| IDENTICAL-COMDAT-ORDER | 7 |
+| NAME-ONLY-LABELS | 46 |
+| NAME-ONLY | 0 |
+| DIFF | 0 |
+
+The seven IDENTICAL-COMDAT-ORDER units are:
+
+- BikeRaceNearMisses.cpp, DlgProcsNearMisses.cpp and
+  ProCircuitProcsNearMisses.cpp;
+- Group4_DlgMain.cpp, Group4_DlgPCBunny.cpp and Group6_BikeRaceCreate.cpp;
+- SoulTreePhysics.cpp.
+
+NAME-ONLY-LABELS means that only the goto-label counters (`$label$N`)
+moved. tests/fixtures/bvh_vector_compare.cpp is not in the unit list.
+
+Negative control (negcontrol.sh, negmutate.py): two wrong edits were made in
+the new tree only.
+
+- UpdateWheelsInContact: the shock store was reversed
+  (`clearedLength = prevLength`).
+- EcoSystem.cpp: `&camera->screenMatrix` became `&camera->screenMatrix[1]`.
+
+Both units gave DIFF, in the `.text` bytes of
+`?UpdateWheelsInContact@Vehicle@@QAEXXZ` and `?PrepareGeometry@EcoSystem@@UAEHXZ`.
+
+Pins: one digest changed. test_terrain_connections pins `?Load@Terrain@@`
+with its relocation names. The EH label moved from `$L6434` to `$L6435`, and
+the 2117 body bytes and the other 64 relocation records are unchanged. It was
+repinned with a comment (work/naming/w31/pinmods.py: 2 digests, 1 module).
+No layout fixture counts declarations.
+tests/fixtures/vehicle_gearbox_boundaries.cpp now spells VehicleWheelAux's new
+names. It is IDENTICAL, and its 48 native cases pass.
+
+Tests: work/naming/w31/pick_tests.py selected 119 modules: the changed files'
+basenames, the old spellings and the NAME-ONLY-LABELS units. 118 passed at
+first. test_terrain_connections failed on the Terrain::Load pin above and
+passes after the repin (work/naming/w31/tests-picked.log). The full suite
+(`python -m unittest discover -s tests` with VC6_ROOT and MCM2_EXE) ran 675
+tests: 674 pass and 12 are skipped. The one failure is the worktree-only
+test_emu_diff case vehicle_simulate_frame (retail_faults 50), which fails the
+same way at 1011ac65. tools/static_check.py passes once
+docs/DECOMPILATION_PROGRESS.md is regenerated (see below). The EOL check
+(work/naming/w31/eolcheck.py) finds every edited file with its original line
+endings.
+
+### Left for wave 32
+
+- tools/static_check.py fails only on docs/DECOMPILATION_PROGRESS.md, because
+  the splits add 86 canonical source lines (112,913 -> 112,999). The brief
+  forbids touching that file. `make progress` in the merge fixes it; it
+  changes only that line, and config/decompilation_progress.json is
+  unchanged. With the regenerated file, static_check passes.
+- Splits reverted for the lottery (evidence-backed; a later wave can include
+  them if other edits move the count):
+  - DDSurfaceDesc2 `field_0x1c` (alphaBitDepth + reserved) and the first
+    three DDCOLORKEYs in `field_0x28`;
+  - EcoCameraView `field_0x188` (upDirection + roll).
+- The headers this wave edits that are in the include closure of the
+  concurrent matching units: RaceView.h, D3DIMSoulTree.h, GUIManager.h,
+  RenderInterfaces.h, KrustyBikeTypes.h and Vehicle.h. The lead should
+  re-prove those units after merging that work, because each declaration
+  moves their counters.
+- Not split because the concurrent matching work uses them, or because they
+  sit next to declarations it uses:
+  - SelectGameRaceSettingsView `field_0x14`/`field_0x14c`;
+  - KrustyVCRHeader `field_0x40`/`field_0x58`/`field_0x61`;
+  - KrustyUI `field_0x4ac`, `field_0x4b4` and `field_0x674`;
+  - ProCircuitRacerResultView `field_0x08`/`field_0x2c`;
+  - SelectGameD3DIMSoultreeCharacterView `field_0x010`;
+  - the SceneSoultreePhysics views and SceneCarProceduralView `field_0x40`;
+  - the MorphBastard channel.
+- Not split: too many members or uncertain members.
+  - EventKrustyBikeView `field_0x054`/`field_0x0bc`.
+  - VehicleCameraVehicleView `field_0x0c0` (764 bytes).
+  - QuarryLoadKrustyBikeCameraView `field_0x02c`.
+  - GuiControlView `field_0x60` and `field_0x164`.
+  - EventManager `field_0x444`.
+  - EventManagerNearMisses.cpp and Group1_PodiumScene.cpp
+    `field_0x5c8[0x784 - 0x5c8]`.
+  - GridManagedTexture `field_0x00` and the GridTerrain pads.
+  - Group1ParticleCamera `field_0x000`.
+  - BikeRaceKrustyBikeView `field_0x024` (16 SPBO floats) and
+    `field_0x5f8`.
+- No clear evidence: TrackGameRaceGateView `field_0x00` (the RaceGate
+  identity is uncertain) and KrustyUIToolTipView `field_0x00`.
+- Not done: CursorUIAnimView `field_0x00` (vfptr + refCount), the
+  CarProcedural model `field_0x38`, the MediaControl DDSurfaceDesc
+  `field_0x10`, and RacerStateMessage `field_0x02`/`field_0x04`.
+- VehicleWheel `secondaryAux`/`primaryAux` (`int`) could be typed as
+  `VehicleShock*`, and Bike.h types them `BikeQ*`.
