@@ -109,6 +109,32 @@
 //               g_collisionQuadTree after its first __ftol, where VC6
 //               here caches the tree in ebx (the s15 reference diff's
 //               missing load)
+//               Big-gap pass, first divergences in order (not applied:
+//               this object is pinned by six fixtures and the gains are
+//               small):
+//               0xaa  retail zeroes `attempt` (frame slot 0x6c, the
+//                     loop's `inc edi`) between the argument pushes of
+//                     GetHeightRange, so `attempt = 0` precedes that
+//                     call in the source; moved there the store is
+//                     retail's (331 strict, 696 aligned; `failures`
+//                     moved instead scores the same but is slot 0x54,
+//                     zeroed after the call in retail; total first 267).
+//               0x173 retail's mode 5 block ends `jmp` to the
+//                     `test ebx, ebx` of `if (mode)` and the mode 6
+//                     block falls into it; VC6 here threads both past
+//                     the test (one extra jmp, so the equal size is a
+//                     coincidence). A switch (sub/dec dispatch, 888
+//                     strict only by position), two separate ifs,
+//                     `!= 0`, `> 0`, a goto around the ring block, k
+//                     declared or zeroed earlier and kept zeroed inside
+//                     do not stop it; `int k = 0` hoisted out of the if
+//                     does (712 aligned, 366 strict, 3298 bytes) but
+//                     emits its xor before the test, where retail has
+//                     it after.
+//               0x3ef retail keeps attempt in edi and clusterCount in
+//                     eax across the draw; here both live in the frame.
+//                     Six orders of the clusterCount/cluster/position.y
+//                     initialisations: 310-381 strict, 684-696 aligned.
 //   0x0045b060  3714/3967, same size and frame (1024/1045 aligned). Logic
 //               fix (session 16): the billboard width scale is
 //               2r / (uRight - uLeft); the sample had the quotient upside
