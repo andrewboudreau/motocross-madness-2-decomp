@@ -2354,3 +2354,101 @@ Left as placeholders:
   (read, but no writer found), PCTextureMap `field_0x38`, and
   KrustyBikeCore's write-only fields.
 - The generic parameters listed in Wave 22.
+
+## Wave 24: fields named by the SDK, a retail string and the values they copy
+
+Wave 24 takes up the `field_0xNN` placeholders and names those whose value
+goes straight to a DirectX or DirectInput parameter, is printed with a retail
+string, or is copied to or from a member that already has a name. It also
+renames the generic parameters and one struct field whose use fixes the
+meaning. Names only: no declaration, typedef, forward declaration or member
+was added or removed, no array was split, and no static or type of a static
+was renamed. Every edited file keeps its line count, so the `__LINE__` values
+that DebugAlloc.h's macros take did not move.
+`git grep -ohE '\bfield_0x[0-9a-fA-F]+' -- src samples` fell from 1899 uses
+to 1786. `\bUnknown[A-Za-z0-9_]*` stays at 2704 uses (366 names), and the
+placeholder method names (`UnknownVirtualSlotN`, `UnknownMethodN`,
+`Method_`, `Fn_`) stay at 85: this wave renamed no type or method.
+
+Method:
+
+- work/naming/w24_survey.py lists every `field_0xNN` declaration with its
+  struct (1001 declarations: 629 padding arrays and 372 scalars), and
+  work/naming/classreads.py (layouts in work/naming/cv/layouts.json) maps
+  the retail reads and writes of each placeholder (work/naming/w24_reads.txt).
+  Fields with only proximity, only constructor stores, or no reader were
+  left alone.
+- The retail string resources are in LANG.DLL and UILANG.DLL (mcm2.exe has
+  no string table). `LoadResourceString(0x13ad)` is "Gate: ".
+- The renames were applied at their own declaration and uses with
+  work/naming/w24/editA.py, editB.py and editC.py (work/naming/sub.py,
+  count-checked, line endings kept).
+
+Result: one proof over every unit whose closure reaches a changed source
+(313 units), from afc56028 to the renamed tree, with an empty map
+(work/naming/w24/map.json): no mangled name changed.
+
+- 305 IDENTICAL and 8 IDENTICAL-COMDAT-ORDER (BikeRaceNearMisses.cpp,
+  DlgProcsNearMisses.cpp, ProCircuitProcsNearMisses.cpp, Group4_DlgMain.cpp,
+  Group4_DlgPCBunny.cpp, Group6_BikeRaceCreate.cpp, KrustyUI.cpp and
+  SelectGamePicProcs.cpp). Every section, relocation and symbol is equal;
+  only the COMDAT order differs, as in earlier waves.
+
+There was no DIFF, no compile failure, and no .bss or .data offset moved.
+
+Negative control: the first attempt gave the Sound bit 6 member the name
+`preferHardware`, which PlayWithOptions' argument already has. Inside
+PlayWithOptions the member store became a self-assignment of the argument and
+the test read the argument, and the proof gave DIFF in the `.text` of
+`?PlayWithOptions@Sound@@QAEHHKH@Z` (work/naming/w24/first-run-report.txt).
+The member is `hardwarePreferred` instead. The same run also caught the
+SoultreeSurface and UnknownTimer uses that the first script missed (compile
+failures in the new tree), which work/naming/w24/editC.py renamed.
+
+Fixture pins: no digest changed, so nothing was repinned. 76 test modules
+reach a changed file or a renamed name (work/naming/w24/pick_tests.py); all
+84 of their tests pass.
+
+### Fields and parameters
+
+| Owner | Old | New | Tier | Evidence |
+| --- | --- | --- | --- | --- |
+| `TrackGameViewOwner` (TrackGame.h) | `field_0xac` | `gateCount` | 1 | TrackOverlay's instrument rows print `LoadResourceString(0x13ad)` (LANG.DLL: "Gate: ") with `"%s %d / %d"`, `lapGate + 1` and this value. RaceStatus.cpp (`0x004e6a50`) wraps a racer's next gate by it. The bike race owner still stores a float there through a cast (FollowRacerNearMisses.cpp, see Wave 5); that role keeps the cast and has no name of its own. |
+| `InputDevice` | `field_0x14_axis0` to `field_0x14_axis5` | `hasXAxis`, `hasYAxis`, `hasZAxis`, `hasRxAxis`, `hasRyAxis`, `hasRzAxis` | 2 | PCJoystickDevice's EnumAxisObjectsCallback (`0x004c2cb0`) sets each bit when the DirectInput object's guidType is GUID_XAxis, GUID_YAxis, GUID_ZAxis, GUID_RxAxis, GUID_RyAxis or GUID_RzAxis. Each bit then gates the DIPROP_RANGE GetProperty at DIJOYSTATE offsets 0, 4, 8, 12, 16 and 20 (lX to lRz), and JoystickDevice reads that axis only when its bit is set. |
+| `Sound` (PCAudio.h) | `field_0x1f4_bit6` | `hardwarePreferred` | 2 | PlayWithOptions stores its `preferHardware` argument there and then plays with flag 2 (DSBPLAY_LOCHARDWARE) when it is set and hardware 3D buffers are free, else with flag 4 (DSBPLAY_LOCSOFTWARE). The constructor and ReleaseBuffers clear it. The argument already has the name `preferHardware`, so the member could not take it (see the negative control). |
+| `Sound` (PCAudio.h) | `field_0x1f4_bit7` | `loadQueued` | 2 | PlayWithOptions sets it when it hands a sound whose buffer is not ready to the loader queue (QueueSoundLoad), and only then. IsPlaying reports the sound as playing while it is set and the buffer is not ready, and the loader thread (samples/audio/AudioLoaderThread.cpp) clears it when the buffer is filled. |
+| `SoundGroup` | `field_0x2c_bit0` | `playEnabled` | 3 | The constructor sets it, and PlayWithOptions returns without playing a member when it is clear. No other writer was found, so the name rests on that one test. |
+| `TrackGameMode` raceSettings (TrackGame.h) | `field_0x18c[0x60]` | `lobbySlots` | 2 | SelectGamePicProcs.cpp copies it into `lobbySlots.slots` (8 LobbySlot of 12 bytes: 0x60), and the lobby start message senders copy `lobbySlots.slots` into it (Group5_MultiPlayerDlg.cpp, SelectGamePicProcsNearMisses.cpp). The array type is kept. |
+| `UnknownBlitSource` (PCRenderTarget.h) | `field_0x70` | `systemSurface` | 2 | PCRenderTarget's Blit (`0x004c53f0`) passes it to Blt as the source surface. The callers pass PCTextureMaps, whose +0x70 is `systemSurface`. |
+| `PCVideoCard` | `field_0x198` | `surfacePalette` | 2 | The constructor stores 0, and every read (`0x004cacbb`, `0x004cade4`, GameCursor.cpp, PartialTextureUploads.cpp) passes it as CreateSurface's `surfacePalette` argument, which other callers fill with a palette. |
+| `DDSurfaceDesc2` (RenderInterfaces.h) | `field_0x14` (union with `backBufferCount`) | `depth` | 2 | DDSURFACEDESC2's union of `dwBackBufferCount` and `dwDepth`. Nothing reads it. |
+| `DPMsgDestroyPlayerOrGroup` (QuarryStuntEvent.cpp, SelectGamePicProcs.cpp) | `field_0x04` | `playerType` | 2 | DPMSG_DESTROYPLAYERORGROUP's `dwPlayerType`, between `dwType` (5, DPSYS_DESTROYPLAYERORGROUP) and `dpId`. Nothing reads it (SDK layout, as in Wave 19). |
+| `UnknownGuiRgb` (GUIManager.cpp) | `field_0x00` to `field_0x02` | `red`, `green`, `blue` | 2 | CreateFilledTexture (`0x00486740`) fills them with `color >> 16`, `color >> 8` and `color`, then loads the pixels as source format 0x378, whose pixel is RgbPixel {red, green, blue}. |
+| `UnknownTimer` (TextureMapManager.h) | `field_0x04` | `peakSample` | 2 | LargestRecentSample (`0x004cb690`) returns it while the interval runs, and RecordSample (`0x004cb6b0`) stores a larger sample in it. |
+| `SoultreeSurface` (D3DIMSoulTree.h) | `field_0x2c`, `field_0x30`, `field_0x34` | `mappingScale`, `mappingOffsetU`, `mappingOffsetV` | 2 | The draw passes their addresses to ManagedTexture::RemapTexCoordsIfMoved as `scale`, `offsetU` and `offsetV`, and restoring the coordinates resets them to 1.0, 0 and 0, as Griddraw.h's records named `mappingScale`, `mappingOffsetU` and `mappingOffsetV` are. The two offsets keep their int type. |
+| `GridManagedTexture::RemapTexCoordsIfMoved` (Griddraw.h, Group5_GridManagedTexture.cpp) | `a`, `b`, `c` | `scale`, `offsetU`, `offsetV` | 2 | The view forwards them to ManagedTexture::RemapTexCoordsIfMoved, whose parameters have these names. |
+| `CarProceduralSensorContact` (Group2_CarProcedural.cpp) | `field_0x08` | `normal` | 2 | The car copies it into the ground normal in place of QueryGround's normal, and the value feeds `smoothedNormal`. |
+| `Scene` (SceneManager.h) | `field_0x88` | `groundProbeMask` | 3 | 0x004ea7e0 stores its last argument (`flag`, now `probeMask`) there; Quarry passes 8. The scene loader passes it to LoadPhysicsModel as `probeMask`, which the physics object keeps as `groundProbeMask`. The canonical names are tier 3. |
+
+Left as placeholders:
+
+- TrackGameViewOwner +0xac in the bike race owner: a float stored through
+  a cast (5.0 when the followed racer changes); its own role has no name.
+- Overlay `field_0x40` (a copy of the render target's surfacePixelFormat),
+  HiResMeter `field_0x38` (the last selected timer) and TrackGame
+  `field_0x1bdc` (saved in the profile): no reader that decides a role was
+  found.
+- Overlay::Attach's `a12` and TextService::Create's `a10`: forwarded, never
+  interpreted.
+- D3DIMSoultreeCharacter `d3d_field_0x1a4[0x6c]`: a 0x50-byte name followed
+  by ints; naming it would need a split.
+- The sound and graphics option blocks' `field_0x0c`/`field_0x24`/`field_0x14`,
+  RaceSound `field_0x40`, Cube `field_0x10`, RacerStanding +0x04/+0x08,
+  UIDialog `field_0x180` and `field_0xd4`, GridTerrain `field_0xc9c`/`0xca0`,
+  the Terrain/FollowCamera header word +0xbe8 and FollowCamera
+  `field_0x33c`: as in Wave 23, their uses do not decide a role.
+- The union int aliases of named UI members (UIScrollBar +0x1ec/+0x204/+0x218,
+  UIListBox +0x218, UIEditBox +0x204/+0x208): kept for codegen; a name would
+  add nothing to the member they alias.
+- `Scene::UnknownFunction4ea7e0` (it stores the owner and settings and adds
+  the sound group) and the generic parameters listed in Wave 22.
