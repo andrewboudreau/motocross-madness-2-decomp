@@ -2147,6 +2147,21 @@ static inline void MatrixMultiplyInline(Matrix4* out, Matrix4 a, Matrix4 b)
 // average / rotate-back sequence as HullVsHull, using the out-of-line vector helpers
 // (0x0042a4b0 in, 0x0042a510 contact back, 0x0042a450 vectors back, 0x0043c890 divide,
 // 0x00428060 accumulate).  The element-node position call 0x004fc9a0 stores to a dead local.
+// Scheduling probe (2026-11-14, scratch only): the candidate differs from retail in 11
+// instruction positions, all in where the integer call set-up of SweptBoxOverlap is
+// interleaved with the last x87 terms of the product (retail starts it six x87
+// instructions later).  k stores of distinct constants to an external int array, placed
+// after `int hit = 0;`, move that interleave step by step and k = 80 gives the k = 0
+// pattern again; k = 74..78 give retail's F/int/push pattern for the 70 instructions before
+// the call (those counts also grow the frame, so the function is not exact).  `x++` and
+// `x = y * z` on the array count about three each; stores before `if (a->swept)` do nothing.
+// So the interleave depends on how many instructions the block holds before the tail,
+// modulo 80, and retail's block behaves as if it held two to six fewer than this source
+// produces before scheduling.  No source form with fewer was found: hit = 0 or the tree
+// read at every other position (11..22), three swap temporaries or a swap helper (26/237),
+// float or constructor translation temporaries (241/15), the inverse written out in the
+// body (486), the product taking references or a pointer (218..384), a named inverse
+// (233/303), a wrapper inline for both steps (521), block scopes (11), /Zd /Z7 /Zi (same).
 int CollisionObject::HullVsModel(CollisionHullBody* a, CollisionModelBody* b, CollisionSweepQuery* q)
 {
     if (a->swept)

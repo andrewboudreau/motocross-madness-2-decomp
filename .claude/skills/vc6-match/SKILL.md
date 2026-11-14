@@ -133,6 +133,18 @@ near misses; `tools/near_miss_drops.py` lists ones whose gap is a single drop.
   Only address-taken scalars respond: MorphBastard LoadParameterFile `0x004a33b0` gains 8 from a function-scope
   `targetValue` assigned in place, while 108 scope combinations of its register locals are flat.
 
+- Same instructions, only the place where integer call set-up is interleaved into a long x87 run differs
+  (CollisionObject `0x00436e50` family): the interleave depends on the instruction count of the basic block
+  before that point, period 80. Measure it with k stores of distinct constants to an extern int array at the
+  block start (one unit each; `x++` about three; stores in an earlier block do nothing) and compare the
+  F/int/push pattern before the call with retail's. It tells you how many instructions retail's block is
+  short or long before scheduling; it is a ruler, not a fix (the stores are dead weight and high counts change
+  the frame). A loop body is its own block: stores before the loop do not move it (EcoSystem `0x00457ed0`).
+
+- Reading a just-stored member instead of the local it was stored from changes leaf ages downstream:
+  SoulTreePhysics `0x00501e90` gains 6 from `contact->normalForceMagnitude = Dot(...)` with the test, negation
+  and call argument reading the member (no `normalComponent` local).
+
 ## 4. Record and ship
 - Exact: set `"expect": "exact"` in the neighbouring `targets.json`, update tests if they hash objects
   (`tests/` object-pin fixtures), regenerate `PYTHONPATH=. python tools/decompilation_progress.py` then `--check`.
