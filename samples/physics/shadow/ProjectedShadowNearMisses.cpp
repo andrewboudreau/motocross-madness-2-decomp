@@ -177,6 +177,11 @@ ShadowMatrix* ShadowMatrixMultiplyInto(ShadowMatrix* out, ShadowMatrix a, Shadow
 struct ShadowVec3Call : ShadowVec3 {
     ShadowVec3Call(float x_, float y_, float z_);
 };
+static inline void ShadowMatrixProduct(ShadowMatrix* out, const ShadowMatrix& a, const ShadowMatrix& b)
+{
+    ShadowMatrix product;
+    *out = *ShadowMatrixMultiplyInto(&product, a, b);
+}
 static inline float AbsF(float v) { return v < 0.0f ? -v : v; }
 
 static inline void ShadowTransformExtents(ShadowVec3* out, ShadowVec3 h, const ShadowCaster* k)
@@ -206,28 +211,41 @@ static inline void ShadowTransformExtents(ShadowVec3* out, ShadowVec3 h, const S
 // shared epilogue sets eax = 1).  The extents and centre are transformed through out-pointer
 // helpers with by-value inputs, centre/halfExtents, the mode-3 eye and the mode-1 direction are
 // built through by-value temporaries, and the mode-1 normalisation is written out with the
-// out-of-line constructor.  PARTIAL: retail copies the GetBounds extents into three separate
-// slots before the products (VC6 elides that copy here), which shifts every frame slot.
-// One product buffer serves both modes (0x134 -> 0xf4, 177 -> 188 strict).
-// Retail's frame (tools/frame_layout.py, 0xc0 against 0xf4 here) has no 64-byte buffer beside
-// projection: the identity call and the product's result pointer are both projection's own
-// slot (0x64), with fov 0xc, casterCenter 0x1c, boundsMin 0x28, boundsMax 0x34, ext 0x40, eye
-// 0x4c and sq 0x78, and 12-byte temporaries at 0, 0x10 and 0x58.  Passing &projection as the
-// product's result instead keeps a 64-byte identity temporary (0xf4, 1970 bytes, 185 strict,
-// 244 differing instructions); `projection = ShadowMatrixIdentity()` after the declaration
-// compiles the same as the initialisation.
+// out-of-line constructor.  PARTIAL (211/2020 strict, 1975 B, 558 of 560 instructions aligned,
+// frame 0xc0 exact):
+// - Retail's frame has ONE 64-byte slot (0x64): the identity result, projection and the product's
+//   result all live there, because VC6 overlays temporaries and block-scoped locals whose
+//   lifetimes only touch.  A function-scope `ShadowMatrix product` is live everywhere and cost
+//   64 bytes (0xf4/0x100); with the product buffer local to an inline helper (or to a block
+//   around the call, same bytes) the frame is retail's 0xc0 and both modes share the tail.
+//   The by-value `lightMatrix = ShadowMatrixMultiply(..)` also gives 0xc0 but copies the result
+//   twice (temporary, then the member; 2055 B); passing &projection as the result keeps a
+//   second 64-byte identity temporary (2021 B).
+// - Retail copies the GetBounds extents into three float slots before the products; a
+//   constructor temporary (`ShadowConstVec3(ext.x, ext.y, ext.z)`) as the by-value argument
+//   keeps that copy (VC6 propagated every other spelling: float locals, float parameters,
+//   a const reference with float copies), 547 -> 553 aligned.
+// First divergence now: displacements only (slot order). Retail order from esp: a 12-byte
+// temporary (30 uses) at 0, fov 0xc, a second temporary 0x10, the z extent copy 0x18,
+// casterCenter 0x1c, boundsMin 0x28, boundsMax 0x34, ext 0x40, the by-value centre copy / eye
+// 0x4c, hi 0x58, projection 0x64 (the nine products overlay it at 0x64..0x84, contiguous),
+// the SetLookAt eye 0xa4, the y extent copy 0xa8, sq 0xb0, the x extent copy 0xb4.  Here fov
+// is at 0 ahead of the temporary, hi shares the second temporary, the three extent copies are
+// one contiguous 12-byte temporary (0x5c) and the products are scattered scalars.  A
+// `float a[3][3]` or `ShadowVec3 r[3]` product array stores the first product too
+// (556 aligned, 226 strict); float or double extent parameters lose the copy again.
+// The other differing instruction is the load of `camera` for LookAt, one store late.
 int ProjectedShadow::ComputeBounds()
 {
     if (!casters)
         return 1;
-    ShadowMatrix product;
     ShadowVec3 boundsMin, boundsMax;
     boundsMin.x = boundsMin.y = boundsMin.z = 3.4028235e38f;
     boundsMax.x = boundsMax.y = boundsMax.z = -3.4028235e38f;
     for (int i = 0; i < casterCount; i++) {
         ShadowVec3 casterCenter, ext;
         casters[i]->GetBounds(&casterCenter, &ext);
-        ShadowTransformExtents(&ext, ext, casters[i]);
+        ShadowTransformExtents(&ext, ShadowConstVec3(ext.x, ext.y, ext.z), casters[i]);
         ShadowTransformCoord(&casterCenter, casterCenter, casters[i]->world);
         ShadowVec3 lo = ShadowDifference(casterCenter, ext);
         ShadowVec3 hi = ShadowSum(casterCenter, ext);
@@ -253,7 +271,7 @@ int ProjectedShadow::ComputeBounds()
         camera->SetLookAt(&eye, 0, 0, 0, 0);
         camera->LookAt(center);
         camera->UpdateMatrices();
-        lightMatrix = *ShadowMatrixMultiplyInto(&product, projection, camera->matrix_0xac);
+        ShadowMatrixProduct(&lightMatrix, projection, camera->matrix_0xac);
         return 1;
     } else if (mode == 1) {
         lightDir = ShadowDifference(center, lightVec2);
@@ -276,7 +294,7 @@ int ProjectedShadow::ComputeBounds()
         ShadowMatrix projection = ShadowMatrixIdentity();
         projection.m[0][0] = (float)texture->size;
         projection.m[1][1] = (float)texture->size;
-        lightMatrix = *ShadowMatrixMultiplyInto(&product, projection, camera->matrix_0xec);
+        ShadowMatrixProduct(&lightMatrix, projection, camera->matrix_0xec);
     }
     return 1;
 }
