@@ -65,6 +65,26 @@
 //               carrier (evidence only) reproduces this loop but flips
 //               `start.x + vertices[j].x` in the next loop, so the two
 //               loops are coupled through the age of their leaves.
+//               2026-11-14: that flip is a local-definition count. The
+//               int carrier (`int h = *(int*)&shape->height;` first in
+//               the body, `*(int*)&vertices[j].y = h;` for the store)
+//               with k more dead initialised int locals at function
+//               scope is byte exact for k = 2..7 and has the flipped
+//               x sum for k = 0, 1 and 8; the spelling of the sum (EcoSum
+//               either way round, a plain constructor sum in four operand
+//               orders) does not matter under the carrier. So retail's
+//               body has the height in an integer temporary before the
+//               angle and at least two more local definitions than this
+//               source. Evidence only, not applied: no readable form
+//               gives the integer temporary. Also measured: the y store
+//               written first or second (the store is not sunk and the
+//               induction pointer changes base, 3 bytes longer), a
+//               `const float&` height, a Vector3 local's y, a double
+//               angle with a float height (x87 carry again), two Vector3
+//               locals copied out (46 bytes longer). Stores placed before
+//               the loop do not move the schedule (the loop body is its
+//               own block), so this is not the scheduling-window effect
+//               of the CollisionObject family.
 //   0x00458da0  four `[eax + esi]` operands come out as `[esi + eax]`
 //               (457/461). Also unchanged: inline helpers for the
 //               terminator, the clamped copy, the length clamp or the
