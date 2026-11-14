@@ -652,6 +652,47 @@ void MultiPlayerDlg::ResetReadyButtons() {
     }
 }
 
+// 0x004f3720: adds a chat line to "ListChat"; -1 is a system message.
+// Retail falls into the colour pass for system messages too (the name buffer
+// is then unset, but only used if a lobby record has id -1). The name lookup
+// is its own early-return test before the player/system split; with the
+// lookup inside the player branch VC6 lays the system branch out before the
+// colour pass and keeps the merged sprintf tail there (docs/VC6_MATCHING.md).
+void MultiPlayerDlg::AddChatLine(int player, const char* text) {
+    char line[0x60];
+    char name[0x80];
+    char system[0x80];
+    UIListBox* list = static_cast<UIListBox*>(FindControl("ListChat", 3));
+    if (!list)
+        return;
+    if (player != -1 && !g_TrackGame->network->GetPlayerName(player, name))
+        return;
+    if (player == -1) {
+        g_TrackGame->LoadResourceString(0x14ba, system, 0x80);
+        if (!g_TrackGame->imeLibrary)
+            sprintf(line, "~5%s: %s", system, text);
+        else
+            sprintf(line, "%s: %s", system, text);
+    } else {
+        sprintf(line, "%s: %s", name, text);
+    }
+    if (!g_TrackGame->imeLibrary) {
+        if (g_TrackGame->network->localPlayer == player) {
+            sprintf(line, "~1%s: ~0%s", name, text);
+        } else {
+            for (int i = 0; i < 7; i++) {
+                if (g_LobbyRemotePlayers[i].id == player)
+                    sprintf(line, "~%1d%s: ~0%s", i + 2, name, text);
+            }
+        }
+    }
+    int rows = list->rowCount;
+    if ((short)rows >= 100)
+        list->RemoveRow(0);
+    list->AddRow(line, 0, 0);
+    list->ScrollToRow((short)rows, 1);
+}
+
 // 0x004f38a0
 void MultiPlayerDlg::SendChatLine() {
     ChatMessage message;

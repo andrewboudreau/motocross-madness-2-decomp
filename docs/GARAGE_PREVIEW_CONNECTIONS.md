@@ -55,7 +55,7 @@ plate UVs. The caller comparisons preserve those input pointers and plate number
 
 ## Validation
 
-`tests/test_garage_preview_connections.py` passes **319 strict comparisons**
+`tests/test_garage_preview_connections.py` passes **320 strict comparisons**
 (including KrustyUI::Create, now exact in KrustyUI.cpp, and InterpolatePose,
 now exact in Motnctrl.cpp) and preserves **five complete partial-function
 fingerprints** of BikeRace sample methods. All five providers

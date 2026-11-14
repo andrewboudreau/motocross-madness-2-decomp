@@ -1,7 +1,7 @@
 """MultiPlayerDlg::AddChatLine 0x004f3720, the lobby chat line (tools/emu_diff.py case,
 call-record/replay mode).
 
-The linked body is src/bringup/Group5_MultiPlayerDlg.cpp. FindControl 0x0046ebf0 answers the
+The linked body is src/reconstructed/SelectGamePicProcs.cpp. FindControl 0x0046ebf0 answers the
 "ListChat" list box (its row count at +0x1ec straddles the 100-row limit, also in the high half
 that the short compare ignores) or null; Network::GetPlayerName 0x004ac720 writes a name or fails;
 LoadResourceString 0x00521970 writes the system label. g_TrackGame (0x0056e26c) carries the
@@ -17,7 +17,7 @@ import random
 
 RETAIL_VA = 0x004f3720
 SYMBOL = '?AddChatLine@MultiPlayerDlg@@QAEXHPBD@Z'
-SOURCE = 'src/bringup/Group5_MultiPlayerDlg.cpp'
+SOURCE = 'src/reconstructed/SelectGamePicProcs.cpp'
 PROBES = {0x004f3767: 'named', 0x004f37f2: 'system plain', 0x004f3809: 'system IME',
           0x004f37a1: 'local colour', 0x004f3835: 'lobby colour', 0x004f386a: 'remove row'}
 

@@ -379,5 +379,11 @@
   "?SyncValues@MPOptionsDlg@@UAEXH@Z": "0x00464e80",
   "?OnControlRelease@MPBikeRiderDlg@@UAEHPAUControlEvent@@PAUInputButtonState@@@Z": "0x0044fab0",
   "?MarkPendingRelease@MPBikeRiderDlg@@UAEXXZ": "0x004d72a0",
-  "?RenderPre3D@MPBikeRiderDlg@@UAEHXZ": "0x004d77d0"
+  "?RenderPre3D@MPBikeRiderDlg@@UAEHXZ": "0x004d77d0",
+  "??_C@_06HNNJ@?$CFs?3?5?$CFs?$AA@": "0x00569b24",
+  "??_C@_08KPPJ@?$HO5?$CFs?3?5?$CFs?$AA@": "0x00573d00",
+  "??_C@_0L@OMKC@?$HO1?$CFs?3?5?$HO0?$CFs?$AA@": "0x00573d0c",
+  "??_C@_0N@LLLF@?$HO?$CF1d?$CFs?3?5?$HO0?$CFs?$AA@": "0x00573cf0",
+  "?RemoveRow@UIListBox@@QAEHH@Z": "0x00477490",
+  "?ScrollToRow@UIListBox@@QAEHHH@Z": "0x00476860"
 }

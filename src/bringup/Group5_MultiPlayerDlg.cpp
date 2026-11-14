@@ -1,10 +1,11 @@
 // Group5 bring-up definitions (best-guess, link frontier). Not strict matches.
 //
-// MultiPlayerDlg::AddChatLine (0x004f3720) and SendStartMessage (0x004f2340),
-// extracted from samples/ui/SelectGamePicProcsNearMisses.cpp (same calls,
-// strings, flow and message layout as retail; register allocation and block
-// layout differ). The file-local message/grid types and COPY_TEXT are copied
-// from src/reconstructed/SelectGamePicProcs.cpp, which keeps them private.
+// MultiPlayerDlg::SendStartMessage (0x004f2340), extracted from
+// samples/ui/SelectGamePicProcsNearMisses.cpp (same calls, strings, flow and
+// message layout as retail; register allocation differs). AddChatLine
+// (0x004f3720) is exact in src/reconstructed/SelectGamePicProcs.cpp. The
+// file-local message/grid types and COPY_TEXT are copied from that file,
+// which keeps them private.
 #include "GUIManagerCore.h"
 #include "SelectGamePicProcs.h"
 #include "DialogEventKind.h"
@@ -77,44 +78,6 @@ struct UnknownGridEntry {
 // A random value in [0, 1) (as in KrustyUI.cpp).
 static inline float RandomUnit() {
     return (float)(rand() * (1.0f / 32768));
-}
-
-// 0x004f3720: adds a chat line to "ListChat"; -1 is a system message.
-// Retail falls into the colour pass for system messages too (the name buffer
-// is then unset, but only used if a lobby record has id -1).
-void MultiPlayerDlg::AddChatLine(int player, const char* text) {
-    char line[0x60];
-    char name[0x80];
-    char system[0x80];
-    UIListBox* list = static_cast<UIListBox*>(FindControl("ListChat", 3));
-    if (!list)
-        return;
-    if (player != -1) {
-        if (!g_TrackGame->network->GetPlayerName(player, name))
-            return;
-        sprintf(line, "%s: %s", name, text);
-    } else {
-        g_TrackGame->LoadResourceString(0x14ba, system, 0x80);
-        if (!g_TrackGame->imeLibrary)
-            sprintf(line, "~5%s: %s", system, text);
-        else
-            sprintf(line, "%s: %s", system, text);
-    }
-    if (!g_TrackGame->imeLibrary) {
-        if (g_TrackGame->network->localPlayer == player) {
-            sprintf(line, "~1%s: ~0%s", name, text);
-        } else {
-            for (int i = 0; i < 7; i++) {
-                if (g_LobbyRemotePlayers[i].id == player)
-                    sprintf(line, "~%1d%s: ~0%s", i + 2, name, text);
-            }
-        }
-    }
-    int rows = list->rowCount;
-    if ((short)rows >= 100)
-        list->RemoveRow(0);
-    list->AddRow(line, 0, 0);
-    list->ScrollToRow((short)rows, 1);
 }
 
 // 0x004f2340: sends the lobby start message; with `start` it first draws

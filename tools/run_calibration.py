@@ -12659,6 +12659,15 @@ CASES = [
         'reason': 'literal ButRdyPlayer%d 0x573ce0',
     },
     {
+        'name': 'SelectGamePicProcs.cpp MultiPlayerDlg add chat line 0x4f3720',
+        'bindings': 'src/reconstructed/SelectGamePicProcs.bindings.json',
+        'source': 'src/reconstructed/SelectGamePicProcs.cpp',
+        'symbol': '?AddChatLine@MultiPlayerDlg@@QAEXHPBD@Z',
+        'target_va': '0x004f3720',
+        'target_size': 380,
+        'reason': 'literal ListChat 0x573d18; the name lookup is an early return ahead of the player/system split, which gives retail block layout (system branch after the local-colour arm, merged sprintf tail in the player branch)',
+    },
+    {
         'name': 'SelectGamePicProcs.cpp SelectGamePicProcs.cpp MultiPlayerDlg send typed chat 0x4f38a0',
         'bindings': 'src/reconstructed/SelectGamePicProcs.bindings.json',
         'source': 'src/reconstructed/SelectGamePicProcs.cpp',

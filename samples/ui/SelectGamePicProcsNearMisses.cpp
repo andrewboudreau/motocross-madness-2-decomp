@@ -3,24 +3,14 @@
 // its matched functions). Check: compile this file and compare each function
 // with SelectGamePicProcsNearMisses.bindings.json.
 //
-// MultiPlayerDlg::AddChatLine (0x004f3720, 380 bytes, 92 match): the same
-//   calls and strings; retail lays the system-message branch and the player
-//   colour loop out after the "~1" branch and merges the "%s: %s" sprintf
-//   into the first branch's call, VC6 here keeps source order. Inverting
-//   the tests, swapping the if/else arms and moving the IME test do not
-//   reproduce the layout. With the system branch first (`player == -1`,
-//   `< 0` or `-1 == player`, 62) VC6 merges the system sprintf calls into
-//   the player branch's as retail does, but keeps the system block inline
-//   instead of moving it after the "~1" branch. The IME sprintfs as a
-//   ternary format (104, 48 diffs), `if (imeLibrary)` first (101), a
-//   TrackGame local and an else-if GetPlayerName test do not move it.
-//   Session 10: a `goto` from the system block into the shared sprintf
-//   (62) and an early return after the system branch (57) do not move it
-//   either; VC6 places a cross-jumped tail in the later block, retail
-//   keeps it in the player branch and jumps back from the system block.
-//   Also worse: the colour block duplicated into both branches (19), a
-//   `!= player` test with swapped arms (95), the colour loop as do/while
-//   (92) and an empty `if (imeLibrary) {} else if` chain (92).
+// MultiPlayerDlg::AddChatLine (0x004f3720) is exact in
+//   src/reconstructed/SelectGamePicProcs.cpp: the name lookup is an early
+//   return of its own (`if (player != -1 && !GetPlayerName(...)) return;`)
+//   ahead of an `if (player == -1) {system} else {sprintf}` split. Every
+//   form with the lookup inside the player branch (if/else either way
+//   round, switch, gotos, the colour block duplicated) gives one of two
+//   VC6 layouts, neither retail's; VC6 rebuilds the layout from the flow
+//   graph, so only a different graph before jump threading moves it.
 // MPBikeRiderDlg::FillBikeRiderLists (0x004f8220, 833 bytes): the same
 //   flow and calls; retail keeps the bike index in edi and KrustyUI in ebp
 //   and lays the locals out differently (VC6 here swaps the registers).
@@ -41,42 +31,6 @@
 //   (aligned 499 -> 460).
 
 #include "../../src/reconstructed/SelectGamePicProcs.cpp"
-
-// 0x004f3720
-void MultiPlayerDlg::AddChatLine(int player, const char* text) {
-    char line[0x60];
-    char name[0x80];
-    char system[0x80];
-    UIListBox* list = static_cast<UIListBox*>(FindControl("ListChat", 3));
-    if (!list)
-        return;
-    if (player != -1) {
-        if (!g_TrackGame->network->GetPlayerName(player, name))
-            return;
-        sprintf(line, "%s: %s", name, text);
-    } else {
-        g_TrackGame->LoadResourceString(0x14ba, system, 0x80);
-        if (!g_TrackGame->imeLibrary)
-            sprintf(line, "~5%s: %s", system, text);
-        else
-            sprintf(line, "%s: %s", system, text);
-    }
-    if (!g_TrackGame->imeLibrary) {
-        if (g_TrackGame->network->localPlayer == player) {
-            sprintf(line, "~1%s: ~0%s", name, text);
-        } else {
-            for (int i = 0; i < 7; i++) {
-                if (g_LobbyRemotePlayers[i].id == player)
-                    sprintf(line, "~%1d%s: ~0%s", i + 2, name, text);
-            }
-        }
-    }
-    int rows = list->rowCount;
-    if ((short)rows >= 100)
-        list->RemoveRow(0);
-    list->AddRow(line, 0, 0);
-    list->ScrollToRow((short)rows, 1);
-}
 
 // 0x004f8220
 void MPBikeRiderDlg::FillBikeRiderLists() {

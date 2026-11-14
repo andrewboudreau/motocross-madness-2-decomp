@@ -77,7 +77,6 @@ Also exact: MPBikeRiderDlg `0x004f8d20`, MPBikeRiderDlg slot 29
   above it, the file's own count falls into that window.
 
 Near misses (`samples/ui/SelectGamePicProcsNearMisses.cpp`):
-- The chat line `0x004f3720`: block layout differs.
 - The bike and rider lists `0x004f8220`: registers differ.
 - MPBikeRiderDlg slot 10 `0x004f8820`: only the scheduling of the by-value
   vector copies for the camera call differs.
