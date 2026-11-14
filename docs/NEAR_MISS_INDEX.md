@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 2, b 111, c 78, total 191. The three class (a) functions of the
+Counts: a 2, b 110, c 77, total 189. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -132,6 +132,13 @@ eliminates the tail call into retail's loop with the index in eax and gridX/grid
 compared through ecx/edx. A child local makes VC6 reload `children` (20/93), and the
 ~110 explicit walks stayed at 81. When retail loops where a sibling recursion was
 eliminated, try the recursive form with the sibling's spelling.
+DrawableGridNode::ReadNode `0x0047e600` (class c, 1605/1617) is exact in
+src/reconstructed/Griddraw.cpp: the two minimums are copied into float locals just
+before the extent products (`float minX = data->gridMinX; ... cell * minX`), so they
+are the newer leaves and load first; the copies fold away. MultiPlayerDlg::AddChatLine
+`0x004f3720` (class b, 92/380) is exact in src/reconstructed/SelectGamePicProcs.cpp:
+the name lookup is its own early return ahead of the system/player split, which gives
+VC6 retail's flow graph before jump threading.
 Compiler flags (s21, `MCM2_EXTRA_FLAGS` of `tools/rank_near_misses.py`): EcoSystem `0x00456890` and `0x00457ed0`,
 Griddraw `0x0047e600`, CacheTexture `0x005102d0`, ResourceManager `0x004e9030`,
 TextService `0x0050ba00` and the FollowCamera constructor `0x00462ee0` are unchanged
@@ -287,7 +294,6 @@ BuildFaceGeometry `0x0043dc60` from 121/1064 to 1100/1104.
 | render/Grid1 | `0x0047d780` | 227/1010 | b | 50 code diffs: `je @321 ; mov esi, [esp + N]` vs `je @315`; `mov eax, [esi]` vs `mov edi, [esp + N]`; slot order differs |
 | render/GridNode | `0x00483d40` | 68/4396 | b | slot 1: ebp frame and four bare `fistp [eax]` from an `__asm` rounding helper (`__ftol` still used elsewhere), so unreachable under the no-inline-asm rule; strict bytes fell after the session-25 logic fixes (`\|\|` merge dedupe, `<=` leaf tests, NaN-safe GridMax) and shape changes, which raised the linked masked score 0.602 -> 0.812 |
 | render/Griddraw | `0x0047de90` | 977/1083 (masked) | c | 30 code diffs: retail lacks `mov esi, [esp + N]`; `mov edi, [ebp*N + N]` vs `mov edi, [esp + N]` |
-| render/Griddraw | `0x0047e600` | 1605/1617 (masked) | c | frame matches; the extent.x/extent.y products load the cell size first (`fld [edx + 0x40] ; fmul [ecx + 0x164]`), retail the minimum ; the order follows which fields are read (+0x168 gives min-first, +0x164/+0x18 cell-first), not source order or parentheses (432 forms) |
 | render/Griddraw | `0x0047f210` | 361/543 (masked) | b | 29 code diffs: retail adds `xor esi, esi`; retail lacks `xor edi, edi`; slot order differs |
 | render/Griddraw | `0x004815e0` | 64/1083 | b | retail keeps both axis deltas on the x87 stack across the near/far branch (`fcom`, spilled in the arms) and pushes edi after the coarse return; VC6 stores them, which shifts the frame (the 65535 clamps now branch as retail) |
 | render/Griddraw | `0x00481de0` | 81/1750 (masked) | b | register allocation (retail keeps `coarse` in ebx) and slots differ; session 25 set `coarse = 1` on the size-16 `b0` path and split the depth switch out of the visible branch (linked masked 0.663 -> 0.711) |
@@ -345,7 +351,6 @@ BuildFaceGeometry `0x0043dc60` from 121/1064 to 1100/1104.
 | ui/ProCircuitProcs | `0x004d8fc0` | 836/882 | c | 12 instruction diffs: retail loads the message kind into ecx before the circuit (VC6 here: circuit first, kind in eax) and stores the fee member first with other registers |
 | ui/ProCircuitProcs | `0x004d9860` | 1068/1122 | c | 13 instruction diffs: the prologue and init-store differences of `0x004d8fc0` |
 | ui/SelectGamePicProcs | `0x004f2340` | 933/2148 | b | retail keeps the racer total in memory and bikes/riders/names in edi/ebx/ebp, and tests `start` through the ax of the message.start store; `if (message.start)` and `!= 0` are inert |
-| ui/SelectGamePicProcs | `0x004f3720` | 92/380 | b | 10 code diffs: retail lacks `jmp @44 ; lea ecx, [esp + N] ; push 0x80`; slots differ |
 | ui/SelectGamePicProcs | `0x004f8220` | 110/840 | b | 57 code diffs: `xor ebp, ebp` vs `xor edi, edi`; `mov [esp + N], ebp ; mov [esp + N], ebp` vs `mov [esp + N], edi ; mov [esp + N], edi`; slot order differs |
 | ui/SelectGamePicProcs | `0x004f8820` | 1214/1268 | b | 8 code diffs: retail lacks `mov edi, esp`; retail adds `mov edi, esp`; slots differ |
 
