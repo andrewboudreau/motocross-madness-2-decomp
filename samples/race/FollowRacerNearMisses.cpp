@@ -20,6 +20,11 @@
 // slots pointer local, a by-pointer BankRun helper, a reference alias of
 // the racer, the zero store folded into an argument or as an int store,
 // and bool/char/short/pointer/float types for the slot 50 arguments.
+// Session 23: not a count effect. 64 extra file-scope typedefs, and 0..39
+// extra statements (diagnostic only) at the top, before the best-run locals,
+// after the announcement, or as dead locals, all leave the fstp after the
+// first push; statements between the call and the ball test, or removing the
+// zero store, the ball test or the tail, move `previous` to another register.
 
 #include <stdlib.h>
 
