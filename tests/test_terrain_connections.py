@@ -58,7 +58,9 @@ PARTIAL = (
     # PCVideoCard's driverColorKeyCaps member renumbers the label again
     # ($L6433 -> $L6434, still .text$x+0xb6); the body bytes and the other 64
     # relocation records are identical.
-    ('?Load@Terrain@@', 2117, '53fc226cae7bdbb978b2154adfb9d58a1470c5cdb73f133b4dfc7fcc4a37f262'),
+    # Naming wave 31's view-pad splits renumber it again ($L6434 -> $L6435);
+    # the body bytes and the other 64 relocation records are identical.
+    ('?Load@Terrain@@', 2117, 'c7a713a3c3904febe821c9d15f17507bad2f0f2b02e5377f164f8d7c9e391c30'),
     # Intentional cell-conversion repair, verified at the actual first-cell
     # boundary in test_terrain_cell_conversion; full interpolation remains partial.
     # The sampler, dot and triangle provider names are now canonical, with
