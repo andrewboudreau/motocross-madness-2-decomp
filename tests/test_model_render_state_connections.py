@@ -44,7 +44,7 @@ RENAMES.update({
     '?Method_004444E0@VehSceneNodeView@@QAEXXZ': '?ClearScreenRects@D3DIMSoultreeObject@@QAEXXZ',
     '?SetLod@KbXform@@QAEXH@Z': '?SetLod@D3DIMSoultreeObject@@QAEXH@Z',
     '?SetLowestLod@KbXform@@QAEXH@Z': '?SetLowestLod@D3DIMSoultreeObject@@QAEXH@Z',
-    '?ApplyLodSettings@UnknownBikeRaceModel@@QAEXH@Z': '?ApplyLodSettings@D3DIMSoultreeObject@@QAEXH@Z',
+    '?ApplyLodSettings@RacerD3DIMSoultreeObjectView@@QAEXH@Z': '?ApplyLodSettings@D3DIMSoultreeObject@@QAEXH@Z',
     '?ApplyLodSettings@UnknownSceneLodObject@@QAEXH@Z': '?ApplyLodSettings@D3DIMSoultreeObject@@QAEXH@Z',
 })
 

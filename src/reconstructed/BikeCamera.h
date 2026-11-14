@@ -2,15 +2,15 @@
 
 #include "VehicleCamera.h"
 
-struct UnknownCameraBikeRider {
+struct BikeCameraRiderView {
     unsigned char field_0x000[0x1a0];
     SoultreeObject* modelNode;            // +0x1a0 the rider model; has a "Head" part
 };
 
-// Object at UnknownCameraBikeState+0x40, Wrecker's PhysicsRigidBody
+// Object at BikeCameraWreckerView+0x40, Wrecker's PhysicsRigidBody
 // (src/krusty2/rigidbody/PhysicsBody.h); KrustyBikeCamera slot 34 leads the
 // camera by its velocity.
-struct UnknownCameraBikeBody {
+struct BikeCameraPhysicsRigidBodyView {
     unsigned char field_0x000[0x154];
     Vector3 velocity;                    // +0x154 PhysicsBody::velocity
 };
@@ -18,18 +18,18 @@ struct UnknownCameraBikeBody {
 // The racer's +0x604 object: the Wrecker (Wrecker.h) lines up at +0x40
 // rigidBody (velocity +0x154), +0x44 wreckState (0 idle, 1..3) and +0xb0
 // contactThisFrame.
-struct UnknownCameraBikeState {
+struct BikeCameraWreckerView {
     unsigned char field_0x00[0x40];
-    UnknownCameraBikeBody* rigidBody;    // +0x40 KrustyBikeCamera slot 34
+    BikeCameraPhysicsRigidBodyView* rigidBody;    // +0x40 KrustyBikeCamera slot 34
     int wreckState;                      // +0x44 BikeCamera slot 75 tests 3
     unsigned char field_0x48[0xb0 - 0x48];
     int contactThisFrame;                // +0xb0 racesnd.cpp 0x004e39b0 plays a fall sound
 };
 
-// Object at BikeCamera+0x3b0. It shares UnknownCameraVehicle's offsets
+// Object at BikeCamera+0x3b0. It shares VehicleCameraVehicleView's offsets
 // (+0x48, +0x3bc, +0x444, +0x460) and adds the fields below; its class is not
 // established.
-struct UnknownCameraBike {
+struct BikeCameraBikeView {
     unsigned char field_0x000[0x48];
     float savedRoll;                          // +0x48 krusty2 SoultreePhysicsBaseObject
     unsigned char field_0x04c[0x58 - 0x4c];
@@ -41,9 +41,9 @@ struct UnknownCameraBike {
     unsigned char field_0x448[0x460 - 0x448];
     int crashReason;                          // +0x460
     unsigned char field_0x464[0x5c4 - 0x464];
-    UnknownCameraBikeRider* riderCharacter;   // +0x5c4
+    BikeCameraRiderView* riderCharacter;   // +0x5c4
     unsigned char field_0x5c8[0x604 - 0x5c8];
-    UnknownCameraBikeState* wrecker;          // +0x604 the racer's Wrecker
+    BikeCameraWreckerView* wrecker;          // +0x604 the racer's Wrecker
 };
 
 // RTTI: BikeCamera : VehicleCamera. Its code sits near BikeAI.cpp references;
@@ -68,5 +68,5 @@ public:
     virtual bool ShouldFollowSubject();
 
 protected:
-    UnknownCameraBike* bike; // +0x3b0
+    BikeCameraBikeView* bike; // +0x3b0
 };

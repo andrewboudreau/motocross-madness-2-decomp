@@ -146,7 +146,7 @@ FollowCamera* FollowCamera::SetupFollowCamera(void* context, float fieldOfViewEa
 }
 
 // 0x00463600
-void FollowCamera::SetSubject(UnknownFollowCameraSubject* newSubject) {
+void FollowCamera::SetSubject(FollowCameraTerrainView* newSubject) {
     subject = newSubject;
     subjectCellSize = newSubject->gridCellSize;
 }

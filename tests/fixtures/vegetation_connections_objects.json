@@ -1,5 +1,5 @@
 {
-  "baseline": "Private round54 same-path four complete objects; all bytes/flags/addends/destinations preserved under only these three names. Only exact enumerated source filename prefixes are portable. Refresh published baseline before admission. Round56 private composition independently reproduces these old pins; one GetObject-to-GetCollisionObject primary call rename and the independently validated complete SetTransform arithmetic repair are then applied. All other sections and relocation destinations remain preserved. Round57 light lookup: published dfdf9823 canonical EcoSystem pin independently reproduced, then complete132 sections/720 relocations preserved under only the UnknownEcoLight*-to-LightEmitter* method-return spelling. All other records unchanged.",
+  "baseline": "Private round54 same-path four complete objects; all bytes/flags/addends/destinations preserved under only these three names. Only exact enumerated source filename prefixes are portable. Refresh published baseline before admission. Round56 private composition independently reproduces these old pins; one GetObject-to-GetCollisionObject primary call rename and the independently validated complete SetTransform arithmetic repair are then applied. All other sections and relocation destinations remain preserved. Round57 light lookup: published dfdf9823 canonical EcoSystem pin independently reproduced, then complete132 sections/720 relocations preserved under only the EcoLightEmitterView*-to-LightEmitter* method-return spelling. All other records unchanged.",
   "renames": {
     "?GetObjectCount@CollisionVegetation@@QAEHXZ": "?GetCollisionCount@Vegetation@@QAEHXZ",
     "?GetRadius@CollisionVegetation@@QAEMXZ": "?GetRadius@Vegetation@@QAEMXZ",
@@ -14,12 +14,12 @@
     "src/reconstructed/EcoSystem.cpp": {
       "sections": 132,
       "relocations": 720,
-      "sha256": "1efd08ee03e06e5180fa230deadd29bde8269db93087529212c57c77f9b4a690"
+      "sha256": "406df161393a7f8b894bd104d6364569d404aebfcdc879f40c0053308abb41f9"
     },
     "samples/ecosystem/EcoSystemNearMisses.cpp": {
       "sections": 98,
       "relocations": 444,
-      "sha256": "32751ae016b808ca10c259be463af85886325df6535905873c258313c955bcfe"
+      "sha256": "2949e44c3c5dc84e5e6d568500eb64c8a8264e60c0f48ac31ad93ff33e124e00"
     }
   }
 }

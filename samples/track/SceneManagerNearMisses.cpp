@@ -158,9 +158,9 @@ public:
 
 // CollisionObject (0xb8 bytes; ObjectPicker.h and src/krusty2/collision
 // declare the same class). The model it collides for is at +0x60.
-class UnknownSceneCollisionObject : public UnknownSoultreeQuadTreeObject, public GameObject {
+class SceneCollisionObjectView : public UnknownSoultreeQuadTreeObject, public GameObject {
 public:
-    explicit UnknownSceneCollisionObject(int flags);   // 0x00431e70
+    explicit SceneCollisionObjectView(int flags);   // 0x00431e70
     void Configure(void* a, int b, int c, int d);  // 0x004320f0
     void SetHullShape(D3DIMSoultreeObject* model, int a, int b, int c, int d); // 0x00432720
     void LoadShape(D3DIMSoultreeObject* model, const char* path); // 0x00432800: from a ".col" file
@@ -399,7 +399,7 @@ int Scene::ReadStaticModels(LightManager* lights, int particleManager, int textu
             if (collision && !stadium
                 && ((D3DIMSoultreeObject*)staticModels->casters[i].model)->CountNodes() == 1) {
                 g_MemTagStack->Push("Collision");
-                staticModels->casters[i].collisionObject = new(__FILE__, 1974) UnknownSceneCollisionObject(1);
+                staticModels->casters[i].collisionObject = new(__FILE__, 1974) SceneCollisionObjectView(1);
                 staticModels->casters[i].collisionObject->Configure(renderContext, 1, 0, 1);
                 staticModels->casters[i].collisionObject->ownerObject =
                     (D3DIMSoultreeObject*)staticModels->casters[i].model;
@@ -597,7 +597,7 @@ int Scene::ReadAnimations(LightManager* lights, int textureManager, int modelTex
         if (!ReadVector(&animationTable->entries[i].position, name, "Position", "0.0,0.0,0.0", 0, 0))
             ReadVector(&animationTable->entries[i].position, name, "Offset", "0.0,0.0,0.0", 0, 0);
         if (animationTable->entries[i].keyFramed) {
-            UnknownSceneObject* character = new(__FILE__, 2300) UnknownSceneObject(1);
+            SceneCollisionCharacterView* character = new(__FILE__, 2300) SceneCollisionCharacterView(1);
             animationTable->entries[i].character = character;
             if (!AppendChild(character->Load(renderContext, sltPath, colPath, lights, modelTextures, 1, 1),
                                        -1)) {
@@ -607,7 +607,7 @@ int Scene::ReadAnimations(LightManager* lights, int textureManager, int modelTex
             }
         }
         if (!animationTable->entries[i].keyFramed) {
-            UnknownSceneAnimatedObject* car = new(__FILE__, 2305) UnknownSceneAnimatedObject(1);
+            SceneCarProceduralView* car = new(__FILE__, 2305) SceneCarProceduralView(1);
             animationTable->entries[i].proceduralObject = car;
             if (!AppendChild(car->Create(renderContext, sltPath, colPath, lights, modelTextures, 0, vuePath,
                                                                  &animationTable->entries[i].position, fps,

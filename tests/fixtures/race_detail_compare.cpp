@@ -12,9 +12,9 @@
 LAYOUT(race_local,offsetof(BikeRace,localRacer)==0x38);
 LAYOUT(race_net,offsetof(BikeRace,racerSlots)==0x3c);
 LAYOUT(race_ai,offsetof(BikeRace,aiRacers)==0x40);
-LAYOUT(racer_model,offsetof(UnknownBikeRaceRacer,modelNode)==0x3bc);
-LAYOUT(racer_rider,offsetof(UnknownBikeRaceRacer,riderCharacter)==0x5c4);
-LAYOUT(rider_model,offsetof(UnknownBikeRaceRider,modelNode)==0x1a0);
+LAYOUT(racer_model,offsetof(BikeRaceKrustyBikeView,modelNode)==0x3bc);
+LAYOUT(racer_rider,offsetof(BikeRaceKrustyBikeView,riderCharacter)==0x5c4);
+LAYOUT(rider_model,offsetof(BikeRaceRiderView,modelNode)==0x1a0);
 LAYOUT(model_size,sizeof(D3DIMSoultreeObject)==0x2d8);
 LAYOUT(model_threshold,offsetof(D3DIMSoultreeObject,inverseLodThreshold)==0x284);
 LAYOUT(model_dirty,offsetof(D3DIMSoultreeObject,subtreeDirty)==0x18c);
@@ -26,11 +26,11 @@ template<class T> struct Raw { DWORD words[(sizeof(T)+3)/4+8]; T* ptr(){return (
 struct State {
     Raw<BikeRace> race;
     Raw<TrackGame> game;
-    Raw<UnknownBikeRaceRacer> racers[5];
-    Raw<UnknownBikeRaceRider> riders[5];
+    Raw<BikeRaceKrustyBikeView> racers[5];
+    Raw<BikeRaceRiderView> riders[5];
     Raw<D3DIMSoultreeObject> models[10];
-    DWORD arrayGuard0[4]; UnknownBikeRaceRacer* ai[2]; DWORD arrayGuard1[4];
-    UnknownBikeRaceRacer* net[2]; DWORD arrayGuard2[4];
+    DWORD arrayGuard0[4]; BikeRaceKrustyBikeView* ai[2]; DWORD arrayGuard1[4];
+    BikeRaceKrustyBikeView* net[2]; DWORD arrayGuard2[4];
 };
 static State state, expected;
 TrackGame* g_TrackGame;
@@ -82,12 +82,12 @@ static void Run(int level,int blade,int mode,int aiCount,int netCount,int alias,
  for(int i=0;i<2;i++){state.ai[i]=state.racers[i+1].ptr();state.net[i]=state.racers[i+3].ptr();}
  for(i=0;i<5;i++){
   state.racers[i].ptr()->riderCharacter=state.riders[i].ptr();
-  state.racers[i].ptr()->modelNode=(UnknownBikeRaceModel*)state.models[alias?i%2:2*i].ptr();
-  state.riders[i].ptr()->modelNode=(UnknownBikeRaceModel*)state.models[alias?i%2:2*i+1].ptr();
+  state.racers[i].ptr()->modelNode=(RacerD3DIMSoultreeObjectView*)state.models[alias?i%2:2*i].ptr();
+  state.riders[i].ptr()->modelNode=(RacerD3DIMSoultreeObjectView*)state.models[alias?i%2:2*i+1].ptr();
  }
  if(failAt>=0){
   REQUIRE(!alias && aiCount==2 && netCount==2 && mode!=4);
-  UnknownBikeRaceModel* bad=(UnknownBikeRaceModel*)(pages+4096-0x284);
+  RacerD3DIMSoultreeObjectView* bad=(RacerD3DIMSoultreeObjectView*)(pages+4096-0x284);
   if(failAt&1)state.riders[failAt/2].ptr()->modelNode=bad;
   else state.racers[failAt/2].ptr()->modelNode=bad;
  }

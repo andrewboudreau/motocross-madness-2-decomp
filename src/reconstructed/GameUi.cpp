@@ -458,7 +458,7 @@ int UIStatic::IsInteractive() {
 // and UIStatic, UIDDLStatic, UIProgressBar and UIVideoStatic all dispatch to it.
 // A click on a hovered static control sends a kDialogCommand to the dialog.
 int UIStatic::ButtonDown(int button, int position) {
-    if (ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this && !button) {
+    if (ownerDialog->guiUser->hoverControl == (GuiControlView*)this && !button) {
         DialogEvent event;
         event.handled = button;
         event.kind = kDialogCommand;
@@ -542,7 +542,7 @@ int UIControl::RenderPre3D() {
 
 // 0x00472250
 int UIControl::ButtonUp(int button, int* position) {
-    if (ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this && !button && currentState == 2) {
+    if (ownerDialog->guiUser->hoverControl == (GuiControlView*)this && !button && currentState == 2) {
         SetState(3);
         PlayControlSound(3, ownerDialog->field_0x180);
     }
@@ -566,14 +566,14 @@ void UIControl::ButtonHeld(int button, int* position) {
 
 // 0x004725b0
 int UIControl::EnterHover() {
-    if (IsInteractive() && ownerDialog->guiUser->hoverControl != (UnknownGuiControl*)this) {
+    if (IsInteractive() && ownerDialog->guiUser->hoverControl != (GuiControlView*)this) {
         SetState(1);
         if (stateImages[currentState])
             stateImages[currentState]->Rewind();
         PlayControlSound(1, ownerDialog->field_0x180);
         ToolTip* tip = ownerDialog->guiUser->userToolTip;
         if (tip)
-            tip->ShowControlToolTip((UnknownGuiControl*)this);
+            tip->ShowControlToolTip((GuiControlView*)this);
     }
     return 1;
 }
@@ -665,7 +665,7 @@ UIButton::UIButton(int id, CameraRect* area, UIDialog* owner)
 
 // 0x00473410
 int UIButton::ButtonUp(int button, int* position) {
-    if (ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this && !button && currentState == 2) {
+    if (ownerDialog->guiUser->hoverControl == (GuiControlView*)this && !button && currentState == 2) {
         DialogEvent event;
         event.handled = button;
         if (sortList)
@@ -796,7 +796,7 @@ void UIEditBox::KillFocus(int value) {
 
 // 0x00474120
 int UIEditBox::ButtonDown(int button, int position) {
-    if (ownerDialog->guiUser->focusControl != (UnknownGuiControl*)this)
+    if (ownerDialog->guiUser->focusControl != (GuiControlView*)this)
         return UIControl::ButtonDown(button, position);
     return 0;
 }
@@ -816,7 +816,7 @@ UIScrollCtl::~UIScrollCtl() {
 
 // 0x00474880: a click scrolls the arrow's lists by a row, then repeats on a timer.
 int UIScrollCtl::ButtonDown(int button, int position) {
-    if (ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this && !button) {
+    if (ownerDialog->guiUser->hoverControl == (GuiControlView*)this && !button) {
         DialogEvent event;
         event.handled = 0;
         GameObjectIterator* iterator;
@@ -921,7 +921,7 @@ void UIScrollCtl::HandleTimer(int value) {
 
 // 0x00474b10
 int UIScrollCtl::ButtonUp(int button, int* position) {
-    if (ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this && !button && currentState == 2) {
+    if (ownerDialog->guiUser->hoverControl == (GuiControlView*)this && !button && currentState == 2) {
         DialogEvent event;
         event.handled = button;
         event.kind = kDialogCommand;
@@ -1567,7 +1567,7 @@ int UIStaticText::Draw() {
 
 // 0x00479190
 int UIStaticText::ButtonDown(int button, int position) {
-    if (ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this && !button) {
+    if (ownerDialog->guiUser->hoverControl == (GuiControlView*)this && !button) {
         DialogEvent event;
         event.handled = button;
         event.kind = kDialogCommand;
@@ -1650,7 +1650,7 @@ UIDDLButton::UIDDLButton(int id, CameraRect* area, UIDialog* owner, UIDropDownLi
 // 0x00479c90
 int UIDDLButton::ButtonDown(int button, int position) {
     UIControl::ButtonDown(button, position);
-    if (ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this)
+    if (ownerDialog->guiUser->hoverControl == (GuiControlView*)this)
         ownerList->SetOpen(1 - ownerList->isOpen);
     return 0;
 }
@@ -1787,9 +1787,9 @@ void UIDropDownList::SyncBoundValue(int value) {
 
 // 0x0047add0
 int UIDropDownList::ButtonDown(int button, int position) {
-    if (ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this) {
+    if (ownerDialog->guiUser->hoverControl == (GuiControlView*)this) {
         SetOpen(isOpen == 0);
-        ownerDialog->guiUser->RequestFocus((UnknownGuiControl*)this, 0, 0);
+        ownerDialog->guiUser->RequestFocus((GuiControlView*)this, 0, 0);
         return 1;
     }
     return UIControl::ButtonDown(button, position);
@@ -2228,7 +2228,7 @@ void UIDialog::SetBackground(void* background) {
 
 // 0x00470000
 int UIDialog::RequestHover(UIControl* control, int previous, int update) {
-    return guiUser->RequestHover((UnknownGuiControl*)control, (UnknownGuiControl**)previous, update);
+    return guiUser->RequestHover((GuiControlView*)control, (GuiControlView**)previous, update);
 }
 
 // 0x00470020
@@ -2373,11 +2373,11 @@ UIControl::~UIControl() {
     if (ownerDialog && !g_TrackGame->shuttingDown) {
         pendingRelease = 1;
         ToolTip* tip = 0;
-        if (ownerDialog->guiUser && ownerDialog->guiUser->focusControl == (UnknownGuiControl*)this) {
+        if (ownerDialog->guiUser && ownerDialog->guiUser->focusControl == (GuiControlView*)this) {
             ownerDialog->guiUser->ClearFocus(0);
             tip = ownerDialog->guiUser->userToolTip;
         }
-        if (ownerDialog->guiUser && ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this) {
+        if (ownerDialog->guiUser && ownerDialog->guiUser->hoverControl == (GuiControlView*)this) {
             ownerDialog->RequestHover(0, 0, 1);
             tip = ownerDialog->guiUser->userToolTip;
         }
@@ -2610,7 +2610,7 @@ end:
 
 // 0x004721b0
 int UIControl::ButtonDown(int button, int position) {
-    if (ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this) {
+    if (ownerDialog->guiUser->hoverControl == (GuiControlView*)this) {
         if (!button) {
             SetState(2);
             PlayControlSound(2, ownerDialog->field_0x180);
@@ -2618,7 +2618,7 @@ int UIControl::ButtonDown(int button, int position) {
         heldButton = button;
         if (button == 1 && ownerDialog->dialogBackground)
             ownerDialog->dialogBackground->MarkAllDirty();
-        ownerDialog->guiUser->RequestFocus((UnknownGuiControl*)this, 0, 0);
+        ownerDialog->guiUser->RequestFocus((GuiControlView*)this, 0, 0);
         ToolTip* tip = ownerDialog->guiUser->userToolTip;
         if (tip) {
             tip->shown = 0;
@@ -2632,7 +2632,7 @@ int UIControl::ButtonDown(int button, int position) {
 int UIControl::OnChar(int value) {
     DialogEvent event;
     event.handled = 0;
-    if (ownerDialog->guiUser->focusControl == (UnknownGuiControl*)this) {
+    if (ownerDialog->guiUser->focusControl == (GuiControlView*)this) {
         event.kind = 0xb;
         event.code = eventCode;
         event.controlName = GetName();
@@ -2654,7 +2654,7 @@ int UIControl::OnChar(int value) {
 int UIControl::OnKeyDown(int value) {
     DialogEvent event;
     event.handled = 0;
-    if (ownerDialog->guiUser->focusControl == (UnknownGuiControl*)this) {
+    if (ownerDialog->guiUser->focusControl == (GuiControlView*)this) {
         event.kind = 0xc;
         event.code = eventCode;
         event.controlName = GetName();
@@ -2695,12 +2695,12 @@ int UIControl::UpdateHoverAt(int* position) {
         UIControl* last = FindLastAnchor(0);
         if (enabled && shown && (!last || (last->shown && !last->transitionState))) {
             GUIUser* user = ownerDialog->guiUser;
-            UnknownGuiControl* hover = user->hoverControl;
-            if (!user->controlDown[0] && !user->controlDown[1] && hover != (UnknownGuiControl*)this) {
+            GuiControlView* hover = user->hoverControl;
+            if (!user->controlDown[0] && !user->controlDown[1] && hover != (GuiControlView*)this) {
                 result = ownerDialog->RequestHover(this, 0, 0);
-            } else if (hover == (UnknownGuiControl*)this) {
-                if (user->pendingHoverControl && user->pendingHoverControl != (UnknownGuiControl*)this)
-                    user->RequestHover((UnknownGuiControl*)this, 0, 0);
+            } else if (hover == (GuiControlView*)this) {
+                if (user->pendingHoverControl && user->pendingHoverControl != (GuiControlView*)this)
+                    user->RequestHover((GuiControlView*)this, 0, 0);
                 result = 1;
             }
         }
@@ -3098,7 +3098,7 @@ void UIMultiState::SetStateText(int index, const char* text) {
 
 // 0x00478d70
 int UIMultiState::ButtonDown(int button, int position) {
-    if (ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this && !button) {
+    if (ownerDialog->guiUser->hoverControl == (GuiControlView*)this && !button) {
         DialogEvent event;
         event.handled = button;
         SelectNextState();
@@ -3156,7 +3156,7 @@ int UIRadioButton::GetGroupSelection() {
 
 // 0x004794c0
 int UIRadioButton::ButtonDown(int button, int position) {
-    if (ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this && !button) {
+    if (ownerDialog->guiUser->hoverControl == (GuiControlView*)this && !button) {
         DialogEvent event;
         event.handled = button;
         if (!GetSelectedState()) {
@@ -3536,7 +3536,7 @@ int UIDialog::IsInDoubleByteCharacter(const char* text, const char* position, in
 void UIDialog::UpdatePointerHover() {
     if (guiUser->pointerDevice && controlContainer->firstChild) {
         GUIUser* user = guiUser;
-        UnknownGuiControl* focus = user->hoverControl;
+        GuiControlView* focus = user->hoverControl;
         if (focus && ((UIControl*)focus)->ownerDialog != (UIDialog*)this)
             focus = 0;
         POINT position = user->pointerDevice->pointerPosition;
@@ -3954,7 +3954,7 @@ int UIScrollBar::ButtonUp(int button, int* position) {
         ownerDialog->HandleEvent(&event);
     }
     dragging = 0;
-    if (ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this && !button && currentState == 2) {
+    if (ownerDialog->guiUser->hoverControl == (GuiControlView*)this && !button && currentState == 2) {
         event.kind = kDialogCommand;
         event.code = eventCode;
         event.controlName = GetName();
@@ -4352,7 +4352,7 @@ int UIControl::Draw() {
 // text and the caret's offset.
 int UIEditBox::OnKeyDown(int value) {
     if (!UIControl::OnKeyDown(value) &&
-        ownerDialog->guiUser->focusControl == (UnknownGuiControl*)this) {
+        ownerDialog->guiUser->focusControl == (GuiControlView*)this) {
         if (clickSound) {
             clickSound->SetVolume(ownerGui->soundVolume, 0);
             clickSound->PlayWithOptions(1, 0, 0);
@@ -4419,7 +4419,7 @@ int UIScrollBar::Tick(float frameTime) {
     for (int i = 0; (device = ownerDialog->guiUser->GetAcceptedDevice(i++)) != 0;) {
         if (device->inputDevice->deviceKind == 2 && device->inputDevice->IsDeviceSubtype(4)) {
             POINT position = device->pointerPosition;
-            if (ownerDialog->guiUser->focusControl == (UnknownGuiControl*)this) {
+            if (ownerDialog->guiUser->focusControl == (GuiControlView*)this) {
                 if (position.y <= -1) {
                     if (ownerDialog->joystickCentred) {
                         if (GetSnapSteps()) {
@@ -4523,7 +4523,7 @@ failed:
 
 // 0x004755d0: a click on the bar moves the thumb (slider) or pages the lists.
 int UIScrollBar::ButtonDown(int button, int position) {
-    if (ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this && !button && position) {
+    if (ownerDialog->guiUser->hoverControl == (GuiControlView*)this && !button && position) {
         GameObjectIterator* iterator;
         UIControl* list;
         if (controlType == 8) {
@@ -4675,7 +4675,7 @@ int UIListBox::Tick(float frameTime) {
     for (int i = 0; (device = ownerDialog->guiUser->GetAcceptedDevice(i++)) != 0;) {
         if (device->inputDevice->deviceKind == 2 && device->inputDevice->IsDeviceSubtype(4)) {
             POINT position = device->pointerPosition;
-            if (ownerDialog->guiUser->focusControl == (UnknownGuiControl*)this) {
+            if (ownerDialog->guiUser->focusControl == (GuiControlView*)this) {
                 if (position.y <= -1) {
                     if (GetSelectedRow() > 0)
                         SelectRow(GetSelectedRow() - 1);
@@ -4690,7 +4690,7 @@ int UIListBox::Tick(float frameTime) {
     GUIUser* user = ownerDialog->guiUser;
     if (user->pointerDevice) {
         POINT cursor = user->pointerDevice->pointerPosition;
-        if (user->hoverControl == (UnknownGuiControl*)this && selectable) {
+        if (user->hoverControl == (GuiControlView*)this && selectable) {
             RECT rect = *(RECT*)screenArea;
             for (int row = firstVisibleRow; row < firstVisibleRow + visibleRowCount; row++) {
                 rect.bottom = rect.top + GetRowHeight(row);
@@ -4944,7 +4944,7 @@ void UIDDLScrollBar::ButtonHeld(int button, int* position) {
 
 // 0x00479a00: a click on the bar moves the thumb (slider) or pages the list.
 int UIDDLScrollBar::ButtonDown(int button, int position) {
-    if (ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this && !button && position) {
+    if (ownerDialog->guiUser->hoverControl == (GuiControlView*)this && !button && position) {
         UIListBox* list = ownerList->listPart;
         if (snapSteps) {
             thumbOffset = (float)UNKNOWN_MIN(GetHeight() - thumbHeight,
@@ -5249,7 +5249,7 @@ void UIListBox::ScrollBy(int delta) {
 
 // 0x00477ff0
 int UIListBox::ButtonUp(int button, int* position) {
-    if (ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this && button == 1) {
+    if (ownerDialog->guiUser->hoverControl == (GuiControlView*)this && button == 1) {
         scrollOffsetX += dragOffsetX;
         dragOffsetX = 0;
     }
@@ -5259,7 +5259,7 @@ int UIListBox::ButtonUp(int button, int* position) {
 // 0x00478040
 int UIListBox::OnKeyDown(int key) {
     if (!UIControl::OnKeyDown(key) &&
-        ownerDialog->guiUser->focusControl == (UnknownGuiControl*)this && selectable) {
+        ownerDialog->guiUser->focusControl == (GuiControlView*)this && selectable) {
         int row;
         switch (key) {
         case VK_LEFT:
@@ -5371,7 +5371,7 @@ int UIControl::OnControlPress(ControlEvent* event, InputButtonState* entry) {
                 !g_TrackGame->controlInterface->keyboard->IsButtonDown(0x2a, 0x3f, 0) &&
                 !g_TrackGame->controlInterface->keyboard->IsButtonDown(0x36, 0x3f, 0) &&
                 IsEnabled() && shown) {
-                ownerDialog->guiUser->RequestHover((UnknownGuiControl*)this, 0, 1);
+                ownerDialog->guiUser->RequestHover((GuiControlView*)this, 0, 1);
                 ButtonDown(0, 0);
                 ButtonUp(0, 0);
                 return 1;

@@ -176,5 +176,5 @@ slot 24) and KrustyUI slot 24 (`0x00499a70`) take
 fields NetworkInterface `0x004aced0` passes. KrustyUI sets the network
 object's +0x10 for type 0x101 (`DPSYS_HOST`). The DirectPlay system message
 constants are shared in `src/reconstructed/DirectPlayMessages.h`.
-The view's +0x38 and +0x3c are racers (`UnknownEventRacer`, in
+The view's +0x38 and +0x3c are racers (`EventKrustyBikeView`, in
 `RaceView.h`); TrackGame's 0xf8-byte racer records start at +0x215c, after their count.

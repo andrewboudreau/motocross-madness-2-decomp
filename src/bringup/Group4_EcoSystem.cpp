@@ -51,13 +51,13 @@ static int s_billboardsDrawn;                // 0x0059af08 (local copy)
 // on bladeRenderer. Render3D reads the shared pointer, as retail does.
 extern UnknownEcoDetailBand* g_UnknownGlobal59af14;
 
-#define ECO_VIEW ((UnknownEcoRenderTarget*)renderContext)
+#define ECO_VIEW ((EcoRenderTargetView*)renderContext)
 
 // BuildCollisionObjects and GenerateObjects call the CollisionObject and
-// UnknownEcoTerrain proxies EcoSystem.h declares, as the sample does (retail
+// EcoTerrainView proxies EcoSystem.h declares, as the sample does (retail
 // calls 0x004328b0, 0x004329a0, 0x00432a20, 0x00507c10 and 0x00508970 directly).
 // Their names mangle differently from the providers (Vector3 against
-// CollisionVec3/TerrainVec3, UnknownEcoTerrain against Terrain); link_aliases
+// CollisionVec3/TerrainVec3, EcoTerrainView against Terrain); link_aliases
 // binds each to the provider at the same retail address (same 12-byte vectors,
 // same pushed arguments, Terrain's GameObject base at offset 0). The former
 // forwarders (Group4_EcoBridges.cpp) cost both bodies their call shape.
@@ -216,7 +216,7 @@ void EcoSystem::BuildCollisionObjects(VegetationDefinition* definition) {
     for (i = 0; i < definition->collisionCount; i++) {
         VegetationCollisionDefinition* shape = &definition->collisionDefinitions[i];
         definition->collisionObjects[i] = new(__FILE__, 0x3ad) CollisionObject(1);
-        definition->collisionObjects[i]->Configure(reinterpret_cast<UnknownEcoTrackGame*>(g_TrackGame)->display, 0, 0, 1);
+        definition->collisionObjects[i]->Configure(reinterpret_cast<EcoTrackGameView*>(g_TrackGame)->display, 0, 0, 1);
         AppendChild(definition->collisionObjects[i], -1);
         definition->collisionObjects[i]->ownerType = 0x3e8;
         if (shape->type == 0) {
@@ -233,7 +233,7 @@ void EcoSystem::BuildCollisionObjects(VegetationDefinition* definition) {
             definition->collisionObjects[i]->ownerType = 0x3e9;
             definition->collisionObjects[i]->SetTriangleMeshHullShape(hull, hullIndices, definition->modelIndexCount[0] / 3,
                                                                definition->modelVertexCount[0]);
-            EcoSetIdentity(&((UnknownEcoHullShape*)definition->collisionObjects[i]->shapeData)->transform);
+            EcoSetIdentity(&((EcoHullShape*)definition->collisionObjects[i]->shapeData)->transform);
             delete hull;
             delete hullIndices;
         } else if (shape->type == 2) {
@@ -263,7 +263,7 @@ void EcoSystem::BuildCollisionObjects(VegetationDefinition* definition) {
                 indices[j * 6 + 5] = j + 16;
             }
             definition->collisionObjects[i]->SetTriangleMeshHullShape(vertices, indices, 32, 32);
-            EcoSetIdentity(&((UnknownEcoHullShape*)definition->collisionObjects[i]->shapeData)->transform);
+            EcoSetIdentity(&((EcoHullShape*)definition->collisionObjects[i]->shapeData)->transform);
         }
     }
     g_MemTagStack->Pop(category);
@@ -421,7 +421,7 @@ int EcoSystem::GenerateObjects(int checkCodes) {
             count++;
         }
     }
-    int mode = reinterpret_cast<UnknownEcoTrackGame*>(g_TrackGame)->GetRegistryInt("EcoGen", 0);
+    int mode = reinterpret_cast<EcoTrackGameView*>(g_TrackGame)->GetRegistryInt("EcoGen", 0);
     rangeX = g_collisionQuadTree->extentX;
     rangeZ = g_collisionQuadTree->extentZ;
     if (mode == 5) {
@@ -643,7 +643,7 @@ int EcoSystem::Render3D() {
     unsigned int start = ReadClock();
     int category = g_MemTagStack->Push("EcoSystem");
     int verticesBefore = ECO_VIEW->verticesDrawn;
-    UnknownEcoCamera* camera = ECO_VIEW->camera;
+    EcoCameraView* camera = ECO_VIEW->camera;
     int trianglesBefore = ECO_VIEW->trianglesDrawn;
     float projectionScale = camera->projectionScale;
     identity(0, 0) = 1.0f;
@@ -697,7 +697,7 @@ int EcoSystem::Render3D() {
     float cosine = inverse * camera->direction.z;
     s_billboardsDrawn = 0;
     s_geometryDrawn = 0;
-    if (reinterpret_cast<UnknownEcoTrackGame*>(g_TrackGame)->bladeRenderer)
+    if (reinterpret_cast<EcoTrackGameView*>(g_TrackGame)->bladeRenderer)
         ECO_VIEW->SetRenderState(D3DRENDERSTATE_TEXTUREPERSPECTIVE, g_UnknownGlobal59af14[detailLevel].fog, 0);
     if (geometryCount) {
         SetRenderStates(definitionTable[vegetation[0].definitionIndex]->modelTexture->pixelFormat);
@@ -708,7 +708,7 @@ int EcoSystem::Render3D() {
         }
     }
     s_geometryRenderTicks = ReadClock() - start;
-    if (reinterpret_cast<UnknownEcoTrackGame*>(g_TrackGame)->bladeRenderer)
+    if (reinterpret_cast<EcoTrackGameView*>(g_TrackGame)->bladeRenderer)
         ECO_VIEW->SetRenderState(D3DRENDERSTATE_TEXTUREPERSPECTIVE, 0, 0);
     if (billboardCount) {
         definitionTable[vegetation[0].definitionIndex]->billboardTexture->Bind();
@@ -744,7 +744,7 @@ int EcoSystem::Render3D() {
                     float x = object->quantizedPosition.x * g_EcoSystem->unitsPerCoordinate;
                     float y = object->quantizedPosition.y * g_EcoSystem->unitsPerCoordinate;
                     float z = object->quantizedPosition.z * g_EcoSystem->unitsPerCoordinate;
-#define VERTEX(o) (*(UnknownEcoVertex*)((char*)billboardVertices + (o)))
+#define VERTEX(o) (*(EcoLitVertex*)((char*)billboardVertices + (o)))
                     VERTEX(offset0).position.x = uRightWidth * cosine + x;
                     VERTEX(offset3).position.x = VERTEX(offset0).position.x;
                     VERTEX(offset1).position.x = x - uLeftWidth * cosine;
@@ -840,35 +840,35 @@ int EcoSystem::Render3D() {
         }
     }
     s_renderTicks = ReadClock() - start;
-    UnknownEcoDebugOverlay* overlay = reinterpret_cast<UnknownEcoTrackGame*>(g_TrackGame)->debugOverlay;
+    EcoDebugOverlayView* overlay = reinterpret_cast<EcoTrackGameView*>(g_TrackGame)->debugOverlay;
     if (overlay) {
         if (s_debugPage < 0)
             { int page = overlay->nextPage++; s_debugPage = page; }
         s_prepareGeometryPeak.Record(s_prepareGeometryTicks);
         s_renderPeak.Record(s_renderTicks);
-        reinterpret_cast<UnknownEcoTrackGame*>(g_TrackGame)->debugOverlay->Title(s_debugPage, "Ecosystem:%d objects", totalObjects);
-        reinterpret_cast<UnknownEcoTrackGame*>(g_TrackGame)->debugOverlay->Print(s_debugPage, "Visible  2D %d 3D %d", billboardCount,
+        reinterpret_cast<EcoTrackGameView*>(g_TrackGame)->debugOverlay->Title(s_debugPage, "Ecosystem:%d objects", totalObjects);
+        reinterpret_cast<EcoTrackGameView*>(g_TrackGame)->debugOverlay->Print(s_debugPage, "Visible  2D %d 3D %d", billboardCount,
                                                        geometryCount);
-        reinterpret_cast<UnknownEcoTrackGame*>(g_TrackGame)->debugOverlay->Print(s_debugPage, "Rendered 2D %d 3D %d",
+        reinterpret_cast<EcoTrackGameView*>(g_TrackGame)->debugOverlay->Print(s_debugPage, "Rendered 2D %d 3D %d",
                                                        s_billboardsDrawn, s_geometryDrawn);
-        reinterpret_cast<UnknownEcoTrackGame*>(g_TrackGame)->debugOverlay->Print(s_debugPage, "Memory %d",
+        reinterpret_cast<EcoTrackGameView*>(g_TrackGame)->debugOverlay->Print(s_debugPage, "Memory %d",
                                                        g_MemTagStack->GetBytes("EcoSystem"));
-        reinterpret_cast<UnknownEcoTrackGame*>(g_TrackGame)->debugOverlay->Print(s_debugPage, "PrepareGeometry %d %d",
+        reinterpret_cast<EcoTrackGameView*>(g_TrackGame)->debugOverlay->Print(s_debugPage, "PrepareGeometry %d %d",
                                                        s_prepareGeometryTicks, s_prepareGeometryPeak.Peak());
-        reinterpret_cast<UnknownEcoTrackGame*>(g_TrackGame)->debugOverlay->Print(s_debugPage, "Render %d(3d:%d) %d",
+        reinterpret_cast<EcoTrackGameView*>(g_TrackGame)->debugOverlay->Print(s_debugPage, "Render %d(3d:%d) %d",
                                                        s_renderTicks, s_geometryRenderTicks,
                                                        s_renderPeak.Peak());
-        reinterpret_cast<UnknownEcoTrackGame*>(g_TrackGame)->debugOverlay->Print(s_debugPage, "Total Transforms %d",
+        reinterpret_cast<EcoTrackGameView*>(g_TrackGame)->debugOverlay->Print(s_debugPage, "Total Transforms %d",
                                                        ECO_VIEW->verticesDrawn - verticesBefore);
-        reinterpret_cast<UnknownEcoTrackGame*>(g_TrackGame)->debugOverlay->Print(s_debugPage, "Total Triangles  %d",
+        reinterpret_cast<EcoTrackGameView*>(g_TrackGame)->debugOverlay->Print(s_debugPage, "Total Triangles  %d",
                                                        ECO_VIEW->trianglesDrawn - trianglesBefore);
     }
     g_MemTagStack->Pop(category);
     ECO_VIEW->SetRenderState(D3DRENDERSTATE_SHADEMODE, savedShadeMode, 0);
     ECO_VIEW->SetRenderState(D3DRENDERSTATE_TEXTUREPERSPECTIVE, savedPerspective, 0);
-    ECO_VIEW->SetTextureStageState(0, D3DTSS_MAGFILTER, reinterpret_cast<UnknownEcoTrackGame*>(g_TrackGame)->magFilter);
-    ECO_VIEW->SetTextureStageState(0, D3DTSS_MINFILTER, reinterpret_cast<UnknownEcoTrackGame*>(g_TrackGame)->minFilter);
-    ECO_VIEW->SetTextureStageState(0, D3DTSS_MIPFILTER, reinterpret_cast<UnknownEcoTrackGame*>(g_TrackGame)->mipFilter);
+    ECO_VIEW->SetTextureStageState(0, D3DTSS_MAGFILTER, reinterpret_cast<EcoTrackGameView*>(g_TrackGame)->magFilter);
+    ECO_VIEW->SetTextureStageState(0, D3DTSS_MINFILTER, reinterpret_cast<EcoTrackGameView*>(g_TrackGame)->minFilter);
+    ECO_VIEW->SetTextureStageState(0, D3DTSS_MIPFILTER, reinterpret_cast<EcoTrackGameView*>(g_TrackGame)->mipFilter);
     ECO_VIEW->DisableAlphaTest();
     return GameObject::Render3D();
 }

@@ -85,7 +85,7 @@ struct UnknownFollowCameraPoint {
 
 // Object at FollowCamera+0x240: the Terrain (QueryGround is Terrain::QueryGround 0x00507c10);
 // slots 43/44 test its +0xbe8, which Terrain::Load reads from the file header.
-struct UnknownFollowCameraSubject {
+struct FollowCameraTerrainView {
     // 0x00507c10: adjusts *point (KrustyBikeCamera slot 52 reads its new y).
     void QueryGround(Vector3* point, int a, int b, int c);
 
@@ -230,7 +230,7 @@ public:
     bool AppendTableEntry(const Vector3& position, float distanceRate, float raiseRate,
                           float lowerRate, float tiltRate, float yawRate);
     // 0x00463600: stores the subject and copies its +0x40.
-    void SetSubject(UnknownFollowCameraSubject* subject);
+    void SetSubject(FollowCameraTerrainView* subject);
 
 protected:
     friend class VCRDlg;        // InGameProcs.cpp: ButCamera restores the saved state
@@ -243,7 +243,7 @@ protected:
     float followYaw;                          // +0x234 yaw slot 49 adds to +0x308 / +0x23c; presets in slots 63-67
     float initialYaw;                         // +0x238 copy of followYaw
     float worldYaw;  // +0x23C  slot 49 non-orbit: rotates world Z by followYaw + it; re-based from the orbit yaw, slot 39 added
-    UnknownFollowCameraSubject* subject;      // +0x240 (0x00463600 SetSubject)
+    FollowCameraTerrainView* subject;      // +0x240 (0x00463600 SetSubject)
     int cameraState;                 // +0x244, current state (slots 70-72, 75)
     int savedCameraState;            // +0x248, saved state (slot 70)
     float savedFieldOfView;          // +0x24c, saved targetFieldOfView (slot 70)

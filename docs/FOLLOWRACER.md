@@ -42,7 +42,7 @@ provisional (proximity only).
 - `0x004a9d20` runs on the network host only. It counts racers whose +0x4a0
   is clear: none -> the view's own racer (+0x38 of the race view), one ->
   that racer, more -> a `rand()`-picked index skipping flagged racers (at
-  most `count` retries). It sends message 0x87 (`UnknownBikeRaceVcrFollow`,
+  most `count` retries). It sends message 0x87 (`VcrFollowRecord`,
   12 bytes, the racer's +0x11bc id) to the local player and, when a replay
   is being recorded, queues the same record.
 - `0x004a9e80` switches the followed racer: the previous racer banks its
@@ -90,7 +90,7 @@ entries. Shared headers touched for this unit: `RaceView.h`
 (`SendFollowedRacer`/`IgnoreCollisionsWith`, `UnknownScoreBoard`, race
 view +0xbc), `TrackGame.h` (ball fields +0x10a/+0x708, the method
 declarations, view owner +0xac as an int/float union) and `BikeRace.h`
-(`TagBallStateDelta`, `UnknownBikeRaceVcrFollow`, the ball state's
+(`TagBallStateDelta`, `VcrFollowRecord`, the ball state's
 float fields). The racer's slot 50 is viewed by a struct local to the
 near-miss sample: 50 placeholder slots in `RaceView.h` flipped a register
 choice in TrackGame slot 1 (`0x00520ab0`, header-content chaos; removing

@@ -106,7 +106,7 @@ struct UnknownWreckerParticle {
 // Particle system at Wrecker+0x11c (Bike hands over its own; RTTI
 // ParticleManager). 0x004baa50 (thiscall, ret 0x20) adds one particle;
 // 0x00531740 takes the next free entry of particles itself.
-class UnknownWreckerParticles : public GameObject {
+class WreckerParticleManagerView : public GameObject {
 public:
     int AddParticle(float age, const Vector3* position, int frame, float size,
                               float lifetime, float growth, unsigned int flags, int color);
@@ -194,7 +194,7 @@ public:
     int* probeHits;            // +0x108 one per collision-model probe
     Vector3 pushImpulse;       // +0x10c
     float pushScale;           // +0x118
-    UnknownWreckerParticles* particles; // +0x11c
+    WreckerParticleManagerView* particles; // +0x11c
     int trailFrame;            // +0x120 particle frame, cycles 0..12
     int sprayFrame;            // +0x124
     float randomTable[256];    // +0x128 random values in [0, 1)

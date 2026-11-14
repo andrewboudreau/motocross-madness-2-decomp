@@ -69,7 +69,7 @@ BaseQuarryEvent::BaseQuarryEvent(int flags) : GameObject(flags) {
 }
 
 // 0x004de3b0
-BaseQuarryEvent* BaseQuarryEvent::Create(RenderTarget* target, UnknownProgressCallback progress) {
+BaseQuarryEvent* BaseQuarryEvent::Create(RenderTarget* target, LoadProgressFn progress) {
     GameObject::SetRenderContext(target);
     g_MemTagStack->ReportTotals("entering BaseQuarryEvent::Create");
     if (!LoadEventObjects(progress)) {
@@ -209,7 +209,7 @@ void BaseQuarryEvent::CreateOverlays() {
 
     instrumentOverlay = new(__FILE__, 1412) InstrumentOverlay(g_TrackGame->mode.instrumentOverlayOn);
     instrumentOverlay = instrumentOverlay->Setup((RenderTarget*)renderContext, g_TrackGame->textureManager,
-                                                   (UnknownInstrumentSource*)raceCamera);
+                                                   (InstrumentKrustyBikeCameraView*)raceCamera);
     if (!instrumentOverlay)
         sprintf(message, "Instrument Overlay not created.\n");
 

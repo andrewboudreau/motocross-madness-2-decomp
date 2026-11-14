@@ -33,7 +33,7 @@ class TextureMapManager;
 
 // IDirectDrawClipper-shaped interface at GUIManager+0x3dc (created through
 // Display+0x190's method 4, handed to Display+0x19c's method 28).
-struct UnknownGuiClipper {
+struct GuiDirectDrawClipper {
     virtual long __stdcall QueryInterface();
     virtual long __stdcall AddRef();
     virtual long __stdcall Release();                          // Release
@@ -47,16 +47,16 @@ struct UnknownGuiClipper {
 
 // The two methods 0x004868b0 calls on Display+0x190 and Display+0x19c
 // (RenderInterfaces.h keeps their slots argument-less).
-struct UnknownGuiDirectDraw {
+struct GuiDirectDraw {
     virtual long __stdcall QueryInterface();
     virtual long __stdcall AddRef();
     virtual long __stdcall Release();
     virtual long __stdcall Compact();
-    virtual long __stdcall CreateClipper(unsigned long flags, UnknownGuiClipper** clipper,
+    virtual long __stdcall CreateClipper(unsigned long flags, GuiDirectDrawClipper** clipper,
                                           void* outer);              // CreateClipper
 };
 
-struct UnknownGuiSurface {
+struct GuiDirectDrawSurface {
     virtual long __stdcall QueryInterface();
     virtual long __stdcall AddRef();
     virtual long __stdcall Release();
@@ -85,26 +85,26 @@ struct UnknownGuiSurface {
     virtual long __stdcall Lock();
     virtual long __stdcall ReleaseDC();
     virtual long __stdcall Restore();
-    virtual long __stdcall SetClipper(UnknownGuiClipper* clipper); // SetClipper
+    virtual long __stdcall SetClipper(GuiDirectDrawClipper* clipper); // SetClipper
 };
 
 // The fog object 0x00484f10 finds by name ("GroundFog") under Game+0x34.
 // Only the members it reads are declared; its class is not established.
-struct UnknownGroundFogCamera {
+struct GroundFogCameraView {
     unsigned char field_0x000[0x170];
     float eyeX;                               // +0x170 eye position
     float eyeY;                               // +0x174
     float eyeZ;                               // +0x178
 };
 
-struct UnknownGroundFogOwner {
+struct GroundFogRenderTargetView {
     unsigned char field_0x00[0x08];
-    UnknownGroundFogCamera* currentCamera;    // +0x08
+    GroundFogCameraView* currentCamera;    // +0x08
 };
 
-struct UnknownGroundFog {
+struct GroundFogView {
     unsigned char field_0x00[0x18];
-    UnknownGroundFogOwner* renderContext;     // +0x18 GameObject+0x18
+    GroundFogRenderTargetView* renderContext;     // +0x18 GameObject+0x18
     unsigned char field_0x1c[0x30 - 0x1c];
     float planeHeight;                        // +0x30: fog plane height (compared with each vertex's y)
     float depthLimit;                         // +0x34
@@ -114,7 +114,7 @@ struct UnknownGroundFog {
 };
 
 // A 0x20-byte lit vertex (D3DLVERTEX layout): position, colour, specular.
-struct UnknownFogVertex {
+struct GroundFogVertex {
     float x;
     float y;
     float z;
@@ -127,11 +127,11 @@ struct UnknownFogVertex {
 
 // The object whose first member 0x00484f10 caches the fog in (0 before
 // the lookup, 1 when there is none). Its class is not established.
-struct UnknownGroundFogShader {
+struct GroundFogCacheOwner {
     // 0x00484f10: fogs `count` vertices by their depth below the fog plane.
-    void FogVertices(UnknownFogVertex* vertices, int count);
+    void FogVertices(GroundFogVertex* vertices, int count);
 
-    UnknownGroundFog* groundFog;              // +0x00: FindByClassName(1, "GroundFog"), or 1 when none
+    GroundFogView* groundFog;              // +0x00: FindByClassName(1, "GroundFog"), or 1 when none
 };
 
 // Cursor animation passed to GUICursor 0x00485150 (GUIUser+0x1c8). Its
@@ -160,15 +160,15 @@ public:
 };
 
 // A dialog control as GUIUser and ToolTip see it. Never constructed as such.
-class UnknownGuiControl : public GameObject {
+class GuiControlView : public GameObject {
 public:
     virtual void AdvanceImages();
     virtual void ContainsPoint();
     virtual void SetState();
     virtual void IsInteractive();
     virtual int EnterHover();       // takes the focus; 0 refuses it
-    virtual void LeaveHover(UnknownGuiControl* next);
-    virtual void KillFocus(UnknownGuiControl* next);
+    virtual void LeaveHover(GuiControlView* next);
+    virtual void KillFocus(GuiControlView* next);
 
     unsigned char field_0x2c[0x3c - 0x2c];
     CameraRect area;                          // +0x3c: area
@@ -207,7 +207,7 @@ public:
     virtual int RenderPost3D();               // 0x00486db0
 
     ToolTip* Create(void* target, GUIManager* gui); // 0x00486a10
-    void ShowControlToolTip(UnknownGuiControl* control); // 0x00486b10: control's text at the pointer or below it
+    void ShowControlToolTip(GuiControlView* control); // 0x00486b10: control's text at the pointer or below it
     // 0x00486b80: shows `text` near `position` for `time` seconds.
     void ShowText(const char* text, int* position, float time);
 

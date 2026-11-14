@@ -7,8 +7,8 @@
 #include "../../src/reconstructed/EcoSystem.h"
 #else
 #include "../../src/reconstructed/FollowCamera.h"
-typedef char CameraTerrainCell[offsetof(UnknownFollowCameraSubject, gridCellSize) == offsetof(Terrain, gridCellSize) ? 1 : -1];
-typedef char CameraTerrainFlag[offsetof(UnknownFollowCameraSubject, field_0xbe8) == offsetof(Terrain, field_0xbe8) ? 1 : -1];
+typedef char CameraTerrainCell[offsetof(FollowCameraTerrainView, gridCellSize) == offsetof(Terrain, gridCellSize) ? 1 : -1];
+typedef char CameraTerrainFlag[offsetof(FollowCameraTerrainView, field_0xbe8) == offsetof(Terrain, field_0xbe8) ? 1 : -1];
 typedef char VectorSize[sizeof(Vector3) == 12 && sizeof(TerrainVec3) == 12 ? 1 : -1];
 typedef char VectorX[offsetof(Vector3, x) == 0 && offsetof(TerrainVec3, x) == 0 ? 1 : -1];
 typedef char VectorY[offsetof(Vector3, y) == 4 && offsetof(TerrainVec3, y) == 4 ? 1 : -1];

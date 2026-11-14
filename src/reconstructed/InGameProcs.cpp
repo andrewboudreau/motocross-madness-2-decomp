@@ -28,14 +28,14 @@ void ExitDlg::HandleEvent(DialogEvent* event) {
         if (!_stricmp("ButMiddle", event->controlName)) {
             guiManager->ShowCursors(0);
             if (!g_TrackGame->uiInteractionBlocked) {
-                UnknownKrustyBikeView* view = g_TrackGame->eventManager->FindRaceView();
+                EventBikeRaceView* view = g_TrackGame->eventManager->FindRaceView();
                 if (view && !view->localRacer->hasFinished) {
                     reinterpret_cast<BikeRace*>(view)->RestartRace(1, 0, 0);
                     g_TrackGame->SetMenuOpen(0, kMenuExit, 1);
                 }
             }
         } else if (!_stricmp("ButLeft", event->controlName)) {
-            UnknownKrustyBikeView* view = g_TrackGame->eventManager->FindRaceView();
+            EventBikeRaceView* view = g_TrackGame->eventManager->FindRaceView();
             if (view && g_TrackGame->mode.raceSettings.raceMode == 4 && view->ghostLap > 0) {
                 ChoiceDlg* dialog = new(__FILE__, 66) ChoiceDlg;
                 guiManager->ShowDialog((UIDialog*)dialog, 0, 4, 0,
@@ -71,7 +71,7 @@ void ExitDlg::HandleEvent(DialogEvent* event) {
         control->SetTextFromResource(g_TrackGame->resourceInstance, 0x13d9);
         control = FindControl("ButMiddle", 1);
         control->SetTextFromResource(g_TrackGame->resourceInstance, 0x13da);
-        UnknownKrustyBikeView* view = g_TrackGame->eventManager->FindRaceView();
+        EventBikeRaceView* view = g_TrackGame->eventManager->FindRaceView();
         if (g_TrackGame->network || view->localRacer->hasFinished ||
             g_TrackGame->mode.raceSettings.raceMode == 4)
             control->Show(0, 1);
@@ -134,7 +134,7 @@ void FormatTime(char* text, float seconds) {
 
 // 0x00488c90
 void VCRDlg::HandleEvent(DialogEvent* event) {
-    UnknownKrustyBikeView* view = g_TrackGame->eventManager->FindRaceView();
+    EventBikeRaceView* view = g_TrackGame->eventManager->FindRaceView();
     switch (event->kind) {
     case kDialogInit:
         leftForMenu = 0;
@@ -238,7 +238,7 @@ void VCRDlg::HandleEvent(DialogEvent* event) {
             }
         } else if (!_stricmp("ButPrevRider", event->controlName) ||
                    !_stricmp("ButNextRider", event->controlName)) {
-            UnknownKrustyBikeView* racers =
+            EventBikeRaceView* racers =
                 g_TrackGame->eventManager->FindRaceMode()->raceView;
             if (!_stricmp("ButPrevRider", event->controlName))
                 racers->NextCameraTarget(1, 1, 0);
@@ -264,7 +264,7 @@ void VCRDlg::HandleEvent(DialogEvent* event) {
     case 16:
         if (!_stricmp("SliderTime", event->controlName)) {
             float fraction = static_cast<UIScrollBar*>(event->control)->GetScrollValue() / 1000.0f;
-            UnknownKrustyBikeView* replay = g_TrackGame->eventManager->FindRaceView();
+            EventBikeRaceView* replay = g_TrackGame->eventManager->FindRaceView();
             replay->replaySeekTarget = fraction * replay->replayVcr->replayLength;
         }
         break;
@@ -285,7 +285,7 @@ int VCRDlg::Tick(float frameTime) {
     char text[32];
     guiManager->ShowCursors(1);
     UIScrollBar* slider = static_cast<UIScrollBar*>(FindControl("SliderTime", 8));
-    UnknownKrustyBikeView* view = g_TrackGame->eventManager->FindRaceView();
+    EventBikeRaceView* view = g_TrackGame->eventManager->FindRaceView();
     UIControl* control = FindControl("TxtTime", 12);
     FormatTime(text, view->replayTime);
     control->SetText(text);
@@ -301,7 +301,7 @@ int VCRDlg::Tick(float frameTime) {
 
 // 0x004894c0
 void VCRDlg::ShowReplayMode() {
-    UnknownKrustyBikeView* view = g_TrackGame->eventManager->FindRaceView();
+    EventBikeRaceView* view = g_TrackGame->eventManager->FindRaceView();
     UIMultiState* play = static_cast<UIMultiState*>(FindControl("TogPlay", 2));
     UIMultiState* pause = static_cast<UIMultiState*>(FindControl("TogPause", 2));
     UIMultiState* reverse = static_cast<UIMultiState*>(FindControl("TogReverse", 2));

@@ -38,13 +38,13 @@ int AdvanceGate(Vector3* from, Vector3* to, RaceGate** current, RaceGate* first,
                           unsigned short* laps, float* lapTime, float* bestLap, float* lapStart, char* finished,
                           int lapLimit, int unlimited, int skipTest, int forced);
 // 0x004e5c70: whether `list` has a node for `racer`.
-int HasStatusNode(RaceStatusNode* list, UnknownEventRacer* racer);  // 0x004e5c70
+int HasStatusNode(RaceStatusNode* list, EventKrustyBikeView* racer);  // 0x004e5c70
 // 0x004e5ca0: frees the nodes of racers whose GameObject +0x25 bit 0 is
 // clear, detaching them from their racers.
 int PruneStatusList(RaceStatusNode** list);  // 0x004e5ca0
 // 0x004e5d00: builds `*list` for `view`: its own racer, then (in some race
 // modes) the AI racers, then the other racers.
-int BuildStatusList(RaceStatusNode** list, UnknownKrustyBikeView* view);  // 0x004e5d00
+int BuildStatusList(RaceStatusNode** list, EventBikeRaceView* view);  // 0x004e5d00
 // 0x004e5f10: frees every node of `list`.
 int FreeStatusList(RaceStatusNode* list);  // 0x004e5f10
 // 0x004e5f40: track distances to `probe`, then orders `*list` by laps and

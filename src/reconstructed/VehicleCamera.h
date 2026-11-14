@@ -5,14 +5,14 @@
 class SoultreeObject;
 
 // An entry of the vehicle's +0x53c list (VehicleCamera slot 35).
-struct UnknownCameraRider {
+struct VehicleCameraWheelView {
     unsigned char field_0x000[0x150];
     float penetration;                        // +0x150  VehicleWheel penetration (CollisionPoint+0x98, reset to -999); slot 35 lifts the camera while it is above -0.5
     unsigned char field_0x154[0x2a8 - 0x154];
     int aux;  // +0x2A8  element of Vehicle+0x53c wheelList = VehicleWheel, whose +0x2a8 is aux (counted by auxWheelCount)
 };
 
-struct UnknownCameraVehicle {
+struct VehicleCameraVehicleView {
     unsigned char field_0x000[0x48];
     float savedRoll;                          // +0x48 VehicleCamera slot 51; krusty2 SoultreePhysicsBaseObject
     float savedPitch;                         // +0x4c VehicleCamera slot 35 pitch angle
@@ -38,7 +38,7 @@ struct UnknownCameraVehicle {
     Vector3 takeoffPosition;                  // +0x488 0x0052bc50 in vehicle mode
     Vector3 takeoffVelocity;                  // +0x494 0x0052bac0 in vehicle mode
     unsigned char field_0x4a0[0x53c - 0x4a0];
-    UnknownCameraRider** riders;              // +0x53c riders (VehicleCamera slot 35)
+    VehicleCameraWheelView** riders;              // +0x53c riders (VehicleCamera slot 35)
     int wheelCapacity;                        // +0x540
     int riderCount;                           // +0x544 rider count
     unsigned char field_0x548[0x56c - 0x548];
@@ -46,7 +46,7 @@ struct UnknownCameraVehicle {
 
     // Inlined by VehicleCamera slot 35: the first rider with +0x2a8 set
     // when +0x56c asks for one, else the first rider.
-    UnknownCameraRider* UnknownInlineRider() {
+    VehicleCameraWheelView* PickCameraWheel() {
         if (auxWheelCount) {
             for (int i = 0; i < riderCount; i++) {
                 if (riders[i]->aux)
@@ -58,14 +58,14 @@ struct UnknownCameraVehicle {
 };
 
 // Optional targets at VehicleCamera+0x384 / +0x388 (slot 33).
-struct UnknownCameraTargetA {
+struct VehicleCameraCharacterTargetView {
     unsigned char field_0x000[0x1a0];
     SoultreeObject* modelNode;       // +0x1a0 0x0052bb60; the characters' model node (krusty2 Character)
     unsigned char field_0x1a4[0x224 - 0x1a4];
     Vector3 nodeVelocity;                // +0x224 krusty2 CollisionCharacter::nodeVelocity
 };
 
-struct UnknownCameraTargetB {
+struct VehicleCameraCarProceduralView {
     unsigned char field_0x00[0x34];
     SoultreeObject* carModel;  // +0x34  camera +0x388 is a scene procedural entry (CarProcedural, BikeRace TargetObject); CarProcedural +0x34 carModel
     unsigned char field_0x38[0x40 - 0x38];
@@ -125,13 +125,13 @@ public:
     }
 
 protected:
-    UnknownCameraTargetA* targetCharacter;  // +0x384  BikeRace TargetCharacter stores a key-framed scene character; slots 33/41/TargetPoint read its node
-    UnknownCameraTargetB* targetCar;  // +0x388  BikeRace TargetObject stores a scene procedural object (CarProcedural)
+    VehicleCameraCharacterTargetView* targetCharacter;  // +0x384  BikeRace TargetCharacter stores a key-framed scene character; slots 33/41/TargetPoint read its node
+    VehicleCameraCarProceduralView* targetCar;  // +0x388  BikeRace TargetObject stores a scene procedural object (CarProcedural)
     SoultreeObject* targetCaster;  // +0x38C  BikeRace view +0x38c shadowCaster (TargetCaster); TargetPoint takes its translation
     bool vehicleMode;                    // +0x390, vehicle mode
     unsigned char targetPointCached;     // +0x391 cachedTargetPoint is valid (cleared on a new target)
     unsigned char targetHeadingCached;   // +0x392 cachedTargetHeading is valid
-    UnknownCameraVehicle* vehicle;       // +0x394
+    VehicleCameraVehicleView* vehicle;       // +0x394
     Vector3 cachedTargetHeading;         // +0x398 slot 33's value
     Vector3 cachedTargetPoint;           // +0x3a4 TargetPoint's value
 };

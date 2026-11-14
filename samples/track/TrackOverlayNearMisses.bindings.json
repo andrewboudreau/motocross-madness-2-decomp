@@ -17,10 +17,10 @@
   "??_C@_0O@KFEA@?$CFd?$CJ?5?$CFs?5?3?5?$CF?40f?$AA@": "0x00575204",
   "?AppendChild@GameObject@@QAEHPAV1@H@Z": "0x00469190",
   "?Attach@Overlay@@QAEPAV1@PAVRenderTarget@@PAVTextureMap@@PBUOverlayRect@@H2MDPBDPAPBDHHH@Z": "0x004b5f50",
-  "?CollectRacers@ChatOverlay@@QAEHPAUUnknownChatView@@@Z": "0x0051d730",
-  "?CollectRacers@ChatOverlay@@QAEHPAUUnknownChatView@@@Z$ehhandler": "0x0054ed6e",
+  "?CollectRacers@ChatOverlay@@QAEHPAUChatBikeRaceView@@@Z": "0x0051d730",
+  "?CollectRacers@ChatOverlay@@QAEHPAUChatBikeRaceView@@@Z$ehhandler": "0x0054ed6e",
   "?CompareScoresDescending@@YAHPBX0@Z": "0x005199f0",
-  "?Create@NameOverlay@@QAEPAV1@PAVRenderTarget@@PAVTextureMap@@PBUOverlayRect@@H2PAUUnknownEventRacer@@PAUUnknownNameOverlayWorld@@H@Z": "0x00518e30",
+  "?Create@NameOverlay@@QAEPAV1@PAVRenderTarget@@PAVTextureMap@@PBUOverlayRect@@H2PAUEventKrustyBikeView@@PAUNameOverlayEventView@@H@Z": "0x00518e30",
   "?DebugCalloc@@YAPAXIIPBDH@Z": "0x004a2fc0",
   "?DebugFree@@YAXPAXPBDH@Z": "0x004a2e60",
   "?DrawGates@RadarOverlay@@QAEXXZ": "0x0051cb20",
@@ -33,8 +33,8 @@
   "?IntersectLineCircle@RadarOverlay@@QAEHPBM00PAM1@Z": "0x0051c4f0",
   "?LineThrough@RadarOverlay@@QAEHPBM0PAM11@Z": "0x0051c460",
   "?LoadResourceString@TrackGame@@QAEHHPADH@Z": "0x00521970",
-  "?NextBike@UnknownChatView@@QAEPAUUnknownChatRacer@@PAH@Z": "0x004204e0",
-  "?NextBike@UnknownKrustyBikeView@@QAEPAUUnknownEventRacer@@PAH@Z": "0x004204e0",
+  "?NextBike@ChatBikeRaceView@@QAEPAUChatKrustyBikeView@@PAH@Z": "0x004204e0",
+  "?NextBike@EventBikeRaceView@@QAEPAUEventKrustyBikeView@@PAH@Z": "0x004204e0",
   "?RedrawNameTags@ChatOverlay@@QAEXH@Z": "0x0051e910",
   "?RestoreRect@Overlay@@QAEHPBUOverlayRect@@@Z": "0x004b6710",
   "?SetAddressModes@TextureMap@@QAEHHH@Z": "0x0050abd0",
@@ -65,5 +65,5 @@
   "_s_UnknownGlobal68a444": "0x0068a444",
   "_sprintf": "0x00534aaf",
   "?TerrainLoadTexture@@YAPAVTextureMap@@PAVTextureMapManager@@PBDHPAVPalette8@@HHHPAUTextureContext@@HIHH@Z": "0x0050a590",
-  "?NextBike@BikeRace@@QAEPAVUnknownBikeRaceRacer@@PAH@Z": "0x004204e0"
+  "?NextBike@BikeRace@@QAEPAVBikeRaceKrustyBikeView@@PAH@Z": "0x004204e0"
 }

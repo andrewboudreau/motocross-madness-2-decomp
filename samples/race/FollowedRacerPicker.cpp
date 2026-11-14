@@ -18,15 +18,15 @@ void TrackGameViewOwner::PickFollowedRacer()
     int racing = 0;
     int iterator = 0;
     int tries = 0;
-    UnknownEventRacer* last = 0;
-    UnknownEventRacer* racer = reinterpret_cast<UnknownEventRacer*>(
+    EventKrustyBikeView* last = 0;
+    EventKrustyBikeView* racer = reinterpret_cast<EventKrustyBikeView*>(
             reinterpret_cast<BikeRace*>(raceView)->NextBike(&iterator));
     while (racer) {
         if (racer->outOfRace == 0) {
             last = racer;
             racing++;
         }
-        racer = reinterpret_cast<UnknownEventRacer*>(
+        racer = reinterpret_cast<EventKrustyBikeView*>(
             reinterpret_cast<BikeRace*>(raceView)->NextBike(&iterator));
     }
     if (racing == 0) {
@@ -35,7 +35,7 @@ void TrackGameViewOwner::PickFollowedRacer()
         followedRacer = last;
     } else {
         // Retail keeps this view across rand(), then reads its slot array.
-        UnknownKrustyBikeView* selectionView = raceView;
+        EventBikeRaceView* selectionView = raceView;
         int count = selectionView->racerCount;
         int index = (int)(UNKNOWN_RANDOM_UNIT() * count);
         while (selectionView->racerSlots[index]->outOfRace == 1 && tries < count) {
@@ -46,7 +46,7 @@ void TrackGameViewOwner::PickFollowedRacer()
         }
         followedRacer = selectionView->racerSlots[index];
     }
-    UnknownBikeRaceVcrFollow follow;
+    VcrFollowRecord follow;
     follow.request = 0;
     follow.followedRacerId = followedRacer->networkPlayerId;
     g_TrackGame->network->Send(0x87, &follow, sizeof(follow), g_TrackGame->network->localPlayer, 0);

@@ -1,5 +1,5 @@
 {
-  "?WriteRelativePositions@UnknownKrustyBikeView@@QAEXPAUVector3@@0PAXH@Z": "0x004210f0",
+  "?WriteRelativePositions@EventBikeRaceView@@QAEXPAUVector3@@0PAXH@Z": "0x004210f0",
   "?Tick@FollowCamera@@UAEHM@Z": "0x00465c20",
   "?BuildOrientationBasis@FollowCamera@@UAEXPAUVector3@@0@Z": "0x004654e0",
   "?PlayRecordedFrame@FollowCamera@@UAE_NMPBUVector3@@@Z": "0x00465720",

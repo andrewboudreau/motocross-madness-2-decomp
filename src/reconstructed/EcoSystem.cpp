@@ -68,7 +68,7 @@ static inline float EcoSquareMagnitude(const Vector3* v) {
 
 // The view (RenderTarget.h) the object was attached to, GameObject+0x18.
 
-#define ECO_VIEW ((UnknownEcoRenderTarget*)renderContext)
+#define ECO_VIEW ((EcoRenderTargetView*)renderContext)
 
 #define ECO_RGBA(r, g, b, a) ((unsigned int)(((a) << 24) | ((r) << 16) | ((g) << 8) | (b)))
 
@@ -155,7 +155,7 @@ int VegetationDefinition::LoadModel(TextureMapManager* textures, int modelFlags)
     char path[0x104];
     char section[0x80];
     if (billboardName[0]) {
-        billboardTexture = reinterpret_cast<UnknownEcoTexture*>(TerrainLoadTexture(textures, billboardName, modelFlags, 0, 2, 5, 6, 0, 0x80, 0xff00ff, 1, 1));
+        billboardTexture = reinterpret_cast<EcoTextureMapView*>(TerrainLoadTexture(textures, billboardName, modelFlags, 0, 2, 5, 6, 0, 0x80, 0xff00ff, 1, 1));
         if (!billboardTexture->IsResident())
             billboardTexture->CreateTextureSurface(1, 0, 0);
     }
@@ -173,10 +173,10 @@ int VegetationDefinition::LoadModel(TextureMapManager* textures, int modelFlags)
             block->SelectSection("Material - 0");
             block->ReadString("TextureMap", path, -1);
             int format = 1555;
-            if (!reinterpret_cast<UnknownEcoTrackGame*>(g_TrackGame)->bladeRenderer && (reinterpret_cast<UnknownEcoTrackGame*>(g_TrackGame)->display->driverColorKeyCaps & 8)
-                && reinterpret_cast<UnknownEcoTrackGame*>(g_TrackGame)->GetRegistryFlag("KeyColorTrees", 0))
-                format = reinterpret_cast<UnknownEcoTrackGame*>(g_TrackGame)->display->colorKeyFormat;
-            modelTexture = reinterpret_cast<UnknownEcoTexture*>(TerrainLoadTexture(textures, path, format, 0, 2, 5, 6, 0, 0x80, 0xff00ff, 1, 1));
+            if (!reinterpret_cast<EcoTrackGameView*>(g_TrackGame)->bladeRenderer && (reinterpret_cast<EcoTrackGameView*>(g_TrackGame)->display->driverColorKeyCaps & 8)
+                && reinterpret_cast<EcoTrackGameView*>(g_TrackGame)->GetRegistryFlag("KeyColorTrees", 0))
+                format = reinterpret_cast<EcoTrackGameView*>(g_TrackGame)->display->colorKeyFormat;
+            modelTexture = reinterpret_cast<EcoTextureMapView*>(TerrainLoadTexture(textures, path, format, 0, 2, 5, 6, 0, 0x80, 0xff00ff, 1, 1));
             if (!modelTexture->IsResident()) {
                 int loaded = modelTexture->pixelFormat;
                 if (loaded == 555 || loaded == 565 || loaded == 888 || loaded == 1555)
@@ -202,8 +202,8 @@ int VegetationDefinition::LoadModel(TextureMapManager* textures, int modelFlags)
                 block->GetInt("NumberOfVertices", 0, &modelVertexCount[lod]);
                 block->GetInt("NumberOfFaces", 0, &faces);
                 modelIndexCount[lod] = faces * 3;
-                modelVertices[lod] = (UnknownEcoModelVertex*)DebugMalloc(
-                    modelVertexCount[lod] * sizeof(UnknownEcoModelVertex) + faces * 3 * sizeof(unsigned short), __FILE__, 0x106);
+                modelVertices[lod] = (EcoModelVertex*)DebugMalloc(
+                    modelVertexCount[lod] * sizeof(EcoModelVertex) + faces * 3 * sizeof(unsigned short), __FILE__, 0x106);
                 modelIndices[lod] = (unsigned short*)(modelVertices[lod] + modelVertexCount[lod]);
                 sprintf(section, "LOD %d - Surface 0 - Vertices", lod);
                 block->BeginRows(section);
@@ -281,7 +281,7 @@ unsigned short Vegetation::ComputeSortKey() {
 }
 
 // 0x00456720
-unsigned int Vegetation::ComputeQuadTreeCode(UnknownEcoQuadTree* tree) {
+unsigned int Vegetation::ComputeQuadTreeCode(EcoQuadTreeView* tree) {
     float radius = g_EcoSystem->definitionTable[definitionIndex]->RadiusForParameter(radiusParam);
     float x = quantizedPosition.x * g_EcoSystem->unitsPerCoordinate;
     float z = quantizedPosition.z * g_EcoSystem->unitsPerCoordinate;
@@ -337,7 +337,7 @@ int EvictGeometry(void* owner, int context) {
 // AgeManager for eviction. The min/max of x are computed but unused.
 void Vegetation::SetBillboard(int billboard, int fade) {
     VegetationDefinition* definition = g_EcoSystem->definitionTable[definitionIndex];
-    UnknownEcoCamera* camera = ((UnknownEcoRenderTarget*)g_EcoSystem->renderContext)->camera;
+    EcoCameraView* camera = ((EcoRenderTargetView*)g_EcoSystem->renderContext)->camera;
     fadeLevel = (unsigned char)fade;
     if (billboard == isBillboard)
         return;
@@ -354,7 +354,7 @@ void Vegetation::SetBillboard(int billboard, int fade) {
         g_EcoSystem->ageManager->Register(entry, EvictGeometry, this, 0,
                                                                   dwords * 4 + sizeof(AgeEntry));
         g_UnknownGlobal59af0c++;
-        memcpy((UnknownEcoVertex*)geometryBlock + vertexCount, definition->modelIndices[billboard], indexCount * 2);
+        memcpy((EcoLitVertex*)geometryBlock + vertexCount, definition->modelIndices[billboard], indexCount * 2);
         float radiusScale = definition->RadiusForParameter(radiusParam) * definition->modelRadiusScale;
         float heightScale = definition->HeightForParameter(heightParam) * definition->modelHeightScale;
         float c;
@@ -378,13 +378,13 @@ void Vegetation::SetBillboard(int billboard, int fade) {
         float ambientB = g_EcoSystem->ambientLight.z;
         unsigned int ambientColor = ECO_RGBA((int)(ambientR * 255.0f), (int)(ambientG * 255.0f),
                                              (int)(ambientB * 255.0f), 255);
-        UnknownEcoModelVertex* source = definition->modelVertices[billboard];
+        EcoModelVertex* source = definition->modelVertices[billboard];
         int i;
         // Retail indexes the output vertex off `geometryBlock` and re-reads
         // the member before every store (the void* member aliases the
-        // stores); a walking `UnknownEcoVertex*` local compiles a different
+        // stores); a walking `EcoLitVertex*` local compiles a different
         // loop with a 0x4c frame.
-#define VERTEX ((UnknownEcoVertex*)geometryBlock)[i]
+#define VERTEX ((EcoLitVertex*)geometryBlock)[i]
         for (i = 0; i < vertexCount; i++) {
             int unlit = 0;
             Vector3 normal;
@@ -463,12 +463,12 @@ void Vegetation::SetBillboard(int billboard, int fade) {
 }
 
 // 0x00457000
-void Vegetation::DrawGeometry(UnknownEcoRenderTarget* target) {
+void Vegetation::DrawGeometry(EcoRenderTargetView* target) {
     VegetationDefinition* definition = g_EcoSystem->definitionTable[definitionIndex];
     definition->modelTexture->Bind();
     int vertexCount = definition->modelVertexCount[isBillboard];
     int indexCount = definition->modelIndexCount[isBillboard];
-    target->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, D3DFVF_LVERTEX, geometryBlock, vertexCount, (UnknownEcoVertex*)geometryBlock + vertexCount,
+    target->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, D3DFVF_LVERTEX, geometryBlock, vertexCount, (EcoLitVertex*)geometryBlock + vertexCount,
                                  indexCount, 0);
     g_EcoSystem->ageManager->MarkUsed(
         (AgeEntry*)((int*)geometryBlock + vertexCount * 8 + (indexCount + 1) / 2));
@@ -793,12 +793,12 @@ void EcoSystem::SetDetailLevel(int level) {
 }
 
 // 0x004594d0
-EcoSystem* EcoSystem::Create(void* view, TextureMapManager* textures, UnknownEcoTerrain* terrain,
+EcoSystem* EcoSystem::Create(void* view, TextureMapManager* textures, EcoTerrainView* terrain,
                                             LightManager* lights, char* path, FileStream* stream,
                                             int textureFormat, int collisions, int level) {
     int i;
     GameObject::SetRenderContext(view);
-    g_UnknownGlobal59af14 = reinterpret_cast<UnknownEcoTrackGame*>(g_TrackGame)->bladeRenderer ? g_UnknownGlobal56a600 : g_UnknownGlobal56a740;
+    g_UnknownGlobal59af14 = reinterpret_cast<EcoTrackGameView*>(g_TrackGame)->bladeRenderer ? g_UnknownGlobal56a600 : g_UnknownGlobal56a740;
     SetDetailLevel(level);
     groundTerrain = terrain;
     textureManager = textures;
@@ -831,7 +831,7 @@ EcoSystem* EcoSystem::Create(void* view, TextureMapManager* textures, UnknownEco
     geometryList = (Vegetation**)DebugMalloc(0x190, __FILE__, 0x5ed);
     billboardCapacity = 2000;
     geometryCapacity = 100;
-    billboardVertices = (UnknownEcoVertex*)DebugMalloc(0x5a00, __FILE__, 0x5f1);
+    billboardVertices = (EcoLitVertex*)DebugMalloc(0x5a00, __FILE__, 0x5f1);
     billboardIndices = (unsigned short*)DebugMalloc(0xb40, __FILE__, 0x5f2);
     for (i = 0; i < 720; i++) {
         billboardVertices[i].reserved = 0;
@@ -943,7 +943,7 @@ done:
 
 // 0x0045a9a0
 void EcoSystem::LightingChanged() {
-    UnknownEcoLight* light = reinterpret_cast<UnknownEcoLight*>(lightManager->FindLightOfType(6));
+    EcoLightEmitterView* light = reinterpret_cast<EcoLightEmitterView*>(lightManager->FindLightOfType(6));
     if (light) {
         ambientLight.x = light->colour[0];
         ambientLight.y = light->colour[1];
@@ -953,9 +953,9 @@ void EcoSystem::LightingChanged() {
         ambientLight.y = 0.0f;
         ambientLight.x = 0.0f;
     }
-    light = reinterpret_cast<UnknownEcoLight*>(lightManager->FindLightOfType(4));
+    light = reinterpret_cast<EcoLightEmitterView*>(lightManager->FindLightOfType(4));
     if (!light) {
-        light = reinterpret_cast<UnknownEcoLight*>(lightManager->FindLightOfType(2));
+        light = reinterpret_cast<EcoLightEmitterView*>(lightManager->FindLightOfType(2));
         if (!light) {
             lightColor.z = 0.0f;
             lightColor.y = 0.0f;
@@ -1018,7 +1018,7 @@ int EcoSystem::PrepareGeometry() {
                 center.x = object->quantizedPosition.x * g_EcoSystem->unitsPerCoordinate;
                 center.y = object->quantizedPosition.y * g_EcoSystem->unitsPerCoordinate + height;
                 center.z = object->quantizedPosition.z * g_EcoSystem->unitsPerCoordinate;
-                visible = reinterpret_cast<UnknownEcoVisibilityClipper*>(g_visibilityClipper)->SphereInFrustum(ECO_VIEW->camera, &ECO_VIEW->camera->field_0xec,
+                visible = reinterpret_cast<EcoVisibilityClipperView*>(g_visibilityClipper)->SphereInFrustum(ECO_VIEW->camera, &ECO_VIEW->camera->field_0xec,
                                                                &center, radius, 0);
             }
             if (visible) {
@@ -1058,7 +1058,7 @@ int EcoSystem::PrepareGeometry() {
 void EcoSystem::SetRenderStates(int format) {
     float alphaReference;
     if (format == 1555) {
-        alphaReference = (float)(reinterpret_cast<UnknownEcoTrackGame*>(g_TrackGame)->bladeRenderer ? 0 : 0xc0);
+        alphaReference = (float)(reinterpret_cast<EcoTrackGameView*>(g_TrackGame)->bladeRenderer ? 0 : 0xc0);
         ECO_VIEW->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, 0, 0);
         ECO_VIEW->SetRenderState(D3DRENDERSTATE_COLORKEYENABLE, 0, 0);
     } else if (format == 4444 || format == 8888) {
@@ -1103,7 +1103,7 @@ void EcoSystem::SetRenderStates(int format) {
     }
     if (format == 1555) {
         ECO_VIEW->SetTextureStageState(0, D3DTSS_MIPFILTER, D3DTFP_NONE);
-        if (reinterpret_cast<UnknownEcoTrackGame*>(g_TrackGame)->bladeRenderer) {
+        if (reinterpret_cast<EcoTrackGameView*>(g_TrackGame)->bladeRenderer) {
             ECO_VIEW->SetTextureStageState(0, D3DTSS_MAGFILTER, D3DTFG_POINT);
             ECO_VIEW->SetTextureStageState(0, D3DTSS_MINFILTER, D3DTFN_POINT);
         } else {
@@ -1212,7 +1212,7 @@ int PreloadEcosystem(TextureMapManager* textures, char* path, FileStream* stream
         }
         for (i = 0; i < 256; i++) {
             if (billboardNames[i][0]) {
-                UnknownEcoTexture* texture = reinterpret_cast<UnknownEcoTexture*>(TerrainLoadTexture(textures, billboardNames[i], modelFlags, 0, 2, 5, 6, 0, 0x80,
+                EcoTextureMapView* texture = reinterpret_cast<EcoTextureMapView*>(TerrainLoadTexture(textures, billboardNames[i], modelFlags, 0, 2, 5, 6, 0, 0x80,
                                                                    0xff00ff, 1, 1));
                 if (!texture->IsResident()) {
                     texture->CreateTextureSurface(1, 0, 0);
@@ -1229,10 +1229,10 @@ int PreloadEcosystem(TextureMapManager* textures, char* path, FileStream* stream
                     block->SelectSection("Material - 0");
                     block->ReadString("TextureMap", sltName, -1);
                     int format = 1555;
-                    if (!reinterpret_cast<UnknownEcoTrackGame*>(g_TrackGame)->bladeRenderer && (reinterpret_cast<UnknownEcoTrackGame*>(g_TrackGame)->display->driverColorKeyCaps & 8)
-                        && reinterpret_cast<UnknownEcoTrackGame*>(g_TrackGame)->GetRegistryFlag("KeyColorTrees", 0))
-                        format = reinterpret_cast<UnknownEcoTrackGame*>(g_TrackGame)->display->colorKeyFormat;
-                    UnknownEcoTexture* texture = reinterpret_cast<UnknownEcoTexture*>(TerrainLoadTexture(textures, sltName, format, 0, 2, 5, 6, 0, 0x80, 0xff00ff, 1, 1));
+                    if (!reinterpret_cast<EcoTrackGameView*>(g_TrackGame)->bladeRenderer && (reinterpret_cast<EcoTrackGameView*>(g_TrackGame)->display->driverColorKeyCaps & 8)
+                        && reinterpret_cast<EcoTrackGameView*>(g_TrackGame)->GetRegistryFlag("KeyColorTrees", 0))
+                        format = reinterpret_cast<EcoTrackGameView*>(g_TrackGame)->display->colorKeyFormat;
+                    EcoTextureMapView* texture = reinterpret_cast<EcoTextureMapView*>(TerrainLoadTexture(textures, sltName, format, 0, 2, 5, 6, 0, 0x80, 0xff00ff, 1, 1));
                     if (!texture->IsResident()) {
                         g_UnknownGlobal59af10++;
                         int loaded = texture->pixelFormat;

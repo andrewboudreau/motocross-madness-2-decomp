@@ -1,4 +1,4 @@
-// Bring-up definition (best-guess-unreviewed): UnknownKrustyBikeView is the
+// Bring-up definition (best-guess-unreviewed): EventBikeRaceView is the
 // view RaceView.h/InGameProcs.cpp use for the race object whose 0x0041f1d0
 // is BikeRace::NextCameraTarget (BikeRaceCore.h; the body is provided by
 // src/bringup/Group1_BikeRaceCamera.cpp). Both names bind to the same retail
@@ -11,12 +11,12 @@ public:
     void NextCameraTarget(int forward, int racers, int objects); // 0x0041f1d0
 };
 
-struct UnknownKrustyBikeView {
+struct EventBikeRaceView {
     void NextCameraTarget(int forward, int racers, int objects); // 0x0041f1d0
 };
 
 // 0x0041f1d0 (ret 0xc): the next (`forward`) or previous camera target.
-void UnknownKrustyBikeView::NextCameraTarget(int forward, int racers, int objects)
+void EventBikeRaceView::NextCameraTarget(int forward, int racers, int objects)
 {
     reinterpret_cast<BikeRace*>(this)->NextCameraTarget(forward, racers, objects);
 }

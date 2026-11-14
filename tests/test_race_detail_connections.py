@@ -26,7 +26,7 @@ SAMPLE='samples/game/QuarryStuntEventNearMisses.cpp'
 RACE='src/reconstructed/BikeRace.cpp'
 MODEL='src/reconstructed/D3DIMSoulTree.cpp'
 STATE='src/reconstructed/GraphicsState.cpp'
-OLD='?SetDetailLevel@UnknownKrustyBikeView@@QAEXH@Z'
+OLD='?SetDetailLevel@EventBikeRaceView@@QAEXH@Z'
 NEW='?SetDetailLevel@BikeRace@@QAEXH@Z'
 PROVIDERS=((RACE,NEW,0x423790,240,'void BikeRace::SetDetailLevel('),
  (MODEL,'?ApplyLodSettings@D3DIMSoultreeObject@@QAEXH@Z',0x4451e0,81,'void D3DIMSoultreeObject::ApplyLodSettings('),

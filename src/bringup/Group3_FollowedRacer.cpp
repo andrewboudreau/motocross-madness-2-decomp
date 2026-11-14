@@ -19,15 +19,15 @@
 #include "vehicle/KrustyBike.h"
 #include "RaceSound.h"
 
-struct UnknownEventRacer;
+struct EventKrustyBikeView;
 
 // The owner's FollowRacer.cpp helper is defined on the TrackGameViewOwner view
 // (src/reconstructed/FollowRacer.cpp); only that member is declared here.
 struct TrackGameViewOwner {
-    void AnnounceFollowedRacer(UnknownEventRacer* racer, UnknownEventRacer* previous);  // 0x004a9f90
+    void AnnounceFollowedRacer(EventKrustyBikeView* racer, EventKrustyBikeView* previous);  // 0x004a9f90
 };
 
-// Raw view of the race view at owner +0x34 (RaceView.h UnknownKrustyBikeView).
+// Raw view of the race view at owner +0x34 (RaceView.h EventBikeRaceView).
 struct Group3FollowRaceView {
     char pad_0x00[0x38];
     KrustyBike* localRacer;      // +0x38
@@ -69,8 +69,8 @@ void KbPlayer::SetFollowedRacer(Vehicle* racerVehicle, Vehicle* previousVehicle,
         RACE_VIEW()->raceSound->PlayItSound();
         racer->SetSpawnProtection(1, 5.0f, 0);
     }
-    ((TrackGameViewOwner*)this)->AnnounceFollowedRacer((UnknownEventRacer*)racer,
-                                                       (UnknownEventRacer*)previous);
+    ((TrackGameViewOwner*)this)->AnnounceFollowedRacer((EventKrustyBikeView*)racer,
+                                                       (EventKrustyBikeView*)previous);
     if (racer == RACE_VIEW()->localRacer && previous && previous != racer) {
         racer->score += 2500.0f;
         if (RACE_VIEW()->scoreBoard)

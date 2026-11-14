@@ -1,5 +1,5 @@
 {
-  "?NextBike@BikeRace@@QAEPAVUnknownBikeRaceRacer@@PAH@Z": "0x004204e0",
+  "?NextBike@BikeRace@@QAEPAVBikeRaceKrustyBikeView@@PAH@Z": "0x004204e0",
   "?Send@NetworkInterface@@QAEHHPAXHHH@Z": "0x004ac830",
   "?QueueRecord@VCRInterface@@QAEHHHPBXI@Z": "0x004e8720",
   "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",

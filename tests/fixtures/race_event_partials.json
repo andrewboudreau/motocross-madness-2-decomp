@@ -41,7 +41,7 @@
       "samples/race/BikeRaceNearMisses.cpp",
       "?Tick@BikeRace@@UAEHM@Z",
       5980,
-      "1636d348dc6114359cecd5331647276cf761f65e71bfa95ede7ffe5d3e24b3db"
+      "dfb7d813d2b6e51499d328116f66b1bacbacb36aef5661caa97ae660f8a6dfd3"
     ],
     [
       "samples/race/BikeRaceNearMisses.cpp",
@@ -65,7 +65,7 @@
       "samples/race/BikeRaceNearMisses.cpp",
       "?AimCamera@BikeRace@@QAEHH@Z",
       1710,
-      "eb234386bbb1d381b505b22fb6d0727ff26fbd05d76e8415db13c486c2ed1659"
+      "87f6badb45d49c0f7a28196b346eebf9540e0caa9abdf441505374052372331d"
     ],
     [
       "samples/race/BikeRaceNearMisses.cpp",
@@ -87,15 +87,15 @@
     ],
     [
       "samples/race/BikeRaceNearMisses.cpp",
-      "?Create@BikeRace@@QAEPAV1@PAX0PAVLightManager@@PAUTextureContext@@PAVUnknownBikeRaceProjector@@PAVKrustyBikeCamera@@PAVScene@@PAURaceGateEvent@@PAVUnknownBikeRaceShadow@@@Z",
+      "?Create@BikeRace@@QAEPAV1@PAX0PAVLightManager@@PAUTextureContext@@PAVBikeRaceTerrainView@@PAVKrustyBikeCamera@@PAVScene@@PAURaceGateEvent@@PAVBikeRaceProjectedShadowView@@@Z",
       6760,
-      "2a6aee6124f3fa2cab2bfb2c336a36822b4a126c9c93fa75b3afc97ff70a82bc"
+      "1d4e84eb742e57c796a683eef56e40b0f44b842eb8859281fe09e27dedb68f65"
     ],
     [
       "samples/race/BikeRaceNearMisses.cpp",
-      "?CreateRacers@BikeRace@@QAEHPAXPAVLightManager@@PAUTextureContext@@PAVUnknownBikeRaceProjector@@PAURaceGateEvent@@@Z",
+      "?CreateRacers@BikeRace@@QAEHPAXPAVLightManager@@PAUTextureContext@@PAVBikeRaceTerrainView@@PAURaceGateEvent@@@Z",
       13428,
-      "8405739fe06b38fd4ca4b8cb88edd656d4f50ada4be2aaafacdae5bd42c1a3fa"
+      "9cf6a3fb1c8fccb8e1f3c006258d9c7f18b07e7f8aa0c4bcee93bc34c7f6a772"
     ],
     [
       "samples/ui/DlgProcsNearMisses.cpp",
@@ -141,9 +141,9 @@
     ],
     [
       "samples/race/RaceSoundNearMisses.cpp",
-      "?Create@RaceSound@@QAEPAV1@PAXPAUUnknownKrustyBikeView@@PAUUnknownRaceSoundCamera@@H@Z",
+      "?Create@RaceSound@@QAEPAV1@PAXPAUEventBikeRaceView@@PAURaceSoundKrustyBikeCameraView@@H@Z",
       4153,
-      "7e91dabbfe70a2681700a449a689af6bee110699a41a1b2f96000ee052e7493c"
+      "7a4da55905fc06a3a86fd6693fa6008ce6288c45b63019d594373859a7a46d21"
     ],
     [
       "samples/race/RaceSoundNearMisses.cpp",

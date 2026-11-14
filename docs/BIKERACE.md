@@ -8,7 +8,7 @@ Evidence:
   at `0x0041cfd8`, by the inline node-list free in the destructor.
 - **RTTI:** `BikeRace : GraphicsTest : GameObject` (vtable `0x00550d24`).
   Only the constructor `0x00417c30` and destructor `0x0041cf30` write it.
-- **Same object as RaceView.h:** RaceView.h's `UnknownKrustyBikeView`
+- **Same object as RaceView.h:** RaceView.h's `EventBikeRaceView`
   describes the same object at the same offsets (strong inference); its
   callers' mangled names are unchanged.
 

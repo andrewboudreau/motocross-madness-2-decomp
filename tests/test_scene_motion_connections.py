@@ -24,8 +24,8 @@ SAMPLE = 'samples/track/SceneManagerNearMisses.cpp'
 MOTION = 'src/krusty2/motion/Motnctrl.cpp'
 FIXTURE = 'tests/fixtures/scene_motion_compare.cpp'
 RENAMES = {
-    '?SetMotion@UnknownSceneObject@@QAEXPAX@Z': '?SetMotion@Character@@QAEXPAUMotion@@@Z',
-    '?AdvanceMotion@UnknownSceneObject@@QAEHMHH@Z': '?AdvanceMotion@Character@@QAEHMHH@Z',
+    '?SetMotion@SceneCollisionCharacterView@@QAEXPAX@Z': '?SetMotion@Character@@QAEXPAUMotion@@@Z',
+    '?AdvanceMotion@SceneCollisionCharacterView@@QAEHMHH@Z': '?AdvanceMotion@Character@@QAEHMHH@Z',
 }
 
 

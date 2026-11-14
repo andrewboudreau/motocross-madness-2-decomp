@@ -7,8 +7,8 @@
 // * VisualCue::Tick (samples/race/Krusty3DObjectsNearMisses.cpp, a game-build candidate
 //   source) calls two provisional view methods
 //   whose retail targets are already reconstructed under canonical classes:
-//     UnknownRunwayTerrain::QueryGround 0x00507c10 = Terrain::QueryGround
-//     UnknownBonusRacerPart::GetPosition 0x004fc970 = SoultreeObject::GetPosition
+//     RunwayTerrainView::QueryGround 0x00507c10 = Terrain::QueryGround
+//     BonusSoultreeObjectView::GetPosition 0x004fc970 = SoultreeObject::GetPosition
 //   (the caller passes 0 for the surface pointer; GetPosition's returned pointer is
 //   the argument and is ignored by the view).
 // The two VisualCue declarations (QuarryEvent.h derives from GameObject,
@@ -19,36 +19,36 @@
 #include "MatrixUtil.h"   // Vector3 (passed by value)
 
 class LightManager;
-class UnknownTerrain;
-struct UnknownKrustyBikeView;
-struct UnknownQuarryCamera;
-struct UnknownRunwayTerrain;
-struct UnknownVisualCueView;
-struct UnknownArcadeView;
+class OverlayTerrainView;
+struct EventBikeRaceView;
+struct QuarryEventKrustyBikeCameraView;
+struct RunwayTerrainView;
+struct VisualCueBikeRaceView;
+struct ArcadeCameraView;
 struct TerrainVec3;
 struct Vec3;
 
 class VisualCue {
 public:
     // Krusty3DObjects.h (defined in Krusty3DObjects.cpp)
-    VisualCue* LoadVisualCue(void* context, int lights, int options, UnknownRunwayTerrain* terrain,
-                             Vector3 position, UnknownVisualCueView* view, int pixels,
-                             UnknownArcadeView* camera, float size, float screenXFraction,
+    VisualCue* LoadVisualCue(void* context, int lights, int options, RunwayTerrainView* terrain,
+                             Vector3 position, VisualCueBikeRaceView* view, int pixels,
+                             ArcadeCameraView* camera, float size, float screenXFraction,
                              float screenYFraction);
     // QuarryEvent.h
-    VisualCue* LoadVisualCue(void* target, LightManager* lights, int options, UnknownTerrain* terrain,
-                             Vector3 offset, UnknownKrustyBikeView* view, int count,
-                             UnknownQuarryCamera* camera, float size, float screenXFraction, float screenYFraction);
+    VisualCue* LoadVisualCue(void* target, LightManager* lights, int options, OverlayTerrainView* terrain,
+                             Vector3 offset, EventBikeRaceView* view, int count,
+                             QuarryEventKrustyBikeCameraView* camera, float size, float screenXFraction, float screenYFraction);
 };
 
 // 0x0048adf0, QuarryStuntEvent's view.
 VisualCue* VisualCue::LoadVisualCue(void* target, LightManager* lights, int options,
-                                    UnknownTerrain* terrain, Vector3 offset,
-                                    UnknownKrustyBikeView* view, int count,
-                                    UnknownQuarryCamera* camera, float size, float screenXFraction, float screenYFraction)
+                                    OverlayTerrainView* terrain, Vector3 offset,
+                                    EventBikeRaceView* view, int count,
+                                    QuarryEventKrustyBikeCameraView* camera, float size, float screenXFraction, float screenYFraction)
 {
-    return LoadVisualCue(target, (int)lights, options, (UnknownRunwayTerrain*)terrain, offset,
-                         (UnknownVisualCueView*)view, count, (UnknownArcadeView*)camera,
+    return LoadVisualCue(target, (int)lights, options, (RunwayTerrainView*)terrain, offset,
+                         (VisualCueBikeRaceView*)view, count, (ArcadeCameraView*)camera,
                          size, screenXFraction, screenYFraction);
 }
 
@@ -57,12 +57,12 @@ public:
     void QueryGround(TerrainVec3* pos, TerrainVec3* normal, int flatShaded, unsigned char* surface);
 };
 
-struct UnknownRunwayTerrain {
+struct RunwayTerrainView {
     void QueryGround(Vector3* point, Vector3* normal, int flatShaded, int surface);
 };
 
 // 0x00507c10
-void UnknownRunwayTerrain::QueryGround(Vector3* point, Vector3* normal, int flatShaded, int surface)
+void RunwayTerrainView::QueryGround(Vector3* point, Vector3* normal, int flatShaded, int surface)
 {
     reinterpret_cast<Terrain*>(this)->QueryGround((TerrainVec3*)point, (TerrainVec3*)normal,
                                                   flatShaded, (unsigned char*)surface);
@@ -73,12 +73,12 @@ public:
     Vec3* GetPosition(Vec3* out);
 };
 
-struct UnknownBonusRacerPart {
+struct BonusSoultreeObjectView {
     void GetPosition(Vector3* translation);
 };
 
 // 0x004fc970
-void UnknownBonusRacerPart::GetPosition(Vector3* translation)
+void BonusSoultreeObjectView::GetPosition(Vector3* translation)
 {
     reinterpret_cast<SoultreeObject*>(this)->GetPosition((Vec3*)translation);
 }

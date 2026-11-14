@@ -39,7 +39,7 @@ struct TgaFile;
 #include "EcoQuadTreeObject.h"
 
 // src/krusty2/broadphase/Quadtree.h: QuadTree (the global 0x0068aba4).
-class UnknownEcoQuadTree {
+class EcoQuadTreeView {
 public:
     unsigned char field_0x00[0x50];
     float extentX;                            // +0x50: world x extent
@@ -54,7 +54,7 @@ public:
 #include "../krusty2/broadphase/QuadTreeDeclarations.h"
 
 // src/krusty2/broadphase/Terrain.h: Terrain.
-class UnknownEcoTerrain {
+class EcoTerrainView {
 public:
     // 0x00507c10: snaps position->y to the ground under (x, z).
     void QueryGround(Vector3* position, Vector3* normal, int flatShaded, unsigned char* surface);
@@ -63,17 +63,17 @@ public:
 
 // src/krusty2/collision/CollisionObject.h: CollisionObject (0xb8 bytes,
 // QuadTreeObject at +0, GraphicsTest : GameObject at +0xc).
-struct UnknownEcoHullShape {                // type 0
+struct EcoHullShape {                // type 0
     unsigned char field_0x00[0xc8];
     Matrix4 transform;                        // +0xc8: the shape's own transform
 };
-struct UnknownEcoCapsuleShape {             // type 3
+struct EcoCapsuleShape {             // type 3
     unsigned char field_0x00[0x20];
     float radiusScale;                        // +0x20: radius scale
     float endpointScale;                      // +0x24: endpoint scale
     Matrix4 transform;                        // +0x28
 };
-struct UnknownEcoSphereShape {              // type 4
+struct EcoSphereShape {              // type 4
     unsigned char field_0x00[0x14];
     float radiusScale;                        // +0x14: radius scale
     float centreScale;                        // +0x18: centre scale
@@ -99,7 +99,7 @@ public:
 
 // LightEmitter.h: LightEmitter and LightManager, as far as the lighting
 // update reads them.
-class UnknownEcoLight {
+class EcoLightEmitterView {
 public:
     unsigned char field_0x00[0x54];
     float colour[4];                          // +0x54
@@ -114,7 +114,7 @@ public:
 
 // RenderTarget.h: the view at GameObject+0x18 and its Camera (+0x08).
 // Slots 27-32 carry Camera.h's names (Camera introduces slots 27-32).
-class UnknownEcoCamera {
+class EcoCameraView {
 public:
     virtual void UnknownVirtualSlot0();
     virtual void AddRef();
@@ -163,7 +163,7 @@ public:
 // Slots 6-9, 15 and 18 are named from the D3D arguments their callers pass
 // (D3DTSS_*/D3DRENDERSTATE_* states, D3DPT_/D3DFVF_ index draws, the alpha
 // reference); the names follow the IDirect3DDevice7 calls they forward to.
-class UnknownEcoRenderTarget {
+class EcoRenderTargetView {
 public:
     virtual void UnknownVirtualSlot0();
     virtual int BeginScene();
@@ -189,7 +189,7 @@ public:
     virtual void DisableAlphaTest();
 
     unsigned char field_0x04[4];
-    UnknownEcoCamera* camera;                 // +0x08
+    EcoCameraView* camera;                 // +0x08
     int width;                                // +0x0c
     unsigned char field_0x10[0x38 - 0x10];
     int verticesDrawn;                        // +0x38
@@ -199,7 +199,7 @@ public:
 
 // TextureMap.h: the texture objects the definitions hold (0x0050a590, Texmap.cpp,
 // returns a TextureMap). Slots 1-3 are BaseObject's and 4-19 TextureMap.h's.
-class UnknownEcoTexture {
+class EcoTextureMapView {
 public:
     virtual void UnknownVirtualSlot0();
     virtual int AddRef();
@@ -233,7 +233,7 @@ float FastInvSqrt(float x);
 float FastInvSqrtEstimate(float x);        // table estimate of 1 / sqrt(x), no Newton step
 
 // A definition's model vertex as the .slt loader stores it (8 floats).
-struct UnknownEcoModelVertex {
+struct EcoModelVertex {
     Vector3 position;
     Vector3 normal;
     float tu;
@@ -242,7 +242,7 @@ struct UnknownEcoModelVertex {
 
 // D3DLVERTEX (FVF 0x1e2) as the geometry blocks and the billboard buffer
 // hold it.
-struct UnknownEcoVertex {
+struct EcoLitVertex {
     Vector3 position;
     int reserved;
     unsigned int diffuse;
@@ -306,10 +306,10 @@ public:
     float normalizedMinY;                     // +0x1D4  the model's lowest y over its height (modelHeightScale * minY); the billboards start that far below the object
     int lodCount;                             // NumberOfLOD (at most kMaxLods)
     unsigned int keyColor;                    // key colour
-    UnknownEcoTexture* billboardTexture;      // billboard texture
-    UnknownEcoTexture* modelTexture;          // model texture
+    EcoTextureMapView* billboardTexture;      // billboard texture
+    EcoTextureMapView* modelTexture;          // model texture
     unsigned short* modelIndices[kMaxLods];   // model indices (inside the vertex block)
-    UnknownEcoModelVertex* modelVertices[kMaxLods]; // model vertices
+    EcoModelVertex* modelVertices[kMaxLods]; // model vertices
     int modelVertexCount[kMaxLods];           // vertex count
     int modelIndexCount[kMaxLods];            // index count
     int usePlanarLighting;                    // UsePlanarLighting
@@ -333,23 +333,23 @@ int WriteXorEncoded(const unsigned char* data, int size, int count, FILE* file, 
 int ReadXorDecoded(unsigned char* data, int size, int count, FILE* file, unsigned char* key);
 
 // Griddraw.h / VisibilityQuadTree.h: the visibility clipper 0x00575a98.
-class UnknownEcoVisibilityClipper {
+class EcoVisibilityClipperView {
 public:
-    int SphereInFrustum(const UnknownEcoCamera* camera, const void* matrix, const Vector3* center,
+    int SphereInFrustum(const EcoCameraView* camera, const void* matrix, const Vector3* center,
                         float radius, int* fullyInside);       // 0x0052fbb0
 };
 #include "../krusty2/visibility/VisibilityClipperGlobal.h"        // 0x00575a98
 
 // TrackGame.h: the game object 0x0056e26c, as far as this file reads it
 // (slot 22 is the registry query).
-struct UnknownEcoDisplay {
+struct EcoVideoCardView {
     unsigned char field_0x000[0x28];
     int colorKeyFormat;                       // +0x28: colour-key texture format
     unsigned char field_0x02c[0x1c0 - 0x2c];
     int driverColorKeyCaps;                   // +0x1c0: DDCAPS dwCKeyCaps (PCVideoCard::driverColorKeyCaps)
 };
 // DebugOverlay.h: the overlay the draw prints its statistics on.
-class UnknownEcoDebugOverlay {
+class EcoDebugOverlayView {
 public:
     // 0x00447f40 / 0x00447fa0: format a row onto page `page` (cdecl, `this`
     // on the stack).
@@ -358,7 +358,7 @@ public:
     unsigned char field_0x0000[0x26c0];
     int nextPage;                             // +0x26c0 next free page (DebugOverlay.h)
 };
-class UnknownEcoTrackGame {
+class EcoTrackGameView {
 public:
     virtual void UnknownVirtualSlot0();
     virtual void Startup();
@@ -385,9 +385,9 @@ public:
     virtual int GetRegistryFlag(const char* name, int defaultValue); // registry value (Game slot 22)
 
     unsigned char field_0x004[0x10 - 4];
-    UnknownEcoDisplay* display;               // +0x10
+    EcoVideoCardView* display;               // +0x10
     unsigned char field_0x014[0x38 - 0x14];
-    UnknownEcoDebugOverlay* debugOverlay;     // +0x38 the debug overlay (DebugOverlay.h), or 0
+    EcoDebugOverlayView* debugOverlay;     // +0x38 the debug overlay (DebugOverlay.h), or 0
     unsigned char field_0x03c[0x2d0 - 0x3c];
     int bladeRenderer;                        // +0x2d0 the "Blade" software renderer (Game.h)
     unsigned char field_0x2d4[0x54c - 0x2d4];
@@ -433,7 +433,7 @@ public:
     int ReadEsb(const char* path, FileStream* stream);               // 0x00458f70: reads the .esb
     void SetDetailLevel(int level);    // 0x004594c0: detail level
     // 0x004594d0: creates the ecosystem.
-    EcoSystem* Create(void* view, TextureMapManager* textures, UnknownEcoTerrain* terrain,
+    EcoSystem* Create(void* view, TextureMapManager* textures, EcoTerrainView* terrain,
                                      LightManager* lights, char* path, FileStream* stream,
                                      int textureFormat, int collisions, int level);
     int PlaceStoredObjects();                 // 0x004598d0: places the objects read from the .esb
@@ -447,10 +447,10 @@ public:
     Vegetation* vegetation;                   // the objects
     Vegetation** billboardList;               // objects drawn as billboards
     Vegetation** geometryList;                // objects drawn as geometry
-    UnknownEcoTerrain* groundTerrain;
+    EcoTerrainView* groundTerrain;
     TextureMapManager* textureManager;
     LightManager* lightManager;
-    UnknownEcoVertex* billboardVertices;      // billboard vertices (120 * 6)
+    EcoLitVertex* billboardVertices;      // billboard vertices (120 * 6)
     unsigned short* billboardIndices;         // billboard indices (120 * 12)
     VegetationDefinition* definitionTable[256];
     float northAngle;                         // NorthAngle

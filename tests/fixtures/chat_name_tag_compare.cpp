@@ -14,7 +14,7 @@ extern "C" int __cdecl _output();
 static BYTE referenceSpace[0x800000]={1};
 struct World {
     BYTE object[sizeof(ChatOverlay)],tags[3][sizeof(NameOverlay)];
-    BYTE racers[2][sizeof(UnknownChatRacer)],game[2][sizeof(TrackGame)];
+    BYTE racers[2][sizeof(ChatKrustyBikeView)],game[2][sizeof(TrackGame)];
     BYTE guards[2][4096];
     DWORD selectedFont,gamePointer;int debugFlag;
 };
@@ -46,7 +46,7 @@ static void Boundary(RECT*rect){
         switch(sc.mutation){
         case 0:c->racerCount=sc.cue?sc.count+1:sc.index;break;
         case 1:c->nameTags[sc.index]=Tag(1);break;
-        case 2:c->racers[sc.index]=(UnknownChatRacer*)w.racers[1];break;
+        case 2:c->racers[sc.index]=(ChatKrustyBikeView*)w.racers[1];break;
         case 3:c->nameTagRects[sc.index].left=-17;c->nameTagRects[sc.index].right=101;break;
         case 4:Tag(0)->drawWidth=23;Tag(0)->sourceWidth=27;break;
         case 5:c->nameTagFont=(void*)0x8888;break;
@@ -56,7 +56,7 @@ static void Boundary(RECT*rect){
         case 9:memcpy(c->cueRacerName,"mutated cue",12);break;
         case 10:if(rect){rect->left=-31;rect->right=119;rect->top=13;}break;
         case 11:c->nameTags[sc.index]=(NameOverlay*)1;break;
-        case 12:c->racers[sc.index]=(UnknownChatRacer*)1;break;
+        case 12:c->racers[sc.index]=(ChatKrustyBikeView*)1;break;
         case 13:Tag(0)->sourceRect.left=57;Tag(0)->sourceRect.right=-9;break;
         case 14:w.selectedFont=0x7777;break;
         }
@@ -100,11 +100,11 @@ static void Setup(){
     ChatOverlay*c=(ChatOverlay*)w.object;c->racerCount=sc.count;c->nameTagFont=(void*)0x4567;
     for(i=0;i<13;i++){
         c->nameTags[i]=Tag(0);c->nameTagRects[i].left=sc.left;c->nameTagRects[i].top=sc.top;c->nameTagRects[i].right=sc.right;c->nameTagRects[i].bottom=sc.bottom;
-        if(i<11)c->racers[i]=(UnknownChatRacer*)w.racers[0];
+        if(i<11)c->racers[i]=(ChatKrustyBikeView*)w.racers[0];
     }
     for(i=0;i<3;i++){Tag(i)->sourceWidth=sc.sourceWidth+i*7;Tag(i)->drawWidth=sc.drawWidth+i*3;Tag(i)->sourceRect.left=101+i;Tag(i)->sourceRect.top=102+i;Tag(i)->sourceRect.right=103+i;Tag(i)->sourceRect.bottom=104+i;}
     for(i=0;i<2;i++){
-        UnknownChatRacer*r=(UnknownChatRacer*)w.racers[i];r->position=sc.position+i;r->driveForceScale=(float)sc.quarter*0.25f;
+        ChatKrustyBikeView*r=(ChatKrustyBikeView*)w.racers[i];r->position=sc.position+i;r->driveForceScale=(float)sc.quarter*0.25f;
         if(sc.rawFloat)At(r,0x4a4)=sc.rawFloat;
         for(int j=0;j<sc.nameLength;j++)r->name[j]=(char)('A'+(j+i)%26);r->name[sc.nameLength]=0;
         TrackGame*g=(TrackGame*)w.game[i];g->mode.showRiderNames=sc.names^i;g->mode.showRiderPositions=sc.positions^i;
@@ -115,14 +115,14 @@ static void Setup(){
     if(sc.alias==2)c->nameTags[sc.index]=(NameOverlay*)(w.object+0x214);
     if(sc.alias==3)c->nameTags[sc.index]=(NameOverlay*)(w.object+0x208);
     if(sc.fault==1)c->nameTags[sc.index]=(NameOverlay*)1;
-    if(sc.fault==2)c->racers[sc.index]=(UnknownChatRacer*)1;
+    if(sc.fault==2)c->racers[sc.index]=(ChatKrustyBikeView*)1;
     if(sc.fault==3)g_TrackGame=(TrackGame*)1;
     if(sc.fault==4)receiver=(BYTE*)1;
     if(sc.fault==5){
         BYTE*p=guard[0]+4096-(0x124+sc.available);memcpy(p,w.tags[0],0x124+sc.available);c->nameTags[sc.index]=(NameOverlay*)p;
     }
     if(sc.fault==6){
-        BYTE*p=guard[0]+4096-(0x5e0+sc.available);memcpy(p,w.racers[0],0x5e0+sc.available);for(i=0;i<sc.available;i++)p[0x5e0+i]='R';c->racers[sc.index]=(UnknownChatRacer*)p;
+        BYTE*p=guard[0]+4096-(0x5e0+sc.available);memcpy(p,w.racers[0],0x5e0+sc.available);for(i=0;i<sc.available;i++)p[0x5e0+i]='R';c->racers[sc.index]=(ChatKrustyBikeView*)p;
     }
     if(sc.fault==7){
         BYTE*p=guard[0]+4096-(0x198+sc.available);memcpy(p,w.object,0x198+sc.available);receiver=p;

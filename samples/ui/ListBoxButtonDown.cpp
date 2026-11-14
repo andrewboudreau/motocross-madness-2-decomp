@@ -19,7 +19,7 @@
 
 int UIListBox::ButtonDown(int button, int position) {
     POINT* point = (POINT*)position;
-    if (ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this && point) {
+    if (ownerDialog->guiUser->hoverControl == (GuiControlView*)this && point) {
         if (button == 0) {
             if (selectable) {
                 int found = 0;

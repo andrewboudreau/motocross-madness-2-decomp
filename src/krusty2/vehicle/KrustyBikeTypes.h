@@ -95,7 +95,7 @@ struct KbNetDelta {
 };
 #pragma pack(pop)
 
-// The state a message is decoded into (BikeRace.h's UnknownBikeRaceNetState; the names
+// The state a message is decoded into (BikeRace.h's RacerStateMessage; the names
 // follow that view and the KrustyBike delta bases 0x004933e0 copies in).
 struct KbNetState {
     short field_0x00;

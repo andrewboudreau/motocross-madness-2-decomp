@@ -7,21 +7,21 @@
 class ArcadeObject;
 class TextQueueOverlay;
 struct TrackGameViewOwner;
-struct UnknownKrustyBikeView;
+struct EventBikeRaceView;
 
 // 0x50-byte entry; EventManager keeps 11 at +0x50.
 class Camera;
 
 // 8-byte record sorted with 0x0045e930.
 struct RacerTimeRank {
-    UnknownEventRacer* racer;
+    EventKrustyBikeView* racer;
     float value;
 };
 
 // 8-byte record sorted with TrackOverlay's 0x005199f0 (higher value first).
 struct RacerScoreRank {
     float value;
-    UnknownEventRacer* racer;
+    EventKrustyBikeView* racer;
 };
 int CompareScoresDescending(const void* a, const void* b); // cdecl 0x005199f0
 
@@ -30,7 +30,7 @@ struct RacerStanding {
     int points;                                    // the result's points (EventManager.cpp)
     float field_0x04;
     float field_0x08;
-    UnknownEventRacer* racer;                      // its +0x5e0 name breaks ties
+    EventKrustyBikeView* racer;                      // its +0x5e0 name breaks ties
 };
 
 // cdecl 0x0045d3d0: qsort order for standings (more points first, then
@@ -82,7 +82,7 @@ struct RacerResult {
     // 0x0045c8b0: copies the racer's id, name and the fields noted below
     // (dword moves; int/float types are from other readers). With racer
     // +0x4a0 set it clears them instead and sets position 99.
-    void CopyFromRacer(UnknownEventRacer* racer);  // 0x0045c8b0
+    void CopyFromRacer(EventKrustyBikeView* racer);  // 0x0045c8b0
 
     int playerId;                                  // +0x00: network player id (racer +0x11bc)
     int position;                                  // +0x04: finishing position (99 when racer +0x4a0 is set)
@@ -125,7 +125,7 @@ public:
     // The first race-mode object of TrackGame+0x558..+0x568 present, its
     // +0x34 view and its +0x6c target.
     TrackGameViewOwner* FindRaceMode();            // 0x0045d2b0
-    UnknownKrustyBikeView* FindRaceView();         // 0x0045d2f0
+    EventBikeRaceView* FindRaceView();         // 0x0045d2f0
     TextQueueOverlay* FindTextQueue();             // 0x0045d340
     // 0x0045d270: Enable() on all three; LoadingDlg's timer (0x00451020)
     // calls it as it ends the loading dialog.
@@ -135,7 +135,7 @@ public:
     // 0x0045e550: once every remote racer is ready, ends the network wait.
     void WaitForRemoteRacers(float frameTime);  // 0x0045e550
     // 0x0045f180: adds the championship points for `racer`'s position.
-    void AddChampionshipPoints(UnknownEventRacer* racer, int* points);  // 0x0045f180
+    void AddChampionshipPoints(EventKrustyBikeView* racer, int* points);  // 0x0045f180
     // 0x0045e600: starts the end-of-race block (or finishes at once), and
     // once it has run its course clears it and moves to the results.
     void EndRace();

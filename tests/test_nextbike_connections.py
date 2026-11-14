@@ -18,7 +18,7 @@ from tools.match import compare
 from tools.run_calibration import CASES
 
 ROOT = Path(__file__).resolve().parents[1]
-SYMBOL = '?NextBike@BikeRace@@QAEPAVUnknownBikeRaceRacer@@PAH@Z'
+SYMBOL = '?NextBike@BikeRace@@QAEPAVBikeRaceKrustyBikeView@@PAH@Z'
 SOURCES = (
     'src/reconstructed/EventManager.cpp', 'src/reconstructed/FollowRacer.cpp',
     'src/reconstructed/RaceSound.cpp', 'src/reconstructed/RaceStatus.cpp',
@@ -33,7 +33,7 @@ SOURCES = (
 # See docs/FOLLOWED_RACER_PICKER.md; all other rows retain their prior hashes.
 PARTIAL = [
     ('samples/race/FollowRacerNearMisses.cpp', '?PickFollowedRacer@TrackGameViewOwner@@QAEXXZ', 4889888, 340, 342, 67, '458488750e4bac7e802c4cfedbd485c6a2abb98a503c88e044ab31a9f57a78fc'),
-    ('samples/race/FollowRacerNearMisses.cpp', '?SetFollowedRacer@TrackGameViewOwner@@QAEXPAUUnknownEventRacer@@0H@Z', 4890240, 272, 272, 259, '6f7a0fdf97b1e244baeb6a3f3af7cf634acda08a0ea738fd1e3de094ccc7032d'),
+    ('samples/race/FollowRacerNearMisses.cpp', '?SetFollowedRacer@TrackGameViewOwner@@QAEXPAUEventKrustyBikeView@@0H@Z', 4890240, 272, 272, 259, '6f7a0fdf97b1e244baeb6a3f3af7cf634acda08a0ea738fd1e3de094ccc7032d'),
     ('samples/physics/krustybike/KrustyBikeNearMisses.cpp', 'IsSpeedGainBelowLimit@KrustyBike', 4790688, 229, 230, 151, '3124025ed125d088a9cf9d706154f76eb28d5e8661543863782a91d540c2e19f'),
     ('samples/physics/krustybike/KrustyBikeNearMisses.cpp', 'FindPlacement@KrustyBike', 4791568, 1296, 1288, 526, '2260143a9d880dfabfff868e69178f34173f372aa53195cc6d885ed5f14bc576'),
     ('samples/physics/krustybike/KrustyBikeNearMisses.cpp', 'SendStateDelta@KrustyBike', 4795088, 2315, 2312, 192, '1941ddbc72fdfd7b01b5ad4ea65fcace024e8e828a4019450c91e9f4d1fb6a95'),
@@ -73,7 +73,7 @@ class NextBikeConnectionsTests(unittest.TestCase):
             # Extract the unchanged function, then independently prove both
             # this execution object and the full production TU against retail.
             text = (ROOT / SOURCES[-1]).read_text()
-            start = text.index('UnknownBikeRaceRacer* BikeRace::NextBike(int* iterator) {')
+            start = text.index('BikeRaceKrustyBikeView* BikeRace::NextBike(int* iterator) {')
             end = text.index('\n}\n', start) + 3
             extracted = output / 'iterator.cpp'
             extracted.write_text('#include "BikeRaceCore.h"\n#include "TrackGame.h"\n' + text[start:end])
@@ -81,11 +81,11 @@ class NextBikeConnectionsTests(unittest.TestCase):
             # matching selected offsets does not assert complete type identity.
             layouts = []
             for name, header, assertions in (
-                ('event', 'RaceView.h', 'offsetof(UnknownKrustyBikeView, localRacer) == 0x38 && offsetof(UnknownEventRacer, position) == 0xc && offsetof(UnknownEventRacer, bikeView) == 0x740'),
-                ('visual', 'Krusty3DObjects.h', 'offsetof(UnknownVisualCueView, ownRacer) == 0x38 && offsetof(UnknownVisualCueRacer, position) == 0xc'),
-                ('stats', 'TrackOverlay.h', 'offsetof(UnknownStatsSource, ownRacer) == 0x38 && offsetof(UnknownStatsSource, replayTime) == 0x1b8'),
+                ('event', 'RaceView.h', 'offsetof(EventBikeRaceView, localRacer) == 0x38 && offsetof(EventKrustyBikeView, position) == 0xc && offsetof(EventKrustyBikeView, bikeView) == 0x740'),
+                ('visual', 'Krusty3DObjects.h', 'offsetof(VisualCueBikeRaceView, ownRacer) == 0x38 && offsetof(VisualCueKrustyBikeView, position) == 0xc'),
+                ('stats', 'TrackOverlay.h', 'offsetof(StatsBikeRaceView, ownRacer) == 0x38 && offsetof(StatsBikeRaceView, replayTime) == 0x1b8'),
                 ('bike', 'vehicle/KrustyBike.h', 'offsetof(KbRace, localRacer) == 0x38 && offsetof(KrustyBike, race) == 0x740 && sizeof(KrustyBike) == 0x1638'),
-                ('canonical', 'BikeRace.h', 'offsetof(UnknownBikeRaceRacer, bikeView) == 0x740 && offsetof(BikeRace, replayTime) == 0x1b8'),
+                ('canonical', 'BikeRace.h', 'offsetof(BikeRaceKrustyBikeView, bikeView) == 0x740 && offsetof(BikeRace, replayTime) == 0x1b8'),
             ):
                 layout = output / (name + '_layout.cpp')
                 layout.write_text(f'#include "{header}"\n#include <stddef.h>\ntypedef char Layout[({assertions}) ? 1 : -1];\n')
@@ -119,9 +119,9 @@ class NextBikeConnectionsTests(unittest.TestCase):
 
             retired = {
                 '?NextBike@KbRace@@QAEPAVKrustyBike@@PAH@Z',
-                '?NextBike@UnknownKrustyBikeView@@QAEPAUUnknownEventRacer@@PAH@Z',
-                '?NextBike@UnknownStatsSource@@QAEPAUUnknownEventRacer@@PAH@Z',
-                '?NextBike@UnknownVisualCueView@@QAEPAUUnknownVisualCueRacer@@PAH@Z',
+                '?NextBike@EventBikeRaceView@@QAEPAUEventKrustyBikeView@@PAH@Z',
+                '?NextBike@StatsBikeRaceView@@QAEPAUEventKrustyBikeView@@PAH@Z',
+                '?NextBike@VisualCueBikeRaceView@@QAEPAUVisualCueKrustyBikeView@@PAH@Z',
             }
             for source in SOURCES[:-1]:
                 obj = objects[source]

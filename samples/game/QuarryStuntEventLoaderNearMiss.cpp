@@ -71,93 +71,93 @@ void PreloadEcosystem(TextureMapManager* manager, const char* path, FileStream* 
                            int format);
 
 // A physics static model (Scene caster +0x08).
-struct UnknownQuarryPhysicsObject {
+struct QuarryLoadPhysicsObjectView {
     unsigned char field_0x000[0x128];
     CollisionObject* collisionObject;   // +0x128 SoultreePhysicsBaseObjectCore.h
     unsigned char field_0x12c[0x1f4 - 0x12c];
-    UnknownTerrain* terrain;                   // +0x1f4
+    OverlayTerrainView* terrain;                   // +0x1f4
     void* terrainScale;                        // +0x1f8 copied from the terrain's +0x40
 };
 
 // The terrain as the loader reads it.
-struct UnknownQuarryTerrain {
+struct QuarryLoadTerrainView {
     unsigned char field_0x00[0x40];
     void* worldScale;                          // +0x40 SoultreeProbe::worldScale
 };
 
-// CarProcedural's terrain pointer (Scene's UnknownSceneAnimatedObject
+// CarProcedural's terrain pointer (Scene's SceneCarProceduralView
 // leaves +0x20c unnamed).
-struct UnknownQuarryCar {
+struct QuarryLoadCarProceduralView {
     unsigned char field_0x000[0x20c];
-    UnknownTerrain* groundProvider;            // +0x20c CarProcedural.h
+    OverlayTerrainView* groundProvider;            // +0x20c CarProcedural.h
 };
 
 // A racer as the loader reads it.
-struct UnknownQuarryRacerRider {
+struct QuarryLoadRiderView {
     unsigned char field_0x000[0x1a0];
     D3DIMSoultreeObject* modelNode;               // +0x1a0
 };
-struct UnknownQuarryRacerState {
+struct QuarryLoadWreckerView {
     unsigned char field_0x00[0x38];
     CollisionObject* collisionModel;    // +0x38 Wrecker.h
 };
-struct UnknownQuarryRaceView {
+struct QuarryLoadLodBikeRaceView {
     unsigned char field_0x000[0x18c];
     unsigned char forceHighLod;                // +0x18c BikeRace.h's "ForceHighLOD"
 };
-struct UnknownQuarryRacer {
+struct QuarryLoadKrustyBikeView {
     unsigned char field_0x000[0x3bc];
     D3DIMSoultreeObject* modelNode;             // +0x3bc bike model
     unsigned char field_0x3c0[0x5c4 - 0x3c0];
-    UnknownQuarryRacerRider* riderCharacter;      // +0x5c4
+    QuarryLoadRiderView* riderCharacter;      // +0x5c4
     unsigned char field_0x5c8[0x5f0 - 0x5c8];
     CollisionObject* frontWheel;           // +0x5f0
     CollisionObject* rearWheel;            // +0x5f4
     unsigned char field_0x5f8[0x604 - 0x5f8];
-    UnknownQuarryRacerState* wrecker;  // +0x604  Bike +0x604 wrecker (its +0x38 collisionModel gets the car's ignore list)
+    QuarryLoadWreckerView* wrecker;  // +0x604  Bike +0x604 wrecker (its +0x38 collisionModel gets the car's ignore list)
     unsigned char field_0x608[0x735 - 0x608];
     unsigned char isRemote;  // +0x735  KrustyBike +0x735 isRemote
     unsigned char field_0x736[0x740 - 0x736];
-    UnknownQuarryRaceView* race;  // +0x740  KrustyBike +0x740 race
+    QuarryLoadLodBikeRaceView* race;  // +0x740  KrustyBike +0x740 race
     unsigned char field_0x744[0x1414 - 0x744];
     CollisionObject* bikeAndRiderCollision;  // +0x1414  KrustyBike +0x1414 bikeAndRiderCollision; the loader adds it as an ignored collision owner
     CollisionObject* bikeCollision;  // +0x1418  KrustyBike +0x1418 bikeCollision; the loader adds it as an ignored collision owner
 };
 
 // BikeRace (0x400 bytes, constructor 0x00417c30) as the loader uses it.
-struct UnknownQuarryRaceCharacter {
+struct QuarryLoadStartObjectView {
     unsigned char field_0x000[0x210];
     CollisionObject* collisionObject; // +0x210 krusty2 CollisionCharacter::collisionObject
 };
-class UnknownQuarryRace : public GameObject {
+class QuarryLoadBikeRaceView : public GameObject {
 public:
-    explicit UnknownQuarryRace(int flags);                     // 0x00417c30
+    explicit QuarryLoadBikeRaceView(int flags);                     // 0x00417c30
     // 0x00417ed0: loads the race; returns this, or 0.
-    UnknownQuarryRace* Create(void* target, void* particles, LightManager* lights,
-                                             TextureContext* textures, UnknownTerrain* terrain,
-                                             UnknownQuarryCamera* camera, Scene* scene, BaseQuarryEvent* event,
+    QuarryLoadBikeRaceView* Create(void* target, void* particles, LightManager* lights,
+                                             TextureContext* textures, OverlayTerrainView* terrain,
+                                             QuarryEventKrustyBikeCameraView* camera, Scene* scene, BaseQuarryEvent* event,
                                              void* shadow);
-    UnknownQuarryRacer* NextBike(int* iterator);  // 0x004204e0: the next racer, or 0
+    QuarryLoadKrustyBikeView* NextBike(int* iterator);  // 0x004204e0: the next racer, or 0
     void SetDetailLevel(int level);                     // 0x00423790: detail level
 
     unsigned char field_0x2c[0x38 - 0x2c];
-    UnknownQuarryRacer* localRacer;                     // +0x38 the player's racer
+    QuarryLoadKrustyBikeView* localRacer;                     // +0x38 the player's racer
     unsigned char field_0x3c[0x64 - 0x3c];
-    UnknownQuarryRaceCharacter* startGate;              // +0x64 (BikeRaceCore.h)
+    QuarryLoadStartObjectView* startGate;              // +0x64 (BikeRaceCore.h)
     int startGateEntry;                                 // +0x68
-    UnknownQuarryRaceCharacter* thirtySecondMan;        // +0x6c
+    QuarryLoadStartObjectView* thirtySecondMan;        // +0x6c
     int thirtySecondManEntry;                           // +0x70
     unsigned char field_0x74[0x400 - 0x74];
 };
 
 // The KrustyBikeCamera at BaseQuarryEvent+0x3c (0x3bc bytes).
-class UnknownQuarryBikeCamera : public GameObject {
+class QuarryLoadKrustyBikeCameraView : public GameObject {
 public:
-    explicit UnknownQuarryBikeCamera(int flags);               // 0x00497cb0
+    explicit QuarryLoadKrustyBikeCameraView(int flags);               // 0x00497cb0
     // 0x00497d90: sets the camera up; returns it.
-    UnknownQuarryBikeCamera* Create(void* target, float a, float b, float c, float d, float e,
+    QuarryLoadKrustyBikeCameraView* Create(void* target, float a, float b, float c, float d, float e,
                                                    int f, int count, int* presets);
-    void SetSubject(UnknownTerrain* terrain);       // 0x00463600
+    void SetSubject(OverlayTerrainView* terrain);       // 0x00463600
 
     unsigned char field_0x02c[0x274 - 0x2c];
     unsigned char isSettled;  // +0x274 FollowCamera isSettled
@@ -169,66 +169,66 @@ public:
     unsigned char targetPointCached;  // +0x391 VehicleCamera targetPointCached
     unsigned char targetHeadingCached;  // +0x392 VehicleCamera targetHeadingCached
     unsigned char field_0x393;
-    UnknownQuarryRacer* vehicle;  // +0x394 VehicleCamera vehicle
+    QuarryLoadKrustyBikeView* vehicle;  // +0x394 VehicleCamera vehicle
     unsigned char field_0x398[0x3b0 - 0x398];
-    UnknownQuarryRacer* bike;  // +0x3B0 BikeCamera bike
-    UnknownQuarryRacer* krustyBike;  // +0x3B4 KrustyBikeCamera krustyBike
+    QuarryLoadKrustyBikeView* bike;  // +0x3B0 BikeCamera bike
+    QuarryLoadKrustyBikeView* krustyBike;  // +0x3B4 KrustyBikeCamera krustyBike
     unsigned char field_0x3b8[0x3bc - 0x3b8];
 };
 
 // The visibility quadtree (0x8a0 bytes); 0x0052d460 returns its GameObject
 // base at +0x874.
-class UnknownQuarryQuadTreeHead {
+class QuarryLoadQuadTreeView {
 public:
     virtual void UnknownVirtualSlot0();
     unsigned char field_0x004[0x874 - 0x04];
 };
-class UnknownQuarryVisibility : public UnknownQuarryQuadTreeHead, public GameObject {
+class QuarryLoadVisibilityQuadTreeView : public QuarryLoadQuadTreeView, public GameObject {
 public:
-    explicit UnknownQuarryVisibility(int flags);               // 0x0052d340
+    explicit QuarryLoadVisibilityQuadTreeView(int flags);               // 0x0052d340
     // 0x0052d460: VisibilityQuadTree::Setup (src/krusty2/visibility).
     GameObject* Setup(void* target, int a, int b, float width, float breadth, Scene* scene,
                       float height);
 };
 
 // Fog (0x5c bytes, QuarryEvent.h's Fog) and the objects the sky adds.
-class UnknownQuarryFog : public GameObject {
+class QuarryLoadFogView : public GameObject {
 public:
-    explicit UnknownQuarryFog(int flags);                      // 0x00462620
+    explicit QuarryLoadFogView(int flags);                      // 0x00462620
     Fog* Create(void* target, unsigned int color, float visibility, float haziness,
                 float a, float b, float c);
 
     unsigned char field_0x2c[0x5c - 0x2c];
 };
-class UnknownQuarryFogObject : public GameObject {
+class QuarryLoadFogOffView : public GameObject {
 public:
-    explicit UnknownQuarryFogObject(int flags);                // 0x00462e10
+    explicit QuarryLoadFogOffView(int flags);                // 0x00462e10
 };
-class UnknownQuarryFogLink : public GameObject {
+class QuarryLoadFogOnView : public GameObject {
 public:
-    explicit UnknownQuarryFogLink(int flags);                  // 0x00462e90
+    explicit QuarryLoadFogOnView(int flags);                  // 0x00462e90
     GameObject* Create(void* target, Fog* fog);  // 0x00486a10
 
     unsigned char field_0x2c[0x30 - 0x2c];
 };
 
 // The last race object (0x48 bytes).
-class UnknownQuarryRaceObject : public GameObject {
+class QuarryLoadSoultreeQuadTreeRendererView : public GameObject {
 public:
-    explicit UnknownQuarryRaceObject(int flags);               // 0x00504490
+    explicit QuarryLoadSoultreeQuadTreeRendererView(int flags);               // 0x00504490
     void InsertNodesInQuadtree();                              // 0x005046e0
 
     unsigned char field_0x2c[0x48 - 0x2c];
 };
 
 // The overlays' race hooks.
-struct UnknownQuarryOverlayHooks {
-    void SetStatsSource(UnknownQuarryRace* race);       // 0x00519880 (StatsOverlay)
+struct QuarryLoadOverlayHooks {
+    void SetStatsSource(QuarryLoadBikeRaceView* race);       // 0x00519880 (StatsOverlay)
     // 0x0051d730 is ChatOverlay::CollectRacers; VisualCue's CollectRacers
     // below has the same view signature, so this one keeps its address name.
-    void UnknownFunction51d730(UnknownQuarryRace* race);       // 0x0051d730 (ChatOverlay)
-    void TakeRacers(UnknownQuarryRace* race, void* chat); // 0x0051baf0 (RadarOverlay::TakeRacers)
-    void CollectRacers(UnknownQuarryRace* race);       // 0x0048af20 (VisualCue)
+    void CollectChatRacers(QuarryLoadBikeRaceView* race);       // 0x0051d730 (ChatOverlay)
+    void TakeRacers(QuarryLoadBikeRaceView* race, void* chat); // 0x0051baf0 (RadarOverlay::TakeRacers)
+    void CollectRacers(QuarryLoadBikeRaceView* race);       // 0x0048af20 (VisualCue)
 };
 
 // The bytes the render target's colour buffers take.
@@ -238,7 +238,7 @@ static inline int FrameBufferBytes(RenderTarget* target) {
 }
 
 // 0x004de590
-int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
+int BaseQuarryEvent::LoadEventObjects(LoadProgressFn progress) {
     int terrainBytes;
     int textureBytes;
     int forced;
@@ -457,7 +457,7 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
     presets[5] = 5;
     presets[6] = 6;
     presets[7] = 7;
-    raceCamera = (UnknownQuarryCamera*)(new(__FILE__, 585) UnknownQuarryBikeCamera(1))
+    raceCamera = (QuarryEventKrustyBikeCameraView*)(new(__FILE__, 585) QuarryLoadKrustyBikeCameraView(1))
                      ->Create(renderContext, 0.55f, 0.3f, 27.0f, 7.0f, 1.048f, 2, 8, presets);
     if (!AppendChild((GameObject*)raceCamera, -1)) {
         sprintf(text, "KrustyBikeCamera not created.\n");
@@ -484,7 +484,7 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
         progress(0);
 
     g_MemTagStack->Push("QuadTree");
-    UnknownQuarryVisibility* visibility = (UnknownQuarryVisibility*)(new(__FILE__, 659) UnknownQuarryVisibility(1))
+    QuarryLoadVisibilityQuadTreeView* visibility = (QuarryLoadVisibilityQuadTreeView*)(new(__FILE__, 659) QuarryLoadVisibilityQuadTreeView(1))
         ->Setup(renderContext, 0, 0,
                                 eventScene->environment->terrainWidth * eventScene->environment->terrainWidthScale * 256.0f,
                                 eventScene->environment->terrainBreadth * eventScene->environment->terrainBreadthScale * 256.0f,
@@ -519,14 +519,14 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
     g_MemTagStack->Push("Sky");
     char* cubeFile = eventScene->environment->cubeFile;
     if (cubeFile && *cubeFile) {
-        eventFog = (new(__FILE__, 720) UnknownQuarryFog(1))
+        eventFog = (new(__FILE__, 720) QuarryLoadFogView(1))
                          ->Create(renderContext, eventScene->fog->color, eventScene->fog->visibility,
                                   eventScene->fog->haziness, 768.0f, 256.0f, 128.0f);
         if (!AppendChild((GameObject*)eventFog, -1))
             sprintf(text, "Fog not created.\n");
         if (eventFog)
             eventFog->SetDetailLevel(g_TrackGame->mode.videoSettings[4]);
-        AppendChild((new(__FILE__, 729) UnknownQuarryFogObject(1))->SetRenderContext(renderContext), -1);
+        AppendChild((new(__FILE__, 729) QuarryLoadFogOffView(1))->SetRenderContext(renderContext), -1);
         if (!g_TrackGame->sceneObject->OpenArchiveFile(stream, eventScene->environment->cubeFile, "rb", 0)) {
             sprintf(text, "No Sky found in resources.  Sky not created.\n");
             if (stream)
@@ -537,7 +537,7 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
                          ->Create(renderContext, stream, (UnknownCubeTextureContext*)&skyTextures, 1024.0f);
         if (!AppendChild((GameObject*)skyCube, -1))
             sprintf(text, "SkyCube not created.\n");
-        AppendChild((new(__FILE__, 750) UnknownQuarryFogLink(1))->Create(renderContext, eventFog), -1);
+        AppendChild((new(__FILE__, 750) QuarryLoadFogOnView(1))->Create(renderContext, eventFog), -1);
         eventFog->SetParameters(eventScene->fog->color, eventFog->fogVisibility, eventFog->fogHaziness);
     }
     if (progress)
@@ -549,7 +549,7 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
         sprintf(text, "No Terrain found in env file.  Terrain not created.\n");
         return 0;
     }
-    eventTerrain = (UnknownTerrain*)(new(__FILE__, 799) Terrain(1))
+    eventTerrain = (OverlayTerrainView*)(new(__FILE__, 799) Terrain(1))
                      ->Load((int)renderContext, (TerrainStream*)terrainStream, 1,
                                              (TerrainSurfaceDesc*)&terrainTextures,
                                              g_TrackGame->mode.videoSettings[3], 0,
@@ -581,7 +581,7 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
     } else {
         ecoSystem = (new(__FILE__, 870) EcoSystem(1))
                          ->Create(renderContext, g_TrackGame->textureManager,
-                                                 (UnknownEcoTerrain*)eventTerrain, lightManager,
+                                                 (EcoTerrainView*)eventTerrain, lightManager,
                                                  (char*)eventScene->environment, stream, 0x115c,
                                                  g_TrackGame->mode.raceSettings.treeCollision,
                                                  g_TrackGame->mode.videoSettings[1]);
@@ -595,7 +595,7 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
     if (!PrepareEvent3DObjects())
         return 0;
     g_MemTagStack->Push("BikeRace");
-    raceView = (UnknownKrustyBikeView*)new(__FILE__, 898) UnknownQuarryRace(0);
+    raceView = (EventBikeRaceView*)new(__FILE__, 898) QuarryLoadBikeRaceView(0);
     g_MemTagStack->Push("Particles");
     if (particleManager)
         particleManager = ((ParticleManager*)particleManager)
@@ -606,7 +606,7 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
         return 0;
     g_TrackGame->mode.networkGame = eventScene->crowdPresent;
     g_MemTagStack->Push("BikeRace");
-    raceView = (UnknownKrustyBikeView*)((UnknownQuarryRace*)raceView)
+    raceView = (EventBikeRaceView*)((QuarryLoadBikeRaceView*)raceView)
                      ->Create(renderContext, particleManager, lightManager, &modelTextures, eventTerrain, raceCamera,
                                              eventScene, this, projectedShadow);
     if (!raceView) {
@@ -621,40 +621,40 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
         for (int i = 0; i < eventScene->staticModels->casterCount; i++) {
             SceneStaticModel* caster = &eventScene->staticModels->casters[i];
             if (caster->physics) {
-                UnknownTerrain* terrain = eventTerrain;
-                UnknownQuarryPhysicsObject* physics = (UnknownQuarryPhysicsObject*)caster->physicsObject;
+                OverlayTerrainView* terrain = eventTerrain;
+                QuarryLoadPhysicsObjectView* physics = (QuarryLoadPhysicsObjectView*)caster->physicsObject;
                 physics->terrain = terrain;
                 if (terrain)
-                    physics->terrainScale = ((UnknownQuarryTerrain*)terrain)->worldScale;
-                ((UnknownQuarryPhysicsObject*)caster->physicsObject)->collisionObject->SnapPlacement();
-                ((UnknownQuarryPhysicsObject*)caster->physicsObject)->collisionObject->SetUseBroadphase(1);
-                ((UnknownQuarryPhysicsObject*)caster->physicsObject)->collisionObject->SetOwner(caster->physicsObject, 0x68);
+                    physics->terrainScale = ((QuarryLoadTerrainView*)terrain)->worldScale;
+                ((QuarryLoadPhysicsObjectView*)caster->physicsObject)->collisionObject->SnapPlacement();
+                ((QuarryLoadPhysicsObjectView*)caster->physicsObject)->collisionObject->SetUseBroadphase(1);
+                ((QuarryLoadPhysicsObjectView*)caster->physicsObject)->collisionObject->SetOwner(caster->physicsObject, 0x68);
             } else if (caster->collisionObject && ((D3DIMSoultreeObject*)caster->model)->CountNodes() == 1) {
                 ((CollisionObject*)caster->collisionObject)->SnapPlacement();
                 ((CollisionObject*)caster->collisionObject)->SetUseBroadphase(1);
             }
         }
     }
-    if (((UnknownQuarryRace*)raceView)->thirtySecondMan && ((UnknownQuarryRace*)raceView)->thirtySecondMan->collisionObject) {
-        ((UnknownQuarryRace*)raceView)->thirtySecondMan->collisionObject->Release();
-        ((UnknownQuarryRace*)raceView)->thirtySecondMan->collisionObject = 0;
+    if (((QuarryLoadBikeRaceView*)raceView)->thirtySecondMan && ((QuarryLoadBikeRaceView*)raceView)->thirtySecondMan->collisionObject) {
+        ((QuarryLoadBikeRaceView*)raceView)->thirtySecondMan->collisionObject->Release();
+        ((QuarryLoadBikeRaceView*)raceView)->thirtySecondMan->collisionObject = 0;
     }
-    if (((UnknownQuarryRace*)raceView)->startGate && ((UnknownQuarryRace*)raceView)->startGate->collisionObject) {
-        ((UnknownQuarryRace*)raceView)->startGate->collisionObject->Release();
-        ((UnknownQuarryRace*)raceView)->startGate->collisionObject = 0;
+    if (((QuarryLoadBikeRaceView*)raceView)->startGate && ((QuarryLoadBikeRaceView*)raceView)->startGate->collisionObject) {
+        ((QuarryLoadBikeRaceView*)raceView)->startGate->collisionObject->Release();
+        ((QuarryLoadBikeRaceView*)raceView)->startGate->collisionObject = 0;
     }
     if (eventScene->animationTable) {
         for (int i = 0; i < eventScene->animationTable->entryCount; i++) {
             if (eventScene->animationTable->entries[i].keyFramed) {
-                UnknownSceneObject* character = eventScene->animationTable->entries[i].character;
+                SceneCollisionCharacterView* character = eventScene->animationTable->entries[i].character;
                 if (character->collisionObject) {
                     ((CollisionObject*)character->collisionObject)->SnapPlacement();
                     ((CollisionObject*)character->collisionObject)->SetUseBroadphase(1);
                     ((CollisionObject*)character->collisionObject)->SetIgnoreListMode(0);
-                    if (i != ((UnknownQuarryRace*)raceView)->thirtySecondManEntry && i != ((UnknownQuarryRace*)raceView)->startGateEntry) {
+                    if (i != ((QuarryLoadBikeRaceView*)raceView)->thirtySecondManEntry && i != ((QuarryLoadBikeRaceView*)raceView)->startGateEntry) {
                         int iterator = 0;
-                        for (UnknownQuarryRacer* racer = ((UnknownQuarryRace*)raceView)->NextBike(&iterator);
-                             racer; racer = ((UnknownQuarryRace*)raceView)->NextBike(&iterator)) {
+                        for (QuarryLoadKrustyBikeView* racer = ((QuarryLoadBikeRaceView*)raceView)->NextBike(&iterator);
+                             racer; racer = ((QuarryLoadBikeRaceView*)raceView)->NextBike(&iterator)) {
                             if (!racer->isRemote) {
                                 ((CollisionObject*)character->collisionObject)->AddIgnoredOwner(racer->bikeCollision);
                                 ((CollisionObject*)character->collisionObject)->AddIgnoredOwner(racer->bikeAndRiderCollision);
@@ -670,8 +670,8 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
                     }
                 }
             } else {
-                UnknownSceneAnimatedObject* car = eventScene->animationTable->entries[i].proceduralObject;
-                ((UnknownQuarryCar*)car)->groundProvider = eventTerrain;
+                SceneCarProceduralView* car = eventScene->animationTable->entries[i].proceduralObject;
+                ((QuarryLoadCarProceduralView*)car)->groundProvider = eventTerrain;
                 ((CollisionObject*)car->sensorCollider)->SetIgnoreListMode(1);
                 for (int j = 0; j < eventScene->animationTable->entryCount; j++) {
                     SceneAnimation* entry = &eventScene->animationTable->entries[j];
@@ -687,8 +687,8 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
                 ((CollisionObject*)car->bodyCollider)->SetOwner(car, 0x69);
                 ((CollisionObject*)car->bodyCollider)->SetIgnoreListMode(0);
                 int iterator = 0;
-                for (UnknownQuarryRacer* racer = ((UnknownQuarryRace*)raceView)->NextBike(&iterator); racer;
-                     racer = ((UnknownQuarryRace*)raceView)->NextBike(&iterator)) {
+                for (QuarryLoadKrustyBikeView* racer = ((QuarryLoadBikeRaceView*)raceView)->NextBike(&iterator); racer;
+                     racer = ((QuarryLoadBikeRaceView*)raceView)->NextBike(&iterator)) {
                     if (!racer->isRemote) {
                         ((CollisionObject*)car->bodyCollider)->AddIgnoredOwner(racer->bikeCollision);
                         ((CollisionObject*)car->bodyCollider)->AddIgnoredOwner(racer->bikeAndRiderCollision);
@@ -728,16 +728,16 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
     if (!raceView->AppendChild((GameObject*)g_TrackGame->eventManager->podiumObject, -1))
         return 0;
     if (auralScape) {
-        auralScape->groundSubject = (UnknownFollowCameraSubject*)eventTerrain;
+        auralScape->groundSubject = (FollowCameraTerrainView*)eventTerrain;
         AppendChild(auralScape, -1);
     }
 
     g_MemTagStack->Push("Shadow");
     if (projectedShadow) {
         AppendChild((GameObject*)projectedShadow, -1);
-        ((ProjectedShadow*)projectedShadow)->AddCaster((ShadowCaster*)((UnknownQuarryRace*)raceView)->localRacer->modelNode);
+        ((ProjectedShadow*)projectedShadow)->AddCaster((ShadowCaster*)((QuarryLoadBikeRaceView*)raceView)->localRacer->modelNode);
         ((ProjectedShadow*)projectedShadow)
-            ->AddCaster((ShadowCaster*)((UnknownQuarryRace*)raceView)->localRacer->riderCharacter->modelNode);
+            ->AddCaster((ShadowCaster*)((QuarryLoadBikeRaceView*)raceView)->localRacer->riderCharacter->modelNode);
         ((ProjectedShadow*)projectedShadow)->SetLight((const ShadowVec3*)&shadowLight->position,
                                                 (const ShadowVec3*)&shadowLight->look, 3);
         ((ProjectedShadow*)projectedShadow)->SetShadowStrength(0x80);
@@ -755,11 +755,11 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
     if (!CreateEventCollision())
         return 0;
     g_MemTagStack->Push("3DObjects");
-    CreateRacer3DObjects((int)((UnknownQuarryRace*)raceView)->localRacer);
+    CreateRacer3DObjects((int)((QuarryLoadBikeRaceView*)raceView)->localRacer);
     g_MemTagStack->Push("BikeRace");
-    ((UnknownQuarryBikeCamera*)raceCamera)->SetSubject(eventTerrain);
-    UnknownQuarryBikeCamera* camera = (UnknownQuarryBikeCamera*)raceCamera;
-    UnknownQuarryRacer* bike = ((UnknownQuarryRace*)raceView)->localRacer;
+    ((QuarryLoadKrustyBikeCameraView*)raceCamera)->SetSubject(eventTerrain);
+    QuarryLoadKrustyBikeCameraView* camera = (QuarryLoadKrustyBikeCameraView*)raceCamera;
+    QuarryLoadKrustyBikeView* bike = ((QuarryLoadBikeRaceView*)raceView)->localRacer;
     if (camera->bike && !bike->race->forceHighLod) {
         camera->bike->modelNode->SetLowestLod(1);
         camera->bike->riderCharacter->modelNode->SetLowestLod(1);
@@ -784,13 +784,13 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
     }
     camera->isSettled = 0;
     if (statsOverlay)
-        ((UnknownQuarryOverlayHooks*)statsOverlay)->SetStatsSource((UnknownQuarryRace*)raceView);
+        ((QuarryLoadOverlayHooks*)statsOverlay)->SetStatsSource((QuarryLoadBikeRaceView*)raceView);
     if (chatOverlay)
-        ((UnknownQuarryOverlayHooks*)chatOverlay)->UnknownFunction51d730((UnknownQuarryRace*)raceView);
+        ((QuarryLoadOverlayHooks*)chatOverlay)->CollectChatRacers((QuarryLoadBikeRaceView*)raceView);
     if (radarOverlay)
-        ((UnknownQuarryOverlayHooks*)radarOverlay)->TakeRacers((UnknownQuarryRace*)raceView, chatOverlay);
+        ((QuarryLoadOverlayHooks*)radarOverlay)->TakeRacers((QuarryLoadBikeRaceView*)raceView, chatOverlay);
     if (visualCue)
-        ((UnknownQuarryOverlayHooks*)visualCue)->CollectRacers((UnknownQuarryRace*)raceView);
+        ((QuarryLoadOverlayHooks*)visualCue)->CollectRacers((QuarryLoadBikeRaceView*)raceView);
     g_MemTagStack->Pop(0);
 
     if (!g_TrackGame->mode.instrumentOverlayOn)
@@ -817,7 +817,7 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
     raceView->SetDetailLevel(g_TrackGame->mode.videoSettings[2]);
     if (progress)
         progress(0);
-    UnknownQuarryRaceObject* last = new(__FILE__, 1251) UnknownQuarryRaceObject(1);
+    QuarryLoadSoultreeQuadTreeRendererView* last = new(__FILE__, 1251) QuarryLoadSoultreeQuadTreeRendererView(1);
     last->SetRenderContext(renderContext);
     AppendChild(last, -1);
     last->InsertNodesInQuadtree();

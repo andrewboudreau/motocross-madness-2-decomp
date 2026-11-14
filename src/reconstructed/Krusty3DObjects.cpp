@@ -61,7 +61,7 @@ RunwayLights::RunwayLights(int flags) : GameObject(flags) {
 
 // 0x0048a600
 RunwayLights* RunwayLights::SetupLights(void* context, int lights, int options,
-                                        UnknownRunwayTerrain* terrain) {
+                                        RunwayTerrainView* terrain) {
     char name[0x104];
 
     GameObject::SetRenderContext(context);
@@ -155,7 +155,7 @@ int RunwayLights::Tick(float frameTime) {
 }
 
 // 0x0048ad50
-void RunwayLights::SetRacer(UnknownRunwayRacer* racer) {
+void RunwayLights::SetRacer(RunwayKrustyBikeView* racer) {
     trackedRacer = racer;
 }
 
@@ -175,9 +175,9 @@ VisualCue::VisualCue(int flags) : ArcadeObject(flags) {
 }
 
 // 0x0048adf0
-VisualCue* VisualCue::LoadVisualCue(void* context, int lights, int options, UnknownRunwayTerrain* terrain,
-                                    Vector3 position, UnknownVisualCueView* view, int pixels,
-                                    UnknownArcadeView* camera, float size, float screenXFraction,
+VisualCue* VisualCue::LoadVisualCue(void* context, int lights, int options, RunwayTerrainView* terrain,
+                                    Vector3 position, VisualCueBikeRaceView* view, int pixels,
+                                    ArcadeCameraView* camera, float size, float screenXFraction,
                                     float screenYFraction) {
     char name[0x104];
 
@@ -196,14 +196,14 @@ VisualCue* VisualCue::LoadVisualCue(void* context, int lights, int options, Unkn
 }
 
 // 0x0048af20
-void VisualCue::CollectRacers(UnknownVisualCueView* view) {
+void VisualCue::CollectRacers(VisualCueBikeRaceView* view) {
     int iterator;
-    UnknownVisualCueRacer* racer;
+    VisualCueKrustyBikeView* racer;
 
     cueRacerCount = 0;
     iterator = 0;
     cueView = view;
-    while ((racer = reinterpret_cast<UnknownVisualCueRacer*>(reinterpret_cast<BikeRace*>(cueView)->NextBike(&iterator))) != 0) {
+    while ((racer = reinterpret_cast<VisualCueKrustyBikeView*>(reinterpret_cast<BikeRace*>(cueView)->NextBike(&iterator))) != 0) {
         cueRacers[cueRacerCount] = racer;
         cueRacerCount++;
     }
@@ -282,8 +282,8 @@ NumberObjectManager::NumberObjectManager(int flags) : GameObject(flags) {
 }
 
 // 0x0048bd00
-NumberObjectManager* NumberObjectManager::SetupDigits(void* context, int options, UnknownNumberRacer* racer,
-                                                      int pixels, UnknownNumberCamera* camera,
+NumberObjectManager* NumberObjectManager::SetupDigits(void* context, int options, NumberBikeRaceView* racer,
+                                                      int pixels, NumberCameraView* camera,
                                                       float size) {
     char name[0x104];
 
@@ -301,7 +301,7 @@ NumberObjectManager* NumberObjectManager::SetupDigits(void* context, int options
         sprintf(name, "%s\\%s", "Res", names[i]);
         digitModels[i] = (new (__FILE__, 0x240) ArcadeObject(1))
                             ->Create(context, 0, options, name, position, pixels,
-                                                    (UnknownArcadeView*)camera, size, 0.5f, 0.1f, 0);
+                                                    (ArcadeCameraView*)camera, size, 0.5f, 0.1f, 0);
         if (!AppendChild(digitModels[i], -1)) {
             Release();
             return 0;
@@ -315,7 +315,7 @@ NumberObjectManager* NumberObjectManager::SetupDigits(void* context, int options
 // The owner a NumberObjectManager compares its camera with (its +0x18).
 struct UnknownNumberOwner {
     unsigned char field_0x00[0x08];
-    UnknownNumberCamera* currentCamera;        // +0x08
+    NumberCameraView* currentCamera;        // +0x08
 };
 
 // 0x0048bfc0
@@ -486,7 +486,7 @@ int BonusObjectManager::CreateFrameNode(void* context, int lights, int options) 
 
 // 0x0048ca60
 BonusObjectManager* BonusObjectManager::SetupCounter(void* context, int lights, int options,
-                                                     UnknownBonusRacer* racer, UnknownBonusCamera* camera) {
+                                                     BonusBikeRaceView* racer, BonusCameraView* camera) {
     GameObject::SetRenderContext(context);
     raceView = racer;
     this->camera = camera;
@@ -521,7 +521,7 @@ void BonusObjectManager::NextKey() {
 // The camera's +0x198 value read by value: VC6 then multiplies
 // `fld [camera+0x198]; fmul [this+0x1e4]` as retail does (a plain
 // camera->focalLength loads this+0x1e4 first).
-static inline float CameraZoom(const UnknownBonusCamera* camera) {
+static inline float CameraZoom(const BonusCameraView* camera) {
     return camera->focalLength;
 }
 
@@ -540,7 +540,7 @@ int BonusObjectManager::Tick(float frameTime) {
     int digit;
     int place;
 
-    if (currentKey == -1 || reinterpret_cast<UnknownKrustyGame*>(g_TrackGame)->uiInteractionBlocked)
+    if (currentKey == -1 || reinterpret_cast<CueTrackGameView*>(g_TrackGame)->uiInteractionBlocked)
         return 1;
     if (raceView->localRacer->crashState && elapsed > 2.0f) {
         HideDigits();
@@ -555,9 +555,9 @@ int BonusObjectManager::Tick(float frameTime) {
         raceView->localRacer->modelNode->GetPosition(&position);
         position += t * keyPositionChange + keyPosition;
         baseFrame->TranslateIn(0, position);
-        if (camera != reinterpret_cast<UnknownKrustyGame*>(g_TrackGame)->renderTarget->currentCamera || camera->fieldOfView != placedFieldOfView ||
+        if (camera != reinterpret_cast<CueTrackGameView*>(g_TrackGame)->renderTarget->currentCamera || camera->fieldOfView != placedFieldOfView ||
             isResizePending) {
-            camera = reinterpret_cast<UnknownKrustyGame*>(g_TrackGame)->renderTarget->currentCamera;
+            camera = reinterpret_cast<CueTrackGameView*>(g_TrackGame)->renderTarget->currentCamera;
             placedFieldOfView = camera->fieldOfView;
             Vector3 delta = position - camera->eyePosition;
             isResizePending = 0;

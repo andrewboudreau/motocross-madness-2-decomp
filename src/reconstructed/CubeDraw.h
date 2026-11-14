@@ -37,7 +37,7 @@ struct UnknownCubeTextureContext;
 
 // 0x20-byte lit vertex (FVF 0x1e2: position, reserved, diffuse, specular,
 // one texture coordinate pair), the D3DLVERTEX layout.
-struct UnknownCubeVertex {
+struct CubeLitVertex {
     Vector3 position;
     int reserved;
     unsigned int diffuse;

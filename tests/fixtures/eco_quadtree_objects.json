@@ -1,23 +1,23 @@
 {
-  "baseline": "Published ed3d06ce same-path complete objects; all nondebug bytes and relocation destinations preserved under exactly these six interface names. Only enumerated complete source paths are portable. Insert remains complete627/620 nonexact. The frozen visibility camera now uses actual PCCamera storage: its old complete pin was independently reproduced first; three names join the same lifecycle/storage, with one exact implicit destructor COMDAT (5 code bytes plus 11 alignment NOPs) and the cleanup reference resolving to that definition. All 87 old sections and 341 relocations otherwise preserve their bytes and destinations. Round57 light lookup: published dfdf9823 canonical EcoSystem pin independently reproduced, then complete132 sections/720 relocations preserved under only the UnknownEcoLight*-to-LightEmitter* method-return spelling. All other records unchanged.",
+  "baseline": "Published ed3d06ce same-path complete objects; all nondebug bytes and relocation destinations preserved under exactly these six interface names. Only enumerated complete source paths are portable. Insert remains complete627/620 nonexact. The frozen visibility camera now uses actual PCCamera storage: its old complete pin was independently reproduced first; three names join the same lifecycle/storage, with one exact implicit destructor COMDAT (5 code bytes plus 11 alignment NOPs) and the cleanup reference resolving to that definition. All 87 old sections and 341 relocations otherwise preserve their bytes and destinations. Round57 light lookup: published dfdf9823 canonical EcoSystem pin independently reproduced, then complete132 sections/720 relocations preserved under only the EcoLightEmitterView*-to-LightEmitter* method-return spelling. All other records unchanged.",
   "renames": {
-    "?ComputeCode@UnknownEcoQuadTree@@QAEIMMMM@Z": "?ComputeCode@QuadTree@@QAEIMMMM@Z",
-    "?Insert@UnknownEcoQuadTree@@QAEXPAVUnknownEcoQuadTreeObject@@IMM@Z": "?Insert@QuadTree@@QAEXPAVQuadTreeObject@@IMM@Z",
-    "?NextObjectSorted@UnknownEcoQuadTree@@QAEPAVUnknownEcoQuadTreeObject@@XZ": "?NextObjectSorted@QuadTree@@QAEPAVQuadTreeObject@@XZ",
-    "?RestartQuery@UnknownEcoQuadTree@@QAEXXZ": "?RestartQuery@QuadTree@@QAEXXZ",
-    "?IsValidCode@UnknownEcoQuadTree@@QAEHI@Z": "?IsValidCode@QuadTree@@QAEHI@Z",
-    "?g_collisionQuadTree@@3PAVUnknownEcoQuadTree@@A": "?g_collisionQuadTree@@3PAVQuadTree@@A"
+    "?ComputeCode@EcoQuadTreeView@@QAEIMMMM@Z": "?ComputeCode@QuadTree@@QAEIMMMM@Z",
+    "?Insert@EcoQuadTreeView@@QAEXPAVUnknownEcoQuadTreeObject@@IMM@Z": "?Insert@QuadTree@@QAEXPAVQuadTreeObject@@IMM@Z",
+    "?NextObjectSorted@EcoQuadTreeView@@QAEPAVUnknownEcoQuadTreeObject@@XZ": "?NextObjectSorted@QuadTree@@QAEPAVQuadTreeObject@@XZ",
+    "?RestartQuery@EcoQuadTreeView@@QAEXXZ": "?RestartQuery@QuadTree@@QAEXXZ",
+    "?IsValidCode@EcoQuadTreeView@@QAEHI@Z": "?IsValidCode@QuadTree@@QAEHI@Z",
+    "?g_collisionQuadTree@@3PAVEcoQuadTreeView@@A": "?g_collisionQuadTree@@3PAVQuadTree@@A"
   },
   "objects": {
     "src/reconstructed/EcoSystem.cpp": {
       "sections": 132,
       "relocations": 720,
-      "sha256": "1efd08ee03e06e5180fa230deadd29bde8269db93087529212c57c77f9b4a690"
+      "sha256": "406df161393a7f8b894bd104d6364569d404aebfcdc879f40c0053308abb41f9"
     },
     "samples/ecosystem/EcoSystemNearMisses.cpp": {
       "sections": 98,
       "relocations": 444,
-      "sha256": "32751ae016b808ca10c259be463af85886325df6535905873c258313c955bcfe"
+      "sha256": "2949e44c3c5dc84e5e6d568500eb64c8a8264e60c0f48ac31ad93ff33e124e00"
     },
     "src/krusty2/broadphase/Quadtree.cpp": {
       "sections": 51,
@@ -33,14 +33,14 @@
   "inventory": [
     [
       "src/reconstructed/EcoSystem.cpp",
-      "?ComputeQuadTreeCode@Vegetation@@UAEIPAVUnknownEcoQuadTree@@@Z",
+      "?ComputeQuadTreeCode@Vegetation@@UAEIPAVEcoQuadTreeView@@@Z",
       "?ComputeCode@QuadTree@@QAEIMMMM@Z",
       108,
       20
     ],
     [
       "src/reconstructed/EcoSystem.cpp",
-      "?Create@EcoSystem@@QAEPAV1@PAXPAVTextureMapManager@@PAVUnknownEcoTerrain@@PAVLightManager@@PADPAVFileStream@@HHH@Z",
+      "?Create@EcoSystem@@QAEPAV1@PAXPAVTextureMapManager@@PAVEcoTerrainView@@PAVLightManager@@PADPAVFileStream@@HHH@Z",
       "?g_collisionQuadTree@@3PAVQuadTree@@A",
       119,
       6

@@ -45,19 +45,19 @@ public:
     unsigned int textColor;                   // +0x54 text colour, 0xff00
 };
 
-struct UnknownEventRacer;
-struct UnknownKrustyBikeView;
+struct EventKrustyBikeView;
+struct EventBikeRaceView;
 struct RaceGate;
 class ChatOverlay;
 
 // The object at a racer's +0x5f0; RaceStatus.cpp 0x004e6a50 reads the
 // position at +0x200 for gate races.
-struct UnknownEventRacerModel {
+struct EventBikeWheelView {
     unsigned char field_0x000[0x200];
     Vector3 nodePosition;  // +0x200  racer +0x5f0 is Bike::frontWheel (BikeWheel); VehicleWheel +0x200 nodePosition; RaceStatus 0x004e6a50 reads it
 };
-struct UnknownCameraBikeRider;
-struct UnknownCameraBikeState;
+struct BikeCameraRiderView;
+struct BikeCameraWreckerView;
 class SoultreeObject;
 // Keep the local race-view name while using the actual scene-node type.
 typedef SoultreeObject UnknownVehiclePart;
@@ -69,7 +69,7 @@ typedef SoultreeObject UnknownVehiclePart;
 // against; +0x38/+0x44 are track positions.
 struct RaceStatusNode {
     int creationOrder;                        // +0x00 1-based order of creation
-    UnknownEventRacer* racer;                 // +0x04 racer
+    EventKrustyBikeView* racer;                 // +0x04 racer
     float goalDistance;                       // +0x08 progressPos to the finish probe (track races) or to the next gate's centre (gate races), 0x004e6a50
     float gateDistance;                       // +0x0c distance to the next gate (sort key)
     float progressStep;                       // +0x10 progressPos..placedPos distance this frame (0x004e6a50)
@@ -88,16 +88,16 @@ struct RaceStatusNode {
 // GameObject through a vbptr at +0x04 (EventManager 0x0045cdc0 calls slot 4
 // through it), as KrustyBike's RTTI shows (virtual GameObject base, pdisp 4).
 // Its methods here are KrustyBike.cpp code, so slot 0 takes KrustyBike's name.
-struct UnknownEventRacer : virtual public GameObject {
+struct EventKrustyBikeView : virtual public GameObject {
     virtual void UpdateMass();            // slot 0 (KrustyBike's); gives the racer its own vfptr at +0
     // Own vtable +0xc8 (slot 50) is called by FollowRacer.cpp 0x004a9e80 with
     // (1, 5.0f, 0); samples/race/FollowRacerNearMisses.cpp views the slot.
 
     // 0x004925a0 (KrustyBike.cpp's code): the view's own racer hears that
     // `racer` is followed (FollowRacer.cpp passes 0 as the flag).
-    void SendFollowedRacer(UnknownEventRacer* racer, bool flag);
+    void SendFollowedRacer(EventKrustyBikeView* racer, bool flag);
     // 0x00496f90 (KrustyBike.cpp's code): this racer hears about `other`.
-    void IgnoreCollisionsWith(UnknownEventRacer* other);
+    void IgnoreCollisionsWith(EventKrustyBikeView* other);
 
     unsigned char field_0x008[0x0c - 0x08];
     Vector3 position;                         // +0x00c position (KrustyBikeCamera slot 10 adds 2 to y)
@@ -128,12 +128,12 @@ struct UnknownEventRacer : virtual public GameObject {
     unsigned char field_0x488[0x4a0 - 0x488];
     int outOfRace;                            // +0x4a0 EventManager 0x0045eef0: counts as done when set
     unsigned char field_0x4a4[0x5c4 - 0x4a4];
-    UnknownCameraBikeRider* riderCharacter;   // +0x5c4 as BikeCamera's bike +0x5c4 (TrackOverlay 0x005190e0)
+    BikeCameraRiderView* riderCharacter;   // +0x5c4 as BikeCamera's bike +0x5c4 (TrackOverlay 0x005190e0)
     unsigned char field_0x5c8[0x5e0 - 0x5c8];
     char racerName[0x10];                     // +0x5e0 name
-    UnknownEventRacerModel* frontWheel;       // +0x5f0 RaceStatus.cpp 0x004e6a50 takes its +0x200 position
+    EventBikeWheelView* frontWheel;       // +0x5f0 RaceStatus.cpp 0x004e6a50 takes its +0x200 position
     unsigned char field_0x5f4[0x604 - 0x5f4];
-    UnknownCameraBikeState* wrecker;          // +0x604 the racer's Wrecker; racesnd.cpp 0x004e39b0 reads its contactThisFrame
+    BikeCameraWreckerView* wrecker;          // +0x604 the racer's Wrecker; racesnd.cpp 0x004e39b0 reads its contactThisFrame
     unsigned char field_0x608[0x734 - 0x608];
     char aiKind;  // +0x734  KrustyBike +0x734 aiKind; RaceStatus estimates finish times only for racers with it set
     unsigned char isRemote;  // +0x735  KrustyBike isRemote; passed as CountLap/AdvanceGate skipTest; selects ClosestPointOnTrack over PlaceNear
@@ -141,8 +141,8 @@ struct UnknownEventRacer : virtual public GameObject {
     char fourStroke;                          // +0x737 selects engine 2 over 1 (racesnd.cpp 0x004e3430)
     int engineSize;                           // +0x738 engine size; below 250 uses engine 0
     unsigned char field_0x73c[0x740 - 0x73c];
-    UnknownKrustyBikeView* bikeView;          // +0x740 the view (RaceStatus.cpp compares its +0x38 and +0x50)
-    RaceStatusNode* statusNode;        // +0x744 race status node (UnknownBikeRaceRacer)
+    EventBikeRaceView* bikeView;          // +0x740 the view (RaceStatus.cpp compares its +0x38 and +0x50)
+    RaceStatusNode* statusNode;        // +0x744 race status node (BikeRaceKrustyBikeView)
     int finishTimeStamp;                      // +0x748 time stamp; 0x7ffffffe until finished
     float lastLapTime;                        // +0x74c last lap time (RaceStatus.cpp)
     float fastestLap;                         // +0x750 EventManager 0x0045c8b0 copies it to ZoneReport's "FastestLap" (TrackRecord reads it)
@@ -179,15 +179,15 @@ struct UnknownEventRacer : virtual public GameObject {
     char aiIndex;                             // +0x11c0 AI racer's index in its messages
 };
 
-// The score board at UnknownKrustyBikeView+0xbc (the krustybike sample's
+// The score board at EventBikeRaceView+0xbc (the krustybike sample's
 // KbScoreBoard); only 0x0048d1e0 is declared: shows `score` with `multiplier`
 // (FollowRacer.cpp passes 2500 and 1 for taking over the followed racer).
 struct UnknownScoreBoard {
     void ShowValue(float score, float multiplier);  // 0x0048d1e0
 };
 
-// The replay object at UnknownKrustyBikeView+0x1a0; +0x10c is its length.
-struct UnknownKrustyBikeViewReplay {
+// The replay object at EventBikeRaceView+0x1a0; +0x10c is its length.
+struct EventKrustyVCRView {
     unsigned char field_0x000[0x10c];
     float replayLength;                       // +0x10c
 };
@@ -196,7 +196,7 @@ struct UnknownKrustyBikeViewReplay {
 // +0x558..+0x568 objects); slot 48 tests two flags. TrackGame and
 // EventManager use it as a GameObject (slot 5, the +0x25 flag bits), which
 // fits KrustyBike's primary base chain; its class is not established.
-struct UnknownKrustyBikeView : public GameObject {
+struct EventBikeRaceView : public GameObject {
     void NextCameraTarget(int forward, int racers, int objects); // 0x0041f1d0 (InGameProcs.cpp)
     void ToggleReplayPause(int value);   // 0x0041f550 (InGameProcs.cpp)
     void RestartRace(int mode, int path, int description); // 0x00420650 (InGameProcs.cpp ExitDlg)
@@ -207,14 +207,14 @@ struct UnknownKrustyBikeView : public GameObject {
     // with `description`.
     void SaveReplay(char* path, char* description);
     // 0x004204e0: the next racer after `*iterator` (advancing it), or 0.
-    UnknownEventRacer* NextBike(int* iterator);
+    EventKrustyBikeView* NextBike(int* iterator);
     // 0x004210f0: writes two positions relative to `reference`.
     void WriteRelativePositions(Vector3* a, Vector3* b, void* reference, int flags);
 
     unsigned char field_0x02c[0x38 - 0x2c];
-    UnknownEventRacer* localRacer;            // +0x38 its own racer
-    UnknownEventRacer** racerSlots;           // +0x3c all racers, by racer slot
-    UnknownEventRacer** aiRacers;             // +0x40 AI racers (TrackGame+0x2d94 of them)
+    EventKrustyBikeView* localRacer;            // +0x38 its own racer
+    EventKrustyBikeView** racerSlots;           // +0x3c all racers, by racer slot
+    EventKrustyBikeView** aiRacers;             // +0x40 AI racers (TrackGame+0x2d94 of them)
     GameObject* raceSound;                    // +0x44 BikeRace: the RaceSound (FollowRacer plays the "it" sound through it)
     unsigned char field_0x048[0x50 - 0x48];
     GameObject* raceCamera;                   // +0x50 BikeRace: the race camera
@@ -232,7 +232,7 @@ struct UnknownKrustyBikeView : public GameObject {
     bool networkStartPending;                 // +0x18e BikeRace: the multiplayer start check is pending (the race clock waits, the camera shows the grid)
     unsigned char field_0x18f[0x19c - 0x18f];
     ChatOverlay* chatOverlay;                 // +0x19c the name tags (TrackOverlay 0x0051bed0 updates them)
-    UnknownKrustyBikeViewReplay* replayVcr;   // +0x1a0 replay being played (InGameProcs.cpp VCRDlg)
+    EventKrustyVCRView* replayVcr;   // +0x1a0 replay being played (InGameProcs.cpp VCRDlg)
     unsigned char field_0x1a4[0x1a8 - 0x1a4];
     VCRFile* vcrFile;             // +0x1a8 VCR file the recordings open; EventManager 0x0045cdc0 saves it as Record\*.gho
     unsigned char field_0x1ac[0x1b8 - 0x1ac];

@@ -22,7 +22,7 @@ typedef void (*UnknownPickCallback)(CollisionObject* self, CollisionObject* othe
 // The object passed as the ninth argument of 0x00401310; only its float at
 // +0x198 is read here (it scales the model to a screen size). The other
 // fields are the camera fields Krusty3DObjects.cpp's VisualCue reads.
-struct UnknownArcadeView {
+struct ArcadeCameraView {
     unsigned char field_0x000[0xac];
     float cameraMatrix[4][4];                 // +0x0ac camera matrix (rows of 4)
     unsigned char field_0x0ec[0x16c - 0xec];
@@ -45,7 +45,7 @@ public:
     // (line 78), places it and optionally scales it to `pixels` and attaches
     // a TransparencyMod with `alpha` (line 104). 0 when the model fails.
     ArcadeObject* Create(void* context, int lights, int options, const char* name, Vector3 position,
-                                        int pixels, UnknownArcadeView* view, float size,
+                                        int pixels, ArcadeCameraView* view, float size,
                                         float screenXFraction, float screenYFraction, unsigned char alpha);
     void SetPosition(const Vector3* position);  // 0x004014f0
     // 0x00401520: forwards the axes and flags to the model's SetAxesPtr (0x004fbd70).
@@ -62,7 +62,7 @@ public:
     float modelScale;                          // scale, 1 by default
     float targetPixels;                       // +0x38 0x00401310's `pixels`: the on-screen size the scale aims for
     float modelSize;                          // +0x3c twice the largest bounds half-extent
-    UnknownArcadeView* arcadeView;
+    ArcadeCameraView* arcadeView;
     float viewDistance;                       // +0x44 0x00401310's `size`; modelScale = targetPixels * viewDistance / (modelSize * focalLength), and VisualCue places the cue this far in front of the camera
     float screenX;                            // +0x48 0x00401310's `c`: VisualCue's horizontal screen fraction
     float screenY;                            // +0x4c 0x00401310's `d`: VisualCue's vertical screen fraction

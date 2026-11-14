@@ -9,8 +9,8 @@ was added.
 | Caller | Retired method view | Canonical provider | Full extent |
 | --- | --- | --- | --- |
 | Grid1 texture eviction callbacks | `Grid1Terrain::RetireOwnedObject` | `Terrain::RetireOwnedObject`, 0x005057d0 | 83 bytes |
-| QuarryStuntEvent detail controls | `UnknownTerrain::SelectQuality` | `Terrain::SelectQuality`, 0x00507960 | 129 bytes |
-| NameOverlay visibility test in TrackOverlay | `UnknownTerrain::CastSegment` | `Terrain::CastSegment`, 0x00506e90 | 1654 bytes |
+| QuarryStuntEvent detail controls | `OverlayTerrainView::SelectQuality` | `Terrain::SelectQuality`, 0x00507960 | 129 bytes |
+| NameOverlay visibility test in TrackOverlay | `OverlayTerrainView::CastSegment` | `Terrain::CastSegment`, 0x00506e90 | 1654 bytes |
 
 ## Boundary evidence
 
@@ -39,7 +39,7 @@ calls and complete caller byte matches:
   height-field interface and writes the world-space hit on success.
 
 These are specific method-boundary connections. They do not merge the whole
-`Grid1Terrain` or `UnknownTerrain` declarations with Terrain or infer equivalence
+`Grid1Terrain` or `OverlayTerrainView` declarations with Terrain or infer equivalence
 of unrelated virtual slots.
 
 ## Verification and remaining dependencies

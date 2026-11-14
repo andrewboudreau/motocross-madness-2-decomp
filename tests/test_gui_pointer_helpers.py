@@ -16,7 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 # ShowControlToolTip is exact now: its body is taken from the canonical unit and
 # compiled with the remaining candidate.
 PROMOTED = 'void ToolTip::ShowControlToolTip('
-CASES = (('?ShowControlToolTip@ToolTip@@QAEXPAVUnknownGuiControl@@@Z', 0x486b10, 106, 106),
+CASES = (('?ShowControlToolTip@ToolTip@@QAEXPAVGuiControlView@@@Z', 0x486b10, 106, 106),
          ('?SetPointerDevice@GUIUser@@QAEHPAVGUIInputDevice@@@Z', 0x488120, 52, 46))
 
 

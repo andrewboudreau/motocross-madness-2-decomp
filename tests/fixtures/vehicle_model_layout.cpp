@@ -18,10 +18,10 @@ typedef char node_child[offsetof(SoultreeObject, firstChild) == 0x140 ? 1 : -1];
 typedef char node_flag[offsetof(SoultreeObject, hidden) == 0x14c ? 1 : -1];
 typedef char screen_rect[offsetof(D3DIMSoultreeObject, screenRect) == 0x298 ? 1 : -1];
 typedef char second_rect[offsetof(D3DIMSoultreeObject, field_0x2a8) == 0x2a8 ? 1 : -1];
-typedef char vehicle_node[offsetof(UnknownCameraVehicle, modelNode) == 0x3bc ? 1 : -1];
-typedef char character_node[offsetof(UnknownCameraTargetA, modelNode) == 0x1a0 ? 1 : -1];
-typedef char car_node[offsetof(UnknownCameraTargetB, carModel) == 0x34 ? 1 : -1];
-typedef char racer_node[offsetof(UnknownEventRacer, vehicleModel) == 0x3bc ? 1 : -1];
+typedef char vehicle_node[offsetof(VehicleCameraVehicleView, modelNode) == 0x3bc ? 1 : -1];
+typedef char character_node[offsetof(VehicleCameraCharacterTargetView, modelNode) == 0x1a0 ? 1 : -1];
+typedef char car_node[offsetof(VehicleCameraCarProceduralView, carModel) == 0x34 ? 1 : -1];
+typedef char racer_node[offsetof(EventKrustyBikeView, vehicleModel) == 0x3bc ? 1 : -1];
 typedef char followed_node[offsetof(SoultreeSoundEmitter, followedPart) == 0x1a4 ? 1 : -1];
 typedef char followed_child[offsetof(SoultreeSoundEmitter, childPart) == 0x1a8 ? 1 : -1];
 

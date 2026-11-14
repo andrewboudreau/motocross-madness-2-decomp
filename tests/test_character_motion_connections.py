@@ -189,9 +189,9 @@ class CharacterMotionConnectionsTests(unittest.TestCase):
                     self.assertTrue(compare(retail, obj, symbol, va, size, bindings_path)['strict_exact'], symbol)
             for source, symbol, retired in (
                 (SOURCES[0], FIND, '?FindMotion@BikeA5C4@@QAEHPBDH@Z'),
-                (SOURCES[1], SET, '?SetMotionByName@UnknownBikeRaceCharacter@@QAEXPBD@Z'),
-                (SOURCES[2], SET, '?SetMotionByName@UnknownKrustyUICharacter@@QAEXPBD@Z'),
-                (SOURCES[3], SET, '?SetMotionByName@UnknownBikeRaceCharacter@@QAEXPBD@Z')):
+                (SOURCES[1], SET, '?SetMotionByName@BikeRaceD3DIMSoultreeCharacterView@@QAEXPBD@Z'),
+                (SOURCES[2], SET, '?SetMotionByName@KrustyUID3DIMSoultreeCharacterView@@QAEXPBD@Z'),
+                (SOURCES[3], SET, '?SetMotionByName@BikeRaceD3DIMSoultreeCharacterView@@QAEXPBD@Z')):
                 obj = objects[source]
                 imports = {s.name for s in obj.symbols if s.section_number == 0}
                 self.assertIn(symbol, imports)

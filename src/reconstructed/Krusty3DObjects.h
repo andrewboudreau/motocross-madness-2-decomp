@@ -30,9 +30,9 @@ struct ControlEvent;
 struct InputButtonState;
 
 // A racer as VisualCue sees it (the objects 0x004204e0 returns; RaceView.h's
-// UnknownEventRacer): a vfptr at +0, GameObject reached through the vbptr at
+// EventKrustyBikeView): a vfptr at +0, GameObject reached through the vbptr at
 // +4. Only the +0x25 bit 0 test is used.
-struct UnknownVisualCueRacer : virtual public GameObject {
+struct VisualCueKrustyBikeView : virtual public GameObject {
     virtual void UnknownVirtualSlot0();
     int UnknownIsEnabled() { return isEnabled; }
 
@@ -42,7 +42,7 @@ struct UnknownVisualCueRacer : virtual public GameObject {
 
 // The camera NumberObjectManager places its digits in front of (its +0x34,
 // also the ArcadeObject view whose +0x198 scales the models).
-struct UnknownNumberCamera {
+struct NumberCameraView {
     unsigned char field_0x000[0x170];
     Vector3 eyePosition;                      // +0x170
     Vector3 viewDirection;                    // +0x17c forward
@@ -51,16 +51,16 @@ struct UnknownNumberCamera {
     float focalLength;                        // +0x198
 };
 
-struct UnknownNumberRacerState {
+struct NumberKrustyBikeView {
     unsigned char field_0x000[0x76c];
     float offTrackTime;                       // +0x76c RaceView.h's racer offTrackTime
 };
 
 // NumberObjectManager's +0x2c. Its offsets line up with BikeRace.h's race
 // view: +0x38 localRacer, +0x6c the 30SecMan entry, +0x15c startCountdown.
-struct UnknownNumberRacer {
+struct NumberBikeRaceView {
     unsigned char field_0x000[0x38];
-    UnknownNumberRacerState* localRacer;      // +0x38
+    NumberKrustyBikeView* localRacer;      // +0x38
     unsigned char field_0x03c[0x6c - 0x3c];
     int thirtySecondMan;                      // +0x6c no digits count down while it is present
     unsigned char field_0x070[0x15c - 0x70];
@@ -71,39 +71,39 @@ struct UnknownNumberRacer {
 float FastInvSqrt(float value);
 
 // A track position (RaceView.h's TrackPos: node, segment, t).
-struct UnknownRunwayTrackPos {
+struct RunwayTrackPos {
     void* node;  // +0x0  RaceView.h/Track.h TrackPos: node
     void* segment;  // +0x4  Track.h TrackPos: segment
     float t;  // +0x8  Track.h TrackPos: t, 0..1 along the segment
 };
 
 // The track a racer's view holds at +0x48 (Track.h's Track).
-struct UnknownRunwayTrack {
+struct RunwayTrackView {
     // 0x00518080: the world point of `pos`.
-    int PointAt(UnknownRunwayTrackPos pos, Vector3* out);
+    int PointAt(RunwayTrackPos pos, Vector3* out);
 };
 
-struct UnknownRunwayView {
+struct RunwayBikeRaceView {
     unsigned char field_0x00[0x48];
-    UnknownRunwayTrack* raceTrack;            // +0x48 BikeRace's raceTrack
+    RunwayTrackView* raceTrack;            // +0x48 BikeRace's raceTrack
 };
 
 // The racer's race status node (RaceView.h's RaceStatusNode).
-struct UnknownRunwayRacerPart {
+struct RunwayRaceStatusNodeView {
     unsigned char field_0x00[0x38];
-    UnknownRunwayTrackPos placedPos;          // +0x38 (RaceView.h)
-    UnknownRunwayTrackPos progressPos;        // +0x44 (RaceView.h)
+    RunwayTrackPos placedPos;          // +0x38 (RaceView.h)
+    RunwayTrackPos progressPos;        // +0x44 (RaceView.h)
 };
 
 // The racer the lights point for (NationalRace.cpp passes its view's
-// +0x38; RaceView.h's UnknownEventRacer).
-struct UnknownRunwayRacer {
+// +0x38; RaceView.h's EventKrustyBikeView).
+struct RunwayKrustyBikeView {
     unsigned char field_0x000[0x10c];
     Vector3 trackPoint;                       // +0x10c
     Vector3 trackDirection;                   // +0x118 track direction there
     unsigned char field_0x124[0x740 - 0x124];
-    UnknownRunwayView* bikeView;              // +0x740 (RaceView.h)
-    UnknownRunwayRacerPart* statusNode;       // +0x744 race status node (RaceView.h)
+    RunwayBikeRaceView* bikeView;              // +0x740 (RaceView.h)
+    RunwayRaceStatusNodeView* statusNode;       // +0x744 race status node (RaceView.h)
     unsigned char field_0x748[0x78c - 0x748];
     int onTrack;                              // +0x78c RaceView.h's racer onTrack
     unsigned char field_0x790[0x7a4 - 0x790];
@@ -111,7 +111,7 @@ struct UnknownRunwayRacer {
 };
 
 // The terrain (NationalRace.cpp's +0x40): 0x00507c10 drops `point` onto it.
-struct UnknownRunwayTerrain {
+struct RunwayTerrainView {
     void QueryGround(Vector3* point, Vector3* normal, int flatShaded, int surface);
 };
 
@@ -122,33 +122,33 @@ public:
     virtual int Tick(float frameTime);                 // 0x0048a760
 
     // 0x0048a600 (ret 0x10): slot 8, then loads the five lights (line 0x40).
-    RunwayLights* SetupLights(void* context, int lights, int options, UnknownRunwayTerrain* terrain);
-    void SetRacer(UnknownRunwayRacer* racer); // 0x0048ad50: sets +0x30
+    RunwayLights* SetupLights(void* context, int lights, int options, RunwayTerrainView* terrain);
+    void SetRacer(RunwayKrustyBikeView* racer); // 0x0048ad50: sets +0x30
 
     float blinkTimer;                          // blink timer
-    UnknownRunwayRacer* trackedRacer;          // +0x30 the lights stand on its track (SetRacer)
-    UnknownRunwayTerrain* groundTerrain;       // +0x34 grounds the lights (SetupLights)
+    RunwayKrustyBikeView* trackedRacer;          // +0x30 the lights stand on its track (SetRacer)
+    RunwayTerrainView* groundTerrain;       // +0x34 grounds the lights (SetupLights)
     ArcadeObject* lightModels[5];
 };
 
 // The object at a view's +0x50 (KrustyBikeCamera; +0x3b0 is the racer it
 // follows).
-struct UnknownVisualCueCamera {
+struct VisualCueKrustyBikeCameraView {
     unsigned char field_0x000[0x3b0];
-    UnknownRunwayRacer* followedBike;         // +0x3b0 (RaceSound.h)
+    RunwayKrustyBikeView* followedBike;         // +0x3b0 (RaceSound.h)
 };
 
-// The view VisualCue follows (its +0xa8; RaceView.h's UnknownKrustyBikeView).
-struct UnknownVisualCueView {
+// The view VisualCue follows (its +0xa8; RaceView.h's EventBikeRaceView).
+struct VisualCueBikeRaceView {
     // 0x004204e0: the next racer after `*iterator` (advancing it), or 0.
-    UnknownVisualCueRacer* NextBike(int* iterator);
+    VisualCueKrustyBikeView* NextBike(int* iterator);
 
     unsigned char field_0x000[0x38];
-    UnknownRunwayRacer* ownRacer;             // +0x38 its own racer
+    RunwayKrustyBikeView* ownRacer;             // +0x38 its own racer
     unsigned char field_0x03c[0x48 - 0x3c];
-    UnknownRunwayTrack* raceTrack;            // +0x48 BikeRace's raceTrack
+    RunwayTrackView* raceTrack;            // +0x48 BikeRace's raceTrack
     unsigned char field_0x04c[0x50 - 0x4c];
-    UnknownVisualCueCamera* raceCamera;       // +0x50 BikeRace's raceCamera
+    VisualCueKrustyBikeCameraView* raceCamera;       // +0x50 BikeRace's raceCamera
     unsigned char field_0x054[0x18a - 0x54];
     bool racing;                              // +0x18a
     unsigned char field_0x18b[0x190 - 0x18b];
@@ -164,12 +164,12 @@ public:
     virtual int OnControlPress(ControlEvent* event, InputButtonState* entry);       // 0x0048afa0
 
     // 0x0048adf0 (ret 0x34): loads "viscue.slt"; returns this, or 0.
-    VisualCue* LoadVisualCue(void* context, int lights, int options, UnknownRunwayTerrain* terrain,
-                             Vector3 position, UnknownVisualCueView* view, int pixels,
-                             UnknownArcadeView* camera, float size, float screenXFraction,
+    VisualCue* LoadVisualCue(void* context, int lights, int options, RunwayTerrainView* terrain,
+                             Vector3 position, VisualCueBikeRaceView* view, int pixels,
+                             ArcadeCameraView* camera, float size, float screenXFraction,
                              float screenYFraction);
     // 0x0048af20 (ret 4): collects the view's racers.
-    void CollectRacers(UnknownVisualCueView* view);
+    void CollectRacers(VisualCueBikeRaceView* view);
     int NextCueIndex();               // 0x0048bc30: the next cue index when it changed, else -1
     int CanCycleCues();               // 0x0048bc80: a cue is active and more than one racer exists
 
@@ -180,8 +180,8 @@ public:
     // The placement block slot 10 repeats in each mode.
     void UnknownPlace();
 
-    UnknownVisualCueView* cueView;
-    UnknownRunwayTerrain* groundTerrain;  // +0xAC  LoadVisualCue's terrain argument; slot 10 drops the cue target onto it with QueryGround
+    VisualCueBikeRaceView* cueView;
+    RunwayTerrainView* groundTerrain;  // +0xAC  LoadVisualCue's terrain argument; slot 10 drops the cue target onto it with QueryGround
     float builtFieldOfView;                          // field of view the offsets were built for
     float screenOffsetX;                          // screen offset along the camera's x axis
     float screenOffsetY;                          // screen offset along the camera's y axis
@@ -189,7 +189,7 @@ public:
     int currentRacer;                            // current racer
     int reportedRacer;                            // last reported racer
     int skippedRacer;                            // racer to skip
-    UnknownVisualCueRacer* cueRacers[11];
+    VisualCueKrustyBikeView* cueRacers[11];
     int cueRacerCount;                            // racers in +0xcc
 };
 
@@ -201,42 +201,42 @@ public:
     virtual int Render3D();        // 0x0048c290
 
     // 0x0048bd00 (ret 0x18): loads the five digits (lines 0x23d, 0x240).
-    NumberObjectManager* SetupDigits(void* context, int options, UnknownNumberRacer* racer, int pixels,
-                                     UnknownNumberCamera* camera, float size);
+    NumberObjectManager* SetupDigits(void* context, int options, NumberBikeRaceView* racer, int pixels,
+                                     NumberCameraView* camera, float size);
 
-    UnknownNumberRacer* countdownRacer;       // +0x2c whose count-down the digits show
+    NumberBikeRaceView* countdownRacer;       // +0x2c whose count-down the digits show
     int drawEnabled;                          // +0x30 slot 14 draws only when set (1 from the constructor and slot 10)
-    UnknownNumberCamera* digitCamera;         // +0x34 the digits show only through this camera
+    NumberCameraView* digitCamera;         // +0x34 the digits show only through this camera
     ArcadeObject* digitModels[5];             // +0x38 "one.slt" .. "five.slt"
 };
 
 // The racer a BonusObjectManager follows (its +0x2c).
-struct UnknownBonusRacerPart {
+struct BonusSoultreeObjectView {
     // 0x004fc970: writes the part's translation into *translation.
     void GetPosition(Vector3* translation);
 };
 
-struct UnknownBonusRacerModel {
+struct BonusBikeWheelView {
     unsigned char field_0x000[0x230];
     Vector3 rollDirection;                    // +0x230  Bike.h BikeWheel rollDirection (this is the localRacer's rearWheel, Bike +0x5f4)
 };
 
-struct UnknownBonusRacerState {
+struct BonusKrustyBikeView {
     unsigned char field_0x000[0x3bc];
-    UnknownBonusRacerPart* modelNode;         // +0x3bc
+    BonusSoultreeObjectView* modelNode;         // +0x3bc
     unsigned char field_0x3c0[0x444 - 0x3c0];
     int crashState;                           // +0x444
     unsigned char field_0x448[0x5f4 - 0x448];
-    UnknownBonusRacerModel* rearWheel;        // +0x5f4
+    BonusBikeWheelView* rearWheel;        // +0x5f4
 };
 
-struct UnknownBonusRacer {
+struct BonusBikeRaceView {
     unsigned char field_0x000[0x38];
-    UnknownBonusRacerState* localRacer;       // +0x38 BikeRace.h's localRacer
+    BonusKrustyBikeView* localRacer;       // +0x38 BikeRace.h's localRacer
 };
 
 // The camera a BonusObjectManager faces (its +0x38).
-struct UnknownBonusCamera {
+struct BonusCameraView {
     unsigned char field_0x000[0x16c];
     float fieldOfView;                        // +0x16c
     Vector3 eyePosition;                      // +0x170
@@ -247,67 +247,67 @@ struct UnknownBonusCamera {
 // The game global at 0x0056e26c (TrackGame.h's g_TrackGame) as
 // this file reads it: +0x10 is the render target, whose +0x08 is the
 // current camera; +0x2d74 the camera mode; +0x3430 blocks the UI.
-struct UnknownBonusRenderTarget {
+struct BonusRenderTargetView {
     unsigned char field_0x00[0x08];
-    UnknownBonusCamera* currentCamera;        // +0x08
+    BonusCameraView* currentCamera;        // +0x08
 };
 
-struct UnknownKrustyRacerRef {
+struct CueGateKrustyBikeView {
     unsigned char field_0x000[0x7b8];
     int gateIndex;                            // +0x7b8
 };
 
-struct UnknownKrustyCamera {
+struct CueKrustyBikeCameraView {
     unsigned char field_0x000[0x3b4];
-    UnknownKrustyRacerRef* followedRacer;     // +0x3b4 (RaceSound.h)
+    CueGateKrustyBikeView* followedRacer;     // +0x3b4 (RaceSound.h)
 };
 
-struct UnknownKrustyCameraHolder {
+struct CueBikeRaceView {
     unsigned char field_0x00[0x50];
-    UnknownKrustyCamera* raceCamera;          // +0x50 BikeRace's raceCamera
+    CueKrustyBikeCameraView* raceCamera;          // +0x50 BikeRace's raceCamera
 };
 
 // One 24-byte gate record of the course at the global's +0x560.
-struct UnknownKrustyGate {
+struct CueCourseGate {
     Vector3 position;  // +0x0  gate point VisualCue slot 10 (camera modes 1/5) turns the cue toward
     unsigned char field_0x0c[0x18 - 0x0c];
 };
 
-struct UnknownKrustyCourse {
+struct CueCourseEventView {
     unsigned char field_0x00[0x34];
-    UnknownKrustyCameraHolder* raceView;      // +0x34
+    CueBikeRaceView* raceView;      // +0x34
     unsigned char field_0x38[0xd8 - 0x38];
-    UnknownKrustyGate gates[1];  // +0xD8  24-byte gate records indexed by the followed racer's gateIndex
+    CueCourseGate gates[1];  // +0xD8  24-byte gate records indexed by the followed racer's gateIndex
 };
 
-struct UnknownKrustyFollowed {
+struct CueTagCameraView {
     unsigned char field_0x000[0x25];
     unsigned char statusFlags;                // +0x25  GameObject statusFlags; bit 0 is tested here
     unsigned char field_0x026[0x3b4 - 0x26];
-    UnknownVisualCueRacer* followedRacer;     // +0x3b4 (RaceSound.h)
+    VisualCueKrustyBikeView* followedRacer;     // +0x3b4 (RaceSound.h)
 };
 
-struct UnknownKrustyNode {
+struct CueTagBallView {
     unsigned char field_0x000[0x21c];
-    UnknownBonusRacerPart sceneObject;        // +0x21C  the SoultreeObject subobject; SoultreePhysicsBaseObject's own part ends at 0x21c, and GetPosition is SoultreeObject's 0x004fc970. Tier 2
+    BonusSoultreeObjectView sceneObject;        // +0x21C  the SoultreeObject subobject; SoultreePhysicsBaseObject's own part ends at 0x21c, and GetPosition is SoultreeObject's 0x004fc970. Tier 2
 };
 
-struct UnknownKrustyPlayer {
+struct CueTagEventView {
     unsigned char field_0x00[0x3c];
-    UnknownKrustyFollowed* raceCamera;        // +0x3c
+    CueTagCameraView* raceCamera;        // +0x3c
     unsigned char field_0x40[0xa8 - 0x40];
-    UnknownVisualCueRacer* followedRacer;     // +0xa8
+    VisualCueKrustyBikeView* followedRacer;     // +0xa8
     unsigned char field_0xac[0xdc - 0xac];
-    UnknownKrustyNode* ball;                  // +0xdc TrackGameViewOwner::ball (the tag ball)
+    CueTagBallView* ball;                  // +0xdc TrackGameViewOwner::ball (the tag ball)
 };
 
-struct UnknownKrustyGame {
+struct CueTrackGameView {
     unsigned char field_0x0000[0x10];
-    UnknownBonusRenderTarget* renderTarget;   // +0x10
+    BonusRenderTargetView* renderTarget;   // +0x10
     unsigned char field_0x0014[0x560 - 0x14];
-    UnknownKrustyCourse* bajaEnduroEvent;     // +0x560
+    CueCourseEventView* bajaEnduroEvent;     // +0x560
     unsigned char field_0x0564[0x568 - 0x564];
-    UnknownKrustyPlayer* tagEvent;            // +0x568
+    CueTagEventView* tagEvent;            // +0x568
     unsigned char field_0x056c[0x2d74 - 0x56c];
     int cameraMode;                           // +0x2d74 camera mode 0..5
     unsigned char field_0x2d78[0x2eb4 - 0x2d78];
@@ -340,16 +340,16 @@ public:
     // 0x0048c8a0 (ret 0xc): creates the frame node (line 0x326).
     int CreateFrameNode(void* context, int lights, int options);
     // 0x0048ca60 (ret 0x14): slot 8, then both loaders; returns this, or 0.
-    BonusObjectManager* SetupCounter(void* context, int lights, int options, UnknownBonusRacer* racer,
-                                     UnknownBonusCamera* camera);
+    BonusObjectManager* SetupCounter(void* context, int lights, int options, BonusBikeRaceView* racer,
+                                     BonusCameraView* camera);
     void NextKey();              // 0x0048cad0: steps to the next key
     void ShowValue(float value, float fraction); // 0x0048d1e0 (ret 8): shows a value
     void HideDigits();              // 0x0048d540: hides the shown digits
 
-    UnknownBonusRacer* raceView;              // +0x2c the race (BikeRace passes this)
+    BonusBikeRaceView* raceView;              // +0x2c the race (BikeRace passes this)
     int currentKey;                            // current key, -1 when idle
     float elapsed;                          // time since the start
-    UnknownBonusCamera* camera;               // +0x38 the race camera, then the current camera
+    BonusCameraView* camera;               // +0x38 the race camera, then the current camera
     D3DIMSoultreeObject* baseFrame;           // "Base Bonus Frame"
     D3DIMSoultreeObject* digitModels[10][5];    // digit models by digit and place
     int shownDigits[5];                        // shown digit per place, -1 when none

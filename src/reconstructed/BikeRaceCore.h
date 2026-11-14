@@ -11,16 +11,16 @@ class ObjectPicker;
 class ChatOverlay;
 class KrustyVCR;
 class VCRFile;
-class UnknownBikeRaceRacer;
-class UnknownBikeRaceProjector;
-class UnknownBikeRaceShadow;
-class UnknownBikeRaceCharacter;
+class BikeRaceKrustyBikeView;
+class BikeRaceTerrainView;
+class BikeRaceProjectedShadowView;
+class BikeRaceD3DIMSoultreeCharacterView;
 struct TextureContext;
-struct UnknownBikeRaceCameraView;
+struct BikeRaceKrustyBikeCameraView;
 struct RaceGateEvent;
 struct RaceGatePose;
-struct UnknownBikeRaceViews;
-struct UnknownBikeRaceView6c;
+struct BikeRaceRaceSoundView;
+struct StartObjectCharacterView;
 struct RaceStatusNode;
 
 class BikeRace : public GraphicsTest {
@@ -44,13 +44,13 @@ public:
     // 0x00423880: control 6 (modifier 0x80) toggles drawChildren (+0x3fd).
     virtual int OnControlRelease(ControlEvent* event, InputButtonState* entry);
 
-    UnknownBikeRaceCameraView* RaceCameraView() {
-        return (UnknownBikeRaceCameraView*)raceCamera;
+    BikeRaceKrustyBikeCameraView* RaceCameraView() {
+        return (BikeRaceKrustyBikeCameraView*)raceCamera;
     }
 
     // Inline (bikerace.h line 0xd3; the destructor 0x0041cf30): frees the
     // +0xc8 gate list.
-    void UnknownFunctionFreeNodes();
+    void FreeGateList();
 
     // 0x00417ed0 (ret 0x24; QuarryStuntEvent.cpp's loader calls it after
     // the constructor): sets the race up in `owner`'s scene: the track file
@@ -58,13 +58,13 @@ public:
     // overlays, the replay recorder, the loader 0x00419970, the dialogs,
     // the sound and the plate numbers. Returns this, or 0 after Release.
     BikeRace* Create(void* owner, void* particles, LightManager* lights,
-                                    TextureContext* textures, UnknownBikeRaceProjector* terrain,
+                                    TextureContext* textures, BikeRaceTerrainView* terrain,
                                     KrustyBikeCamera* camera, Scene* scene, RaceGateEvent* event,
-                                    UnknownBikeRaceShadow* shadow);
+                                    BikeRaceProjectedShadowView* shadow);
     // 0x00419970 (ret 0x14): loads the rider models and creates the racers;
     // 0 on failure.
     int CreateRacers(void* owner, LightManager* lights, TextureContext* textures,
-                              UnknownBikeRaceProjector* terrain, RaceGateEvent* event);
+                              BikeRaceTerrainView* terrain, RaceGateEvent* event);
     // 0x00417bc0: the racer numbers 1..+0x158 ordered by championship points.
     void RankByPoints(int* order);
     // 0x0041d0d0: appends a node for `source[index]` at `*tail`.
@@ -77,16 +77,16 @@ public:
     void SetSceneTime(float time);   // 0x0041d2a0: the scene's time
     int AnyRacerRemote();              // 0x0041ea10: whether a racer is remote
     // 0x0041ea60: replaces id `from` with `to` in `character`'s mesh groups.
-    void ReplaceMeshId(UnknownBikeRaceCharacter* character, int from, int to);
+    void ReplaceMeshId(BikeRaceD3DIMSoultreeCharacterView* character, int from, int to);
     // 0x0041eb20: points the camera at racer +0x14c (when it follows a
     // racer) or at scene object +0x154 / +0x150; 0 when that one is hidden.
     int AimCamera(int caster);
-    UnknownBikeRaceRacer* UnknownFunctionRacerAt(int index);
+    BikeRaceKrustyBikeView* UnknownFunctionRacerAt(int index);
     // 0x0041f1d0: the next (`forward`) or previous camera target: a racer
     // (`racers`), a scene object or a shadow caster.
     void NextCameraTarget(int forward, int racers, int objects);
     void ToggleReplayPause(int pauseOnly); // 0x0041f550: pauses, or with 0 toggles, +0x3f8
-    UnknownBikeRaceRacer* NextBike(int* iterator); // 0x004204e0
+    BikeRaceKrustyBikeView* NextBike(int* iterator); // 0x004204e0
     void HandlePlayerLeft(int player);   // 0x00420590
     void SaveReplay(char* path, char* description); // 0x00420b00: saves the recording, copies VCRtape.dat to `path`
     // 0x00420650 (InGameProcs.cpp ExitDlg): restarts the race; `mode` 0
@@ -105,22 +105,22 @@ public:
 
     unsigned char debugDraw;                  // +0x34 toggled by control 0x1f (modifier 0x80): slot 14 draws the track, probes and debug lines
     unsigned char field_0x035[0x38 - 0x35];
-    UnknownBikeRaceRacer* localRacer;        // its own racer
-    UnknownBikeRaceRacer** racerSlots;       // all racers, by racer slot
-    UnknownBikeRaceRacer** aiRacers;       // AI racers (TrackGame+0x2d94 of them)
-    UnknownBikeRaceViews* raceSound;          // +0x44 the RaceSound object (RaceSound::Create in the setup)
+    BikeRaceKrustyBikeView* localRacer;        // its own racer
+    BikeRaceKrustyBikeView** racerSlots;       // all racers, by racer slot
+    BikeRaceKrustyBikeView** aiRacers;       // AI racers (TrackGame+0x2d94 of them)
+    BikeRaceRaceSoundView* raceSound;          // +0x44 the RaceSound object (RaceSound::Create in the setup)
     Track* raceTrack;
-    UnknownBikeRaceProjector* raceTerrain;  // +0x4C  Create's terrain argument; QueryGround (Terrain 0x00507c10) puts probes/debug lines on the ground; grid scale
+    BikeRaceTerrainView* raceTerrain;  // +0x4C  Create's terrain argument; QueryGround (Terrain 0x00507c10) puts probes/debug lines on the ground; grid scale
     KrustyBikeCamera* raceCamera;            // the race camera
     int particleManager;  // +0x54  Create's particles argument (QuarryStuntEvent passes its particleManager); forwarded to every racer loader
     Scene* raceScene;
-    UnknownBikeRaceShadow* raceShadow;  // +0x5C  Create's shadow argument (ProjectedShadow); camera targeting clears it and adds the target's casters
+    BikeRaceProjectedShadowView* raceShadow;  // +0x5C  Create's shadow argument (ProjectedShadow); camera targeting clears it and adds the target's casters
     GameObject* youIndicator;                 // +0x60 the spinning "youind.slt" marker over the local racer
-    UnknownBikeRaceView6c* startGate;         // +0x64 the scene's "StartGate.slb" entry; reset by a restart (slot 5)
+    StartObjectCharacterView* startGate;         // +0x64 the scene's "StartGate.slb" entry; reset by a restart (slot 5)
     int startGateEntry;                       // +0x68 its scene animation entry index
-    UnknownBikeRaceView6c* thirtySecondMan;   // +0x6c the scene's "30SecMan.slt" entry
+    StartObjectCharacterView* thirtySecondMan;   // +0x6c the scene's "30SecMan.slt" entry
     int thirtySecondManEntry;                 // +0x70 its scene animation entry index
-    UnknownBikeRaceCharacter* flagGirl;    // the flag girl (0x0041ea60's argument)
+    BikeRaceD3DIMSoultreeCharacterView* flagGirl;    // the flag girl (0x0041ea60's argument)
     int flagGirlState;  // +0x78  flag girl motion state: 0 Stand, 1 first FlagStart, 3 second FlagStart, 4 FlagLoop (slot 10)
     float aiSettings[11];  // +0x7C  Create's 11 constants: [0..1]/[5..6] AI skill ranges, [8..10] AI stunt chance % by difficulty
     int lodDebugPage;                         // +0x0a8

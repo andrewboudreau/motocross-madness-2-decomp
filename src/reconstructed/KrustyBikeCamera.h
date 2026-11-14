@@ -58,5 +58,5 @@ public:
 
 protected:
     UnknownKrustyBike* krustyBike;       // +0x3b4
-    UnknownKrustyBikeView* raceView;     // +0x3b8
+    EventBikeRaceView* raceView;     // +0x3b8
 };

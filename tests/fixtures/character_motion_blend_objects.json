@@ -14,7 +14,7 @@
     "samples/physics/krustybike/KrustyBikeNearMisses.cpp": {
       "sections": 271,
       "relocations": 1443,
-      "sha256": "aff7ca93381beb7ee8c3c0c2963c465f0a42fc685083b2f54ea55ee76c3d6a11"
+      "sha256": "eba27d0e79b49acf2d1051400f387f0d65425d9c7de05ce9a7addab412434a18"
     },
     "samples/physics/motion/Motnctrl.cpp": {
       "sections": 35,

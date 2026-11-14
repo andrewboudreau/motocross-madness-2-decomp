@@ -30,9 +30,9 @@ struct UnknownSceneLodObject {
 // (D3DIMSoultreeCharacter::SetMotion in src/krusty2/motion) on it, whose
 // +0x1a4 buffer 0x004eaec0 compares as the name. Only what the scene uses is
 // declared.
-struct UnknownSceneObject : public virtual GameObject {
+struct SceneCollisionCharacterView : public virtual GameObject {
 public:
-    explicit UnknownSceneObject(int flags);            // 0x004318d0
+    explicit SceneCollisionCharacterView(int flags);            // 0x004318d0
     virtual void UnknownVirtualSlot0();
 
     // 0x004319c0: loads the character and returns the GameObject to add
@@ -56,9 +56,9 @@ public:
 // What SceneAnimation::field_0x08 holds for procedural entries (without
 // bit 3): CarProcedural (0x22c bytes), a GameObject whose slot 10 0x004eb040
 // calls. Only what the scene uses is declared.
-class UnknownSceneAnimatedObject : public GameObject {
+class SceneCarProceduralView : public GameObject {
 public:
-    explicit UnknownSceneAnimatedObject(int flags);    // 0x0042f390 (CarProcedural)
+    explicit SceneCarProceduralView(int flags);    // 0x0042f390 (CarProcedural)
     // Slot 27 (0x0042f600, CarProcedural.h): loads the model and its path;
     // returns the object to add.
     virtual GameObject* Create(void* owner, const char* name, const char* colPath,
@@ -92,8 +92,8 @@ struct SceneAnimation {
     unsigned char excludeFromCameraIteration : 1; // +0x00 bit 4: the "ExcludeFromCameraIteration" parameter; bikerace.cpp's camera (0x0041f1d0) skips it
     unsigned char animatesWhileHeld : 1;      // +0x00 bit 5 (provisional): Scene slot 10 still advances the entry while holdAnimations is set; cleared by 0x004edfe0, bikerace.cpp sets it for the 30SecMan
     unsigned char field_0x01[3];
-    UnknownSceneObject* character;            // +0x04 key-framed (bit 3)
-    UnknownSceneAnimatedObject* proceduralObject; // +0x08 procedural
+    SceneCollisionCharacterView* character;            // +0x04 key-framed (bit 3)
+    SceneCarProceduralView* proceduralObject; // +0x08 procedural
     Vector3 position;                     // "Position" (or "Offset")
     int motionFrame;                          // +0x18  the frame number AdvanceMotion 0x004a6bb0 returned (RestartEntry, Scene slot 10 0x004eae7d)
     int motionCount;                      // "NumberOfMotions" (1 for procedural entries)
@@ -129,7 +129,7 @@ class ProjectedShadow;
 
 // Views declared in samples/track/SceneManagerNearMisses.cpp (0x004ecd60).
 class UnknownScenePhysicsObject;
-class UnknownSceneCollisionObject;
+class SceneCollisionObjectView;
 
 // 0x28-byte element of SceneStaticModels::field_0x04: a static model
 // ("Model<n>", 0x004ecd60), also a shadow caster (0x004edf20 attaches a
@@ -140,7 +140,7 @@ struct SceneStaticModel {
     unsigned char field_0x01[3];
     ShadowCaster* model;                      // +0x04 the model (a D3DIMSoultreeObject)
     UnknownScenePhysicsObject* physicsObject; // +0x08
-    UnknownSceneCollisionObject* collisionObject; // +0x0c
+    SceneCollisionObjectView* collisionObject; // +0x0c
     char fileName[0x18];                      // +0x10 the model's file name, at most 0x14 characters
 };
 
@@ -250,7 +250,7 @@ public:
     Scene* UnknownFunction4ea7e0(SceneArchiveFinder* manager, int value, int unused,
                                  char probeMask);
     // 0x004eaec0: the entry object named like `path`'s file name.
-    UnknownSceneObject* FindEntryByFileName(const char* path, int* index);
+    SceneCollisionCharacterView* FindEntryByFileName(const char* path, int* index);
     void EnableAutomaticSequence(int index);  // 0x004eafd0: sets entry `index`'s automaticSequence
     void SetDetailLevel(int level);           // 0x004eff30: detail level (QuarryStuntEvent.cpp)
     void RestartAllEntries(float time);       // 0x004eb000: RestartEntry(i, time, 1, 0) for every entry

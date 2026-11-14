@@ -75,11 +75,11 @@ type, member and function names are provisional.
 
 - `SceneLight`, `SceneEnvironment`: the light and environment
   records; offsets from the readers, names from the section keys.
-- `UnknownSceneObject` is the key-framed entry's CollisionCharacter. It has
+- `SceneCollisionCharacterView` is the key-framed entry's CollisionCharacter. It has
   its own vfptr at +0, a vbptr at +4, the GameObject virtual base at +0x268
   and fields +0x0c, +0x10, +0x1a0, +0x1a4 and +0x210. It stays a `struct`
   so the bound mangled names keep `PAU`.
-- `UnknownSceneAnimatedObject` is the procedural entry's CarProcedural: a
+- `SceneCarProceduralView` is the procedural entry's CarProcedural: a
   GameObject with +0x34, +0x38/+0x3c, +0x5c and +0x194, plus slot 27.
   Naming +0x20c as well changes VC6's code for `0x004eb570`.
 - `UnknownSceneLodObject` has `0x004444c0`, `0x004451e0`, `0x004fbd70` and
@@ -155,7 +155,7 @@ and the two `fileName` buffers (animation entry +0x2c, static model +0x10)
 are named. The section pointers `+0xa4..+0xbc`, the table, caster, light
 and entry fields keep their placeholders because `QuarryStuntEvent.cpp` and
 its loader sample read them too; renaming them is a joint change with that
-unit. `UnknownSceneObject::field_0x10` cannot take a name without the
+unit. `SceneCollisionCharacterView::field_0x10` cannot take a name without the
 member lookup resolving to the virtual base's protected `field_0x10`.
 
 ## Not reconstructed

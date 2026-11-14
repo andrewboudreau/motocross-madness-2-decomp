@@ -130,7 +130,7 @@ class GaragePreviewConnectionsTests(unittest.TestCase):
                 if source == SOURCES[0]:
                     required |= {CHARACTER, ADVANCE}
                 self.assertTrue(required <= imports, (source, required - imports))
-                self.assertFalse(any('UnknownKrustyUIPlatePainter' in s or 'AdvanceMotion@UnknownKrustyUICharacter' in s
+                self.assertFalse(any('UnknownKrustyUIPlatePainter' in s or 'AdvanceMotion@KrustyUID3DIMSoultreeCharacterView' in s
                                      or '??0UnknownKrustyUICharacter' in s or s == '?PaintNumber@BikeNumberPainter@@QAEXPAXH@Z'
                                      for s in imports), source)
             cases = [(c['source'], c['symbol'], int(c['target_va'], 0), c['target_size'], ROOT / c['bindings'])

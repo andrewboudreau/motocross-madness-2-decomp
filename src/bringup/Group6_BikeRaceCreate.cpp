@@ -122,9 +122,9 @@ static inline Vector3 ScaledVector(const Vector3& v, float scale) {
 // 0x00417ed0
 BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
                                           TextureContext* textures,
-                                          UnknownBikeRaceProjector* terrain, KrustyBikeCamera* camera,
+                                          BikeRaceTerrainView* terrain, KrustyBikeCamera* camera,
                                           Scene* scene, RaceGateEvent* event,
-                                          UnknownBikeRaceShadow* shadow) {
+                                          BikeRaceProjectedShadowView* shadow) {
     char name[0x104];
     char path[0x104];
     char modelName[0x104];
@@ -240,7 +240,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
                     point = position;
                 }
                 terrain->QueryGround(&point, &normal, 0, 0);
-                thirtySecondMan = (UnknownBikeRaceView6c*)raceScene->FindEntryByFileName("30SecMan.slt", &thirtySecondManEntry);
+                thirtySecondMan = (StartObjectCharacterView*)raceScene->FindEntryByFileName("30SecMan.slt", &thirtySecondManEntry);
                 if (thirtySecondMan) {
                     raceScene->RestartEntry(thirtySecondManEntry, 0, 0, 0);
                     raceScene->animationTable->entries[thirtySecondManEntry].animatesWhileHeld = 1;
@@ -267,7 +267,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
                 terrain->QueryGround(&point, &normal, 0, 0);
                 if (g_TrackGame->mode.raceSettings.eventType == 3) {
                     startGate =
-                        (UnknownBikeRaceView6c*)raceScene->FindEntryByFileName("StartGate.slb", &startGateEntry);
+                        (StartObjectCharacterView*)raceScene->FindEntryByFileName("StartGate.slb", &startGateEntry);
                     if (startGate) {
                         raceScene->RestartEntry(startGateEntry, 0, 0, 0);
                         if (startGate->collisionObject) {
@@ -332,7 +332,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
             if (g_TrackGame->mode.raceSettings.raceMode != 0 &&
                 g_TrackGame->mode.raceSettings.raceMode != 4) {
                 sprintf(modelName, "%s\\%s", "Res", "FlagGirl.mcf");
-                flagGirl = (UnknownBikeRaceCharacter*)new(__FILE__, 0x26f) D3DIMSoultreeCharacter(1);
+                flagGirl = (BikeRaceD3DIMSoultreeCharacterView*)new(__FILE__, 0x26f) D3DIMSoultreeCharacter(1);
                 AppendChild(flagGirl->LoadCharacter(renderContext, modelName, lights, textures, 1, 1),
                                       -1);
                 ReplaceMeshId(flagGirl, 1, 2);
@@ -358,7 +358,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
     } else if (mode == 0 || (mode == 4 && g_TrackGame->mode.raceSettings.stuntMode)) {
         BonusObjectManager* bonus = new(__FILE__, 0x28e) BonusObjectManager(1);
         scoreBoard = (int)bonus->SetupCounter(renderContext, (int)lights, (int)textures,
-                                               (UnknownBonusRacer*)this, (UnknownBonusCamera*)raceCamera);
+                                               (BonusBikeRaceView*)this, (BonusCameraView*)raceCamera);
         if (!AppendChild((GameObject*)scoreBoard, -1))
             return 0;
     }
@@ -368,8 +368,8 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
     raceScene->holdAnimations = 1;
     if (g_TrackGame->mode.raceSettings.raceMode) {
         NumberObjectManager* numbers = new(__FILE__, 0x29b) NumberObjectManager(1);
-        digitCounter = (int)numbers->SetupDigits(renderContext, (int)textures, (UnknownNumberRacer*)this, 0x1e,
-                                                (UnknownNumberCamera*)raceCamera, 3.0f);
+        digitCounter = (int)numbers->SetupDigits(renderContext, (int)textures, (NumberBikeRaceView*)this, 0x1e,
+                                                (NumberCameraView*)raceCamera, 3.0f);
         if (!AppendChild((GameObject*)digitCounter, -1))
             return 0;
     }
@@ -467,8 +467,8 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
 
     g_MemTagStack->Push("Audio");
     RaceSound* sound = new(__FILE__, 0x347) RaceSound(1);
-    raceSound = (UnknownBikeRaceViews*)sound->Create(renderContext, (UnknownKrustyBikeView*)this,
-                                                                      (UnknownRaceSoundCamera*)raceCamera, 6);
+    raceSound = (BikeRaceRaceSoundView*)sound->Create(renderContext, (EventBikeRaceView*)this,
+                                                                      (RaceSoundKrustyBikeCameraView*)raceCamera, 6);
     AppendChild((GameObject*)raceSound, -1);
     g_MemTagStack->Push("BikeRace");
     if (g_TrackGame->mode.joystickOn) {
@@ -478,7 +478,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
         g_TrackGame->controlInterface->activeJoystick->SetAcquired(1);
     }
     if (g_TrackGame->mode.raceSettings.eventType)
-        BuildStatusList(&statusList, (UnknownKrustyBikeView*)this);
+        BuildStatusList(&statusList, (EventBikeRaceView*)this);
     if (ghostVcr)
         localRacer->fastestLap = bestGhostLength;
     g_TrackGame->ui->StepProgressBar();
@@ -491,7 +491,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
     } else if (g_TrackGame->playerCount > 1) {
         for (int i = 0; i < UnknownFunctionRacerCount(); i++) {
             for (int j = 0; j < UnknownFunctionRacerCount(); j++) {
-                UnknownBikeRaceRacer* racer = racerSlots[i];
+                BikeRaceKrustyBikeView* racer = racerSlots[i];
                 RacerSlot* slot = &g_TrackGame->mode.racers[j];
                 if (racer->recorderId == slot->networkPlayerId && racer->aiMessageIndex == slot->racerIndex)
                     painter->PaintNumber(reinterpret_cast<D3DIMSoultreeObject*>(racer->modelNode), slot->plateNumber);

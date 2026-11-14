@@ -35,7 +35,7 @@ int StatsOverlay::DrawStandings()
     void* font;
     int i;
     int count = 0;
-    UnknownKrustyBikeView* view = g_TrackGame->quarryEvent->raceView;
+    EventBikeRaceView* view = g_TrackGame->quarryEvent->raceView;
     if (g_TrackGame->mode.raceSettings.raceMode != 0 && g_TrackGame->mode.raceSettings.raceMode != 4) {
         g_TrackGame->LoadResourceString(0x943, label, 0x80);
         TrackGameViewOwner* owner = g_TrackGame->quarryEvent;
@@ -44,8 +44,8 @@ int StatsOverlay::DrawStandings()
         sprintf(rowText[0], "%s", label);
     }
     iterator = 0;
-    UnknownEventRacer* racer;
-    while ((racer = reinterpret_cast<UnknownEventRacer*>(reinterpret_cast<BikeRace*>(view)->NextBike(&iterator))) != 0) {
+    EventKrustyBikeView* racer;
+    while ((racer = reinterpret_cast<EventKrustyBikeView*>(reinterpret_cast<BikeRace*>(view)->NextBike(&iterator))) != 0) {
         if (racer->isEnabled) {
             scores[count].value = racer->score;
             scores[count].racer = racer;

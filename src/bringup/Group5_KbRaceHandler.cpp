@@ -7,15 +7,15 @@
 // RaceSound and the bike pointer is the racer it compares.
 #include "../krusty2/vehicle/BikeRaceHandlerView.h"
 
-struct UnknownEventRacer;
+struct EventKrustyBikeView;
 
 // Only the provider call is needed here (RaceSound.h declares the full class).
 class RaceSound {
 public:
-    void PlayScoreSounds(UnknownEventRacer* racer, float value);  // 0x004e57d0
+    void PlayScoreSounds(EventKrustyBikeView* racer, float value);  // 0x004e57d0
 };
 
 void KbRaceHandler::ReportTrickScore(KrustyBike* who, float score)
 {
-    reinterpret_cast<RaceSound*>(this)->PlayScoreSounds(reinterpret_cast<UnknownEventRacer*>(who), score);
+    reinterpret_cast<RaceSound*>(this)->PlayScoreSounds(reinterpret_cast<EventKrustyBikeView*>(who), score);
 }

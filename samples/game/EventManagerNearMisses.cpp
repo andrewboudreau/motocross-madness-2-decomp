@@ -74,7 +74,7 @@ struct UnknownPodiumGrid {                          // TrackGameViewOwner+0x2c
 struct UnknownPodiumOwner : public GameObject {     // TrackGameViewOwner
     UnknownPodiumGrid* grid;                        // +0x2c
     unsigned char field_0x30[0x34 - 0x30];
-    UnknownKrustyBikeView* raceView;                // +0x34
+    EventBikeRaceView* raceView;                // +0x34
     unsigned char field_0x38[0x7c - 0x38];
     GameObject* lights;                             // +0x7c
     unsigned char field_0x80[0x94 - 0x80];
@@ -190,7 +190,7 @@ int EventManager::CreatePodiumScene() {
     char message[0x184];
     ProCircuit* circuit = g_TrackGame->proCircuit;
     TrackGameViewOwner* owner = FindRaceMode();
-    UnknownKrustyBikeView* view = FindRaceView();
+    EventBikeRaceView* view = FindRaceView();
     int iterator = 0;
     int ok;
     if (g_TrackGame->mode.raceSettings.raceMode == 2)
@@ -292,7 +292,7 @@ int EventManager::CreatePodiumScene() {
     podiumCharacterCount = resultCount < 3 ? resultCount : 3;
     float chance = rand() * (1.0f / 32768);
     for (int place = 1; place - 1 < podiumCharacterCount; place++) {
-        UnknownEventRacer* racer = 0;
+        EventKrustyBikeView* racer = 0;
         iterator = 0;
         racer = PODIUM_OWNER(owner)->raceView->NextBike(&iterator);
         while (racer && ((UnknownPodiumRacer*)racer)->place != place)

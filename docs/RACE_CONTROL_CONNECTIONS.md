@@ -1,6 +1,6 @@
 # Race control calls
 
-Five provisional `UnknownKrustyBikeView` method references now call existing
+Five provisional `EventBikeRaceView` method references now call existing
 `BikeRace` implementations through explicit primary-pointer casts. The
 provisional field view remains in place; no class layout, inheritance,
 virtual declaration, method body, or provider ownership changes.

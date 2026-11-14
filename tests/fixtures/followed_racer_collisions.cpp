@@ -19,7 +19,7 @@ struct World {
  DWORD guard0[4]; BYTE bike[4][sizeof(KrustyBike)]; BYTE wrecker[4][sizeof(Wrecker)];
  BYTE collider[20][sizeof(CollisionObject)]; void* lists[20][32];
  BYTE race[sizeof(BikeRace)]; BYTE game[sizeof(TrackGame)]; BYTE owner[sizeof(TrackGameViewOwner)];
- UnknownBikeRaceRacer* racers[8]; DWORD guard1[4];
+ BikeRaceKrustyBikeView* racers[8]; DWORD guard1[4];
 };
 static World world,expected;
 static int checks,faults,events;
@@ -94,17 +94,17 @@ static void AnnounceCases(){
  for(int seed=0;seed<4;++seed)for(int alias=0;alias<5;++alias)for(int mode=0;mode<3;++mode)
  for(int blocked=0;blocked<2;++blocked)for(int newIndex=-1;newIndex<4;++newIndex)for(int oldIndex=-1;oldIndex<4;++oldIndex)for(int hole=0;hole<2;++hole){
   Prepare(seed,alias,seed);BikeRace*r=(BikeRace*)world.race;TrackGameViewOwner*v=(TrackGameViewOwner*)world.owner;
-  for(int i=0;i<8;++i)world.racers[i]=(UnknownBikeRaceRacer*)Bike(i%4);
+  for(int i=0;i<8;++i)world.racers[i]=(BikeRaceKrustyBikeView*)Bike(i%4);
   if(hole)world.racers[2]=0;
-  r->localRacer=(UnknownBikeRaceRacer*)Bike(0);r->aiRacers=world.racers+1;r->racerSlots=world.racers;
-  v->raceView=(UnknownKrustyBikeView*)r;g_TrackGame->playerCount=mode==2?2:1;g_TrackGame->uiInteractionBlocked=blocked;
+  r->localRacer=(BikeRaceKrustyBikeView*)Bike(0);r->aiRacers=world.racers+1;r->racerSlots=world.racers;
+  v->raceView=(EventBikeRaceView*)r;g_TrackGame->playerCount=mode==2?2:1;g_TrackGame->uiInteractionBlocked=blocked;
   g_TrackGame->mode.raceSettings.raceMode=mode==1?4:0;g_TrackGame->mode.raceSettings.aiRacerCount=3;g_TrackGame->mode.raceSettings.multiplayerAiRacerCount=2;
   KrustyBike*a=newIndex<0?0:Bike(newIndex),*old=oldIndex<0?0:Bike(oldIndex);expected=world;
   int limit=mode==1?2:4;
   if(!blocked)for(i=0;i<limit;++i){KrustyBike*other=(KrustyBike*)world.racers[i];if(!other)break;if(other==a)continue;
    if(a)NotifyExpected(a,other);if(old&&old!=other)NotifyExpected(other,old);if(a)NotifyExpected(other,a);
   }
-  __try{v->AnnounceFollowedRacer((UnknownEventRacer*)a,(UnknownEventRacer*)old);}__except(Filter(GetExceptionInformation())){}
+  __try{v->AnnounceFollowedRacer((EventKrustyBikeView*)a,(EventKrustyBikeView*)old);}__except(Filter(GetExceptionInformation())){}
   Finish();
  }
 }

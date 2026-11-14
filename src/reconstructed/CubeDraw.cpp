@@ -34,7 +34,7 @@ Vector3 s_faceNormals[6];
 // 0x00579af8: each face's 5x5 grid of points.
 Vector3 s_facePoints[6][25];
 // 0x0057a210: two triangles per cell, 16 cells per face.
-UnknownCubeVertex s_cellVertices[6][16][6];
+CubeLitVertex s_cellVertices[6][16][6];
 // 0x0057ea10
 UnknownCubeTextureMapping s_cellMappings[6][16];
 // The cell arrays viewed flat: cell = face * 16 + i, whose first vertex is

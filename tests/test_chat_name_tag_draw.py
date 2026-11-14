@@ -228,10 +228,10 @@ class ChatNameTagTests(unittest.TestCase):
             text='#include "'+(ROOT/'src/reconstructed/TrackOverlay.h').as_posix()+'"\n#include "'+(ROOT/'src/reconstructed/TrackGame.h').as_posix()+'"\n#include <stddef.h>\n'
             fields={'ChatOverlay':{'nameTagFont':0x124,'racers':0x16c,'racerCount':0x198,'cueRacerName':0x1d4,'nameTags':0x2d8,'nameTagRects':0x30c},
                     'NameOverlay':{'sourceRect':0xf8,'sourceWidth':0x120,'drawWidth':0x124},
-                    'UnknownChatRacer':{'driveForceScale':0x4a4,'name':0x5e0,'position':0x784}}
+                    'ChatKrustyBikeView':{'driveForceScale':0x4a4,'name':0x5e0,'position':0x784}}
             for cls,members in fields.items():
                 for member,value in members.items():text+=f'typedef char Offset_{cls}_{member}[offsetof({cls},{member})=={value}?1:-1];\n'
-            for cls,n in [('ChatOverlay',0x3e0),('NameOverlay',0x174),('UnknownChatRacer',0x788),('TrackOverlayRect',16)]:text+=f'typedef char Size_{cls}[sizeof({cls})=={n}?1:-1];\n'
+            for cls,n in [('ChatOverlay',0x3e0),('NameOverlay',0x174),('ChatKrustyBikeView',0x788),('TrackOverlayRect',16)]:text+=f'typedef char Size_{cls}[sizeof({cls})=={n}?1:-1];\n'
             text+='typedef char GameNames[offsetof(TrackGame,mode)+offsetof(TrackGameMode,showRiderNames)==0xc34?1:-1];\n'
             text+='typedef char GamePositions[offsetof(TrackGame,mode)+offsetof(TrackGameMode,showRiderPositions)==0xc38?1:-1];\n'
             text+='typedef char Method[sizeof(void(ChatOverlay::*)(void*,int))==4?1:-1];\n'

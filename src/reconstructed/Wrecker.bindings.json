@@ -29,7 +29,7 @@
   "?SetMotionByName@Character@@QAEXPBD@Z": "0x004a8b10",
   "?SetMotion@Character@@QAEXPAUMotion@@@Z": "0x004a8b40",
   "?BlendToMotion@Character@@QAEXPAUMotion@@M@Z": "0x004a8b80",
-  "?AddParticle@UnknownWreckerParticles@@QAEHMPBUVector3@@HMMMIH@Z": "0x004baa50",
+  "?AddParticle@WreckerParticleManagerView@@QAEHMPBUVector3@@HMMMIH@Z": "0x004baa50",
   "?Remove@QuadTree@@QAEXPAVQuadTreeObject@@I@Z": "0x004dcf20",
   "?SetMatrixIn@SoultreeObject@@QAEXPAV1@PAUMatrix4@@@Z": "0x004fb8c0",
   "?TranslateIn@SoultreeObject@@QAEXPAV1@UVec3@@@Z": "0x004fc690",

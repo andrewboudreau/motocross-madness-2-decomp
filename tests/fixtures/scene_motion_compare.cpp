@@ -39,7 +39,7 @@ static DWORD characterTable[11], carTable[27];
 static int checks, callbackMode;
 static Scene* SceneObject() { return (Scene*)(state.scene+16); }
 static Character* Actor() { return (Character*)(state.actor+16); }
-static UnknownSceneAnimatedObject* Car() { return (UnknownSceneAnimatedObject*)(state.car+16); }
+static SceneCarProceduralView* Car() { return (SceneCarProceduralView*)(state.car+16); }
 
 struct Boundary {
     int Restart(int,float,int,int);
@@ -79,7 +79,7 @@ static void Setup(int seed,int index,int sequenceLength,int scenario) {
     actor->currentMotion=&state.motions[0];actor->currentFrame=&state.frames[0][0];
     for(int entry=0;entry<3;entry++) {
         SceneAnimation& e=state.entries[entry];
-        e.keyFramed=scenario!=3;e.character=scenario==4?0:(UnknownSceneObject*)actor;
+        e.keyFramed=scenario!=3;e.character=scenario==4?0:(SceneCollisionCharacterView*)actor;
         e.proceduralObject=Car();e.motions=state.motionPointers[entry];e.motionCount=3;
         e.motionSequence=state.sequences[entry];e.sequenceLength=(signed char)sequenceLength;
         e.sequenceIndex=0;e.currentMotion=0;e.motionFrame=-9;

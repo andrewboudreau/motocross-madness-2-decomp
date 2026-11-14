@@ -4,7 +4,7 @@
   "?FastSqrt@@YAMM@Z": "0x00460b50",
   "?FastInvSqrt@@YAMM@Z": "0x00460c00",
   "?BlendToMotion@Character@@QAEXPAUMotion@@M@Z": "0x004a8b80",
-  "?AddParticle@UnknownWreckerParticles@@QAEHMPBUVector3@@HMMMIH@Z": "0x004baa50",
+  "?AddParticle@WreckerParticleManagerView@@QAEHMPBUVector3@@HMMMIH@Z": "0x004baa50",
   "?SetMatrixIn@SoultreeObject@@QAEXPAV1@PAUMatrix4@@@Z": "0x004fb8c0",
   "?SetPositionInFrame@SoultreeObject@@QAEXPAV1@PBUVec3@@@Z": "0x004fc740",
   "?SetPositionIn@SoultreeObject@@QAEXPAV1@PBUVec3@@@Z": "0x004fc890",

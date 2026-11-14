@@ -181,7 +181,7 @@
   "?SetCurrentState@UIMultiState@@QAEXH@Z": "0x00478cf0",
   "?SelectInGroup@UIRadioButton@@QAEHH@Z": "0x00479310",
   "?ShowDialog@GUIManager@@QAEPAVUIDialog@@PAV2@HHH0HHH@Z": "0x00485a70",
-  "?RequestFocus@GUIUser@@QAEHPAVUnknownGuiControl@@PAPAV2@H@Z": "0x00487790",
+  "?RequestFocus@GUIUser@@QAEHPAVGuiControlView@@PAPAV2@H@Z": "0x00487790",
   "?OpenMenu@KrustyUI@@QAEXH@Z": "0x00499b20",
   "?OpenExitDialog@KrustyUI@@QAEXXZ": "0x0049a4a0",
   "?AddEntry@KrustyUI@@QAEHHHHPBDHH@Z": "0x0049ba70",

@@ -34,7 +34,7 @@
 // rand() scaled to [0, 1), as ProCircuit.cpp.
 #define UNKNOWN_RANDOM_UNIT() (rand() * (1.0f / 32768.0f))
 
-// The racer's own vtable (UnknownEventRacer+0; RaceView.h models only slot
+// The racer's own vtable (EventKrustyBikeView+0; RaceView.h models only slot
 // 0): 0x004a9e80 calls slot 50 (+0xc8) with (1, 5.0f, 0) on the racer it
 // stops and the one it starts following (tier 3 roles).
 struct UnknownFollowedRacerSlots {
@@ -66,7 +66,7 @@ struct UnknownFollowedRacerSlots {
 // previous racer banks its run (tagRun into totalTagRun, the best into bestTagRun),
 // both racers get their tier-3 role for five seconds and every other racer
 // hears of it; the view's own racer taking over scores 2500.
-void TrackGameViewOwner::SetFollowedRacer(UnknownEventRacer* racer, UnknownEventRacer* previous, int tell)
+void TrackGameViewOwner::SetFollowedRacer(EventKrustyBikeView* racer, EventKrustyBikeView* previous, int tell)
 {
     if (previous) {
         previous->totalTagRun += previous->tagRun;

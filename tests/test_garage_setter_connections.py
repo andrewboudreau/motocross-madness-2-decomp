@@ -74,11 +74,11 @@ class GarageSetterConnectionsTests(unittest.TestCase):
             layout = output / 'layout.cpp'
             # Actual provisional producer view from the caller; no invented test layout.
             caller = (ROOT / GARAGE).read_text()
-            char_start = caller.index('class UnknownKrustyUICharacter :')
+            char_start = caller.index('class KrustyUID3DIMSoultreeCharacterView :')
             char_end = caller.index('\n};', char_start)+3
             layout.write_text('#include <stddef.h>\n#include "D3DIMSoulTree.h"\n'
                 'struct UnknownKrustyUISoultree;\n' + caller[char_start:char_end] + '\n'
-                'typedef char ModelOffset[(offsetof(UnknownKrustyUICharacter,modelNode)==0x1a0)?1:-1];\n'
+                'typedef char ModelOffset[(offsetof(KrustyUID3DIMSoultreeCharacterView,modelNode)==0x1a0)?1:-1];\n'
                 'typedef char LocalOffset[(offsetof(SoultreeObject,localMatrix)==0xb8)?1:-1];\n'
                 'typedef char ValidOffset[(offsetof(SoultreeObject,worldValid)==0x138)?1:-1];\n'
                 'typedef char DirtyOffset[(offsetof(SoultreeObject,subtreeDirty)==0x18c)?1:-1];\n'

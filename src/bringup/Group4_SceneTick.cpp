@@ -4,7 +4,7 @@
 // Scene::Tick advances every "Animation<n>" entry of the scene's animation
 // table, then (unless holdAnimations is set) the "RandomSet<n>" picks, and
 // finally runs GameObject::Tick. The scene entries keep their characters as
-// UnknownSceneObject (SceneManager.h); like SceneManager.cpp, this unit uses
+// SceneCollisionCharacterView (SceneManager.h); like SceneManager.cpp, this unit uses
 // the real Character methods on them through reinterpret_cast.
 //
 // Audited against the retail disassembly on 2026-11-11 for the linked game: no
@@ -115,7 +115,7 @@ int Scene::Tick(float frameTime)
             if (!animationTable->entries[j].keyFramed) {
                 continue;
             }
-            UnknownSceneObject* object = entry->character;
+            SceneCollisionCharacterView* object = entry->character;
             if (!object->isEnabled || reinterpret_cast<Character*>(object)->motionStopped) {
                 // Swap in a random member of the set.
                 object->Disable();

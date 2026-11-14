@@ -1,22 +1,22 @@
 {
   "renames": {
-    "?IgnoreCollisionsWith@UnknownEventRacer@@QAEXPAU1@@Z": "?IgnoreCollisionsWith@KrustyBike@@QAEXPAV1@@Z"
+    "?IgnoreCollisionsWith@EventKrustyBikeView@@QAEXPAU1@@Z": "?IgnoreCollisionsWith@KrustyBike@@QAEXPAV1@@Z"
   },
   "objects": {
     "src/reconstructed/FollowRacer.cpp": {
       "sections": 7,
       "relocations": 17,
-      "sha256": "339de39062b82f3aabe2a445242e6c1db24754bd366a084ea2b29ac75d9631ad"
+      "sha256": "c5e23edc7f773947f04f3bf218705babbca3122b0747d900b890239d2869e3ca"
     },
     "samples/race/FollowRacerNearMisses.cpp": {
       "sections": 11,
       "relocations": 32,
-      "sha256": "2fdb9627f36facc51ab97866a09a8b77719d1eee62cb54a334d246b0024939c0"
+      "sha256": "cb2d1ea0612b8482199a82f1a12ada94e7710d9b2139351df0f2460a661b7c36"
     },
     "samples/race/FollowedRacerPicker.cpp": {
       "sections": 4,
       "relocations": 10,
-      "sha256": "8c3acf9e0fd1e0698faa5cacb33b0e08808b66cf8ecc16289a1754a256ded00d"
+      "sha256": "a1980f3982a04e9cf44ad5b267dfabb48ba0256c12970b860f26e6f4457bd0b2"
     }
   },
   "partials": [
@@ -30,7 +30,7 @@
       "resolved_sha256": "458488750e4bac7e802c4cfedbd485c6a2abb98a503c88e044ab31a9f57a78fc"
     },
     {
-      "symbol": "?SetFollowedRacer@TrackGameViewOwner@@QAEXPAUUnknownEventRacer@@0H@Z",
+      "symbol": "?SetFollowedRacer@TrackGameViewOwner@@QAEXPAUEventKrustyBikeView@@0H@Z",
       "va": 4890240,
       "retail_size": 272,
       "size": 272,

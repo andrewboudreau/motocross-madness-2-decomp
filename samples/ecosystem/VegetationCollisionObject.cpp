@@ -1,9 +1,9 @@
 #include "../../src/reconstructed/EcoSystem.h"
 
 // Complete 386-byte retail method; unchanged readable candidate remains nonexact.
-#define ECO_SPHERE ((UnknownEcoSphereShape*)object->shapeData)
-#define ECO_CAPSULE ((UnknownEcoCapsuleShape*)object->shapeData)
-#define ECO_HULL ((UnknownEcoHullShape*)object->shapeData)
+#define ECO_SPHERE ((EcoSphereShape*)object->shapeData)
+#define ECO_CAPSULE ((EcoCapsuleShape*)object->shapeData)
+#define ECO_HULL ((EcoHullShape*)object->shapeData)
 
 CollisionObject* Vegetation::GetCollisionObject(int index) {
     int table = definitionIndex;

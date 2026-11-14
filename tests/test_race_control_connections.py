@@ -66,7 +66,7 @@ class RaceControlConnectionsTests(unittest.TestCase):
         self.assertEqual(decoded[0x4dfabf].operands[0].imm, 0x417ed0)
         self.assertEqual(decoded[0x4dfac6].op_str, 'dword ptr [ebp + 0x34], eax')
         # BikeRace's own inheritance, not an assertion that the provisional
-        # UnknownKrustyBikeView declaration describes its complete class.
+        # EventBikeRaceView declaration describes its complete class.
         col = struct.unpack('<5I', retail.bytes_at_va(0x55ac68, 20))
         self.assertEqual(col, (0, 0, 0, 0x567ab0, 0x55ac58))
         _, _, count, array = struct.unpack('<4I', retail.bytes_at_va(col[4], 16))
@@ -97,7 +97,7 @@ class RaceControlConnectionsTests(unittest.TestCase):
             pieces = ['#include "' + (ROOT / 'src/reconstructed' / h).as_posix() + '"\n'
                       for h in ('BikeRaceCore.h', 'EventManager.h', 'TrackGame.h')]
             for source, declaration in (
-                (SOURCES[0], 'UnknownKrustyBikeView* EventManager::FindRaceView() {'),
+                (SOURCES[0], 'EventBikeRaceView* EventManager::FindRaceView() {'),
                 (SOURCES[4], 'void BikeRace::ToggleReplayPause(int pauseOnly) {'),
             ):
                 text = (ROOT / source).read_text()
@@ -124,7 +124,7 @@ class RaceControlConnectionsTests(unittest.TestCase):
                 self.assertTrue(compare(retail, provider, symbol, va, size,
                                        ROOT / 'src/reconstructed/BikeRace.bindings.json')['strict_exact'])
             for symbol, va, size, bindings in (
-                ('?FindRaceView@EventManager@@QAEPAUUnknownKrustyBikeView@@XZ', 0x45d2f0, 78,
+                ('?FindRaceView@EventManager@@QAEPAUEventBikeRaceView@@XZ', 0x45d2f0, 78,
                  'src/reconstructed/EventManager.bindings.json'),
                 ('?ToggleReplayPause@BikeRace@@QAEXH@Z', 0x41f550, 60,
                  'src/reconstructed/BikeRace.bindings.json'),
@@ -143,7 +143,7 @@ class RaceControlConnectionsTests(unittest.TestCase):
                     if method in methods:
                         self.assertIn(symbol, imports)
                         self.assertIn(symbol, calls)
-                    self.assertFalse(any(name.startswith('?' + method + '@UnknownKrustyBikeView@@')
+                    self.assertFalse(any(name.startswith('?' + method + '@EventBikeRaceView@@')
                                          for name in imports), source)
             cases = [c for c in CASES if c['source'] in SOURCES]
             for case in cases:

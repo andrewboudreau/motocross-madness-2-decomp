@@ -86,11 +86,11 @@ static int WINAPI Draw(HDC dc,LPCSTR text,int n,LPRECT rect,UINT flags){if(flags
 static int WINAPI Load(HINSTANCE h,UINT id,LPSTR out,int size){Event&e=Begin(1,-1);e.a=(DWORD)h;e.b=id;e.c=size;strcpy(out,"Time left");e.status=sc.status?9:0;Boundary(0);Finish(e);return e.status;}
 static void Defaults(){memset(&sc,0,sizeof(sc));sc.count=5;sc.own=4;sc.disabled=-1;sc.width=4;sc.format=4444;sc.pitch=16;sc.rows=4;sc.whole=1;sc.resource=1;sc.status=1;sc.partial=1;sc.control=_MCW_EM|_PC_64|_RC_NEAR;}
 static void Setup(){
- memset(&w,0,sizeof(w));memset(&got,0,sizeof(got));receiver=OverlayObject();g_TrackGame=(TrackGame*)w.game[0];g_TrackGame->quarryEvent=(TrackGameViewOwner*)w.owner;g_TrackGame->quarryEvent->raceView=(UnknownKrustyBikeView*)w.race;
+ memset(&w,0,sizeof(w));memset(&got,0,sizeof(got));receiver=OverlayObject();g_TrackGame=(TrackGame*)w.game[0];g_TrackGame->quarryEvent=(TrackGameViewOwner*)w.owner;g_TrackGame->quarryEvent->raceView=(EventBikeRaceView*)w.race;
  g_TrackGame->playerCount=sc.count;g_TrackGame->mode.raceSettings.raceMode=sc.mode;g_TrackGame->mode.raceSettings.aiRacerCount=sc.count-1;g_TrackGame->mode.raceSettings.multiplayerAiRacerCount=0;g_TrackGame->mode.raceSettings.timeLimitMinutes=3.5f;g_TrackGame->quarryEvent->elapsedMinutes=1;g_TrackGame->quarryEvent->elapsedSeconds=15;
  if(sc.timeCase){float times[]={-75.0f,-0.5f,0.0f,59.75f,60.0f,60.25f,119.75f,120.0f,3599.0f};g_TrackGame->mode.raceSettings.timeLimitMinutes=0;g_TrackGame->quarryEvent->elapsedMinutes=0;g_TrackGame->quarryEvent->elapsedSeconds=-times[sc.timeCase-1];}
  g_TrackGame->resourceInstance=sc.resource?(void*)0x1111:0;g_TrackGame->display=(PCVideoCard*)w.display;((PCVideoCard*)w.display)->partialTextureUploadResult=sc.partial;
- BikeRace*r=(BikeRace*)w.race;r->localRacer=(UnknownBikeRaceRacer*)w.racers[sc.own];r->racerSlots=(UnknownBikeRaceRacer**)w.slots;
+ BikeRace*r=(BikeRace*)w.race;r->localRacer=(BikeRaceKrustyBikeView*)w.racers[sc.own];r->racerSlots=(BikeRaceKrustyBikeView**)w.slots;
  int order[12],used=0;for(int i=0;i<sc.count;i++){w.slots[i]=(DWORD)w.racers[i];At(w.racers[i],4)=(DWORD)vb;w.racers[i][0x1631]=(BYTE)(i!=sc.disabled);char*p=(char*)w.racers[i]+0x5e0;*p++='R';Number(p,i);*p=0;float value=(float)Score(i);if(sc.scoreVariant)value+=(sc.scoreVariant-3)*0.25f;*(float*)(w.racers[i]+0x768)=value;if(i!=sc.disabled)order[used++]=i;}
  if(sc.reverse&&!sc.tie)for(int j=0;j<used/2;j++){int t=order[j];order[j]=order[used-1-j];order[used-1-j]=t;}
  int ownRank=0;while(order[ownRank]!=sc.own)ownRank++;

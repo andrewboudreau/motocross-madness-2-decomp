@@ -21,7 +21,7 @@ sounds: idle effects (+0x11b8, +0x11d0), position/lap cues (+0x11ec..
 +0x1204), the crash sound (`0x004e57d0`) and keyboard toggles in slot 23
 (Ctrl+S sound, Ctrl+C music volume, Ctrl+V the EAX 1.0 environment). The
 camera's protected Camera/BikeCamera fields are read through
-`UnknownRaceSoundCamera`.
+`RaceSoundKrustyBikeCameraView`.
 
 Exact (26 calibration cases): constructor, destructor and deleting
 wrapper, the loader `0x004e23f0`, the channel reset `0x004e3430`, slots

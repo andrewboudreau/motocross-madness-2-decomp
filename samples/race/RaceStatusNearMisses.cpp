@@ -24,7 +24,7 @@
 #include "../../src/reconstructed/TrackGame.h"
 
 // 0x004e5d00
-int BuildStatusList(RaceStatusNode** list, UnknownKrustyBikeView* view) {
+int BuildStatusList(RaceStatusNode** list, EventBikeRaceView* view) {
     RaceStatusNode* status;
     RaceStatusNode** tail;
     int index;

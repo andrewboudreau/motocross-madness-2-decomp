@@ -88,7 +88,7 @@ InstrumentOverlay::InstrumentOverlay(int flags) : Overlay(flags, 1)
 
 // 0x00518770: loads the dial texture and places the needle for the
 // render target's size (the layout is for 640x480).
-InstrumentOverlay* InstrumentOverlay::Setup(RenderTarget* target, TextureMapManager* manager, UnknownInstrumentSource* source)
+InstrumentOverlay* InstrumentOverlay::Setup(RenderTarget* target, TextureMapManager* manager, InstrumentKrustyBikeCameraView* source)
 {
     OverlayRect rect;
     char name[260];
@@ -152,7 +152,7 @@ int InstrumentOverlay::Render3D()
             dial.degreesPerUnit = 130.0f;
             PlaceNeedle(&dial, dialNeedle);
         }
-        UnknownInstrumentState* state = instrumentSource->state;
+        InstrumentKrustyBikeView* state = instrumentSource->state;
         if (state->airborne) {
             s_UnknownGlobal68a448 = (!s_UnknownGlobal575140 ? state->gaugeValue * 0.68182f : s_UnknownGlobal68a448) - 0.5f;
             if (s_UnknownGlobal68a448 < 0.0f)
@@ -264,8 +264,8 @@ NameOverlay::~NameOverlay()
 // 0x00518e30
 NameOverlay* NameOverlay::Create(RenderTarget* target, TextureMap* texture,
                                                 const OverlayRect* rect, int scaleRect,
-                                                const OverlayRect* source, UnknownEventRacer* racer,
-                                                UnknownNameOverlayWorld* nameWorld, int phase)
+                                                const OverlayRect* source, EventKrustyBikeView* racer,
+                                                NameOverlayEventView* nameWorld, int phase)
 {
     if (!Attach(target, texture, rect, scaleRect, source, 0.00001f, 0, 0, 0, 0, 1555, 0)) {
         Release();
@@ -458,7 +458,7 @@ StatsOverlay* StatsOverlay::LoadPanel(RenderTarget* target, TextureMapManager* m
     OverlayRect source;
     char name[260];
     char path[260];
-    instrumentSource = (UnknownInstrumentSource*)camera;
+    instrumentSource = (InstrumentKrustyBikeCameraView*)camera;
     rect.left = 0;
     rect.top = 0;
     rect.right = 128;
@@ -539,7 +539,7 @@ StatsOverlay* StatsOverlay::LoadPanel(RenderTarget* target, TextureMapManager* m
 // 0x00519880
 int StatsOverlay::SetStatsSource(int value)
 {
-    statsSource = (UnknownStatsSource*)value;
+    statsSource = (StatsBikeRaceView*)value;
     return 1;
 }
 
@@ -649,8 +649,8 @@ int StatsOverlay::DrawViewModePanel()
     g_TrackGame->LoadResourceString(0x835, label, 0x80);
     int finished = 0;
     iterator = 0;
-    UnknownEventRacer* racer;
-    while ((racer = reinterpret_cast<UnknownEventRacer*>(reinterpret_cast<BikeRace*>(statsSource)->NextBike(&iterator))) != 0) {
+    EventKrustyBikeView* racer;
+    while ((racer = reinterpret_cast<EventKrustyBikeView*>(reinterpret_cast<BikeRace*>(statsSource)->NextBike(&iterator))) != 0) {
         if (racer->outOfRace)
             finished++;
     }
@@ -761,8 +761,8 @@ int StatsOverlay::DrawRacePanel()
     char time[0x80];
     int finished = 0;
     iterator = 0;
-    UnknownEventRacer* racer;
-    while ((racer = reinterpret_cast<UnknownEventRacer*>(reinterpret_cast<BikeRace*>(statsSource)->NextBike(&iterator))) != 0) {
+    EventKrustyBikeView* racer;
+    while ((racer = reinterpret_cast<EventKrustyBikeView*>(reinterpret_cast<BikeRace*>(statsSource)->NextBike(&iterator))) != 0) {
         if (racer->outOfRace)
             finished++;
     }
@@ -856,10 +856,10 @@ int StatsOverlay::DrawTagStandings()
     if (g_TrackGame->mode.raceSettings.stuntMode) {
         int iterator;
         int own;
-        UnknownKrustyBikeView* view = g_TrackGame->tagEvent->raceView;
+        EventBikeRaceView* view = g_TrackGame->tagEvent->raceView;
         iterator = 0;
-        UnknownEventRacer* racer;
-        while ((racer = reinterpret_cast<UnknownEventRacer*>(reinterpret_cast<BikeRace*>(view)->NextBike(&iterator))) != 0) {
+        EventKrustyBikeView* racer;
+        while ((racer = reinterpret_cast<EventKrustyBikeView*>(reinterpret_cast<BikeRace*>(view)->NextBike(&iterator))) != 0) {
             scores[count].value = racer->score;
             scores[count].racer = racer;
             count++;
@@ -1212,7 +1212,7 @@ RadarOverlay* RadarOverlay::LoadMap(RenderTarget* target, TextureMapManager* man
         frameRateRect.top = mapRect.top + 112;
         frameRateRect.bottom = mapRect.top + 124;
     }
-    radarCamera = (UnknownRadarCamera*)camera;
+    radarCamera = (RadarKrustyBikeCameraView*)camera;
     backingTexture = TerrainLoadTexture(manager, name, 4444, 0, 8, 5, 6, 0, 0x10, 0xff00ff, 1, 1);
     if (!backingTexture) {
         Release();
@@ -1234,14 +1234,14 @@ RadarOverlay* RadarOverlay::LoadMap(RenderTarget* target, TextureMapManager* man
 }
 
 // 0x0051baf0: takes the racers from `view`.
-int RadarOverlay::TakeRacers(UnknownKrustyBikeView* view, int chat)
+int RadarOverlay::TakeRacers(EventBikeRaceView* view, int chat)
 {
     int iterator;
-    UnknownEventRacer* racer;
+    EventKrustyBikeView* racer;
     racerCount = 0;
     iterator = 0;
     radarView = view;
-    while ((racer = reinterpret_cast<UnknownEventRacer*>(reinterpret_cast<BikeRace*>(radarView)->NextBike(&iterator))) != 0) {
+    while ((racer = reinterpret_cast<EventKrustyBikeView*>(reinterpret_cast<BikeRace*>(radarView)->NextBike(&iterator))) != 0) {
         racers[racerCount] = racer;
         racerCount++;
     }
@@ -1385,7 +1385,7 @@ int RadarOverlay::LineThrough(const float* p0, const float* p1, float* nx, float
 }
 
 // The race object RadarOverlay's gate drawing reads (see TrackOverlay.h).
-#define RadarRace() ((UnknownRadarGateOwner*)g_TrackGame->bajaEnduroEvent)
+#define RadarRace() ((RadarGateEventView*)g_TrackGame->bajaEnduroEvent)
 
 // Cross product as 0x0051cb20 inlines it. The doubled parentheses matter:
 // with them VC6 keeps the folded zero term on the x87 stack and loads the
@@ -1501,7 +1501,7 @@ ChatOverlay* ChatOverlay::Setup(RenderTarget* target, TextureMapManager* manager
     chatRect.right = chatRect.left + 256;
     chatRect.bottom = 68;
     strcpy(name, "chat256.tga");
-    chatCamera = (UnknownChatCamera*)camera;
+    chatCamera = (ChatKrustyBikeCameraView*)camera;
     cueRect = cue;
     timeSum = 0.08f;
     backingTexture = TerrainLoadTexture(manager, name, 4444, 0, 8, 5, 6, 0, 0x10, 0xff00ff, 1, 1);

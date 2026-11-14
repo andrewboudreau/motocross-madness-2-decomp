@@ -98,14 +98,14 @@ int RadarOverlay::IntersectLineCircle(const float* a, const float* b, const floa
 // an extra fixed tag in event type 0. Near miss from TrackOverlayNearMisses.cpp (587
 // against 586 bytes, same instructions); the racer iteration goes through the BikeRace
 // provider (0x004204e0) as RadarOverlay::TakeRacers does.
-int ChatOverlay::CollectRacers(UnknownChatView* view)
+int ChatOverlay::CollectRacers(ChatBikeRaceView* view)
 {
     int iterator;
-    UnknownChatRacer* racer;
+    ChatKrustyBikeView* racer;
     racerCount = 0;
     iterator = 0;
     chatView = view;
-    while ((racer = reinterpret_cast<UnknownChatRacer*>(
+    while ((racer = reinterpret_cast<ChatKrustyBikeView*>(
                 reinterpret_cast<BikeRace*>(chatView)->NextBike(&iterator))) != 0) {
         racers[racerCount] = racer;
         racerCount++;
@@ -113,8 +113,8 @@ int ChatOverlay::CollectRacers(UnknownChatView* view)
     int i;
     for (i = 0; i < racerCount; i++) {
         nameTags[i] = (new(__FILE__, 2369) NameOverlay(1))->Create(
-            Target(), overlayTexture, &nameTagRects[i], 0, &nameTagRects[i], (UnknownEventRacer*)racers[i],
-            (UnknownNameOverlayWorld*)chatView, i);
+            Target(), overlayTexture, &nameTagRects[i], 0, &nameTagRects[i], (EventKrustyBikeView*)racers[i],
+            (NameOverlayEventView*)chatView, i);
         AppendChild(nameTags[i], -1);
     }
     if (g_TrackGame->mode.raceSettings.eventType == 0) {
@@ -122,7 +122,7 @@ int ChatOverlay::CollectRacers(UnknownChatView* view)
         // Create argument.
         nameTags[racerCount] = (new(__FILE__, 2376) NameOverlay(1))->Create(
             Target(), overlayTexture, &nameTagRects[racerCount], 0, &nameTagRects[racerCount], 0,
-            (UnknownNameOverlayWorld*)chatView, i);
+            (NameOverlayEventView*)chatView, i);
         AppendChild(nameTags[racerCount], -1);
         if (nameTags[racerCount]) {
             nameTags[racerCount]->SetFixedPosition(Vector3(cueRect.left, cueRect.top, 0));

@@ -3,11 +3,11 @@
 `EcoSystem::LightingChanged` uses the existing source-defined
 `LightManager::FindLightOfType` at `0x4a0190` (52 bytes). Its three calls request
 light types 6, 4 and 2. The existing EcoSystem declaration now returns
-`LightEmitter*`; explicit result casts retain the separate `UnknownEcoLight`
+`LightEmitter*`; explicit result casts retain the separate `EcoLightEmitterView`
 prefix view used by this caller. The canonical `LightEmitter.h` is unchanged.
 
 The single decorated-name correction is
-`?FindLightOfType@LightManager@@QAEPAVUnknownEcoLight@@H@Z` to
+`?FindLightOfType@LightManager@@QAEPAVEcoLightEmitterView@@H@Z` to
 `?FindLightOfType@LightManager@@QAEPAVLightEmitter@@H@Z`. Both production and
 aggregate bindings use the canonical name. There is no new provider, storage,
 calibration target or candidate admission. This connects an existing complete
@@ -44,7 +44,7 @@ LightingChanged reads only the returned ambient fields +0x54/+0x58/+0x5c
 and direction fields +0x70/+0x78. Separate compilations of the genuine headers
 check this prefix against LightEmitter. They also check EcoSystem's manager
 field at +0x4c. This is bounded pointer and field evidence, not a claim of full
-identity for `UnknownEcoLight` or the existing provisional manager view.
+identity for `EcoLightEmitterView` or the existing provisional manager view.
 
 ## Preservation
 

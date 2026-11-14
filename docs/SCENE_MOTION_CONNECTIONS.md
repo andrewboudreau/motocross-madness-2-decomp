@@ -13,7 +13,7 @@ retain their layouts. No provider body, virtual slot or object allocation change
 | AdvanceLooping | `0x004a56d0` | 121 bytes |
 
 All four complete source bodies match retail strictly. The two retired external
-names belong to `UnknownSceneObject`; the actual providers remain in
+names belong to `SceneCollisionCharacterView`; the actual providers remain in
 `src/krusty2/motion/Motnctrl.cpp`. No aliases or additional provider definitions
 are introduced.
 

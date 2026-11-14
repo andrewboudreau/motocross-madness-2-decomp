@@ -8,12 +8,12 @@ this call boundary. There is no forwarding implementation or linker alias.
 
 | Retired production method name | Existing caller view |
 | --- | --- |
-| `UnknownKrustyBikeView::NextBike` | EventManager, FollowRacer, RaceSound, RaceStatus, TrackOverlay |
-| `UnknownStatsSource::NextBike` | TrackOverlay |
-| `UnknownVisualCueView::NextBike` | Krusty3DObjects |
+| `EventBikeRaceView::NextBike` | EventManager, FollowRacer, RaceSound, RaceStatus, TrackOverlay |
+| `StatsBikeRaceView::NextBike` | TrackOverlay |
+| `VisualCueBikeRaceView::NextBike` | Krusty3DObjects |
 | `KbRace::NextBike` | KrustyBike |
 
-`UnknownChatView::NextBike` remains a sample-only declaration and is not counted
+`ChatBikeRaceView::NextBike` remains a sample-only declaration and is not counted
 as a removed production dependency.
 
 ## Receiver and result evidence
@@ -44,7 +44,7 @@ primary pointer returned by the iterator. The explicit result casts preserve
 that primary value. The event/visual views' position at +0x0c and the
 event/canonical/KrustyBike race pointer at +0x740 are checked under native VC6.
 This does **not** establish full type or virtual-base layout equivalence among
-`UnknownBikeRaceRacer`, `UnknownEventRacer`, `UnknownVisualCueRacer` and
+`BikeRaceKrustyBikeView`, `EventKrustyBikeView`, `VisualCueKrustyBikeView` and
 `KrustyBike`; their partial declarations and existing access code are retained.
 
 ## Shared declaration
@@ -54,7 +54,7 @@ This does **not** establish full type or virtual-base layout equivalence among
 `BikeRace.h` includes both and continues to expose the original helper types.
 The extraction preserves the 0x400-byte race, fields, virtual slots and method
 signatures. Pointer-only helper dependencies are forward-declared in the core.
-`UnknownFunctionFreeNodes` remains inline in `BikeRace.h`, including the
+`FreeGateList` remains inline in `BikeRace.h`, including the
 original `__FILE__` diagnostic context.
 
 This split lets callers include the actual class without importing unrelated

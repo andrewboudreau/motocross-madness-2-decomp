@@ -97,7 +97,7 @@ dispatch or instrumentation.
 
 Terrain `QueryGround`, Direct3DRM rotation, other camera methods, allocation and
 virtual/input callbacks are scripted boundaries. In particular, this does not
-validate or connect the still-separate `UnknownFollowCameraSubject::QueryGround`
+validate or connect the still-separate `FollowCameraTerrainView::QueryGround`
 declaration, nor validate the default virtual implementations or rendered
 camera behavior. The rotation callback is a deterministic test transformation,
 not a replacement Direct3DRM implementation. Finite full-state equivalence under

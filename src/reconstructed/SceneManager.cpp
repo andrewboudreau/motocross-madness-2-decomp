@@ -386,7 +386,7 @@ void Scene::OnEnable()
 }
 
 // 0x004eaec0
-UnknownSceneObject* Scene::FindEntryByFileName(const char* path, int* index)
+SceneCollisionCharacterView* Scene::FindEntryByFileName(const char* path, int* index)
 {
     char name[0x104];
 
@@ -440,7 +440,7 @@ int Scene::RestartEntry(int index, float time, int force, int motion)
         }
         SceneAnimation* entry = &animationTable->entries[index];
         if (entry->keyFramed) {
-            UnknownSceneObject* object = entry->character;
+            SceneCollisionCharacterView* object = entry->character;
             if (object->motionStopped || force) {
                 if (motion >= entry->sequenceLength)
                     entry->sequenceIndex = 0;
@@ -455,11 +455,11 @@ int Scene::RestartEntry(int index, float time, int force, int motion)
                 return 1;
             }
         } else {
-            UnknownSceneAnimatedObject* object = (UnknownSceneAnimatedObject*)entry->proceduralObject;
+            SceneCarProceduralView* object = (SceneCarProceduralView*)entry->proceduralObject;
             object->pathTime = time;
             object->skipSmoothing = running;
             if (running)
-                ((UnknownSceneAnimatedObject*)animationTable->entries[index].proceduralObject)
+                ((SceneCarProceduralView*)animationTable->entries[index].proceduralObject)
                     ->Tick(0.0001f);
         }
     }
@@ -1199,14 +1199,14 @@ void Scene::SetDetailLevel(int level)
             if (animationTable->entries[i].keyFramed)
                 reinterpret_cast<D3DIMSoultreeObject*>(animationTable->entries[i].character->modelNode)->ApplyLodSettings(level);
             else
-                reinterpret_cast<D3DIMSoultreeObject*>(((UnknownSceneAnimatedObject*)animationTable->entries[i].proceduralObject)->carModel)->ApplyLodSettings(level);
+                reinterpret_cast<D3DIMSoultreeObject*>(((SceneCarProceduralView*)animationTable->entries[i].proceduralObject)->carModel)->ApplyLodSettings(level);
         }
         for (i = 0; i < animationTable->randomSetCount; i++) {
             SceneAnimation* entry = animationTable->randomSets[i].entry;
             if (entry->keyFramed)
                 reinterpret_cast<D3DIMSoultreeObject*>(entry->character->modelNode)->ApplyLodSettings(level);
             else
-                reinterpret_cast<D3DIMSoultreeObject*>(((UnknownSceneAnimatedObject*)entry->proceduralObject)->carModel)->ApplyLodSettings(level);
+                reinterpret_cast<D3DIMSoultreeObject*>(((SceneCarProceduralView*)entry->proceduralObject)->carModel)->ApplyLodSettings(level);
         }
     }
     if (staticModels) {

@@ -7,10 +7,10 @@
 #include <float.h>
 extern "C" long __cdecl _ftol();
 class TrackGame;
-class UnknownBikeRaceRacer;
+class BikeRaceKrustyBikeView;
 class TrackGameViewOwner {public:void PickFollowedRacer();};
-class BikeRace {public:UnknownBikeRaceRacer* NextBike(int*);};
-class ActualBikeRace {public:UnknownBikeRaceRacer* NextBike(int*);};
+class BikeRace {public:BikeRaceKrustyBikeView* NextBike(int*);};
+class ActualBikeRace {public:BikeRaceKrustyBikeView* NextBike(int*);};
 class NetworkInterface {public:int Send(int,void*,int,int,int);};
 class VCRInterface {public:int QueueRecord(int,int,const void*,unsigned);};
 static BYTE referenceSpace[0x800000]={1};
@@ -49,7 +49,7 @@ static void Boundary(){
  case 11:At(world.owner,0x34)=0;break;
  }}ToReference();if(scenario.throwAt==observed.count)throw 0x781;
 }
-UnknownBikeRaceRacer* BikeRace::NextBike(int* cursor){Event& e=Begin(1,this,*cursor);Boundary();UnknownBikeRaceRacer* result=((ActualBikeRace*)this)->NextBike(cursor);e.cursorAfter=*cursor;e.result=Identity(result);return result;}
+BikeRaceKrustyBikeView* BikeRace::NextBike(int* cursor){Event& e=Begin(1,this,*cursor);Boundary();BikeRaceKrustyBikeView* result=((ActualBikeRace*)this)->NextBike(cursor);e.cursorAfter=*cursor;e.result=Identity(result);return result;}
 extern "C" int __cdecl rand(){Begin(2);Boundary();return scenario.random;}
 int NetworkInterface::Send(int kind,void* data,int size,int player,int flags){Event& e=Begin(3,this,kind,size,player,flags);if(size!=12)Fail(82);packet=data;e.payload[4]=((BYTE*)data)[4];memcpy(e.payload+8,(BYTE*)data+8,4);
  if(scenario.writePacket)for(int i=0;i<12;++i)((BYTE*)data)[i]=(BYTE)(0x31+i*17);

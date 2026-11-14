@@ -32,7 +32,7 @@ emitted callers remain strict matches in the focused test.
 ## Iterator connection and dependencies
 
 Only the picker's two iterator invocations change from the provisional
-`UnknownKrustyBikeView` method name to the existing canonical `BikeRace`
+`EventBikeRaceView` method name to the existing canonical `BikeRace`
 provider. Explicit receiver and result casts preserve the primary pointer
 values. This uses the same boundary already established in canonical
 `FollowRacer.cpp`; it does not establish complete equivalence between the

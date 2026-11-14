@@ -5,7 +5,7 @@
 //
 // The view's position writer is retail 0x004210f0, bound in src as
 // BikeRace::WriteRelativePositions (BikeRace.bindings.json); RaceView.h's view
-// declares the same function on UnknownKrustyBikeView (a view of the same object,
+// declares the same function on EventBikeRaceView (a view of the same object,
 // BikeRace.h). The body calls it through the view, as the sample does, and a link_aliases
 // entry binds the view's name to BikeRace's definition (same arguments, no this
 // adjustment). The former BikeRace-view local changed the register assignment

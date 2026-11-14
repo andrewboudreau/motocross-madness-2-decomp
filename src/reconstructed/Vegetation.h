@@ -4,7 +4,7 @@
 #include "EcoCoordinates.h"
 
 class TextureMapManager;
-class UnknownEcoRenderTarget;
+class EcoRenderTargetView;
 class CollisionObject;
 struct Vector3;
 
@@ -12,7 +12,7 @@ class Vegetation : public UnknownEcoQuadTreeObject {
 public:
     Vegetation();                             // 0x00456650
     virtual unsigned short ComputeSortKey(); // 0x00456690: view depth as a sort key
-    virtual unsigned int ComputeQuadTreeCode(UnknownEcoQuadTree* tree); // 0x00456720: cell code
+    virtual unsigned int ComputeQuadTreeCode(EcoQuadTreeView* tree); // 0x00456720: cell code
 
     // 0x004567a0 / 0x004567e0: place the object (quantised or world
     // coordinates); the first argument (EcoSystem::textureManager) is not used.
@@ -26,7 +26,7 @@ public:
     void TestDistance(int* billboard, int* fade);
     // 0x00456a10: switches between the 3D geometry and the billboard.
     void SetBillboard(int billboard, int fade);
-    void DrawGeometry(UnknownEcoRenderTarget* target);          // 0x00457000: draws the geometry
+    void DrawGeometry(EcoRenderTargetView* target);          // 0x00457000: draws the geometry
     int GetCollisionCount();                  // 0x00457080: the definition's collision count
     // 0x004570a0: the definition's collision object `index`, placed here.
     CollisionObject* GetCollisionObject(int index);

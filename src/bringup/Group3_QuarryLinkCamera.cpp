@@ -14,5 +14,5 @@ void* G3Q_BikeCameraSetupFlyby(void* camera, void* target, float a, float b, flo
 // 0x00463600: FollowCamera::SetSubject on the camera (the subject is the terrain).
 void G3Q_BikeCameraSetSubject(void* camera, void* subject)
 {
-    ((FollowCamera*)(KrustyBikeCamera*)camera)->SetSubject((UnknownFollowCameraSubject*)subject);
+    ((FollowCamera*)(KrustyBikeCamera*)camera)->SetSubject((FollowCameraTerrainView*)subject);
 }

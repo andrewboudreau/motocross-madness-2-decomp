@@ -1,5 +1,5 @@
 {
-  "baseline": "Published f6c22865 before declaration correction; each same-path complete object preserves all nondebug bytes, flags and relocation targets under only the FilePrintf void-to-int external-name substitution. Only enumerated full source filenames are checkout-relative. EcoSystem QuadTree correction: published ed3d06ce old EcoSystem pins reproduced independently; both complete objects preserve all bytes and destinations under only the six tree interface names, with no exclusions or score changes. Round57 light lookup: published dfdf9823 canonical EcoSystem pin independently reproduced, then complete132 sections/720 relocations preserved under only the UnknownEcoLight*-to-LightEmitter* method-return spelling. All other records unchanged.",
+  "baseline": "Published f6c22865 before declaration correction; each same-path complete object preserves all nondebug bytes, flags and relocation targets under only the FilePrintf void-to-int external-name substitution. Only enumerated full source filenames are checkout-relative. EcoSystem QuadTree correction: published ed3d06ce old EcoSystem pins reproduced independently; both complete objects preserve all bytes and destinations under only the six tree interface names, with no exclusions or score changes. Round57 light lookup: published dfdf9823 canonical EcoSystem pin independently reproduced, then complete132 sections/720 relocations preserved under only the EcoLightEmitterView*-to-LightEmitter* method-return spelling. All other records unchanged.",
   "rename": {
     "?FilePrintf@@YAXPAU_iobuf@@PBDZZ": "?FilePrintf@@YAHPAU_iobuf@@PBDZZ"
   },
@@ -17,12 +17,12 @@
     "src/reconstructed/EcoSystem.cpp": {
       "sections": 132,
       "relocations": 720,
-      "sha256": "e5eddfb191c4c824354ce6ab50a6559e135ce667167f36560e0afc61ea9358a7"
+      "sha256": "f7cad24a83af91493079bd8a4e850efb9df8f560e9d07dff3cbca8c95947c007"
     },
     "samples/ecosystem/EcoSystemNearMisses.cpp": {
       "sections": 98,
       "relocations": 444,
-      "sha256": "1d37cfd81e5ef7cf3613f1c292c21d136cb5b43ce8019209ac77009140b00771"
+      "sha256": "839298b5e1730727a9613695241c72ae7f6c873834a478532f496edce417a0c0"
     }
   }
 }

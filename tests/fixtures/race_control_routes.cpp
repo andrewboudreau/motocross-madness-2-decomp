@@ -6,11 +6,11 @@
 #include <string.h>
 
 typedef char RaceSize[sizeof(BikeRace) == 0x400 ? 1 : -1];
-typedef char RaceViewSize[sizeof(UnknownKrustyBikeView) == 0x3fc ? 1 : -1];
+typedef char RaceViewSize[sizeof(EventBikeRaceView) == 0x3fc ? 1 : -1];
 typedef char CanonicalLocal[offsetof(BikeRace, localRacer) == 0x38 ? 1 : -1];
-typedef char ProvisionalLocal[offsetof(UnknownKrustyBikeView, localRacer) == 0x38 ? 1 : -1];
+typedef char ProvisionalLocal[offsetof(EventBikeRaceView, localRacer) == 0x38 ? 1 : -1];
 typedef char CanonicalPause[offsetof(BikeRace, replayPaused) == 0x3f8 ? 1 : -1];
-typedef char ProvisionalPause[offsetof(UnknownKrustyBikeView, replayPaused) == 0x3f8 ? 1 : -1];
+typedef char ProvisionalPause[offsetof(EventBikeRaceView, replayPaused) == 0x3f8 ? 1 : -1];
 typedef char EventRace[offsetof(TrackGameViewOwner, raceView) == 0x34 ? 1 : -1];
 
 TrackGame* g_TrackGame;
@@ -39,11 +39,11 @@ int main() {
     for (unsigned mask = 0; mask < 32; ++mask) {
         memset(gameStorage, 0xa5, sizeof(gameStorage));
         memset(events, 0x6b, sizeof(events));
-        UnknownKrustyBikeView* first = 0;
+        EventBikeRaceView* first = 0;
         for (int n = 0; n < 5; ++n) {
             *(void**)((char*)gameStorage + offsets[n]) = mask & (1u << n) ? events[n] : 0;
             events[n][0x34 / 4] = (unsigned long)&identities[n];
-            if (!first && (mask & (1u << n))) first = (UnknownKrustyBikeView*)&identities[n];
+            if (!first && (mask & (1u << n))) first = (EventBikeRaceView*)&identities[n];
         }
         memcpy(savedGame, gameStorage, sizeof(gameStorage));
         if (manager->FindRaceView() != first || memcmp(savedGame, gameStorage, sizeof(gameStorage))) return 1;
@@ -73,7 +73,7 @@ int main() {
         }
         // The call crosses precisely the provisional primary-pointer boundary
         // used by the production callers, without a receiver adjustment.
-        UnknownKrustyBikeView* view = reinterpret_cast<UnknownKrustyBikeView*>(race);
+        EventBikeRaceView* view = reinterpret_cast<EventBikeRaceView*>(race);
         reinterpret_cast<BikeRace*>(view)->ToggleReplayPause(pauses[value]);
         if (memcmp(savedRace, raceStorage, sizeof(raceStorage)) ||
             memcmp(savedGame, gameStorage, sizeof(gameStorage))) return 3;

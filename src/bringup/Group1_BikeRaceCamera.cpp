@@ -60,28 +60,28 @@ int BikeRace::AimCamera(int caster) {
         if (g_TrackGame->playerCount > 1) {
             RaceCameraView()->followedBike->modelNode->ClearFlag14c();
             RaceCameraView()->followedBike->riderCharacter->modelNode->ClearFlag14c();
-            RaceCameraView()->UnknownFunctionFollow(racerSlots[targetRacer]);
+            RaceCameraView()->StartFollowing(racerSlots[targetRacer]);
             if (raceShadow != 0) {
                 raceShadow->ClearCasters();
                 raceShadow->AddCaster(racerSlots[targetRacer]->modelNode);
                 raceShadow->AddCaster(racerSlots[targetRacer]->riderCharacter->modelNode);
             }
             if (g_TrackGame->bajaEnduroEvent != 0) {
-                UnknownBikeRaceRacer* racer = racerSlots[targetRacer];
+                BikeRaceKrustyBikeView* racer = racerSlots[targetRacer];
                 g_TrackGame->bajaEnduroEvent->SelectLapGates(racer->lapGate,
                                                                           racer->nextLapGate, racer);
             }
         } else if (targetRacer == 0) {
             RaceCameraView()->followedBike->modelNode->ClearFlag14c();
             RaceCameraView()->followedBike->riderCharacter->modelNode->ClearFlag14c();
-            RaceCameraView()->UnknownFunctionFollow(localRacer);
+            RaceCameraView()->StartFollowing(localRacer);
             if (raceShadow != 0) {
                 raceShadow->ClearCasters();
                 raceShadow->AddCaster(localRacer->modelNode);
                 raceShadow->AddCaster(localRacer->riderCharacter->modelNode);
             }
             if (g_TrackGame->bajaEnduroEvent != 0) {
-                UnknownBikeRaceRacer* racer = localRacer;
+                BikeRaceKrustyBikeView* racer = localRacer;
                 g_TrackGame->bajaEnduroEvent->SelectLapGates(racer->lapGate,
                                                                           racer->nextLapGate, racer);
             }
@@ -89,14 +89,14 @@ int BikeRace::AimCamera(int caster) {
             RaceCameraView()->followedBike->modelNode->ClearFlag14c();
             RaceCameraView()->followedBike->riderCharacter->modelNode->ClearFlag14c();
             int index = targetRacer - 1;
-            RaceCameraView()->UnknownFunctionFollow(aiRacers[index]);
+            RaceCameraView()->StartFollowing(aiRacers[index]);
             if (raceShadow != 0) {
                 raceShadow->ClearCasters();
                 raceShadow->AddCaster(aiRacers[index]->modelNode);
                 raceShadow->AddCaster(aiRacers[index]->riderCharacter->modelNode);
             }
             if (g_TrackGame->bajaEnduroEvent != 0) {
-                UnknownBikeRaceRacer* racer = aiRacers[index];
+                BikeRaceKrustyBikeView* racer = aiRacers[index];
                 g_TrackGame->bajaEnduroEvent->SelectLapGates(racer->lapGate,
                                                                           racer->nextLapGate, racer);
             }
@@ -109,7 +109,7 @@ int BikeRace::AimCamera(int caster) {
             if (raceShadow != 0) {
                 raceShadow->ClearCasters();
             }
-            RaceCameraView()->UnknownFunctionTargetCaster(
+            RaceCameraView()->TargetShadowCaster(
                 raceScene->staticModels->casters[targetCaster].model);
         } else {
             RaceCameraView()->followingRacer = 1;
@@ -123,17 +123,17 @@ int BikeRace::AimCamera(int caster) {
             }
             SceneAnimation* entry = &raceScene->animationTable->entries[targetEntry];
             if (entry->keyFramed) {
-                UnknownBikeRaceSceneCharacter* character =
-                    (UnknownBikeRaceSceneCharacter*)entry->character;
+                BikeRaceSceneCharacterView* character =
+                    (BikeRaceSceneCharacterView*)entry->character;
                 if (character->isEnabled) {
-                    RaceCameraView()->UnknownFunctionTargetCharacter(character);
+                    RaceCameraView()->TargetSceneCharacter(character);
                 } else {
                     return 0;
                 }
             } else {
                 GameObject* object = (GameObject*)entry->proceduralObject;
-                if (((UnknownBikeRaceObjectFlags*)object)->isEnabled) {
-                    RaceCameraView()->UnknownFunctionTargetObject(object);
+                if (((BikeRaceGameObjectFlags*)object)->isEnabled) {
+                    RaceCameraView()->TargetSceneObject(object);
                 } else {
                     return 0;
                 }
@@ -154,7 +154,7 @@ int BikeRace::AimCamera(int caster) {
 // remote racers). The player count is read at each test: retail re-tests
 // `playerCount > 1` after the `index == 0` miss (`cmp ecx, 1` twice at
 // 0x0041f2f6/0x0041f304), which a `players` local lets VC6 thread away.
-inline UnknownBikeRaceRacer* BikeRace::UnknownFunctionRacerAt(int index) {
+inline BikeRaceKrustyBikeView* BikeRace::UnknownFunctionRacerAt(int index) {
     if (g_TrackGame->playerCount == 1 && index == 0) {
         return localRacer;
     }
@@ -175,7 +175,7 @@ void BikeRace::NextCameraTarget(int forward, int racers, int objects) {
     if (g_TrackGame->uiInteractionBlocked) {
         return;
     }
-    UnknownBikeRaceCameraView* camera = RaceCameraView();
+    BikeRaceKrustyBikeCameraView* camera = RaceCameraView();
     if ((camera->overrideActive || camera->cameraState == 7) &&
         (camera->cameraState != 7 || racers || objects)) {
         return;
@@ -240,28 +240,28 @@ void BikeRace::NextCameraTarget(int forward, int racers, int objects) {
             }
             SceneAnimation* entry = &scene->animationTable->entries[targetEntry];
             if (entry->keyFramed) {
-                if (((UnknownBikeRaceSceneCharacter*)entry->character)->isEnabled) {
+                if (((BikeRaceSceneCharacterView*)entry->character)->isEnabled) {
                     hidden = entry->excludeFromCameraIteration;
                 } else {
                     hidden = 1;
                 }
-            } else if (((UnknownBikeRaceObjectFlags*)entry->proceduralObject)->isEnabled) {
+            } else if (((BikeRaceGameObjectFlags*)entry->proceduralObject)->isEnabled) {
                 hidden = entry->excludeFromCameraIteration;
             } else {
                 hidden = 1;
             }
             if (old == targetEntry) {
-                UnknownBikeRaceCameraView* view = RaceCameraView();
+                BikeRaceKrustyBikeCameraView* view = RaceCameraView();
                 if (view->targetCharacter != 0 || view->targetCar != 0) {
                     return;
                 }
                 entry = &scene->animationTable->entries[targetEntry];
                 if (entry->keyFramed) {
-                    if (!((UnknownBikeRaceSceneCharacter*)entry->character)->isEnabled) {
+                    if (!((BikeRaceSceneCharacterView*)entry->character)->isEnabled) {
                         view->followingRacer = 1;
                         return;
                     }
-                } else if (!((UnknownBikeRaceObjectFlags*)entry->proceduralObject)->isEnabled) {
+                } else if (!((BikeRaceGameObjectFlags*)entry->proceduralObject)->isEnabled) {
                     view->followingRacer = 1;
                     return;
                 }

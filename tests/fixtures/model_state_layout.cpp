@@ -13,11 +13,11 @@ extern "C" int PhysicsModelBase() {
 #include "../../src/reconstructed/BikeRace.h"
 #include "../../src/reconstructed/SceneManager.h"
 #include "../../src/reconstructed/D3DIMSoulTree.h"
-CHECK(racer_model, offsetof(UnknownBikeRaceRacer, modelNode) == 0x3bc);
-CHECK(racer_rider, offsetof(UnknownBikeRaceRacer, riderCharacter) == 0x5c4);
-CHECK(rider_model, offsetof(UnknownBikeRaceRider, modelNode) == 0x1a0);
-CHECK(scene_character_model, offsetof(UnknownSceneObject, modelNode) == 0x1a0);
-CHECK(scene_car_model, offsetof(UnknownSceneAnimatedObject, carModel) == 0x34);
+CHECK(racer_model, offsetof(BikeRaceKrustyBikeView, modelNode) == 0x3bc);
+CHECK(racer_rider, offsetof(BikeRaceKrustyBikeView, riderCharacter) == 0x5c4);
+CHECK(rider_model, offsetof(BikeRaceRiderView, modelNode) == 0x1a0);
+CHECK(scene_character_model, offsetof(SceneCollisionCharacterView, modelNode) == 0x1a0);
+CHECK(scene_car_model, offsetof(SceneCarProceduralView, carModel) == 0x34);
 #endif
 CHECK(model_size, sizeof(D3DIMSoultreeObject) == 0x2d8);
 extern "C" int ModelGameBase() {

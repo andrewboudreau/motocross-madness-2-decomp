@@ -4,7 +4,7 @@ The two detail-key branches in `BaseQuarryEvent::OnControlPress` now call the
 existing `BikeRace::SetDetailLevel(int)` definition through an explicit primary
 pointer cast. The existing `BikeRaceCore.h` include supplies the declaration.
 No class layout, provider body, allocation, shared header or table changes.
-The provisional `UnknownKrustyBikeView` is not identified as a complete BikeRace
+The provisional `EventBikeRaceView` is not identified as a complete BikeRace
 class by this bounded connection.
 
 ## Receiver and ABI evidence
@@ -36,7 +36,7 @@ The canonical object preserves all 86 nondebug sections and 393 relocations
 under exactly one external name replacement:
 
 ```
-?SetDetailLevel@UnknownKrustyBikeView@@QAEXH@Z
+?SetDetailLevel@EventBikeRaceView@@QAEXH@Z
 ?SetDetailLevel@BikeRace@@QAEXH@Z
 ```
 

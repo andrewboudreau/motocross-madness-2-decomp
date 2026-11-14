@@ -1,5 +1,5 @@
 {
-  "baseline": "Published 5c439bb source hashes matched the same-path private baseline before applying six global-name joins. All nondebug bytes, flags and relocation destinations remain identical. Terrain transitive consumer included after genuine global-only header narrowing; no commutative target swaps accepted. Only recognized complete checkout filenames are portable. FilePrintf declaration correction: both EcoSystem objects were independently checked against these original pins and complete current objects under only the void-to-int FilePrintf name; only the sample hash changes. EcoSystem QuadTree correction: published ed3d06ce old EcoSystem pins reproduced independently; both complete objects preserve all bytes and destinations under only the six tree interface names, with no exclusions or score changes. Round50 exposes the existing TrackOverlay flag at unchanged BSS+0x40: its published old pin was reproduced first, and all207 sections/863 relocations remain identical under only that one static-to-external symbol name/visibility change; only the canonical TrackOverlay record is refreshed. The frozen visibility camera now uses actual PCCamera storage: its old complete pin was independently reproduced first; three names join the same lifecycle/storage, with one exact implicit destructor COMDAT (5 code bytes plus 11 alignment NOPs) and the cleanup reference resolving to that definition. All 87 old sections and 341 relocations otherwise preserve their bytes and destinations. Round51 StatsOverlay::DrawStandings extraction: the published old aggregate pin was independently reproduced; all 37 sections and 162 relocations preserve exactly under only its two iterator-call targets (function offsets 172 and 220) joining existing BikeRace::NextBike. Other aggregate functions and the canonical TrackOverlay record are unchanged. FollowCameraLoadFile extraction: both published camera aggregate pins were independently reproduced from the same-path original object. The corrected nonexact loader changes 952 to 980 bytes, its constructor-EH saved-pointer displacement changes -396 to -420, and its exact diagnostic filename moves to FollowCameraLoadFile.cpp. All other 63 sections and 302 relocations are identical. The complete aggregate remains 66 sections with 336 to 337 relocations; only its record is updated, with the new exact source filename added to the portability allowlist. Round57 light lookup: published dfdf9823 canonical EcoSystem pin independently reproduced, then complete132 sections/720 relocations preserved under only the UnknownEcoLight*-to-LightEmitter* method-return spelling. All other records unchanged. WalkSlot4Block promotion: both published fcf4a507 Griddraw pins were reproduced from the same-path HEAD sources first. The canonical object gains only the strict-exact WalkSlot4Block COMDAT (224 bytes, 4 relocations), and WalkSlot4Quadrants keeps identical bytes with its four calls now resolving to that definition instead of the external; the sample loses only its nonexact WalkSlot4Block COMDAT. Totals stay 1030 sections and 4712 relocations. D3DIMSoultreeShadow slot 30 frame-pointer pragma: only the sample record changes; slot 30 keeps ebp as its frame and reloads s_shadowPoints at two more sites (51 to 53 relocations), as retail does. CubeDraw cell-index promotion: LoadTexturesAndCoords 0x0043e0b0 moves strict-exact into the canonical object (two sections, nine relocations); the sample keeps only the rewritten BuildFaceGeometry (five sections, 47 to 41 relocations). Totals stay 1031 sections; relocations 4725 to 4728. ChatOverlay::Setup promotion: the strict-exact loader moves from TrackOverlayNearMisses.cpp (37 to 27 sections, 162 to 111 relocations) into canonical TrackOverlay.cpp (210 to 215 sections, 869 to 920 relocations). Totals 1031 to 1026 sections; relocations stay 4728. Terrain Render3D 0x00506220 became strict exact when PCVideoCard gained its DDCAPS dwCKeyCaps member (driverColorKeyCaps +0x1c0): the declaration count before the function moved by one and the two relocation targets at function offsets 2200 and 2205 exchanged to retail's order. Sections, relocation count and every other byte and destination are unchanged; only the Terrain.cpp record is refreshed.",
+  "baseline": "Published 5c439bb source hashes matched the same-path private baseline before applying six global-name joins. All nondebug bytes, flags and relocation destinations remain identical. Terrain transitive consumer included after genuine global-only header narrowing; no commutative target swaps accepted. Only recognized complete checkout filenames are portable. FilePrintf declaration correction: both EcoSystem objects were independently checked against these original pins and complete current objects under only the void-to-int FilePrintf name; only the sample hash changes. EcoSystem QuadTree correction: published ed3d06ce old EcoSystem pins reproduced independently; both complete objects preserve all bytes and destinations under only the six tree interface names, with no exclusions or score changes. Round50 exposes the existing TrackOverlay flag at unchanged BSS+0x40: its published old pin was reproduced first, and all207 sections/863 relocations remain identical under only that one static-to-external symbol name/visibility change; only the canonical TrackOverlay record is refreshed. The frozen visibility camera now uses actual PCCamera storage: its old complete pin was independently reproduced first; three names join the same lifecycle/storage, with one exact implicit destructor COMDAT (5 code bytes plus 11 alignment NOPs) and the cleanup reference resolving to that definition. All 87 old sections and 341 relocations otherwise preserve their bytes and destinations. Round51 StatsOverlay::DrawStandings extraction: the published old aggregate pin was independently reproduced; all 37 sections and 162 relocations preserve exactly under only its two iterator-call targets (function offsets 172 and 220) joining existing BikeRace::NextBike. Other aggregate functions and the canonical TrackOverlay record are unchanged. FollowCameraLoadFile extraction: both published camera aggregate pins were independently reproduced from the same-path original object. The corrected nonexact loader changes 952 to 980 bytes, its constructor-EH saved-pointer displacement changes -396 to -420, and its exact diagnostic filename moves to FollowCameraLoadFile.cpp. All other 63 sections and 302 relocations are identical. The complete aggregate remains 66 sections with 336 to 337 relocations; only its record is updated, with the new exact source filename added to the portability allowlist. Round57 light lookup: published dfdf9823 canonical EcoSystem pin independently reproduced, then complete132 sections/720 relocations preserved under only the EcoLightEmitterView*-to-LightEmitter* method-return spelling. All other records unchanged. WalkSlot4Block promotion: both published fcf4a507 Griddraw pins were reproduced from the same-path HEAD sources first. The canonical object gains only the strict-exact WalkSlot4Block COMDAT (224 bytes, 4 relocations), and WalkSlot4Quadrants keeps identical bytes with its four calls now resolving to that definition instead of the external; the sample loses only its nonexact WalkSlot4Block COMDAT. Totals stay 1030 sections and 4712 relocations. D3DIMSoultreeShadow slot 30 frame-pointer pragma: only the sample record changes; slot 30 keeps ebp as its frame and reloads s_shadowPoints at two more sites (51 to 53 relocations), as retail does. CubeDraw cell-index promotion: LoadTexturesAndCoords 0x0043e0b0 moves strict-exact into the canonical object (two sections, nine relocations); the sample keeps only the rewritten BuildFaceGeometry (five sections, 47 to 41 relocations). Totals stay 1031 sections; relocations 4725 to 4728. ChatOverlay::Setup promotion: the strict-exact loader moves from TrackOverlayNearMisses.cpp (37 to 27 sections, 162 to 111 relocations) into canonical TrackOverlay.cpp (210 to 215 sections, 869 to 920 relocations). Totals 1031 to 1026 sections; relocations stay 4728. Terrain Render3D 0x00506220 became strict exact when PCVideoCard gained its DDCAPS dwCKeyCaps member (driverColorKeyCaps +0x1c0): the declaration count before the function moved by one and the two relocation targets at function offsets 2200 and 2205 exchanged to retail's order. Sections, relocation count and every other byte and destination are unchanged; only the Terrain.cpp record is refreshed.",
   "renames": {
     "?UnknownVirtualSlot3@DrawableGridNode@@UAEXM@Z": "?SelectTexture@DrawableGridNode@@UAEXM@Z",
     "?UnknownVirtualSlot6@DrawableGridNode@@UAEXXZ": "?BindNodeTexture@DrawableGridNode@@UAEXXZ",
@@ -8,7 +8,7 @@
     "?UnknownVirtualSlot4@DrawableGridNode@@UAEXH@Z": "?RequestTextureSize@DrawableGridNode@@UAEXH@Z",
     "?g_visibilityClipper@@3PAVD3DIMShadowClipper@@A": "?g_visibilityClipper@@3PAVVisibilityClipper@@A",
     "?g_visibilityClipper@@3PAVUnknownCubeClipper@@A": "?g_visibilityClipper@@3PAVVisibilityClipper@@A",
-    "?g_visibilityClipper@@3PAVUnknownEcoVisibilityClipper@@A": "?g_visibilityClipper@@3PAVVisibilityClipper@@A",
+    "?g_visibilityClipper@@3PAVEcoVisibilityClipperView@@A": "?g_visibilityClipper@@3PAVVisibilityClipper@@A",
     "?g_visibilityClipper@@3PAVUnknownFollowCameraProjector@@A": "?g_visibilityClipper@@3PAVVisibilityClipper@@A",
     "?g_visibilityClipper@@3PAVGridVisibilityClipper@@A": "?g_visibilityClipper@@3PAVVisibilityClipper@@A",
     "?g_UnknownGlobal575a98@@3PAVUnknownProjector@@A": "?g_visibilityClipper@@3PAVVisibilityClipper@@A"
@@ -17,22 +17,22 @@
     "src/reconstructed/CubeDraw.cpp": {
       "sections": 49,
       "relocations": 183,
-      "sha256": "22fdcf3213c898f9f8d29d814045a45ae6a38a73d5fa2cc2fdfdf35e862a5155"
+      "sha256": "f8533ffe51997552bd9ef54bd78dc54785df1de0cde440885ea3fa4fc44604aa"
     },
     "src/reconstructed/FollowCamera.cpp": {
       "sections": 98,
       "relocations": 250,
-      "sha256": "2b4bbbf10f4b907fa828c957a45691c5605a474262410f72092cf183f3296873"
+      "sha256": "e9e8fe1633fe204ab67451759fac2771ed98952e78ff08d4c39f0653b2009f3b"
     },
     "src/reconstructed/TrackOverlay.cpp": {
       "sections": 215,
       "relocations": 920,
-      "sha256": "3044aa80143d7986e7e320fd1d3088f4f6d9d0b871e0f9a32da2920243890b6f"
+      "sha256": "90f38277f0c888ebcb484b4abb1a0da627db5a063ebd10b60b49154076d48534"
     },
     "src/reconstructed/EcoSystem.cpp": {
       "sections": 132,
       "relocations": 720,
-      "sha256": "e5eddfb191c4c824354ce6ab50a6559e135ce667167f36560e0afc61ea9358a7"
+      "sha256": "f7cad24a83af91493079bd8a4e850efb9df8f560e9d07dff3cbca8c95947c007"
     },
     "src/reconstructed/Griddraw.cpp": {
       "sections": 89,
@@ -52,7 +52,7 @@
     "samples/render/CubeDrawNearMisses.cpp": {
       "sections": 5,
       "relocations": 41,
-      "sha256": "5871c6589c88aeb178cc85cc1c1053b87176a26f5a4438f43f7f4d5cade30b5c"
+      "sha256": "7486de3d847d1d7faec510eeb7dea912d2bd650f8706e8512bcacf09ebb85dfc"
     },
     "samples/camera/FollowCameraNearMisses.cpp": {
       "sections": 66,
@@ -62,12 +62,12 @@
     "samples/track/TrackOverlayNearMisses.cpp": {
       "sections": 27,
       "relocations": 111,
-      "sha256": "0e5aae4f4691be0802e0baa8b9693ac62507e9f3c3b5887542c4c075c496dc6c"
+      "sha256": "3122202dd76858d864f1f0ed44711e2ee7e3454ffe2708fb6fb15f5fea964c66"
     },
     "samples/ecosystem/EcoSystemNearMisses.cpp": {
       "sections": 98,
       "relocations": 444,
-      "sha256": "1d37cfd81e5ef7cf3613f1c292c21d136cb5b43ce8019209ac77009140b00771"
+      "sha256": "839298b5e1730727a9613695241c72ae7f6c873834a478532f496edce417a0c0"
     },
     "samples/render/GriddrawNearMisses.cpp": {
       "sections": 16,

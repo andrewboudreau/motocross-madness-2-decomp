@@ -3,7 +3,7 @@ flag girl, counters, VCR tapes, racers, sound, plates) (tools/emu_diff.py case,
 call-record/replay mode).
 
 The linked body is src/bringup/Group6_BikeRaceCreate.cpp (the quarry loader's
-UnknownQuarryRace::Create forward reaches it). Every callee is replayed. The memory the body
+QuarryLoadBikeRaceView::Create forward reaches it). Every callee is replayed. The memory the body
 walks is "universal": the replay arena is 16-byte cells (the generic fake vptr, then three cell
 pointers), and the race object, the scene, its environment, the arguments and g_TrackGame are
 objects with that vptr and cell pointers everywhere else, so any pointer chain stays readable and
@@ -31,8 +31,8 @@ import struct
 
 RETAIL_VA = 0x00417ed0
 SYMBOL = ('?Create@BikeRace@@QAEPAV1@PAX0PAVLightManager@@PAUTextureContext@@'
-          'PAVUnknownBikeRaceProjector@@PAVKrustyBikeCamera@@PAVScene@@PAURaceGateEvent@@'
-          'PAVUnknownBikeRaceShadow@@@Z')
+          'PAVBikeRaceTerrainView@@PAVKrustyBikeCamera@@PAVScene@@PAURaceGateEvent@@'
+          'PAVBikeRaceProjectedShadowView@@@Z')
 SOURCE = 'src/bringup/Group6_BikeRaceCreate.cpp'
 PROBES = {0x0041800f: 'tdf from env', 0x004180f3: 'no track file', 0x00418338: 'after load',
           0x00418b06: 'flag girl', 0x00419578: 'AI speeds', 0x00419660: 'joystick',

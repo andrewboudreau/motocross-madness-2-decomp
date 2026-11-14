@@ -150,8 +150,8 @@ class TerrainConnectionsTests(unittest.TestCase):
                 self.assertIn(symbol, {obj.symbol_by_index[r.symbol_index].name
                                        for r in obj.relocations if r.type == 0x14})
                 retired = ('?RetireOwnedObject@Grid1Terrain@@QAEXPAVBaseObject@@@Z',
-                           '?SelectQuality@UnknownTerrain@@QAEXH@Z',
-                           '?CastSegment@UnknownTerrain@@QAEHPBUVector3@@0PAU2@HHH@Z')
+                           '?SelectQuality@OverlayTerrainView@@QAEXH@Z',
+                           '?CastSegment@OverlayTerrainView@@QAEHPBUVector3@@0PAU2@HHH@Z')
                 self.assertFalse(set(retired) & {s.name for s in obj.symbols})
             cases = [(c['source'], c['symbol'], int(c['target_va'], 0), c['target_size'], ROOT / c['bindings'])
                      for c in CASES if c['source'] in SOURCES]

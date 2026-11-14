@@ -60,9 +60,9 @@ struct UnknownKrustyUISoultree {
 // RTTI D3DIMSoultreeCharacter (0x240 bytes, constructor 0x004455b0): vfptr
 // at +0, vbptr at +4, virtual GameObject base. Its primary slot 11 loads a
 // model file and returns the GameObject to add to the scene.
-class UnknownKrustyUICharacter : public virtual GameObject {
+class KrustyUID3DIMSoultreeCharacterView : public virtual GameObject {
 public:
-    explicit UnknownKrustyUICharacter(int flags);
+    explicit KrustyUID3DIMSoultreeCharacterView(int flags);
     virtual void BuildModel();
     virtual void LoadFromSlt();
     virtual void CaptureRestPose();
@@ -263,13 +263,13 @@ GameObject* KrustyUI::Create(RenderTarget* target, int showIntro) {
 // KrustyUI.h leaves +0x480 as bytes and types +0x46c and +0x470 as the
 // selection dialogs' model views; 0x00498cf0 stores the garage character at
 // +0x470, the rider at +0x46c and the rider's position (a Vector3) at +0x480.
-#define KRUSTYUI_GARAGE (*(UnknownKrustyUICharacter**)&garageCharacter)
-#define KRUSTYUI_RIDER (*(UnknownKrustyUICharacter**)&riderPreview)
+#define KRUSTYUI_GARAGE (*(KrustyUID3DIMSoultreeCharacterView**)&garageCharacter)
+#define KRUSTYUI_RIDER (*(KrustyUID3DIMSoultreeCharacterView**)&riderPreview)
 #define KRUSTYUI_RIDER_POSITION (*(Vector3*)field_0x480)
 #define KRUSTYUI_TARGET ((PCRenderTarget*)renderContext)
 #define KRUSTYUI_MODELS ((KrustyUIModelRecord*)manufacturers)
 // The manufacturers' UI models, seen through this unit's character view.
-#define KRUSTYUI_MODEL_CHARACTER(i) reinterpret_cast<UnknownKrustyUICharacter*>(KRUSTYUI_MODELS[i].uiModel)
+#define KRUSTYUI_MODEL_CHARACTER(i) reinterpret_cast<KrustyUID3DIMSoultreeCharacterView*>(KRUSTYUI_MODELS[i].uiModel)
 
 // 0x00498cf0: builds the garage scene (+0x464) on the first call with 1 or
 // -1: camera, lights, the garage and rider models and their shadow; with 2
@@ -353,7 +353,7 @@ void KrustyUI::BuildGarageScene(int value) {
             if (!g_TrackGame->display->isAGP && free < 0x500000)
                 context.halvings = 1;
         }
-        KRUSTYUI_GARAGE = reinterpret_cast<UnknownKrustyUICharacter*>(new(__FILE__, 0x174) D3DIMSoultreeCharacter(1));
+        KRUSTYUI_GARAGE = reinterpret_cast<KrustyUID3DIMSoultreeCharacterView*>(new(__FILE__, 0x174) D3DIMSoultreeCharacter(1));
         garageScene->AppendChild(
             KRUSTYUI_GARAGE->LoadCharacter(renderContext, "UIgarage.mcf", lights, &context, 1, 1), -1);
         reinterpret_cast<D3DIMSoultreeObject*>(KRUSTYUI_GARAGE->modelNode)->SetUseLighting(0);
@@ -368,7 +368,7 @@ void KrustyUI::BuildGarageScene(int value) {
         garageScene->AppendChild(shadowLink, -1);
         if (shadow)
             garageScene->AppendChild(shadow, -1);
-        KRUSTYUI_RIDER = reinterpret_cast<UnknownKrustyUICharacter*>(new(__FILE__, 0x194) D3DIMSoultreeCharacter(1));
+        KRUSTYUI_RIDER = reinterpret_cast<KrustyUID3DIMSoultreeCharacterView*>(new(__FILE__, 0x194) D3DIMSoultreeCharacter(1));
         garageScene->AppendChild(
             KRUSTYUI_RIDER->LoadCharacter(renderContext, "UIRider.mcf", lights,
                                                    &g_TrackGame->textureContext, 1, 1), -1);
@@ -390,7 +390,7 @@ void KrustyUI::BuildGarageScene(int value) {
                 KRUSTYUI_MODEL_CHARACTER(i)->LoadCharacter(renderContext, text, lights,
                                                                       &g_TrackGame->textureContext,
                                                                       1, 1), -1);
-            UnknownKrustyUICharacter* bike = KRUSTYUI_MODEL_CHARACTER(i);
+            KrustyUID3DIMSoultreeCharacterView* bike = KRUSTYUI_MODEL_CHARACTER(i);
             reinterpret_cast<D3DIMSoultreeObject*>(bike->modelNode)->SetUseLighting(1);
             reinterpret_cast<SoultreeObject*>(bike->modelNode)->SetPosition(*reinterpret_cast<const Vec3*>(&garageFocus));
             reinterpret_cast<SoultreeObject*>(bike->modelNode)->SetAxes(0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0, 1);

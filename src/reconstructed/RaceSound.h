@@ -14,28 +14,28 @@
 // slot 18 (0x00499af0, a body shared with KrustyUI) and slot 23 (0x004e44e0). bikerace.cpp allocates 0x12b0 bytes for it
 // (0x004195e4) and constructs it with 1.
 
-struct UnknownEventRacer;
-struct UnknownKrustyBikeView;
+struct EventKrustyBikeView;
+struct EventBikeRaceView;
 
 // The camera at RaceSound+0x38 as this file reads it: the listener's
 // position and orientation, the followed bike (velocity at +0x64) and the
 // racer it follows. These are KrustyBikeCamera's Camera and BikeCamera
 // offsets; the declared class there keeps them protected.
-struct UnknownRaceSoundCamera {
+struct RaceSoundKrustyBikeCameraView {
     unsigned char field_0x000[0x170];
     Vector3 listenerPosition;                  // position
     Vector3 listenerForward;                  // forward
     Vector3 listenerUp;                  // up
     unsigned char field_0x194[0x3b0 - 0x194];
-    UnknownEventRacer* followedBike;       // followed bike
-    UnknownEventRacer* followedRacer;       // racer the listener follows
+    EventKrustyBikeView* followedBike;       // followed bike
+    EventKrustyBikeView* followedRacer;       // racer the listener follows
 };
 
 // One 0x54-byte engine channel per racer (RaceSound+0x98, eleven of them).
 // Each owns a 44100-byte sample buffer; the channel at RaceSound+0x434 is
 // streamed into its Sound in two halves (0x004e4a30 / 0x004e4d10).
 struct EngineSoundChannel {
-    UnknownEventRacer* channelRacer;        // racer
+    EventKrustyBikeView* channelRacer;        // racer
     Sound* channelSound;
     int voiceIndex;                        // +0x08, -1 when reset
     int engine;                            // +0x0c, engine (125/250/400 section) indexing the sample sets
@@ -79,7 +79,7 @@ public:
     // 0x004e23f0 (thiscall, ret 0x10; bikerace.cpp 0x00419628 passes its
     // +0x18, itself, its +0x50 camera and 6): creates the sound groups and
     // loads every sample; returns this.
-    RaceSound* Create(void* owner, UnknownKrustyBikeView* view, UnknownRaceSoundCamera* camera,
+    RaceSound* Create(void* owner, EventBikeRaceView* view, RaceSoundKrustyBikeCameraView* camera,
                                      int racers);
     // 0x004e3430: assigns the racers to channels and resets the listener and
     // the 3D distances.
@@ -87,8 +87,8 @@ public:
     int UpdateRacerSounds(float frameTime); // 0x004e39b0: per-racer sounds
     // 0x004e42e0 / 0x004e43a0: plays a random "wreck%02d.wav" (wreckSounds)
     // or "fall%02d.wav" (fallSounds) sound at `racer`; the index, or 0 after ten busy tries.
-    int PlayWreckSound(UnknownEventRacer* racer);
-    int PlayFallSound(UnknownEventRacer* racer);
+    int PlayWreckSound(EventKrustyBikeView* racer);
+    int PlayFallSound(EventKrustyBikeView* racer);
     // 0x004e4460: the ground distance between two points, 500 when either
     // axis is further apart than that.
     float GroundDistance(Vector3* a, Vector3* b);
@@ -102,15 +102,15 @@ public:
     // 0x004e5780: plays `sound` while sound is on (`network` sounds only in
     // network games); `stop` rewinds it first.
     void PlayIfEnabled(Sound* sound, int network, int stop, int loop, int unused);
-    void PlayScoreSounds(UnknownEventRacer* racer, float value); // 0x004e57d0
+    void PlayScoreSounds(EventKrustyBikeView* racer, float value); // 0x004e57d0
     void PlayItSound();         // 0x004e5860: plays itSound
     // 0x004e5880 (qsort callback): orders channels by cameraDistance.
     static int CompareChannels(const void* a, const void* b);
 
-    UnknownEventRacer* listenerRacer;        // listener's racer
+    EventKrustyBikeView* listenerRacer;        // listener's racer
     int field_0x30;
-    UnknownKrustyBikeView* raceView;
-    UnknownRaceSoundCamera* listenerCamera;
+    EventBikeRaceView* raceView;
+    RaceSoundKrustyBikeCameraView* listenerCamera;
     SoundGroup* engineGroup;               // +0x3c, engine voices and LandHard01
     SoundGroup* field_0x40;
     SoundGroup* effectsGroup;              // +0x44, launch, bonus, wreck/fall and waypoint sounds, racer +0xb8 * 0.68182 against the *MaxSpeed limits
@@ -126,7 +126,7 @@ public:
     int channelsInUse;                       // channels in use
     EngineSoundChannel engineChannels[11];
     EngineSoundChannel* streamChannel; // streamed channel
-    UnknownEventRacer* currentRacer;       // racer being updated
+    EventKrustyBikeView* currentRacer;       // racer being updated
     Sound* engineVoices[4];                // the four engine voices
     int engineVoiceInUse[4];                   // voice in use
     // Engines present in the race (audio_*.ini sections "125", "250", "400",
@@ -192,7 +192,7 @@ public:
     int lastListenerGate;                 // +0x1294 listener's gate (racer +0x7b8) last frame
     int bytesPerSample;                    // +0x1298, 2 with audio_16.ini, 1 with audio_08.ini
     int lastListenerPosition;                 // +0x129c, listener's last position (99 initially)
-    UnknownEventRacer* lastListenerRacer;     // +0x12a0, listener's racer last frame
+    EventKrustyBikeView* lastListenerRacer;     // +0x12a0, listener's racer last frame
     float ohClock;                            // +0x12a4, seconds since oh_01.wav
     float applauseClock;                      // +0x12a8, seconds since applause01/02
     float stuntApplauseClock;                 // +0x12ac, seconds since 0x004e57d0's applause

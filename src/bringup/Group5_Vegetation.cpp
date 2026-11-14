@@ -28,7 +28,7 @@ extern UnknownEcoDetailBand* g_UnknownGlobal59af14;
 // (then `fade` is 255), else the fade between the band's two distances.
 void Vegetation::TestDistance(int* billboard, int* fade) {
     VegetationDefinition* definition = g_EcoSystem->definitionTable[definitionIndex];
-    UnknownEcoCamera* camera = ((UnknownEcoRenderTarget*)g_EcoSystem->renderContext)->camera;
+    EcoCameraView* camera = ((EcoRenderTargetView*)g_EcoSystem->renderContext)->camera;
     float dx = camera->position.x - quantizedPosition.x * g_EcoSystem->unitsPerCoordinate;
     float dz = camera->position.z - quantizedPosition.z * g_EcoSystem->unitsPerCoordinate;
     *billboard = 0;

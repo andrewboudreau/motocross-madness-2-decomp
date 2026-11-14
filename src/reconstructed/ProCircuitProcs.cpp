@@ -378,7 +378,7 @@ void PCNewDlg::HandleEvent(DialogEvent* event)
             list->AddRow(number, i, 0);
         }
         list->SelectRowByData(7);
-        guiUser->RequestFocus((UnknownGuiControl*)FindControl("EditBox", 11), 0, 0);
+        guiUser->RequestFocus((GuiControlView*)FindControl("EditBox", 11), 0, 0);
         break;
     }
     case kDialogCommand:

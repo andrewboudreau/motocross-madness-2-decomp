@@ -367,7 +367,7 @@
   "_s_kbTimeTo60": "0x0067c3b0",
   "_s_kbTimeTo60Armed": "0x0056d0a0",
   "_sprintf": "0x00534aaf",
-  "?NextBike@BikeRace@@QAEPAVUnknownBikeRaceRacer@@PAH@Z": "0x004204e0",
+  "?NextBike@BikeRace@@QAEPAVBikeRaceKrustyBikeView@@PAH@Z": "0x004204e0",
   "?SetMatrixIn@SoultreeObject@@QAEXPAV1@PAUMatrix4@@@Z": "0x004fb8c0",
   "?Send@NetworkInterface@@QAEHHPAXHHH@Z": "0x004ac830",
   "?QueueRecord@VCRInterface@@QAEHHHPBXI@Z": "0x004e8720",

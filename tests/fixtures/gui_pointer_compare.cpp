@@ -7,7 +7,7 @@
 #include "../../src/reconstructed/GUIManager.h"
 static unsigned char referenceSpace[0x800000];
 struct World { unsigned char user[2][sizeof(GUIUser)]; unsigned char device[2][sizeof(GUIInputDevice)];
-    unsigned char tip[sizeof(ToolTip)]; unsigned char control[sizeof(UnknownGuiControl)];
+    unsigned char tip[sizeof(ToolTip)]; unsigned char control[sizeof(GuiControlView)];
     unsigned char dialog[sizeof(UIDialog)]; char text[32]; };
 static World world;
 struct Observation { int result,calls,exception,faultKind,faultAddress; DWORD receiver,text; int x,y; float time; World boundary,after; };
@@ -16,7 +16,7 @@ static int checks,callbackMode;
 static GUIUser* User(int i){return (GUIUser*)world.user[i];}
 static GUIInputDevice* Device(int i){return (GUIInputDevice*)world.device[i];}
 static ToolTip* Tip(){return (ToolTip*)world.tip;}
-static UnknownGuiControl* Control(){return (UnknownGuiControl*)world.control;}
+static GuiControlView* Control(){return (GuiControlView*)world.control;}
 static UIDialog* Dialog(){return (UIDialog*)world.dialog;}
 void ToolTip::ShowText(const char* text,int* pos,float time){
     ++actual.calls; actual.receiver=(DWORD)this;actual.text=(DWORD)text;
@@ -51,8 +51,8 @@ static int InvokePointer(int retail,GUIInputDevice* device){
     call.method=&GUIUser::SetPointerDevice;if(retail)call.address=0x488120;
     __try{return (User(0)->*call.method)(device);}__except(Filter(GetExceptionInformation())){return -5;}
 }
-static void InvokeTip(int retail,UnknownGuiControl* control){
-    union { void (ToolTip::*method)(UnknownGuiControl*);DWORD address; } call;
+static void InvokeTip(int retail,GuiControlView* control){
+    union { void (ToolTip::*method)(GuiControlView*);DWORD address; } call;
     call.method=&ToolTip::ShowControlToolTip;if(retail)call.address=0x486b10;
     __try{(Tip()->*call.method)(control);}__except(Filter(GetExceptionInformation())){}
 }
@@ -105,7 +105,7 @@ int main(int argc,char**argv){
     if(argc!=2 || !MapReference(argv[1]))return 3;
     if(offsetof(GUIUser,pointerDevice)!=0x2c || offsetof(GUIInputDevice,ownerUser)!=0xc0 ||
        offsetof(GUIInputDevice,pointerPosition)!=0xa4 || offsetof(UIDialog,guiUser)!=0x34 ||
-       offsetof(UnknownGuiControl,ownerDialog)!=0xb8 || offsetof(UnknownGuiControl,toolTipText)!=0xf0)return 4;
+       offsetof(GuiControlView,ownerDialog)!=0xb8 || offsetof(GuiControlView,toolTipText)!=0xf0)return 4;
     union{void(ToolTip::*method)(const char*,int*,float);DWORD address;} hook;hook.method=&ToolTip::ShowText;
     if(*(BYTE*)0x486b6e!=0xe8 || 0x486b73+*(DWORD*)0x486b6f!=0x486b80)return 5;
     *(DWORD*)0x486b6f=hook.address-0x486b73;FlushInstructionCache(GetCurrentProcess(),0,0);

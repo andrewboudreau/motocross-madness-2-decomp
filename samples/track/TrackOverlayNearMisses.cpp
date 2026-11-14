@@ -186,10 +186,10 @@ int RadarOverlay::IntersectLineCircle(const float* a, const float* b, const floa
 }
 
 // 0x0051d730
-int ChatOverlay::CollectRacers(UnknownChatView* view)
+int ChatOverlay::CollectRacers(ChatBikeRaceView* view)
 {
     int iterator;
-    UnknownChatRacer* racer;
+    ChatKrustyBikeView* racer;
     racerCount = 0;
     iterator = 0;
     chatView = view;
@@ -200,15 +200,15 @@ int ChatOverlay::CollectRacers(UnknownChatView* view)
     for (int i = 0; i < racerCount; i++) {
         nameTags[i] = (new(__FILE__, 2369) NameOverlay(1))->Create(
             (RenderTarget*)renderContext, overlayTexture, &nameTagRects[i], 0, &nameTagRects[i],
-            (UnknownEventRacer*)racers[i],
-            (UnknownNameOverlayWorld*)chatView, i);
+            (EventKrustyBikeView*)racers[i],
+            (NameOverlayEventView*)chatView, i);
         AppendChild(nameTags[i], -1);
     }
     if (g_TrackGame->mode.raceSettings.eventType == 0) {
         nameTags[racerCount] = (new(__FILE__, 2376) NameOverlay(1))->Create(
             (RenderTarget*)renderContext, overlayTexture, &nameTagRects[racerCount], 0,
             &nameTagRects[racerCount], 0,
-            (UnknownNameOverlayWorld*)chatView, i);
+            (NameOverlayEventView*)chatView, i);
         AppendChild(nameTags[racerCount], -1);
         if (nameTags[racerCount]) {
             nameTags[racerCount]->SetFixedPosition(Vector3(cueRect.left, cueRect.top, 0));

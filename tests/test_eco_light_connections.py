@@ -20,7 +20,7 @@ from test_edit_box_draw import signature
 import test_eco_quadtree_connections as objects
 
 ROOT = Path(__file__).resolve().parents[1]
-OLD = '?FindLightOfType@LightManager@@QAEPAVUnknownEcoLight@@H@Z'
+OLD = '?FindLightOfType@LightManager@@QAEPAVEcoLightEmitterView@@H@Z'
 GET = '?FindLightOfType@LightManager@@QAEPAVLightEmitter@@H@Z'
 ADD = '?AddLight@LightManager@@QAEXPAVLightEmitter@@@Z'
 
@@ -121,8 +121,8 @@ class EcoLightConnections(unittest.TestCase):
             layout = out/'eco_layout.cpp'
             layout.write_text('#include "EcoSystem.h"\n#include <stddef.h>\n'
                 'typedef char E[(offsetof(EcoSystem,lightManager)==0x4c && '
-                'offsetof(UnknownEcoLight,colour)==0x54 && '
-                'offsetof(UnknownEcoLight,direction)==0x70)?1:-1];\n')
+                'offsetof(EcoLightEmitterView,colour)==0x54 && '
+                'offsetof(EcoLightEmitterView,direction)==0x70)?1:-1];\n')
             compile_source('layout', layout)
             code = (ROOT/'src/reconstructed/LightEmitter.cpp').read_text()
             helpers = out/'helpers.cpp'

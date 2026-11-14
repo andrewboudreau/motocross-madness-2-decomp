@@ -761,16 +761,16 @@ clearly more faithful, the game now links the sample's text:
 
   | Retail | View name | Provider |
   |---|---|---|
-  | 0x00431e70, 0x004320f0, 0x00432720, 0x00432800 | `UnknownSceneCollisionObject` constructor and methods | `CollisionObject` |
-  | 0x004318d0, 0x004319c0 | `UnknownSceneObject` constructor and `Load` | `CollisionCharacter` |
+  | 0x00431e70, 0x004320f0, 0x00432720, 0x00432800 | `SceneCollisionObjectView` constructor and methods | `CollisionObject` |
+  | 0x004318d0, 0x004319c0 | `SceneCollisionCharacterView` constructor and `Load` | `CollisionCharacter` |
   | 0x004328b0, 0x004329a0, 0x00432a20 | `CollisionObject` hull, sphere and capsule shapes taking `Vector3` | the `CollisionVec3` forms |
-  | 0x00507c10, 0x00508970 | `UnknownEcoTerrain::QueryGround`, `GetHeightRange` | `Terrain` |
-  | 0x0048fa60 | `UnknownBikeRaceRacer` constructor (0x1638 bytes) | `KrustyBike` |
+  | 0x00507c10, 0x00508970 | `EcoTerrainView::QueryGround`, `GetHeightRange` | `Terrain` |
+  | 0x0048fa60 | `BikeRaceKrustyBikeView` constructor (0x1638 bytes) | `KrustyBike` |
   | 0x004b5d00 | `OrientationAxesFromAngles` (`Vector3`/`int` and `Vec3`/`void` forms) | `src/reconstructed/OrientationAxes.cpp` |
   | 0x004fc050, 0x004fc740, 0x004fdab0, 0x004fb8c0 | `TreeSceneNode` axes, position, dirty mark, matrix | `SoultreeObject` (`SetAxesIn`, `SetPositionInFrame`, `MarkSubtreeDirty`, `SetMatrixIn`) |
   | 0x004fc690 | `SoultreeObject::TranslateIn` taking `Vector3` | the `Vec3` form |
   | 0x00505600 | `Grid1Terrain::AcquireOwnedObject` | `Terrain::AcquireOwnedObject` |
-  | 0x004210f0 | `UnknownKrustyBikeView::WriteRelativePositions` | `BikeRace` |
+  | 0x004210f0 | `EventBikeRaceView::WriteRelativePositions` | `BikeRace` |
   | 0x00404df0 | `KbTrack::SelectLapGates` | `TrackGameViewOwner` |
   | 0x00404e60, 0x0040ae30, 0x00421cb0, 0x005015b0 | Wrecker and shadow vector call views | `Vec3Call`, `Vec3DotCall`, `Vec3AddCall`, `Vec3ScaleCall` |
   | 0x004da7b0 | `UnknownKrustyUIShadow::Init` | `ProjectedShadow::Init` |
@@ -817,7 +817,7 @@ Bytes at masked score 1.000 rose from 772244 to 795446. About 2300 of the
 increase is not from switched bodies:
 
 - exact providers such as the `CollisionObject` shapes and the
-  `UnknownBikeRaceRacer` constructor are now bound, because their alias names
+  `BikeRaceKrustyBikeView` constructor are now bound, because their alias names
   appear in the map;
 - `OrientationAxesFromAngles` (274 bytes) is newly linked.
 
@@ -874,7 +874,7 @@ body was unregistered:
   | 0x00513560 | `KbWheel::SetRollDistance` | `Tire::SetRollDistance` | body in `Group3_KrustyBikeAISupport.cpp` |
   | 0x004b8d90 | `VehicleImpactSink::SetPosition(Vec3, float)` | `DustParticleEmitter::SetPosition` | body in `Group3_VehicleStubs.cpp` |
   | 0x004b9dc0 | `VehicleImpactSink::SetPosition(Vec3)` | `SparkParticleEmitter::SetPosition` | body in `Group3_VehicleStubs.cpp` |
-  | 0x004baa50 | `UnknownWreckerParticles::AddParticle` | `ParticleManager::AddParticle` | `Group1_WreckerParticles.cpp` |
+  | 0x004baa50 | `WreckerParticleManagerView::AddParticle` | `ParticleManager::AddParticle` | `Group1_WreckerParticles.cpp` |
   | 0x004a23a0 | `BikeA60C` constructor | `MovingPart(const char*, SoultreeObject*, int)` | `Group2_BikeA60C.cpp` |
 
   Each stand-in's bytes equalled the provider's apart from relocations, and

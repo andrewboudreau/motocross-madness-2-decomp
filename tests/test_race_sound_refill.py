@@ -167,7 +167,7 @@ class RaceSoundRefillTests(unittest.TestCase):
             self.assertEqual(report['strict_match']['matching_positions'], 806)
             rows = complete_object(aggregate)
             self.assertEqual((len(rows), sum(len(row[3]) for row in rows)), (107, 580))
-            self.assertEqual(hashlib.sha256(json.dumps(rows).encode()).hexdigest(), 'f92ba659dd3237ccb6f5d562c07cd1fe21e54e132d0e127adda120dd4e61e6ba')
+            self.assertEqual(hashlib.sha256(json.dumps(rows).encode()).hexdigest(), 'a21181882e525b3b275458f3979ebc43dd971acf591820effd221021ec3e80b6')
             cases = [c for c in CASES if c['source'] == CANONICAL]
             self.assertEqual(len(cases), 26)
             for case in cases:

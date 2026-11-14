@@ -10,7 +10,7 @@ typedef char RaceSlots[offsetof(BikeRace, racerSlots) == 0x3c ? 1 : -1];
 typedef char RaceAi[offsetof(BikeRace, aiRacers) == 0x40 ? 1 : -1];
 typedef char GateSize[sizeof(RaceGate) == 0x3c ? 1 : -1];
 typedef char GateNext[offsetof(RaceGate, nextGate) == 0x38 ? 1 : -1];
-typedef char ViewLocal[offsetof(UnknownKrustyBikeView, localRacer) == 0x38 ? 1 : -1];
+typedef char ViewLocal[offsetof(EventBikeRaceView, localRacer) == 0x38 ? 1 : -1];
 typedef char GamePlayers[offsetof(TrackGame, playerCount) == 0x18 ? 1 : -1];
 typedef char GameBlocked[offsetof(TrackGame, uiInteractionBlocked) == 0x3430 ? 1 : -1];
 
@@ -24,8 +24,8 @@ int main() {
     unsigned long savedRace[sizeof(BikeRace) / 4];
     unsigned long savedGame[(sizeof(TrackGame) + 3) / 4];
     unsigned long tokens[32];
-    UnknownBikeRaceRacer* slots[32];
-    UnknownBikeRaceRacer* ai[32];
+    BikeRaceKrustyBikeView* slots[32];
+    BikeRaceKrustyBikeView* ai[32];
     BikeRace* race = reinterpret_cast<BikeRace*>(raceStorage);
     g_TrackGame = reinterpret_cast<TrackGame*>(gameStorage);
     unsigned cases = 0;
@@ -38,10 +38,10 @@ int main() {
         memset(raceStorage, 0xa5, sizeof(raceStorage));
         memset(gameStorage, 0x5a, sizeof(gameStorage));
         for (int i = 0; i != 32; ++i) {
-            slots[i] = holes && i % 3 == 0 ? 0 : reinterpret_cast<UnknownBikeRaceRacer*>(&tokens[i]);
-            ai[i] = holes && i % 3 == 1 ? 0 : reinterpret_cast<UnknownBikeRaceRacer*>(&tokens[31-i]);
+            slots[i] = holes && i % 3 == 0 ? 0 : reinterpret_cast<BikeRaceKrustyBikeView*>(&tokens[i]);
+            ai[i] = holes && i % 3 == 1 ? 0 : reinterpret_cast<BikeRaceKrustyBikeView*>(&tokens[31-i]);
         }
-        race->localRacer = reinterpret_cast<UnknownBikeRaceRacer*>(&tokens[31]);
+        race->localRacer = reinterpret_cast<BikeRaceKrustyBikeView*>(&tokens[31]);
         race->racerSlots = slots;
         race->aiRacers = nullAi ? 0 : ai;
         g_TrackGame->playerCount = players;
@@ -55,7 +55,7 @@ int main() {
             int cursor = start;
             int expectedCursor = start;
             for (int step = 0; step != 3; ++step) {
-                UnknownBikeRaceRacer* expected = 0;
+                BikeRaceKrustyBikeView* expected = 0;
                 int limit = players > 1 ? players + count : (mode ? 2 : count + 1);
                 if (!blocked) {
                     if (expectedCursor < limit) {
@@ -65,7 +65,7 @@ int main() {
                     }
                     expectedCursor = expectedCursor + 1 > limit ? 0 : expectedCursor + 1;
                 }
-                UnknownBikeRaceRacer* result = race->NextBike(&cursor);
+                BikeRaceKrustyBikeView* result = race->NextBike(&cursor);
                 if (result != expected || cursor != expectedCursor ||
                     memcmp(savedRace, raceStorage, sizeof(savedRace)) ||
                     memcmp(savedGame, gameStorage, sizeof(savedGame))) {

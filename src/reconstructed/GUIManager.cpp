@@ -37,9 +37,9 @@ float FastSqrt(float value);
 #define SoundSystem() ((PCSoundInterface*)g_TrackGame->soundInterface)
 
 // 0x00484f10
-void UnknownGroundFogShader::FogVertices(UnknownFogVertex* vertices, int count) {
-    UnknownGroundFog* fog;
-    UnknownGroundFogCamera* camera;
+void GroundFogCacheOwner::FogVertices(GroundFogVertex* vertices, int count) {
+    GroundFogView* fog;
+    GroundFogCameraView* camera;
     float eyeX;
     float eyeY;
     float eyeZ;
@@ -56,12 +56,12 @@ void UnknownGroundFogShader::FogVertices(UnknownFogVertex* vertices, int count) 
     int alpha;
     int i;
 
-    if (groundFog == (UnknownGroundFog*)1)
+    if (groundFog == (GroundFogView*)1)
         return;
     if (!groundFog) {
-        groundFog = (UnknownGroundFog*)g_TrackGame->childRoot->FindByClassName(1, "GroundFog");
+        groundFog = (GroundFogView*)g_TrackGame->childRoot->FindByClassName(1, "GroundFog");
         if (!groundFog) {
-            groundFog = (UnknownGroundFog*)1;
+            groundFog = (GroundFogView*)1;
             return;
         }
     }
@@ -650,9 +650,9 @@ int GUIManager::EnableWindowClipper(int enable) {
             windowClipper->SetClipList(0, 0);
             windowClipper->Release();
         }
-        ((UnknownGuiDirectDraw*)g_TrackGame->display->directDraw)
+        ((GuiDirectDraw*)g_TrackGame->display->directDraw)
             ->CreateClipper(0, &windowClipper, 0);
-        ((UnknownGuiSurface*)g_TrackGame->display->primarySurface)->SetClipper(windowClipper);
+        ((GuiDirectDrawSurface*)g_TrackGame->display->primarySurface)->SetClipper(windowClipper);
         if (windowClipper)
             windowClipper->SetHWnd(0, g_TrackGame->windowHandle);
     } else {
@@ -661,7 +661,7 @@ int GUIManager::EnableWindowClipper(int enable) {
             windowClipper->Release();
             windowClipper = 0;
         }
-        ((UnknownGuiSurface*)g_TrackGame->display->primarySurface)->SetClipper(0);
+        ((GuiDirectDrawSurface*)g_TrackGame->display->primarySurface)->SetClipper(0);
     }
     display = g_TrackGame->display;
     display->SetGDISurfaceVisible(enable);
@@ -720,7 +720,7 @@ int ToolTip::Tick(float frameTime) {
 // bottom then loads into eax after the x store and the call gets the text in
 // eax and &position in edx, as in retail. Component assignments (ternaries or
 // if/else) hoist the bottom load into edx and swap the two (89/106).
-void ToolTip::ShowControlToolTip(UnknownGuiControl* control) {
+void ToolTip::ShowControlToolTip(GuiControlView* control) {
     POINT position;
     GUIInputDevice* device = control->ownerDialog->guiUser->pointerDevice;
 
@@ -1022,7 +1022,7 @@ void GUIUser::ReleaseToolTip() {
 }
 
 // 0x00487730
-int GUIUser::RequestHover(UnknownGuiControl* control, UnknownGuiControl** previous, int update) {
+int GUIUser::RequestHover(GuiControlView* control, GuiControlView** previous, int update) {
     if (pendingHoverControl && strstr(pendingHoverControl->classNames, "UIDDL"))
         return 0;
     if (previous)
@@ -1034,7 +1034,7 @@ int GUIUser::RequestHover(UnknownGuiControl* control, UnknownGuiControl** previo
 }
 
 // 0x00487790
-int GUIUser::RequestFocus(UnknownGuiControl* control, UnknownGuiControl** previous, int update) {
+int GUIUser::RequestFocus(GuiControlView* control, GuiControlView** previous, int update) {
     if (pendingFocusControl && strstr(pendingFocusControl->classNames, "UIDDL"))
         return 0;
     if (previous)
@@ -1047,7 +1047,7 @@ int GUIUser::RequestFocus(UnknownGuiControl* control, UnknownGuiControl** previo
 }
 
 // 0x00487800
-int GUIUser::SetHoverControl(UnknownGuiControl* control, UnknownGuiControl** previous) {
+int GUIUser::SetHoverControl(GuiControlView* control, GuiControlView** previous) {
     int result = 1;
 
     if (control && control != hoverControl)
@@ -1064,7 +1064,7 @@ int GUIUser::SetHoverControl(UnknownGuiControl* control, UnknownGuiControl** pre
 
 // 0x00487870: moves the focus to `control`; a digits-only edit box turns the
 // IME off.
-int GUIUser::MoveFocus(UnknownGuiControl* control, UnknownGuiControl** previous) {
+int GUIUser::MoveFocus(GuiControlView* control, GuiControlView** previous) {
     int result = 1;
 
     if (control && control != hoverControl)
@@ -1100,7 +1100,7 @@ void GUIUser::EnableImeInput(int enable) {
     LOGFONTA font;
     HWND window;
     const char* face;
-    UnknownGuiControl* control;
+    GuiControlView* control;
 
     if (enable) {
         ImmAssociateContext((HWND)g_TrackGame->windowHandle, (HIMC)g_TrackGame->inputContext);
@@ -1154,7 +1154,7 @@ void GUIUser::EnableImeInput(int enable) {
 }
 
 // 0x00487bf0
-int GUIUser::ClearFocus(UnknownGuiControl** previous) {
+int GUIUser::ClearFocus(GuiControlView** previous) {
     if (focusControl && !focusControl->pendingRelease)
         focusControl->KillFocus(0);
     if (previous)

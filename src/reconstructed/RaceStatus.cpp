@@ -120,7 +120,7 @@ int AdvanceGate(Vector3* from, Vector3* to, RaceGate** current, RaceGate* first,
 }
 
 // 0x004e5c70
-int HasStatusNode(RaceStatusNode* list, UnknownEventRacer* racer) {
+int HasStatusNode(RaceStatusNode* list, EventKrustyBikeView* racer) {
     for (; list; list = list->next) {
         if (list->racer == racer)
             return 1;
@@ -246,7 +246,7 @@ int ComputeTimeBehind(RaceStatusNode* list, int mode) {
     RaceStatusNode* status;
 
     for (status = list; status; status = status->next) {
-        UnknownEventRacer* racer = status->racer;
+        EventKrustyBikeView* racer = status->racer;
         if (racer->finishPosition > 1) {
             if (mode == 1)
                 racer->timeBehindLeader = racer->gateTimes[racer->gatesPassed % 600] -
@@ -271,10 +271,10 @@ int RankByScore(int keepRacing) {
 
     if (g_TrackGame->mode.raceSettings.eventType == 0) {
         count = 0;
-        UnknownKrustyBikeView* view = g_TrackGame->quarryEvent->raceView;
-        UnknownEventRacer* racer;
+        EventBikeRaceView* view = g_TrackGame->quarryEvent->raceView;
+        EventKrustyBikeView* racer;
         iterator = 0;
-        for (racer = reinterpret_cast<UnknownEventRacer*>(reinterpret_cast<BikeRace*>(view)->NextBike(&iterator)); racer; racer = reinterpret_cast<UnknownEventRacer*>(reinterpret_cast<BikeRace*>(view)->NextBike(&iterator))) {
+        for (racer = reinterpret_cast<EventKrustyBikeView*>(reinterpret_cast<BikeRace*>(view)->NextBike(&iterator)); racer; racer = reinterpret_cast<EventKrustyBikeView*>(reinterpret_cast<BikeRace*>(view)->NextBike(&iterator))) {
             if (racer->isEnabled) {
                 scores[count].value = racer->score;
                 scores[count].racer = racer;
@@ -301,7 +301,7 @@ int UpdateLapRace(RaceStatusNode** list, Track* track, float frameTime, RaceGate
                           RaceGate* finish, int lapLimit, int unlimited) {
     RaceStatusNode* previous = 0;
     RaceStatusNode* status;
-    UnknownEventRacer* racer;
+    EventKrustyBikeView* racer;
 
     if (!list || !track)
         return 0;
@@ -396,10 +396,10 @@ int UpdateLapRace(RaceStatusNode** list, Track* track, float frameTime, RaceGate
 }
 
 // The view's camera (+0x50), whose +0x3b4 racer is the one followed (as
-// RaceSound.h's UnknownRaceSoundCamera; KrustyBikeCamera keeps it protected).
-struct UnknownRaceStatusCamera {
+// RaceSound.h's RaceSoundKrustyBikeCameraView; KrustyBikeCamera keeps it protected).
+struct RaceStatusKrustyBikeCameraView {
     unsigned char field_0x000[0x3b4];
-    UnknownEventRacer* followedRacer;         // +0x3b4 (RaceSound.h)
+    EventKrustyBikeView* followedRacer;         // +0x3b4 (RaceSound.h)
 };
 
 // |v|, exact for unit vectors (as CarProcedural.cpp).
@@ -419,7 +419,7 @@ int UpdateGateRace(RaceStatusNode** list, RaceGate* firstGate, float frameTime, 
                           int unlimited) {
     RaceStatusNode* previous = 0;
     RaceStatusNode* status;
-    UnknownEventRacer* racer;
+    EventKrustyBikeView* racer;
 
     if (!list || !firstGate)
         return 0;
@@ -441,7 +441,7 @@ int UpdateGateRace(RaceStatusNode** list, RaceGate* firstGate, float frameTime, 
                 return 0;
             if (g_TrackGame->bajaEnduroEvent && gate != racer->lapGate) {
                 racer->nextLapGate = (racer->lapGate + 1) % g_TrackGame->bajaEnduroEvent->gateCount;
-                if (racer == ((UnknownRaceStatusCamera*)racer->bikeView->raceCamera)->followedRacer)
+                if (racer == ((RaceStatusKrustyBikeCameraView*)racer->bikeView->raceCamera)->followedRacer)
                     g_TrackGame->bajaEnduroEvent->SelectLapGates(racer->lapGate, racer->nextLapGate,
                                                                               racer);
             }

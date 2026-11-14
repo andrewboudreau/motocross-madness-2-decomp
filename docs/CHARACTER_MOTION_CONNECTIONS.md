@@ -9,8 +9,8 @@ declaration is introduced.
 | Retired call view | Existing provider | Complete strict extent |
 |---|---|---:|
 | `BikeA5C4::FindMotion` | `Character::FindMotion`, `0x004a6b30` | 24 bytes |
-| `UnknownBikeRaceCharacter::SetMotionByName` | `Character::SetMotionByName`, `0x004a8b10` | 33 bytes |
-| `UnknownKrustyUICharacter::SetMotionByName` | Same Character provider | 33 bytes |
+| `BikeRaceD3DIMSoultreeCharacterView::SetMotionByName` | `Character::SetMotionByName`, `0x004a8b10` | 33 bytes |
+| `KrustyUID3DIMSoultreeCharacterView::SetMotionByName` | Same Character provider | 33 bytes |
 
 The Bike calls retain their motion names and lookup arguments. The canonical
 lookup returns `Motion*`; an explicit pointer-to-int cast preserves the pointer

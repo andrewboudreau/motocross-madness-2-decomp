@@ -17,5 +17,5 @@
   "__real@4@4004f000000000000000": "0x00550768",
   "_qsort": "0x00534426",
   "_sprintf": "0x00534aaf",
-  "?NextBike@BikeRace@@QAEPAVUnknownBikeRaceRacer@@PAH@Z": "0x004204e0"
+  "?NextBike@BikeRace@@QAEPAVBikeRaceKrustyBikeView@@PAH@Z": "0x004204e0"
 }

@@ -7,7 +7,7 @@ names; it does **not** supply that cell, its pointed-to object, or another
 clipper method.
 
 The retired pointer types are `D3DIMShadowClipper`, `UnknownCubeClipper`,
-`UnknownEcoVisibilityClipper`, `UnknownFollowCameraProjector`,
+`EcoVisibilityClipperView`, `UnknownFollowCameraProjector`,
 `GridVisibilityClipper`, and `UnknownProjector`. The last view used the variable
 name `g_UnknownGlobal575a98`; the other five used `g_visibilityClipper`.
 All now import `?g_visibilityClipper@@3PAVVisibilityClipper@@A`.

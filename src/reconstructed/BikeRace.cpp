@@ -187,7 +187,7 @@ BikeRace::~BikeRace() {
         }
         delete track;
     }
-    UnknownFunctionFreeNodes();
+    FreeGateList();
     if (statusList != 0) {
         FreeStatusList(statusList);
         statusList = 0;
@@ -446,7 +446,7 @@ int BikeRace::Tick(float frameTime) {
             }
             if (networkStartPending) {
                 if (!startStampSent) {
-                    UnknownBikeRaceNetStamp stamp;
+                    TimeStampMessage stamp;
                     stamp.timeStamp = ReadClock();
                     g_TrackGame->network->Send(
                         0x84, &stamp, 8, g_TrackGame->network->localPlayer, 0);
@@ -494,7 +494,7 @@ int BikeRace::Tick(float frameTime) {
             } else {
                 Vector3 position;
                 if (isRacing) {
-                    if (startGate != 0 && ((UnknownBikeRaceSceneCharacter*)startGate)->isEnabled &&
+                    if (startGate != 0 && ((BikeRaceSceneCharacterView*)startGate)->isEnabled &&
                         startGateTimer > 0.0f) {
                         startGateTimer -= g_TrackGame->frameTime;
                         if (startGateTimer <= 0.0f) {
@@ -591,7 +591,7 @@ int BikeRace::Tick(float frameTime) {
                     restartPending = false;
                     isRacing = false;
                 }
-                if (youIndicator != 0 && ((UnknownBikeRaceObjectFlags*)youIndicator)->isEnabled) {
+                if (youIndicator != 0 && ((BikeRaceGameObjectFlags*)youIndicator)->isEnabled) {
                     position = localRacer->carriedFlagPosition;
                     position.y += 4.25f;
                     ((ArcadeObject*)youIndicator)->SetPosition(&position);
@@ -657,12 +657,12 @@ int BikeRace::Tick(float frameTime) {
         }
         if (g_TrackGame->debugOverlay->shownPage == lodDebugPage) {
             char name[0x20];
-            UnknownBikeRaceModel* model;
+            RacerD3DIMSoultreeObjectView* model;
             int pass = 0;
             if ((signed char)targetKind < 0) {
                 strncpy(name,
-                        ((UnknownBikeRaceUiModel*)g_TrackGame->ui->manufacturers)
-                            [((UnknownBikeRaceUiChoice*)g_TrackGame->ui->bikes)
+                        ((BikeRaceManufacturerRecord*)g_TrackGame->ui->manufacturers)
+                            [((BikeRaceBikeRecord*)g_TrackGame->ui->bikes)
                                  [g_TrackGame->mode.racerChoice.bikeIndex].manufacturer].modelFile,
                         0x14);
                 name[0x14] = 0;
@@ -671,20 +671,20 @@ int BikeRace::Tick(float frameTime) {
             } else if (targetKind == 0) {
                 strncpy(name, raceScene->staticModels->casters[targetIndex].fileName, 0x14);
                 name[0x14] = 0;
-                model = (UnknownBikeRaceModel*)raceScene->staticModels->casters[targetIndex].model;
+                model = (RacerD3DIMSoultreeObjectView*)raceScene->staticModels->casters[targetIndex].model;
             } else {
                 strncpy(name, raceScene->animationTable->entries[targetIndex].fileName, 0x14);
                 name[0x14] = 0;
                 SceneAnimation* entry = &raceScene->animationTable->entries[targetIndex];
                 if (entry->keyFramed) {
-                    model = ((UnknownBikeRaceRider*)entry->character)->modelNode;
+                    model = ((BikeRaceRiderView*)entry->character)->modelNode;
                 } else {
-                    model = (UnknownBikeRaceModel*)entry->proceduralObject->carModel;
+                    model = (RacerD3DIMSoultreeObjectView*)entry->proceduralObject->carModel;
                 }
             }
             do {
                 int faces = 0;
-                UnknownBikeRaceMeshGroup* group = &model->levelGroups[model->currentDetailLevel];
+                BikeRaceSoultreeLodView* group = &model->levelGroups[model->currentDetailLevel];
                 for (int i = 0; i < group->itemCount; i++) {
                     faces += group->surfaces[i].faceCount;
                 }
@@ -799,7 +799,7 @@ int BikeRace::AnyRacerRemote() {
 }
 
 // 0x0041ea60
-void BikeRace::ReplaceMeshId(UnknownBikeRaceCharacter* character, int from, int to) {
+void BikeRace::ReplaceMeshId(BikeRaceD3DIMSoultreeCharacterView* character, int from, int to) {
     for (int i = 0; i < character->modelNode->groupCount; i++) {
         for (int j = 0; j < character->modelNode->levelGroups[i].itemCount; j++) {
             for (int k = 0; k < character->modelNode->levelGroups[i].surfaces[j].idCount; k++) {
@@ -1028,7 +1028,7 @@ int BikeRace::OnControlPress(ControlEvent* event, InputButtonState* entry) {
                 if (g_TrackGame->ui->gui->GetUser(0)->userCursor == 0) {
                     g_TrackGame->ui->gui->CreateCursors("ui\\cursor.tga", 0);
                 }
-                if (!((UnknownBikeRaceObjectFlags*)g_TrackGame->ui->gui
+                if (!((BikeRaceGameObjectFlags*)g_TrackGame->ui->gui
                           ->GetUser(0)->userCursor)->isEnabled) {
                     if (objectPicker == 0) {
                         ObjectPicker* picker = new (__FILE__, 0xed2) ObjectPicker(1);
@@ -1062,8 +1062,8 @@ int BikeRace::OnControlPress(ControlEvent* event, InputButtonState* entry) {
                 if (picked != 0) {
                     if (raceScene->staticModels != 0) {
                         for (int i = 0; i < raceScene->staticModels->casterCount; i++) {
-                            UnknownBikeRacePickCaster* caster =
-                                &((UnknownBikeRacePickCaster*)raceScene->staticModels->casters)[i];
+                            PickSceneStaticModelView* caster =
+                                &((PickSceneStaticModelView*)raceScene->staticModels->casters)[i];
                             if (caster->flags & 1) {
                                 if (picked == caster->physicsObject->collisionObject) {
                                     RaceCameraView()->followingRacer = 1;
@@ -1083,13 +1083,13 @@ int BikeRace::OnControlPress(ControlEvent* event, InputButtonState* entry) {
                         for (int i = 0; i < raceScene->animationTable->entryCount; i++) {
                             SceneAnimation* entry = &raceScene->animationTable->entries[i];
                             if (entry->keyFramed) {
-                                if (picked == ((UnknownBikeRacePickCharacter*)entry->character)->collisionObject) {
+                                if (picked == ((PickCollisionCharacterView*)entry->character)->collisionObject) {
                                     RaceCameraView()->followingRacer = 1;
                                     targetEntry = i;
                                     NextCameraTarget(1, 0, 1);
                                     return 1;
                                 }
-                            } else if (picked == ((UnknownBikeRacePickObject*)entry->proceduralObject)->collisionObject) {
+                            } else if (picked == ((PickProceduralObjectView*)entry->proceduralObject)->collisionObject) {
                                 RaceCameraView()->followingRacer = 1;
                                 targetEntry = i;
                                 NextCameraTarget(1, 0, 1);
@@ -1117,16 +1117,16 @@ int BikeRace::OnNetworkMessage(int type, void* data, int from, int to, int flags
         return 0;
     }
     if (type == 1) {
-        UnknownBikeRaceNetState* state = (UnknownBikeRaceNetState*)data;
+        RacerStateMessage* state = (RacerStateMessage*)data;
         int self = g_TrackGame->network->localPlayer;
         count = g_TrackGame->mode.racerCount;
         for (int i = 0; i < count; i++) {
             int id = g_TrackGame->mode.racers[i].networkPlayerId;
             if (id != self && id == from) {
-                UnknownBikeRaceRacer* racer = racerSlots[i];
+                BikeRaceKrustyBikeView* racer = racerSlots[i];
                 if (racer != 0 && racer->netIndex == state->racerIndex) {
                     racerSlots[i]->hasFullState = 1;
-                    UnknownBikeRaceRacerPart* oldest = racerSlots[i]->receivedStates[2];
+                    ReceivedRacerState* oldest = racerSlots[i]->receivedStates[2];
                     racerSlots[i]->receivedStates[2] = racerSlots[i]->receivedStates[1];
                     racerSlots[i]->receivedStates[1] = racerSlots[i]->receivedStates[0];
                     racerSlots[i]->receivedStates[0] = oldest;
@@ -1145,7 +1145,7 @@ int BikeRace::OnNetworkMessage(int type, void* data, int from, int to, int flags
             }
         }
     } else if (type == 13) {
-        UnknownBikeRaceNetMessage13* message = (UnknownBikeRaceNetMessage13*)data;
+        RacerDeltaMessage* message = (RacerDeltaMessage*)data;
         int self = g_TrackGame->network->localPlayer;
         for (int i = 0; i < g_TrackGame->mode.racerCount; i++) {
             int id = g_TrackGame->mode.racers[i].networkPlayerId;
@@ -1154,7 +1154,7 @@ int BikeRace::OnNetworkMessage(int type, void* data, int from, int to, int flags
                 if (!racerSlots[i]->hasFullState) {
                     return 1;
                 }
-                UnknownBikeRaceRacerPart* oldest = racerSlots[i]->receivedStates[2];
+                ReceivedRacerState* oldest = racerSlots[i]->receivedStates[2];
                 racerSlots[i]->receivedStates[2] = racerSlots[i]->receivedStates[1];
                 racerSlots[i]->receivedStates[1] = racerSlots[i]->receivedStates[0];
                 racerSlots[i]->receivedStates[0] = oldest;
@@ -1167,13 +1167,13 @@ int BikeRace::OnNetworkMessage(int type, void* data, int from, int to, int flags
             }
         }
     } else if (type == 10) {
-        UnknownBikeRaceNetScore* score = (UnknownBikeRaceNetScore*)data;
+        RacerScoreMessage* score = (RacerScoreMessage*)data;
         count = g_TrackGame->mode.racerCount;
         int self = g_TrackGame->network->localPlayer;
         for (int i = 0; i < count; i++) {
             int id = g_TrackGame->mode.racers[i].networkPlayerId;
             if (id != self && id == from) {
-                UnknownBikeRaceRacer* racer = racerSlots[i];
+                BikeRaceKrustyBikeView* racer = racerSlots[i];
                 if (racer != 0 && racer->netIndex == score->racerIndex) {
                     racerSlots[i]->score = score->racerScore;
                     return 1;
@@ -1191,12 +1191,12 @@ int BikeRace::OnNetworkMessage(int type, void* data, int from, int to, int flags
                 chatOpen = true;
             }
             if (chatOverlay != 0) {
-                chatOverlay->AddMessage(name, (int)&((UnknownBikeRaceNetStamp*)data)->timeStamp, 1);
+                chatOverlay->AddMessage(name, (int)&((TimeStampMessage*)data)->timeStamp, 1);
             }
         }
         return 1;
     } else if (type == 0x84) {
-        UnknownBikeRaceNetStamp* stamp = (UnknownBikeRaceNetStamp*)data;
+        TimeStampMessage* stamp = (TimeStampMessage*)data;
         for (int i = 0; i < g_TrackGame->mode.racerCount; i++) {
             if (g_TrackGame->mode.racers[i].networkPlayerId == from) {
                 float delay = (float)(unsigned int)flags - (float)stamp->timeStamp;
@@ -1211,8 +1211,8 @@ int BikeRace::OnNetworkMessage(int type, void* data, int from, int to, int flags
 }
 
 // 0x004204e0
-UnknownBikeRaceRacer* BikeRace::NextBike(int* iterator) {
-    UnknownBikeRaceRacer* racer = 0;
+BikeRaceKrustyBikeView* BikeRace::NextBike(int* iterator) {
+    BikeRaceKrustyBikeView* racer = 0;
     if (g_TrackGame->uiInteractionBlocked) {
         return 0;
     }
@@ -1254,7 +1254,7 @@ void BikeRace::HandlePlayerLeft(int player) {
         if (id != self && id == player && racerSlots[i] != 0) {
             racerSlots[i]->RemoveFromRace();
             TrackGameViewOwner* owner = g_TrackGame->tagEvent;
-            if (owner != 0 && owner->followedRacer == (UnknownEventRacer*)racerSlots[i]) {
+            if (owner != 0 && owner->followedRacer == (EventKrustyBikeView*)racerSlots[i]) {
                 if (g_TrackGame->mode.raceSettings.tagBall) {
                     owner->followedRacer = 0;
                 } else if (g_TrackGame->network->isHost) {
@@ -1348,7 +1348,7 @@ void BikeRace::RestartRace(int mode, char* path, char* description) {
     }
     SetSceneTime(0.0001f);
     raceScene->holdAnimations = 1;
-    for (UnknownBikeRaceRacer* racer = NextBike(&iterator); racer != 0;
+    for (BikeRaceKrustyBikeView* racer = NextBike(&iterator); racer != 0;
          racer = NextBike(&iterator)) {
         racer->SnapshotRespawnPose();
         racer->restarted = true;
@@ -1502,7 +1502,7 @@ int BikeRace::RecordFrame(int kind, void* data, int flag, int recorderId, int* k
     *keep = 0;
     lastRecordKind = kind;
     if (replayPaused && kind == -1) {
-        replayTime = ((UnknownBikeRaceVcrTick*)data)->time;
+        replayTime = ((VcrTickRecord*)data)->time;
         replayStepFrame = false;
         return 5;
     }
@@ -1559,7 +1559,7 @@ int BikeRace::RecordFrame(int kind, void* data, int flag, int recorderId, int* k
         replayMode = 4;
         return 1;
     } else if (kind == -1) {
-        UnknownBikeRaceVcrTick* tick = (UnknownBikeRaceVcrTick*)data;
+        VcrTickRecord* tick = (VcrTickRecord*)data;
         if (replayStepFrame) {
             replayTime = tick->time;
             ToggleReplayPause(0);
@@ -1620,8 +1620,8 @@ int BikeRace::RecordFrame(int kind, void* data, int flag, int recorderId, int* k
         }
         return replayMode == 11 ? 11 : 1;
     } else if (kind == 1) {
-        UnknownBikeRaceNetState* state = (UnknownBikeRaceNetState*)data;
-        UnknownBikeRaceRacer* racer = localRacer;
+        RacerStateMessage* state = (RacerStateMessage*)data;
+        BikeRaceKrustyBikeView* racer = localRacer;
         if (recorderId == racer->recorderId && racer->netIndex == state->racerIndex) {
             if (g_TrackGame->mode.raceSettings.raceMode == 4) {
                 racer = aiRacers[0];
@@ -1630,7 +1630,7 @@ int BikeRace::RecordFrame(int kind, void* data, int flag, int recorderId, int* k
                 return 0;
             }
             racer->hasFullState = 1;
-            UnknownBikeRaceRacerPart* oldest;
+            ReceivedRacerState* oldest;
             if (g_TrackGame->mode.raceSettings.raceMode == 4) {
                 oldest = racer->receivedStates[2];
             } else {
@@ -1674,7 +1674,7 @@ int BikeRace::RecordFrame(int kind, void* data, int flag, int recorderId, int* k
             if (aiRacers[i] != 0 && recorderId == aiRacers[i]->recorderId &&
                 aiRacers[i]->netIndex == state->racerIndex) {
                 aiRacers[i]->hasFullState = 1;
-                UnknownBikeRaceRacerPart* oldest;
+                ReceivedRacerState* oldest;
                 if (g_TrackGame->mode.raceSettings.raceMode == 4) {
                     oldest = aiRacers[i]->receivedStates[2];
                 } else {
@@ -1716,11 +1716,11 @@ int BikeRace::RecordFrame(int kind, void* data, int flag, int recorderId, int* k
             }
         }
     } else if (kind == 13) {
-        UnknownBikeRaceNetMessage13* message = (UnknownBikeRaceNetMessage13*)data;
+        RacerDeltaMessage* message = (RacerDeltaMessage*)data;
         if (flag) {
             return 1;
         }
-        UnknownBikeRaceRacer* racer = localRacer;
+        BikeRaceKrustyBikeView* racer = localRacer;
         if (recorderId == racer->recorderId && racer->netIndex == message->racerIndex) {
             if (g_TrackGame->mode.raceSettings.raceMode == 4) {
                 racer = aiRacers[0];
@@ -1728,7 +1728,7 @@ int BikeRace::RecordFrame(int kind, void* data, int flag, int recorderId, int* k
             if (racer == 0 || !racer->hasFullState) {
                 return 0;
             }
-            UnknownBikeRaceRacerPart* oldest;
+            ReceivedRacerState* oldest;
             if (g_TrackGame->mode.raceSettings.raceMode == 4) {
                 oldest = racer->receivedStates[2];
             } else {
@@ -1756,7 +1756,7 @@ int BikeRace::RecordFrame(int kind, void* data, int flag, int recorderId, int* k
                 if (!aiRacers[i]->hasFullState) {
                     return 0;
                 }
-                UnknownBikeRaceRacerPart* oldest = aiRacers[i]->receivedStates[3];
+                ReceivedRacerState* oldest = aiRacers[i]->receivedStates[3];
                 aiRacers[i]->receivedStates[3] = aiRacers[i]->receivedStates[2];
                 aiRacers[i]->receivedStates[2] = aiRacers[i]->receivedStates[1];
                 aiRacers[i]->receivedStates[1] = aiRacers[i]->receivedStates[0];
@@ -1771,8 +1771,8 @@ int BikeRace::RecordFrame(int kind, void* data, int flag, int recorderId, int* k
             }
         }
     } else if (kind == 10) {
-        UnknownBikeRaceNetScore* score = (UnknownBikeRaceNetScore*)data;
-        UnknownBikeRaceRacer* racer = localRacer;
+        RacerScoreMessage* score = (RacerScoreMessage*)data;
+        BikeRaceKrustyBikeView* racer = localRacer;
         if (recorderId == racer->recorderId && racer->netIndex == score->racerIndex) {
             if (racer == 0) {
                 return 0;
@@ -1843,15 +1843,15 @@ int BikeRace::RecordFrame(int kind, void* data, int flag, int recorderId, int* k
             return 1;
         }
     } else if (kind == 0x87) {
-        UnknownBikeRaceVcrFollow* follow = (UnknownBikeRaceVcrFollow*)data;
+        VcrFollowRecord* follow = (VcrFollowRecord*)data;
         if (g_TrackGame->tagEvent != 0) {
             g_TrackGame->tagEvent->followedRacer = 0;
             if (follow->followedRacerId != 0) {
                 int iterator = 0;
-                for (UnknownBikeRaceRacer* racer = NextBike(&iterator); racer != 0;
+                for (BikeRaceKrustyBikeView* racer = NextBike(&iterator); racer != 0;
                      racer = NextBike(&iterator)) {
                     if (racer->recorderId == follow->followedRacerId) {
-                        g_TrackGame->tagEvent->followedRacer = (UnknownEventRacer*)racer;
+                        g_TrackGame->tagEvent->followedRacer = (EventKrustyBikeView*)racer;
                         break;
                     }
                 }
@@ -1863,7 +1863,7 @@ int BikeRace::RecordFrame(int kind, void* data, int flag, int recorderId, int* k
 
 // 0x00423040
 void BikeRace::ClearAiRacerParts(int index) {
-    UnknownBikeRaceRacer* racer = aiRacers[index];
+    BikeRaceKrustyBikeView* racer = aiRacers[index];
     if (racer != 0) {
         racer->receivedStates[0]->state.position = kVec3Zero;
         racer->receivedStates[1]->state.position = kVec3Zero;
@@ -1874,7 +1874,7 @@ void BikeRace::ClearAiRacerParts(int index) {
 
 // 0x00422ec0
 void BikeRace::ClearRacerParts() {
-    UnknownBikeRaceRacer* racer = localRacer;
+    BikeRaceKrustyBikeView* racer = localRacer;
     racer->receivedStates[0]->state.position = kVec3Zero;
     racer->receivedStates[1]->state.position = kVec3Zero;
     racer->receivedStates[2]->state.position = kVec3Zero;

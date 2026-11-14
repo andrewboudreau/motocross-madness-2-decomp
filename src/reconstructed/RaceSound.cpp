@@ -138,8 +138,8 @@ RaceSound::~RaceSound() {
 // present engine's section ("125", "250", "400") of audio_16.ini or
 // audio_08.ini: the sample counts (divided down when several engines share
 // the race) and names of eight sample sets, and three engine speeds.
-RaceSound* RaceSound::Create(void* owner, UnknownKrustyBikeView* view,
-                                            UnknownRaceSoundCamera* camera, int racers) {
+RaceSound* RaceSound::Create(void* owner, EventBikeRaceView* view,
+                                            RaceSoundKrustyBikeCameraView* camera, int racers) {
     int count;
     FileStream* stream;
     int iterator;
@@ -148,7 +148,7 @@ RaceSound* RaceSound::Create(void* owner, UnknownKrustyBikeView* view,
     char section[0x50];
     char file[0x50];
     ParameterBlock parameters;
-    UnknownEventRacer* racer;
+    EventKrustyBikeView* racer;
     int i;
     int k;
 
@@ -171,7 +171,7 @@ RaceSound* RaceSound::Create(void* owner, UnknownKrustyBikeView* view,
     enginePresent[1] = 0;
     enginePresent[2] = 0;
     iterator = 0;
-    while ((racer = reinterpret_cast<UnknownEventRacer*>(reinterpret_cast<BikeRace*>(raceView)->NextBike(&iterator))) != 0) {
+    while ((racer = reinterpret_cast<EventKrustyBikeView*>(reinterpret_cast<BikeRace*>(raceView)->NextBike(&iterator))) != 0) {
         if (racer->engineSize < 250) {
             enginePresent[0] = 1;
             if (racer == raceView->localRacer)
@@ -453,7 +453,7 @@ void RaceSound::AssignChannels() {
     int i;
     int count;
     int kind;
-    UnknownEventRacer* racer;
+    EventKrustyBikeView* racer;
     float volume;
 
     for (i = 0; i < 11; i++) {
@@ -480,7 +480,7 @@ void RaceSound::AssignChannels() {
 
     iterator = 0;
     count = 0;
-    while ((racer = reinterpret_cast<UnknownEventRacer*>(reinterpret_cast<BikeRace*>(raceView)->NextBike(&iterator))) != 0) {
+    while ((racer = reinterpret_cast<EventKrustyBikeView*>(reinterpret_cast<BikeRace*>(raceView)->NextBike(&iterator))) != 0) {
         engineChannels[count].channelRacer = racer;
         if (racer->engineSize < 250)
             engineChannels[count].engine = 0;
@@ -911,7 +911,7 @@ int RaceSound::OnControlPress(ControlEvent* event, InputButtonState* entry) {
 // 0x004e42e0: plays one of the six wreck sounds that is not playing (at most
 // ten random picks) at the racer's position; returns its index, 0 when
 // none was free.
-int RaceSound::PlayWreckSound(UnknownEventRacer* racer) {
+int RaceSound::PlayWreckSound(EventKrustyBikeView* racer) {
     Vector3 position;
     int tries = 0;
     int index = rand() % 6;
@@ -930,7 +930,7 @@ int RaceSound::PlayWreckSound(UnknownEventRacer* racer) {
 // 0x004e43a0: plays one of the six fall sounds that is not playing (at most
 // ten random picks) at the racer's position; returns its index, 0 when
 // none was free.
-int RaceSound::PlayFallSound(UnknownEventRacer* racer) {
+int RaceSound::PlayFallSound(EventKrustyBikeView* racer) {
     Vector3 position;
     int tries = 0;
     int index = rand() % 6;
@@ -1083,7 +1083,7 @@ void RaceSound::PlayIfEnabled(Sound* sound, int network, int stop, int loop, int
 
 // 0x004e57d0: bonus.wav for the listener's scores of 10000 and more
 // (modes 0 and 4); applause01 in mode 3 at most every 15 seconds.
-void RaceSound::PlayScoreSounds(UnknownEventRacer* racer, float value) {
+void RaceSound::PlayScoreSounds(EventKrustyBikeView* racer, float value) {
     if (listenerRacer == racer && value >= 10000.0f &&
         (!g_TrackGame->mode.raceSettings.eventType || g_TrackGame->mode.raceSettings.eventType == 4))
         PlayIfEnabled(bonusSound, 0, 0, 0, 0);

@@ -1,7 +1,7 @@
 [
   {
     "source": "TrackOverlayNearMisses.cpp",
-    "candidate_symbol_contains": "?CollectRacers@ChatOverlay@@QAEHPAUUnknownChatView@@@Z",
+    "candidate_symbol_contains": "?CollectRacers@ChatOverlay@@QAEHPAUChatBikeRaceView@@@Z",
     "target_va": "0x0051d730",
     "target_size": 586,
     "expect": "exact",

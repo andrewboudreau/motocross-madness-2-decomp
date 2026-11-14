@@ -22,7 +22,7 @@
   "?GetRefCount@BaseObject@@UAEHXZ": "0x00401940",
   "?Release@GameObject@@UAEHXZ": "0x004696c0",
   "?SetMemberVolume@SoundGroup@@QAEXJ@Z": "0x00401dd0",
-  "?NextBike@UnknownKrustyBikeView@@QAEPAUUnknownEventRacer@@PAH@Z": "0x004204e0",
+  "?NextBike@EventBikeRaceView@@QAEPAUEventKrustyBikeView@@PAH@Z": "0x004204e0",
   "?FindRaceMode@EventManager@@QAEPAUTrackGameViewOwner@@XZ": "0x0045d2b0",
   "?FastSqrt@@YAMM@Z": "0x00460b50",
   "?Seek@FileStream@@QAEHHHH@Z": "0x00461340",
@@ -51,8 +51,8 @@
   "?ShowOnOffMessage@BaseQuarryEvent@@QAEXHH@Z": "0x004e0c30",
   "?AssignChannels@RaceSound@@QAEXXZ": "0x004e3430",
   "?UpdateRacerSounds@RaceSound@@QAEHM@Z": "0x004e39b0",
-  "?PlayWreckSound@RaceSound@@QAEHPAUUnknownEventRacer@@@Z": "0x004e42e0",
-  "?PlayFallSound@RaceSound@@QAEHPAUUnknownEventRacer@@@Z": "0x004e43a0",
+  "?PlayWreckSound@RaceSound@@QAEHPAUEventKrustyBikeView@@@Z": "0x004e42e0",
+  "?PlayFallSound@RaceSound@@QAEHPAUEventKrustyBikeView@@@Z": "0x004e43a0",
   "?GroundDistance@RaceSound@@QAEMPAUVector3@@0@Z": "0x004e4460",
   "?StartStream@RaceSound@@QAEXXZ": "0x004e4a30",
   "?RefillStream@RaceSound@@QAEXXZ": "0x004e4d10",
@@ -61,7 +61,7 @@
   "?LoadSound@RaceSound@@QAEHPAVSound@@PBDHH@Z": "0x004e5660",
   "?LoadSound@RaceSound@@QAEHPAVSound@@PBDHH@Z$ehhandler": "0x0054d99a",
   "?PlayIfEnabled@RaceSound@@QAEXPAVSound@@HHHH@Z": "0x004e5780",
-  "?PlayScoreSounds@RaceSound@@QAEXPAUUnknownEventRacer@@M@Z": "0x004e57d0",
+  "?PlayScoreSounds@RaceSound@@QAEXPAUEventKrustyBikeView@@M@Z": "0x004e57d0",
   "?PlayItSound@RaceSound@@QAEXXZ": "0x004e5860",
   "?CompareChannels@RaceSound@@SAHPBX0@Z": "0x004e5880",
   "?OpenArchiveFile@SceneArchiveFinder@@QAEHPAVFileStream@@PBD1H@Z": "0x004e9cd0",
@@ -126,5 +126,5 @@
   "_s_UnknownVector689be0": "0x00689be0",
   "_s_UnknownVector689bf0": "0x00689bf0",
   "_sprintf": "0x00534aaf",
-  "?NextBike@BikeRace@@QAEPAVUnknownBikeRaceRacer@@PAH@Z": "0x004204e0"
+  "?NextBike@BikeRace@@QAEPAVBikeRaceKrustyBikeView@@PAH@Z": "0x004204e0"
 }

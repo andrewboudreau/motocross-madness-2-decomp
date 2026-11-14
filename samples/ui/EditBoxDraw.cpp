@@ -89,7 +89,7 @@ int UIEditBox::Draw() {
             if (controlTextLength)
                 ownerDialog->DrawAlignedText(dc, &rect, controlText, controlTextLength, textColor, fontHeight, 0,
                                                   textDrop, dropColor, 9, 1, 0);
-            if (!more && ownerDialog->guiUser->focusControl == (UnknownGuiControl*)this) {
+            if (!more && ownerDialog->guiUser->focusControl == (GuiControlView*)this) {
                 int caret = rect.left + textWidth;
                 int limit = ownerDialog->screenArea.left + screenArea[0] + width - 1;
                 if (limit < caret)
@@ -112,7 +112,7 @@ int UIEditBox::Draw() {
             }
             ownerDialog->EndControlDraw(dc);
             if (g_TrackGame->display->freezeFrameIndex &&
-                ownerDialog->guiUser->focusControl == (UnknownGuiControl*)this) {
+                ownerDialog->guiUser->focusControl == (GuiControlView*)this) {
                 if (ownerDialog && ownerDialog->dialogBackground)
                     ownerDialog->dialogBackground->ReleaseDc();
                 HIMC context = ImmGetContext((HWND)g_TrackGame->windowHandle);
@@ -130,7 +130,7 @@ int UIEditBox::Draw() {
     } while (more);
     if (frames >= 0)
         redrawFrames = frames;
-    if (ownerDialog->guiUser->focusControl == (UnknownGuiControl*)this)
+    if (ownerDialog->guiUser->focusControl == (GuiControlView*)this)
         RequestRedraw();
     else
         needsRedraw = 1;

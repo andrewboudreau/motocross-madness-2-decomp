@@ -8,14 +8,14 @@ class GUIManager;
 class GUIInputDevice;
 class GUICursor;
 class ToolTip;
-class UnknownGuiControl;
+class GuiControlView;
 class InputDevice;
 class Palette8;
 class BackgroundImage;
 class TextureMapManager;
 class PCTextureMap;
 class UnknownCursorAnimation;
-struct UnknownGuiClipper;
+struct GuiDirectDrawClipper;
 
 // RTTI: GUIUser : GameObject (vtable 0x00554100; 0x1f4 bytes). One of
 // GUIManager's four users: a cursor, a tool tip and the input devices it accepts.
@@ -33,12 +33,12 @@ public:
     // 0x00487730 / 0x00487790: make `control` the pending hover (focus also
     // sets hover), unless the pending one is a drop-down list ("UIDDL");
     // `update` applies it at once through 0x004875c0.
-    int RequestHover(UnknownGuiControl* control, UnknownGuiControl** previous, int update);
-    int RequestFocus(UnknownGuiControl* control, UnknownGuiControl** previous, int update);
-    int SetHoverControl(UnknownGuiControl* control, UnknownGuiControl** previous); // 0x00487800: +0x1d8
-    int MoveFocus(UnknownGuiControl* control, UnknownGuiControl** previous); // 0x00487870: moves the focus
+    int RequestHover(GuiControlView* control, GuiControlView** previous, int update);
+    int RequestFocus(GuiControlView* control, GuiControlView** previous, int update);
+    int SetHoverControl(GuiControlView* control, GuiControlView** previous); // 0x00487800: +0x1d8
+    int MoveFocus(GuiControlView* control, GuiControlView** previous); // 0x00487870: moves the focus
     void EnableImeInput(int enable);   // 0x00487990: input method editor on/off
-    int ClearFocus(UnknownGuiControl** previous); // 0x00487bf0: drops the focus, returning it
+    int ClearFocus(GuiControlView** previous); // 0x00487bf0: drops the focus, returning it
     int AcceptDevice(GUIInputDevice* device); // 0x00487c30: accepts a device
     void AcceptKeyboardAndJoysticks();             // 0x00487d00: accepts the keyboard and joysticks
     void ForgetDevices();             // 0x00487d60: forgets every device
@@ -64,10 +64,10 @@ public:
     char cursorImage[0x80];                   // +0xc8: cursor image ("cursor.tga")
     char waitImage[0x80];                     // +0x148: wait image ("wait.tga")
     UnknownCursorAnimation* cursorAnimation;  // +0x1c8
-    UnknownGuiControl* pendingHoverControl;   // +0x1cc: set by 0x00487730/0x00487790; UpdateFocus passes it to SetHoverControl
-    UnknownGuiControl* pendingFocusControl;   // +0x1d0: set by 0x00487790; UpdateFocus passes it to MoveFocus
-    UnknownGuiControl* focusControl;          // +0x1d4: focus
-    UnknownGuiControl* hoverControl;          // +0x1d8: set by SetHoverControl and MoveFocus
+    GuiControlView* pendingHoverControl;   // +0x1cc: set by 0x00487730/0x00487790; UpdateFocus passes it to SetHoverControl
+    GuiControlView* pendingFocusControl;   // +0x1d0: set by 0x00487790; UpdateFocus passes it to MoveFocus
+    GuiControlView* focusControl;          // +0x1d4: focus
+    GuiControlView* hoverControl;          // +0x1d8: set by SetHoverControl and MoveFocus
     int field_0x1dc;
     ContainerList<GUIInputDevice*> acceptedDevices; // +0x1e0: accepted devices
 };
@@ -165,5 +165,5 @@ public:
     int fontSizeOffset;                       // +0x3d0 a float added to the dialog and control font heights (0x0046a920); string 0xfed (KrustyUI)
     int toolTipBold;                          // +0x3d4: bold
     int toolTipItalic;                        // +0x3d8: italic
-    UnknownGuiClipper* windowClipper;         // +0x3dc
+    GuiDirectDrawClipper* windowClipper;         // +0x3dc
 };

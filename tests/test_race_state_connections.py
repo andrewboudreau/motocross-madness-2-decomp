@@ -133,13 +133,13 @@ class RaceStateConnectionsTests(unittest.TestCase):
                 'src/reconstructed/BikeRace.h', 'src/krusty2/vehicle/KrustyBikeCore.h')) + '''
 #include <stddef.h>
 #define CHECK(n,x) typedef char n[(x)?1:-1]
-CHECK(primary_size,sizeof(UnknownBikeRaceRacer)==sizeof(KrustyBike));
-CHECK(remote,offsetof(UnknownBikeRaceRacer,isRemote)==offsetof(KrustyBike,isRemote));
-CHECK(states,offsetof(UnknownBikeRaceRacer,receivedStates)==offsetof(KrustyBike,states));
-CHECK(velocity,offsetof(UnknownBikeRaceRacer,deltaBaseVelocity)==offsetof(KrustyBike,deltaBaseVelocity));
-CHECK(time,offsetof(UnknownBikeRaceRacer,deltaBaseTime)==offsetof(KrustyBike,deltaBaseTime));
-CHECK(packet,sizeof(UnknownBikeRaceNetMessage13)==0x17 && offsetof(UnknownBikeRaceNetMessage13,racerIndex)==0x16);
-CHECK(record,sizeof(UnknownBikeRaceRacerPart)==0x60 && offsetof(UnknownBikeRaceRacerPart,state)==0 && offsetof(UnknownBikeRaceRacerPart,messageFlags)==0x58 && offsetof(UnknownBikeRaceRacerPart,fresh)==0x5c);
+CHECK(primary_size,sizeof(BikeRaceKrustyBikeView)==sizeof(KrustyBike));
+CHECK(remote,offsetof(BikeRaceKrustyBikeView,isRemote)==offsetof(KrustyBike,isRemote));
+CHECK(states,offsetof(BikeRaceKrustyBikeView,receivedStates)==offsetof(KrustyBike,states));
+CHECK(velocity,offsetof(BikeRaceKrustyBikeView,deltaBaseVelocity)==offsetof(KrustyBike,deltaBaseVelocity));
+CHECK(time,offsetof(BikeRaceKrustyBikeView,deltaBaseTime)==offsetof(KrustyBike,deltaBaseTime));
+CHECK(packet,sizeof(RacerDeltaMessage)==0x17 && offsetof(RacerDeltaMessage,racerIndex)==0x16);
+CHECK(record,sizeof(ReceivedRacerState)==0x60 && offsetof(ReceivedRacerState,state)==0 && offsetof(ReceivedRacerState,messageFlags)==0x58 && offsetof(ReceivedRacerState,fresh)==0x5c);
 ''')
             compile_source(layout, 'layout')
             for _, symbol, va, size in BODIES:

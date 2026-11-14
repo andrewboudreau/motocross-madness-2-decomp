@@ -709,7 +709,7 @@ void MultiPlayerDlg::SendChatLine() {
         edit->SetEditText("");
         AddChatLine(player, message.text);
     }
-    guiUser->RequestFocus((UnknownGuiControl*)edit, 0, 0);
+    guiUser->RequestFocus((GuiControlView*)edit, 0, 0);
 }
 
 // 0x004f3980
@@ -722,7 +722,7 @@ void MultiPlayerDlg::SendSystemChatLine(const char* text) {
     g_TrackGame->network->Send(
         0x92, &message, 0x4e, g_TrackGame->network->localPlayer, 0);
     AddChatLine(-1, message.text);
-    guiUser->RequestFocus((UnknownGuiControl*)FindControl("EditChat", 0xb), 0, 0);
+    guiUser->RequestFocus((GuiControlView*)FindControl("EditChat", 0xb), 0, 0);
 }
 
 // 0x004f3a10
@@ -1054,7 +1054,7 @@ void MultiPlayerDlg::HandleEvent(DialogEvent* event) {
             AddChatLine(-1, line);
         }
         AddTimer(0, 0x3e8, 0);
-        guiUser->RequestFocus((UnknownGuiControl*)FindControl("EditChat", 0xb), 0, 0);
+        guiUser->RequestFocus((GuiControlView*)FindControl("EditChat", 0xb), 0, 0);
         break;
     }
     case kDialogCommand:
@@ -1143,7 +1143,7 @@ void MultiPlayerDlg::HandleEvent(DialogEvent* event) {
             }
         } else if (!_stricmp("ButChatSend", event->controlName)) {
             SendChatLine();
-            guiUser->RequestFocus((UnknownGuiControl*)FindControl("EditChat", 0xb), 0, 0);
+            guiUser->RequestFocus((GuiControlView*)FindControl("EditChat", 0xb), 0, 0);
         } else if (!_stricmp("ButRdyPlayer2", event->controlName)) {
             RemoveLobbyPlayer(0);
         } else if (!_stricmp("ButRdyPlayer3", event->controlName)) {
@@ -1168,16 +1168,16 @@ void MultiPlayerDlg::HandleEvent(DialogEvent* event) {
             g_TrackGame->mode.OpenHelp("MCM2HELP", 0);
         }
         if (_stricmp("Back", event->controlName) && _stricmp("Start", event->controlName))
-            guiUser->RequestFocus((UnknownGuiControl*)FindControl("EditChat", 0xb), 0, 0);
+            guiUser->RequestFocus((GuiControlView*)FindControl("EditChat", 0xb), 0, 0);
         break;
     case kDialogEditDone:
         _stricmp("EditChat", event->controlName);
         break;
     case 11:
         if (event->key == 0x2f) {
-            UnknownGuiControl* focus = guiUser->focusControl;
-            if (focus != (UnknownGuiControl*)FindControl("EditChat", 0))
-                guiUser->RequestFocus((UnknownGuiControl*)FindControl("EditChat", 0xb), 0, 0);
+            GuiControlView* focus = guiUser->focusControl;
+            if (focus != (GuiControlView*)FindControl("EditChat", 0))
+                guiUser->RequestFocus((GuiControlView*)FindControl("EditChat", 0xb), 0, 0);
         }
         if (event->key == 0xd) {
             FindControl("ButChatSend", 0)->PlayControlSound(2, 0);

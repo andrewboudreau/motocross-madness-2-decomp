@@ -24,8 +24,8 @@ ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT/'samples/track/StatsStandingsDraw.cpp'
 AGGREGATE = ROOT/'samples/track/TrackOverlayNearMisses.cpp'
 SYMBOL = '?DrawStandings@StatsOverlay@@QAEHXZ'
-ITERATOR = '?NextBike@BikeRace@@QAEPAVUnknownBikeRaceRacer@@PAH@Z'
-OLD_ITERATOR = '?NextBike@UnknownKrustyBikeView@@QAEPAUUnknownEventRacer@@PAH@Z'
+ITERATOR = '?NextBike@BikeRace@@QAEPAVBikeRaceKrustyBikeView@@PAH@Z'
+OLD_ITERATOR = '?NextBike@EventBikeRaceView@@QAEPAUEventKrustyBikeView@@PAH@Z'
 DIRECT = {0x519a68:0x521970, 0x519a9f:0x518640, 0x519ab8:0x534aaf,
           0x519acb:0x4204e0, 0x519afb:0x4204e0, 0x519b11:0x534426,
           0x519bb2:0x534aaf, 0x519c33:0x534aaf, 0x519ca7:0x4b6710,
@@ -38,7 +38,7 @@ INDIRECT = {0x519cbe:'dword ptr [edx + 0x44]', 0x519cd0:'dword ptr [0x550070]',
 # Each extraction is checked against both complete retail and the actual full TU.
 HELPER_GROUPS = [
     ('iteration', '#include "BikeRaceCore.h"\n#include "TrackGame.h"\n',
-     [('BikeRace', 'UnknownBikeRaceRacer* BikeRace::NextBike(', 0x4204e0, 162)]),
+     [('BikeRace', 'BikeRaceKrustyBikeView* BikeRace::NextBike(', 0x4204e0, 162)]),
     ('format', '#include <stdio.h>\n#include "Track.h"\n',
      [('Track', 'void FormatMinutesSeconds(', 0x518640, 67)]),
     ('comparator', '#include "TrackOverlay.h"\n#include "EventManager.h"\n',
@@ -163,7 +163,7 @@ class StatsStandingsTests(unittest.TestCase):
                               if candidate.symbol_by_index[r.symbol_index].name==ITERATOR],[172,220])
             self.assertNotIn(OLD_ITERATOR,[s.name for s in candidate.symbols])
             # The other aggregate caller keeps its independently provisional view.
-            self.assertIn('?NextBike@UnknownChatView@@QAEPAUUnknownChatRacer@@PAH@Z',
+            self.assertIn('?NextBike@ChatBikeRaceView@@QAEPAUChatKrustyBikeView@@PAH@Z',
                           [s.name for s in aggregate.symbols])
             helper_paths=[];strict=0
             for name,header,items in HELPER_GROUPS:
@@ -208,7 +208,7 @@ class StatsStandingsTests(unittest.TestCase):
                 'offsetof(StatsOverlay,drawnRowText)==0x1b0 && offsetof(StatsOverlay,rowText)==0x5b0 && '
                 'offsetof(StatsOverlay,rowExtent)==0x9b0 && offsetof(TrackGame,quarryEvent)==0x55c && '
                 'offsetof(TrackGameViewOwner,raceView)==0x34 && offsetof(BikeRace,localRacer)==0x38 && '
-                'offsetof(UnknownEventRacer,racerName)==0x5e0 && offsetof(UnknownEventRacer,score)==0x768 && '
+                'offsetof(EventKrustyBikeView,racerName)==0x5e0 && offsetof(EventKrustyBikeView,score)==0x768 && '
                 'offsetof(Overlay,overlayTexture)==0x2c && offsetof(Overlay,backingTexture)==0x30 && '
                 'offsetof(Overlay,sharedTexture)==0x34 && offsetof(Overlay,sourceRect)==0xf8 && '
                 'offsetof(TextureMap,textureWidth)==0x14 && offsetof(TextureMap,mapFormat)==0x20 && '

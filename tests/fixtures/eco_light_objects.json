@@ -1,13 +1,13 @@
 {
   "baseline": "Published dfdf98230fff5c3ccead8e21a82acc4eebc5b3b9: complete same-path before/after objects preserve all payloads, flags, addends and destinations under precisely one return-type symbol mapping. Only enumerated filenames are normalized in these portable retained pins. Explicit ContainerList.h filename normalization repairs the sole cross-root SceneManager pin difference; all thirteen original private pins were reproduced before repair, and complete cross-root rows then match. QuarryStuntEvent preserves every nondebug section and relocation under only the verified SetDetailLevel method-name join; its standalone sample is unchanged.",
   "renames": {
-    "?FindLightOfType@LightManager@@QAEPAVUnknownEcoLight@@H@Z": "?FindLightOfType@LightManager@@QAEPAVLightEmitter@@H@Z"
+    "?FindLightOfType@LightManager@@QAEPAVEcoLightEmitterView@@H@Z": "?FindLightOfType@LightManager@@QAEPAVLightEmitter@@H@Z"
   },
   "objects": {
     "src/reconstructed/EcoSystem.cpp": {
       "sections": 132,
       "relocations": 720,
-      "sha256": "1efd08ee03e06e5180fa230deadd29bde8269db93087529212c57c77f9b4a690"
+      "sha256": "406df161393a7f8b894bd104d6364569d404aebfcdc879f40c0053308abb41f9"
     },
     "src/reconstructed/LightEmitter.cpp": {
       "sections": 57,
@@ -17,7 +17,7 @@
     "src/reconstructed/SceneManager.cpp": {
       "sections": 272,
       "relocations": 1273,
-      "sha256": "6b72f681039552dd5b35b05e3b1081daf74fea79c50eb3a41c19f1ac5cc949d7"
+      "sha256": "5365f1990cf24d723973fcf67667246461ffec61205eee27b30729b64e874c54"
     },
     "src/reconstructed/KrustyUI.cpp": {
       "sections": 317,
@@ -27,12 +27,12 @@
     "src/reconstructed/QuarryStuntEvent.cpp": {
       "sections": 86,
       "relocations": 393,
-      "sha256": "d8032dafa2496559e0d06ace5d0ae0263ad9a9eecfcb6923bb3df253bf6711f4"
+      "sha256": "1395805734a309be0dcafe119673aa69a1da6d9909b050d7f1b967fe75a4c32b"
     },
     "src/reconstructed/ArcadeObject.cpp": {
       "sections": 32,
       "relocations": 127,
-      "sha256": "77bd9086e6cca9d25e8cd00968464451ca370a6e62c7a43dfbc8202c8caa352d"
+      "sha256": "c00e7e1ef6dc61536aa9c0e9ba6a0214b71c091fb77c4df590bf64205b93ee5f"
     },
     "src/reconstructed/D3DIMSoultreeModifier.cpp": {
       "sections": 23,
@@ -42,7 +42,7 @@
     "samples/ecosystem/EcoSystemNearMisses.cpp": {
       "sections": 98,
       "relocations": 444,
-      "sha256": "32751ae016b808ca10c259be463af85886325df6535905873c258313c955bcfe"
+      "sha256": "2949e44c3c5dc84e5e6d568500eb64c8a8264e60c0f48ac31ad93ff33e124e00"
     },
     "samples/ecosystem/VegetationCollisionObject.cpp": {
       "sections": 2,
@@ -52,7 +52,7 @@
     "samples/track/SceneManagerNearMisses.cpp": {
       "sections": 96,
       "relocations": 484,
-      "sha256": "db56ff4808a86450c86a86356f26c9ee3ee700c01e6f23ff78a433929aeb94f7"
+      "sha256": "f74768e1da52b19d7b91a4f7c595f716b999c30dfe5f3b17bf34a93a38e4a448"
     },
     "samples/render/D3DIMSoulTreeNearMisses.cpp": {
       "sections": 29,
@@ -67,7 +67,7 @@
     "samples/game/QuarryStuntEventLoaderNearMiss.cpp": {
       "sections": 50,
       "relocations": 435,
-      "sha256": "eb5842a2cc485b3cf82ff000d0525742088ff835e99e9d5633fca094b336bbd3"
+      "sha256": "73a5a5144f9b82318c41c9802749ae02c26316d96f76ed2aabff7031112c3a3f"
     }
   },
   "strict_cases": [
@@ -283,7 +283,7 @@
     },
     {
       "source": "src/reconstructed/EcoSystem.cpp",
-      "symbol": "?ComputeQuadTreeCode@Vegetation@@UAEIPAVUnknownEcoQuadTree@@@Z",
+      "symbol": "?ComputeQuadTreeCode@Vegetation@@UAEIPAVEcoQuadTreeView@@@Z",
       "va": "0x00456720",
       "size": 117
     },
@@ -307,7 +307,7 @@
     },
     {
       "source": "src/reconstructed/EcoSystem.cpp",
-      "symbol": "?DrawGeometry@Vegetation@@QAEXPAVUnknownEcoRenderTarget@@@Z",
+      "symbol": "?DrawGeometry@Vegetation@@QAEXPAVEcoRenderTargetView@@@Z",
       "va": "0x00457000",
       "size": 125
     },
@@ -361,7 +361,7 @@
     },
     {
       "source": "src/reconstructed/EcoSystem.cpp",
-      "symbol": "?Create@EcoSystem@@QAEPAV1@PAXPAVTextureMapManager@@PAVUnknownEcoTerrain@@PAVLightManager@@PADPAVFileStream@@HHH@Z",
+      "symbol": "?Create@EcoSystem@@QAEPAV1@PAXPAVTextureMapManager@@PAVEcoTerrainView@@PAVLightManager@@PADPAVFileStream@@HHH@Z",
       "va": "0x004594d0",
       "size": 859
     },

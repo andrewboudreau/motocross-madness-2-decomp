@@ -72,7 +72,7 @@
   "?SetDirectory@DirectoryList@@QAEXPBD@Z": "0x0044a1d0",
   "?SetPattern@DirectoryList@@QAEXPBDH@Z": "0x0044a220",
   "?FindRaceMode@EventManager@@QAEPAUTrackGameViewOwner@@XZ": "0x0045d2b0",
-  "?FindRaceView@EventManager@@QAEPAUUnknownKrustyBikeView@@XZ": "0x0045d2f0",
+  "?FindRaceView@EventManager@@QAEPAUEventBikeRaceView@@XZ": "0x0045d2f0",
   "?ResetClock@Game@@QAEXXZ": "0x00468880",
   "?DisableByClassName@GameObject@@IAEXPBD@Z": "0x00468dd0",
   "?EnableByClassName@GameObject@@IAEXPBD@Z": "0x00468f10",

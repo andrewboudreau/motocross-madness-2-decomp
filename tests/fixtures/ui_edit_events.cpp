@@ -86,7 +86,7 @@ static void Setup(int seed) {
         *(DWORD**)Dialog(world, i) = dialogTable;
         Dialog(world, i)->guiUser = User(world, i);
         Dialog(world, i)->field_0x180 = 100 + i;
-        User(world, i)->hoverControl = reinterpret_cast<UnknownGuiControl*>(edit);
+        User(world, i)->hoverControl = reinterpret_cast<GuiControlView*>(edit);
     }
 }
 static int TestRelease() {

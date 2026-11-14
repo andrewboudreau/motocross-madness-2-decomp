@@ -63,13 +63,13 @@
 extern Vector3 s_viewPoints[25];
 extern Vector3 s_faceNormals[6];
 extern Vector3 s_facePoints[6][25];
-extern UnknownCubeVertex s_cellVertices[6][16][6];
+extern CubeLitVertex s_cellVertices[6][16][6];
 extern UnknownCubeTextureMapping s_cellMappings[6][16];
 
 // 0x0043dc60
 int DrawableCube::BuildFaceGeometry()
 {
-    UnknownCubeVertex grid[25];
+    CubeLitVertex grid[25];
     for (int face = 0; face < 6; face++) {
         int point = 0;
         for (int row = 0; row < 5; row++) {
@@ -127,7 +127,7 @@ int DrawableCube::BuildFaceGeometry()
         int index = 0;
         for (int cellRow = 0; cellRow < 4; cellRow++, first++) {
             for (int cellColumn = 0; cellColumn < 4; cellColumn++, first++, index++) {
-                UnknownCubeVertex* corner = &grid[first];
+                CubeLitVertex* corner = &grid[first];
                 s_cellVertices[face][index][0].position = corner[0].position;
                 s_cellVertices[face][index][0].diffuse = 0xffffffff;
                 s_cellVertices[face][index][0].specular = 0;

@@ -40,10 +40,10 @@ claim of complete equivalence between all racer view declarations.
 The old aggregate includes the standalone body at its original position.
 Same-path before/after compilation preserves all **37 sections and 162
 relocations**, allowing only the two iterator targets at candidate offsets
-172 and 220 to change from `UnknownKrustyBikeView::NextBike` to
+172 and 220 to change from `EventBikeRaceView::NextBike` to
 `BikeRace::NextBike`. Every other function, static initializer, section
 attribute, storage byte and relocation is retained. The separate
-`UnknownChatView::NextBike` call in the aggregate remains unchanged.
+`ChatBikeRaceView::NextBike` call in the aggregate remains unchanged.
 Canonical `TrackOverlay.cpp` is unchanged and its complete object is also
 pinned by the regression.
 

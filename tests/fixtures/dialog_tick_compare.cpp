@@ -71,8 +71,8 @@ static void Mutate(int operation) {
     UIDialog* d=Dialog();
     if (scenario.callback==4) d->guiUser=d->guiUser==User(0)?User(1):User(0);
     if (scenario.callback==5) {
-        User(0)->hoverControl=(UnknownGuiControl*)Control(2);
-        User(1)->hoverControl=(UnknownGuiControl*)Control(0);
+        User(0)->hoverControl=(GuiControlView*)Control(2);
+        User(1)->hoverControl=(GuiControlView*)Control(0);
         Control(0)->mouseAnim=(int)(cursorTokens+7);
         world.dialog[0x25]^=4;d->isClosing^=1;
     }
@@ -88,7 +88,7 @@ static void Mutate(int operation) {
             d->timerList.m_count=3;
             world.timerPointers[0][1]=Timer(3);world.timerPointers[0][2]=Timer(0);
             Timer(3)->targetControl=Control(2);Timer(3)->periodTime=0;
-            User(0)->hoverControl=(UnknownGuiControl*)Control(2);
+            User(0)->hoverControl=(GuiControlView*)Control(2);
         }
     }
 }
@@ -142,7 +142,7 @@ UIControl* UIControl::NextFocusableControl() {
 int UIDialog::RequestHover(UIControl* control,int a,int b) {
     if(this!=Dialog())ExitProcess(89);ControlIndex(control);
     Event& e=Record(8,this);e.args[0]=(int)control;e.args[1]=a;e.args[2]=b;
-    guiUser->hoverControl=(UnknownGuiControl*)control;Mutate(8);return -7;
+    guiUser->hoverControl=(GuiControlView*)control;Mutate(8);return -7;
 }
 void UIDialog::UpdatePointerHover() {
     if(this!=Dialog())ExitProcess(90);Record(9,this);Mutate(9);
@@ -211,7 +211,7 @@ static void Reset() {
     if(scenario.seed&16)world.timerPointers[0][1]=0;
     d->timerList.m_capacity=4;d->timerList.m_growBy=4;d->timerList.m_allocated=0;
     for(int u=0;u<2;++u) {
-        GUIUser* user=User(u);user->hoverControl=scenario.focus?(UnknownGuiControl*)Control((scenario.focus-1+u)%3):0;
+        GUIUser* user=User(u);user->hoverControl=scenario.focus?(GuiControlView*)Control((scenario.focus-1+u)%3):0;
         user->acceptedDevices.m_count=(scenario.seed+u)%5;
         user->acceptedDevices.m_data=world.devicePointers[u];user->acceptedDevices.m_capacity=4;
         user->acceptedDevices.m_growBy=4;user->acceptedDevices.m_allocated=0;

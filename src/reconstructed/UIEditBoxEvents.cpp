@@ -7,7 +7,7 @@
 // 0x00474b10, 144 bytes: report an unmodified release inside the pressed edit
 // control, then retain the base release behavior unless the event was handled.
 int UIEditBox::ButtonUp(int button, int* position) {
-    if (ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this && !button && currentState == 2) {
+    if (ownerDialog->guiUser->hoverControl == (GuiControlView*)this && !button && currentState == 2) {
         DialogEvent event;
         event.handled = button;
         event.kind = kDialogCommand;

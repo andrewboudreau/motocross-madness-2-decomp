@@ -2,10 +2,10 @@
 
 int ReadEcoRendererFlag()
 {
-    return reinterpret_cast<UnknownEcoTrackGame*>(g_TrackGame)->bladeRenderer;
+    return reinterpret_cast<EcoTrackGameView*>(g_TrackGame)->bladeRenderer;
 }
 
 void WriteEcoRendererFlag(int value)
 {
-    reinterpret_cast<UnknownEcoTrackGame*>(g_TrackGame)->bladeRenderer = value;
+    reinterpret_cast<EcoTrackGameView*>(g_TrackGame)->bladeRenderer = value;
 }

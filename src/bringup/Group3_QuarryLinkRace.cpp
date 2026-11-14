@@ -12,9 +12,9 @@ void* G3Q_BikeRaceCreate(void* race, void* target, void* particles, void* lights
 {
     return ((BikeRace*)race)->Create(target, particles, (LightManager*)lights,
                                      (TextureContext*)textures,
-                                     (UnknownBikeRaceProjector*)terrain, (KrustyBikeCamera*)camera,
+                                     (BikeRaceTerrainView*)terrain, (KrustyBikeCamera*)camera,
                                      (Scene*)scene, (RaceGateEvent*)event,
-                                     (UnknownBikeRaceShadow*)shadow);
+                                     (BikeRaceProjectedShadowView*)shadow);
 }
 
 void* G3Q_BikeRaceNextBike(void* race, int* iterator)
@@ -34,15 +34,15 @@ void G3Q_StatsOverlaySetSource(void* stats, void* race)
 
 void G3Q_ChatOverlayCollectRacers(void* chat, void* race)
 {
-    ((ChatOverlay*)chat)->CollectRacers((UnknownChatView*)race);
+    ((ChatOverlay*)chat)->CollectRacers((ChatBikeRaceView*)race);
 }
 
 void G3Q_RadarOverlayTakeRacers(void* radar, void* race, void* chat)
 {
-    ((RadarOverlay*)radar)->TakeRacers((UnknownKrustyBikeView*)race, (int)chat);
+    ((RadarOverlay*)radar)->TakeRacers((EventBikeRaceView*)race, (int)chat);
 }
 
 void G3Q_VisualCueCollectRacers(void* cue, void* race)
 {
-    ((VisualCue*)cue)->CollectRacers((UnknownVisualCueView*)race);
+    ((VisualCue*)cue)->CollectRacers((VisualCueBikeRaceView*)race);
 }

@@ -19,18 +19,18 @@
 // Krusty3DObjects.h's RunwayLights, as this file uses it. That header and
 // QuarryEvent.h cannot be included together (both declare VisualCue), so
 // the three members are redeclared here with the same signatures.
-struct UnknownRunwayTerrain;
-struct UnknownRunwayRacer;
+struct RunwayTerrainView;
+struct RunwayKrustyBikeView;
 
 class RunwayLights : public GameObject {
 public:
     explicit RunwayLights(int flags);          // 0x0048a5b0
-    RunwayLights* SetupLights(void* value, int a, int b, UnknownRunwayTerrain* terrain); // 0x0048a600
-    void SetRacer(UnknownRunwayRacer* racer); // 0x0048ad50
+    RunwayLights* SetupLights(void* value, int a, int b, RunwayTerrainView* terrain); // 0x0048a600
+    void SetRacer(RunwayKrustyBikeView* racer); // 0x0048ad50
 
     float blinkTimer;                          // +0x2c blink timer
-    UnknownRunwayRacer* trackedRacer;          // +0x30
-    UnknownRunwayTerrain* groundTerrain;       // +0x34
+    RunwayKrustyBikeView* trackedRacer;          // +0x30
+    RunwayTerrainView* groundTerrain;       // +0x34
     ArcadeObject* lightModels[5];              // +0x38
 };
 
@@ -42,11 +42,11 @@ NationalRace::NationalRace(int flags) : BaseQuarryEvent(flags) {
 }
 
 // 0x004aa850
-NationalRace* NationalRace::Create(RenderTarget* target, UnknownProgressCallback progress) {
+NationalRace* NationalRace::Create(RenderTarget* target, LoadProgressFn progress) {
     if (!BaseQuarryEvent::Create(target, progress))
         return 0;
     if (runwayLights)
-        runwayLights->SetRacer((UnknownRunwayRacer*)raceView->localRacer);
+        runwayLights->SetRacer((RunwayKrustyBikeView*)raceView->localRacer);
     return this;
 }
 
@@ -57,7 +57,7 @@ int NationalRace::Create3DObjects(int value) {
     if (!BaseQuarryEvent::Create3DObjects(value))
         return 0;
     runwayLights = (new (__FILE__, 53) RunwayLights(g_TrackGame->mode.visualCuesOn))
-                     ->SetupLights(renderContext, (int)lightManager, value, (UnknownRunwayTerrain*)eventTerrain);
+                     ->SetupLights(renderContext, (int)lightManager, value, (RunwayTerrainView*)eventTerrain);
     if (!AppendChild(runwayLights, -1)) {
         sprintf(message, "Runway Lights not loaded.\n");
         return 0;

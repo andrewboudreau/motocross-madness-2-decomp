@@ -13,16 +13,16 @@ class RenderTarget;
 class Scene;
 class StatsOverlay;
 class TextQueueOverlay;
-class UnknownTerrain;
+class OverlayTerrainView;
 class FileStream;
 class VisualCue;
 class Fog;
-struct UnknownKrustyBikeView;
-struct UnknownQuarryCamera;
+struct EventBikeRaceView;
+struct QuarryEventKrustyBikeCameraView;
 
 // Progress callback the events' initialisers take (EventManager passes the
 // cdecl 0x0045cb20).
-typedef void (*UnknownProgressCallback)(int* step);
+typedef void (*LoadProgressFn)(int* step);
 
 // RTTI: BaseQuarryEvent : GameObject (vtable 0x0055766c; 0xa4 bytes, the
 // size EventManager 0x0045cb70 allocates). QuarryStuntEvent.cpp
@@ -62,14 +62,14 @@ public:
 
     // 0x004de3b0: GameObject's slot 8, then loads the event; on failure it
     // releases itself (slot 2) and returns 0, else returns this.
-    BaseQuarryEvent* Create(RenderTarget* target, UnknownProgressCallback progress);
+    BaseQuarryEvent* Create(RenderTarget* target, LoadProgressFn progress);
     // 0x004de590 (about 7.9 KB, Create's only callee that can fail): picks
     // texture detail from the video memory, then creates the audio, camera,
     // scene, quadtree, fog and sky, terrain, shadows, ecosystem, race and
     // collision links (MemTagStack tags "Audio" .. "Collision"), calling
     // `progress` between stages; a near miss in
     // samples/game/QuarryStuntEventLoaderNearMiss.cpp.
-    int LoadEventObjects(UnknownProgressCallback progress);
+    int LoadEventObjects(LoadProgressFn progress);
     // 0x004e04a0, 0x004e04e0, 0x004e04f0, 0x004e0560: memory estimates
     // (bytes) 0x004de590 sums and compares against the free video memory:
     // the terrain by its width, the cube, the model textures by the
@@ -85,10 +85,10 @@ public:
 
     Scene* eventScene;
     void* skyCube;                         // SkyCube
-    UnknownKrustyBikeView* raceView;
+    EventBikeRaceView* raceView;
     VisualCue* visualCue;
-    UnknownQuarryCamera* raceCamera;
-    UnknownTerrain* eventTerrain;               // Terrain (src/krusty2/broadphase/Terrain.h)
+    QuarryEventKrustyBikeCameraView* raceCamera;
+    OverlayTerrainView* eventTerrain;               // Terrain (src/krusty2/broadphase/Terrain.h)
     FileStream* terrainStream;        // +0x44 opened on the env's terrain file and handed to the terrain loader; the destructor deletes it
     EcoSystem* ecoSystem;
     void* field_0x4c;

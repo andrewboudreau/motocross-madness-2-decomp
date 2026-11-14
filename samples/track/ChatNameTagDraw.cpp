@@ -55,7 +55,7 @@ void ChatOverlay::DrawNameTag(void* dc, int index)
             sprintf(text, "%.3f", racers[index]->driveForceScale);
         } else {
             if (g_TrackGame->mode.showRiderPositions) {
-                UnknownChatRacer* racer = racers[index];
+                ChatKrustyBikeView* racer = racers[index];
                 if (racer->position > 0)
                     sprintf(text, "%d", racer->position);
                 else

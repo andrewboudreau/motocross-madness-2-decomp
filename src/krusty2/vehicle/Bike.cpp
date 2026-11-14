@@ -1403,7 +1403,7 @@ void Bike::CreateWrecker()
         BikeAttachBone(this, "LwrLegR", 0.0f, 0.0f, 0.0f);
         BikeAttachBone(this, "FootR", 0.0f, -0.5f, 0.75f);
         BikeAttachBone(this, "FootR", 0.0f, -1.0f, 0.0f);
-        wrecker->particles = (UnknownWreckerParticles*)particleManager;
+        wrecker->particles = (WreckerParticleManagerView*)particleManager;
     }
 }
 

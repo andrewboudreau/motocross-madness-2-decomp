@@ -265,7 +265,7 @@ void TCPAddressDlg::HandleEvent(DialogEvent* event) {
         control->wordWrap = 1;
         control->SetTextFromResource(g_TrackGame->resourceInstance, 0x899);
         control = FindControl("EditBox", 0);
-        guiUser->RequestFocus((UnknownGuiControl*)control, 0, 0);
+        guiUser->RequestFocus((GuiControlView*)control, 0, 0);
         break;
     }
     }
@@ -311,7 +311,7 @@ void SessionDlg::HandleEvent(DialogEvent* event) {
         control->SetCapacity(11);
         control->SetEditText(g_TrackGame->mode.playerName);
         control->SetAcceptedCharacters(kSessionNameCharacters);
-        guiUser->RequestFocus((UnknownGuiControl*)control, 0, 0);
+        guiUser->RequestFocus((GuiControlView*)control, 0, 0);
         break;
     }
     }

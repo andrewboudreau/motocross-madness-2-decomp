@@ -2,15 +2,15 @@
 // BikeRace::Create (Group6_BikeRaceCreate.cpp) calls.  Each view method is a retail
 // function already reconstructed under its canonical class (addresses from the
 // *.bindings.json files), so it forwards with the same `this`:
-//   UnknownBikeRaceMesh::SetUseLighting    0x004444c0 = D3DIMSoultreeObject::SetUseLighting
-//   UnknownBikeRaceMesh::SetAxesPtr        0x004fbd70 = SoultreeObject::SetAxesPtr
-//   UnknownBikeRaceMesh::SetPositionVec3   0x004fc630 = D3DIMSoultreeObject::SetPositionVec3
-//   UnknownBikeRaceModel::GetPosition      0x004fc970 = SoultreeObject::GetPosition
-//   UnknownBikeRaceProjector::QueryGround  0x00507c10 = Terrain::QueryGround
-//   UnknownBikeRaceRacer::SetNetRecorder 0x00496e20 = KrustyBike::SetNetRecorder
+//   StartD3DIMSoultreeObjectView::SetUseLighting    0x004444c0 = D3DIMSoultreeObject::SetUseLighting
+//   StartD3DIMSoultreeObjectView::SetAxesPtr        0x004fbd70 = SoultreeObject::SetAxesPtr
+//   StartD3DIMSoultreeObjectView::SetPositionVec3   0x004fc630 = D3DIMSoultreeObject::SetPositionVec3
+//   RacerD3DIMSoultreeObjectView::GetPosition      0x004fc970 = SoultreeObject::GetPosition
+//   BikeRaceTerrainView::QueryGround  0x00507c10 = Terrain::QueryGround
+//   BikeRaceKrustyBikeView::SetNetRecorder 0x00496e20 = KrustyBike::SetNetRecorder
 //     (the racer pointer is KrustyBike's primary pointer; docs/BIKE_RACE_STATE_CONNECTIONS.md)
-//   UnknownBikeRaceModel::ReplaceMaterialTexture 0x00444c70 = D3DIMSoultreeObject::ReplaceMaterialTexture
-//   UnknownBikeRaceRacer::Load             0x0048fc80 = KrustyBike::Load (ret 0x7c both)
+//   RacerD3DIMSoultreeObjectView::ReplaceMaterialTexture 0x00444c70 = D3DIMSoultreeObject::ReplaceMaterialTexture
+//   BikeRaceKrustyBikeView::Load             0x0048fc80 = KrustyBike::Load (ret 0x7c both)
 // No project header is included: the declarations below repeat only the members
 // needed, with the same class keys, so every mangled name equals the canonical one.
 // None of these classes gets a constructor here, so no vtable is emitted.
@@ -34,7 +34,7 @@ class LightManager;
 struct TextureContext;
 class ControlInterface;
 class BikeRace;
-struct UnknownBikeRaceBikeSetup;
+struct BikeEngineSetup;
 class Scene;
 
 class SoultreeObject {
@@ -68,45 +68,45 @@ public:
 
 // ---- the views (same keys and signatures as BikeRace.h / Group6_BikeRaceCreate.cpp)
 
-struct UnknownBikeRaceMesh {
+struct StartD3DIMSoultreeObjectView {
     void SetUseLighting(int value);
     void SetPositionVec3(Vector3 position);
     void SetAxesPtr(const Vector3* look, const Vector3* up, int orthogonalize, int keepZ);
 };
 
-class UnknownBikeRaceModel {
+class RacerD3DIMSoultreeObjectView {
 public:
     void GetPosition(Vector3* position);
     int ReplaceMaterialTexture(int index, const char* name, int textures);
 };
 
-class UnknownBikeRaceProjector {
+class BikeRaceTerrainView {
 public:
     void QueryGround(Vector3* point, Vector3* normal, int flatShaded, unsigned char* surface);
 };
 
-class UnknownBikeRaceRacer {
+class BikeRaceKrustyBikeView {
 public:
     void SetNetRecorder(KrustyVCR* vcr);
     GameObject* Load(void* owner, const char* engineName, const char* bikeFile, const char* riderFile,
                      LightManager* lights, TextureContext* textures, Vector3 position,
-                     Vector3 direction, Vector3 up, UnknownBikeRaceProjector* terrain,
+                     Vector3 direction, Vector3 up, BikeRaceTerrainView* terrain,
                      ControlInterface* control, char ai, int remote, BikeRace* race,
-                     const char* name, int b, int id, UnknownBikeRaceBikeSetup* setup, int gasGyroOption, int brakeGyroOption,
+                     const char* name, int b, int id, BikeEngineSetup* setup, int gasGyroOption, int brakeGyroOption,
                      int particles, Scene* scene, KrustyVCR* vcr, float skill, int withRider);
 };
 
-void UnknownBikeRaceMesh::SetUseLighting(int value)
+void StartD3DIMSoultreeObjectView::SetUseLighting(int value)
 {
     reinterpret_cast<D3DIMSoultreeObject*>(this)->SetUseLighting(value);
 }
 
-void UnknownBikeRaceMesh::SetPositionVec3(Vector3 position)
+void StartD3DIMSoultreeObjectView::SetPositionVec3(Vector3 position)
 {
     reinterpret_cast<D3DIMSoultreeObject*>(this)->SetPositionVec3(position);
 }
 
-void UnknownBikeRaceMesh::SetAxesPtr(const Vector3* look, const Vector3* up, int orthogonalize,
+void StartD3DIMSoultreeObjectView::SetAxesPtr(const Vector3* look, const Vector3* up, int orthogonalize,
                                      int keepZ)
 {
     reinterpret_cast<SoultreeObject*>(this)->SetAxesPtr(reinterpret_cast<const Vec3*>(look),
@@ -114,12 +114,12 @@ void UnknownBikeRaceMesh::SetAxesPtr(const Vector3* look, const Vector3* up, int
                                                         orthogonalize, keepZ);
 }
 
-void UnknownBikeRaceModel::GetPosition(Vector3* position)
+void RacerD3DIMSoultreeObjectView::GetPosition(Vector3* position)
 {
     reinterpret_cast<SoultreeObject*>(this)->GetPosition(reinterpret_cast<Vec3*>(position));
 }
 
-void UnknownBikeRaceProjector::QueryGround(Vector3* point, Vector3* normal, int flatShaded,
+void BikeRaceTerrainView::QueryGround(Vector3* point, Vector3* normal, int flatShaded,
                                            unsigned char* surface)
 {
     reinterpret_cast<Terrain*>(this)->QueryGround(reinterpret_cast<TerrainVec3*>(point),
@@ -129,12 +129,12 @@ void UnknownBikeRaceProjector::QueryGround(Vector3* point, Vector3* normal, int 
 
 // best guess: the KrustyVCR passed here is the recorder KrustyBike keeps as
 // netRecorder (KbRecorder is KrustyBike.h's view of the same object).
-void UnknownBikeRaceRacer::SetNetRecorder(KrustyVCR* vcr)
+void BikeRaceKrustyBikeView::SetNetRecorder(KrustyVCR* vcr)
 {
     reinterpret_cast<KrustyBike*>(this)->SetNetRecorder(reinterpret_cast<KbRecorder*>(vcr));
 }
 
-int UnknownBikeRaceModel::ReplaceMaterialTexture(int index, const char* name, int textures)
+int RacerD3DIMSoultreeObjectView::ReplaceMaterialTexture(int index, const char* name, int textures)
 {
     return reinterpret_cast<D3DIMSoultreeObject*>(this)->ReplaceMaterialTexture(index, name, textures);
 }
@@ -151,14 +151,14 @@ static inline Vec3 Vector3AsVec3(const Vector3& v)
 // best guess: the two views pass the same 25 stack words to 0x0048fc80; each view
 // argument goes to the canonical parameter in the same position.  The skill float is
 // the word KrustyBike::Load keeps as `aiSkill` (+0x15d8), so its bits are passed unchanged.
-GameObject* UnknownBikeRaceRacer::Load(void* owner, const char* engineName, const char* bikeFile,
+GameObject* BikeRaceKrustyBikeView::Load(void* owner, const char* engineName, const char* bikeFile,
                                        const char* riderFile, LightManager* lights,
                                        TextureContext* textures, Vector3 position,
                                        Vector3 direction, Vector3 up,
-                                       UnknownBikeRaceProjector* terrain,
+                                       BikeRaceTerrainView* terrain,
                                        ControlInterface* control, char ai, int remote,
                                        BikeRace* race, const char* name, int b, int id,
-                                       UnknownBikeRaceBikeSetup* setup, int gasGyroOption, int brakeGyroOption,
+                                       BikeEngineSetup* setup, int gasGyroOption, int brakeGyroOption,
                                        int particles, Scene* scene, KrustyVCR* vcr, float skill,
                                        int withRider)
 {
