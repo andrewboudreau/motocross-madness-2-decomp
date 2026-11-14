@@ -28,8 +28,8 @@ extent (1,253,440 bytes); everything after it is library or compiler tail.
 
 | Category | Bytes | % `.text` | % game code | Count | Evidence |
 |---|---:|---:|---:|---:|---|
-| `exact_src`: strict VC6 match, source under `src/` | 846,817 | 61.88 | 67.56 | 4,016 | 1: rerun verdicts, relocations resolved |
-| `exact_samples`: strict match, source only under `samples/` | 3,363 | 0.25 | 0.27 | 63 | 1 (not canonical source) |
+| `exact_src`: strict VC6 match, source under `src/` | 847,372 | 61.92 | 67.60 | 4,017 | 1: rerun verdicts, relocations resolved |
+| `exact_samples`: strict match, source only under `samples/` | 3,949 | 0.29 | 0.32 | 64 | 1 (not canonical source) |
 | `library_crt_atlas`: LIBCMT bodies | 77,929 | 5.69 | - | 443 | 1 masked match, [VC6_CRT_ATLAS](VC6_CRT_ATLAS.md) |
 | `library_span_tier1`: LIBCMT sections, atlas row or named by a decoded relocation | 4,696 | 0.34 | - | 86 | 1 whole-section masked match, [span attribution](VC6_CRT_ATLAS.md#span-attribution) |
 | `library_span_tier2`: LIBCMT sections matched in a gap | 860 | 0.06 | - | 35 | 2 |
@@ -38,7 +38,7 @@ extent (1,253,440 bytes); everything after it is library or compiler tail.
 | `library_data`: DINPUT.LIB tables | 4,912 | 0.36 | - | 3 | 1 byte match against VC6 `DINPUT.LIB` |
 | `compiler_eh_text_x`: `$ehhandler` stubs + unwind funclets | 23,542 | 1.72 | - | 394 | 1 decoded `mov eax, FuncInfo; jmp ___CxxFrameHandler` |
 | `inline_asm_excluded` | 42,650 | 3.12 | 3.40 | 33 | 1 instruction (`fistp`/`rdtsc`/`fs:[4]`); 3 for the 4 docs-only rows |
-| `near_miss`: registered partials / near misses | 329,198 | 24.06 | 26.26 | 176 | 1 verdict; extent 2 where padding-delimited |
+| `near_miss`: registered partials / near misses | 328,057 | 23.97 | 26.17 | 174 | 1 verdict; extent 2 where padding-delimited |
 | `library_span_unlabeled`: LIBCMT span bytes nothing explains | 1 | 0.00 | - | - | - |
 | `library_unknown`: x87 span loops after LIBCMT, before the EH tail | 2,682 | 0.20 | - | - | 3 provider |
 | `padding`: int3/nop alignment | 31,668 | 2.31 | 2.51 | - | 2 decoder rule; 254 B span attribution |
@@ -50,12 +50,12 @@ byte). For libraries they count objects, thunks and stubs; for the
 rows. For `unattributed` they count the padding-delimited ranges. The library
 rows and `padding` were recounted on 2026-11-11 after the span attribution was
 added. The game rows (`exact_src`, `exact_samples`, `near_miss`,
-`unattributed`) were rerun on 2026-11-13 (main `ae01415a`, after the
-register sweep, wave 22 and the HullVsHull match); `inline_asm_excluded` is unchanged.
+`unattributed`) were rerun on 2026-11-13 (main `dc8253e8`, after wave 24,
+Fable round 6 and the CollectRacers and ApplyBodyContactImpulse matches); `inline_asm_excluded` is unchanged.
 
-Headline: **67.8% of game-code bytes (850,180) are strict exact**, 0.3% of it
-(3,363 bytes: inline COMDAT helpers, layout probes, the three
-`DrawCurrentLod` atexit stubs and PoseRotation) only from `samples/`. 26.3% is registered but
+Headline: **67.9% of game-code bytes (851,321) are strict exact**, 0.3% of it
+(3,949 bytes: inline COMDAT helpers, layout probes, the three
+`DrawCurrentLod` atexit stubs, PoseRotation and ChatOverlay::CollectRacers) only from `samples/`. 26.2% is registered but
 not exact, 3.4% needs inline assembly and no game byte is left without a
 registration. The last five ranges (129 bytes) were:
 
@@ -485,7 +485,7 @@ sample ([GAME_BUILD.md](GAME_BUILD.md#rider-pose-selection-rounding)).
 
 ## What is needed next
 
-1. **Code that exists but does not match**: 329,198 near-miss bytes in 176
+1. **Code that exists but does not match**: 328,057 near-miss bytes in 174
    registered functions (summary table; largest BikeAI `0x0040eca0`, 17.6 KB,
    and BikeRace `0x00419970`, 13 KB). See [NEAR_MISS_INDEX](NEAR_MISS_INDEX.md).
    The linked bodies of these functions are what the game runs; the accuracy
