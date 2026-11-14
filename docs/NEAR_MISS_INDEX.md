@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 2, b 110, c 76, total 188. The three class (a) functions of the
+Counts: a 2, b 110, c 73, total 185. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -140,6 +140,11 @@ are the newer leaves and load first; the copies fold away. MultiPlayerDlg::AddCh
 the name lookup is its own early return ahead of the system/player split, which gives
 VC6 retail's flow graph before jump threading. PoseRotation `0x004a7fd0` (class c, 1097/1121) is exact
 in its sample through the function-local definition count (docs/VC6_OPERAND_ORDER.md 2.4).
+FileStream::Write `0x004618e0` and CheckHeader `0x00460db0` are exact in
+src/reconstructed/FileStream.cpp: the file handle is read into a `FILE* file` local and
+passed to the calls, which shifts VC6's scratch-register rotation to retail's.
+ToolTip::ShowControlToolTip `0x00486b10` is exact in src/reconstructed/GUIManager.cpp
+through a POINT copy then `position.y += 16` in the pointer branch.
 Compiler flags (s21, `MCM2_EXTRA_FLAGS` of `tools/rank_near_misses.py`): EcoSystem `0x00456890` and `0x00457ed0`,
 Griddraw `0x0047e600`, CacheTexture `0x005102d0`, ResourceManager `0x004e9030`,
 TextService `0x0050ba00` and the FollowCamera constructor `0x00462ee0` are unchanged
@@ -192,10 +197,8 @@ BuildFaceGeometry `0x0043dc60` from 121/1064 to 1100/1104.
 | gameui/MediaControl | `0x004a2560` | 53/656 | b | 29 code diffs: retail adds `push ebp`; slots differ |
 | inputdevice/PCJoystickDevice | `0x004c3100` | 102/1449 (masked) | b | 90 code diffs: retail lacks `push ebp`; retail lacks `xor ebp, ebp`; slots differ. Linked 0.915. Retail's arm-local spike temporaries (ebx/ebp, a separate `mov eax, [edi]` on the unfiltered path) leave no register for VC6's zero; FilterAxisSpike taking `const unsigned long&` gives aligned 314 of 416 (from 356) |
 | inputdevice/PCJoystickDevice | `0x004c3790` | 345/417 (masked) | b | 7 code diffs: `mov eax, [esi + 0x260] ; mov ecx, [A] ;~` vs `mov ecx, [esi + 0x260] ; mov edx, [A] ;~`; `mov ecx, [ecx + 0x14]` vs `mov ecx, [edx + 0x14]`; slots differ |
-| io/FileStream | `0x00460db0` | 27/186 | c | 10 code diffs: retail keeps the first fseek-failure block inline (samples/io/FileStream.cpp; the extent is 186 bytes, docs/FILESTREAM.md) |
 | io/FileStream | `0x00461340` | 286/702 | c | +0x0c read once into `position` and cleared when not below `offset` (201 with the ternary); left: origin/offset in ebp/ebx swapped, the zero and next pointer in other registers, the SEEK_CUR test repeated where retail threads it |
 | io/FileStream | `0x00461640` | 467/670 | c | a separate `out` pointer gives retail's homed buffer copy and a `?:` empty-buffer encoded return keeps the buffered one's own `return count`; left: file pointer in edx (retail eax/ebx), the second 45c7b0 call, which retail cross-jumps, and the two `(done + read) / size` returns merged |
-| io/FileStream | `0x004618e0` | 136/152 | c | 7 code diffs: retail loads buffer/size/count into registers before the pushes |
 | io/FileStream | `0x00461b90` | 257/282 | c | 3 code diffs: retail stores the 0xfa seed inside the inlined strcat and sets up the name pointer right after strlen |
 | krusty2/broadphase/Quadtree | `0x004dcac0` | 620/627 | a | x and z spill slots swapped (0x2c/0x30) |
 | krusty2/broadphase/Quadtree | `0x004dcf20` | 182/331 | b | i and cell cached in edi/edx where retail reads their slots; z in esi; slot order differs |
@@ -335,7 +338,6 @@ BuildFaceGeometry `0x0043dc60` from 121/1064 to 1100/1104.
 | ui/DlgProcs | `0x004507a0` | 589/1668 | c | 32 code diffs: retail computes `lea eax,[TrackGame+0x570]` in each loop test and reloads eventManager through it at the body top; VC6 here reuses the loaded pointer; a reference-returning accessor, `++i`, a reversed test, `(&em)[0]` and `field_0x50 + i` all compile the same; so do (2026-11-11, in the Group2 bring-up) inline `EventManager*&`/by-value manager, entry and count helpers in the test, the body or both, and a `while` loop |
 | ui/DlgProcs | `0x004513a0` | 595/2004 | c | first loop: retail reloads EventManager for the +0x04 sprintf arg, VC6 here reuses it; `continue`, `EventManager* const&` alias, entry reference/pointer, TrackGame local, `(int)` cast and `(field_0x50 + i)->` all give 595 |
 | ui/GUIManager | `0x00486170` | 280/896 | b | 52 code diffs: retail lacks `xor ebx, ebx`; `cmp ecx, ebx` vs `xor ebx, ebx`; frame 0xa4 vs 0xb0, slot order differs |
-| ui/GUIManager | `0x00486b10` | 89/106 | c | two per-component ternaries give retail's `pop edi` placement; retail loads bottom into eax after storing x and passes the text in eax and &position in edx (VC6 here hoists the bottom load into edx beside the cdq and swaps the call registers) |
 | ui/GUIManager | `0x00488120` | 46/52 | c | retail tests the owner for zero before comparing it with `this`; VC6 threads the ternary's xor arm into a leading zero test, so the sample compares with `this` first (samples/ui/GUIManagerNearMisses.cpp) |
 | ui/GameUi | `0x0046a920` | 684/2323 (masked) | b | 17 code diffs: `mov eax, 0x64` vs `mov ecx, 0x64 ; mov eax, 1 ; mov [esp +~`; `mov eax, 1` vs `mov [esp + N], eax`; frame 0x9bf4 vs 0x9c74, slot order differs |
 | ui/GameUi | `0x004734c0` | 256/354 | c | 8 code diffs: `je @82 ; jmp @81` vs `je @83 ; mov edi, 1 ; jmp @84` |
