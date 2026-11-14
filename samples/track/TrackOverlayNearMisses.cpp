@@ -38,7 +38,7 @@
 // gives a 1002-byte body with 98 differing instructions.
 
 // ChatOverlay::DrawNameTag is included from ChatNameTagDraw.cpp below.
-// Its complete 974-byte candidate has 966 matching retail positions;
+// Its complete 974-byte candidate matches all 974 retail positions;
 // behavior and platform-boundary evidence are in docs/CHAT_NAME_TAG_DRAW.md.
 
 // RadarOverlay::DrawTrackOutline (0x0051c720, 1016 bytes; candidate

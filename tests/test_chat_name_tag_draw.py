@@ -191,7 +191,7 @@ class ChatNameTagTests(unittest.TestCase):
             _,canonical = compile_source(CANONICAL,'canonical')
             _,aggregate = compile_source(AGGREGATE,'aggregate')
             result=compare(image,candidate,SYMBOL,0x51e3f0,974,SOURCE.with_suffix('.bindings.json'))
-            self.assertEqual((result['candidate_size'],result['strict_match']['matching_positions'],result['strict_exact']),(974,966,False))
+            self.assertEqual((result['candidate_size'],result['strict_match']['matching_positions'],result['strict_exact']),(974,974,True))
             pin=json.loads((ROOT/'tests/fixtures/chat_name_tag_objects.json').read_text())
             for name,obj in [('canonical',canonical),('aggregate',aggregate)]:
                 view=object_view(obj,portable=True);record=pin[name]

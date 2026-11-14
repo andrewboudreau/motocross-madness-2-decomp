@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 2, b 107, c 71, total 180. The three class (a) functions of the
+Counts: a 2, b 106, c 71, total 179. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -190,6 +190,14 @@ CubeDraw.cpp: a per-face running cell index (`int index = 0` per face, `index++`
 the column) and direct `s_cellVertices[face][index][k]` stores give retail's row-exit
 pointer; every cell-pointer form folded the row away. The same counters take
 BuildFaceGeometry `0x0043dc60` from 121/1064 to 1100/1104.
+ChatOverlay::DrawNameTag `0x0051e3f0` (class b, 966/974) is exact too, in
+samples/track/ChatNameTagDraw.cpp: the growing arm of the width test ends with its own
+`SelectObject(dc, font); return;` and the clamp store follows the `if`. VC6 tail-merges
+the duplicated epilogue, so that branch's bytes do not change, but the arm is no longer
+the last block in source order before the next branch, and the scratch-register rotation
+(eax, ecx, edx in turn per temporary) enters that branch one register later. The
+positions block also reads `racers[index]->position` without a block-local pointer. When
+every register after an if/else is one rotation step off, change which arm comes last.
 
 | TU | VA | score | class | what differs |
 |---|---|---|---|---|
@@ -349,7 +357,6 @@ BuildFaceGeometry `0x0043dc60` from 121/1064 to 1100/1104.
 | track/TrackOverlay | `0x0051bed0` | 1057/1088 (masked) | b | 3 code diffs: retail lacks `add edx, 0x5e0 ; push edx ; push ecx`; retail adds `add edx, 0x5e0`; slots differ |
 | track/TrackOverlay | `0x0051c4f0` | 334/520 (masked) | b | 13 code diffs: `mov ecx, [esp + N]` vs `mov eax, [esp + N]`; retail adds `fld [esp + N] ; faddp st(2)`; slots differ |
 | track/TrackOverlay | `0x0051c720` | 249/962 (masked) | b | 10 code diffs: `mov [ebp + N], ecx ; fstp [ebx + 0x1dc]~` vs `mov [ebx + 0x1bc], ecx`; retail adds `fstp [esi] ; fild [esp + N]`; frame 0x74 vs 0x8c, slot order differs |
-| track/TrackOverlay | `0x0051e3f0` | 886/894 (masked) | b | 6 code diffs: `mov edx, [ebx + ebp*4 + 0x16c]` vs `mov eax, [ebx + ebp*4 + 0x16c]`; `lea eax, [esp + N] ; fld [edx + 0x4a4]` vs `lea ecx, [esp + N] ; fld [eax + 0x4a4]`; slots differ ; the "%.3f" branch register choice (racer eax, buffer ecx, game edx); shadowing-size, racer-local and branch forms reach 853-886 |
 | ui/DlgProcs | `0x0044b200` | 925/5232 | b | references match retail since ButModem returns from its loop (three array destructor calls); left: frame 0xc64 vs 0x6c4 (the two ConnectionInfoType[5] arrays get separate slots) and retail's `edi = 1` in the MenuMulti block |
 | ui/DlgProcs | `0x0044fae0` | 1181/1235 | b | 8 code diffs: retail lacks `mov edi, esp`; retail adds `mov edi, esp`; slots differ |
 | ui/DlgProcs | `0x004507a0` | 589/1668 | c | 32 code diffs: retail computes `lea eax,[TrackGame+0x570]` in each loop test and reloads eventManager through it at the body top; VC6 here reuses the loaded pointer; a reference-returning accessor, `++i`, a reversed test, `(&em)[0]` and `field_0x50 + i` all compile the same; so do (2026-11-11, in the Group2 bring-up) inline `EventManager*&`/by-value manager, entry and count helpers in the test, the body or both, and a `while` loop |

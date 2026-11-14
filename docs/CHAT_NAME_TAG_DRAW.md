@@ -3,9 +3,9 @@
 `ChatOverlay::DrawNameTag(void*, int)` is complete readable C++ in
 `samples/track/ChatNameTagDraw.cpp`. It draws the cue/racer text and updates the
 corresponding `NameOverlay` width and source rectangle. The unchanged source
-emits **974 bytes**, with **966 matching positions against all 974 retail
-bytes**. It remains a nonexact sample; matching declarations and behavioral
-evidence do not establish original translation-unit ownership.
+emits **974 bytes**, all **974 matching retail** with relocations resolved.
+It remains a sample; matching bytes, declarations and behavioral evidence do
+not establish original translation-unit ownership.
 
 ## Complete extent and receiver
 
@@ -166,7 +166,8 @@ prepared state do not demonstrate integrated HUD rendering, startup or racing.
 
 ## Functional build review
 
-This standalone is a complete individually reviewed nonexact candidate. Its
+This standalone is a complete individually reviewed candidate, byte-exact since the
+width test's growing arm returns on its own (see the sample header). Its
 existing game dependencies are the canonical flag and `g_TrackGame`; the other
 imports are the actual CRT and OS functions listed above. The candidate is explicitly admitted by `config/game_build.json`. The isolated
 real build `build-ixxvm39u` compiles 258/258 translation units and removes only

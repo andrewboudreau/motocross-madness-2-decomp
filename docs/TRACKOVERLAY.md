@@ -107,15 +107,15 @@ zero-extension.
 These are in `samples/track/TrackOverlayNearMisses.cpp`, with notes:
 
 The complete `DrawNameTag` body is now included from
-`samples/track/ChatNameTagDraw.cpp`. It remains nonexact (974 bytes, 966
-matching positions); see [shared flag, actual CRT and finite native evidence](CHAT_NAME_TAG_DRAW.md).
+`samples/track/ChatNameTagDraw.cpp`. It is exact (974 of 974 bytes,
+registered in `samples/track/targets.json`); see [shared flag, actual CRT and finite native evidence](CHAT_NAME_TAG_DRAW.md).
 The canonical flag at `0x68a444` retains its storage offset and now has external
 linkage so the standalone uses the same mutable DWORD as `RenderPre3D`.
 
-- `0x0051e3f0` (draws one name tag, 974 bytes, 966 match): the frame matches;
-  a racer local in the position branch gives retail's eax there; in the
-  `%.3f` branch retail picks eax/ecx/edx for the racer, the buffer and the
-  game pointer, VC6 here edx/eax/ecx.
+- `0x0051e3f0` (draws one name tag, 974 bytes): exact. The growing arm of
+  the width test returns through its own `SelectObject(dc, font)` and the
+  positions block reads `racers[index]->position` directly; both move the
+  scratch-register rotation, not the instruction shapes.
 - `0x0051bed0` (the map update, 1160 bytes; 1129 match): places every
   racer's name tag through the view's ChatOverlay (+0x19c) and draws the
   map dots, then calls `0x0051c720` (modes 2, 3) or `0x0051cb20` (modes

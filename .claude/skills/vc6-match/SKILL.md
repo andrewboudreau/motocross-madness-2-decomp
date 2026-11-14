@@ -70,6 +70,10 @@ near misses; `tools/near_miss_drops.py` lists ones whose gap is a single drop.
   one call and persists usually means retail had (or lacked) a named value there. A local declared before an argument
   list shifts the whole list; a pointer local held across a call goes to esi; a read-only local is propagated away, a
   reassigned one survives (FileStream Write/CheckHeader, ShowControlToolTip, LeaveRaceForMenu, HandleReceivedMessage).
+  The rotation state after an if/else is that of the arm written last. If everything after a branch is one step off and
+  the arms themselves match, give the earlier arm its own copy of the function's tail and a `return`, with the other
+  arm's statements after the `if`: VC6 tail-merges the copy (same bytes) but the arm order in the IL changes
+  (ChatOverlay::DrawNameTag `0x0051e3f0`, 966 -> exact). A value loaded only to be tested takes no turn.
 - A `c ? &a : &b` call argument is evaluated whole, ahead of the pushes. Retail testing first, pushing the shared
   arguments and choosing with `lea/jne/lea` in place means the call was written once per if/else arm; VC6 merges the
   shared pushes on both sides (Vehicle::ApplyBodyContactImpulse `0x005265d0`, 405 -> exact; arm order matters).

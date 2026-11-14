@@ -7,5 +7,14 @@
     "expect": "exact",
     "bindings": "TrackOverlayNearMisses.bindings.json",
     "status": "Strict exact (586/586): both NameOverlay::Create calls read the render context in place instead of through the inline Target() accessor."
+  },
+  {
+    "source": "ChatNameTagDraw.cpp",
+    "candidate_symbol_contains": "?DrawNameTag@ChatOverlay@@QAEXPAXH@Z",
+    "target_va": "0x0051e3f0",
+    "target_size": 974,
+    "expect": "exact",
+    "bindings": "ChatNameTagDraw.bindings.json",
+    "status": "Exact (974/974 strict). Kept as a sample: translation-unit ownership is provisional and the canonical TrackOverlay.cpp object is pinned."
   }
 ]
