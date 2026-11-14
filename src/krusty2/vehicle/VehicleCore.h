@@ -153,7 +153,7 @@ public:
                             int* torqueTable, int rpmLow, int rpmHigh, int rpmStep, float gearArg,
                             VehicleAxis* steer, VehicleAxis* lean, VehicleAxis* throttle,
                             SoultreeSlot1f0* trackObject, int createCollision);
-    int Method_00478FE0();      // 0x00478fe0, shared `xor eax,eax; ret` stub (direct call from CheckCrash)
+    int DetectCrash();      // 0x00478fe0, shared `xor eax,eax; ret` stub (direct call from CheckCrash)
     int AddEarlyTicker(VehicleTicker* ticker);                  // 0x00525cb0, append to earlyTickers
     int AddLateTicker(VehicleTicker* ticker);                   // 0x00525cf0, append to lateTickers
     int AddWheel(VehicleWheel* wheel, int contactThreshold, int primaryAux, int secondaryAux, VehicleWheelAux* aux); // 0x00525d30, appends a wheel and registers its contact point
@@ -162,9 +162,9 @@ public:
     int   UpdateWheelRampLevels();       // 0x00529280, ramps each wheel's rampLevel by its slot 83 answer
     void  PlaceWheels();                 // 0x00528eb0, retracts the shocks and probes each wheel against the ground
     void  UpdateWheelsInContact();       // 0x00529a20, updates in-contact wheels, resets the aux ramp of the others
-    void  Method_00527A20(float* speed, Vec3* worldTorque, Vec3* force);   // 0x00527a20
-    void  Method_005293E0(float* speed);                         // 0x005293e0
-    void  Method_00529450(Vec3* force, Vec3* localTorque);           // 0x00529450
+    void  ApplyWheelDriveAndFriction(float* speed, Vec3* worldTorque, Vec3* force);   // 0x00527a20
+    void  ApplyShockDamping(float* speed);                         // 0x005293e0
+    void  ApplyShockForces(Vec3* force, Vec3* localTorque);           // 0x00529450
     void  AccumulateWheelContacts(Vec3* force, Vec3* localTorque, float torqueScale);  // 0x00529c20, folds in-contact wheel vectors into the accumulators
     // 0x00525c60: calls virtual slot 0 of every object in the two owned arrays (+0x554/+0x55c, +0x560/+0x568).
     void RunTickers();
@@ -216,7 +216,7 @@ public:
     Vec3 tiltAxisLocal;  // +0x4c0 slot 49: WorldToLocalDirection of the lift axis, used as the RotateAboutPoint axis
     Vec3 sideAxis;  // +0x4cc slots 34/35: cross product of the two basis vectors field_0x88 and field_0x94
     float suspensionWeightScale;              // +0x4D8  LoadVehicle's float argument after the weight (Bike passes 0.9); slot 0 multiplies baseWeight by it (provisional)
-    float suspensionMass;                     // +0x4DC  slot 0: = (suspensionWeightScale * baseWeight + arg) / 32.2 (weight to slugs); Method_005293E0 passes it to Shock::ApplyDamping as the mass factor of the critical damping (tier 2)
+    float suspensionMass;                     // +0x4DC  slot 0: = (suspensionWeightScale * baseWeight + arg) / 32.2 (weight to slugs); ApplyShockDamping passes it to Shock::ApplyDamping as the mass factor of the critical damping (tier 2)
     float targetLeanAngle;  // +0x4e0 Bike clamps it to +-maxLeanAngle and subtracts it from the current lean (slot 57)
     float leanError;        // +0x4e4 Bike slot 92 (0x0040ba30): _finite()/fabs on it (float, tier 2)
     float field_0x4e8;

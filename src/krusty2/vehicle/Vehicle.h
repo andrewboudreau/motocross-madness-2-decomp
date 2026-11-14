@@ -241,13 +241,13 @@ struct VehicleShock {
     char pad_0x00[0x44];
     SoultreeObject* node;            // +0x44 the shock's scene node (Suspension.h: found below the root by name)
     char pad_0x48[0x10];
-    Vec3 spring;                     // +0x58 spring force (Suspension.h name); Method_00529450 projects it on the ground normal
+    Vec3 spring;                     // +0x58 spring force (Suspension.h name); ApplyShockForces projects it on the ground normal
     char pad_0x64[0x10];
     Vec3 displacement;               // +0x74 Suspension.h name; scaled by impulseScale and projected on the Y axis
     char pad_0x80[0x14];
-    float impulseScale;              // +0x94 one-shot scale of the displacement impulse: Bike slot 65 sets it on a fast pitch-input rise; Method_00529450 adds the Y part of displacement * it (times leanCos) and zeroes it
+    float impulseScale;              // +0x94 one-shot scale of the displacement impulse: Bike slot 65 sets it on a fast pitch-input rise; ApplyShockForces adds the Y part of displacement * it (times leanCos) and zeroes it
     void ClearForces();                                         // 0x004f9c70
-    // 0x004f9d30 (ret 0x10): Suspension.h's Shock::ApplyDamping; Method_005293E0 passes the
+    // 0x004f9d30 (ret 0x10): Suspension.h's Shock::ApplyDamping; ApplyShockDamping passes the
     // wheel's load weight, Vehicle+0x4dc suspensionMass, the last step time and its speed output.
     void ApplyDamping(float loadWeight, float massFactor, float dt, float* speed);
 };
@@ -284,7 +284,7 @@ struct VehicleWheelAux {             // object at VehicleWheel+0x2a8 (provisiona
     int field_0x90;
 };
 // The wheel's collision point (VehicleWheel+0xb8, the CollisionPoint base of Tire): only its
-// virtual slot 1 (friction update) is called here, by Method_00527A20.  Provisional view.
+// virtual slot 1 (friction update) is called here, by ApplyWheelDriveAndFriction.  Provisional view.
 struct VehicleContactPoint {
     virtual void UnknownVirtualSlot0();
     virtual void UnknownVirtualSlot1();
@@ -309,13 +309,13 @@ struct VehicleWheel {
     Vec3 appliedShare;              // +0xfc per-wheel share of the applied vector
     Vec3 frictionDirection;  // +0x108 CollisionPoint+0x50 frictionDirection (base at +0xb8)
     Vec3 field_0x114;
-    Vec3 normalLoadVector;                    // +0x120  CollisionPoint+0x68 (base at +0xb8); Method_00527A20: = groundNormal * normalLoad, zero when appliedShare points away from the ground
-    float normalLoad;                         // +0x12C  CollisionPoint+0x74 (named frictionCoefficient in the base); = -(appliedShare . groundNormal) when negative, else 0 (Method_00527A20, before the contact point's slot 1)
+    Vec3 normalLoadVector;                    // +0x120  CollisionPoint+0x68 (base at +0xb8); ApplyWheelDriveAndFriction: = groundNormal * normalLoad, zero when appliedShare points away from the ground
+    float normalLoad;                         // +0x12C  CollisionPoint+0x74 (named frictionCoefficient in the base); = -(appliedShare . groundNormal) when negative, else 0 (ApplyWheelDriveAndFriction, before the contact point's slot 1)
     Vec3 frictionForce;  // +0x130 CollisionPoint+0x78 frictionForce (base at +0xb8)
-    float frictionMagnitude;                  // +0x13C  CollisionPoint+0x84 frictionMagnitude (base at +0xb8); Method_00527A20 limits the friction impulse by it
+    float frictionMagnitude;                  // +0x13C  CollisionPoint+0x84 frictionMagnitude (base at +0xb8); ApplyWheelDriveAndFriction limits the friction impulse by it
     char pad_0x140[4];
     float contactLoad;  // +0x144 slot 72 accumulates it over wheels and averages by the contact count
-    float tangentSpeed;  // +0x148 CollisionPoint+0x90 tangentSpeed (base at +0xb8); Method_00527A20 adds it to spinSpeed for the available load
+    float tangentSpeed;  // +0x148 CollisionPoint+0x90 tangentSpeed (base at +0xb8); ApplyWheelDriveAndFriction adds it to spinSpeed for the available load
     float spinSpeed;  // +0x14C CollisionPoint+0x94 spinSpeed (base at +0xb8)
     float penetration;  // +0x150 CollisionPoint+0x98 penetration (base at +0xb8); reset to -999
     char pad_0x154[4];
@@ -346,7 +346,7 @@ struct VehicleWheel {
     Vec3 field_0x254;
     int inContact;  // +0x260 selects wheels touching the ground (slots 7, 54, 72, 75-86); count equals Vehicle::wheelsInContact
     int reportContactOutputs;  // +0x264 (Tire.h name) PlaceWheels sets it on the first in-contact wheel without field_0x1c0 (else on wheel 0)
-    int shockEngaged;                         // +0x268  Tire 0x00513c70 sets it after a shock solve; Method_005293E0 damps and Method_00529450 applies the spring only while set
+    int shockEngaged;                         // +0x268  Tire 0x00513c70 sets it after a shock solve; ApplyShockDamping damps and ApplyShockForces applies the spring only while set
     int shockExtending;                       // +0x26C  Tire 0x00513c70 copies the shock's extending flag here (Tire.h); ResetWheelContacts clears it
     char pad_0x270[8];
     int rollAngle;  // +0x278 Tire.h rollAngle (float there; only cleared here)
@@ -359,10 +359,10 @@ struct VehicleWheel {
     float restLoadWeight;                     // +0x294  Tire ctor argument a14; Bike's loader stores the static weight split (rear = share / wheelBase, front = 1 - rear); loadWeight is reset to it
     char pad_0x298[0x4];
     float rampLevel;               // +0x29c 0 selects a flag passed to slot 77 (slot 83)
-    float driveStrength;           // +0x2a0 Tire.h ctor arg a10, read by 0x00514170; Method_00527A20 counts the in-contact wheels where it is nonzero
+    float driveStrength;           // +0x2a0 Tire.h ctor arg a10, read by 0x00514170; ApplyWheelDriveAndFriction counts the in-contact wheels where it is nonzero
     float field_0x2a4;
     VehicleWheelAux* aux;          // +0x2a8 Tire.h engine (TireAux)
-    int secondaryAux;  // +0x2ac same use as primaryAux, the fallback when it is null (UpdateWheelsInContact, Method_005293E0)
+    int secondaryAux;  // +0x2ac same use as primaryAux, the fallback when it is null (UpdateWheelsInContact, ApplyShockDamping)
     int primaryAux;  // +0x2b0 AddWheel stores an attachment here; UpdateWheelsInContact treats it as an object whose +0x8c is reset from +0x90
     char pad_0x2B4[0x4];
     float driveShare;  // +0x2B8 UpdateDriveShare (0x00513f90) stores the drive share here (fst [esi+0x2b8]; 1.0 on the other path)
@@ -373,7 +373,7 @@ struct VehicleWheel {
     void UpdateShock(float bias, int flag, int crashState, float speed, Vec3* velocity, Vec3* anchor);   // 0x00513c70 (Tire.h UpdateShock, tier 3 name; sets shockEngaged/shockExtending)
     void UpdateDriveShare(Vehicle* owner);       // 0x00513f90, Tire.h: drive share +0x2b8 from the vehicle speed
     void UpdateAttachment();                    // 0x00515660, called per wheel by Bike slot 41 (0x0040cbd0)
-    // 0x00514170 (ret 0x1c): per-wheel drive/brake step called by Method_00527A20 with the
+    // 0x00514170 (ret 0x1c): per-wheel drive/brake step called by ApplyWheelDriveAndFriction with the
     // reciprocal of the driven-wheel count, the body's step time, direction flag and mass.
     void ApplyDrive(float share, float stepTime, int movingForward, float bodyMass,
                          float* speed, Vec3* torque, Vec3* force);

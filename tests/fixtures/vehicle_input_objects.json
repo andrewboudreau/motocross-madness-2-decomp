@@ -733,7 +733,7 @@
     },
     {
       "source": "src/krusty2/vehicle/Vehicle.cpp",
-      "symbol": "Method_005293E0",
+      "symbol": "ApplyShockDamping",
       "va": "0x5293e0",
       "extent": 104,
       "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
@@ -1006,7 +1006,7 @@
     },
     {
       "source": "src/krusty2/vehicle/Vehicle.cpp",
-      "symbol": "Method_00529450@Vehicle",
+      "symbol": "ApplyShockForces@Vehicle",
       "va": "0x529450",
       "extent": 1415,
       "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
@@ -1759,7 +1759,7 @@
     },
     {
       "source": "src/krusty2/vehicle/Vehicle.cpp",
-      "symbol": "?Method_00527A20@Vehicle@@QAEXPAMPAUVec3@@1@Z",
+      "symbol": "?ApplyWheelDriveAndFriction@Vehicle@@QAEXPAMPAUVec3@@1@Z",
       "va": "0x527a20",
       "extent": 870,
       "candidate": 870,

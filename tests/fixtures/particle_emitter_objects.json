@@ -747,7 +747,7 @@
     },
     {
       "source": "src/krusty2/vehicle/Vehicle.cpp",
-      "symbol": "Method_005293E0",
+      "symbol": "ApplyShockDamping",
       "target_va": "0x005293e0",
       "target_size": 104,
       "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
@@ -950,7 +950,7 @@
     },
     {
       "source": "src/krusty2/vehicle/Vehicle.cpp",
-      "symbol": "Method_00529450@Vehicle",
+      "symbol": "ApplyShockForces@Vehicle",
       "target_va": "0x00529450",
       "target_size": 1415,
       "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"

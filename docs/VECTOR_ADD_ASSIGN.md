@@ -24,7 +24,7 @@ There is no wrapper or linker alias.
 | Caller | Complete retail body | Calls to 0x00428060 |
 | --- | --- | --- |
 | `LeafPairQuery` | 0x004275f0 / 736 bytes, strict | 0x0042786a |
-| `Vehicle::Method_00529450` | 0x00529450 / 1,415 bytes, strict | 0x0052993b, 0x005299ae |
+| `Vehicle::ApplyShockForces` | 0x00529450 / 1,415 bytes, strict | 0x0052993b, 0x005299ae |
 
 Retail copies ECX to EAX, reads one source pointer from `[esp+4]`, updates
 x/y/z at offsets 0/4/8 and returns with `ret 4`. EAX remains the receiver.

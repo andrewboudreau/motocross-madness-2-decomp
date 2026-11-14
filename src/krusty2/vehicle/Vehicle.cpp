@@ -1113,10 +1113,10 @@ void Vehicle::SimulateFrame(float frame)
         Vec3 localTorque = kVec3Zero;
         AccumulateContactForces(&force, &localTorque, torqueScale);
         if (anyWheelInContact) {
-            Method_00527A20(&speed, &worldTorque, &force);
+            ApplyWheelDriveAndFriction(&speed, &worldTorque, &force);
             if (crashState == 0 || !pointsTouching) {
-                Method_005293E0(&speed);
-                Method_00529450(&force, &localTorque);
+                ApplyShockDamping(&speed);
+                ApplyShockForces(&force, &localTorque);
             }
             AccumulateWheelContacts(&force, &localTorque, torqueScale);
         }
@@ -1709,7 +1709,7 @@ void Vehicle::RotateByAngularVelocity()
 // the result goes to crashState, see Bike slot 99).
 int Vehicle::CheckCrash()
 {
-    int crashed = Method_00478FE0();
+    int crashed = DetectCrash();
     crashState = crashed;
     if (crashed) {
         Vec3 heading(bodyForward.x, 0.0f, bodyForward.z);
@@ -1776,7 +1776,7 @@ int Vehicle::AddWheel(VehicleWheel* wheel, int contactThreshold, int primaryAux,
 
 // 0x005293e0: for every flagged wheel, its shock (primary, else secondary) applies the
 // wheel load weight to the speed (0x004f9d30).
-void Vehicle::Method_005293E0(float* speed)
+void Vehicle::ApplyShockDamping(float* speed)
 {
     for (int i = 0; i < wheelCount; i++) {
         VehicleWheel* wheel = wheelList[i];
@@ -1796,7 +1796,7 @@ int __cdecl VehVec3Equal(const Vec3* a, const Vec3* b)
     return 0;
 }
 
-// Out-of-line call views for Method_00529450 (see math/Math3D.h): the retail function has
+// Out-of-line call views for ApplyShockForces (see math/Math3D.h): the retail function has
 // used up its inline budget by its second helper site, so the Vec3 constructor
 // (0x00404e60), operator+= (0x00428060), DotProduct (0x0040ae30), operator*(Vec3, float)
 // (0x005015b0) and the equality 0x005299e0 are called at the sites marked below.
@@ -1818,7 +1818,7 @@ static inline Vec3 VehScaleCtorCall(const Vec3& v, float s)
 {
     return VehVec3Call(s * v.x, s * v.y, s * v.z);
 }
-// The equality 0x005299e0 as retail expands it at the first site of Method_00529450.
+// The equality 0x005299e0 as retail expands it at the first site of ApplyShockForces.
 static inline int VehVec3EqualInline(const Vec3* a, const Vec3* b)
 {
     if (a->x == b->x && a->y == b->y && a->z == b->z)
@@ -1848,7 +1848,7 @@ static inline Vec3 VehProjectFirst(const Vec3& v, const Vec3& onto)
 // (impulseScale * displacement, projected on the Y axis and scaled the same way) is added to
 // *force and consumed.  Then scratchVector is added to the wheel's applied share and to
 // *force, and its moment about relativePosition (in body space, x only) to *localTorque.
-void Vehicle::Method_00529450(Vec3* force, Vec3* localTorque)
+void Vehicle::ApplyShockForces(Vec3* force, Vec3* localTorque)
 {
     for (int i = 0; i < wheelCount; i++) {
         VehicleWheel* wheel = wheelList[i];
@@ -2342,7 +2342,7 @@ static inline void VehCopyBits(Vec3& d, const Vec3& s)
     ((long*)&d)[1] = ((const long*)&s)[1];
     ((long*)&d)[2] = ((const long*)&s)[2];
 }
-void Vehicle::Method_00527A20(float* speed, Vec3* worldTorque, Vec3* force)
+void Vehicle::ApplyWheelDriveAndFriction(float* speed, Vec3* worldTorque, Vec3* force)
 {
     int i;
     float driven = 0.0f;

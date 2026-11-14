@@ -125,7 +125,7 @@ class VectorAddAssignTests(unittest.TestCase):
                                  for s in provider.sections if not s.name.startswith('.debug')))
             for source,symbol,va,size,callee,sites in (
                 (QUERY,'?LeafPairQuery@@',0x4275f0,736,VIEW,[0x42786a]),
-                (VEHICLE,'?Method_00529450@Vehicle@@',0x529450,1415,CANONICAL,[0x52993b,0x5299ae])):
+                (VEHICLE,'?ApplyShockForces@Vehicle@@',0x529450,1415,CANONICAL,[0x52993b,0x5299ae])):
                 obj=objects[source];entry=obj.find_symbol(symbol);body,extent,relocs=obj.symbol_extent(entry)
                 self.assertEqual((entry.function_size,entry.extent_source),(size,'coff_function_aux'))
                 self.assertTrue(compare(retail,obj,symbol,va,size,(ROOT/source).with_suffix('.bindings.json'))['strict_exact'])

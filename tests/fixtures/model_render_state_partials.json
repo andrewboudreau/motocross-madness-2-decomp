@@ -102,7 +102,7 @@
     ],
     [
       "src/krusty2/vehicle/Vehicle.cpp",
-      "?Method_00527A20@Vehicle@@QAEXPAMPAUVec3@@1@Z",
+      "?ApplyWheelDriveAndFriction@Vehicle@@QAEXPAMPAUVec3@@1@Z",
       5405216,
       870,
       870,

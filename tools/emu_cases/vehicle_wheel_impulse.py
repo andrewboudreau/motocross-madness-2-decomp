@@ -1,4 +1,4 @@
-"""Vehicle::Method_00527A20 0x00527a20, wheel drive and contact impulses (tools/emu_diff.py case).
+"""Vehicle::ApplyWheelDriveAndFriction 0x00527a20, wheel drive and contact impulses (tools/emu_diff.py case).
 
 Offsets from the retail body (tier 1): Vehicle +0x53c wheel list, +0x544 count, +0x444 crash
 state, +0x440 direction flag, +0x13c step time, +0x158 body mass. Wheel +0x260 in contact,
@@ -10,7 +10,7 @@ state, +0x440 direction flag, +0x13c step time, +0x158 body mass. Wheel +0x260 i
 nonpositive time scale, loads on both sides of zero and *speed above and below the budget.
 """
 RETAIL_VA = 0x00527a20
-SYMBOL = '?Method_00527A20@Vehicle@@QAEXPAMPAUVec3@@1@Z'
+SYMBOL = '?ApplyWheelDriveAndFriction@Vehicle@@QAEXPAMPAUVec3@@1@Z'
 SOURCE = 'src/krusty2/vehicle/Vehicle.cpp'
 PROBES = {0x00527ac9: 'drive', 0x00527b46: 'load >= 0', 0x00527ba1: 'load < 0',
           0x00527c73: 'scaled impulse', 0x00527cb7: 'unscaled impulse'}

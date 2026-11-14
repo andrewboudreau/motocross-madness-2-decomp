@@ -596,7 +596,7 @@
     "target_va": "0x005264c0",
     "target_size": 264,
     "expect": "exact",
-    "notes": "Wave 2. VehLengthAcc helper + Fn_500220 solver call.",
+    "notes": "Wave 2. VehLengthAcc helper + ResolveContactImpulse solver call.",
     "bindings": "Vehicle.bindings.json"
   },
   {
@@ -666,7 +666,7 @@
     "target_va": "0x00527430",
     "target_size": 365,
     "expect": "exact",
-    "notes": "Wave 2. Re-pose from position/axes: slots 1,36,58 (twice),50,45 (twice) plus Method_00528EB0 twice; wheel node positions and body node refreshed.",
+    "notes": "Wave 2. Re-pose from position/axes: slots 1,36,58 (twice),50,45 (twice) plus PlaceWheels twice; wheel node positions and body node refreshed.",
     "bindings": "Vehicle.bindings.json"
   },
   {
@@ -992,7 +992,7 @@
   {
     "class": "Vehicle",
     "source": "Vehicle.cpp",
-    "candidate_symbol_contains": "Method_005293E0",
+    "candidate_symbol_contains": "ApplyShockDamping",
     "target_va": "0x005293e0",
     "target_size": 104,
     "expect": "exact",
@@ -1622,7 +1622,7 @@
   {
     "class": "Vehicle",
     "source": "Vehicle.cpp",
-    "candidate_symbol_contains": "?Method_00527A20@Vehicle@@QAEXPAMPAUVec3@@1@Z",
+    "candidate_symbol_contains": "?ApplyWheelDriveAndFriction@Vehicle@@QAEXPAMPAUVec3@@1@Z",
     "target_va": "0x00527a20",
     "target_size": 870,
     "expect": "partial",
@@ -1652,7 +1652,7 @@
   {
     "class": "Vehicle",
     "source": "Vehicle.cpp",
-    "candidate_symbol_contains": "Method_00529450@Vehicle",
+    "candidate_symbol_contains": "ApplyShockForces@Vehicle",
     "target_va": "0x00529450",
     "target_size": 1415,
     "expect": "exact",

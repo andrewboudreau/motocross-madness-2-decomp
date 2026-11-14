@@ -2,7 +2,7 @@
 // Vehicle shared-stub entries.
 //
 // Evidence: decoded retail bodies.
-//   0x00478fe0  xor eax,eax; ret          -> Vehicle::Method_00478FE0
+//   0x00478fe0  xor eax,eax; ret          -> Vehicle::DetectCrash
 //   0x00464e80  ret 4                     -> Vehicle slot 65 (shared empty stub)
 //   0x00464e90  ret                       -> Vehicle slot 91 (shared empty stub)
 //
@@ -13,7 +13,7 @@
 #include "vehicle/Vehicle.h"
 
 // 0x00478fe0: the shared `return 0` stub CheckCrash calls directly.
-int Vehicle::Method_00478FE0()
+int Vehicle::DetectCrash()
 {
     return 0;
 }

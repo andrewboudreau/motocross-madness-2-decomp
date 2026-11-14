@@ -361,7 +361,7 @@ x87 operand order facts measured on these targets (they add to the list below):
   copy, then pops it: only `v.x *= (s = expr); v.y *= s; v.z *= s;` reproduces that
   (a named `s` first, `v *= s`, `Vec3::operator*=` or a scaling helper give 389/395).
 - VC6 always forms the destination address of a `Vec3` struct assignment or `memcpy`
-  in a register (`lea`/`add`); retail `Method_00527A20` `0x00527a20` stores through
+  in a register (`lea`/`add`); retail `ApplyWheelDriveAndFriction` `0x00527a20` stores through
   `[wheel+disp]` directly.  Memberwise float helpers reproduce that for member copies
   but fold the `(0,0,0)` temporary into immediates; a dword-wise copy (`VehCopyBits`)
   keeps retail's stack temporary with direct moves (840/870, one store scheduled
@@ -372,7 +372,7 @@ x87 operand order facts measured on these targets (they add to the list below):
 
 Large functions of the two units (all registered in `src/krusty2/vehicle/targets.json`):
 
-- `Vehicle::Method_00529450` `0x00529450` (1415 bytes) is strict exact: the per-wheel shock
+- `Vehicle::ApplyShockForces` `0x00529450` (1415 bytes) is strict exact: the per-wheel shock
   pass projects the shock's spring force (+0x58) on the ground normal and a pending
   displacement impulse (+0x94 * +0x74) on the Y axis, scales both by `leanCos`, and folds
   them into the wheel's applied share, `*up` and (as a body-space x moment) `*zero`.  Its
@@ -407,7 +407,7 @@ Large functions of the two units (all registered in `src/krusty2/vehicle/targets
   remains is the local slot layout (retail: result 0xc, len 0x10, cross temp 0x14, offset
   0x20, torque 0x2c, base 0x38, temps 0x44, unmoved by declaration order), `frontWheel` in
   eax and the constant 2 of the state stores kept in edi.
-- `Method_00527A20` `0x00527a20`: references to the wheel or to the destination vector
+- `ApplyWheelDriveAndFriction` `0x00527a20`: references to the wheel or to the destination vector
   do not change the struct-assignment addressing; the dword-wise copy does (840/870).
 - `Bike::LoadBike` `0x004079c0` (6745 bytes, `ret 0xa0` = 40 argument dwords, 8 EH states,
   0x2cc-byte frame) is written out as a partial (strict 6428/6745, instruction ratio 0.88,

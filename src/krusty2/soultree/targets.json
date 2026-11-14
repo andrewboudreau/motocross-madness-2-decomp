@@ -186,7 +186,7 @@
     "target_va": "0x00501da0",
     "target_size": 105,
     "expect": "exact",
-    "notes": "exact under vc6_o2_ml; Fn_4b0df0 j is unsigned char",
+    "notes": "exact under vc6_o2_ml; FindObjectPlacement j is unsigned char",
     "bindings": "SoulTreePhysics.bindings.json"
   },
   {
@@ -266,7 +266,7 @@
     "target_va": "0x005024f0",
     "target_size": 1116,
     "expect": "exact",
-    "notes": "exact under vc6_o2_ml (target_size = extent_with_tables 1116; wave 3: was 8.47%). Made it match: the probe is two separate Fn_506e90 calls (VC6 cross-jumps their common tail), so there is no dir pointer local; the type-4 sink is reloaded from a->field_0x14 at every use (AttachmentSink accessor, no cached local); field_0x1ac is assigned the LocalToWorldPoint result and then passed by value; the final clear loop indexes field_0x1d4[i] directly without an attachment pointer local.",
+    "notes": "exact under vc6_o2_ml (target_size = extent_with_tables 1116; wave 3: was 8.47%). Made it match: the probe is two separate CastSegment calls (VC6 cross-jumps their common tail), so there is no dir pointer local; the type-4 sink is reloaded from a->field_0x14 at every use (AttachmentSink accessor, no cached local); field_0x1ac is assigned the LocalToWorldPoint result and then passed by value; the final clear loop indexes field_0x1d4[i] directly without an attachment pointer local.",
     "bindings": "SoulTreePhysics.bindings.json"
   },
   {
@@ -466,7 +466,7 @@
     "target_va": "0x00504520",
     "target_size": 79,
     "expect": "exact",
-    "notes": "destructor core: calls Fn_5047f0 then ~GraphicsTest",
+    "notes": "destructor core: calls RemoveNodesFromQuadtree then ~GraphicsTest",
     "bindings": "SoultreeQuadTreeRenderer.bindings.json"
   },
   {
