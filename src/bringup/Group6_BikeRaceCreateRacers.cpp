@@ -638,7 +638,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, TextureContext* te
                     aiRacers[n]->riderCharacter->modelNode->ReplaceMaterialTexture(0, riderTexture, (int)textures);
                     aiRacers[n]->plateNumber = plate;
                 } else {
-                    g_TrackGame->ui->ResolveBikeFile(UiBike(bikes[n]).bikeName, bikeTexture, 0x3f);
+                    g_TrackGame->ui->ResolveBikeFile(UiBike(bikes[n]).texture, bikeTexture, 0x3f);
                     aiRacers[n]->modelNode->ReplaceMaterialTexture(0, bikeTexture, (int)textures);
                     g_TrackGame->ui->ResolveRiderFile(UiRider(riders[n]).modelFile, riderTexture,
                                                                      0x3f);

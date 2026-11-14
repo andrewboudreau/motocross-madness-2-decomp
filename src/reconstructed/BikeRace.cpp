@@ -592,7 +592,7 @@ int BikeRace::Tick(float frameTime) {
                     isRacing = false;
                 }
                 if (youIndicator != 0 && ((BikeRaceGameObjectFlags*)youIndicator)->isEnabled) {
-                    position = localRacer->carriedFlagPosition;
+                    position = localRacer->centerOfMass;
                     position.y += 4.25f;
                     ((ArcadeObject*)youIndicator)->SetPosition(&position);
                 }

@@ -101,13 +101,27 @@ struct EventKrustyBikeView : virtual public GameObject {
 
     unsigned char sceneNode[0x0c - 0x08];  // +0x08 KrustyBike sceneNode (SoultreePhysicsBaseObject) (bytes kept)
     Vector3 position;                         // +0x00c position (KrustyBikeCamera slot 10 adds 2 to y)
-    unsigned char field_0x018[0x50 - 0x18];
+    Vector3 centerOfMass;                     // +0x018 KrustyBike centerOfMass (SoultreePhysicsBaseObject)
+    float invMass;                            // +0x024 KrustyBike invMass (SoultreePhysicsBaseObject)
+    float inverseLoadMass;                    // +0x028 KrustyBike inverseLoadMass (SoultreePhysicsBaseObject)
+    float bodyRoll;                           // +0x02c KrustyBike bodyRoll (SoultreePhysicsBaseObject)
+    float bodyPitch;                          // +0x030 KrustyBike bodyPitch (SoultreePhysicsBaseObject)
+    float bodyYaw;                            // +0x034 KrustyBike bodyYaw (SoultreePhysicsBaseObject)
+    float bodySinRoll;                        // +0x038 KrustyBike bodySinRoll (SoultreePhysicsBaseObject)
+    float bodyCosRoll;                        // +0x03c KrustyBike bodyCosRoll (SoultreePhysicsBaseObject)
+    float bodySinPitch;                       // +0x040 KrustyBike bodySinPitch (SoultreePhysicsBaseObject)
+    float bodyCosPitch;                       // +0x044 KrustyBike bodyCosPitch (SoultreePhysicsBaseObject)
+    float savedRoll;                          // +0x048 KrustyBike savedRoll (SoultreePhysicsBaseObject)
+    float savedPitch;                         // +0x04c KrustyBike savedPitch (SoultreePhysicsBaseObject)
     float heading;                            // +0x050 heading; RadarOverlay 0x0051bed0 negates it for the map
     unsigned char field_0x054[0x64 - 0x54];
     Vector3 velocity;                         // +0x064 velocity (racesnd.cpp 0x004e3730)
-    unsigned char field_0x070[0x88 - 0x70];
+    Vector3 acceleration;                     // +0x070 KrustyBike acceleration (SoultreePhysicsBaseObject)
+    Vector3 prevVelocity;                     // +0x07c KrustyBike prevVelocity (SoultreePhysicsBaseObject)
     Vector3 bodyForward;  // +0x88  SoultreePhysicsBaseObject +0x88 bodyForward; RaceStatus leads position by 3.5x it, falls back to it for trackDirection
-    unsigned char field_0x094[0xb8 - 0x94];
+    Vector3 bodyUp;                           // +0x094 KrustyBike bodyUp (SoultreePhysicsBaseObject)
+    Vector3 savedForward;                     // +0x0a0 KrustyBike savedForward (SoultreePhysicsBaseObject)
+    Vector3 savedUp;                          // +0x0ac KrustyBike savedUp (SoultreePhysicsBaseObject)
     float previousSpeed;                      // +0x0b8 racesnd.cpp scales it to an engine speed
     unsigned char field_0x0bc[0x108 - 0xbc];
     bool airborne;                            // +0x108 racesnd.cpp 0x004e39b0 (airborne sounds)
@@ -125,7 +139,8 @@ struct EventKrustyBikeView : virtual public GameObject {
     bool driveDisengaged;                     // +0x479  Vehicle +0x479 driveDisengaged; racesnd.cpp 0x004e39b0 picks the engine sound off it
     unsigned char field_0x47a[0x484 - 0x47a];
     int justLanded;                           // +0x484 racesnd.cpp 0x004e39b0
-    unsigned char field_0x488[0x4a0 - 0x488];
+    Vector3 takeoffPosition;                  // +0x488 KrustyBike takeoffPosition (Vehicle)
+    Vector3 takeoffVelocity;                  // +0x494 KrustyBike takeoffVelocity (Vehicle)
     int outOfRace;                            // +0x4a0 EventManager 0x0045eef0: counts as done when set
     unsigned char field_0x4a4[0x5c4 - 0x4a4];
     BikeCameraRiderView* riderCharacter;   // +0x5c4 as BikeCamera's bike +0x5c4 (TrackOverlay 0x005190e0)

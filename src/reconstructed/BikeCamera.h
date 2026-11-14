@@ -42,7 +42,13 @@ struct BikeCameraBikeView {
     int crashReason;                          // +0x460
     unsigned char field_0x464[0x5c4 - 0x464];
     BikeCameraRiderView* riderCharacter;   // +0x5c4
-    unsigned char field_0x5c8[0x604 - 0x5c8];
+    unsigned char loadInfo[0x5e0 - 0x5c8];    // +0x5c8 Bike loadInfo (BikeA5C8) (bytes kept)
+    char riderName[0x10];                     // +0x5e0 Bike riderName
+    unsigned char frontWheel[0x5f4 - 0x5f0];  // +0x5f0 Bike frontWheel (BikeWheel*) (bytes kept)
+    unsigned char rearWheel[0x5f8 - 0x5f4];   // +0x5f4 Bike rearWheel (BikeWheel*) (bytes kept)
+    unsigned char leftBarContact[0x5fc - 0x5f8];// +0x5f8 Bike leftBarContact (bytes kept)
+    unsigned char rightBarContact[0x600 - 0x5fc];// +0x5fc Bike rightBarContact (bytes kept)
+    int tailContact;                          // +0x600 Bike tailContact
     BikeCameraWreckerView* wrecker;          // +0x604 the racer's Wrecker
 };
 

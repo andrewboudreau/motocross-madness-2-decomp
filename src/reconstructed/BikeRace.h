@@ -136,7 +136,11 @@ struct StartD3DIMSoultreeObjectView {
 
     unsigned char field_0x000[0x274];
     int groupCount;                           // +0x274 group count
-    unsigned char field_0x278[0x28c - 0x278];
+    int lowestLod;                            // +0x278 D3DIMSoultreeObject lowestLod
+    int currentLod;                           // +0x27c D3DIMSoultreeObject currentLod
+    float* autoLodDistances;                  // +0x280 D3DIMSoultreeObject autoLodDistances
+    float inverseLodThreshold;                // +0x284 D3DIMSoultreeObject inverseLodThreshold
+    int useAutoLod;                           // +0x288 D3DIMSoultreeObject useAutoLod
     BikeRaceSoultreeLodView* levelGroups;  // +0x28C  per-level groups (+0x274 of them), as RacerD3DIMSoultreeObjectView::levelGroups / D3DIMSoulTree lodTable
 };
 
@@ -214,7 +218,8 @@ public:
     unsigned char lowestLod[0x27c - 0x278]; // +0x278: D3DIMSoultreeObject::lowestLod (bytes kept)
     int currentDetailLevel;                   // +0x27c current detail level
     float* detailDistances;                   // +0x280 automatic detail distances (slot 10's debug page)
-    unsigned char field_0x284[0x28c - 0x284];
+    float inverseLodThreshold;                // +0x284 D3DIMSoultreeObject inverseLodThreshold
+    int useAutoLod;                           // +0x288 D3DIMSoultreeObject useAutoLod
     BikeRaceSoultreeLodView* levelGroups;    // +0x28c per level
 };
 
@@ -397,17 +402,28 @@ public:
     // 0x004933e0 (KrustyBike.cpp's code): applies message 13 to a state.
     void ApplyStateDelta(RacerDeltaMessage* message, ReceivedRacerState* part);
 
-    unsigned char field_0x008[0x18 - 0x08];
-    Vector3 carriedFlagPosition;              // +0x018 the flag carried above it (slot 10)
+    unsigned char sceneNode[0x0c - 0x08];     // +0x008 KrustyBike sceneNode (SoultreePhysicsBaseObject) (bytes kept)
+    Vector3 position;                         // +0x00c KrustyBike position (SoultreePhysicsBaseObject)
+    Vector3 centerOfMass;                     // +0x018 KrustyBike centerOfMass (SoultreePhysicsBaseObject); the "you" indicator sits 4.25 above it
     unsigned char field_0x024[0x64 - 0x24];
     Vector3 velocity;                         // +0x064 velocity (cleared for a remote player's racer)
-    unsigned char field_0x070[0x88 - 0x70];
+    Vector3 acceleration;                     // +0x070 KrustyBike acceleration (SoultreePhysicsBaseObject)
+    Vector3 prevVelocity;                     // +0x07c KrustyBike prevVelocity (SoultreePhysicsBaseObject)
     Vector3 heading;                          // +0x088 heading (the setup puts the scene's 30SecMan ahead of it)
-    unsigned char field_0x094[0xbc - 0x94];
+    Vector3 bodyUp;                           // +0x094 KrustyBike bodyUp (SoultreePhysicsBaseObject)
+    Vector3 savedForward;                     // +0x0a0 KrustyBike savedForward (SoultreePhysicsBaseObject)
+    Vector3 savedUp;                          // +0x0ac KrustyBike savedUp (SoultreePhysicsBaseObject)
+    float prevSpeed;                          // +0x0b8 KrustyBike prevSpeed (SoultreePhysicsBaseObject)
     int linearSpeed;  // +0xBC  SoultreePhysicsBaseObject+0xbc linearSpeed; zeroed with velocity at a network start
-    unsigned char field_0x0c0[0x109 - 0xc0];
+    Vector3 angularAcceleration;              // +0x0c0 KrustyBike angularAcceleration (SoultreePhysicsBaseObject)
+    Vector3 worldAngularVelocity;             // +0x0cc KrustyBike worldAngularVelocity (SoultreePhysicsBaseObject)
+    Vector3 angularVelocity;                  // +0x0d8 KrustyBike angularVelocity (SoultreePhysicsBaseObject)
+    Vector3 invInertia;                       // +0x0e4 KrustyBike invInertia (SoultreePhysicsBaseObject)
+    Vector3 shapeInvInertia;                  // +0x0f0 KrustyBike shapeInvInertia (SoultreePhysicsBaseObject)
+    unsigned char field_0x0fc[0x108 - 0xfc];
+    char airborne;                            // +0x108 KrustyBike airborne (SoultreePhysicsBaseObject)
     bool restarted;                           // +0x109 set on a restart
-    unsigned char field_0x10a[0x10c - 0x10a];
+    char asleep;                              // +0x10a KrustyBike asleep (SoultreePhysicsBaseObject); +0x10b is padding
     Vector3 startPosition;                    // +0x10c start position (0x004210f0)
     Vector3 startDirection;                   // +0x118 start direction
     unsigned char particleManager[0x128 - 0x124];  // +0x124 KrustyBike particleManager (SoultreePhysicsBaseObject) (bytes kept)
@@ -420,7 +436,8 @@ public:
     int gasGyro;                              // +0x5bc TrackGameMode gasGyro copy (slot 23 key 0x22)
     int brakeGyro;                            // +0x5c0 TrackGameMode brakeGyro copy (slot 23 key 0x30)
     BikeRaceRiderView* riderCharacter;     // +0x5c4
-    unsigned char field_0x5c8[0x5f0 - 0x5c8];
+    unsigned char loadInfo[0x5e0 - 0x5c8];    // +0x5c8 KrustyBike loadInfo (Bike, BikeA5C8) (bytes kept)
+    char riderName[0x10];                     // +0x5e0 KrustyBike riderName (Bike); EventKrustyBikeView racerName
     CollisionObject* frontWheel;       // +0x5f0 paired with the other racers' (the loader)
     CollisionObject* rearWheel;        // +0x5f4
     unsigned char field_0x5f8[0x604 - 0x5f8];
@@ -565,7 +582,8 @@ struct RaceGateEvent {
 class StartObjectColliderBase {
 public:
     virtual void UnknownVirtualSlot0();
-    int field_0x04;
+    short queryStamp;                         // +0x004 QuadTreeObject queryStamp
+    short sortKey;                            // +0x006 QuadTreeObject sortKey
     int objectTypeId;                       // +0x08 QuadTreeObject objectTypeId (a char there)
 };
 
@@ -627,7 +645,8 @@ struct BikeRaceKrustyBikeCameraView {
     unsigned char targetPointCached;          // +0x391 VehicleCamera 0x0052bc50; cleared on a new target
     unsigned char targetHeadingCached;        // +0x392 VehicleCamera 0x0052bac0; cleared on a new target
     BikeRaceKrustyBikeView* vehicle;            // +0x394 VehicleCamera's followed vehicle
-    unsigned char field_0x398[0x3b0 - 0x398];
+    Vector3 cachedTargetHeading;              // +0x398 VehicleCamera cachedTargetHeading (targetHeadingCached)
+    Vector3 cachedTargetPoint;                // +0x3a4 VehicleCamera cachedTargetPoint (targetPointCached)
     BikeRaceKrustyBikeView* followedBike;       // +0x3b0 BikeCamera's bike (RaceSound.h)
     BikeRaceKrustyBikeView* followedRacer;      // +0x3b4 KrustyBikeCamera's racer (RaceSound.h)
 
@@ -807,7 +826,8 @@ struct BikeRaceManufacturerRecord {
 struct BikeRaceBikeRecord {
     int manufacturer;  // +0x0  KrustyUI bike entry +0: index into the manufacturers (+0x48)
     unsigned char displayName[0x48 - 0x04]; // +0x04: KrustyUIBikeRecord::displayName, "BikeName_%02d" (bytes kept)
-    char bikeName[0x44];                      // +0x48 bike name (the loader's AI racers)
+    char texture[0x40];                       // +0x48 KrustyUIBikeRecord texture ("BikeTexture_%02d"); CreateRacers resolves it to the AI bike's texture
+    int engineSizeSelectable;                 // +0x88 KrustyUIBikeRecord engineSizeSelectable
     int engineSize;                           // +0x8c engine size
     int fourStroke;                           // +0x90 four-stroke flag (KrustyUI "BikeFourStroke_%02d")
 };

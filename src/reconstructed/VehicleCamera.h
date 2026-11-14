@@ -18,9 +18,13 @@ struct VehicleCameraVehicleView {
     float savedPitch;                         // +0x4c VehicleCamera slot 35 pitch angle
     unsigned char field_0x050[0x64 - 0x50];
     Vector3 velocity;                         // +0x64 VehicleCamera slot 33
-    unsigned char field_0x070[0x88 - 0x70];
+    Vector3 acceleration;                     // +0x070 Vehicle acceleration (SoultreePhysicsBaseObject)
+    Vector3 prevVelocity;                     // +0x07c Vehicle prevVelocity (SoultreePhysicsBaseObject)
     Vector3 bodyForward;                      // +0x88 VehicleCamera slot 41 heading fallback
-    unsigned char field_0x094[0xbc - 0x94];
+    Vector3 bodyUp;                           // +0x094 Vehicle bodyUp (SoultreePhysicsBaseObject)
+    Vector3 savedForward;                     // +0x0a0 Vehicle savedForward (SoultreePhysicsBaseObject)
+    Vector3 savedUp;                          // +0x0ac Vehicle savedUp (SoultreePhysicsBaseObject)
+    float prevSpeed;                          // +0x0b8 Vehicle prevSpeed (SoultreePhysicsBaseObject)
     float linearSpeed;                        // +0xbc |velocity|; VehicleCamera slot 41 (at least 0.01)
     unsigned char field_0x0c0[0x3bc - 0xc0];
     SoultreeObject* modelNode;            // +0x3bc VehicleCamera slot 50

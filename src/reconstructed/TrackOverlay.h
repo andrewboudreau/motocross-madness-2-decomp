@@ -25,7 +25,12 @@ struct TrackOverlayRect : public OverlayRect {
 struct InstrumentKrustyBikeView {
     unsigned char field_0x000[0xbc];
     float gaugeValue;                         // the gauge value before scaling
-    unsigned char field_0x0c0[0x108 - 0xc0];
+    Vector3 angularAcceleration;              // +0x0c0 KrustyBike angularAcceleration (SoultreePhysicsBaseObject)
+    Vector3 worldAngularVelocity;             // +0x0cc KrustyBike worldAngularVelocity (SoultreePhysicsBaseObject)
+    Vector3 angularVelocity;                  // +0x0d8 KrustyBike angularVelocity (SoultreePhysicsBaseObject)
+    Vector3 invInertia;                       // +0x0e4 KrustyBike invInertia (SoultreePhysicsBaseObject)
+    Vector3 shapeInvInertia;                  // +0x0f0 KrustyBike shapeInvInertia (SoultreePhysicsBaseObject)
+    unsigned char field_0x0fc[0x108 - 0xfc];
     bool airborne;                            // +0x108 RaceView.h's racer airborne flag; the gauge winds down while set
     unsigned char field_0x109[0x736 - 0x109];
     unsigned char isGhost;  // +0x736  the followed racer (camera +0x3b4); KrustyBike +0x736 isGhost (RaceView.h racer view)

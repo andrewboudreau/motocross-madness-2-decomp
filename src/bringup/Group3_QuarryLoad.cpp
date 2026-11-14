@@ -105,7 +105,8 @@ struct QuarryLoadKrustyBikeView {
     D3DIMSoultreeObject* modelNode;             // +0x3bc bike model
     unsigned char field_0x3c0[0x5c4 - 0x3c0];
     QuarryLoadRiderView* riderCharacter;      // +0x5c4
-    unsigned char field_0x5c8[0x5f0 - 0x5c8];
+    unsigned char loadInfo[0x5e0 - 0x5c8];    // +0x5c8 KrustyBike loadInfo (Bike, BikeA5C8) (bytes kept)
+    char riderName[0x10];                     // +0x5e0 KrustyBike riderName (Bike)
     CollisionObject* frontWheel;           // +0x5f0
     CollisionObject* rearWheel;            // +0x5f4
     unsigned char field_0x5f8[0x604 - 0x5f8];
@@ -165,7 +166,8 @@ public:
     unsigned char targetHeadingCached;  // +0x392 VehicleCamera targetHeadingCached
     unsigned char field_0x393;
     QuarryLoadKrustyBikeView* vehicle;  // +0x394 VehicleCamera vehicle
-    unsigned char field_0x398[0x3b0 - 0x398];
+    Vector3 cachedTargetHeading;              // +0x398 VehicleCamera cachedTargetHeading
+    Vector3 cachedTargetPoint;                // +0x3a4 VehicleCamera cachedTargetPoint
     QuarryLoadKrustyBikeView* bike;  // +0x3B0 BikeCamera bike
     QuarryLoadKrustyBikeView* krustyBike;  // +0x3B4 KrustyBikeCamera krustyBike
     unsigned char raceView[0x3bc - 0x3b8];  // +0x3b8 KrustyBikeCamera raceView (bytes kept)
