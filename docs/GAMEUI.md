@@ -27,7 +27,9 @@ destructor and deleting destructor (`0x00469db0`, `0x0046a070`, `0x00469ff0`)
 and `NotifyParent` (`0x0046ff70`). Seven sit
 at the addresses of the deliberately non-strict compiler-shape probes in
 `samples/calibration/CompilerShapeProbe.cpp`; those probes are kept
-unchanged as regression probes. The 17 added with the class-size
+unchanged as regression probes (they carry no bindings, so they never
+count as strict), and the seven canonical bodies are registered beside
+them as strict cases. The 17 added with the class-size
 restructure are the
 UIDDLStatic, UIDDLButton and UIDropDownList constructors (`0x00479b50`,
 `0x00479bf0`, `0x00479ea0`), UIDDLButton's deleting destructor and
