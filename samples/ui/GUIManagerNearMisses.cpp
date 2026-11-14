@@ -71,6 +71,11 @@
 //   `device ? owner : (GUIUser*)device`, `owner = (GUIUser*)device; if
 //   (device) ...`, `owner && owner == this`, `return owner == this` and the
 //   store block first.
+//   2026-11-14, threaded or worse (17-35/52), 46 unchanged: inline helpers
+//   that take the ternary's result as a parameter (an OwnedByOther test, a
+//   Claim helper holding both blocks, a three-way State helper under a
+//   switch), a `volatile` owner local, plain nested if/else, a bool result,
+//   the zero test written twice and the owner slot through a reference.
 
 #include "../../src/reconstructed/GUIManager.cpp"
 

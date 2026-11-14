@@ -24,6 +24,13 @@
 // (42 of 492); a `projection` copy right before the product is inert (487).
 // Session 18: `Matrix4 viewportScale(IdentityMatrix());` is inert (487) and a
 // named `Matrix4& screen = screenMatrix[1]` for the second product is worse (350).
+// 2026-11-14: the slot between `mov edi, esp` and `rep movsd` is the address
+// register's delay slot, and VC6 fills it with a nearby independent
+// instruction: with a single viewport store left before the product, that
+// store lands there instead of the `sub esp, 0x40`. Not moved (487 or worse):
+// dropping the viewport stores, `viewMatrix` as the second operand, one to
+// eight member stores before, between or after the two products, the product
+// declared and then assigned, and a named result.
 #include <math.h>
 
 #include "../../src/reconstructed/Camera.h"

@@ -15,6 +15,21 @@
 // Worse: cursor declared in each arm (1004), length in each arm (339, 1048 bytes), no
 // length local (351), no locals (339), the call as the condition (1002 or worse), a `length -=
 // cursor` statement (314), GetName before the code store (1005, 7 instructions).
+// 2026-11-14 (about 450 more variants; every one lands on 1018, 1004, 351 or 339):
+// retail's Backspace is `mov ecx, [length]; test eax, eax; mov eax, [cursor]; je`, then
+// in each arm `mov edx, [text]; sub ecx, eax; inc ecx; add edx, eax; push ecx; push edx`.
+// The cursor read is therefore an in-arm read that VC6 hoists between the test and the
+// branch, as the 1004 form does; that form then builds the count before it loads the
+// text (`sub; inc; push ecx; mov ecx, [text]; add eax, ecx; push eax`).
+// The Enter register follows the Backspace block: with the length read in the arms
+// (339), one arm or an empty block Enter's eventCode is in eax as in retail; the 1018
+// and 1004 forms give ecx.
+// Swept without a new outcome: length/cursor/text/source/count locals placed outside,
+// in the arms or absent in every combination and order (with the lead local or the call
+// as the condition), function-scope length/cursor declarations shared with the insert
+// branch (834-848, 1036 bytes), inline member accessors, a memmove wrapper, inline
+// RemoveBefore helpers (with and without the byte count, the decrements and a length
+// parameter), comma and ternary conditions and a negated test.
 #include <string.h>
 #include "../../src/reconstructed/GameUi.h"
 #include "../../src/reconstructed/DialogEventKind.h"

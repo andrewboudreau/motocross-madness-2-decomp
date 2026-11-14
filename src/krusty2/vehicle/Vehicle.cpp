@@ -2124,13 +2124,26 @@ GameObject* Vehicle::LoadVehicle(int context, const char* engineName, const char
 }
 
 // owner: Vehicle.cpp (__FILE__ 0x005257a0 region), PARTIAL 734/745.  VC6 fills the load
-// delay of the weightForce copy with the two stores a fixed number of statements before the
-// end of the block (as in KrustyBike's constructor 0x0048fa60), so leanCos and
-// wheelForwardAlignment are written there, after throttleAxis, and land in the copy as in
-// retail.  Left: the 0.025f constant load (`mov eax, 0x3ccccccd`) is placed one store early,
-// before leanAxis' store; it rises at most 13 original-order units above stepTime, and
-// retail behaves as if one more unit sat between leanAxis and stepTime (a visible extra
-// store there moves it to retail's place).
+// delay of the weightForce copy with two later stores (as in KrustyBike's constructor
+// 0x0048fa60), so leanCos and wheelForwardAlignment are written after throttleAxis and land
+// in the copy as in retail.  Left: the 0.025f constant load (`mov eax, 0x3ccccccd`) is placed
+// one store early, before leanAxis' store.
+// Measured 2026-11-14 (about 900 orderings):
+// - The pair is not picked by position.  leanCos then wheelForwardAlignment anywhere from
+//   after throttleAxis to before stepTime, together or apart, compiles to these same bytes
+//   (66 placements), and one extra store anywhere in the block leaves the pair alone.
+// - The constant load is not distance-limited.  It always follows the last remaining store
+//   of 1.0f from eax (driveForceScale): an extra store before or after leanAxis is passed
+//   too, and removing one to four earlier stores does not move it.  Retail keeps it below
+//   leanAxis' store, so something there still holds eax; none of the forms below does.
+// - 741/745 but a different pair of instructions: leanAxis before driveForceScale (the
+//   load is in retail's place, the two stores are swapped), and wheelForwardAlignment,
+//   throttleAxis, leanAxis, leanCos (wheelForwardAlignment stays where leanAxis should be).
+// - No better: all 120 orders of driveForceScale/leanAxis/throttleAxis/leanCos/
+//   wheelForwardAlignment, the pair at every two slots from attachmentCapacity to
+//   prevThrottleFraction in both orders, a second store of any 1.0f/0.025f/zero member at
+//   every slot (VC6 emits one of the two), and chained assignments of the three axes or the
+//   three 1.0f members.
 Vehicle::Vehicle(int flags) : GameObject(1), SoultreePhysicsCharacter(flags)
 {
     field_0x28 = 1.0f;
