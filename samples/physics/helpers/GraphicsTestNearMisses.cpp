@@ -1,17 +1,27 @@
 // Near-miss GraphicsTest.cpp candidates (src/krusty2/core/GraphicsTest.cpp), kept out of
 // src/krusty2 until they match.
 //
-// 0x0047bd10 (circle, 917 bytes, 818 strict): same calls (two inlined and two out-of-line
-// cross products, two Vec3Normalize calls), loop and vertex fill. With Math3D.h's
-// parenthesised CrossProduct the basis products match retail's operand order and schedule
-// except one load of the first inline cross product (issued one instruction early). Left:
-// the frame (0xb84 against retail's 0xb78, one more Vec3 temporary), the `[eax - 4]` store of
-// the vertex fill, one x87 load scheduled later in the point loop and the operand order of
-// `points[i] += *center` (retail loads the centre first).
+// 0x0047bd10 (circle, 917 bytes, 836 strict, 268 of 273 instructions): same frame (0xb78),
+// calls (two inlined and two out-of-line cross products, two Vec3Normalize calls), loop and
+// vertex fill. Storing the point as x, z, y (the constant y last) puts the `[eax - 4]` store
+// where retail has it, and passing `points[i]` rather than `*point` as the transform's by-value
+// argument gives retail's z centre sum. Five x87 operand orders are left:
+//   - the x component of the first inline cross product (retail loads [0x28] then multiplies
+//     by [0x20], and [0x2c] by [0x1c]; ours the other way round);
+//   - the x row of the transform: retail loads the matrix element first in all three
+//     products, ours loads the vector component first in that row only (rows y and z match);
+//   - the x centre sum: retail `fld point->x; fadd center->x`, ours loads the centre first.
 //
-// A `Vec3* point = &points[i]` local for the transform and the centre sum gives 818 (the same
-// pointer local made DrawBox 0x0047c270 exact, now in src/krusty2/core/GraphicsTest.cpp);
-// using it for the cos/sin stores as well gives 799.
+// Forms tried on the 836 base, all 836 unless noted: matrix by reference, the three other
+// parameter orders, a caller-side Vec3 copy, parenthesised or regrouped row sums, matrix-first
+// products in the source (`m->_11 * v.x`), a transform that copies `*out` itself (pointer or
+// reference), component-wise centre sum. Worse: `const Vec3* c = center; *point += *c` 834
+// (fixes the x sum, flips the y sum), `const Vec3& in` copied inside the helper 834, float
+// locals for the components 832, a `const Matrix4* m = &basis` local 828, `points[i] +=
+// *center` 828, `&points[i]` as the output argument 828, a Vec3-returning helper 528,
+// `*point = *point + *center` 500. Before: y stored second with `*point` as the argument 818;
+// the pointer local also used for the cos/sin stores 799. (The same pointer local made DrawBox
+// 0x0047c270 exact, now in src/krusty2/core/GraphicsTest.cpp.)
 #include <math.h>
 
 #include "core/GraphicsTest.h"
@@ -83,11 +93,11 @@ void GraphicsTest::DrawCircle(const Vec3* center, float radius, const Vec3* axis
     for (i = 0; i < segments; i++) {
         float angle = i * (6.2831855f / segments);
         points[i].x = cos(angle) * radius;
-        points[i].y = 0;
         points[i].z = sin(angle) * radius;
+        points[i].y = 0;
         Vec3* point = &points[i];
         if (axis) {
-            GraphicsTestTransform(point, *point, &basis);
+            GraphicsTestTransform(point, points[i], &basis);
         }
         *point += *center;
     }
