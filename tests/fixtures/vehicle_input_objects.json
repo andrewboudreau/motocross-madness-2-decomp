@@ -38,7 +38,7 @@
     "samples/physics/bikeai/BikeAINearMisses.cpp": {
       "sections": 98,
       "relocations": 819,
-      "sha256": "4078a438681bc2c6d29e9ff7cf39bf67a542a59c2f3436e4c7d7d4c531469e50"
+      "sha256": "b22ccaa24fb28ab9dac9580529de32c43b3e926c4afe8fe7d3c0c39a52a4edda"
     },
     "samples/physics/krustybike/KrustyBikeNearMisses.cpp": {
       "sections": 271,
@@ -1785,9 +1785,9 @@
       "source": "samples/physics/bikeai/BikeAINearMisses.cpp",
       "symbol": "PathSteeringDirection",
       "va": "0x40e510",
-      "extent": 1936,
+      "extent": 1935,
       "candidate": 1935,
-      "matching": 1884
+      "matching": 1935
     },
     {
       "source": "samples/physics/bikeai/BikeAINearMisses.cpp",
