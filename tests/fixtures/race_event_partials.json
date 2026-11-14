@@ -21,7 +21,7 @@
     ],
     [
       "src/reconstructed/QuarryStuntEvent.cpp",
-      "?UnknownVirtualSlot32@BaseQuarryEvent@@UAEXH@Z",
+      "?OnRaceViewAttached@BaseQuarryEvent@@UAEXH@Z",
       3,
       "38fe9af4770dbe85954444b4ba5dca24575f8edbf3bd17304f57cfd562a64417"
     ],

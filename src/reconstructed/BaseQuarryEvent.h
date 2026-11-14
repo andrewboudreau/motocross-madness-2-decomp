@@ -51,11 +51,11 @@ public:
     virtual void CreateOverlays();
     // Slot 30 (0x004e0be0): appends those overlays as children.
     virtual void AttachOverlays();
-    // provisional names (31, 33, 35), call-site role only: the bodies are shared stubs. The
-    // loader calls 35 under the "3DObjects" memtag before BikeRace, 31 under "Collision" and 33
-    // under "3DObjects" with the local racer; a zero from 31 or 35 aborts the load.
+    // provisional names (31-33, 35), call-site role only: the bodies are shared stubs. The
+    // loader calls 35 under "3DObjects" before BikeRace, 31 under "Collision", 32 with the race
+    // view just after appending it, 33 with the local racer; 0 from 31 or 35 aborts the load.
     virtual int CreateEventCollision();       // 0x00467ae0 (shared `return 1` body)
-    virtual void UnknownVirtualSlot32(int value); // 0x00464e80 (shared empty body)
+    virtual void OnRaceViewAttached(int value); // 0x00464e80 (shared empty body)
     virtual void CreateRacer3DObjects(int value); // 0x00464e80
     virtual void UnknownVirtualSlot34(int a, int b, int c); // 0x004de580 (shared empty body)
     virtual int PrepareEvent3DObjects();       // 0x00467ae0

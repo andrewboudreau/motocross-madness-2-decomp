@@ -560,7 +560,7 @@ int BaseQuarryEvent::CreateEventCollision() {
 }
 
 // 0x00464e80
-void BaseQuarryEvent::UnknownVirtualSlot32(int value) {
+void BaseQuarryEvent::OnRaceViewAttached(int value) {
 }
 
 // 0x00464e80

@@ -116,7 +116,7 @@
   "?CreateOverlays@BaseQuarryEvent@@UAEXXZ$ehhandler": "0x0054d6d2",
   "?AttachOverlays@BaseQuarryEvent@@UAEXXZ": "0x004e0be0",
   "?CreateEventCollision@BaseQuarryEvent@@UAEHXZ": "0x00467ae0",
-  "?UnknownVirtualSlot32@BaseQuarryEvent@@UAEXH@Z": "0x00464e80",
+  "?OnRaceViewAttached@BaseQuarryEvent@@UAEXH@Z": "0x00464e80",
   "?CreateRacer3DObjects@BaseQuarryEvent@@UAEXH@Z": "0x00464e80",
   "?UnknownVirtualSlot34@BaseQuarryEvent@@UAEXHHH@Z": "0x004de580",
   "?PrepareEvent3DObjects@BaseQuarryEvent@@UAEHXZ": "0x00467ae0",

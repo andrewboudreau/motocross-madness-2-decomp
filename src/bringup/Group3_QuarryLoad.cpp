@@ -707,7 +707,7 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
     if (ecoSystem)
         AppendChild((GameObject*)ecoSystem, -1);
     AppendChild(raceView, -1);
-    UnknownVirtualSlot32((int)raceView);
+    OnRaceViewAttached((int)raceView);
     AppendChild((GameObject*)particleManager, -1);
     UnknownVirtualSlot28();
     AttachOverlays();
