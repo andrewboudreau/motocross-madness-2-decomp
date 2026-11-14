@@ -2452,3 +2452,273 @@ Left as placeholders:
   add nothing to the member they alias.
 - `Scene::UnknownFunction4ea7e0` (it stores the owner and settings and adds
   the sound group) and the generic parameters listed in Wave 22.
+
+## Wave 25: the view types named after the class they view
+
+Wave 25 renames 149 `Unknown*` types, typedefs and inline methods. The views
+are partial declarations of a retail class, seen by one consumer. Each one
+is named `<Consumer><Class>View`, and the class is the one the view's
+constructor, vtable write, RTTI or member offsets identify. Several
+consumers view the same class (KrustyBike is seen from EventManager,
+BikeRace, the visual cue, the number, the runway, the bonus, the cue gate,
+the instrument and the chat overlays), so the consumer prefix keeps the
+views apart. Wave 18's declaration count still forbids merging them. A
+record or a network message takes its role name instead
+(`RacerStateMessage`, `KrustyVcrGridEntry`, `VcrTickRecord`). Tier 2 means
+the class or role is fixed by a constructor, vtable write, RTTI, the
+member offsets shared with the named class, or an SDK layout. Tier 3 means
+the role rests on how one consumer uses the object.
+
+Names only: no declaration, typedef, forward declaration or member was
+added or removed, and no static, global or type of a static or global was
+renamed. Every edited file keeps its line count. The excluded progress
+documents (NEAR_MISS_INDEX.md, REBUILD_GAPS.md, DECOMPILATION_PROGRESS.md,
+config/decompilation_progress.json) spell none of the renamed names.
+
+`git grep -ohE '\bUnknown[A-Za-z0-9_]*' -- src samples` fell from 2704 uses
+(366 names) to 1317 uses (217 names). `field_0xNN` stays at 1786 uses and
+the placeholder method names (`UnknownVirtualSlotN`, `UnknownMethodN`,
+`Method_`, `Fn_`) stay at 85.
+
+Method:
+
+- work/naming/w25/triage.txt lists every remaining name with its uses and
+  definitions. The specs work/naming/w25/specA.py, specB.py and specC.py
+  hold each row with its tier and evidence. work/naming/w25/check.py flags
+  names with no use, new names that already exist as an identifier or
+  inside a decorated name, duplicates, and variables whose type is the old
+  name (static or global hazard).
+- check.py stopped two renames. `UnknownProgressCallback` could not take
+  `LoadProgressCallback`, which is already the name of the function
+  0x0045cb20 that is passed through it, so the typedef is `LoadProgressFn`.
+  `UnknownSoultreeClipper` is the type of the extern `g_visibilityClipper`
+  in D3DIMSoulTreeNearMisses.cpp, so it keeps its name.
+- work/naming/rename.py rewrote each name as an identifier and inside
+  decorated names (`PAVOld@@`, `?Method@Old@@`, `??0Old@@`) across the
+  tracked tree, .bindings.json keys, tools/run_calibration.py, tests and docs
+  included (work/naming/w25/map.json).
+
+Result: one proof over every unit whose closure reaches a changed source
+(272 units), from dc8253e8 to the renamed tree. The map
+(work/naming/w25/proofmap.json) holds `Old@` -> `New@` for every rename.
+
+- 199 IDENTICAL, 71 NAME-ONLY, 1 IDENTICAL-COMDAT-ORDER (Group4_DlgMain.cpp)
+  and 1 NAME-ONLY+COMDAT-ORDER (DlgProcsNearMisses.cpp).
+
+There was no DIFF in the final tree, no compile failure, and no .bss or
+.data offset moved.
+
+- The first run renamed `UnknownSoultreeQuadTreeObject` as well and gave
+  DIFF in D3DIMSoulTree.cpp. The type descriptor
+  `??_R0?AVSoultreeQuadTreeObjectView@@@8` is emitted in `.data`, so the
+  name's length changes the section. The rename was reverted. A 70-unit
+  rerun over the files that spell the name gave 45 IDENTICAL, 23 NAME-ONLY,
+  1 IDENTICAL-COMDAT-ORDER and 1 NAME-ONLY+COMDAT-ORDER.
+- Negative control: GameUiNearMisses.cpp and BikeRace.cpp proved with an
+  empty map give DIFF in the relocations of `?EnterHover@UIControl@@UAEHXZ`
+  and `?PickerHitCallback@@YAXPAVCollisionObject@@0@Z`. These are the
+  renamed symbols they reference.
+
+Fixture pins: the whole-object digests of 48 NAME-ONLY units changed with
+the decorated names, in 45 fixture files and three test modules
+(test_race_sound_refill's RaceSoundNearMisses.cpp aggregate and
+test_rider_motion_start_connections' KrustyBike.cpp and
+KrustyBikeNearMisses.cpp tuples). They were repinned with
+work/naming/repin.py, repin2.py and w16_repin3.py, and by hand for the
+three test modules. Each one is checked against the proof's NAME-ONLY
+verdict for the unit, and no IDENTICAL or DIFF unit was repinned.
+115 test modules reach a changed file, a renamed name or a repinned digest
+(work/naming/w25/pick_tests.py, pinmods.py). All of them pass
+(160 tests, 1 skipped). tools/static_check.py passes. tools/audit_bindings.py reports
+0 mismatches and the same 6 `_kVec3*`/`_g_gridRow*` symbol conflicts that
+the base dc8253e8 already reports without a linked build.
+
+Left for later:
+
+- Statics, globals and the types of statics: `UnknownStatic65b478`,
+  `UnknownFontTextureManager`, `UnknownSoultreeStaticVector`,
+  `UnknownKrustyUIVector`, `UnknownVisibilityStatic`, the `UnknownOpt*Settings`
+  blocks, `UnknownBikeAIFilter` (0x00577ac0), `UnknownCubeTextureMapping`
+  (0x0057ea10), `UnknownEcoDetailBand` (0x0056a600/0x0056a740),
+  `UnknownBonusKey` (0x0056c820), `UnknownFilterKeys` (0x00689940),
+  `UnknownSceneKeyword` and its sample siblings, and `UnknownSoultreeClipper`
+  (the extern `g_visibilityClipper`).
+- `UnknownSoultreeQuadTreeObject`: its RTTI type descriptor is emitted, so a
+  rename changes `.data` (see above).
+- Shared stubs and folded helpers (`UnknownFunction4de580`,
+  `UnknownFunction464e80`, `UnknownFunction464e90`, `UnknownFolded4de580`)
+  and `Scene::UnknownFunction4ea7e0`.
+- Views whose class is not yet fixed: `UnknownTexturePalette` and
+  `UnknownCursorAnimation` (blocked merges), `UnknownSoultreeNodeView`,
+  `UnknownSoultreeMesh`, `UnknownSoultreeCameraView`, `UnknownKrustyUIModelObject`,
+  `UnknownResourceEntry`, `UnknownGridEntry`, `UnknownGridDraw`, `UnknownTimer`,
+  `UnknownCubeTextureContext`, `UnknownTrackGameModeOptions*`,
+  `UnknownSoundNotifier`, `UnknownInlineButton`, `UnknownBikeAIPath`, the
+  Wrecker, Recorder, Background, Scene emitter and Podium views, and the
+  remaining single-file helpers in work/naming/w25/triage.txt.
+- The fields and parameters listed at the end of Waves 23 and 24. Their uses
+  still do not decide a role, and this wave found no new reader for them.
+
+### Race, bike race, 3D object and overlay views
+
+| Old | New | Tier | Rewrites | Evidence |
+| --- | --- | --- | --- | --- |
+| `UnknownEventRacer` | `EventKrustyBikeView` | 2 | 166 | RaceView.h: a vfptr at +0 and GameObject through a vbptr at +4, as KrustyBike's RTTI (virtual GameObject base, pdisp 4); its methods (0x004925a0, 0x00496f90) are KrustyBike.cpp code and its members sit at KrustyBike offsets (aiKind +0x734, isRemote +0x735, isGhost +0x736). |
+| `UnknownKrustyBikeView` | `EventBikeRaceView` | 2 | 129 | TrackGameViewOwner+0x34: its methods are bikerace.cpp code (NextCameraTarget 0x0041f1d0, RestartRace 0x00420650, NextBike 0x004204e0; 0x004210f0 is bound as BikeRace::WriteRelativePositions) and its members are BikeRace's (localRacer +0x38, raceSound +0x44, raceCamera +0x50, youIndicator +0x60). |
+| `UnknownKrustyBikeViewReplay` | `EventKrustyVCRView` | 2 | 2 | BikeRace+0x1a0 is the replay being recorded or played, a KrustyVCR (BikeRace.h). |
+| `UnknownEventRacerModel` | `EventBikeWheelView` | 2 | 2 | A racer's +0x5f0 is Bike::frontWheel; its +0x200 is VehicleWheel nodePosition. |
+| `UnknownBikeRaceRacer` | `BikeRaceKrustyBikeView` | 2 | 147 | BikeRace.h: its constructor is KrustyBike's (0x0048fa60), its slots are KrustyBike's (vtable 0x00554548, object_offset 0) and it reaches GameObject through the vbptr at +4. |
+| `UnknownBikeRaceRacerInfo` | `LodBikeRaceView` | 2 | 3 | A racer's +0x740 is its BikeRace (RaceView.h bikeView); +0x18c is BikeRace's "ForceHighLOD". |
+| `UnknownBikeRaceRacerPart604` | `BikeRaceWreckerView` | 2 | 2 | A racer's +0x604 is the Wrecker (Bike SetupWrecker); +0x38 is Wrecker::collisionModel. |
+| `UnknownBikeRaceViews` | `BikeRaceRaceSoundView` | 2 | 5 | BikeRace+0x44 is the RaceSound (RaceView.h raceSound); +0x3c and +0x44 are RaceSound's engineGroup and effectsGroup. |
+| `UnknownBikeRaceCharacter` | `BikeRaceD3DIMSoultreeCharacterView` | 2 | 13 | Its slots 0-11 are D3DIMSoultreeCharacter's primary slots (LoadCharacter is slot 11) and 0x004a8b10 is the character's SetMotionByName. |
+| `UnknownBikeRaceMesh` | `StartD3DIMSoultreeObjectView` | 2 | 13 | The model at +0x1a0 of the start character and of the BikeRace+0x64/+0x6c objects; the methods called on it are D3DIMSoultreeObject's (0x004444c0, 0x004fc630, 0x004fbd70) and +0x28c is the LOD table. |
+| `UnknownBikeRaceModel` | `RacerD3DIMSoultreeObjectView` | 2 | 34 | A racer's +0x3bc model and its rider's +0x1a0: 0x00444d00, 0x00444d40 and 0x00444c70 are D3DIMSoulTree/D3DIMSoultreeModifier code, and +0x274/+0x27c/+0x280/+0x28c are the LOD count, level, distances and table. |
+| `UnknownBikeRaceMeshGroup` | `BikeRaceSoultreeLodView` | 2 | 5 | An entry of the +0x28c LOD table (8 bytes): D3DIMSoulTree's SoultreeLod, item count and surfaces. |
+| `UnknownBikeRaceMeshItem` | `BikeRaceSoultreeSurfaceView` | 3 | 3 | One of a LOD's surfaces (0x38 bytes); ReplaceMeshId walks its ids. |
+| `UnknownBikeRaceRider` | `BikeRaceRiderView` | 3 | 6 | A racer's +0x5c4 rider character, seen only for its +0x1a0 model. |
+| `UnknownBikeRaceNetPlayer` | `BikeRaceGridEntryView` | 2 | 7 | TrackGame+0x2ebc (race settings +0x14c) is the grid; +0x04 is GridEntry::points (TrackGame.h). |
+| `UnknownKrustyVcrRecord` | `KrustyVcrGridEntry` | 2 | 3 | KrustyVCR+0x25c holds the race settings' grid (+0x14c) copied with the settings: player id and points per slot. |
+| `UnknownKrustyVcrRacer` | `KrustyVcrRacerRecord` | 2 | 2 | KrustyVCR+0x300: the 0x124-byte record KrustyVCR::SetRacer (0x0049c070) writes and GetRacer (0x0049c1e0) reads. |
+| `UnknownBikeRaceEventAi` | `EventAiRacerRecord` | 2 | 5 | EventManager+0x444: one 0xcc-byte record per AI racer (textures, model path, engine, skill) that the loader reads. |
+| `UnknownBikeRaceView6c` | `StartObjectCharacterView` | 3 | 9 | BikeRace+0x64/+0x6c ("StartGate.slb", "30SecMan.slt"): vbptr GameObject at +4, model at +0x1a0 and CollisionCharacter::collisionObject at +0x210; the class is not established. |
+| `UnknownBikeRaceColliderBase` | `StartObjectColliderBase` | 3 | 2 | The object at +0x210 of the 30SecMan: a base with its own vfptr in front of the GameObject part 0x00421050 releases. |
+| `UnknownBikeRaceCollider` | `StartObjectCollider` | 3 | 2 | The same object with its GameObject base. |
+| `UnknownBikeRaceProjector` | `BikeRaceTerrainView` | 2 | 26 | BikeRace+0x4c: 0x00507c10 is Terrain::QueryGround and +0x40 is Terrain::gridCellSize. |
+| `UnknownBikeRaceObjectFlags` | `BikeRaceGameObjectFlags` | 2 | 10 | GameObject's +0x25 flags (GameObject.h keeps them protected). |
+| `UnknownBikeRaceSceneCharacter` | `BikeRaceSceneCharacterView` | 3 | 13 | A Scene+0xb4 entry with bit 3 set, reaching its GameObject flags through a vbptr at +4. |
+| `UnknownBikeRaceCameraView` | `BikeRaceKrustyBikeCameraView` | 2 | 8 | BikeRace+0x50 is the KrustyBikeCamera; the members are FollowCamera's +0x244/+0x274, VehicleCamera's +0x384..+0x394, BikeCamera's +0x3b0 and KrustyBikeCamera's +0x3b4. |
+| `UnknownBikeRaceShadow` | `BikeRaceProjectedShadowView` | 2 | 18 | BikeRace+0x5c: 0x004dab00 and 0x004dab90 are ProjectedShadow.cpp code (RTTI ProjectedShadow). |
+| `UnknownBikeRacePickModel` | `PickPhysicsObjectView` | 2 | 2 | A scene caster's +0x08 physics object: +0x128 is SoultreePhysicsBaseObject::collisionObject. |
+| `UnknownBikeRacePickCaster` | `PickSceneStaticModelView` | 2 | 3 | A Scene+0xb8 caster: SceneStaticModel's flags, physicsObject (+0x08) and collisionObject (+0x0c). |
+| `UnknownBikeRacePickCharacter` | `PickCollisionCharacterView` | 2 | 2 | +0x210 is CollisionCharacter::collisionObject. |
+| `UnknownBikeRacePickObject` | `PickProceduralObjectView` | 3 | 2 | A Scene+0xb4 procedural entry's object; +0x3c is its collision. |
+| `UnknownBikeRaceVcrTick` | `VcrTickRecord` | 2 | 4 | Replay record kind -1: the time played and the tick count. |
+| `UnknownBikeRaceVcrFollow` | `VcrFollowRecord` | 2 | 9 | Record and message kind 0x87: FollowRacer sends the followed racer's networkPlayerId, RecordFrame matches it to recorderId. |
+| `UnknownBikeRaceNetState` | `RacerStateMessage` | 2 | 7 | Network message 1 (0x58 bytes): the KbBikeMessage layout the sender builds (position, angles, velocities, time). |
+| `UnknownBikeRaceNetMessage13` | `RacerDeltaMessage` | 2 | 9 | Network message 13, which KrustyBike 0x004933e0 applies as deltas (KbNetDelta). |
+| `UnknownBikeRaceNetScore` | `RacerScoreMessage` | 2 | 5 | Network message 10: racer index and KrustyBike score (+0x768). |
+| `UnknownBikeRaceNetStamp` | `TimeStampMessage` | 2 | 5 | Network messages 0x84 (a time stamp at +4) and 0x85 (text at +4). |
+| `UnknownBikeRaceRacerPart` | `ReceivedRacerState` | 2 | 14 | One of a racer's received states (+0x11c8, newest first): a message 1 state, its flags and a fresh flag (as TagBallReceivedState). |
+| `UnknownBikeRaceBikeSetup` | `BikeEngineSetup` | 2 | 33 | The 0x5c-byte engine setup (engine size, four-stroke, KrustyUI "Weight", preset curve, "RPMLowerLimit"/"RPMUpperLimit") KrustyBike::Load takes as `setup`. |
+| `UnknownBikeRaceUiModel` | `BikeRaceManufacturerRecord` | 3 | 10 | KrustyUI+0x48 records (0xc8 bytes, "ModelFile" at +0x40); the bike records' +0 indexes them. |
+| `UnknownBikeRaceUiChoice` | `BikeRaceBikeRecord` | 3 | 6 | KrustyUI+0x50 records (0x94 bytes): manufacturer index, bike name, engine size, four-stroke flag. |
+| `UnknownFunctionFollow` | `StartFollowing` | 2 | 7 | Inline (three times in 0x0041eb20): follows `racer`, restoring the previous racer's LOD and setting the camera's followed bike and racer. |
+| `UnknownFunctionTargetCaster` | `TargetShadowCaster` | 2 | 3 | Inline: stores a scene shadow caster as the target and clears the others. |
+| `UnknownFunctionTargetCharacter` | `TargetSceneCharacter` | 2 | 4 | Inline: stores a scene character as targetCharacter and clears the others. |
+| `UnknownFunctionTargetObject` | `TargetSceneObject` | 2 | 4 | Inline: stores a scene procedural object as targetCar and clears the others. |
+| `UnknownFunctionFreeNodes` | `FreeGateList` | 2 | 4 | Inline: frees each RaceGate of gateList (DebugFree at bikerace.cpp line 0xd3) and clears it. |
+| `UnknownVisualCueRacer` | `VisualCueKrustyBikeView` | 2 | 11 | The racers BikeRace::NextBike (0x004204e0) returns: vfptr at +0, GameObject through the vbptr at +4 (KrustyBike RTTI). |
+| `UnknownNumberCamera` | `NumberCameraView` | 2 | 11 | NumberObjectManager+0x34: Camera's +0x170 position, +0x17c/+0x188 axes and +0x198 focal length. |
+| `UnknownNumberRacerState` | `NumberKrustyBikeView` | 2 | 2 | BikeRace's localRacer; +0x76c is the racer's offTrackTime. |
+| `UnknownNumberRacer` | `NumberBikeRaceView` | 2 | 10 | NumberObjectManager+0x2c: BikeRace's localRacer (+0x38), 30SecMan (+0x6c) and startCountdown (+0x15c). |
+| `UnknownRunwayTrackPos` | `RunwayTrackPos` | 2 | 11 | Track.h's TrackPos (node, segment, t), as Track::PointAt (0x00518080) takes it. |
+| `UnknownRunwayTrack` | `RunwayTrackView` | 2 | 9 | BikeRace's raceTrack (+0x48); 0x00518080 is Track::PointAt. |
+| `UnknownRunwayView` | `RunwayBikeRaceView` | 2 | 2 | A racer's +0x740 BikeRace, read only for raceTrack (+0x48). |
+| `UnknownRunwayRacerPart` | `RunwayRaceStatusNodeView` | 2 | 2 | A racer's +0x744 RaceStatusNode: placedPos (+0x38) and progressPos (+0x44). |
+| `UnknownRunwayRacer` | `RunwayKrustyBikeView` | 2 | 13 | The racer NationalRace passes (its view's +0x38): trackPoint, bikeView, statusNode, onTrack, hasFinished at the KrustyBike offsets of RaceView.h. |
+| `UnknownRunwayTerrain` | `RunwayTerrainView` | 2 | 25 | NationalRace+0x40; 0x00507c10 is Terrain::QueryGround. |
+| `UnknownVisualCueCamera` | `VisualCueKrustyBikeCameraView` | 2 | 2 | BikeRace's raceCamera (+0x50), a KrustyBikeCamera; +0x3b0 is BikeCamera's followed bike. |
+| `UnknownVisualCueView` | `VisualCueBikeRaceView` | 2 | 17 | VisualCue+0xa8: BikeRace::NextBike (0x004204e0), localRacer +0x38, raceTrack +0x48, raceCamera +0x50, racing +0x18a. |
+| `UnknownBonusRacerPart` | `BonusSoultreeObjectView` | 2 | 8 | A racer's +0x3bc model node; 0x004fc970 is SoultreeObject::GetPosition. |
+| `UnknownBonusRacerModel` | `BonusBikeWheelView` | 2 | 2 | The racer's rearWheel (Bike +0x5f4); +0x230 is BikeWheel rollDirection. |
+| `UnknownBonusRacerState` | `BonusKrustyBikeView` | 2 | 2 | BikeRace's localRacer: model node +0x3bc, crashState +0x444, rearWheel +0x5f4. |
+| `UnknownBonusRacer` | `BonusBikeRaceView` | 2 | 9 | BonusObjectManager+0x2c, read only for BikeRace's localRacer (+0x38). |
+| `UnknownBonusCamera` | `BonusCameraView` | 2 | 11 | The render target's current camera: Camera's +0x16c field of view, +0x170 position, +0x198 focal length. |
+| `UnknownBonusRenderTarget` | `BonusRenderTargetView` | 2 | 2 | g_TrackGame+0x10, the render target; +0x08 is its current camera. |
+| `UnknownKrustyRacerRef` | `CueGateKrustyBikeView` | 2 | 3 | The camera's followed racer; +0x7b8 is the racer's lapGate. |
+| `UnknownKrustyCamera` | `CueKrustyBikeCameraView` | 2 | 2 | BikeRace's raceCamera (KrustyBikeCamera); +0x3b4 is its followed racer. |
+| `UnknownKrustyCameraHolder` | `CueBikeRaceView` | 2 | 2 | The course event's +0x34 race view (BikeRace), read for raceCamera (+0x50). |
+| `UnknownKrustyGate` | `CueCourseGate` | 2 | 2 | One 24-byte gate record at the course event's +0xd8 (RaceGatePose: centre and direction). |
+| `UnknownKrustyCourse` | `CueCourseEventView` | 3 | 2 | TrackGame+0x560 (the Baja/Enduro event): raceView at +0x34, gate records at +0xd8. Its class is not established. |
+| `UnknownKrustyFollowed` | `CueTagCameraView` | 3 | 2 | The tag event's raceCamera (+0x3c): GameObject flags at +0x25 and KrustyBikeCamera's followed racer at +0x3b4. |
+| `UnknownKrustyNode` | `CueTagBallView` | 2 | 2 | TrackGameViewOwner::ball (the tag ball); its SoultreeObject subobject at +0x21c. |
+| `UnknownKrustyPlayer` | `CueTagEventView` | 3 | 2 | TrackGame+0x568 (the Tag event): raceCamera +0x3c, followedRacer +0xa8, ball +0xdc. Its class is not established. |
+| `UnknownKrustyGame` | `CueTrackGameView` | 2 | 15 | The game global 0x0056e26c (g_TrackGame): render target +0x10, events +0x560/+0x568, cameraMode +0x2d74. |
+| `UnknownInstrumentState` | `InstrumentKrustyBikeView` | 2 | 3 | InstrumentOverlay+0x184's +0x3b4 (the followed racer): airborne +0x108, isGhost +0x736, lastLapTime +0x74c, fastestLap +0x750, finishPosition +0x784 at KrustyBike offsets. |
+| `UnknownInstrumentSource` | `InstrumentKrustyBikeCameraView` | 2 | 10 | InstrumentOverlay+0x184, read only for +0x3b4, KrustyBikeCamera's followed racer. |
+| `UnknownTerrain` | `OverlayTerrainView` | 2 | 31 | 0x00506e90 casts a segment against the terrain and 0x00507960 is Terrain::SelectQuality (src/krusty2/broadphase/Terrain.h). |
+| `UnknownNameOverlayWorld` | `NameOverlayEventView` | 3 | 11 | NameOverlay+0x12c, read only for its terrain at +0x4c. |
+| `UnknownStatsSource` | `StatsBikeRaceView` | 2 | 7 | StatsOverlay+0x124: BikeRace::NextBike (0x004204e0), localRacer +0x38, replayTime +0x1b8. |
+| `UnknownRadarCamera` | `RadarKrustyBikeCameraView` | 2 | 3 | The camera RadarOverlay's loader is given (KrustyBikeCamera); +0x3b0 is the followed bike. |
+| `UnknownRadarGate` | `RadarGatePose` | 2 | 2 | The gate event's +0xd8 records: position and direction (BikeRace.h's RaceGatePose). |
+| `UnknownRadarGateEntry` | `RadarGateObjectView` | 2 | 2 | The gate event's +0x420 entries (BikeRace.h's RaceGateObject): draw flag +0x30, half width +0x50. |
+| `UnknownRadarGateOwner` | `RadarGateEventView` | 2 | 3 | TrackGame+0x560 as RadarOverlay reads it (BikeRace.h's RaceGateEvent): gate count +0xac, current/next gate, records +0xd8, entries +0x420. |
+| `UnknownChatRacerState` | `ChatSoultreeObjectView` | 3 | 2 | A racer's +0x3bc model, read for +0x14c (hides the name tag). |
+| `UnknownChatRacer` | `ChatKrustyBikeView` | 2 | 22 | The racers BikeRace::NextBike returns: Vehicle driveForceScale +0x4a4, name +0x5e0, finishPosition +0x784. |
+| `UnknownChatCamera` | `ChatKrustyBikeCameraView` | 2 | 3 | ChatOverlay+0x128: KrustyBikeCamera's followed racer at +0x3b4. |
+| `UnknownChatView` | `ChatBikeRaceView` | 2 | 15 | ChatOverlay+0x12c: BikeRace::NextBike (0x004204e0) and localRacer +0x38. |
+
+### Quarry loader, camera, GUI, ground fog and ecosystem views
+
+| Old | New | Tier | Rewrites | Evidence |
+| --- | --- | --- | --- | --- |
+| `UnknownQuarryPhysicsObject` | `QuarryLoadPhysicsObjectView` | 2 | 12 | PhysicsObject members the loader reads |
+| `UnknownQuarryTerrain` | `QuarryLoadTerrainView` | 2 | 4 | Terrain (QueryGround 0x00507c10) |
+| `UnknownQuarryCar` | `QuarryLoadCarProceduralView` | 2 | 4 | CarProcedural fields the loader sets |
+| `UnknownQuarryRacerRider` | `QuarryLoadRiderView` | 3 | 4 | rider member of the racer as the loader reads it |
+| `UnknownQuarryRacerState` | `QuarryLoadWreckerView` | 2 | 4 | Wrecker offsets on the racer |
+| `UnknownQuarryRaceView` | `QuarryLoadLodBikeRaceView` | 2 | 4 | LodBikeRace members |
+| `UnknownQuarryRacer` | `QuarryLoadKrustyBikeView` | 2 | 21 | KrustyBike members |
+| `UnknownQuarryRaceCharacter` | `QuarryLoadStartObjectView` | 3 | 6 | start-object character the loader places |
+| `UnknownQuarryRace` | `QuarryLoadBikeRaceView` | 2 | 78 | ctor 0x00417c30 = BikeRace, Create 0x00417ed0 |
+| `UnknownQuarryBikeCamera` | `QuarryLoadKrustyBikeCameraView` | 2 | 21 | ctor 0x00497cb0 = KrustyBikeCamera |
+| `UnknownQuarryFog` | `QuarryLoadFogView` | 2 | 7 | 0x0046262f writes Fog vtable 0x005526dc |
+| `UnknownQuarryFogObject` | `QuarryLoadFogOffView` | 2 | 6 | 0x00462e1d writes FogOff vtable 0x0055274c |
+| `UnknownQuarryFogLink` | `QuarryLoadFogOnView` | 2 | 7 | 0x00462e9d writes FogOn vtable 0x005527bc |
+| `UnknownQuarryRaceObject` | `QuarryLoadSoultreeQuadTreeRendererView` | 2 | 11 | 0x005044b9 writes vtable 0x00558168 |
+| `UnknownQuarryVisibility` | `QuarryLoadVisibilityQuadTreeView` | 2 | 7 | ctor 0x0052d340; VisibilityQuadTree : QuadTree, GameObject |
+| `UnknownQuarryQuadTreeHead` | `QuarryLoadQuadTreeView` | 2 | 2 | QuadTree head the loader resets |
+| `UnknownQuarryOverlayHooks` | `QuarryLoadOverlayHooks` | 3 | 18 | overlay calls the loader makes |
+| `UnknownFunction51d730` | `CollectChatRacers` | 2 | 6 | ChatOverlay::CollectRacers 0x0051d730 |
+| `UnknownProgressCallback` | `LoadProgressFn` | 2 | 8 | BaseQuarryEvent.h typedef; LoadProgressCallback 0x0045cb20 is the function passed |
+| `UnknownQuarryCamera` | `QuarryEventKrustyBikeCameraView` | 2 | 14 | KrustyBikeCamera offsets |
+| `UnknownQuarryCameraSubject` | `QuarryEventKrustyBikeView` | 2 | 2 | KrustyBike offsets |
+| `UnknownArcadeView` | `ArcadeCameraView` | 2 | 20 | arcade camera fields |
+| `UnknownRaceSoundCamera` | `RaceSoundKrustyBikeCameraView` | 2 | 13 | KrustyBikeCamera offsets |
+| `UnknownRaceStatusCamera` | `RaceStatusKrustyBikeCameraView` | 2 | 2 | KrustyBikeCamera offsets |
+| `UnknownCameraBikeState` | `BikeCameraWreckerView` | 2 | 5 | Wrecker offsets |
+| `UnknownCameraBikeRider` | `BikeCameraRiderView` | 3 | 4 | rider member |
+| `UnknownCameraBikeBody` | `BikeCameraPhysicsRigidBodyView` | 2 | 2 | PhysicsRigidBody offsets |
+| `UnknownCameraBike` | `BikeCameraBikeView` | 3 | 2 | bike the camera follows |
+| `UnknownCameraVehicle` | `VehicleCameraVehicleView` | 2 | 4 | Vehicle offsets (+0x53c wheelList) |
+| `UnknownCameraRider` | `VehicleCameraWheelView` | 2 | 3 | Vehicle+0x53c wheelList entries are VehicleWheel |
+| `UnknownInlineRider` | `PickCameraWheel` | 3 | 2 | wheel entry the inline pick reads |
+| `UnknownCameraTargetA` | `VehicleCameraCharacterTargetView` | 2 | 3 | character target offsets |
+| `UnknownCameraTargetB` | `VehicleCameraCarProceduralView` | 2 | 3 | CarProcedural offsets |
+| `UnknownGuiControl` | `GuiControlView` | 2 | 136 | dialog control as GUIUser/ToolTip see it; UIEditBox +0x214 caretRect |
+| `UnknownGuiClipper` | `GuiDirectDrawClipper` | 2 | 5 | IDirectDrawClipper slot layout (SetClipList 7, SetHWnd 8) |
+| `UnknownGuiDirectDraw` | `GuiDirectDraw` | 2 | 2 | IDirectDraw slot 4 CreateClipper |
+| `UnknownGuiSurface` | `GuiDirectDrawSurface` | 2 | 3 | IDirectDrawSurface slot 28 SetClipper |
+| `UnknownGroundFogCamera` | `GroundFogCameraView` | 2 | 3 | Camera position +0x170 (same as EcoSystem camera view) |
+| `UnknownGroundFogOwner` | `GroundFogRenderTargetView` | 2 | 2 | RenderTarget at GameObject+0x18, camera at +0x08 |
+| `UnknownGroundFog` | `GroundFogView` | 3 | 6 | found by name "GroundFog" (0x00484f10); class not established |
+| `UnknownGroundFogShader` | `GroundFogCacheOwner` | 3 | 9 | object whose first member caches the fog (0x00484f10) |
+| `UnknownFogVertex` | `GroundFogVertex` | 2 | 11 | D3DLVERTEX layout the fog pass edits |
+| `UnknownEcoQuadTree` | `EcoQuadTreeView` | 2 | 15 | QuadTree global 0x0068aba4; Insert 0x004dcac0 |
+| `UnknownEcoTerrain` | `EcoTerrainView` | 2 | 24 | Terrain QueryGround 0x00507c10 |
+| `UnknownEcoHullShape` | `EcoHullShape` | 3 | 6 | CollisionObject shapeType 0 data |
+| `UnknownEcoCapsuleShape` | `EcoCapsuleShape` | 3 | 2 | CollisionObject shapeType 3 data |
+| `UnknownEcoSphereShape` | `EcoSphereShape` | 3 | 2 | CollisionObject shapeType 4 data |
+| `UnknownEcoLight` | `EcoLightEmitterView` | 2 | 16 | LightManager::FindLightOfType 0x004a0190 result |
+| `UnknownEcoCamera` | `EcoCameraView` | 2 | 13 | Camera slots 27-32, RenderTarget+0x08 |
+| `UnknownEcoRenderTarget` | `EcoRenderTargetView` | 2 | 14 | GameObject+0x18 render target; IDirect3DDevice7 forwards |
+| `UnknownEcoTexture` | `EcoTextureMapView` | 2 | 9 | TextureMap slots 4-19; 0x0050a590 returns TextureMap |
+| `UnknownEcoModelVertex` | `EcoModelVertex` | 2 | 5 | .slt loader vertex (8 floats) |
+| `UnknownEcoVertex` | `EcoLitVertex` | 2 | 9 | D3DLVERTEX FVF 0x1e2 |
+| `UnknownEcoVisibilityClipper` | `EcoVisibilityClipperView` | 2 | 9 | visibility clipper 0x00575a98, SphereInFrustum 0x0052fbb0 |
+| `UnknownEcoDisplay` | `EcoVideoCardView` | 3 | 2 | TrackGame+0x10; +0x1c0 PCVideoCard::driverColorKeyCaps |
+| `UnknownEcoDebugOverlay` | `EcoDebugOverlayView` | 2 | 8 | DebugOverlay Print/Title 0x00447f40/0x00447fa0 |
+| `UnknownEcoTrackGame` | `EcoTrackGameView` | 2 | 48 | cast from g_TrackGame; Game registry slots 20-22 |
+
+### Scene, follow camera and other views
+
+| Old | New | Tier | Rewrites | Evidence |
+| --- | --- | --- | --- | --- |
+| `UnknownFollowCameraSubject` | `FollowCameraTerrainView` | 2 | 15 | Terrain QueryGround 0x00507c10 |
+| `UnknownSceneCollisionObject` | `SceneCollisionObjectView` | 2 | 16 | CollisionObject members SceneManager reads |
+| `UnknownSceneAnimatedObject` | `SceneCarProceduralView` | 2 | 20 | CarProcedural members |
+| `UnknownSceneObject` | `SceneCollisionCharacterView` | 2 | 29 | CollisionCharacter ctor 0x004318d0 (0x294 bytes); SetMotion 0x004a8b40 |
+| `UnknownKrustyUICharacter` | `KrustyUID3DIMSoultreeCharacterView` | 2 | 13 | RTTI D3DIMSoultreeCharacter |
+| `UnknownWreckerParticles` | `WreckerParticleManagerView` | 2 | 7 | RTTI ParticleManager |
+| `UnknownCubeVertex` | `CubeLitVertex` | 2 | 7 | D3DLVERTEX layout |
