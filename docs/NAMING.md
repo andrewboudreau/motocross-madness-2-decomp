@@ -3693,3 +3693,343 @@ work/naming/w28/remain.py):
 
 The Scene loader group is closed. The SceneManagerNearMisses.cpp pads and the
 other multi-member pads need a declaration split, not a rename.
+
+## Wave 30: members and parameters named by their readers
+
+Wave 30 names the remaining `field_0x` members and placeholder parameters
+wherever a reader, a named parameter, an SDK position or another view of the
+same class decides the role. Names only: no declaration was added, removed or
+reordered, and every edited file keeps its line count and line endings. No
+static, global, type of a static, or type with an emitted RTTI descriptor was
+renamed. Four read-only research passes (UI and sound; render and terrain;
+vehicle, physics and collision; game, events and views) proposed names with
+evidence. Each one was checked before it was applied. The proposals, the
+left-over lists and the scripts are in work/naming/w30/:
+
+- proposalA-D.json and leftA-D.txt;
+- accepted*.json, apply.py and comments*.py;
+- prove.sh and negcontrol.sh.
+
+Counts over `src` and `samples` (`git grep -ohE`, work/naming/w28/counts.py):
+
+| Placeholder | Before (38d2a74e) | After |
+| --- | --- | --- |
+| `\bUnknownVirtualSlot[0-9]+` | 74 uses, 17 names | 74 uses, 17 names |
+| placeholder methods | 85 uses | 85 uses |
+| `\bUnknown[A-Za-z0-9_]*` | 376 uses, 74 names | 376 uses, 74 names |
+| `\bfield_0x[0-9a-fA-F]+` | 1274 uses, 326 spellings | 1214 uses, 322 spellings |
+| `field_0x` in samples/ only | 113 uses | 112 uses |
+
+The spelling count drops by only 4 because most renamed spellings (`field_0x00`,
+`field_0x10`, `field_0x14` and so on) remain in unrelated structs.
+
+| Tier | Members | Parameters |
+| --- | --- | --- |
+| 2 | 23 | 31 |
+| 3 | 9 | 0 |
+| Total | 32 | 31 |
+
+The 63 renames edit 170 lines. Most of the 31 parameter renames are virtual
+overrides that take the name of their base declaration, or view declarations
+that take the name of the canonical declaration of the same retail function.
+
+That is well short of the 100 the wave aimed at. The four passes looked at
+every code use of a `field_0x` member (306 lines) and at the scalar members
+that retail reads. What is left is mostly:
+
+- constructor-only or lifecycle-only stores;
+- members written but never read;
+- union arms kept by policy;
+- multi-member pads, which need a declaration split.
+
+None of these was named to raise the count. The left-over lists give the
+reason for each one.
+
+Method:
+
+- Each accepted name was applied with a line-targeted word substitution
+  (work/naming/w30/apply.py). Every listed line must hold the old spelling,
+  and the line endings are kept at the byte level.
+- Comments that name the member were reworded in the same line
+  (comments0.py, commentsA.py, commentsB.py, commentsD.py, work/naming/sub.py).
+- The single-letter parameters (`a`, `b`) were applied only on their own
+  declaration and code lines. Comment lines were edited by hand.
+- An exact-size view pad that names one member of the viewed class keeps its
+  byte-array type and gets a "(bytes kept)" comment (the Wave 27 rule).
+- Every new name was checked against the parameters, locals, members and
+  globals visible at each use.
+- No renamed member or local is used in the bodies the concurrent matching
+  work edits:
+  - DlgProcs `0x0044fae0`;
+  - ProCircuitProcs `0x004d72c0`, `0x004d8fc0`, `0x004d9860`;
+  - SelectGamePicProcs `0x004f8820`;
+  - SceneManager `0x004edfe0`;
+  - MorphBastardModifier `0x004a33b0`.
+
+  Three view declarations in SelectGamePicProcs.h and ProCircuitProcs.h were
+  renamed. Their pads have no code use.
+- One `targets.json` note (Vehicle::DeflectVelocity) spelled `field_0x4e8`
+  and now says `scaledTurnRadius`. No test or fixture spells a renamed
+  member or parameter.
+
+### Decisions requested by the brief
+
+- Vehicle `field_0x4e8` -> `scaledTurnRadius` (tier 3). DeflectVelocity
+  (`0x005281cf`) is the only writer apart from the constructor, which stores
+  0 at `0x0052556a`. It stores GetTurnRadius(point, dir) * d there, then
+  reads the member back for the abs test and into k. Nothing else reads +0x4e8
+  on a Vehicle. The name describes the stored value. Its purpose beyond
+  DeflectVelocity is not shown, hence tier 3.
+- SoultreePhysicsBaseObjectCore `field_0x28` -> `inverseLoadMass` (tier 3).
+  Bike::LoadBike stores 32.2f / loadWeight there (or 1.0f when loadWeight is
+  0), right after riderMass = loadWeight * 0.0310559f, so the value is
+  1 / riderMass. The constructors store 1.0f. It is the load-weight
+  counterpart of invMass (+0x24 = 1 / bodyMass, UpdateMass `0x005008d0`).
+  The member is write-only, but the value is derived from the named
+  loadWeight, which is the Overlay `pixelFormat` rule. Hence tier 3.
+- VideoCard `field_0x14[16]` -> `textureKindCost` (tier 3). Its only reader is
+  the texture memory report in TextureMapManager (`0x005116ce`,
+  `mov ecx,[eax+ebx*4+0x14]`). The report indexes it with the texture kind:
+  bits 6/4/2 for the size, bit 0 for mips and bit 3 for 8-bit. It adds the
+  value to `cost`. No writer outside the constructor was found. The indexed
+  store at `0x004c9703` writes a 36-byte record of a PCVideoCard list, not
+  this member.
+
+### Proof
+
+One proof from 38d2a74e to the renamed tree (work/naming/w30/prove.sh all)
+covered every unit whose closure reaches a changed file: 471 units. A member,
+parameter or local name is not part of any decorated name, so the map is
+empty (work/naming/w30/map.json is `{}`).
+
+| Verdict | Units |
+| --- | --- |
+| IDENTICAL | 458 |
+| IDENTICAL-COMDAT-ORDER | 13 |
+| NAME-ONLY / NAME-ONLY-LABELS | 0 |
+| DIFF | 0 |
+
+The 13 IDENTICAL-COMDAT-ORDER units are:
+
+- BikeRaceNearMisses.cpp, DlgProcsNearMisses.cpp,
+  ProCircuitProcsNearMisses.cpp and SelectGamePicProcsNearMisses.cpp;
+- Group4_DlgMain.cpp, Group4_DlgPCBunny.cpp and Group5_PCBailoutDlg.cpp;
+- VisibilityQuadTree.cpp;
+- DlgProcs.cpp, KrustyUI.cpp, OptionProcs.cpp, ProCircuitProcs.cpp and
+  SelectGamePicProcs.cpp.
+
+tests/fixtures/bvh_vector_compare.cpp includes a header that its test writes,
+so it does not compile on its own in either tree. It was compiled in both
+trees with the same stub `bvh_vector_patches.h`, as in Wave 26
+(work/naming/w30/bvhstub.sh), and it is IDENTICAL. It is counted among the
+458 above.
+
+Negative control (work/naming/w30/negcontrol.sh, negmutate.py): two wrong
+edits were made in the new tree only.
+
+- In Vehicle::DeflectVelocity, `scaledTurnRadius = ...` became
+  `float scaledTurnRadius = ...`. A local now shadows the renamed member,
+  which is what a name collision would do.
+- In Bike::LoadBike, the inverseLoadMass store became 32.0f / loadWeight
+  instead of 32.2f / loadWeight.
+
+Both units gave DIFF, in the `.text` bytes of
+`?DeflectVelocity@Vehicle@@UAEMPAUVec3@@0MM@Z` and of `?LoadBike@Bike@@...`.
+
+Pins: no unit is NAME-ONLY and no object digest changed, so nothing was
+repinned (work/naming/w30/pinmods.py: 0 changed digests).
+
+Tests: work/naming/w30/pick_tests.py selected 131 modules. It matches the
+changed files' basenames and the renamed spellings. All 131 pass
+(work/naming/w30/tests-picked.log). tools/static_check.py passes.
+
+### Members
+
+| Owner | Old | New | Tier | Evidence |
+| --- | --- | --- | --- | --- |
+| BikeRaceBikeRecord | `field_0x04` | `displayName` | 2 | Both views read the same retail array g_TrackGame->ui->bikes (BikeRace.cpp:665, Group6_BikeRaceCreateRacers.cpp:109 vs DlgProcs.cpp:1096, Group2_MPBikeRiderDlg.cpp:79); KrustyUIBikeRecord (SelectGamePicProcs.h:93) names +0x04 `char displayName[0x44]` ("BikeName_%02d") and agrees at +0x00 manufacturer, +0x8c engineSize, +0x90 fourStroke; the pad is exactly 0x44 bytes. Note pairmatch conflict=1: BikeRaceBikeRecord calls +0x48 `bikeName` where KrustyUIBikeRecord calls it `texture` ("BikeTexture_%02d") - a naming disagreement at the same offset, not a layout shift. Keep `unsigned char[0x48 - 0x04]`; comment `// +0x04 KrustyUI "BikeName_%02d" (bytes kept)`. No code uses. |
+| CollisionMeshBody | `field_0x00` | `sceneNode` | 3 | Third view of the type-2 mesh payload. Its +0x04 boxTree and +0x08 bodyTransform agree with CollisionMeshShapeBlock. The +0 role is set by the SyncTransformFromNode reader at 0x00435f75 (GetMatrixIn 0x004fca80 on it). No code use spells it; it is the declaration only. The type stays void*. |
+| CollisionMeshShapeBlock | `field_0x00` | `sceneNode` | 3 | The only retail reader is SyncTransformFromNode 0x00435f10 case 2 (shapeType 2 = mesh): `mov ecx,[shape]` at 0x00435f75, then it calls SoultreeObject::GetMatrixIn 0x004fca80 with that value as `this`. The hull payload's +4 and the model payload's +0x10, read the same way in cases 0 and 1, are already named `sceneNode` (CollisionHullShape, CollisionModelShape). MeshNodeView in the same file names this offset `node`. SetMeshShape 0x00432ab0 stores 0 (0x00432ae2), and I found no other writer: one reader, so this is close to tier 3. |
+| CollisionMeshShapeData | `field_0x00` | `sceneNode` | 3 | Another view of the same type-2 mesh payload. Its +0x04 boxTree agrees with CollisionMeshShapeBlock and CollisionMeshBody. Same evidence as CollisionMeshShapeBlock::field_0x00: GetMatrixIn 0x004fca80 is called on [shape+0] in SyncTransformFromNode 0x00435f75. Only the declaration spells it. |
+| CollisionVegetation | `field_0x0e` | `cellY` | 2 | CollisionVegetation is 0x00438e70's view of a Vegetation. Vegetation's base UnknownEcoQuadTreeObject is 0xc bytes, followed by EcoQuantizedPosition quantizedPosition {x, y, z} at +0x0c/+0x0e/+0x10 (Vegetation.h:35, EcoCoordinates.h). This view already names +0x0c cellX and +0x10 cellZ, which both agree with x and z (both are scaled by the EcoSystem cell size at CollisionObject.cpp:1494-1495). So +0x0e is quantizedPosition.y, read as y in Group4_EcoSystem.cpp:290/745. The name follows the view's cellX/cellZ pattern. Declaration only. |
+| Cube | `field_0x10` | `headerFlags` | 2 | Cube::LoadTexture 0x0043d460 reads it (0x0043d5f9 `test byte ptr [esi+0x10],2`), and bit 1 gates SkipToSector(textureStream, alignmentBase). That is the same header-flag bit that Load 0x0043d230 tests (0x0043d3ae) before the same SkipToSector. The member sits in the file-header slot between fileFormat (+0xc) and field_0x12. Retail Load reads the flags into a stack local (0x0043d26a lea [esp+0x20]), so the member keeps Reset's 0 (0x0043d110). The obvious name `flags` would clash with Load's local `flags`. |
+| EcoLightEmitterView | `field_0x64` | `lightPosition` | 2 | The view is the LightEmitter LightManager::FindLightOfType 0x004a0190 returns in EcoSystem::LightingChanged 0x0045a9a0 (EcoSystem.cpp:946/956/958). It agrees with LightEmitter at +0x54 colour[4] (= ambientRGBA float[4]) and +0x70 direction (= lightDirection Vector3); LightEmitter +0x64 is `Vector3 lightPosition`, exactly 12 bytes (0x64..0x70). Keep the array; comment `// +0x64 LightEmitter lightPosition (bytes kept)`. No code uses; `lightPosition` elsewhere is LightEmitter's own member and locals in D3DIMSoulTree draw code, none in EcoSystem.h/.cpp. |
+| EventKrustyBikeView | `field_0x5c8` | `loadInfo` | 2 | Exact 24-byte pad = Bike +0x5c8 `BikeA5C8 loadInfo` (BikeCore.h:132; sizeof BikeA5C8 = 24, the loader's info block copied by Bike::LoadBike 0x005498b0 path). The view is the racer KrustyBike and agrees with Bike/KrustyBike at riderCharacter +0x5c4, racerName +0x5e0 (= riderName[16]), frontWheel +0x5f0, outOfRace +0x4a0, vehicleModel +0x3bc and further offsets (viewmatch agree=47). Keep `unsigned char[0x5e0 - 0x5c8]`; comment `// +0x5c8 Bike loadInfo (BikeA5C8) (bytes kept)`. No code uses. |
+| GridBaseCell | `field_0x7_b0` | `flipDiagonal` | 3 | Retail reads it only in DrawableGridNode::EmitLeafEdgeFan 0x0047fe70 (0x0047ff82, 0x00480122 `test byte ptr [cell*8+7],1`). There the bit (or 1 - bit for the opposite neighbour cell), combined with vertexFlags & 0x80, decides whether the fan's third vertex shifts to the diagonal corner. So it selects which way the cell's split diagonal runs. Tier 3: one function. Terrain::QueryGround uses a checkerboard instead, so collision code does not confirm the bit. |
+| GridBlockRecord | `field_0x08` | `ageEntry` | 2 | Grid1.h's Grid1BlockTexture is the same 0x2c-byte record at GridNodeExtra::blockRecords and names +0x08 `AgeEntry ageEntry` (0x14 bytes, matching the +0x08..+0x1c pad). It is registered with textureAgeManager in Grid1NearMisses.cpp:172 and cleared at Grid1.cpp:67. The views agree on texture +0x04, mappingScale/OffsetU/OffsetV +0x1c..+0x24 and detail +0x28. |
+| GridNodeExtra | `field_0x14` | `ageEntry` | 2 | Grid1.h's Grid1NodeExtra, a view of the same DrawableGridNode+0x3c block, names +0x14 `AgeEntry ageEntry` (0x14 bytes = exactly the +0x14..+0x28 pad). That view registers the entry with textureAgeManager (Grid1NearMisses.cpp:254), marks it used (Grid1.cpp:135) and reads its size field (retail 0x0047d325 [extra+0x24]). The views agree on byteCount, data, texture, textureReference, builtTexture, mappingScale/OffsetU/OffsetV, detail and blocks. Keep the type; only the identifier changes. Same name as the precedent at Terrain.h:125. |
+| GridNodeExtra | `field_0x3c` | `textureFlags` | 2 | The Grid1NodeExtra view of the same block names +0x3c `int textureFlags`. Bit 0x10000 means the node texture is built and bit n means block n is built. Retail 0x0047caa0 reads and writes it, as do Grid1.cpp:55/66 and Grid1NearMisses.cpp:141/160/169/252. The alignment checks out against the other named offsets (see ageEntry above). |
+| Group1ParticleCamera | `field_0x194` | `roll` | 2 | Cast directly from Camera*; agrees with Camera at screenMatrix +0xec, eyePosition +0x170, viewDirection +0x17c, upDirection +0x188, focalLength +0x198, nearPlane +0x1bc, farPlane +0x1c0, targetWidth +0x1c4, targetHeight +0x1c8. Camera +0x194 is `roll`; precedent Krusty3DObjects.h:50 NumberCameraView `unsigned char roll[0x198 - 0x194]; // +0x194 Camera roll (bytes kept)`. Keep `char[0x198 - 0x194]`, same comment. No code uses; no `roll` identifier in the file. |
+| GuiControlView | `field_0x15c` | `italic` | 2 | Exact-size (4-byte) view pad of UIControl +0x15c `italic` (GameUi.h:308); GuiControlView agrees with UIControl at controlType 0x5c, ownerDialog 0xb8, ownerGui 0xbc, toolTipText 0xf0, fontFace 0x130, bold 0x158 and fontHeight 0x160 (bytes kept, W27/W28 precedent). No code uses. |
+| HullNodeView | `field_0x00` | `swept` | 2 | HullNodeView is SyncTransformFromNode's (0x00435f10) view of the type-0 hull payload. It reads only +4 (`node`, 0x00435f2f). The other views of the same payload, CollisionHullShape (CollisionObject.h:53-54) and CollisionHullBody (CollisionShapeTests.h:35-36), name +0x00 `swept` and +0x04 `sceneNode`, and their +4 agrees with this view's node. SetHullShape 0x00432720 stores its `swept` argument there, and HullVsHull 0x00436720 branches on it. |
+| KbEffectParams | `field_0x0` | `angle` | 2 | This is the direction array for joystick slot 7, SetConstantForce (PCJoystickDevice.cpp:344). It forwards to SetDirection 0x004c3db0, which copies direction[0..1] into the DIEFFECT rglDirection with cAxes 2 and dwFlags 0x22 (DIEFF_OBJECTOFFSETS\|DIEFF_POLAR). By SDK position, element 0 of a polar direction is the angle in hundredths of a degree. KrustyBike::UpdateForceFeedback passes 0x4650 = 18000 = 180 degrees (KrustyBike.cpp:668). It is used only through the brace initializer, so it is the declaration only. |
+| KrustyUI | `field_0x480` | `riderPosition` | 2 | One Vector3 (12 bytes, not a multi-member pad): BuildGarageScene 0x00498cf0 stores kVec3Zero with y += 0.1 there (0x00498ede..0x00498f08) and passes &this+0x480 (0x004995c9 lea [ebp+0x480]) to the "UIRider.mcf" rider model's SoultreeObject::SetPosition(const Vector3* position) 0x004fc660; KrustyUI.cpp's own comment and the KRUSTYUI_RIDER_POSITION macro already call it the rider's position. |
+| MovingPart (Suspension.h) | `field_0x00` | `matrix` | 2 | Second declaration of the same MovingPart (sceneNode +0x40, ownerRef +0x44 agree with MovingPart.h); +0x00 is MovingPart.h `Matrix4 matrix` filled by ctor 0x004a23a0 through GetLocalMatrix 0x004fca60 and read back by the shock path (Group3_KrustyBikeAISupport.cpp:182 SetLocalMatrix). Keep `char[0x40]`; same comment. No code uses; no `matrix` identifier in Suspension.h/.cpp. |
+| MovingPart (Tire.h) | `field_0x00` | `matrix` | 2 | Same retail class as the canonical src/reconstructed/MovingPart.h, which names +0x00 `Matrix4 matrix` (the node's local matrix): ctor 0x004a23a0 calls node->GetLocalMatrix(&matrix) (SoultreeObject::GetLocalMatrix 0x004fca60) into +0x00; agrees at +0x40 sceneNode and +0x44 ownerRef. The matrix has a reader: Group3_KrustyBikeAISupport.cpp:182 G3ShockView passes its MovingPart localMatrix to sceneNode->SetLocalMatrix. Keep `char[0x40]`; comment `// +0x00 the node's local matrix at construction (MovingPart.h matrix) (bytes kept)`. No code uses; no `matrix` identifier in Tire.h/Tire.cpp (comment-only hits at Tire.h:57, Tire.cpp:472). |
+| Particle | `field_0x24` | `screenRect` | 2 | ParticleManager Render slot 14 0x004bac60 stores the projected sprite's top/bottom/left/right floats at +0x24/+0x28/+0x2c/+0x30 (0x004bae2f, 0x004bae4f, 0x004badfa, 0x004bae19) and reads them back for clipping, all through the one 16-byte Group1ParticleRect {top,bottom,left,right} view (Group1_ParticleRender.cpp:100/136). It is a single rect, not a multi-member pad. No local or member named screenRect exists in the particle files; the hits for that name are TestBox parameters in the visibility/shadow code. |
+| ProCircuitRacerResultView | `field_0x40` | `name` | 2 | The view is cast from EventManager results, which are RacerResult (samples/ui/ProCircuitProcsNearMisses.cpp:94, src/bringup/Group0_PCLastRaceDlg.cpp:47). It agrees with RacerResult at +0x00 racer (= playerId), +0x04 position, +0x28 points, +0x34/0x38/0x3c repairs/medical/stunts (= repairDamage/injuryDamage/stuntEarnings); RacerResult +0x40 is `char name[16]`, identical type and size. No code uses, so the locked ProCircuitProcs bodies (0x004d72c0/0x004d8fc0/0x004d9860) are untouched. Comment `// +0x40: the racer's name (RacerResult name)`. |
+| RacerD3DIMSoultreeObjectView | `field_0x278` | `lowestLod` | 2 | Exact 4-byte pad = D3DIMSoultreeObject +0x278 `int lowestLod` (D3DIMSoulTree.h:301). D3DIMSoultreeObject::SetLowestLod 0x00444d40 writes [ecx+0x278] (0x00444d57) and SetLod 0x00444d00 clamps the requested level from below with it. The view agrees at +0x274 detailLevelCount (= lodCount), +0x27c currentDetailLevel (= currentLod), +0x280 detailDistances (= autoLodDistances), +0x28c levelGroups (= lodTable). Keep the array type; comment `// +0x278 D3DIMSoultreeObject lowestLod (bytes kept)`. No code uses. |
+| SelectGameD3DIMSoultreeCharacterView | `field_0x008` | `sltFile` | 2 | The models are `new D3DIMSoultreeCharacter(0)` (KrustyUI.cpp:388). The view agrees with D3DIMSoultreeCharacter at +0x0c motionFinished (= motionStopped), +0x1a0 plateTexture (= modelNode, cast to D3DIMSoultreeObject* in DlgProcs.cpp:1128/1172/1180, SelectGamePicProcs.cpp:2014/2261/2269) and the vfptr/vbptr-to-virtual-GameObject layout. D3DIMSoultreeCharacter.h:121 names +0x008 `ParameterBlock* sltFile` (LoadCharacter 0x00445680 creates it, D3DIMSoultreeMotnctrl.cpp:430). Keep the array; comment `// +0x08 D3DIMSoultreeCharacter sltFile (bytes kept)`. No code uses. |
+| SelectGameRaceSettingsView | `field_0x08` | `series` | 2 | The view is cast from &g_TrackGame->mode.raceSettings.raceMode (DlgProcs.cpp:558/826, SelectGamePicProcs.cpp:1499/1574/1755); TrackGame.h RaceSettings names +0x08 `series` (TrackGame+0x2d78, also the `series : 3` bitfield of LobbySettingsMessage at SelectGamePicProcs.h:160). The view agrees at 15 offsets (raceMode, eventType, races, treeCollision, laps, opponents, multiplayerAiRacerCount, gateSeed, trackNumber, trackName, minutes, tagBall, stuntMode, ...). Keep the array; comment `// +0x08: series (+0x2d78) (bytes kept)`. No `settings->field_0x08` use exists, so the locked SelectGamePicProcs 0x004f8820 body is untouched (declaration only). |
+| SoultreeObject (D3DIMSoulTree.h view) | `field_0x148` | `prevSibling` | 2 | The canonical src/krusty2/core/SoultreeObject.h:326 names +0x148 `SoultreeObject* prevSibling`, which AppendSibling and RemoveChild link (soultree.cpp:703-726). This view agrees on firstChild +0x140, nextSibling +0x144, hidden +0x14c, boundsFound/localBounds* +0x150..+0x164 and parameterBlock +0x1a0. The 4-byte pad covers exactly one pointer. |
+| SoultreePhysicsBaseObjectCore | `field_0x28` | `inverseLoadMass` | 3 | Bike::SetLoadWeight-path (Bike.cpp:620-624) stores 32.2f / loadWeight (1 / riderMass, riderMass = loadWeight * 0.0310559 = loadWeight / 32.2), else 1.0f; ctors store 1.0f; write-only, value derived from the named loadWeight, beside invMass (+0x24 = 1 / bodyMass) |
+| StartObjectColliderBase | `field_0x08` | `objectTypeId` | 2 | StartObjectCollider is StartObjectCharacterView +0x210 collisionObject, which krusty2 CollisionCharacter.h:39 types `CollisionObject*` (0xb8 bytes): QuadTreeObject at +0 and GameObject at +0xc, the same split as StartObjectCollider (StartObjectColliderBase, GameObject at +0xc). QuadTreeObject +0x08 is `objectTypeId` (CollisionObject.h:46; ctor 0x00431e70 stores TypeRegistry::FindTypeId, 0x00438e70 compares [obj+8]); the int covers that char plus padding up to the GameObject base, as BikeQuadTreeHead (Bike.cpp:561) and CarProceduralNode already name it (pairmatch agree=13, conflict=0). No code uses. field_0x04 stays (spans queryStamp + sortKey). |
+| Terrain | `field_0x84` | `runMeshChecks` | 3 | It has one reader, Terrain::PrepareGeometry (0x0050789e). When nonzero, it gates GridRoot()->TestDroppableVertices() 0x00481580 and CountEdgeDifferences() 0x004813e0, a per-frame mesh consistency pass whose results nothing reads. The constructor (0x0050587b) is the only writer and stores 0, so the checks are off in retail. Wave 27 (leftB2) missed this reader. The name rests on that single gate; tier 3 is also defensible. |
+| TrackGameTagBallView | `field_0x10a` | `asleep` | 2 | The tag ball is a SoultreePhysicsBaseObject: retail reads its +0x128 collisionObject at 0x0048dae6, and its SoultreeObject subobject sits at +0x21c, where the base's own part ends. SoultreePhysicsBaseObjectCore.h:211 names +0x10a `asleep`: UpdateRestState 0x00502c40 sets it, and GameObject slot 10 (0x005036f0) skips the update while it is set. SetFollowedRacer 0x004a9e80 clears it to wake the ball. The bring-up body of the same function, src/bringup/Group3_FollowedRacer.cpp:63, already spells it `ball->asleep = 0`. The declaration comment can say: 'SoultreePhysicsBaseObject asleep; SetFollowedRacer 0x004a9e80 clears it (wakes the ball)'. |
+| Vehicle | `field_0x4e8` | `scaledTurnRadius` | 3 | DeflectVelocity 0x005281cf stores GetTurnRadius(point, dir) * d there and reads it back for the abs test; ctor 0x0052556a stores 0; no other reader |
+| VideoCard | `field_0x14` | `textureKindCost` | 3 | Only reader TextureMapManager 0x00511580 (0x005116ce mov ecx,[eax+ebx*4+0x14]) indexes it with the texture kind (size bits 6/4/2, mip bit 0, 8-bit bit 3) and sums it into the texture cost; no writer found outside the ctor |
+| VisualCueKrustyBikeView | `field_0x08` | `sceneNode` | 3 | The objects are the racers BikeRace::NextBike 0x004204e0 returns (VisualCue CollectRacers 0x0048af20), i.e. KrustyBike: vfptr +0, vbptr +4 to virtual GameObject (isEnabled read through it), position Vector3 +0x0c = SoultreePhysicsBaseObject position. SoultreePhysicsBaseObjectCore.h:175 names +0x08 `SoultreeObject* sceneNode`, and the sibling view RaceView.h:102 EventKrustyBikeView already spells this exact pad `sceneNode[0x0c - 0x08] // +0x08 KrustyBike sceneNode (bytes kept)`. Keep the array; same comment. Only one named data offset (+0x0c) agrees directly; the rest is the shared vfptr/vbptr layout and the precedent view. No code uses. |
+
+### Parameters
+
+| Owner | Old | New | Tier | Evidence |
+| --- | --- | --- | --- | --- |
+| BackgroundImage::GetDc | `a` | `more` | 2 | 0x004049d0 stores 0 then 1 when it returns the copy surface / a further dirty region (samples/render/BackgroundImageNearMisses.cpp:36/43/70) so the caller draws again; UIDialog::BeginControlDraw forwards its `more` out-parameter here. Near miss 108/606; param rename is codegen-neutral. |
+| GameObject::OnChar / PCGame::OnChar / BikeRace::OnChar | `value` | `character` | 2 | Same virtual slot as UIControl::OnChar (character, below): GameObject 0x00469c00 passes it to each child's OnChar, PCGame 0x004c0340 to the root object's, BikeRace 0x0041f590 to ChatOverlay::HandleChatKey |
+| GameObject::OnKeyDown / PCGame::OnKeyDown | `value` | `key` | 2 | Same virtual slot as UIControl::OnKeyDown (key): GameObject 0x00469c40 passes it to each child's OnKeyDown, PCGame 0x004c0370 to the root object's |
+| KrustyUI::Create | `value` | `showIntro` | 2 | Declaration only: the exact definition 0x004988a0 (KrustyUI.cpp:187) already names the parameter showIntro and opens Intro1Dlg only when it is set (KrustyUI.cpp:257). |
+| KrustyUID3DIMSoultreeCharacterView::AdvanceMotion | `a` | `mirror` | 2 | View declaration of Character::AdvanceMotion 0x004a6bb0, canonically (float dt, int mirror, int mask) in D3DIMSoultreeCharacter.h:113 / Motnctrl.cpp:508 and (float time, int mirror, int mask) in SceneManager.h:44. Declaration only. |
+| KrustyUID3DIMSoultreeCharacterView::AdvanceMotion | `b` | `mask` | 2 | Same as `mirror`: third parameter of 0x004a6bb0, `mask` in D3DIMSoultreeCharacter.h:113 and SceneManager.h:44. Declaration only. |
+| KrustyUID3DIMSoultreeCharacterView::LoadCharacter | `a` | `useOptions` | 2 | View declaration of D3DIMSoultreeCharacter slot 11 0x00445680, canonically (int context, const char* path, const SoultreeLoadDesc* desc, int loadInfo, int useOptions, int unused) (D3DIMSoultreeCharacter.h:182; useOptions is forwarded to LoadModel's useOptions, Group5_D3DIMForwarders.cpp:30-32). Declaration only. |
+| KrustyUID3DIMSoultreeCharacterView::LoadCharacter | `b` | `unused` | 2 | Sixth parameter of 0x00445680, `unused` in the canonical D3DIMSoultreeCharacter.h:182 declaration. Declaration only; no `unused` identifier in KrustyUI.cpp code. |
+| KrustyUISoultreeObjectView::SetAxes | `a` | `zx` | 2 | View declaration of SoultreeObject::SetAxes 0x004fbd10 (?SetAxes@SoultreeObject@@QAEXMMMMMMHH@Z), whose canonical declaration (src/krusty2/core/SoultreeObject.h:229, D3DIMSoulTree.h:80) names the parameters zx, zy, zz, yx, yy, yz, orthogonalize, keepZ. Declaration only (callers use SoultreeObject directly). The view's 7th parameter `g` is typed float but retail's is int `orthogonalize`; left (see leftA). |
+| KrustyUISoultreeObjectView::SetAxes | `b` | `zy` | 2 | View declaration of SoultreeObject::SetAxes 0x004fbd10 (?SetAxes@SoultreeObject@@QAEXMMMMMMHH@Z), whose canonical declaration (src/krusty2/core/SoultreeObject.h:229, D3DIMSoulTree.h:80) names the parameters zx, zy, zz, yx, yy, yz, orthogonalize, keepZ. Declaration only (callers use SoultreeObject directly). The view's 7th parameter `g` is typed float but retail's is int `orthogonalize`; left (see leftA). |
+| KrustyUISoultreeObjectView::SetAxes | `c` | `zz` | 2 | View declaration of SoultreeObject::SetAxes 0x004fbd10 (?SetAxes@SoultreeObject@@QAEXMMMMMMHH@Z), whose canonical declaration (src/krusty2/core/SoultreeObject.h:229, D3DIMSoulTree.h:80) names the parameters zx, zy, zz, yx, yy, yz, orthogonalize, keepZ. Declaration only (callers use SoultreeObject directly). The view's 7th parameter `g` is typed float but retail's is int `orthogonalize`; left (see leftA). |
+| KrustyUISoultreeObjectView::SetAxes | `d` | `yx` | 2 | View declaration of SoultreeObject::SetAxes 0x004fbd10 (?SetAxes@SoultreeObject@@QAEXMMMMMMHH@Z), whose canonical declaration (src/krusty2/core/SoultreeObject.h:229, D3DIMSoulTree.h:80) names the parameters zx, zy, zz, yx, yy, yz, orthogonalize, keepZ. Declaration only (callers use SoultreeObject directly). The view's 7th parameter `g` is typed float but retail's is int `orthogonalize`; left (see leftA). |
+| KrustyUISoultreeObjectView::SetAxes | `e` | `yy` | 2 | View declaration of SoultreeObject::SetAxes 0x004fbd10 (?SetAxes@SoultreeObject@@QAEXMMMMMMHH@Z), whose canonical declaration (src/krusty2/core/SoultreeObject.h:229, D3DIMSoulTree.h:80) names the parameters zx, zy, zz, yx, yy, yz, orthogonalize, keepZ. Declaration only (callers use SoultreeObject directly). The view's 7th parameter `g` is typed float but retail's is int `orthogonalize`; left (see leftA). |
+| KrustyUISoultreeObjectView::SetAxes | `f` | `yz` | 2 | View declaration of SoultreeObject::SetAxes 0x004fbd10 (?SetAxes@SoultreeObject@@QAEXMMMMMMHH@Z), whose canonical declaration (src/krusty2/core/SoultreeObject.h:229, D3DIMSoulTree.h:80) names the parameters zx, zy, zz, yx, yy, yz, orthogonalize, keepZ. Declaration only (callers use SoultreeObject directly). The view's 7th parameter `g` is typed float but retail's is int `orthogonalize`; left (see leftA). |
+| KrustyUISoultreeObjectView::SetAxes | `h` | `keepZ` | 2 | View declaration of SoultreeObject::SetAxes 0x004fbd10 (?SetAxes@SoultreeObject@@QAEXMMMMMMHH@Z), whose canonical declaration (src/krusty2/core/SoultreeObject.h:229, D3DIMSoulTree.h:80) names the parameters zx, zy, zz, yx, yy, yz, orthogonalize, keepZ. Declaration only (callers use SoultreeObject directly). The view's 7th parameter `g` is typed float but retail's is int `orthogonalize`; left (see leftA). |
+| Overlay::Attach | `a12` | `textureContext` | 2 | 0x004b5f50 forwards it as TextService::Create's last argument, i.e. FontTexture::Load's textureContext (all callers pass 0: TrackOverlay.cpp:108, 270, 504, 1231, 1522, 1532, 1541). Exact. |
+| PCSoundInterface::InitializeSound | `value` | `budget` | 2 | 0x004be5a0 passes it to SoundMemoryManager::StartLoaderThread(int budget) (PCAudio.cpp:1326, 1144), which stores it as byteBudget; callers pass 4000000 (GUIManager.cpp:194, TrackGame.cpp:244). Exact; `budget` is otherwise only StartLoaderThread's parameter. |
+| PCVideoCard::SetDisplayMode | `a` | `bufferCount` | 2 | 0x004c9ec0 passes it straight into FindDisplayMode's bufferCount parameter (PCVideoCard.cpp:272). PCGame passes 2 (PCGame.cpp:519). The pure-virtual base declaration VideoCard.h:20 should be renamed with it. The body has no other `bufferCount`. The trailing `c` is unused and stays. |
+| RaceSound::PlayScoreSounds | `value` | `score` | 2 | KbRaceHandler::ReportTrickScore(KrustyBike* who, float score) passes its score (src/bringup/Group5_KbRaceHandler.cpp:20); 0x004e57d0 compares it with 10000.0f to play bonus.wav for the listened racer. Exact; no `score` identifier in RaceSound. |
+| RaceSound::PlayScoreSounds (bring-up redeclaration) | `value` | `score` | 2 | The same function 0x004e57d0 as RaceSound.h (score) |
+| SoultreeQuadTreeRenderer::OnControlPress | `a` | `event` | 2 | This is the slot 23 override (0x005048d0, expect exact in src/krusty2/soultree/targets.json) of GameObject::OnControlPress(ControlEvent* event, InputButtonState* entry) (GameObject.h:72). It passes `a` to TestInputEvent's event parameter and forwards both to GraphicsTest::OnControlPress. Neither SoultreeQuadTreeRenderer nor GraphicsTest/GameObject has a member named event or entry. |
+| SoultreeQuadTreeRenderer::OnControlPress | `b` | `entry` | 2 | This is the slot 23 override (0x005048d0, expect exact in src/krusty2/soultree/targets.json) of GameObject::OnControlPress(ControlEvent* event, InputButtonState* entry) (GameObject.h:72). It passes `a` to TestInputEvent's event parameter and forwards both to GraphicsTest::OnControlPress. Neither SoultreeQuadTreeRenderer nor GraphicsTest/GameObject has a member named event or entry. |
+| TextService::Create | `a10` | `textureContext` | 2 | 0x0050ae80 passes it unchanged as FontTexture::Load's `textureContext` (FontTexture.h:47-48, named in b0754c51; TerrainLoadTexture casts it to TextureContext*). Wave 24 left it as never interpreted. Exact; no textureContext identifier in TextService/Overlay. |
+| UIControl::KillFocus (+ overrides UIEditBox, UIDDLScrollBar, UIDDLStatic, UIDDLButton, UIDDLListBox, UIDropDownList) | `value` | `next` | 2 | GUIUser::MoveFocus 0x00487870 calls focusControl->KillFocus(control) with the control receiving the focus (GUIManager.cpp:1076; 0 at 1159); GuiControlView::KillFocus(GuiControlView* next) names it; the drop-down parts' overrides (0x004796e0, 0x00479bc0, 0x00479ce0, 0x00479e70, 0x0047a7d0) test ownerList->IsPart((UIControl*)value) to close the list only when the focus leaves it. All exact; UIEditBox 0x004740b0 forwards it. |
+| UIControl::LeaveHover | `value` | `next` | 2 | GUIUser::SetHoverControl 0x00487800 (GUIManager.cpp:1057, 1074) calls hoverControl->LeaveHover(control) with the control taking the hover; GUIManager.h:170 GuiControlView::LeaveHover(GuiControlView* next) already names this slot-32 parameter `next`. The body 0x00472630 ignores it. Exact; no member/local `next` in UIControl (GameObject has nextSibling; UpdateHoverAt's local `next` is another function). |
+| UIControl::OnChar | `value` | `character` | 2 | 0x00472320 receives the WM_CHAR wParam (Main.cpp:236 via g_TrackGame->OnChar -> GameObject::OnChar children), copies it into DialogEvent::key for kind 0xb and forwards it to GameObject::OnChar. Exact (not in NEAR_MISS_INDEX); no `character` identifier in GameUi/UIDialog/GameObject. |
+| UIControl::OnKeyDown | `value` | `key` | 2 | 0x004723d0 receives the WM_KEYDOWN wParam (virtual key), copies it to DialogEvent::key and forwards it to GameObject::OnKeyDown; the sibling override UIListBox::OnKeyDown (GameUi.h:492, 0x00478040) already names it `key`. `event.key = key;` stays unambiguous. Exact. |
+| UIDialog::BeginControlDraw | `a` | `more` | 2 | 0x0046ed70 clears *a then forwards it to BackgroundImage::GetDc, which sets it when another surface/dirty region remains; every caller passes &more and loops `while (more && BeginControlDraw(...))` (GameUi.cpp:4313/4343, 4712/4740/4860, 5091/5118). Exact; no `more` in UIDialog. |
+| UIEditBox::OnChar | `value` | `character` | 2 | 0x00474150 (near miss 1018/1044, body in samples/ui/EditBoxOnChar.cpp) narrows it to `char c` and forwards it to UIControl::OnChar; it is the WM_CHAR character as for UIControl::OnChar. Parameter renames do not change the mangled name or codegen. |
+| UIEditBox::OnKeyDown | `value` | `key` | 2 | 0x00474570 switches on it over VK_HOME/VK_END/VK_DELETE/VK_LEFT/VK_RIGHT after UIControl::OnKeyDown(value); same name as UIListBox::OnKeyDown(int key). The `char key` local at GameUi.cpp:4227 is in another function. Exact. |
+| VideoCard::FindDisplayMode | `a` | `bufferCount` | 2 | The body of 0x0052d250 compares it with DisplayMode::bufferCount (`!a \|\| mode->bufferCount == a`, VideoCard.cpp:83), the same any-match pattern used for refreshRate. Callers pass 0 (EventManager.cpp:343) and the 2 that PCGame sends through SetDisplayMode (front plus back buffer). VideoCard has no member or local named bufferCount. tests/fixtures/leave_race_menu_compare.cpp:96 defines its own stub with params (a, b) and is unaffected. |
+
+### Left for wave 31
+
+The full lists, with a reason for each line, are work/naming/w30/leftA.txt
+(UI, sound), leftB.txt (render, terrain), leftC.txt (vehicle, physics,
+collision) and leftD.txt (game, events, views). These open points need a
+decision rather than more evidence:
+
+- VehicleWheelAux `field_0x8c`/`field_0x90` (Vehicle.h:283-284). Retail
+  `0x00529a20` copies +0x90 into +0x8c on the shock pointers at wheel+0x2b0
+  and +0x2ac. Shock names those offsets prevLength and clearedLength. The same
+  struct also types the gearbox pointer at wheel+0x2a8, and
+  tests/fixtures/vehicle_gearbox_boundaries.cpp equates the two members with
+  EngineGearbox throttleTimeScale/gearCount. The fix is a separate shock view
+  for those casts, which is not a rename.
+- KbEffectParams `field_0x4` (KrustyBikeTypes.h:462). It is the second
+  element of the DIEFF_POLAR direction array: SetDirection `0x004c3db0`,
+  flags 0x22, two axes. DirectInput requires that element to be 0. `field_0x0`
+  became `angle`; the second element is left until a name is chosen.
+- KrustyUISoultreeObjectView::SetAxes `g` (KrustyUI.cpp:56). The view types
+  it as `float`, but retail SoultreeObject::SetAxes takes an int there
+  (orthogonalize). That needs a type fix, or the unused view declaration
+  removed, not a rename.
+- BikeRaceBikeRecord `bikeName` (+0x48, BikeRace.h:810). KrustyUIBikeRecord
+  fills that offset from "BikeTexture_%02d" (`texture`), so the existing name
+  looks wrong. Its size (0x44) also differs from `texture` (0x40).
+- Terrain `field_0xbe8`. The level file supplies it, and every reader compares
+  it with 1. It drives two unrelated tunings: the Bike nose-over limit and
+  the FollowCamera rate, 0.25 or 0.3. The level headers are compressed, so the
+  values in use are unknown.
+- GameObject `field_0x24`. The GameObject constructor stores 0xff and the
+  SoultreeObject constructor stores FindTypeId("SoultreeObject"). These are
+  constructor stores only (`objectType` was proposed at tier 3 and not
+  taken).
+- EventManager RacerStanding `field_0x04`/`field_0x08`. These are comparator
+  tie-breakers, but the only sort caller, EndRace, never fills them.
+- Constructor-only or write-only members, not named:
+  - TrackGameMode `field_0x1bdc`: saved and loaded with the profile, never
+    read.
+  - NameOverlay `field_0x170`.
+  - EngineGearbox `field_0x74`/`field_0x80`/`field_0x14c`/`field_0x1d8`, and
+    the `arg6` that the last one is stored from.
+  - FollowCamera `field_0x33c`.
+  - CarProcedural `a11`-`a15`, and KbBikeLoader `a13`/KrustyBike `a16`,
+    which only pass through to LoadBike's unused `a19`.
+- Union arms kept by policy:
+  - UIEditBox, UIScrollBar and UIListBox `field_0x1ec`/`1f4`/`1f8`/`204`/
+    `208`/`218`;
+  - GridTerrain `field_0xc9c`/`field_0xca0`, the float arms of
+    unlitColor/unlitSpecular.
+- Not renamed because of the concurrent matching work:
+  - KrustyUI `field_0x4ac`: DlgProcs.cpp may set it inside `0x0044fae0`, and
+    nothing reads it.
+  - The MorphBastard channel `field_0x5c` (-1), and
+    KbMorphMod::LoadParameterFile `a` (MorphBastardModifier `0x004a33b0`).
+  - The SceneManager `0x004edfe0` body.
+
+Multi-member pads that need a declaration split, not a rename:
+
+- RaceView, BikeRace and racer views of KrustyBike:
+  - EventKrustyBikeView `field_0x018`, `field_0x070`, `field_0x094`, and
+    `field_0x488` (takeoffPosition + takeoffVelocity);
+  - BikeRaceKrustyBikeView `field_0x070`, `field_0x094`, `field_0x0c0`, and
+    `field_0x5c8` (loadInfo + riderName);
+  - QuarryLoadKrustyBikeView `field_0x5c8` (Group3_QuarryLoad.cpp,
+    QuarryStuntEventLoaderNearMiss.cpp);
+  - BikeCameraBikeView `field_0x5c8` (loadInfo .. tailContact);
+  - InstrumentKrustyBikeView `field_0x0c0`;
+  - VehicleCameraVehicleView `field_0x070`, `field_0x094` and `field_0x0c0`;
+  - EventManagerNearMisses.cpp:110 and Group1_PodiumScene.cpp:79
+    `field_0x5c8[0x784 - 0x5c8]`;
+  - the `field_0x10a[2]` racer/tag-ball view at BikeRace.h:410 (asleep and
+    +0x10b).
+- Camera views:
+  - ArcadeCameraView, BonusCameraView and PickerCameraView `field_0x17c`
+    (viewDirection, upDirection and roll);
+  - D3DIMSoultreeCameraView `field_0x188` and EcoCameraView `field_0x188`
+    (upDirection + roll);
+  - EcoCameraView `field_0xec` (screenMatrix + 0x12c..0x170);
+  - Group1ParticleCamera `field_0x000`, `field_0x12c` and `field_0x19c`;
+  - BikeRaceKrustyBikeCameraView and QuarryLoadKrustyBikeCameraView
+    `field_0x398` (cachedTargetHeading + cachedTargetPoint);
+  - QuarryLoadKrustyBikeCameraView `field_0x02c`.
+- SoultreeObject views:
+  - StartD3DIMSoultreeObjectView `field_0x278` (lowestLod .. useAutoLod);
+  - RacerD3DIMSoultreeObjectView `field_0x284`;
+  - D3DIMSoulTree.h `field_0x194` (inQuadtree, quadtreeCell,
+    loadedNodeCount);
+  - SelectGameD3DIMSoultreeCharacterView `field_0x010`;
+  - SceneSoultreePhysicsBaseObjectView and SceneSoultreePhysicsObjectView
+    `field_0x0c`.
+- Race settings and results:
+  - SelectGameRaceSettingsView `field_0x14` and `field_0x14c`;
+  - KrustyVCRHeader (DlgProcs.h) `field_0x40`, `field_0x58` and `field_0x61`;
+  - KrustyUI `field_0x4b4` and `field_0x674` (a KrustyVCRHeader copy around
+    gridOrder);
+  - ProCircuitRacerResultView `field_0x08` and `field_0x2c`;
+  - EventManager `field_0x444` (the AI racer table);
+  - TrackGameRaceGateView `field_0x00`;
+  - SceneCarProceduralView `field_0x40`.
+- UI:
+  - GuiControlView `field_0x60`, `field_0xc0`, `field_0xf4` and
+    `field_0x164`;
+  - CursorUIAnimView `field_0x00` and `field_0x14`;
+  - KrustyUIToolTipView `field_0x00`;
+  - the Instrument, Chat, Stats, RadarGateEvent and NameOverlayEvent view
+    pads;
+  - DDSurfaceDesc2 `field_0x28` (the four DDCOLORKEYs) and `field_0x1c`
+    (dwAlphaBitDepth + dwReserved).
+- Render and terrain:
+  - Particle corner `field_0x0c` (rhw .. v of the FVF 0x1c4 vertex);
+  - GridTerrain `field_0x540`, `field_0xc18` and `field_0xc90`;
+  - GridManagedTexture `field_0x00`.
+- Quad-tree heads:
+  - CarProcedural.h `field_0x04`, Bike.cpp BikeQuadTreeHead `field_0x04` and
+    StartObjectColliderBase `field_0x04` (queryStamp + sortKey);
+  - CarProcedural model `field_0x38`.
+- KbNetState `field_0x00` and `field_0x04`.
