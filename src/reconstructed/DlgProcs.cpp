@@ -1383,7 +1383,7 @@ int LoadingDlg::Tick(float frameTime) {
         if (!g_TrackGame->eventManager->LoadEvent()) {
             EndDialog(0);
             if (g_TrackGame->network) {
-                UnknownLoadFailedMessage message;
+                LoadFailedMessage message;
                 message.playerId = g_TrackGame->network->localPlayer;
                 g_TrackGame->network->Send(0xcc, &message, sizeof(message),
                                                                         message.playerId, 0);

@@ -1614,7 +1614,7 @@ void ChatOverlay::SetCueRacer(float squaredDistance, const char* name)
 // 0x0051da30
 int ChatOverlay::HandleChatKey(int key, int* result)
 {
-    UnknownChatMessage message;
+    ChatMessage message;
     if (inputShown) {
         *result = 0;
         if (key == 0xd || key == 0xa) {

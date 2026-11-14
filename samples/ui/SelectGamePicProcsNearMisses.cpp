@@ -287,7 +287,7 @@ void MultiPlayerDlg::SendStartMessage(short start) {
         if (names)
             DebugFree(names, __FILE__, 0x23e);
     }
-    UnknownLobbyStartMessage message;
+    LobbyStartMessage message;
     message.start = start;
     message.raceSettings = g_TrackGame->mode.raceSettings;
     message.difficulty = g_TrackGame->mode.difficulty;

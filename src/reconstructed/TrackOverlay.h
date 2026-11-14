@@ -382,7 +382,7 @@ struct ChatHistoryEntry {
 
 // Network message 0x85 (0x4e bytes sent): a chat line. Its first field is
 // set by the sender (0x0051da30) only through SendRaw.
-struct UnknownChatMessage {
+struct ChatMessage {
     int header;                               // +0x00 SendRaw (0x004ad280) writes the type byte here and the sequence at +0x02
     char text[0x4a];
 };

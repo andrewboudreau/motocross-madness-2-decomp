@@ -99,7 +99,7 @@ int g_LobbyRemotePlayerCount;
 int g_LobbyReadyBlockReason;
 
 // The chat message (types 0x85 and 0x92): 0x4e bytes are sent.
-struct UnknownChatMessage {
+struct ChatMessage {
     int header;                               // +0x00 SendRaw (0x004ad280) writes the type byte here and the sequence at +0x02
     char text[0x4a];                          // +0x04: the chat text
 };
@@ -121,7 +121,7 @@ struct UnknownPlayerStateMessage {
 };
 
 // The player removal message (type 0x8e).
-struct UnknownKickMessage {
+struct RemovePlayerMessage {
     int header;                               // +0x00 SendRaw (0x004ad280) writes the type byte here and the sequence at +0x02
     int playerId;                             // +0x04: player id
 };
@@ -134,14 +134,14 @@ struct UnknownGridDraw {
 };
 
 // The player left message (type 5).
-struct UnknownPlayerLeftMessage {
+struct DPMsgDestroyPlayerOrGroup {
     int type;                                 // +0x00 5: a DirectPlay system message (no Send passes 5; NetMessage::Set 0x004aacc0 reads the whole dword when from == 0)
     int field_0x04;
     int playerId;                             // +0x08: player id
 };
 
 // The lobby start message (type 0x83, 0x8d8 bytes).
-struct UnknownLobbyStartMessage {
+struct LobbyStartMessage {
     int header;                               // +0x00 SendRaw (0x004ad280) writes the type byte here and the sequence at +0x02
     short start;                              // +0x04: start
     RaceSettings raceSettings; // +0x08: TrackGame+0x2d70
@@ -654,7 +654,7 @@ void MultiPlayerDlg::ResetReadyButtons() {
 
 // 0x004f38a0
 void MultiPlayerDlg::SendChatLine() {
-    UnknownChatMessage message;
+    ChatMessage message;
     UIEditBox* edit = static_cast<UIEditBox*>(FindControl("EditChat", 0xb));
     int length = strlen("");
     int count = length > 0x49 ? 0x49 : length;
@@ -673,7 +673,7 @@ void MultiPlayerDlg::SendChatLine() {
 
 // 0x004f3980
 void MultiPlayerDlg::SendSystemChatLine(const char* text) {
-    UnknownChatMessage message;
+    ChatMessage message;
     int length = strlen(text);
     int count = length > 0x49 ? 0x49 : length;
     strncpy(message.text, text, count);
@@ -688,7 +688,7 @@ void MultiPlayerDlg::SendSystemChatLine(const char* text) {
 void MultiPlayerDlg::RemoveLobbyPlayer(int index) {
     int player = g_LobbyRemotePlayers[index].id;
     if (player && player != g_TrackGame->network->localPlayer) {
-        UnknownKickMessage message;
+        RemovePlayerMessage message;
         NetworkInterface* network = g_TrackGame->network;
         message.playerId = player;
         network->Send(0x8e, &message, sizeof(message), network->localPlayer, player);
@@ -762,7 +762,7 @@ int MultiPlayerDlg::OnNetworkMessage(int type, void* data, int from, int to, int
             }
         }
     } else if (from && type == 0x83) {
-        UnknownLobbyStartMessage* start = (UnknownLobbyStartMessage*)data;
+        LobbyStartMessage* start = (LobbyStartMessage*)data;
         g_TrackGame->mode.raceSettings = start->raceSettings;
         g_TrackGame->mode.difficulty = start->difficulty;
         int total = g_TrackGame->mode.raceSettings.networkPlayerCount + g_TrackGame->mode.raceSettings.multiplayerAiRacerCount;
@@ -814,7 +814,7 @@ int MultiPlayerDlg::OnNetworkMessage(int type, void* data, int from, int to, int
         AddChatLine(-1, (const char*)data + 4);
         return 1;
     } else if (type == 5) {
-        lobbySlots.FreeSlot(((UnknownPlayerLeftMessage*)data)->playerId);
+        lobbySlots.FreeSlot(((DPMsgDestroyPlayerOrGroup*)data)->playerId);
         if (eventPage) {
             UIListBox* list = static_cast<UIListBox*>(eventPage->FindControl("OpponentsListBox", 0));
             if (g_TrackGame->network->isHost && list &&
@@ -833,7 +833,7 @@ int MultiPlayerDlg::OnNetworkMessage(int type, void* data, int from, int to, int
             }
         }
     } else if (from && type == 0x8e) {
-        UnknownKickMessage* kick = (UnknownKickMessage*)data;
+        RemovePlayerMessage* kick = (RemovePlayerMessage*)data;
         int player = g_TrackGame->network->localPlayer;
         if (kick->playerId == player) {
             if (g_TrackGame->network->lobbyConnected) {

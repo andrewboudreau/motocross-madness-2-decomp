@@ -48,7 +48,7 @@ struct UnknownGridDraw {
 };
 
 // The lobby start message (type 0x83, 0x8d8 bytes).
-struct UnknownLobbyStartMessage {
+struct LobbyStartMessage {
     int header;                               // +0x00 SendRaw writes the type byte and sequence here
     short start;                              // +0x04: start
     RaceSettings raceSettings; // +0x08: TrackGame+0x2d70
@@ -200,7 +200,7 @@ void MultiPlayerDlg::SendStartMessage(short start) {
         if (names)
             DebugFree(names, "D:\\aardvark\\VC\\krusty2\\SelectGamePicProcs.cpp", 0x23e);
     }
-    UnknownLobbyStartMessage message;
+    LobbyStartMessage message;
     message.start = start;
     message.raceSettings = g_TrackGame->mode.raceSettings;
     message.difficulty = g_TrackGame->mode.difficulty;

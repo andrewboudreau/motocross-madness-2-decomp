@@ -248,7 +248,7 @@ extern int g_UnknownGlobal59ae88;
 
 // The 8-byte message 0xcc a network player sends when its race fails to
 // load.
-struct UnknownLoadFailedMessage {
+struct LoadFailedMessage {
     int header;                               // +0x00 SendRaw (0x004ad280) writes the type byte here and the sequence at +0x02
     int playerId;                             // +0x04: the sender's player id
 };
