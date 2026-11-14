@@ -249,7 +249,7 @@
     {
       "path": "samples/ui/ListBoxButtonDown.cpp",
       "status": "reviewed-nonexact",
-      "reason": "Complete list-box mouse selection passes 8707 native row, real-height-helper, Windows hit-test, callback and fault scenarios. The 342-byte candidate has 306 matching positions against 342 retail bytes; an evidenced Y-before-X point-read correction changes the former 322-position partial. Selection, base dispatch and click reporting are scripted boundaries; integrated menu navigation remains untested.",
+      "reason": "Complete list-box mouse selection passes 8707 native row, real-height-helper, Windows hit-test, callback and fault scenarios. The 342-byte candidate has 320 matching positions against 342 retail bytes; an evidenced Y-before-X point-read correction changes the former 322-position partial. Selection, base dispatch and click reporting are scripted boundaries; integrated menu navigation remains untested.",
       "evidence": "docs/LIST_BOX_BUTTON_DOWN.md#functional-build-review"
     },
     {

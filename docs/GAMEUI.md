@@ -293,7 +293,7 @@ COM/alias/fault proof. Real DirectDraw rendering remains outside that fixture.
 The complete list-box mouse-button candidate is maintained in
 `samples/ui/ListBoxButtonDown.cpp`. Explicit Y-before-X point reads correct a
 native-confirmed fault-order discrepancy. The full extent stays 342 bytes;
-matching positions change from 322 to 306. [List-box behavior evidence](LIST_BOX_BUTTON_DOWN.md)
+matching positions change from 322 to 320. [List-box behavior evidence](LIST_BOX_BUTTON_DOWN.md)
 records the preserved aggregate, existing strict providers and 8,707-case
 native proof with scripted selection/base/event boundaries.
 

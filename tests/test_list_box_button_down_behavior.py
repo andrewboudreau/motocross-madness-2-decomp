@@ -68,7 +68,7 @@ class ListBoxButtonDownBehaviorTests(unittest.TestCase):
             self.assertEqual(candidate.symbol_extent(candidate.find_symbol(SYMBOL))[1],342)
             self.assertEqual(fingerprint(candidate,SYMBOL),fingerprint(aggregate,SYMBOL))
             report=compare(image,candidate,SYMBOL,0x477e90,342,ROOT/'samples/ui/ListBoxButtonDown.bindings.json')
-            self.assertFalse(report['strict_exact']);self.assertEqual(report['strict_match']['matching_positions'],306)
+            self.assertFalse(report['strict_exact']);self.assertEqual(report['strict_match']['matching_positions'],320)
             self.assertEqual({s.name for s in candidate.symbols if s.storage_class==2 and s.section_number>0 and s.type==0x20},{SYMBOL})
             self.assertEqual({s.name for s in candidate.symbols if s.storage_class==2 and s.section_number==0},
                 {'?GetRowHeight@UIListBox@@QAEHH@Z','?SelectRow@UIListBox@@QAEHH@Z','?ButtonDown@UIControl@@UAEHHH@Z','__imp__PtInRect@12'})

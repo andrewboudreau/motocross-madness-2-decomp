@@ -23,7 +23,7 @@ the complete decoded body, and both emitted and retail slot destinations.
 ## Functional build review
 
 `samples/ui/ListBoxButtonDown.cpp` is the separately compiled complete
-candidate. It remains **nonexact: 342 bytes, 306 matching positions** under
+candidate. It remains **nonexact: 342 bytes, 320 matching positions** under
 VC6 SP3 `/O2 /GR /GX /MT`. The original candidate had the same size and
 322 matching positions, but a demonstrated observable behavior difference.
 
@@ -31,9 +31,12 @@ Retail loads the point's Y coordinate at `0x00477f24`, then X at `0x00477f2e`.
 The old candidate loaded X first. Native comparison with point address 1
 reproduced an access violation reading **address 5 in retail versus address 1
 in the old source**, after one identical real GetRowHeight observation.
-Explicit ordered volatile reads now load Y and then X into the local POINT.
+The maintained form copies the point into a local POINT with no row-height
+local ahead of it; VC6 forwards those copies into the by-value pushes and
+loads Y, then X. (An earlier correction used ordered volatile reads: 306
+matching positions.)
 This narrow correction preserves ordinary coordinate values and matches the
-observed fault order. Its lower byte score is recorded rather than hidden by
+observed fault order. The scores are recorded rather than hidden by
 changing the target extent or replacing the old baseline.
 
 The ignored evidence is `work/list-button35/before-fault.log`,

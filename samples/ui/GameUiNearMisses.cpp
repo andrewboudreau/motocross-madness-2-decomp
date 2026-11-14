@@ -2,11 +2,11 @@
 // included below for its types and matched functions). Check: compile this
 // file and compare each function with GameUiNearMisses.bindings.json.
 //
-// 0x00477e90 UIListBox slot 55 (306 matching positions, full retail and
+// 0x00477e90 UIListBox slot 55 (320 matching positions, full retail and
 //   candidate both 342 bytes): included from ListBoxButtonDown.cpp. The old
 //   322-position form read point.x before point.y and faulted at address1
-//   instead of retail's address5 for point=1. Ordered volatile reads preserve
-//   the decoded y-then-x behavior; see docs/LIST_BOX_BUTTON_DOWN.md.
+//   instead of retail's address5 for point=1. Point copies with no height
+//   local keep the decoded y-then-x reads; see docs/LIST_BOX_BUTTON_DOWN.md.
 // 0x0047b490 colour-key test (120/220): keeping the key pixel in the red
 //   term's variable (`pixel |= green | blue`) keeps it in a register and
 //   spills the row counter into the key's argument slot as retail does;
