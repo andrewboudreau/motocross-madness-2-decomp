@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 2, b 109, c 71, total 182. The three class (a) functions of the
+Counts: a 2, b 108, c 71, total 181. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -154,6 +154,13 @@ src/krusty2/collision/CollisionObject.cpp: the contact normal is copied by value
 leaf age and the register base. A sweep of initialised-local counts (k = 0..15) across
 about 90 physics, race and camera rows is flat for most; where it varies it is mostly
 period 8 and never fixes scheduling (push order, `sub esp`, store placement).
+ChatOverlay::CollectRacers `0x0051d730` (class b, 214/510 masked) is exact in its
+samples/track sample: both `NameOverlay::Create` calls read the render context in place
+(`(RenderTarget*)renderContext`). An inline accessor in an argument list is loaded ahead
+of the other arguments; the member read gives the natural right-to-left interleaving.
+The same session took UIDropDownList::LayoutParts `0x0047a400` to 887/962 (use the shared
+value first, then `scroll.bottom = list.bottom - 2`) and UIListBox::ButtonDown
+`0x00477e90` to 320/342 (`rect.bottom = rect.top + GetRowHeight(row)` with no height local).
 Compiler flags (s21, `MCM2_EXTRA_FLAGS` of `tools/rank_near_misses.py`): EcoSystem `0x00456890` and `0x00457ed0`,
 Griddraw `0x0047e600`, CacheTexture `0x005102d0`, ResourceManager `0x004e9030`,
 TextService `0x0050ba00` and the FollowCamera constructor `0x00462ee0` are unchanged
@@ -337,7 +344,6 @@ BuildFaceGeometry `0x0043dc60` from 121/1064 to 1100/1104.
 | track/TrackOverlay | `0x0051bed0` | 1057/1088 (masked) | b | 3 code diffs: retail lacks `add edx, 0x5e0 ; push edx ; push ecx`; retail adds `add edx, 0x5e0`; slots differ |
 | track/TrackOverlay | `0x0051c4f0` | 334/520 (masked) | b | 13 code diffs: `mov ecx, [esp + N]` vs `mov eax, [esp + N]`; retail adds `fld [esp + N] ; faddp st(2)`; slots differ |
 | track/TrackOverlay | `0x0051c720` | 249/962 (masked) | b | 10 code diffs: `mov [ebp + N], ecx ; fstp [ebx + 0x1dc]~` vs `mov [ebx + 0x1bc], ecx`; retail adds `fstp [esi] ; fild [esp + N]`; frame 0x74 vs 0x8c, slot order differs |
-| track/TrackOverlay | `0x0051d730` | 214/510 (masked) | b | 26 code diffs: `xor ebp, ebp` vs `xor ebx, ebx`; `mov [esi + 0x198], ebp ; mov [esp + N],~` vs `mov [esi + 0x198], ebx ; mov [esp + N],~`; slots differ |
 | track/TrackOverlay | `0x0051e3f0` | 886/894 (masked) | b | 6 code diffs: `mov edx, [ebx + ebp*4 + 0x16c]` vs `mov eax, [ebx + ebp*4 + 0x16c]`; `lea eax, [esp + N] ; fld [edx + 0x4a4]` vs `lea ecx, [esp + N] ; fld [eax + 0x4a4]`; slots differ ; the "%.3f" branch register choice (racer eax, buffer ecx, game edx); shadowing-size, racer-local and branch forms reach 853-886 |
 | ui/DlgProcs | `0x0044b200` | 925/5232 | b | references match retail since ButModem returns from its loop (three array destructor calls); left: frame 0xc64 vs 0x6c4 (the two ConnectionInfoType[5] arrays get separate slots) and retail's `edi = 1` in the MenuMulti block |
 | ui/DlgProcs | `0x0044fae0` | 1181/1235 | b | 8 code diffs: retail lacks `mov edi, esp`; retail adds `mov edi, esp`; slots differ |
@@ -349,10 +355,10 @@ BuildFaceGeometry `0x0043dc60` from 121/1064 to 1100/1104.
 | ui/GameUi | `0x004734c0` | 256/354 | c | 8 code diffs: `je @82 ; jmp @81` vs `je @83 ; mov edi, 1 ; jmp @84` |
 | ui/GameUi | `0x004738a0` | 76/968 | b | one `redrawFrames = redraw` after the texture block (linked 0.873, aligned 215/310; the per-arm stores gave 206/975 strict but 0.830 linked); retail keeps the width and the redraw count in memory; the caret store now writes the member (the old 440 stored through a self-initialised pointer) |
 | ui/GameUi | `0x00474150` | 1018/1044 | c | Backspace: retail gives the cursor eax, VC6 here edx; one local (1004 length / 351 cursor), no locals (339), call as condition and swapped decrements (1002) are worse |
-| ui/GameUi (ListBoxButtonDown) | `0x00477e90` | 306/342 | c | explicit y-before-x reads correct the old 322-position candidate's invalid-point fault order; full extent remains 342 bytes; see [behavior proof](LIST_BOX_BUTTON_DOWN.md) |
+| ui/GameUi (ListBoxButtonDown) | `0x00477e90` | 320/342 | c | explicit y-before-x reads correct the old 322-position candidate's invalid-point fault order; full extent remains 342 bytes; see [behavior proof](LIST_BOX_BUTTON_DOWN.md) |
 | ui/GameUi | `0x00478570` | 139/682 | b | 32 code diffs: `lea eax, [esi + 0x1bc] ; mov [esp + N],~` vs `mov eax, [esi + 0x1bc] ; lea ebx, [esi ~`; retail adds `mov [esp + N], ebx`; slot order differs |
 | ui/GameUi | `0x00478e10` | 231/303 | c | frame and head are retail's (the area is tested in place, no RECT copy); the opaque-result tail differs as in UIButton slot 28 `0x004734c0` (retail returns through edi, 8-bit hit sets edi directly) |
-| ui/GameUi | `0x0047a400` | 702/962 | c | the area bottom written from the list gives retail's store order; VC6 forms it with `lea edx, [edi + edx - 2]` (retail adds the scroll bottom's `sub eax, 2` value) and swaps ebx/edi, shifting later scratch registers |
+| ui/GameUi | `0x0047a400` | 887/962 | c | the area bottom written from the list gives retail's store order; VC6 forms it with `lea edx, [edi + edx - 2]` (retail adds the scroll bottom's `sub eax, 2` value) and swaps ebx/edi, shifting later scratch registers |
 | ui/GameUi | `0x0047b490` | 120/220 | c | the key pixel kept in the red term's variable stays in a register and the row counter spills into the key's slot as retail; VC6 ORs green and blue first where retail ORs red and green first, saves edi in the prologue (retail inside the row loop) and steps the row with one lea |
 | ui/ProCircuitProcs | `0x004d72c0` | 1237/1291 | b | as DlgProcs `0x0044fae0`: only the scheduling of the by-value Vector3 copies for the camera call (`mov edi, esp` placement) differs; kVec3YAxis now bound to this unit's 0x00689b28 |
 | ui/ProCircuitProcs | `0x004d8c40` | 427/886 | c | 15 code diffs: retail lacks `mov edx, [esi + 8]`; retail lacks `mov ebx, [esi + 0x14]` |
