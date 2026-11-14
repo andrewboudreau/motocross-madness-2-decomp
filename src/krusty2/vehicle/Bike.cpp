@@ -557,7 +557,8 @@ static inline float BikeDistanceAcc(const Vec3& a, const Vec3& b)
 // +0xc (Tire.h base offsets).  Only used to convert the new wheel.
 struct BikeQuadTreeHead {
     virtual void UnknownVirtualSlot0();
-    int field_0x04;
+    short queryStamp;           // +0x04 QuadTreeObject queryStamp
+    short sortKey;              // +0x06 QuadTreeObject sortKey
     int objectTypeId;           // +0x08 QuadTreeObject objectTypeId (a char there)
 };
 struct BikeTireObject : BikeQuadTreeHead, GameObject {

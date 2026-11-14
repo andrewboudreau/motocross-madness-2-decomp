@@ -24,7 +24,9 @@ struct PickerCameraView {
     float viewMatrix[3][4];                   // +0x0ac
     unsigned char field_0x0dc[0x170 - 0xdc];
     Vector3 eyePosition;                      // +0x170 (Camera::eyePosition)
-    unsigned char field_0x17c[0x198 - 0x17c];
+    Vector3 viewDirection;                    // +0x17c Camera viewDirection
+    Vector3 upDirection;                      // +0x188 Camera upDirection
+    float roll;                               // +0x194 Camera roll
     float focalLength;                        // +0x198
     int displayAspect;
     unsigned int viewportX;                   // +0x1a0 viewport x

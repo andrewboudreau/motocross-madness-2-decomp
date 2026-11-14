@@ -164,7 +164,8 @@ struct DDSurfaceDesc2 {
     };
     unsigned char field_0x1c[0x24 - 0x1c];
     void* surface;                                // the locked bits
-    unsigned char field_0x28[0x48 - 0x28];
+    unsigned char field_0x28[0x40 - 0x28];
+    unsigned long srcBltColorKey[2];              // +0x40 ddckCKSrcBlt
     DDPixelFormat pixelFormat;
     unsigned long caps[4];
     unsigned long textureStage;

@@ -75,10 +75,14 @@ class TextureMapManager;
 // passed as 0 here.
 #include "../../reconstructed/TextureLoader.h"
 
-// One 0x20-byte TLVERTEX-sized template (FVF 0x1c4); slot 27 writes only x, y, z.
+// One 0x20-byte TLVERTEX-sized template (FVF 0x1c4 = XYZRHW | DIFFUSE | SPECULAR | TEX1;
+// the members after z follow D3DTLVERTEX); slot 27 writes only x, y, z.
 struct ParticleCornerVertex {
     float x, y, z;
-    char field_0x0c[0x20 - 0x0c];
+    float rhw;                    // +0x0c
+    unsigned int color;           // +0x10 diffuse (Group1CornerColor)
+    unsigned int specular;        // +0x14
+    float tu, tv;                 // +0x18
 };
 
 // Four sprite-cell texture-coordinate corners (u, v) in the global table at 0x00689158

@@ -240,7 +240,9 @@ struct BonusCameraView {
     unsigned char field_0x000[0x16c];
     float fieldOfView;                        // +0x16c
     Vector3 eyePosition;                      // +0x170
-    unsigned char field_0x17c[0x198 - 0x17c];
+    Vector3 viewDirection;                    // +0x17c Camera viewDirection
+    Vector3 upDirection;                      // +0x188 Camera upDirection
+    float roll;                               // +0x194 Camera roll
     float focalLength;                        // +0x198
 };
 

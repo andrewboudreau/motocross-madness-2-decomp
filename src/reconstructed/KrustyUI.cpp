@@ -53,7 +53,7 @@ void SetTaskSwitchAllowed(int value);
 // The Soultree object at a character's +0x1a0.
 struct KrustyUISoultreeObjectView {
     void SetPosition(const Vector3* position);   // 0x004fc660
-    void SetAxes(float zx, float zy, float zz, float yx, float yy, float yz, float g,
+    void SetAxes(float zx, float zy, float zz, float yx, float yy, float yz, int orthogonalize,
                                int keepZ);                     // 0x004fbd10
 };
 

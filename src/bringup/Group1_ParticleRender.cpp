@@ -113,13 +113,16 @@ struct Group1ParticleGame {
 struct Group1ParticleCamera {
     char field_0x000[0xec];
     float screenMatrix[16];        // +0xec screen x view matrix (column 2 gives view depth)
-    char field_0x12c[0x170 - 0x12c];
+    char field_0x12c[0x16c - 0x12c]; // +0x12c Camera screenMatrix[1]
+    float fieldOfView;             // +0x16c Camera fieldOfView
     Vector3 eyePosition;           // +0x170
     Vector3 viewDirection;         // +0x17c
     Vector3 upDirection;           // +0x188
     char roll[0x198 - 0x194]; // +0x194: Camera::roll (bytes kept)
     float focalLength;             // +0x198
-    char field_0x19c[0x1bc - 0x19c];
+    float displayAspect;           // +0x19c Camera displayAspect
+    int viewport[6];               // +0x1a0 Camera viewport
+    float heightWidthRatio;        // +0x1b8 Camera heightWidthRatio
     float nearPlane;               // +0x1bc
     float farPlane;                // +0x1c0
     int targetWidth;               // +0x1c4
@@ -138,7 +141,7 @@ static inline Group1ParticleRect* Group1Rect(Particle* particle)
 
 static inline unsigned int& Group1CornerColor(ParticleCornerVertex& corner)
 {
-    return *reinterpret_cast<unsigned int*>(corner.field_0x0c + 4);   // +0x10
+    return corner.color;   // +0x10
 }
 
 // The normalize retail inlines twice: unit vectors are kept as they are.

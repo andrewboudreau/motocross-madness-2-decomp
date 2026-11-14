@@ -123,7 +123,9 @@ public:
     Vector3 subtreeBoundsHalfExtent;           // +0x180 subtree bounds half extent (0x004fe0f0)
     int subtreeDirty;                          // +0x18c subtree bounds dirty (set up the parent chain by 0x004fdab0)
     int drawsItself;                           // +0x190 slot 12 tests it before the visibility test; the quadtree renderer clears it (core/SoultreeObject.h). Tier 3
-    unsigned char field_0x194[0x1a0 - 0x194];
+    int inQuadtree;                           // +0x194 SoultreeObject inQuadtree
+    int quadtreeCell;                         // +0x198 SoultreeObject quadtreeCell (15 = none)
+    int loadedNodeCount;                      // +0x19c SoultreeObject loadedNodeCount
     ParameterBlock* parameterBlock;     // .slt reader
 };
 
@@ -199,7 +201,8 @@ struct D3DIMSoultreeCameraView {
     unsigned char field_0x12c[0x170 - 0x12c];
     Vector3 position;                          // position
     Vector3 viewDirection;                     // view direction (drawing mode 5)
-    unsigned char field_0x188[0x198 - 0x188];
+    Vector3 upDirection;                      // +0x188 Camera upDirection
+    float roll;                               // +0x194 Camera roll
     float imagePlaneDistance;                  // image plane distance
     int displayAspect;
     unsigned int viewportX;                    // viewport x

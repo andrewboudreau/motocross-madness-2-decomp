@@ -30,10 +30,10 @@ int UIButton::ContainsPoint(POINT point, int state) {
         if (!texture->systemSurface->Lock(0, &desc, 1, 0)) {
             int offset = desc.pitch * y / PixelFormatBytesPerPixel(format) + x;
             if (format == 8) {
-                if (((unsigned char*)desc.surface)[offset] != *(unsigned char*)&desc.field_0x28[0x18])
+                if (((unsigned char*)desc.surface)[offset] != *(unsigned char*)&desc.srcBltColorKey[0])
                     opaque = 1;
             } else {
-                if (((unsigned short*)desc.surface)[offset] != *(unsigned short*)&desc.field_0x28[0x18])
+                if (((unsigned short*)desc.surface)[offset] != *(unsigned short*)&desc.srcBltColorKey[0])
                     opaque = 1;
             }
             if (texture->systemSurface->Unlock(0))
@@ -60,10 +60,10 @@ int UIMultiState::ContainsPoint(POINT point, int state) {
         if (!texture->systemSurface->Lock(0, &desc, 1, 0)) {
             int offset = desc.pitch * y / PixelFormatBytesPerPixel(format) + x;
             if (format == 8) {
-                if (((unsigned char*)desc.surface)[offset] != *(unsigned char*)&desc.field_0x28[0x18])
+                if (((unsigned char*)desc.surface)[offset] != *(unsigned char*)&desc.srcBltColorKey[0])
                     opaque = 1;
             } else {
-                if (((unsigned short*)desc.surface)[offset] != *(unsigned short*)&desc.field_0x28[0x18])
+                if (((unsigned short*)desc.surface)[offset] != *(unsigned short*)&desc.srcBltColorKey[0])
                     opaque = 1;
             }
             if (texture->systemSurface->Unlock(0))

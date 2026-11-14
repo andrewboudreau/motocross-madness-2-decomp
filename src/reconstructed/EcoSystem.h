@@ -152,7 +152,8 @@ public:
 
     unsigned char field_0x004[0xac - 4];
     Matrix4 viewMatrix;                       // +0xac
-    unsigned char field_0xec[0x170 - 0xec];   // the clipper's matrix
+    Matrix4 screenMatrix[2];                  // +0x0ec Camera screenMatrix; [0] is the clipper's matrix
+    float fieldOfView;                        // +0x16c Camera fieldOfView
     Vector3 position;                         // +0x170
     Vector3 direction;                        // +0x17c
     unsigned char field_0x188[0x198 - 0x188];

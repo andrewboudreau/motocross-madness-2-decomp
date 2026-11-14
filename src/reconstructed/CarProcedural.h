@@ -49,7 +49,8 @@ public:
     Vector3 LocalToWorldDirection(const Vector3& direction);                  // 0x004fd5c0 (ret 8) local -> world
     void SetAxesPtr(const Vector3* axisZ, const Vector3* axisY, int orthogonalize, int keepZ); // 0x004fbd70
 
-    int field_0x04;
+    short queryStamp;// +0x04 QuadTreeObject queryStamp
+    short sortKey;  // +0x06 QuadTreeObject sortKey
     int objectTypeId;   // +0x08 QuadTreeObject objectTypeId (a char there)
 };
 
