@@ -136,11 +136,11 @@ public:
     virtual void AddAttachment(int type, GameObject* emitter, void* point, int a);
     virtual void ApplyCollisionEvent();
     virtual void ApplyPendingRespawn();
-    virtual GameObject* LoadPhysicsModel(void* owner, const char* name, LightManager* lights, int a4,
-                                             Vector3 position, Vector3 look, Vector3 up, int a8, int a9,
-                                             float a10, int points, int emitters, Scene* scene, float a14,
-                                             int a15, float a16, float a17, float radius, int shape,
-                                             int minPoints, char a21, int a22);
+    virtual GameObject* LoadPhysicsModel(void* owner, const char* name, LightManager* lights, int options,
+                                             Vector3 position, Vector3 look, Vector3 up, int terrainProbe, int a9,
+                                             float weight, int points, int emitters, Scene* scene, float fixedStep,
+                                             int maxSteps, float drag, float elasticity, float radius, int shape,
+                                             int minPoints, char probeMask, int createCollision);
 
     int field_0x04;
     void* followedNode;                   // +0x08: the scene node the collision points follow
@@ -173,8 +173,8 @@ public:
 
 // 0x0043a330 (cdecl, CollisionPoint.cpp): adds a collision point at
 // `position` to `points` (`*count` of `capacity`).
-void* AddCollisionPoint(int capacity, void** points, const Vector3* position, void* owner, float a4,
-                        int* count, float friction, int a7);
+void* AddCollisionPoint(int capacity, void** points, const Vector3* position, void* owner, float threshold,
+                        int* count, float friction, int surfaceOwner);
 // 0x004b5d00 (cdecl): the look and up vectors of a heading and pitch.
 void OrientationAxesFromAngles(Vector3* look, Vector3* up, float heading, float pitch, int a);
 
@@ -209,7 +209,7 @@ static inline int FindEmitter(const char* name, const UnknownSceneEmitterKeyword
 // 0x004ecd60: see the declaration. A model whose ".seg" name is the
 // stadium's gets no collision object; its ".col" file is used when the
 // archive has one.
-int Scene::ReadStaticModels(LightManager* lights, int a2, int a3, int a4, void (*progress)(int),
+int Scene::ReadStaticModels(LightManager* lights, int particleManager, int textureManager, int modelTextures, void (*progress)(int),
                                  int interval)
 {
     int models;
@@ -304,8 +304,8 @@ int Scene::ReadStaticModels(LightManager* lights, int a2, int a3, int a4, void (
             if (minPoints >= points - 1)
                 minPoints = points - 1;
             UnknownScenePhysicsObject* object = new(__FILE__, 1845) UnknownScenePhysicsObject(1, 1);
-            AppendChild(object->LoadPhysicsModel(renderContext, sltPath, lights, a4, position, look, up,
-                                                               0, a2, 5.0f, points, emitters, this,
+            AppendChild(object->LoadPhysicsModel(renderContext, sltPath, lights, modelTextures, position, look, up,
+                                                               0, particleManager, 5.0f, points, emitters, this,
                                                                0.033333f, 10, 0.025f, 0.05f, radius, shape,
                                                                minPoints, field_0x88, 1),
                                   -1);
@@ -323,7 +323,7 @@ int Scene::ReadStaticModels(LightManager* lights, int a2, int a3, int a4, void (
                                       &object->collisionPointCount,
                                       friction, (int)this);
                 }
-            if (a2) {
+            if (particleManager) {
                 int dust = 0;
                 int chunk = 0;
                 int spray = 0;
@@ -344,7 +344,7 @@ int Scene::ReadStaticModels(LightManager* lights, int a2, int a3, int a4, void (
                         } else {
                             UnknownSceneDustEmitter* emitter = new(__FILE__, 1917) UnknownSceneDustEmitter(1);
                             D3DIMSoultreeObject* node = object;
-                            node->AppendChild(emitter->Create(renderContext, a2), -1);
+                            node->AppendChild(emitter->Create(renderContext, particleManager), -1);
                             object->AddAttachment(1, emitter, *object->collisionPoints, 0);
                             dust = 1;
                         }
@@ -356,7 +356,7 @@ int Scene::ReadStaticModels(LightManager* lights, int a2, int a3, int a4, void (
                         } else {
                             UnknownSceneChunkEmitter* emitter = new(__FILE__, 1927) UnknownSceneChunkEmitter(1);
                             D3DIMSoultreeObject* node = object;
-                            node->AppendChild(emitter->Create(renderContext, a2), -1);
+                            node->AppendChild(emitter->Create(renderContext, particleManager), -1);
                             object->AddAttachment(2, emitter, *object->collisionPoints, 0);
                             chunk = 1;
                         }
@@ -368,7 +368,7 @@ int Scene::ReadStaticModels(LightManager* lights, int a2, int a3, int a4, void (
                         } else {
                             UnknownSceneSprayEmitter* emitter = new(__FILE__, 1937) UnknownSceneSprayEmitter(1);
                             D3DIMSoultreeObject* node = object;
-                            node->AppendChild(emitter->Create(renderContext, a2), -1);
+                            node->AppendChild(emitter->Create(renderContext, particleManager), -1);
                             object->AddAttachment(3, emitter, *object->collisionPoints, 0);
                             spray = 1;
                         }
@@ -387,7 +387,7 @@ int Scene::ReadStaticModels(LightManager* lights, int a2, int a3, int a4, void (
             staticModels->casters[i].physicsObject = 0;
             D3DIMSoultreeObject* object = new(__FILE__, 1956) D3DIMSoultreeObject(1);
             staticModels->casters[i].model = (ShadowCaster*)object;
-            AppendChild(object->LoadModel(renderContext, sltPath, (int)lights, a4, 1), -1);
+            AppendChild(object->LoadModel(renderContext, sltPath, (int)lights, modelTextures, 1), -1);
             int length = strcspn(sltPath, ".");
             int count = length < 0x14 ? length : 0x14;
             strncpy(staticModels->casters[i].fileName, sltPath, count);
@@ -460,7 +460,7 @@ int Scene::ReadStaticModels(LightManager* lights, int a2, int a3, int a4, void (
 // "Animation<n>", either a key-framed character (MCF file, motions and a
 // motion sequence) or a procedural car (SLT and VUE files), each with an
 // optional sound emitter; then the "RandomSet<n>" sections.
-int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)(int), int interval)
+int Scene::ReadAnimations(LightManager* lights, int textureManager, int modelTextures, void (*progress)(int), int interval)
 {
     int automatic;
     float fps;
@@ -599,7 +599,7 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
         if (animationTable->entries[i].keyFramed) {
             UnknownSceneObject* character = new(__FILE__, 2300) UnknownSceneObject(1);
             animationTable->entries[i].character = character;
-            if (!AppendChild(character->Load(renderContext, sltPath, colPath, lights, a4, 1, 1),
+            if (!AppendChild(character->Load(renderContext, sltPath, colPath, lights, modelTextures, 1, 1),
                                        -1)) {
                 sprintf(message, "\nScene: Cannot create character from %s.\n\n", file);
                 UnknownFunction464e80(message);
@@ -609,7 +609,7 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
         if (!animationTable->entries[i].keyFramed) {
             UnknownSceneAnimatedObject* car = new(__FILE__, 2305) UnknownSceneAnimatedObject(1);
             animationTable->entries[i].proceduralObject = car;
-            if (!AppendChild(car->Create(renderContext, sltPath, colPath, lights, a4, 0, vuePath,
+            if (!AppendChild(car->Create(renderContext, sltPath, colPath, lights, modelTextures, 0, vuePath,
                                                                  &animationTable->entries[i].position, fps,
                                                                  frontWheelsTurn, lagDistance, 1.0f, tires, 0, 0, 0),
                                        -1)) {

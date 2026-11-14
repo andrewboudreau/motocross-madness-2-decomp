@@ -1117,7 +1117,7 @@ int Scene::OnControlPress(ControlEvent* event, InputButtonState* entry)
 // an emitter in `lights` for each light that emits; then the fog, resource
 // files, stadium and the 0x004ecd60/0x004edfe0/0x004ef4c0 parts. Returns 0
 // when a part fails.
-int Scene::Load(void* owner, LightManager* lights, int a3, int a4, int a5,
+int Scene::Load(void* owner, LightManager* lights, int particleManager, int textureManager, int modelTextures,
                                  const char* cubeDirectory, void (*progress)(int), int interval)
 {
     int logProgress;
@@ -1163,12 +1163,12 @@ int Scene::Load(void* owner, LightManager* lights, int a3, int a4, int a5,
             return 0;
         if (sceneLights[i].emitsLight) {
             const char* flare = sceneLights[i].hasLensFlare ? sceneLights[i].lensFlareTexture : 0;
-            int camera = sceneLights[i].hasLensFlare ? (int)g_TrackGame->textureManager : 0;
+            int flareTextureManager = sceneLights[i].hasLensFlare ? (int)g_TrackGame->textureManager : 0;
             sceneLights[i].emitter =
                 (new(__FILE__, 2798) LightEmitter(1))
                     ->Create(renderContext, sceneLights[i].type, sceneLights[i].color,
                                             &sceneLights[i].position, sceneLights[i].emitterDirection,
-                                            sceneLights[i].range, sceneLights[i].showDebugSphere, 0, camera,
+                                            sceneLights[i].range, sceneLights[i].showDebugSphere, 0, flareTextureManager,
                                             (int)flare, i);
             if (!sceneLights[i].emitter)
                 return 0;
@@ -1179,8 +1179,8 @@ int Scene::Load(void* owner, LightManager* lights, int a3, int a4, int a5,
     OpenResourceFiles();
     ReadStadium();
     {
-        int objects = ReadStaticModels(lights, a3, a4, a5, progress, interval);
-        if (!ReadAnimations(lights, a4, a5, progress, interval) && !objects)
+        int objects = ReadStaticModels(lights, particleManager, textureManager, modelTextures, progress, interval);
+        if (!ReadAnimations(lights, textureManager, modelTextures, progress, interval) && !objects)
             Disable();
     }
     ReadSounds();

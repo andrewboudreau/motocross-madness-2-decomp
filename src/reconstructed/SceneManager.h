@@ -38,7 +38,7 @@ public:
     // 0x004319c0: loads the character and returns the GameObject to add
     // (CollisionCharacter::Load, src/krusty2/motion).
     GameObject* Load(void* owner, const char* name, const char* colPath,
-                     LightManager* lights, int a4, int a5, int a6);
+                     LightManager* lights, int loadInfo, int a5, int unused);
     void* FindMotion(const char* name, int unused); // 0x004a6b30 (FindMotion)
     void SetMotion(void* motion);          // 0x004a8b40 (SetMotion)
     int AdvanceMotion(float time, int mirror, int mask); // 0x004a6bb0: advances the motion
@@ -62,7 +62,7 @@ public:
     // Slot 27 (0x0042f600, CarProcedural.h): loads the model and its path;
     // returns the object to add.
     virtual GameObject* Create(void* owner, const char* name, const char* colPath,
-                               LightManager* lights, int a4, int a5, const char* vuePath,
+                               LightManager* lights, int options, int ground, const char* vuePath,
                                const Vector3* position, float fps, int frontWheelsTurn,
                                float lagDistance, float a11, int tires, float a13,
                                float a14, float a15);
@@ -285,18 +285,18 @@ public:
     void UnknownFolded4de580(const char* section, const char* key, const char* value);
     // 0x004efb20: loads the scene: its file, the start and podium positions,
     // the environment, lights, fog, resources, stadium and the rest.
-    int Load(void* owner, LightManager* lights, int a3, int a4, int a5,
+    int Load(void* owner, LightManager* lights, int particleManager, int textureManager, int modelTextures,
                               const char* cubeDirectory, void (*progress)(int), int interval);
     // 0x004ecd60: reads "StaticModels": a model per "Model<n>", with its
     // physics object, collision points and particle emitters or its
     // collision object, and its sound emitter. `progress` is called every
     // `interval` models.
-    int ReadStaticModels(LightManager* lights, int a2, int a3, int a4, void (*progress)(int),
+    int ReadStaticModels(LightManager* lights, int particleManager, int textureManager, int modelTextures, void (*progress)(int),
                               int interval);           // near miss (samples/track)
     // 0x004edfe0: reads "Animations": a key-framed character or a procedural
     // car per "Animation<n>", with its motions and sound emitter, then the
     // "RandomSet<n>" sections.
-    int ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)(int),
+    int ReadAnimations(LightManager* lights, int textureManager, int modelTextures, void (*progress)(int),
                               int interval);           // near miss (samples/track)
     int ReadSounds();                                // 0x004ef4c0: reads the "Sounds" section
     int ReadEnvironment(const char* directory, const char* cubeDirectory); // 0x004ebfc0: "Environment"
