@@ -57,9 +57,9 @@ type, member and function names are provisional.
 - The large readers and loaders:
   - `0x004e9cd0` (345 bytes): opens a file through an archive stream;
   - `0x004eb040` (280): restarts a scene entry's motion or object;
-  - `0x004eb570` (2102): reads "Light<n>" (`UnknownSceneLight`, 0x8c bytes);
+  - `0x004eb570` (2102): reads "Light<n>" (`SceneLight`, 0x8c bytes);
   - `0x004ebfc0` (2650): reads "Environment", the terrain and reverb zones
-    (`UnknownSceneEnvironment`, 0x420 bytes, line 1456);
+    (`SceneEnvironment`, 0x420 bytes, line 1456);
   - `0x004ef4c0` (1274): reads "Sounds" (emitters and plain sounds);
   - `0x004efb20` (1040): the scene loader that calls the readers and
     creates a `LightEmitter` per emitting light (lines 2784/2798);
@@ -73,7 +73,7 @@ type, member and function names are provisional.
 
 ## Views declared in SceneManager.h
 
-- `UnknownSceneLight`, `UnknownSceneEnvironment`: the light and environment
+- `SceneLight`, `SceneEnvironment`: the light and environment
   records; offsets from the readers, names from the section keys.
 - `UnknownSceneObject` is the key-framed entry's CollisionCharacter. It has
   its own vfptr at +0, a vbptr at +4, the GameObject virtual base at +0x268

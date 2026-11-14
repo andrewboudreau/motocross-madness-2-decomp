@@ -147,7 +147,7 @@ procedure bodies read them:
   `soundTable[20]`, +0x9b0/+0x9b4 their counts, +0x9b8 `parentBackground`
   (restored into the background when +0x7f10 is set), +0x9bc `sortingList`,
   +0x9c0 `lastFrameTime`, +0x9c4/+0x9c8 the scales (1.0f), +0x9cc
-  `sectionTable[500]` (0x3c-byte `UnknownGameUiSection`, memset to 0),
+  `sectionTable[500]` (0x3c-byte `DialogSection`, memset to 0),
   +0x7efc `sectionCount`.
 - +0x7f00 `drawClipRegion`/+0x7f04 `previousFont` (the control-draw clip region and replaced font), +0x7f18 `controlsPost3D`
   (1), +0x7f1c `joystickCentred` (1), +0x7f20 `dialogTextures`, +0x7f24

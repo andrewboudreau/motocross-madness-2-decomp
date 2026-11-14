@@ -48,7 +48,7 @@ int Game::Tick() {
     }
 
     meter = (HiResMeter*)g_HiResMeter;
-    UnknownHiResMeterEntry* entry = &meter->timers[gameTickTimer];
+    HiResMeterTimer* entry = &meter->timers[gameTickTimer];
     unsigned __int64 stamp = ReadProfilingCounter();
     unsigned __int64 previous = ((unsigned __int64)entry->startStampHigh << 32)
                              | entry->startStampLow;

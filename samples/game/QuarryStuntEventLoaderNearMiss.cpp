@@ -492,8 +492,8 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
     if (!visibility)
         sprintf(text, "VisibilityQuadTree not created.\n");
     g_MemTagStack->Pop(0);
-    UnknownSceneLight* shadowLight = 0;
-    UnknownSceneLight* flareLight = 0;
+    SceneLight* shadowLight = 0;
+    SceneLight* flareLight = 0;
     for (int i = 0; i < eventScene->lightCount; i++) {
         if (eventScene->sceneLights[i].emitsLight) {
             if (eventScene->sceneLights[i].emitter) {
@@ -619,7 +619,7 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
     g_MemTagStack->Push("Collision");
     if (eventScene->staticModels) {
         for (int i = 0; i < eventScene->staticModels->casterCount; i++) {
-            UnknownSceneCaster* caster = &eventScene->staticModels->casters[i];
+            SceneStaticModel* caster = &eventScene->staticModels->casters[i];
             if (caster->physics) {
                 UnknownTerrain* terrain = eventTerrain;
                 UnknownQuarryPhysicsObject* physics = (UnknownQuarryPhysicsObject*)caster->physicsObject;

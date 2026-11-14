@@ -14,7 +14,7 @@
 // `message` keeps the last status text (the retail literals) but is not
 // otherwise used.
 unsigned __stdcall UnknownRecorderThread(void* parameters) {
-    UnknownRecorderThreadParameters* params = (UnknownRecorderThreadParameters*)parameters;
+    RecorderThreadParameters* params = (RecorderThreadParameters*)parameters;
     VCRInterface* vcr;
     VCRFile* file;
     void* header;

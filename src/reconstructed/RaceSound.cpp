@@ -600,7 +600,7 @@ int RaceSound::UpdateRacerSounds(float frameTime) {
             engineChannels[i].channelSound = 0;
         }
     }
-    qsort(engineChannels, channelsInUse, sizeof(UnknownRaceSoundChannel), CompareChannels);
+    qsort(engineChannels, channelsInUse, sizeof(EngineSoundChannel), CompareChannels);
 
     for (i = channelsInUse - 1; i > -1; i--) {
         if (engineChannels[i].channelSound && i >= 4) {
@@ -1100,8 +1100,8 @@ void RaceSound::PlayItSound() {
 
 // 0x004e5880
 int RaceSound::CompareChannels(const void* a, const void* b) {
-    int first = ((const UnknownRaceSoundChannel*)a)->cameraDistance;
-    int second = ((const UnknownRaceSoundChannel*)b)->cameraDistance;
+    int first = ((const EngineSoundChannel*)a)->cameraDistance;
+    int second = ((const EngineSoundChannel*)b)->cameraDistance;
 
     if (first < second)
         return -1;

@@ -5,7 +5,7 @@
 // RTTI: HiResMeter : GameObject (vtable 0x00554170). A global instance at
 // 0x0067b468 (initializer 0x00488340) prints timer rows on a DebugOverlay
 // page.
-struct UnknownHiResMeterEntry {
+struct HiResMeterTimer {
     unsigned long startStampLow;              // +0x00: raw counter low word (0x00468712)
     unsigned long startStampHigh;             // +0x04: high word, subtracted with borrow
     // Named after slot 10's "MS Timers [CallsThisTick-->TotMSThisTick
@@ -38,5 +38,5 @@ public:
     int timerCount;                           // +0x34: entries in use
     int field_0x38;                           // +0x38: last selected timer; cleared by resets
     int overlayPage;                          // +0x3c: debug overlay page, -1 until assigned
-    UnknownHiResMeterEntry timers[50];        // +0x40
+    HiResMeterTimer timers[50];        // +0x40
 };

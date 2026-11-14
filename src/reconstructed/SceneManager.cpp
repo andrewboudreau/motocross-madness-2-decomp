@@ -613,7 +613,7 @@ int Scene::ReadLight(int index)
     sprintf(section, "Light%d", index + 1);
     int found = parameters.SelectSection(section);
     if (sceneManager->sceneNamed && found) {
-        UnknownSceneLight* light = &sceneLights[index];
+        SceneLight* light = &sceneLights[index];
         parameters.GetString("Type", "BLANK", text, 0x100);
         if (FindKeyword(&light->type, text, s_lightTypes)) {
             UnknownFunction4de580(section, "Type", text);
@@ -694,7 +694,7 @@ int Scene::ReadLight(int index)
         UnknownFunction4de580(section, "Type", text);
         return 0;
     }
-    UnknownSceneLight* light = &sceneLights[index];
+    SceneLight* light = &sceneLights[index];
     if (index == 0) {
         light->type = 6;
         light->color = 0x5a5a5a;
@@ -734,7 +734,7 @@ int Scene::ReadFog()
     float visibility;
     float haziness;
 
-    fog = new(__FILE__, 1392) UnknownSceneFog;
+    fog = new(__FILE__, 1392) SceneFog;
     fog->color = 0x8080c0;
     fog->visibility = 1.0f;
     fog->haziness = 0.5f;
@@ -784,7 +784,7 @@ int Scene::ReadEnvironment(const char* directory, const char* cubeDirectory)
         UnknownFunction464e80(text);
         return 0;
     }
-    environment = new(__FILE__, 1456) UnknownSceneEnvironment;
+    environment = new(__FILE__, 1456) SceneEnvironment;
     sprintf(environment->terrainFile, "%s\\%s", directory, sceneManager->trnFile);
     sprintf(environment->ecosystemFile, "%s\\%s", directory, sceneManager->estFile);
     if (sceneManager->cubeFile[0])
@@ -1156,7 +1156,7 @@ int Scene::Load(void* owner, LightManager* lights, int a3, int a4, int a5,
     UnknownFunction464e80("");
     if (!sceneManager->sceneNamed || lightCount == -1)
         lightCount = 2;
-    sceneLights = new(__FILE__, 2784) UnknownSceneLight[lightCount];
+    sceneLights = new(__FILE__, 2784) SceneLight[lightCount];
     for (int i = 0; i < lightCount; i++) {
         sceneLights[i].emitter = 0;
         if (!ReadLight(i))

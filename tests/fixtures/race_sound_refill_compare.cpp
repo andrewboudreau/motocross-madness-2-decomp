@@ -33,7 +33,7 @@ static DWORD vtable[21];
 static int checks;
 static RaceSound* Race(){return (RaceSound*)world.race;}
 static Sound* SoundAt(int n){return (Sound*)world.sound[n];}
-static UnknownRaceSoundChannel* Channel(int n){return &Race()->engineChannels[n];}
+static EngineSoundChannel* Channel(int n){return &Race()->engineChannels[n];}
 static int Receiver(void* p){for(int n=0;n<2;++n)if(p==world.com[n])return n;ExitProcess(80);return -1;}
 static void Boundary(int kind,int receiver,int a=0,int b=0,int c=0,int d=0,int e=0,int f=0,int g=0){
     if(observed.events>=EVENTS)ExitProcess(81);
@@ -41,7 +41,7 @@ static void Boundary(int kind,int receiver,int a=0,int b=0,int c=0,int d=0,int e
     event.args[0]=a;event.args[1]=b;event.args[2]=c;event.args[3]=d;event.args[4]=e;event.args[5]=f;event.args[6]=g;
     memcpy(event.held,observed.held,sizeof(event.held));event.state=world;memcpy(event.guard,guard,GUARD);
     if(scenario.mutateAt==observed.events){
-        UnknownRaceSoundChannel* channel=Race()->streamChannel;
+        EngineSoundChannel* channel=Race()->streamChannel;
         switch(scenario.action){
         case 1:Race()->streamChannel=Channel(1);break;
         case 2:Race()->bytesPerSample=3-Race()->bytesPerSample;break;
@@ -141,7 +141,7 @@ static void Prepare(){
             Race()->powerBandSamples[n][j]=world.source[(n+j+1)%3];Race()->powerBandSampleBytes[n][j]=41000+j;
             Race()->sputterSamples[n][j]=world.source[(n+j+2)%3];Race()->sputterSampleBytes[n][j]=42000+j;}}
     int half=11025*scenario.width;int available[]={0,1,half-1,half,half+1,half*2,half/2};
-    for(n=0;n<2;++n){UnknownRaceSoundChannel* c=Channel(n);c->channelSound=SoundAt(n);c->engine=scenario.engine;c->sampleKind=6;
+    for(n=0;n<2;++n){EngineSoundChannel* c=Channel(n);c->channelSound=SoundAt(n);c->engine=scenario.engine;c->sampleKind=6;
         c->sampleOffset=17+scenario.seed%31;c->sampleBytes=c->sampleOffset+available[scenario.avail];
         c->fillHalf=scenario.half;c->nextSampleKind=scenario.kind;c->streamSample=world.source[n];c->sampleBuffer=world.buffer[n];}
     if(scenario.alias==4)Channel(0)->streamSample=world.buffer[0];
@@ -203,7 +203,7 @@ int main(int argc,char**argv){
     if(!worlds||!observations)return 6;
     guard=(BYTE*)VirtualAlloc(0,GUARD*2,MEM_RESERVE|MEM_COMMIT,PAGE_READWRITE);DWORD old;
     if(!guard||!VirtualProtect(guard+GUARD,GUARD,PAGE_NOACCESS,&old))return 4;
-    if(sizeof(RaceSound)!=0x12b0||sizeof(UnknownRaceSoundChannel)!=0x54||offsetof(RaceSound,streamChannel)!=0x434||
+    if(sizeof(RaceSound)!=0x12b0||sizeof(EngineSoundChannel)!=0x54||offsetof(RaceSound,streamChannel)!=0x434||
        offsetof(RaceSound,bytesPerSample)!=0x1298||offsetof(Sound,dsBuffer)!=0xc)return 5;
     for(int i=0;i<21;++i)vtable[i]=(DWORD)abort;vtable[4]=(DWORD)GetPosition;vtable[11]=(DWORD)Lock;vtable[19]=(DWORD)Unlock;
     int k;const int kinds[]={0,1,3,4,2,-1},halves[]={0,1,2,3,-1},returns[]={0,1,-1,(int)0x80000000},counts[]={1,3,10};

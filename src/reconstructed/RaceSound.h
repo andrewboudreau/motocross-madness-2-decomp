@@ -34,7 +34,7 @@ struct UnknownRaceSoundCamera {
 // One 0x54-byte engine channel per racer (RaceSound+0x98, eleven of them).
 // Each owns a 44100-byte sample buffer; the channel at RaceSound+0x434 is
 // streamed into its Sound in two halves (0x004e4a30 / 0x004e4d10).
-struct UnknownRaceSoundChannel {
+struct EngineSoundChannel {
     UnknownEventRacer* channelRacer;        // racer
     Sound* channelSound;
     int voiceIndex;                        // +0x08, -1 when reset
@@ -124,8 +124,8 @@ public:
     int field_0x64;
     WaveFileHeader waveHeader;         // header read by 0x004e5500
     int channelsInUse;                       // channels in use
-    UnknownRaceSoundChannel engineChannels[11];
-    UnknownRaceSoundChannel* streamChannel; // streamed channel
+    EngineSoundChannel engineChannels[11];
+    EngineSoundChannel* streamChannel; // streamed channel
     UnknownEventRacer* currentRacer;       // racer being updated
     Sound* engineVoices[4];                // the four engine voices
     int engineVoiceInUse[4];                   // voice in use

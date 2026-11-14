@@ -64,7 +64,7 @@ DIALOG_OFFSET(screenGrab, 0x7f44);
 DIALOG_OFFSET(grabRegion, 0x7f48);
 DIALOG_OFFSET(isClosing, 0x7f50);
 DIALOG_OFFSET(closeFrame, 0x7f54);
-LAYOUT_CHECK(section_size, sizeof(UnknownGameUiSection) == 0x3c);
+LAYOUT_CHECK(section_size, sizeof(DialogSection) == 0x3c);
 LAYOUT_CHECK(timer_list_size, sizeof(ContainerList<UITimer*>) == 0x14);
 
 // Derived dialogs: their own members start at +0x7f58.

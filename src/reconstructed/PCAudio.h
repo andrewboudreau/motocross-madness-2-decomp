@@ -158,7 +158,7 @@ public:
 
 // A volume fade: its length in milliseconds, the volume a fade-out stops
 // at, and flags (1 rewind when stopped, 2 fade out).
-struct UnknownSoundFade {
+struct SoundFade {
     int length;
     int target;
     unsigned char flags;
@@ -225,7 +225,7 @@ public:
     DirectSoundBuffer** duplicateBuffers;        // +0x20
     int duplicateCount;                      // +0x24
     Sound* duplicateSource;                  // +0x28: source of a duplicate
-    UnknownSoundFade fade;                   // +0x2c
+    SoundFade fade;                   // +0x2c
     int fadeVolume;                          // +0x38
     UnknownSoundNotifier* notifier;          // +0x3c
     FileStream* sourceStream;           // +0x40: stream of a streamed sound

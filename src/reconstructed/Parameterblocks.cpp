@@ -40,7 +40,7 @@ int ClassifyParameterValue(const char* text)
 
 // The string case computes the size into a local before the call; passing
 // `strlen(text) + 1` directly schedules the pushes differently.
-void ParseParameterValue(const char* text, UnknownParameterValue* value)
+void ParseParameterValue(const char* text, ParameterValue* value)
 {
     switch (value->type = ClassifyParameterValue(text)) {
     case 2: {
@@ -60,7 +60,7 @@ void ParseParameterValue(const char* text, UnknownParameterValue* value)
 
 // Retail copies the raw 32 bits for both numeric types (no float-to-int
 // conversion), in two separate case bodies.
-void ParameterValueToInt(UnknownParameterValue value, int* out)
+void ParameterValueToInt(ParameterValue value, int* out)
 {
     char* end;
 
@@ -78,7 +78,7 @@ void ParameterValueToInt(UnknownParameterValue value, int* out)
 }
 
 // As above: both numeric types load the raw bits as a float.
-void ParameterValueToFloat(UnknownParameterValue value, float* out)
+void ParameterValueToFloat(ParameterValue value, float* out)
 {
     switch (value.type) {
     case 2:
@@ -93,7 +93,7 @@ void ParameterValueToFloat(UnknownParameterValue value, float* out)
     }
 }
 
-void ParameterValueToString(UnknownParameterValue value, char* out)
+void ParameterValueToString(ParameterValue value, char* out)
 {
     switch (value.type) {
     case 2:
@@ -255,13 +255,13 @@ void ParameterBlock::IndexSections(FileStream* stream)
                 if (sectionTable) {
                     if (sectionCount >= sectionCapacity) {
                         sectionCapacity += 10;
-                        sectionTable = (UnknownParameterSection*)DebugRealloc(
-                            sectionTable, sectionCapacity * sizeof(UnknownParameterSection),
+                        sectionTable = (ParameterSection*)DebugRealloc(
+                            sectionTable, sectionCapacity * sizeof(ParameterSection),
                             __FILE__, 318);
                     }
                 } else {
-                    sectionTable = (UnknownParameterSection*)DebugMalloc(
-                        10 * sizeof(UnknownParameterSection), __FILE__, 321);
+                    sectionTable = (ParameterSection*)DebugMalloc(
+                        10 * sizeof(ParameterSection), __FILE__, 321);
                     sectionCapacity = 10;
                 }
                 strcpy(sectionTable[sectionCount].name, header);

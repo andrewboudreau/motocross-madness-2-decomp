@@ -246,7 +246,7 @@ static void Run(int reference) {
         const DWORD scales[] = {0x3a83126f, 0, 0xba83126f, 0x7fc01234, 0x358637bd};
         *(DWORD*)&meter->millisecondsPerCounterTick = scales[scenario.scale];
         for (int i = 0; i < 50; ++i) {
-            UnknownHiResMeterEntry& e = meter->timers[i];
+            HiResMeterTimer& e = meter->timers[i];
             e.startStampLow = 0xfffffff0u + i; e.startStampHigh = 0x10000000u - i;
             e.calls = i * 1.5f; e.totalMs = i * -0.375f;
             e.callsThisTick = i * -2.5f; e.msThisTick = i * 3.625f;

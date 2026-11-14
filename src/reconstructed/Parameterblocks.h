@@ -10,7 +10,7 @@
 #include "FileStream.h"
 
 // One parsed row value: 0 int, 1 float, 2 string (owned, DebugMalloc).
-struct UnknownParameterValue {
+struct ParameterValue {
     int type;
     union {
         int i;
@@ -20,7 +20,7 @@ struct UnknownParameterValue {
 };
 
 // One indexed section (0x40c bytes).
-struct UnknownParameterSection {
+struct ParameterSection {
     int offset;          // stream position after the header line
     int lineCount;       // lines up to the next header
     char name[0x400];
@@ -30,11 +30,11 @@ struct UnknownParameterSection {
 // 0x004b6f30: 2 if `text` has a letter, 1 if it has a '.', else 0.
 int ClassifyParameterValue(const char* text);
 // 0x004b6fb0: classifies and parses `text` into `value`.
-void ParseParameterValue(const char* text, UnknownParameterValue* value);
+void ParseParameterValue(const char* text, ParameterValue* value);
 // 0x004b7040/0x004b7080/0x004b70c0: convert a value to int, float or text.
-void ParameterValueToInt(UnknownParameterValue value, int* out);
-void ParameterValueToFloat(UnknownParameterValue value, float* out);
-void ParameterValueToString(UnknownParameterValue value, char* out);
+void ParameterValueToInt(ParameterValue value, int* out);
+void ParameterValueToFloat(ParameterValue value, float* out);
+void ParameterValueToString(ParameterValue value, char* out);
 
 // 0x5c4 bytes (operator new(0x5c4) at 0x004458b5). No vtable; callers
 // `delete` it through 0x004b7190 and the plain operator delete.
@@ -73,7 +73,7 @@ public:
     int field_0x114;
     int sectionCount;                         // +0x118 section count
     int sectionCapacity;                      // +0x11c section capacity
-    UnknownParameterSection* sectionTable;    // +0x120 sections
+    ParameterSection* sectionTable;    // +0x120 sections
     int fileOffset;                           // +0x124 file offset in the stream
     int loadedLineCount;                      // +0x128 loaded line count
     char** loadedLines;                       // +0x12c loaded lines
@@ -83,5 +83,5 @@ public:
     int rowCount;                             // +0x538 row count
     int rowIndex;                             // +0x53c row index
     int valueCount;                           // +0x540 value count
-    UnknownParameterValue rowValues[16];      // +0x544
+    ParameterValue rowValues[16];      // +0x544
 };

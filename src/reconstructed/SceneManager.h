@@ -131,10 +131,10 @@ class ProjectedShadow;
 class UnknownScenePhysicsObject;
 class UnknownSceneCollisionObject;
 
-// 0x28-byte element of UnknownSceneBuffer::field_0x04: a static model
+// 0x28-byte element of SceneStaticModels::field_0x04: a static model
 // ("Model<n>", 0x004ecd60), also a shadow caster (0x004edf20 attaches a
 // D3DIMSoultreeShadow to each).
-struct UnknownSceneCaster {
+struct SceneStaticModel {
     unsigned char physics : 1;            // bit 0: has a physics object
     unsigned char useLighting : 1;        // bit 1: "UseLighting"
     unsigned char field_0x01[3];
@@ -145,9 +145,9 @@ struct UnknownSceneCaster {
 };
 
 // Owned by Scene+0xb8: the shadow casters.
-struct UnknownSceneBuffer {
+struct SceneStaticModels {
     int casterCount;                          // +0x00 caster count
-    UnknownSceneCaster* casters;              // +0x04
+    SceneStaticModel* casters;              // +0x04
 };
 
 // Minimal view of RTTI class D3DIMSoultreeShadow (0x48 bytes), declared in
@@ -171,7 +171,7 @@ struct UnknownSceneTextureInfo {
 
 // 0x8c-byte element of Scene::field_0xac, filled by 0x004eb570 from the
 // "Light<n>" sections. Names follow the section keys.
-struct UnknownSceneLight {
+struct SceneLight {
     LightEmitter* emitter;                    // +0x00 the emitter 0x004efb20 creates
     int type;                             // "Type" keyword (0x00572c28 table: Undefined..AmbientNoise)
     unsigned long color;                  // "ColorRGB"
@@ -196,7 +196,7 @@ struct UnknownSceneLight {
 // Scene+0xa4 (0x420 bytes, SceneManager.cpp line 1456), filled by
 // 0x004ebfc0 from the "Environment", "TerrainZone<n>" and "ReverbZone<n>"
 // sections. Names follow the keys.
-struct UnknownSceneEnvironment {
+struct SceneEnvironment {
     char ecosystemFile[0x104];            // +0x000
     char terrainFile[0x104];              // +0x104
     char cubeFile[0x104];                 // +0x208
@@ -216,7 +216,7 @@ struct UnknownSceneEnvironment {
 };
 
 // Scene+0xb0, allocated by 0x004ebdb0 from the "Fog" section.
-struct UnknownSceneFog {
+struct SceneFog {
     unsigned long color;                  // "ColorRGB", default 0x8080c0
     float visibility;                     // "Visibility", default 1.0
     float haziness;                       // "Haziness", default 0.5
@@ -320,12 +320,12 @@ public:
     Vector3 podiumPosition;                          // "PodiumPosition"
     Vector3 podiumDirection;                         // "PodiumDirection"
     // QuarryStuntEvent.cpp reads +0xa4..+0xbc under their provisional names.
-    UnknownSceneEnvironment* environment;     // +0xa4 "Environment" section
+    SceneEnvironment* environment;     // +0xa4 "Environment" section
     int lightCount;                           // +0xa8 light count ("Lights" "NumberOfLights")
-    UnknownSceneLight* sceneLights;           // +0xac "Light<n>" sections
-    UnknownSceneFog* fog;                     // +0xb0 "Fog" section
+    SceneLight* sceneLights;           // +0xac "Light<n>" sections
+    SceneFog* fog;                     // +0xb0 "Fog" section
     SceneAnimationTable* animationTable;        // +0xb4 "Animations" section (BikeRace.cpp reads it)
-    UnknownSceneBuffer* staticModels;         // +0xb8 "StaticModels" section
+    SceneStaticModels* staticModels;         // +0xb8 "StaticModels" section
     int crowdPresent;                         // +0xbc "Sounds" "CrowdPresent"
     int auralScape;                       // the AuralScape the sound emitters use
     SoundGroup* soundGroup;

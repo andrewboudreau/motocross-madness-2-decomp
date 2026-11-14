@@ -271,7 +271,7 @@ void BikeRace::NextCameraTarget(int forward, int racers, int objects) {
         } while (hidden);
     } else {
         caster = 1;
-        UnknownSceneBuffer* casters = raceScene->staticModels;
+        SceneStaticModels* casters = raceScene->staticModels;
         if (casters == 0 || casters->casterCount <= 0) {
             RaceCameraView()->followingRacer = 1;
             return;

@@ -254,9 +254,9 @@ int Scene::ReadStaticModels(LightManager* lights, int a2, int a3, int a4, void (
         if (models > 0) {
     FileStream* stream =
         new(__FILE__, 1749) FileStream(g_ResourceManager);
-    staticModels = new(__FILE__, 1751) UnknownSceneBuffer;
+    staticModels = new(__FILE__, 1751) SceneStaticModels;
     staticModels->casterCount = models;
-    staticModels->casters = new(__FILE__, 1753) UnknownSceneCaster[staticModels->casterCount];
+    staticModels->casters = new(__FILE__, 1753) SceneStaticModel[staticModels->casterCount];
     for (int i = 0; i < staticModels->casterCount; i = next) {
         if (i % interval == interval - 1 && progress)
             progress(0);

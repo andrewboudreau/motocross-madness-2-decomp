@@ -1382,7 +1382,7 @@ void HiResMeter::ClearTimers() {
 
 // 0x004885c0
 int HiResMeter::Tick(float frameTime) {
-    UnknownHiResMeterEntry* entry;
+    HiResMeterTimer* entry;
     int i;
 
     if (g_TrackGame->debugOverlay) {

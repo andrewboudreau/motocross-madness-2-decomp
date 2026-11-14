@@ -7,7 +7,7 @@
 
 // An 8-byte list row (0x0051ffe0, TrackRecord.cpp line 535): a strdup'd
 // name and a value.
-struct UnknownTrackRecordRow {
+struct TrackRecordRow {
     char* fileName;                           // +0x00 strdup of the high-score file's name; LstTrack's selection passes it to ShowTrackScores
     int field_0x04;
 };
@@ -108,6 +108,6 @@ public:
 
     int selectedSeries;                       // +0x7f58 selected series (0..5)
     int selectedSubTab;                       // +0x7f5c TabLeft/TabMiddle/TabRight (0..2); mirrors highScores->extensionIndex, LabelTabs selects it
-    UnknownTrackRecordRow** rows;             // +0x7f60 the listed tracks (FreeRows)
+    TrackRecordRow** rows;             // +0x7f60 the listed tracks (FreeRows)
     int rowCount;                             // +0x7f64 row count
 };

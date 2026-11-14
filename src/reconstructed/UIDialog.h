@@ -26,7 +26,7 @@ struct DialogEvent;
 // One .dtm section of a dialog (0x3c bytes; the table is at UIDialog+0x9cc):
 // its name and the control, image or sound built for it
 // (UIDialog::FindSectionObject).
-struct UnknownGameUiSection {
+struct DialogSection {
     char sectionName[0x34];                   // +0x00
     Sound* sectionObject;                     // +0x34 (typed as the sound case)
     int sectionKind;                          // +0x38  0 Set_Info, 1 Set_Anim, 2 Set_Sound, 3 Set_Default, 4 Set_Control (the ReadDialogResource passes switch on it). Tier 2
@@ -167,7 +167,7 @@ public:
     float lastFrameTime;                      // +0x9c0
     float scaleX;                             // +0x9c4: horizontal scale
     float scaleY;                             // +0x9c8: vertical scale
-    UnknownGameUiSection sectionTable[500];   // +0x9cc
+    DialogSection sectionTable[500];   // +0x9cc
     int sectionCount;                         // +0x7efc
     void* drawClipRegion;                     // +0x7f00: the clip region of a control draw
     void* previousFont;                       // +0x7f04: the font a control draw replaced

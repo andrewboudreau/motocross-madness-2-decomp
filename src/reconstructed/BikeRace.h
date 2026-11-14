@@ -707,10 +707,10 @@ struct UnknownBikeRacePickModel {
 };
 
 struct UnknownBikeRacePickCaster {
-    unsigned char flags;  // +0x0  UnknownSceneCaster+0 bits; bit 0 physics: a physics object at +0x08
+    unsigned char flags;  // +0x0  SceneStaticModel+0 bits; bit 0 physics: a physics object at +0x08
     unsigned char field_0x01[0x08 - 0x01];
-    UnknownBikeRacePickModel* physicsObject;  // +0x8  UnknownSceneCaster+0x08 physicsObject
-    int collisionObject;  // +0xC  UnknownSceneCaster+0x0c collisionObject; compared with the pick
+    UnknownBikeRacePickModel* physicsObject;  // +0x8  SceneStaticModel+0x08 physicsObject
+    int collisionObject;  // +0xC  SceneStaticModel+0x0c collisionObject; compared with the pick
     unsigned char field_0x10[0x28 - 0x10];
 };
 

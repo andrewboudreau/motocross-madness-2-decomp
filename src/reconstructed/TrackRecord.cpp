@@ -435,8 +435,8 @@ void TrackRecordDlg::ListHighScoreTracks(UIControl* list, DirectoryList* directo
         g_TrackGame->sceneObject->ReadSceneName(display, track, digit, "scn", 0, 0);
         static_cast<UIListBox*>(list)->AddRow(display, rowCount, 0);
         count++;
-        rows = (UnknownTrackRecordRow**)DebugRealloc(rows, (rowCount + 1) * 4, __FILE__, 534);
-        rows[rowCount] = new(__FILE__, 535) UnknownTrackRecordRow;
+        rows = (TrackRecordRow**)DebugRealloc(rows, (rowCount + 1) * 4, __FILE__, 534);
+        rows[rowCount] = new(__FILE__, 535) TrackRecordRow;
         rows[rowCount]->fileName = strdup(found);
         rows[rowCount]->field_0x04 = 0;
         rowCount++;

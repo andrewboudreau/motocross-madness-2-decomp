@@ -31,7 +31,7 @@ typedef int (*UnknownRecorderCallback)(int kind, void* data, int flag, int recor
                                        int* milliseconds);
 
 // What 0x004e7a90 passes to the worker thread (VCRInterface+0x90).
-struct UnknownRecorderThreadParameters {
+struct RecorderThreadParameters {
     int header;                           // +0x00 header to write (mode 1), a pointer
     int headerSize;                       // +0x04
     int fileName;                         // +0x08 VCR tape file name, a pointer
@@ -94,7 +94,7 @@ public:
     int recordPending;                        // +0x84  slot 10 hands the last taken record to the callback again while set (set on its answers 3 and 5)
     int readingReverse;                       // +0x88  set when the callback answers 11 at a record end; slot 10 then reads backwards until it stops
     unsigned char field_0x8c[0x90 - 0x8c];
-    UnknownRecorderThreadParameters threadParameters;
+    RecorderThreadParameters threadParameters;
     int recordType;                           // +0xA0  type of the last taken record (QueueRecord's first header word; -1 marks a tick record)
     int recordId;                             // +0xA4  the last taken record's second header word (the sender's network id)
     int recordPosition;                       // +0xA8  ring position of the last taken tick record (AppendPosition)
