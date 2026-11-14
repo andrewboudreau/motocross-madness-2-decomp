@@ -1611,6 +1611,17 @@ and UIDialogTick.cpp):
 
 No fixture was repinned.
 
+Follow-up (2026-11-13): the `PCVideoCard::field_0x1c0[]` split is on main as
+`unsigned int driverColorKeyCaps; // +0x1c0` (DDCAPS `dwCKeyCaps`, tier 2:
+the DDCAPS block starts at +0x1b4 and EcoSystem.cpp tests bit 8 there). The
+Render3D change it causes is the one retail needs: the physics runner row
+0x00506220 (src/krusty2/broadphase/targets.json) went from 3171/3173 to
+strict exact, and the Terrain.cpp calibration rows stayed exact. Other units
+that include the header differ only in `$L`/`$T` label numbers or RTTI
+COMDAT order. `UnknownEcoTrackGame::display->capabilityBits` can now become
+`driverColorKeyCaps`; the +0x28 `colorKeyFormat` part of that merge is still
+blocked as described above.
+
 ## Wave 19: SDK layouts, scene sections, helpers and messages
 
 Wave 19 names the long tail of distinct `Unknown*` types and helpers that are

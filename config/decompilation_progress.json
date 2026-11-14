@@ -1,13 +1,13 @@
 {
-  "as_of": "2026-11-12",
+  "as_of": "2026-11-13",
   "retail_sha256": "31fde4cc686a5ee89ef9095b90235325b195596867ecacefe511263e1509b874",
   "retail_text_bytes": 1368518,
   "retail_source_paths": 111,
   "rtti_types": 252,
-  "vc6_selected_targets": 3014,
-  "vc6_exact_targets": 3005,
-  "notes": "3005 of 3014 unique retail address/extent pairs passed strict comparison in 3058 calibration cases using authentic VC6 SP3 (Windows, native CL.EXE). There are 3050 strict rows and 3042 distinct source/address/extent cases; multiple source definitions may share a retail address. Every strict comparison resolves all relocations or has no relocation bytes. The 10 nonexact rows are BaseObject::Release, seven UI compiler-shape probes and two FollowRacer near misses (0x4a9d20, 0x4a9e80). The UIStatic zero-return probe remains nonexact while the independently identified UIStaticText body at the same address now matches strictly. The separately reviewed physics runner has 1085 strict exact results among 1152 comparisons; those results are not included in this calibration percentage. Neither suite is a census of retail functions or evidence that the source-built game links or runs. RTTI/source-path and .text figures retain their hash-pinned executable provenance.",
-  "vc6_case_count": 3058,
+  "vc6_selected_targets": 3016,
+  "vc6_exact_targets": 3014,
+  "notes": "3014 of 3016 unique retail address/extent pairs passed strict comparison in 3067 calibration cases using authentic VC6 SP3 (Windows, native CL.EXE). There are 3060 strict rows and 3051 distinct source/address/extent cases; multiple source definitions may share a retail address. Every strict comparison resolves all relocations or has no relocation bytes. The 2 nonexact pairs are the FollowRacer near misses (0x4a9d20, 0x4a9e80). BaseObject::Release and the seven UI probe addresses now have strict rows; the seven bindings-free CompilerShapeProbe rows remain deliberate regression probes. The separately reviewed physics runner has 1086 strict exact results among 1152 comparisons; those results are not included in this calibration percentage. Neither suite is a census of retail functions or evidence that the source-built game links or runs. RTTI/source-path and .text figures retain their hash-pinned executable provenance.",
+  "vc6_case_count": 3067,
   "vc6_profile": "vc6_o2_mt",
-  "reviewed_commit": "calibration rerun after registering the four atexit ret stubs (on adf12997), 2026-11-12"
+  "reviewed_commit": "calibration rerun after the ReadNode, AddChatLine, Render3D and calibration-row matches (on 0cfe9b8d..50dc8ab4), 2026-11-13"
 }
