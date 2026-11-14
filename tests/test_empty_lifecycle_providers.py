@@ -102,7 +102,7 @@ class EmptyLifecycleProviderTests(unittest.TestCase):
                                 case['target_size'], ROOT / case['bindings'])
                 self.assertTrue(proof['strict_exact'], (case['source'], case['symbol'], proof))
                 checked.append(case)
-            self.assertEqual(len(checked), 501)
+            self.assertEqual(len(checked), 508)
             self.assertTrue(any(c['symbol'] == '??0SceneArchiveFinder@@QAE@XZ' for c in checked))
 
 
