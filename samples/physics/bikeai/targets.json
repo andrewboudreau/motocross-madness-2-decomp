@@ -5,8 +5,8 @@
     "candidate_symbol_contains": "PathSteeringDirection",
     "target_va": "0x0040e510",
     "target_size": 1935,
-    "expect": "exact",
-    "notes": "AI path steering direction; strict exact over the 1935 code bytes (the 1936th byte, 0x0040ec9f, is the nop aligning 0x0040eca0). Needed: a separate walk index (path=esi/index=edi), component-wise perpendiculars with one perp at the enclosing scope, the step per component with t assigned in the x product, ONE segment vector at function scope reused by the single-point tail (retail keeps both in the +0x20 slot; a separate tail vector leaves seg short of references and swaps the two 12-byte slots, 1884 -> 1925), BikeAISegmentLength with (y*y) parenthesised as well as (x*x) (y product loaded first, 1933), and seg.y = 0 after the neighbour-segment differences (flattening before the 2D intersection; a dead store that makes seg.y's x87 leaf older than t's so the step's y product loads t first, 1935; inferred from the leaf order). See the comment at the top of the file.",
+    "expect": "partial",
+    "notes": "AI path steering direction; strict 1933 of the 1935 code bytes (the 1936th byte, 0x0040ec9f, is the nop aligning 0x0040eca0). Needed: a separate walk index (path=esi/index=edi), component-wise perpendiculars with one perp at the enclosing scope, the step per component with t assigned in the x product, ONE segment vector at function scope reused by the single-point tail (retail keeps both in the +0x20 slot; a separate tail vector leaves seg short of references and swaps the two 12-byte slots, 1884 -> 1925), BikeAISegmentLength with (y*y) parenthesised as well as (x*x) (y product loaded first, 1933), left: the step's y product loads seg.y before t. A dead seg.y = 0 after the neighbour-segment differences gives 1935 but is not applied (a compiler-only store with no evidence). See the comment at the top of the file.",
     "bindings": "BikeAINearMisses.bindings.json"
   },
   {

@@ -8,6 +8,11 @@ description: Byte-match one MCM2 function against retail with authentic VC6 SP3 
 Goal: readable C++ whose VC6 SP3 `/O2` output equals the retail bytes with relocations resolved.
 Rules from AGENTS.md apply: no inline asm, no byte arrays, no extent trimming, inference stays marked as inference.
 
+User rule (2026-11-14): readable source that behaves the same but does not byte match beats source that games the
+compiler. Never apply a form whose only purpose is codegen: dead tests, `if (0)` blocks, dummy/unused locals, bare
+labels, redundant or compiler-eliminated stores, casts that change nothing. Probe with them, record them in the
+header, leave the function a near miss. Natural restructurings (scope, statement order, a reused local, grouping) are fine.
+
 ## Setup (once per shell; Windows-style paths)
 ```bash
 export VC6_ROOT="$(pwd -W)/work/vc6sp3-disc" MCM2_EXE="$(pwd -W)/work/game/mcm2.exe"
@@ -111,8 +116,9 @@ near misses; `tools/near_miss_drops.py` lists ones whose gap is a single drop.
 - A commutative product that loads a struct member before a scalar local (retail the scalar first) means the member's
   leaf is too new: its only earlier reads were copy-propagated or inside an inline helper. A plain store to the member
   earlier in dominating order (`seg.y = 0.0f;` when flattening, dead and emitting nothing) or `m * 0.0f` (folded by VC6)
-  creates the leaf; a dead initialiser at the declaration does not (`0x0040e510`, 1933 -> exact). Confirm with a probe read
-  first, and apply it only where the store has a meaning the neighbouring code shares.
+  creates the leaf; a dead initialiser at the declaration does not (`0x0040e510`, 1933 -> 1935). Use it only as a
+  diagnostic: the user rule is that dead or compiler-eliminated stores chosen for codegen are NOT applied (record the
+  form in the header; readable non-matching source beats a gamed match). `0x0040e510` stays at 1933.
 - sweep_variants templates: an inline choice ending in `{` followed by `@|` parses as nested; keep braces outside choices.
 - In Git Bash, `/` compiler flags in env vars (`MCM2_EXTRA_FLAGS`) need `MSYS_NO_PATHCONV=1`, or they are ignored.
 - A test the optimiser folds late flips `[base + index]` operand order. When a loop's

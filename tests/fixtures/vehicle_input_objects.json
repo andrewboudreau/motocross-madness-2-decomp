@@ -38,7 +38,7 @@
     "samples/physics/bikeai/BikeAINearMisses.cpp": {
       "sections": 98,
       "relocations": 819,
-      "sha256": "b22ccaa24fb28ab9dac9580529de32c43b3e926c4afe8fe7d3c0c39a52a4edda"
+      "sha256": "9685113ffd6de61a0a3de0d16c8273142be55972ec904172cb75e118770aae77"
     },
     "samples/physics/krustybike/KrustyBikeNearMisses.cpp": {
       "sections": 271,
@@ -1787,7 +1787,7 @@
       "va": "0x40e510",
       "extent": 1935,
       "candidate": 1935,
-      "matching": 1935
+      "matching": 1933
     },
     {
       "source": "samples/physics/bikeai/BikeAINearMisses.cpp",

@@ -6,8 +6,9 @@
 // canonical file, with the BikeAILength/BikeAISegmentLength/BikeAIDotZ/
 // BikeAINormalize helpers the functions here share.
 //
-// 0x0040e510 (AI path steering direction): EXACT, 1935/1935 code bytes.  Retail's
-// 1936th byte (0x0040ec9f) is the nop that aligns 0x0040eca0, not part of the function.
+// 0x0040e510 (AI path steering direction): 1933/1935 code bytes, same instructions.
+// Retail's 1936th byte (0x0040ec9f) is the nop that aligns 0x0040eca0, not part of the
+// function.  Left: the step's y product loads `seg.y` before `t` (retail `t` first).
 // What it took, in the order found:
 //  * The walk along the path uses its own index (`index = best`): with one variable
 //    for the nearest search and the walk, VC6 swaps esi/edi against retail (path in
@@ -37,7 +38,8 @@
 //    (`(x*x + (y*y)) + z*z` does the same; `((x*x) + y*y) + z*z` loads x first, the
 //    flat sum and BikeAILength lose 13-31 bytes).  0x0040d200 is unaffected (its
 //    seg.y is 0 and the term folds) and stays exact.
-//  * `seg.y = 0.0f` after each neighbour-segment difference (1933 -> 1935): the
+//  * NOT APPLIED (compiler gaming, no evidence): `seg.y = 0.0f` after each
+//    neighbour-segment difference gives 1935/1935: the
 //    segment is flattened before the 2D perpendicular and intersection, as the tail
 //    and 0x0040d200 do.  The store is dead (IntersectLines reads x and z only) and
 //    emits nothing, but it creates seg.y's x87 leaf before `t`'s (first referenced as
@@ -46,6 +48,8 @@
 //    second is kept for symmetry.  `perp.y = seg.y * 0.0f` (VC6 folds the product) and
 //    `seg.y = 0.0f; perp.y = seg.y;` give the same bytes.  Evidence tier: the store
 //    is an inference from the leaf order, not something retail's bytes show directly.
+//    It was applied in round 12 and reverted: the store is dead, emits nothing and was
+//    chosen only because it moves VC6's operand order, so it stays a recorded form.
 // Forms that did not move the y product or the frame before these (all 1884): operand
 // order and store order of the step rows, the step declaration's position, a dead
 // `seg.y = 0` after the walk's differences, component-wise differences (worse), walk
@@ -200,7 +204,6 @@ int PathSteeringDirection(Vec3* outDir, Vec3 pos, BikeAIRacingLine* path, float 
         Vec3 perp;
         if (nearest > 0) {
             seg = path->points[nearest] - path->points[nearest - 1];
-            seg.y = 0.0f;
             perp.x = seg.z;
             perp.y = 0.0f;
             perp.z = -seg.x;
@@ -216,7 +219,6 @@ int PathSteeringDirection(Vec3* outDir, Vec3 pos, BikeAIRacingLine* path, float 
         }
         if (nearest < path->count - 1) {
             seg = path->points[nearest + 1] - path->points[nearest];
-            seg.y = 0.0f;
             perp.x = seg.z;
             perp.y = 0.0f;
             perp.z = -seg.x;

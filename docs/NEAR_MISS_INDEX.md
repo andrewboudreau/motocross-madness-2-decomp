@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 2, b 103, c 69, total 174. The three class (a) functions of the
+Counts: a 2, b 104, c 69, total 175. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -62,13 +62,13 @@ where the candidate had a separate `normal` in the orthogonalize block. Retail k
 one 12-byte slot and every call result in another; blocks, inline helpers and scope changes
 cannot make VC6 colour two locals that way, a reused variable does. When /FAs shows two named
 vectors with disjoint lives in one slot and the temporaries apart, try one variable.
-BikeAI PathSteeringDirection `0x0040e510` (class b, 1884/1936) is exact over its 1935 code bytes
-(the 1936th is the nop aligning `0x0040eca0`) by the same lever plus two leaf-order forms: the
+BikeAI PathSteeringDirection `0x0040e510` (class b, 1884/1936) is 1933/1935 code bytes
+(the 1936th is the nop aligning `0x0040eca0`; row below) by the same lever plus one leaf-order form: the
 single-point tail's flattened direction is the function-scope `seg` reused, not a separate vector
 (retail keeps both in one slot; the extra references also restore the use-density order of the
 two 12-byte slots, 1925), the walk length sums `((x*x) + (y*y)) + z*z` (y product first, 1933),
-and `seg.y = 0.0f` follows each neighbour-segment difference (a dead flattening store that makes
-seg.y's x87 leaf older than `t`'s, so the step's y product loads `t` first, 1935). A named local
+and a dead `seg.y = 0.0f` after each neighbour-segment difference would give 1935 (it makes
+seg.y's x87 leaf older than `t`'s) but is not applied: it only games the compiler. A named local
 that VC6 packs into a dead argument slot while retail has it in a frame slot is a sign of a reused
 variable.
 SoultreeRefreshContacts `0x0043ad80` (class c, 604/615) is exact too, in CollisionPoint.cpp:
@@ -306,6 +306,7 @@ before it, even if that arm already matches.
 | krusty2/vehicle/Vehicle | `0x0052a940` | 2339/3254 | b | 40 differing instructions (3257 B; backingUp and DriveForce's reversing are char). The lift tilt-axis arm is laid out after the Rotate(k) arm (30 control-flow forms, dead end); prevSpeed is loaded before the wheel-count store; some local slots differ |
 | net/Net | `0x004aced0` | 361/370 | c | ring slot addressed through a byte-offset helper (fixes every SIB order); retail loads `from` before `lea ebx, [edx + edi]` for the system-message pointer, VC6 forms the pointer first (`mov ebx, edi ; add ebx, ecx`) and pushes system[2] from edx instead of eax |
 | net/NetThread | `0x004af8e0` | 274/339 | c | a reassigned `unsigned char* buffer = s_ReceiveBuffer;` local gives retail's registers; one instruction left |
+| physics/bikeai/BikeAI | `0x0040e510` | 1933/1935 | b | PathSteeringDirection: same instructions; the step's y product loads `seg.y` before `t` (retail `t` first). A dead `seg.y = 0.0f` after the neighbour differences matches but is not applied (compiler-only store) |
 | physics/bikeai/BikeAI | `0x00415640` | 6063/6112 | b | schedule and frame size match (squared distance and k dot grouped `z + ((x) + y)`, start-up zero vectors cleared with a chained assignment so they store z-first like retail); the one-use temporaries above +0x100 sit in other slots (retail orders the block locals tmp, v, v, p, the candidate p, v, v, tmp; hoisting any single block local is inert or worse); the retail extent includes one nop of padding (candidate 6111 bytes) |
 | physics/bikeai/BikeAI | `0x0040eca0` | 1542/17585 | b | reads the complete TrackGame (`g_TrackGame->mode.raceSettings.eventType`, `childRoot`, ...) with no cast: aligned 3731 of 3966, frame 0x968 vs 0x93c; dir2's double cross in the parenthesised Vec3-constructor form gives 1479 and aligned 3740, the y + z grouped penetration dots 1542 and aligned 3739 (candidate 17382 bytes). With the cast views of the shared pointer it was 1218 and aligned 3402; a pointer declared with the view type gave the 1561/3760 state below. Before that: aligned 3760 of 3966 instructions (206 diffs); `right` built in a named copy; prologue matches (frame/flag initialisations before the dt clamp); frame 0x968 vs retail 0x93c (re-read with the fixed frame_layout; function-scope ground/normal vectors reach 0x938 with retail's temporary regions but move the inline switch-over, a bare post-loop block reaches 0x92c/0x938 with identical code and no strict gain); the ~60 two-use operator temporaries are the same set in a different quicksort-tie order. Retail keeps `up` (not address-taken) and the loop-head drag (`rf.x - 0.0`, `-32 - drag.y`) in memory; every drag spelling tried (7 drag x 3 force forms, address-taken/tracked padding, `v*0.0f`) is folded by VC6. Retail selects `side` by pointer and copies it to sideV and sideF at the merge (declaring sideF there: strict 1520 but aligned 3737 -> 3703, not kept) |
 | physics/bikeai/BikeAI | `0x00413200` | 2044/4112 | b | KrustyBike member (rear look-ahead cross as the unparenthesised Vec3-constructor helper): frame 0x74 and most slots exact; first three locals at other offsets (`a` needs disp32; retail: c 0x5c, b 0x50, a 0x44 shared with `start`, steps 0, the WorldToLocalDirection/negated-cross temp alone at 0x68 -- moving a/b into the hit block gives retail's a/b/c offsets but merges the temps and shrinks the frame to 0x68; no a/b/c placement x start form beats 2026); operand order of the second lever cross product; ground-branch lean clamp keeps the value on the FPU stack; smoother target kept in a register |

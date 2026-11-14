@@ -111,6 +111,15 @@
     ],
     [
       "samples/physics/bikeai/BikeAINearMisses.cpp",
+      "PathSteeringDirection",
+      4252944,
+      1935,
+      1935,
+      1933,
+      "f695e4ef7a4f2b5f3493bdded0489fbdd30deae42dc458f952652626f7056a2f"
+    ],
+    [
+      "samples/physics/bikeai/BikeAINearMisses.cpp",
       "QuerySegmentObstacles",
       4281920,
       6112,
