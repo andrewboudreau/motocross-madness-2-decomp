@@ -23,7 +23,7 @@ inline int PCJoystickDevice::FilterAxisSpike(int axis, unsigned long value) {
 // other joysticks filter spikes, apply the X/Y dead zone and feed the
 // bindings; POV values are kept.
 int PCJoystickDevice::ReadBufferedState(int) {
-    UnknownDeviceObjectData events[16];
+    DIDeviceObjectData events[16];
     long count;
     int i;
     unsigned long value;
@@ -31,13 +31,13 @@ int PCJoystickDevice::ReadBufferedState(int) {
     if (!device)
         return 0;
     count = 16;
-    long result = device->GetDeviceData(sizeof(UnknownDeviceObjectData), events, &count, 0);
+    long result = device->GetDeviceData(sizeof(DIDeviceObjectData), events, &count, 0);
     if (result == (long)0x8007001e || result == (long)0x8007000c) {
         if (device->Acquire() < 0) {
             ReportDirectInputError(result, __FILE__, 317);
             return 0;
         }
-        result = device->GetDeviceData(sizeof(UnknownDeviceObjectData), events, &count, 0);
+        result = device->GetDeviceData(sizeof(DIDeviceObjectData), events, &count, 0);
     }
     if (result < 0)
         return 0;

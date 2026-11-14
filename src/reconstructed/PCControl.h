@@ -2,7 +2,7 @@
 
 #include "ControlInterface.h"
 
-struct UnknownDeviceInstance;
+struct DIDeviceInstance;
 
 // RTTI: PCControlInterface : ControlInterface. Its functions pass the literal
 // __FILE__ "D:\\aardvark\\VC\\krusty2\\PCControl.cpp", which names the TU.
@@ -21,7 +21,7 @@ public:
     // 0x004bf490: acquires (nonzero) or unacquires every device.
     void SetDevicesAcquired(int acquire);
     // 0x004bf3c0: joystick enumeration callback.
-    static int __stdcall EnumJoystickCallback(const UnknownDeviceInstance* instance,
+    static int __stdcall EnumJoystickCallback(const DIDeviceInstance* instance,
         void* context);
 
     int devicesAcquired;                       // +0xcc4: acquired; 1 initially

@@ -448,7 +448,7 @@ RaceSound* RaceSound::Create(void* owner, UnknownKrustyBikeView* view,
 
 // 0x004e3430
 void RaceSound::AssignChannels() {
-    UnknownEaxListenerParameters environment;
+    EaxReverbProperties environment;
     int iterator;
     int i;
     int count;
@@ -809,7 +809,7 @@ int RaceSound::OnActivate() {
 // 0x004e44e0: Ctrl+V toggles the EAX environment, Ctrl+C cycles the music
 // volume (race mode 3 only) and Ctrl+S turns all sound on or off.
 int RaceSound::OnControlPress(ControlEvent* event, InputButtonState* entry) {
-    UnknownEaxListenerParameters environment;
+    EaxReverbProperties environment;
     char text[0x80];
     TrackGameViewOwner* owner;
 

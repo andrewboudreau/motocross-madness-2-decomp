@@ -17,7 +17,7 @@ struct Win32Rect;
 
 // 0x430-byte device identifier, saved whole as "DriverInfo\\<name>\\
 // DeviceIdentifier" (the DDDEVICEIDENTIFIER2 size; inference).
-struct UnknownDeviceIdentifier {
+struct DDDeviceIdentifier2 {
     char driver[0x200];
     char description[0x200];                      // Game slot 8 prints it
     unsigned long driverVersion[2];
@@ -86,7 +86,7 @@ public:
     Guid driverGuid;                    // +0x4ac: DirectDraw driver GUID (0: primary)
     char driverGuidText[0x100];                // +0x4bc: driver name: the GUID text (PCGame 0x004c1610)
     int partialTextureUploadResult;            // +0x5bc: "PartialTexBlt"
-    UnknownDeviceIdentifier deviceIdentifier;  // +0x5c0
+    DDDeviceIdentifier2 deviceIdentifier;  // +0x5c0
     int isAGP;                                 // +0x9f0: "IsAGP"
     unsigned char field_0x9f4[0xa70 - 0x9f4];
     unsigned int cooperativeLevel;             // +0xa70: cooperative level flags (8: normal)
@@ -111,17 +111,17 @@ extern "C" const Guid IID_IDirect3D7;                 // 0x00556180
 extern "C" const Guid IID_IDirectDrawGammaControl;    // 0x00556140
 extern "C" const Guid IID_IDirect3DHALDevice;         // 0x005561b0
 
-typedef int(__stdcall* UnknownEnumCallback)(Guid* guid, char* description, char* name,
+typedef int(__stdcall* DDEnumCallback)(Guid* guid, char* description, char* name,
                                             void* context);
 
 // ddraw.dll entry points, called through the import thunks 0x00533040 and
 // 0x00533046 (DirectDrawEnumerateExA is looked up with GetProcAddress).
-extern "C" long __stdcall DirectDrawEnumerateA(UnknownEnumCallback callback, void* context);
+extern "C" long __stdcall DirectDrawEnumerateA(DDEnumCallback callback, void* context);
 extern "C" long __stdcall DirectDrawCreateEx(Guid* guid, void** object, const Guid& iid,
                                              void* outer);
 
 // 0x64-byte blit effects (the DDBLTFX layout).
-struct UnknownBltFx {
+struct DDBltFx {
     unsigned long size;
     unsigned char field_0x04[0x50 - 0x04];
     unsigned long fillColor;

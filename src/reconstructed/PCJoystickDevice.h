@@ -4,7 +4,7 @@
 
 // 0x38-byte effect parameter block passed to device method 18 and effect
 // method 6; the layout matches DIEFFECT (DirectX 6 size).
-struct UnknownEffectParams {
+struct DIEffect {
     unsigned long size;
     unsigned long flags;
     unsigned long duration;
@@ -15,14 +15,14 @@ struct UnknownEffectParams {
     unsigned long axisCount;
     unsigned long* axes;
     long* direction;
-    struct UnknownEnvelope* envelope;
+    struct DIEnvelope* envelope;
     unsigned long typeSpecificSize;
     void* typeSpecific;
     unsigned long startDelay;
 };
 
 // Attack/fade envelope (DIENVELOPE layout).
-struct UnknownEnvelope {
+struct DIEnvelope {
     unsigned long size;
     unsigned long attackLevel;
     unsigned long attackTime;
@@ -31,7 +31,7 @@ struct UnknownEnvelope {
 };
 
 // Periodic-force parameters (DIPERIODIC layout).
-struct UnknownPeriodic {
+struct DIPeriodic {
     unsigned long magnitude;
     long offset;
     unsigned long phase;
@@ -39,7 +39,7 @@ struct UnknownPeriodic {
 };
 
 // 0x50-byte immediate joystick state (DIJOYSTATE layout).
-struct UnknownJoystickState {
+struct DIJoyState {
     long axes[6];
     long sliders[2];
     unsigned long pov[4];
@@ -56,8 +56,8 @@ struct DirectInputEffect {
     virtual long __stdcall Release();
     virtual long __stdcall Initialize(void* instance, unsigned long version, const struct Guid& guid);
     virtual long __stdcall GetEffectGuid(struct Guid* guid);
-    virtual long __stdcall GetParameters(struct UnknownEffectParams* params, unsigned long flags);
-    virtual long __stdcall SetParameters(const struct UnknownEffectParams* params,
+    virtual long __stdcall GetParameters(struct DIEffect* params, unsigned long flags);
+    virtual long __stdcall SetParameters(const struct DIEffect* params,
                                           unsigned long flags); // SetParameters
     virtual long __stdcall Start(unsigned long iterations, unsigned long flags);
     virtual long __stdcall Stop();
@@ -92,7 +92,7 @@ public:
     virtual int StopEffect(int effect);
     virtual int StartEffect(int effect, unsigned long iterations, unsigned long flags);
     virtual int IsEffectPlaying(int effect);
-    virtual int EnumEffects(UnknownEffectInfo* effects, int* count);
+    virtual int EnumEffects(DIEffectInfo* effects, int* count);
     virtual void ReleaseEffects();
     virtual int ResetForceFeedback();
     virtual int SendForceFeedbackCommand(int command);
@@ -101,9 +101,9 @@ public:
     virtual int Update(int value);
 
     // 0x004c2930: opens the device described by `instance`.
-    int OpenDevice(const UnknownDeviceInstance* instance);
+    int OpenDevice(const DIDeviceInstance* instance);
     // 0x004c2cb0: object enumeration callback; marks the axes present.
-    static int __stdcall EnumAxisObjectsCallback(const UnknownObjectInstance* object,
+    static int __stdcall EnumAxisObjectsCallback(const DIDeviceObjectInstance* object,
         void* context);
     // 0x004c2d90: key-repeat stepping driven by an axis direction (gamepads).
     void UpdateAxisRepeat(int axis, int value);

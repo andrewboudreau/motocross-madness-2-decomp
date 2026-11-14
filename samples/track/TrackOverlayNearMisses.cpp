@@ -78,7 +78,7 @@
 #include "../../src/reconstructed/D3DConstants.h"
 
 // GDI32 imports, as in TrackOverlay.cpp.
-struct UnknownLogFont {
+struct LogFont {
     long lfHeight;
     long lfWidth;
     long lfEscapement;
@@ -94,13 +94,13 @@ struct UnknownLogFont {
     unsigned char lfPitchAndFamily;
     char lfFaceName[32];
 };
-extern "C" __declspec(dllimport) void* __stdcall CreateFontIndirectA(const UnknownLogFont* font);
+extern "C" __declspec(dllimport) void* __stdcall CreateFontIndirectA(const LogFont* font);
 extern "C" __declspec(dllimport) void* __stdcall SelectObject(void* dc, void* object);
 extern "C" __declspec(dllimport) unsigned long __stdcall SetBkColor(void* dc, unsigned long color);
 extern "C" __declspec(dllimport) int __stdcall SetBkMode(void* dc, int mode);
 extern "C" __declspec(dllimport) unsigned long __stdcall SetTextColor(void* dc, unsigned long color);
 extern "C" __declspec(dllimport) int __stdcall GetTextExtentPoint32A(void* dc, const char* text, int length,
-                                                                     UnknownTextExtent* size);
+                                                                     Win32Size* size);
 extern "C" __declspec(dllimport) int __stdcall DrawTextA(void* dc, const char* text, int length,
                                                          OverlayRect* rect, unsigned int format);
 

@@ -13,7 +13,7 @@ PCMouseDevice::PCMouseDevice() {
 // counts, sets the mouse data format, cooperative level 5 and a 16-entry
 // buffer, then acquires it.
 int PCMouseDevice::CreateDevice() {
-    UnknownDeviceCaps caps;
+    DIDevCaps caps;
     if (g_TrackGame->controlInterface->directInput->CreateDeviceEx(
             GUID_SysMouse, IID_IDirectInputDevice7A, &device, 0) < 0)
         goto failed;
@@ -134,24 +134,24 @@ int PCMouseDevice::IsControlDown(int control, int modifier, InputButtonState* en
 // a lost device) and queues them on the ControlInterface, then reads the
 // movement into +0x2d8 and feeds x and y to the bindings.
 int PCMouseDevice::Update(int value) {
-    UnknownDeviceObjectData events[16];
+    DIDeviceObjectData events[16];
     long count;
     int i;
     if (!device)
         return 0;
     count = -1;
     long result;
-    result = device->GetDeviceData(sizeof(UnknownDeviceObjectData), 0, &count, DIGDD_PEEK);
+    result = device->GetDeviceData(sizeof(DIDeviceObjectData), 0, &count, DIGDD_PEEK);
     if (result == DIERR_INPUTLOST || result == DIERR_NOTACQUIRED) {
         if (device->Acquire() < 0) {
             ReportDirectInputError(result, __FILE__, 1316);
             return 0;
         }
-        result = device->GetDeviceData(sizeof(UnknownDeviceObjectData), 0, &count, DIGDD_PEEK);
+        result = device->GetDeviceData(sizeof(DIDeviceObjectData), 0, &count, DIGDD_PEEK);
     }
     if (result < 0)
         goto failed;
-    if (device->GetDeviceData(sizeof(UnknownDeviceObjectData), events, &count, 0) < 0)
+    if (device->GetDeviceData(sizeof(DIDeviceObjectData), events, &count, 0) < 0)
         goto failed;
     for (i = 0; i < count; i++) {
         int button;

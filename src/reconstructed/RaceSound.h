@@ -61,7 +61,7 @@ struct UnknownRaceSoundChannel {
 
 // EAX 1.0 listener settings (16 bytes) passed to PCSoundInterface
 // 0x004bed40: an environment index, its volume, decay time and damping.
-struct UnknownEaxListenerParameters {
+struct EaxReverbProperties {
     unsigned long environment;
     float volume;
     float decayTime;

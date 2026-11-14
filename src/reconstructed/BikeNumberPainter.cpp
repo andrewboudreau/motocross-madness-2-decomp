@@ -76,7 +76,7 @@ void BikeNumberPainter::PaintNumber(D3DIMSoultreeObject* model, int number) {
             continue;
         plate = i;
         PCTextureMap* texture = (PCTextureMap*)model->materialTable[i]->surfaceMap->texture;
-        UnknownBltFx fx;
+        DDBltFx fx;
         memset(&fx, 0, sizeof(fx));
         fx.size = sizeof(fx);
         fx.fillColor = 0;

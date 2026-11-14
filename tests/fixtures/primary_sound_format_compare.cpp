@@ -13,7 +13,7 @@ static int active,mode,callbackResult,checks;
 struct Observation {int result,calls,exception,faultKind,faultAddress;unsigned char format[16];World before,after;};
 static Observation observed,expected;
 static PCSoundInterface* Object(){return (PCSoundInterface*)world.audio;}
-static long __stdcall SetFormat(void* self,const UnknownWaveFormat* format){
+static long __stdcall SetFormat(void* self,const WaveFormatEx* format){
     if(self!=world.buffer || observed.calls++)ExitProcess(81);
     memcpy(observed.format,format,16);observed.before=world;
     if(mode==1){world.audio[0x2c]^=1;Object()->primaryBuffer=0;world.buffer[3]^=0x12345678;}
@@ -68,8 +68,8 @@ static void Compare(int rate,int stereo,int bits){
 }
 int main(int argc,char**argv){
     if(argc!=2 || !MapReference(argv[1]))return 3;
-    if(sizeof(PCSoundInterface)!=0x478 || sizeof(UnknownWaveFormat)!=20 ||
-       offsetof(PCSoundInterface,primaryBuffer)!=0x468 || offsetof(UnknownWaveFormat,extraSize)!=16)return 4;
+    if(sizeof(PCSoundInterface)!=0x478 || sizeof(WaveFormatEx)!=20 ||
+       offsetof(PCSoundInterface,primaryBuffer)!=0x468 || offsetof(WaveFormatEx,extraSize)!=16)return 4;
     for(int i=0;i<21;++i)table[i]=(DWORD)abort;table[14]=(DWORD)SetFormat;
     active=1;for(int b=0;b<65536;++b){Compare(22050,0,b);Compare(22050,1,b);}
     const int flags[]={0,1,2,255},stereos[]={0,1,-1,(int)0x80000000},returns[]={0,1,-1,0x7fffffff,(int)0x80000000};

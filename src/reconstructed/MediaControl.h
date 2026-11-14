@@ -28,7 +28,7 @@ class UIDialog;
 
 // The DDSURFACEDESC layout (0x6c bytes), as IDirectDrawMediaStream::GetFormat
 // fills it.
-struct UnknownMediaSurfaceDesc {
+struct DDSurfaceDesc {
     unsigned long size;
     unsigned long flags;
     unsigned long height;
@@ -59,8 +59,8 @@ struct DirectDrawMediaStream {
     virtual long __stdcall AllocateSample();
     virtual long __stdcall CreateSharedSample();
     virtual long __stdcall SendEndOfStream();
-    virtual long __stdcall GetFormat(UnknownMediaSurfaceDesc* current, void* palette,
-                                     UnknownMediaSurfaceDesc* desired, unsigned long* flags);
+    virtual long __stdcall GetFormat(DDSurfaceDesc* current, void* palette,
+                                     DDSurfaceDesc* desired, unsigned long* flags);
     virtual long __stdcall SetFormat();
     virtual long __stdcall GetDirectDraw();
     virtual long __stdcall SetDirectDraw();

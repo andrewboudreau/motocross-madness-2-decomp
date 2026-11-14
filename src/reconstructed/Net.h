@@ -14,7 +14,7 @@ struct _GUID;
 // IDirectPlay4. The IIDs passed to CoCreateInstance/QueryInterface are the
 // SDK's IID_IDirectPlay4A and IID_IDirectPlayLobby3A (GUID bytes at
 // 0x005567b0 and 0x00556870); the slot offsets are decoded from the calls.
-struct UnknownDirectPlay4A {
+struct DirectPlay4A {
     virtual long __stdcall QueryInterface(const _GUID& iid, void** result);
     virtual unsigned long __stdcall AddRef();
     virtual unsigned long __stdcall Release();
@@ -93,11 +93,11 @@ struct UnknownDirectPlay4A {
                                   unsigned long timeout, void* context, unsigned long* messageId);
 };
 
-struct UnknownDirectPlayLobby3A {
+struct DirectPlayLobby3A {
     virtual long __stdcall QueryInterface(const _GUID& iid, void** result);
     virtual unsigned long __stdcall AddRef();
     virtual unsigned long __stdcall Release();
-    virtual long __stdcall Connect(unsigned long flags, UnknownDirectPlay4A** result, void* outer);
+    virtual long __stdcall Connect(unsigned long flags, DirectPlay4A** result, void* outer);
     virtual long __stdcall CreateAddress(const _GUID& provider, const _GUID& dataType,
                                          const void* data, unsigned long dataSize, void* address,
                                          unsigned long* addressSize);
@@ -400,8 +400,8 @@ public:
     long EnumSessions(SessionInfoType* sessions, int* count, unsigned long flags);  // 0x004adff0
     long EnumPlayers(_GUID* session, PlayerInfoType* entries, int* count);  // 0x004ae200
 
-    UnknownDirectPlay4A* directPlay;
-    UnknownDirectPlayLobby3A* lobby;
+    DirectPlay4A* directPlay;
+    DirectPlayLobby3A* lobby;
     int localPlayer;                                     // local player id
     int isHost;                                         // 1 after Open with DPOPEN_CREATE (0x004ac3c0) or DPSYS_HOST (KrustyUI slot 24); 0 after DPOPEN_JOIN
     int lobbyConnected;                                     // connected (TrackGame slot 4)

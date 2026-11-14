@@ -32,14 +32,14 @@ extern const GUID g_LobbyRankPropertyGuid;    // 0x00556de0 GetLobbyRank
 
 // DirectX 6 lobby system messages (dplobby.h layout; VC6's headers predate
 // them): DPLMSG_GETPROPERTY (type 7) and DPLMSG_GETPROPERTYRESPONSE (type 8).
-struct UnknownLobbyGetProperty {
+struct DPLMsgGetProperty {
     unsigned long type;
     unsigned long requestId;
     GUID player;
     GUID property;
 };
 
-struct UnknownLobbyGetPropertyResponse {
+struct DPLMsgGetPropertyResponse {
     unsigned long type;
     unsigned long requestId;
     GUID player;
@@ -68,11 +68,11 @@ struct UnknownZoneScore {
     virtual long __stdcall UnknownMethod12();
     virtual long __stdcall UnknownMethod13();
     virtual long __stdcall UnknownMethod14();
-    virtual long __stdcall UnknownMethod15(UnknownDirectPlayLobby3A* lobby);
+    virtual long __stdcall UnknownMethod15(DirectPlayLobby3A* lobby);
 };
 
 // 0x004aa350
-void MSZoneInterface::SetDirectPlay(UnknownDirectPlay4A* a, UnknownDirectPlayLobby3A* b) {
+void MSZoneInterface::SetDirectPlay(DirectPlay4A* a, DirectPlayLobby3A* b) {
     directPlay = a;
     lobby = b;
 }
@@ -83,14 +83,14 @@ void MSZoneInterface::SetDirectPlay(UnknownDirectPlay4A* a, UnknownDirectPlayLob
 // failed` tests: that places the failure block right after the last test,
 // falling through from it as in retail; one `||` condition sinks it to the end.
 int MSZoneInterface::GetLobbyPreset(char* buffer, unsigned int size) {
-    UnknownLobbyGetPropertyResponse* response;
-    UnknownLobbyGetProperty request;
+    DPLMsgGetPropertyResponse* response;
+    DPLMsgGetProperty request;
     unsigned long flags = 0;
     unsigned long responseSize = 0;
     long result;
     unsigned int start;
 
-    response = (UnknownLobbyGetPropertyResponse*)DebugMalloc(0x1000, __FILE__, 57);
+    response = (DPLMsgGetPropertyResponse*)DebugMalloc(0x1000, __FILE__, 57);
     responseSize = 4;
     request.type = 7;
     request.requestId = 1;
@@ -127,14 +127,14 @@ failed:
 
 // 0x004aa4e0: the same for the rank property.
 int MSZoneInterface::GetLobbyRank(char* buffer, unsigned int size) {
-    UnknownLobbyGetPropertyResponse* response;
-    UnknownLobbyGetProperty request;
+    DPLMsgGetPropertyResponse* response;
+    DPLMsgGetProperty request;
     unsigned long flags = 0;
     unsigned long responseSize = 0;
     long result;
     unsigned int start;
 
-    response = (UnknownLobbyGetPropertyResponse*)DebugMalloc(0x1000, __FILE__, 135);
+    response = (DPLMsgGetPropertyResponse*)DebugMalloc(0x1000, __FILE__, 135);
     responseSize = 4;
     request.type = 7;
     request.requestId = 2;

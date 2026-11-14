@@ -59,7 +59,7 @@ struct DirectSoundBuffer {
                                 void** second, unsigned long* secondBytes, unsigned long flags);
     virtual long __stdcall Play(unsigned long reserved, unsigned long priority, unsigned long flags);
     virtual long __stdcall SetCurrentPosition(unsigned long position);
-    virtual long __stdcall SetFormat(const struct UnknownWaveFormat* format);
+    virtual long __stdcall SetFormat(const struct WaveFormatEx* format);
     virtual long __stdcall SetVolume(long volume);
     virtual long __stdcall SetPan(long pan);
     virtual long __stdcall SetFrequency(unsigned long frequency);
@@ -125,12 +125,12 @@ struct DirectSoundBufferDesc {
     unsigned long flags;
     unsigned long bufferBytes;
     unsigned long reserved;
-    struct UnknownWaveFormat* format;
+    struct WaveFormatEx* format;
     Guid algorithm3D;
 };
 
 // Sample format (WAVEFORMATEX layout; the first 16 bytes are PCMWAVEFORMAT).
-struct UnknownWaveFormat {
+struct WaveFormatEx {
     unsigned short formatTag;
     unsigned short channels;
     unsigned long samplesPerSec;

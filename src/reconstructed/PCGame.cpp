@@ -551,7 +551,7 @@ int PCGame::SaveDisplayProfile(PCVideoCard* display) {
 int PCGame::IsAnyProfileStale() {
     for (int i = 0; i < g_DisplayCount; i++) {
         char name[256];
-        UnknownDeviceIdentifier saved;
+        DDDeviceIdentifier2 saved;
         unsigned long size = sizeof(saved);
         sprintf(name, "DriverInfo\\%s\\ProfileVersion", g_Displays[i]->driverGuidText);
         if (GetRegistryInt(name, 0) != 7)

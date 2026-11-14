@@ -130,7 +130,7 @@ class JoystickImmediateBehaviorTests(unittest.TestCase):
                 'offsetof(LayoutProbe,buttonStates)==0x264 && offsetof(LayoutProbe,axisValues)==0x4e4 && '
                 'offsetof(LayoutProbe,axisBindings)==0x4fc && offsetof(LayoutProbe,axisMaximums)==0x58c && '
                 'offsetof(LayoutProbe,povValues)==0x5d8)?1:-1];}\n'
-                'typedef char Other[(sizeof(UnknownJoystickState)==80 && sizeof(ControlBinding)==0x3c && '
+                'typedef char Other[(sizeof(DIJoyState)==80 && sizeof(ControlBinding)==0x3c && '
                 'offsetof(ControlInterface,queuedEventCount)==0x38 && offsetof(ControlInterface,events)==0x3c && '
                 'sizeof(ControlEvent)==20 && offsetof(TrackGame,controlInterface)==0x14)?1:-1];\n')
             compile_source(layout, 'layout')

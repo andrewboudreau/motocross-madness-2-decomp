@@ -33,7 +33,7 @@ public:
     virtual int StopEffect(int effect) = 0;
     virtual int StartEffect(int effect, unsigned long iterations, unsigned long flags) = 0;
     virtual int IsEffectPlaying(int effect) = 0;
-    virtual int EnumEffects(UnknownEffectInfo* effects, int* count) = 0;
+    virtual int EnumEffects(DIEffectInfo* effects, int* count) = 0;
     virtual void ReleaseEffects() = 0;
     virtual int ResetForceFeedback() = 0;
     virtual int SendForceFeedbackCommand(int command) = 0;

@@ -30,31 +30,31 @@ struct DirectInputDevice {
     virtual long __stdcall QueryInterface(const struct Guid& iid, void** object);
     virtual long __stdcall AddRef();
     virtual long __stdcall Release();
-    virtual long __stdcall GetCapabilities(struct UnknownDeviceCaps* caps);
-    virtual long __stdcall EnumObjects(int (__stdcall* callback)(const struct UnknownObjectInstance*, void*),
+    virtual long __stdcall GetCapabilities(struct DIDevCaps* caps);
+    virtual long __stdcall EnumObjects(int (__stdcall* callback)(const struct DIDeviceObjectInstance*, void*),
                                           void* context, unsigned long flags); // EnumObjects
     virtual long __stdcall GetProperty(int property, void* value);
-    virtual long __stdcall SetProperty(int property, struct UnknownInputProperty* value);
+    virtual long __stdcall SetProperty(int property, struct DIPropDword* value);
     virtual long __stdcall Acquire();
     virtual long __stdcall Unacquire();
     virtual long __stdcall GetDeviceState(unsigned long size, void* state);
-    virtual long __stdcall GetDeviceData(unsigned long size, struct UnknownDeviceObjectData* data,
+    virtual long __stdcall GetDeviceData(unsigned long size, struct DIDeviceObjectData* data,
                                            long* count, unsigned long flags); // GetDeviceData
-    virtual long __stdcall SetDataFormat(const struct UnknownDataFormat* format);
+    virtual long __stdcall SetDataFormat(const struct DIDataFormat* format);
     virtual long __stdcall SetEventNotification(void* event);
     virtual long __stdcall SetCooperativeLevel(void* window, unsigned long flags);
-    virtual long __stdcall GetObjectInfo(struct UnknownObjectInstance* info, unsigned long object,
+    virtual long __stdcall GetObjectInfo(struct DIDeviceObjectInstance* info, unsigned long object,
                                            unsigned long how); // GetObjectInfo
-    virtual long __stdcall GetDeviceInfo(struct UnknownDeviceInstance* info);
+    virtual long __stdcall GetDeviceInfo(struct DIDeviceInstance* info);
     virtual long __stdcall RunControlPanel(void* owner, unsigned long flags);
     virtual long __stdcall Initialize(void* instance, unsigned long version, const struct Guid& guid);
     virtual long __stdcall CreateEffect(const struct Guid& type,
-                                           const struct UnknownEffectParams* params,
+                                           const struct DIEffect* params,
                                            struct DirectInputEffect** effect,
                                            void* outer); // CreateEffect
-    virtual long __stdcall EnumEffects(int (__stdcall* callback)(const struct UnknownEffectInfo*, void*),
+    virtual long __stdcall EnumEffects(int (__stdcall* callback)(const struct DIEffectInfo*, void*),
                                            void* context, unsigned long type); // EnumEffects
-    virtual long __stdcall GetEffectInfo(struct UnknownEffectInfo* info, const struct Guid& guid);
+    virtual long __stdcall GetEffectInfo(struct DIEffectInfo* info, const struct Guid& guid);
     virtual long __stdcall GetForceFeedbackState(unsigned long* state);
     virtual long __stdcall SendForceFeedbackCommand(int command);
     virtual long __stdcall EnumCreatedEffectObjects(void* callback, void* context, unsigned long flags);
@@ -78,7 +78,7 @@ struct InputButtonState {
 
 // 20-byte property block passed to interface method 6; the layout matches
 // DIPROPDWORD (a 16-byte header, then one value).
-struct UnknownInputProperty {
+struct DIPropDword {
     unsigned long size;
     unsigned long headerSize;
     unsigned long object;
@@ -88,7 +88,7 @@ struct UnknownInputProperty {
 
 // 0x244-byte device description at PCInputDevice+0x18. Its size and the
 // offsets used (type at +0x24, product name at +0x12c) match DIDEVICEINSTANCEA.
-struct UnknownDeviceInstance {
+struct DIDeviceInstance {
     unsigned long size;
     Guid instanceGuid;
     Guid productGuid;
@@ -107,7 +107,7 @@ struct UnknownDeviceInstance {
 
 // 0x124-byte effect description filled by interface method 19's callback; the
 // layout matches DIEFFECTINFOA.
-struct UnknownEffectInfo {
+struct DIEffectInfo {
     unsigned long size;
     Guid guid;
     unsigned long effectType;
@@ -139,13 +139,13 @@ void ReportDirectInputError(long result, const char* file, int line);
 
 // DirectInput object at ControlInterface+0xcc0; method 9 creates devices like
 // IDirectInput7::CreateDeviceEx.
-struct UnknownDirectInput {
+struct DirectInput7 {
     virtual long __stdcall QueryInterface();
     virtual long __stdcall AddRef();
     virtual long __stdcall Release();
     virtual long __stdcall CreateDevice();
     virtual long __stdcall EnumDevices(unsigned long type,
-                                          int (__stdcall* callback)(const struct UnknownDeviceInstance*, void*),
+                                          int (__stdcall* callback)(const struct DIDeviceInstance*, void*),
                                           void* context, unsigned long flags); // EnumDevices
     virtual long __stdcall GetDeviceStatus(const Guid& device);
     virtual long __stdcall RunControlPanel();
@@ -156,7 +156,7 @@ struct UnknownDirectInput {
 };
 
 // 24-byte data format descriptor (DIDATAFORMAT layout).
-struct UnknownDataFormat {
+struct DIDataFormat {
     unsigned long size;
     unsigned long objectSize;
     unsigned long flags;
@@ -166,7 +166,7 @@ struct UnknownDataFormat {
 };
 
 // 0x2c-byte device capabilities (DIDEVCAPS layout).
-struct UnknownDeviceCaps {
+struct DIDevCaps {
     unsigned long size;
     unsigned long flags;
     unsigned long deviceType;
@@ -190,11 +190,11 @@ extern "C" const Guid IID_IDirectInput7A;         // 0x005569e0 ({9A4CB684-236D-
 extern "C" long __stdcall DirectInputCreateEx(void* instance, unsigned long version,
                                               const Guid& iid, void** result,
                                               void* outer);
-extern "C" const UnknownDataFormat c_dfDIKeyboard;       // 0x00558f18
-extern "C" const UnknownDataFormat c_dfDIMouse;          // 0x00558f30
+extern "C" const DIDataFormat c_dfDIKeyboard;       // 0x00558f18
+extern "C" const DIDataFormat c_dfDIMouse;          // 0x00558f30
 
 // 16-byte buffered input event (DIDEVICEOBJECTDATA layout).
-struct UnknownDeviceObjectData {
+struct DIDeviceObjectData {
     unsigned long offset;      // key or object
     unsigned long data;        // bit 7: pressed
     unsigned long timeStamp;
@@ -202,7 +202,7 @@ struct UnknownDeviceObjectData {
 };
 
 // 0x13c-byte object description (DIDEVICEOBJECTINSTANCEA layout).
-struct UnknownObjectInstance {
+struct DIDeviceObjectInstance {
     unsigned long size;
     Guid guidType;
     unsigned long offset;
@@ -213,7 +213,7 @@ struct UnknownObjectInstance {
 };
 
 // 24-byte range property (DIPROPRANGE layout).
-struct UnknownInputPropertyRange {
+struct DIPropRange {
     unsigned long size;
     unsigned long headerSize;
     unsigned long object;
@@ -231,7 +231,7 @@ extern "C" const Guid GUID_ZAxis;                 // 0x00556a90
 extern "C" const Guid GUID_RxAxis;                // 0x00556aa0
 extern "C" const Guid GUID_RyAxis;                // 0x00556ab0
 extern "C" const Guid GUID_RzAxis;                // 0x00556ac0
-extern "C" const UnknownDataFormat c_dfDIJoystick;       // 0x00558f00
+extern "C" const DIDataFormat c_dfDIJoystick;       // 0x00558f00
 
 // RTTI: PCInputDevice : InputDevice. PCInputDeviceType.cpp is the nearest
 // source reference; the TU is not established.
@@ -250,6 +250,6 @@ public:
     friend int ChooseJoystick(int useLast);                                           // PickDevice.cpp
 
 protected:
-    UnknownDeviceInstance deviceInfo;          // +0x18; cleared by the constructor
+    DIDeviceInstance deviceInfo;          // +0x18; cleared by the constructor
     DirectInputDevice* device;             // +0x25c
 };

@@ -40,7 +40,7 @@ static int __stdcall EnumDisplayExCallback(Guid* guid, char* description, char* 
     return 1;
 }
 
-typedef long(__stdcall* UnknownEnumerateEx)(
+typedef long(__stdcall* DirectDrawEnumerateExFunction)(
     int(__stdcall* callback)(Guid*, char*, char*, void*, void*), void* context,
     unsigned long flags);
 
@@ -49,7 +49,7 @@ int EnumerateDisplays(void* window) {
     HMODULE library = LoadLibraryA("ddraw.dll");
     if (!library)
         return 0;
-    UnknownEnumerateEx enumerate = (UnknownEnumerateEx)GetProcAddress(library, "DirectDrawEnumerateExA");
+    DirectDrawEnumerateExFunction enumerate = (DirectDrawEnumerateExFunction)GetProcAddress(library, "DirectDrawEnumerateExA");
     if (enumerate) {
         enumerate(EnumDisplayExCallback, &window,
                   DDENUM_ATTACHEDSECONDARYDEVICES | DDENUM_NONDISPLAYDEVICES);
@@ -281,7 +281,7 @@ int PCVideoCard::CreateFlipChain(int backBuffers) {
     DDSCaps2 caps;
     RECT rect;
     DDSurfaceDesc2 desc;
-    UnknownBltFx fx;
+    DDBltFx fx;
 
     memset(&desc, 0, sizeof(desc));
     desc.size = sizeof(desc);
@@ -528,7 +528,7 @@ int CopyRenderSurfaceToTexture(PCRenderTarget* target, TextureMap* texture) {
 }
 
 // Pre-transformed, lit vertex (the D3DTLVERTEX layout, FVF 0x1c4).
-struct UnknownScreenVertex {
+struct D3DTLVertex {
     float x;
     float y;
     float z;
@@ -540,7 +540,7 @@ struct UnknownScreenVertex {
 };
 
 // Viewport (the D3DVIEWPORT7 layout).
-struct UnknownViewport {
+struct D3DViewport7 {
     unsigned long x;
     unsigned long y;
     unsigned long width;
@@ -557,10 +557,10 @@ struct UnknownViewport {
 int TestPartialTextureUpload(PCRenderTarget* target, Win32Rect* area, PCTextureMap* image,
     PCTextureMap* expected, PCTextureMap* rendered, PCVideoCard* display,
     int present) {
-    UnknownViewport viewport;
+    D3DViewport7 viewport;
     Win32Rect clear;
-    UnknownScreenVertex vertices[4];
-    UnknownBltFx fx;
+    D3DTLVertex vertices[4];
+    DDBltFx fx;
 
     memset(&fx, 0, sizeof(fx));
     fx.size = sizeof(fx);

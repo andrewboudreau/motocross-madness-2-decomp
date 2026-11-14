@@ -38,7 +38,7 @@ extern "C" __declspec(dllimport) long __stdcall RegQueryValueExA(void* key, cons
 extern "C" __declspec(dllimport) long __stdcall RegCloseKey(void* key);
 
 // KERNEL32 MEMORYSTATUS and its import (slot 8's memory page).
-struct UnknownMemoryStatus {
+struct MemoryStatus {
     unsigned long length;
     unsigned long memoryLoad;
     unsigned long totalPhys;
@@ -48,7 +48,7 @@ struct UnknownMemoryStatus {
     unsigned long totalVirtual;
     unsigned long availVirtual;
 };
-extern "C" __declspec(dllimport) void __stdcall GlobalMemoryStatus(UnknownMemoryStatus* status);
+extern "C" __declspec(dllimport) void __stdcall GlobalMemoryStatus(MemoryStatus* status);
 
 // 0x0065b490..0x0065b528: peak-held frame timings for slot 8's profile page,
 // constructed in this order (0x00467860..0x00467980).
@@ -292,7 +292,7 @@ int Game::RenderFrame() {
             if (memoryPage < 0)
                 memoryPage = debugOverlay->NewPage();
             if (debugOverlay->isEnabled && debugOverlay->shownPage == memoryPage) {
-                UnknownMemoryStatus status;
+                MemoryStatus status;
                 GlobalMemoryStatus(&status);
                 debugOverlay->Title(memoryPage, "Memory");
                 debugOverlay->Print(memoryPage, "  Ours   in DirectX       Area");

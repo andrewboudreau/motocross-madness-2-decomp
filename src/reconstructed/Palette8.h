@@ -8,7 +8,7 @@ struct DirectDrawPalette;
 
 // PALETTEENTRY-shaped (red, green, blue, flags); passed to
 // GetSystemPaletteEntries and DirectDraw's CreatePalette.
-struct UnknownPaletteEntry {
+struct PaletteEntry {
     unsigned char red;
     unsigned char green;
     unsigned char blue;
@@ -30,7 +30,7 @@ public:
     static Palette8* LoadShared(const char* name);
 
     unsigned char rgbEntries[256][3];         // +0x008 RGB entries from the stream
-    UnknownPaletteEntry paletteEntries[256];  // +0x308 the DirectDraw palette's entries
+    PaletteEntry paletteEntries[256];  // +0x308 the DirectDraw palette's entries
     ColorMapper* colorMapper;                 // +0x708 the mapper named in the stream
     DirectDrawPalette* ddPalette;       // +0x70c from DirectDraw CreatePalette
     int firstEntry;                           // +0x710 first entry; 10 keeps the system colours

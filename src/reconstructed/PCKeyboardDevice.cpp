@@ -64,7 +64,7 @@ int PCKeyboardDevice::IsButtonDown(int key, int modifier, InputButtonState* entr
 // repeat runs for the six lists and the modifiers are refreshed.
 int PCKeyboardDevice::Update(int value) {
     unsigned char keys[256];
-    UnknownDeviceObjectData events[16];
+    DIDeviceObjectData events[16];
     long count;
     if (!device)
         return 0;
@@ -86,16 +86,16 @@ int PCKeyboardDevice::Update(int value) {
         keyStates[DIK_NUMLOCK].state = 1;
     else
         keyStates[DIK_NUMLOCK].state = 0;
-    result = device->GetDeviceData(sizeof(UnknownDeviceObjectData), 0, &count, DIGDD_PEEK);
+    result = device->GetDeviceData(sizeof(DIDeviceObjectData), 0, &count, DIGDD_PEEK);
     if (result == DIERR_INPUTLOST || result == DIERR_NOTACQUIRED) {
         if (device->Acquire() < 0) {
             ReportDirectInputError(result, __FILE__, 1113);
             return 0;
         }
-        result = device->GetDeviceData(sizeof(UnknownDeviceObjectData), 0, &count, DIGDD_PEEK);
+        result = device->GetDeviceData(sizeof(DIDeviceObjectData), 0, &count, DIGDD_PEEK);
     }
     if (result >= 0)
-        result = device->GetDeviceData(sizeof(UnknownDeviceObjectData), events, &count, 0);
+        result = device->GetDeviceData(sizeof(DIDeviceObjectData), events, &count, 0);
     if (result < 0)
         return 0;
     for (int i = 0; i < count; i++) {

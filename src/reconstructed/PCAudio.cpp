@@ -959,7 +959,7 @@ int Sound::CreateBuffer(DirectSoundBuffer** buffer, unsigned long bytes, unsigne
     if (isStatic)
         desc.flags |= 2;
     desc.bufferBytes = bytes;
-    desc.format = (UnknownWaveFormat*)&format;
+    desc.format = (WaveFormatEx*)&format;
     if (SoundSystem()->directSound->CreateSoundBuffer(&desc, buffer, 0) < 0)
         return 0;
     g_MemTagStack->AddDirectXBytes(bytes);

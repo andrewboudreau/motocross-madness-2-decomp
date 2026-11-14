@@ -58,7 +58,7 @@ Function and member names in `Net.h` are provisional (tier 3) unless noted:
   of line here, because code at `0x0044b634`/`0x0044c0f5` passes its address
   to the vector constructor.
 - DirectPlay calls go through decoded vtable slot offsets on hand-declared
-  `UnknownDirectPlay4A`/`UnknownDirectPlayLobby3A` interfaces, because VC6's
+  `DirectPlay4A`/`DirectPlayLobby3A` interfaces, because VC6's
   DPLAY.H predates IDirectPlay4.
   - The GUIDs bind to their SDK addresses (`0x005567b0`..`0x00556970`); the
     application GUID is at `0x00556dc0`.

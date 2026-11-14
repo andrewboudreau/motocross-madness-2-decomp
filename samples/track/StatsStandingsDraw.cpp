@@ -15,7 +15,7 @@ extern "C" __declspec(dllimport) unsigned long __stdcall SetBkColor(void* dc, un
 extern "C" __declspec(dllimport) int __stdcall SetBkMode(void* dc, int mode);
 extern "C" __declspec(dllimport) unsigned long __stdcall SetTextColor(void* dc, unsigned long color);
 extern "C" __declspec(dllimport) int __stdcall GetTextExtentPoint32A(void* dc, const char* text, int length,
-                                                                     UnknownTextExtent* size);
+                                                                     Win32Size* size);
 extern "C" __declspec(dllimport) int __stdcall DrawTextA(void* dc, const char* text, int length,
                                                          OverlayRect* rect, unsigned int format);
 

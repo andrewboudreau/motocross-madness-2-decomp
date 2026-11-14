@@ -38,7 +38,7 @@ int PCInputDevice::SetDwordProperty(int property, unsigned long object, unsigned
     unsigned long data) {
     if (!device)
         return 0;
-    UnknownInputProperty value;
+    DIPropDword value;
     value.size = sizeof(value);
     value.headerSize = 0x10;
     value.object = object;

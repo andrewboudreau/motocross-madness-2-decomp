@@ -86,7 +86,7 @@ int Fog::PrepareGeometry()
 }
 
 // A D3DFVF_TLVERTEX (screen-space backdrop corner).
-struct UnknownFogBackdropVertex {
+struct FogBackdropVertex {
     float x;
     float y;
     float z;
@@ -112,7 +112,7 @@ int Fog::Render3D()
         }
         if (!drawnByFogOn && TARGET()->targetDisplay->isPowerVR
             && (TARGET()->clearTarget || TARGET()->fillMode == D3DFILL_WIREFRAME)) {
-            UnknownFogBackdropVertex vertices[4];
+            FogBackdropVertex vertices[4];
             vertices[0].x = (float)VIEWPORT(0);
             vertices[0].y = (float)VIEWPORT(1);
             vertices[0].z = 0.999999f;

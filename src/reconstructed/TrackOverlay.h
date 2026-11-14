@@ -146,7 +146,7 @@ public:
 };
 
 // A GDI SIZE.
-struct UnknownTextExtent {
+struct Win32Size {
     int cx;
     int cy;
 };
@@ -199,7 +199,7 @@ public:
     TrackOverlayRect rowRects[8];
     char drawnRowText[8][0x80];               // +0x1b0 the rows last drawn; a row is redrawn when its text changes
     char rowText[8][0x80];                    // the text drawn into field_0x130[i]
-    UnknownTextExtent rowExtent;              // extent of the first row (GetTextExtentPoint32A)
+    Win32Size rowExtent;              // extent of the first row (GetTextExtentPoint32A)
 };
 
 // 0x005199f0 (cdecl): qsort comparator for UnknownEventScore records

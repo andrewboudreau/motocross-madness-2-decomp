@@ -124,5 +124,5 @@ public:
     int queuedEventCount;                        // queued events
     ControlEvent events[160];
     ControlMapping* mapping;
-    struct UnknownDirectInput* directInput;
+    struct DirectInput7* directInput;
 };

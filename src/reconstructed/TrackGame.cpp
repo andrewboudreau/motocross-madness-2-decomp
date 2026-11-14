@@ -42,7 +42,7 @@ extern "C" __declspec(dllimport) int __stdcall PostMessageA(void* window, unsign
                                                            unsigned int wParam, long lParam);
 
 // KERNEL32 MEMORYSTATUS.
-struct UnknownMemoryStatus {
+struct MemoryStatus {
     unsigned long length;
     unsigned long memoryLoad;
     unsigned long totalPhys;
@@ -52,7 +52,7 @@ struct UnknownMemoryStatus {
     unsigned long totalVirtual;
     unsigned long availVirtual;
 };
-extern "C" __declspec(dllimport) void __stdcall GlobalMemoryStatus(UnknownMemoryStatus* status);
+extern "C" __declspec(dllimport) void __stdcall GlobalMemoryStatus(MemoryStatus* status);
 
 // EBUEula.dll's entry point: shows the EULA for the registry key; nonzero
 // when accepted.
@@ -144,7 +144,7 @@ TrackGame::TrackGame() {
 // 64 MB of available memory (0x14bb), then the EULA through EBUEula.dll.
 // On NT it also turns the screen saver off, remembering the setting.
 int TrackGame::Startup() {
-    UnknownMemoryStatus status;
+    MemoryStatus status;
     char text[128];
     if (!mode.FindDataDirectory() &&
         LoadStringA(resourceInstance, 0x13b3, text, sizeof(text))) {

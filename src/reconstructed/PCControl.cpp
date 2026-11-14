@@ -95,7 +95,7 @@ int PCControlInterface::CreateDevices() {
 
 // 0x004bf3c0: opens each attached joystick, stopping at eight; a joystick
 // that fails to open is deleted.
-int __stdcall PCControlInterface::EnumJoystickCallback(const UnknownDeviceInstance* instance,
+int __stdcall PCControlInterface::EnumJoystickCallback(const DIDeviceInstance* instance,
     void* context) {
     PCControlInterface* control = (PCControlInterface*)context;
     control->joysticks[control->joystickCount] = new(__FILE__, 73) PCJoystickDevice(control->joystickCount);

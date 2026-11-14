@@ -52,7 +52,7 @@ MediaControl* MediaControl::Open(void* target, const char* file,
 {
     DirectDrawSurface* surface;
     DDSurfaceDesc2 frameDesc;
-    UnknownMediaSurfaceDesc format;
+    DDSurfaceDesc format;
     unsigned short path[MAX_PATH];
     long result;
 

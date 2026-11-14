@@ -9,7 +9,7 @@
 // their bindings (axis 1 flipped by the JoyDirectionFlipped bit, axis 2
 // always); button changes are queued as events, and the POV values kept.
 int PCJoystickDevice::ReadImmediateState(int value) {
-    UnknownJoystickState state;
+    DIJoyState state;
     if (!device)
         return 0;
     if (device->GetDeviceState(sizeof(state), &state) < 0)

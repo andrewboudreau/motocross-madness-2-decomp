@@ -38,7 +38,7 @@ extern "C" __declspec(dllimport) void* __stdcall CreateFontA(int height, int wid
                                                              const char* face);
 extern "C" __declspec(dllimport) int __stdcall DeleteObject(void* object);
 // A GDI LOGFONTA (0x3c bytes).
-struct UnknownLogFont {
+struct LogFont {
     long lfHeight;
     long lfWidth;
     long lfEscapement;
@@ -54,14 +54,14 @@ struct UnknownLogFont {
     unsigned char lfPitchAndFamily;
     char lfFaceName[32];
 };
-extern "C" __declspec(dllimport) void* __stdcall CreateFontIndirectA(const UnknownLogFont* font);
+extern "C" __declspec(dllimport) void* __stdcall CreateFontIndirectA(const LogFont* font);
 extern "C" __declspec(dllimport) void* __stdcall SelectObject(void* dc, void* object);
 extern "C" __declspec(dllimport) unsigned long __stdcall SetBkColor(void* dc, unsigned long color);
 extern "C" __declspec(dllimport) int __stdcall SetBkMode(void* dc, int mode);
 extern "C" __declspec(dllimport) unsigned long __stdcall SetTextColor(void* dc, unsigned long color);
 extern "C" __declspec(dllimport) int __stdcall TextOutA(void* dc, int x, int y, const char* text, int length);
 extern "C" __declspec(dllimport) int __stdcall GetTextExtentPoint32A(void* dc, const char* text, int length,
-                                                                     UnknownTextExtent* size);
+                                                                     Win32Size* size);
 extern "C" __declspec(dllimport) int __stdcall DrawTextA(void* dc, const char* text, int length,
                                                          OverlayRect* rect, unsigned int format);
 extern "C" __declspec(dllimport) void* __stdcall CreatePen(int style, int width, unsigned long color);
@@ -453,7 +453,7 @@ StatsOverlay* StatsOverlay::LoadPanel(RenderTarget* target, TextureMapManager* m
                                                   OverlayRect screen)
 {
     const char* font;
-    UnknownLogFont logFont;
+    LogFont logFont;
     OverlayRect rect;
     OverlayRect source;
     char name[260];
@@ -1491,7 +1491,7 @@ ChatOverlay* ChatOverlay::Setup(RenderTarget* target, TextureMapManager* manager
 {
     const char* font;
     OverlayRect source;
-    UnknownLogFont logFont;
+    LogFont logFont;
     char name[260];
     char path[260];
 

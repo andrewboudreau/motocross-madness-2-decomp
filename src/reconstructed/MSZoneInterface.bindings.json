@@ -9,7 +9,7 @@
   "?DebugFree@@YAXPAXPBDH@Z": "0x004a2e60",
   "?DebugMalloc@@YAPAXIPBDH@Z": "0x004a2e20",
   "?SendDebugMessage@@YAXPBDZZ": "0x00520820",
-  "?SetDirectPlay@MSZoneInterface@@QAEXPAUUnknownDirectPlay4A@@PAUUnknownDirectPlayLobby3A@@@Z": "0x004aa350",
+  "?SetDirectPlay@MSZoneInterface@@QAEXPAUDirectPlay4A@@PAUDirectPlayLobby3A@@@Z": "0x004aa350",
   "?GetLobbyPreset@MSZoneInterface@@QAEHPADI@Z": "0x004aa360",
   "?GetLobbyRank@MSZoneInterface@@QAEHPADI@Z": "0x004aa4e0",
   "?SubmitScores@MSZoneInterface@@QAEHIPAX0@Z": "0x004aa670",

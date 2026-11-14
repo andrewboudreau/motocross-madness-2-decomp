@@ -465,7 +465,7 @@ failed:
 
 // 0x00534420: import thunk (jmp [0x00550030]).
 extern "C" long __stdcall DirectPlayLobbyCreateA(GUID* provider,
-                                                 UnknownDirectPlayLobby3A** lobby,
+                                                 DirectPlayLobby3A** lobby,
                                                  void* outer, void* data,
                                                  unsigned long dataSize);
 
@@ -484,9 +484,9 @@ extern "C" long __stdcall DirectPlayLobbyCreateA(GUID* provider,
 // order.
 long NetworkInterface::ConnectUsingLobby()
 {
-    UnknownDirectPlay4A* baseDirectPlay = 0;
-    UnknownDirectPlay4A* directPlay4 = 0;
-    UnknownDirectPlayLobby3A* baseLobby = 0;
+    DirectPlay4A* baseDirectPlay = 0;
+    DirectPlay4A* directPlay4 = 0;
+    DirectPlayLobby3A* baseLobby = 0;
     NetConnection* connection = 0;
     unsigned long size;
     unsigned long flags;
@@ -1590,7 +1590,7 @@ int __stdcall EnumConnectionsCallback(const GUID* provider, void* connection, un
                                     const NetName* name, unsigned long, void* context)
 {
     ConnectionInfoType* connections = (ConnectionInfoType*)context;
-    UnknownDirectPlay4A* directPlay = 0;
+    DirectPlay4A* directPlay = 0;
     long result = 0;
 
     if ((*provider == DPSPGUID_IPX || *provider == DPSPGUID_MODEM ||

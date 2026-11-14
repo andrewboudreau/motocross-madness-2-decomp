@@ -81,7 +81,7 @@
   "?BuildGarageScene@KrustyUI@@QAEXH@Z": "0x00498cf0",
   "?OpenMenu@KrustyUI@@QAEXH@Z": "0x00499b20",
   "?ReportTotals@MemTagStack@@QAEXPBD@Z": "0x004a2bc0",
-  "?SetDirectPlay@MSZoneInterface@@QAEXPAUUnknownDirectPlay4A@@PAUUnknownDirectPlayLobby3A@@@Z": "0x004aa350",
+  "?SetDirectPlay@MSZoneInterface@@QAEXPAUDirectPlay4A@@PAUDirectPlayLobby3A@@@Z": "0x004aa350",
   "?GetPlayerName@NetworkInterface@@QAEHHPAD@Z": "0x004ac720",
   "?Connect@DebugSocket@@QAEHPBDH@Z": "0x004ad3e0",
   "?InitializeSound@PCSoundInterface@@QAEJHHHHH@Z": "0x004be5a0",

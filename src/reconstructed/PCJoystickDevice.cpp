@@ -39,9 +39,9 @@ PCJoystickDevice::~PCJoystickDevice() {
 // 0x004c2930: creates the device, takes its description and capabilities
 // (force feedback makes it type 3), enumerates the axes and reads each axis
 // range, with a 5% dead zone. On failure the device is released.
-int PCJoystickDevice::OpenDevice(const UnknownDeviceInstance* instance) {
-    UnknownInputPropertyRange range;
-    UnknownDeviceCaps caps;
+int PCJoystickDevice::OpenDevice(const DIDeviceInstance* instance) {
+    DIPropRange range;
+    DIDevCaps caps;
     int half;
     const Guid& guid = instance->instanceGuid;
     if (g_TrackGame->controlInterface->directInput->CreateDeviceEx(
@@ -130,10 +130,10 @@ failed:
 }
 
 // 0x004c2cb0
-int __stdcall PCJoystickDevice::EnumAxisObjectsCallback(const UnknownObjectInstance* object,
+int __stdcall PCJoystickDevice::EnumAxisObjectsCallback(const DIDeviceObjectInstance* object,
     void* context) {
     PCJoystickDevice* device = (PCJoystickDevice*)context;
-    UnknownObjectInstance info;
+    DIDeviceObjectInstance info;
     info.size = sizeof(info);
     if (device->device->GetObjectInfo(&info, object->type, DIPH_BYID) >= 0) {
         if (!memcmp(&object->guidType, &GUID_XAxis, sizeof(Guid)))
@@ -316,7 +316,7 @@ int PCJoystickDevice::CreateConstantForce(int effect, long magnitude, unsigned l
     if (device && deviceKind == 3 && effect < 5) {
         unsigned long axes[2];
         long direction[2];
-        UnknownEffectParams params;
+        DIEffect params;
         long force = magnitude;
         direction[0] = 0;
         direction[1] = 0;
@@ -345,7 +345,7 @@ int PCJoystickDevice::SetConstantForce(int effect, long* direction, long magnitu
     if (device && deviceKind == 3 && effect < 5) {
         long force = magnitude;
         SetDirection(effect, direction);
-        UnknownEffectParams params = { sizeof(params) };
+        DIEffect params = { sizeof(params) };
         params.typeSpecificSize = sizeof(force);
         params.typeSpecific = &force;
         return effects[effect]->SetParameters(&params, 0x100) >= 0;
@@ -359,7 +359,7 @@ int PCJoystickDevice::SetDirection(int effect, long* direction) {
         long value[2];
         value[0] = direction[0];
         value[1] = direction[1];
-        UnknownEffectParams params = { sizeof(params) };
+        DIEffect params = { sizeof(params) };
         params.flags = 0x22;
         params.axisCount = 2;
         params.axes = 0;
@@ -378,8 +378,8 @@ int PCJoystickDevice::CreateEnvelopedForce(int effect, unsigned long duration, l
     if (device && deviceKind == 3 && effect < 5) {
         unsigned long axes[2];
         long directions[2];
-        UnknownEnvelope envelope;
-        UnknownEffectParams params;
+        DIEnvelope envelope;
+        DIEffect params;
         long force = magnitude;
         envelope.size = sizeof(envelope);
         envelope.attackTime = attackTime;
@@ -417,9 +417,9 @@ int PCJoystickDevice::CreateSquareWave(int effect, unsigned long duration, unsig
     if (device && deviceKind == 3 && effect < 5) {
         unsigned long axes[2];
         long direction[2];
-        UnknownPeriodic wave;
-        UnknownEnvelope envelope;
-        UnknownEffectParams params;
+        DIPeriodic wave;
+        DIEnvelope envelope;
+        DIEffect params;
         wave.magnitude = magnitude;
         wave.offset = 0;
         wave.phase = 0;
@@ -494,8 +494,8 @@ static int s_UnknownEffectCount;
 
 // 0x004c4260: the IDirectInputDevice2::EnumEffects (method 19) callback; copies each effect into the caller's
 // array, stopping at 32. The formatted line is not used further.
-static int __stdcall EnumEffectsCallback(const UnknownEffectInfo* info, void* context) {
-    UnknownEffectInfo* effects = (UnknownEffectInfo*)context;
+static int __stdcall EnumEffectsCallback(const DIEffectInfo* info, void* context) {
+    DIEffectInfo* effects = (DIEffectInfo*)context;
     if (!effects)
         return 0;
     effects[s_UnknownEffectCount] = *info;
@@ -509,7 +509,7 @@ static int __stdcall EnumEffectsCallback(const UnknownEffectInfo* info, void* co
 
 // 0x004c4190: clears five entries, then enumerates the device's effects into
 // `effects` and stores how many were found.
-int PCJoystickDevice::EnumEffects(UnknownEffectInfo* effects, int* count) {
+int PCJoystickDevice::EnumEffects(DIEffectInfo* effects, int* count) {
     if (deviceKind != 3)
         return 0;
     for (int i = 0; i < 5; i++) {
@@ -571,7 +571,7 @@ int PCJoystickDevice::SetBufferedInput(int buffered) {
     if (!device)
         return 0;
     device->Unacquire();
-    UnknownInputProperty property;
+    DIPropDword property;
     memset(&property, 0, sizeof(property));
     property.size = sizeof(property);
     property.headerSize = 0x10;

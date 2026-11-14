@@ -553,8 +553,8 @@ public:
 
     // The constructor clears +0 and +4; 0x004aa350 sets them
     // (MSZoneInterface.cpp).
-    UnknownDirectPlay4A* directPlay;          // +0x00
-    UnknownDirectPlayLobby3A* lobby;          // +0x04
+    DirectPlay4A* directPlay;          // +0x00
+    DirectPlayLobby3A* lobby;          // +0x04
     UnknownZonePlayerRecord players[8];       // +0x08: reported by 0x004aa670
     unsigned char field_0x248[0x24c - 0x248];
     // 0x0049c2f0 fills these from the lobby preset: a tag's value minus
@@ -575,7 +575,7 @@ public:
 // MSZoneInterface.cpp's literals.
 class MSZoneInterface : public MSZoneInterfaceBase {
 public:
-    void SetDirectPlay(UnknownDirectPlay4A* a, UnknownDirectPlayLobby3A* b); // 0x004aa350
+    void SetDirectPlay(DirectPlay4A* a, DirectPlayLobby3A* b); // 0x004aa350
     // MSZoneInterface.cpp: 0x004aa360 / 0x004aa4e0 ask the lobby for the
     // preset / rank property and copy it into `buffer` (at most `size`
     // bytes); 0x004aa670 reports `count` players through a COM object.
