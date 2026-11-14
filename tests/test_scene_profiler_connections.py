@@ -93,13 +93,14 @@ class SceneProfilerConnectionTests(unittest.TestCase):
                                 ROOT / Path(SOURCES[owner]).with_suffix('.bindings.json'))
                 self.assertTrue(proof['strict_exact'], proof)
 
-            # Terrain slot 14 is the known-partial case (targets.json expect: partial):
-            # declaring Terrain::PrepareGeometry swaps two stack-slot offsets.
+            # Terrain slot 14 is exact, but sensitive to the declaration count before it
+            # (docs/VC6_OPERAND_ORDER.md section 2): a header edit can exchange the two
+            # relocation targets at offsets 2200 and 2205 (3171 matching positions).
             proof = compare(retail, objects['terrain'], '?Render3D@Terrain@@', 0x506220, 3173,
                             ROOT / Path(SOURCES['terrain']).with_suffix('.bindings.json'))
             self.assertEqual((proof['strict_match']['matching_positions'],
                               [(m['offset'], m['retail'], m['candidate']) for m in proof['strict_match']['mismatches']]),
-                             (3171, [(2200, 24, 28), (2205, 28, 24)]), proof)
+                             (3173, []), proof)
 
             # Guard the production global, not merely a separately compiled size probe:
             # retail initializer passes 0x68ab90; its constructor writes +0,+4,+8.

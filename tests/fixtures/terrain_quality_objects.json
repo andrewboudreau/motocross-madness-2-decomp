@@ -1,10 +1,10 @@
 {
-  "baseline": "Current published ae991302 plus reviewed quaternion/Wrecker composition; only exact Terrain.cpp filename root normalization. No consumer changes.",
+  "baseline": "Current published ae991302 plus reviewed quaternion/Wrecker composition; only exact Terrain.cpp filename root normalization. No consumer changes. Terrain Render3D 0x00506220 became strict exact when PCVideoCard gained its DDCAPS dwCKeyCaps member (driverColorKeyCaps +0x1c0): the declaration count before the function moved by one and the two relocation targets at function offsets 2200 and 2205 exchanged to retail's order. Sections, relocation count and every other byte and destination are unchanged; only the Terrain.cpp record is refreshed.",
   "objects": {
     "src/krusty2/broadphase/Terrain.cpp": {
       "sections": 87,
       "relocations": 528,
-      "sha256": "5be593cb619e1bf49074078cd2f4f3245f549ceb2c3ad4bd03f4226c3a218f33"
+      "sha256": "3d0fe47066ea8d8d531f74d4c22092b98d0e559837fc8bf4dd01276e75ffffbb"
     }
   }
 }

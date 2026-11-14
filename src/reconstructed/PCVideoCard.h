@@ -78,7 +78,8 @@ public:
     unsigned int driverCapsSize;               // +0x1b4: size
     unsigned int driverCaps;                   // +0x1b8: capability bits (PCGame 0x004c0d10: 0x1, 0x400)
     unsigned int driverCaps2;                  // +0x1bc: caps2
-    unsigned char field_0x1c0[0x1f0 - 0x1c0];
+    unsigned int driverColorKeyCaps;           // +0x1c0: colour-key caps (DDCAPS dwCKeyCaps; EcoSystem.cpp tests bit 8)
+    unsigned char field_0x1c4[0x1f0 - 0x1c4];
     unsigned int driverVideoMemory;            // +0x1f0: total video memory
     unsigned char field_0x1f4[0x330 - 0x1f4];
     unsigned int emulationCapsSize;            // +0x330: emulation caps (DDCAPS) from here

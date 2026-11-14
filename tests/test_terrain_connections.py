@@ -55,7 +55,10 @@ PARTIAL = (
     # Load's 2117 bytes and other 64 relocation records are identical.
     # Load now passes its third argument (retail 0x0050614c), not `host`, to the height field;
     # the size and relocations are unchanged, one push source differs.
-    ('?Load@Terrain@@', 2117, '670eff52240feeb67e8a13e28c9a5605d4fe25df7b564d7dfcab49f4c54c3aae'),
+    # PCVideoCard's driverColorKeyCaps member renumbers the label again
+    # ($L6433 -> $L6434, still .text$x+0xb6); the body bytes and the other 64
+    # relocation records are identical.
+    ('?Load@Terrain@@', 2117, '53fc226cae7bdbb978b2154adfb9d58a1470c5cdb73f133b4dfc7fcc4a37f262'),
     # Intentional cell-conversion repair, verified at the actual first-cell
     # boundary in test_terrain_cell_conversion; full interpolation remains partial.
     # The sampler, dot and triangle provider names are now canonical, with
@@ -163,7 +166,7 @@ class TerrainConnectionsTests(unittest.TestCase):
             for source, symbol, va, size, bindings in dict.fromkeys(cases):
                 self.assertTrue(compare(retail, objects[source], symbol, va, size, bindings)['strict_exact'],
                                 (source, symbol))
-            self.assertEqual(len(dict.fromkeys(cases)), 190)
+            self.assertEqual(len(dict.fromkeys(cases)), 191)
             # Load remains nonexact; keep its complete candidate instruction
             # bytes, while joining only the three evidenced stream calls.
             entry = provider.find_symbol('?Load@Terrain@@')
