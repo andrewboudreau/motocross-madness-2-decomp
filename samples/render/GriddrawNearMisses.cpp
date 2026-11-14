@@ -108,6 +108,19 @@
 //   same: the child case reaches it with size 0. Two separate tests scored
 //   0.632; ordering `size == 16 ||` first 0.721 (larger body); a split or
 //   goto form 0.620-0.638.
+// Big-gap pass (73 of 1750 strict, candidate 1712, same frame 0x54): the
+// first divergence is at offset 4, register choice. Retail loads `size`
+// into ebx, screenMatrix into ebp and center into esi between the pushes
+// and compares `cmp ebx, 1`; VC6 here loads size (edx), extent (ebp),
+// center (esi) and screenMatrix (ebx) up front and keeps the constant 1
+// in ecx (`cmp edx, ecx`), then pushes TestBox's arguments from the
+// registers where retail reloads extent from the frame. Unchanged
+// (186 of 500 aligned): `count = 1` before `coarse = 1`, the 1s chained
+// through coarse (`count = coarse` ..., 69), `visible`/`corners` order
+// in the else block, oldMask declared last; `size >= 2` 101 strict by
+// position only (185 aligned), oldMask declared first 174 aligned.
+// Dropping `coarse = 1` (a probe, not retail's logic) does not free the
+// constant register either.
 // k-scan (s22): compiled behind 0..63 prepended typedefs, 0x0047de90,
 // 0x0047f210, 0x004815e0, 0x00481de0 have the same code at every
 // count, so their differences are not a declaration-count effect
