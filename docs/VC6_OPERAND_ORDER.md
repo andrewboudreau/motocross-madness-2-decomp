@@ -800,6 +800,14 @@ without effect, as noted.
   `+=` on one field (`position = device->pointerPosition; position.y += 16;`) expands
   into per-field loads with the add folded in and, unlike component-wise stores, takes
   no turn in the scratch-register rotation (ToolTip `0x00486b10`, 89 to exact).
+- **A member passed through a local.** VC6 hands expression temporaries eax, ecx
+  and edx in turn; a member read into a named local that is then passed to a call
+  (`FILE* file = stream->fileHandle; ftell(file);`) is a variable and takes no turn, so
+  every later temporary moves one register along. That is the register permutation
+  that starts at one call and runs to the end of the function (FileStream `0x004618e0`,
+  136 to exact). It also decides whether two failure tails merge: with different
+  registers for the `fclose` argument the first stays inline (FileStream `0x00460db0`,
+  27 to exact).
 - **Not moved by any of these:** byte-store parity in EcoSystem `0x00458da0` (each
   variable-index byte store toggles the later SIB order), the `memset` + `.size`
   store placement in PCGame `0x004c0d10`

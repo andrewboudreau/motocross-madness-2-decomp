@@ -76,6 +76,18 @@
 //   memory copy when Unlock fails, which retail does not (edi). By value
 //   the helper loses the 0x84 frame (54-59). Early returns for PtInRect or
 //   Lock (72-96) and a single `return opaque` exit (241-250) are worse.
+//   Session 24 (0x00478e10): VC6 scalarises `opaque` whether it is an
+//   `int[1]`, a member of a one- or two-field local struct, written through
+//   an `int*` or bound to an `int&` (all 231, same object as the plain int,
+//   with every tail form). Only an aggregate that also holds the surface
+//   description keeps it in memory: `struct { int opaque; DDSurfaceDesc2
+//   desc; }` gives retail's unfolded `mov eax, [opaque]` for the Lock failure
+//   and a real `result` copy in edi, but puts the pair after `format` in the
+//   frame, stores 1 for the 8-bit hit too (no `mov edi, 1`), drops the dead
+//   test and orders the two failure returns the other way (200-220/329);
+//   with `format` in the aggregate as well 134. `volatile` gives 190. The
+//   `unsigned char result` form scores 288 unchanged with PtInRect as an
+//   early return, as an if/else, or with the Lock-failure return first.
 // 0x004738a0 UIEditBox slot 40 (76/968): retail keeps the width and the
 //   redraw count in memory. Retail reloads width into edi at the loop top
 //   (0x47396d) and consumes that copy in the scroll arms (`sub edi, ebx`),

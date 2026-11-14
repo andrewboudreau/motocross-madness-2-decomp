@@ -301,6 +301,16 @@ static inline int PutHeader(FileStream* stream)
 // where VC6 here stores it before the loop. Seeding before strcat or before
 // _splitpath moves the store to the start of the strcat or ahead of the call;
 // `name[i]`, a count-down loop and `length` in the for-init are no closer.
+// Session 24 (255/282 as written; one instruction out of place): the seed
+// between strcat and strlen lands before the strlen's `repne scasb` (257, two
+// instructions out of place), before strcat it lands before the strcat's first
+// scan (248). Also no closer (60 forms): `p` declared before strcat or taken
+// from strcat's result, `strlen(strcat(..))`, `strcpy(name + strlen(name),
+// ..)`, comma forms joining the seed and the strcat, a `char* key` local, the
+// loop indexed, with `p++` in the for-increment, as `while` or `do/while`, the
+// xor reading `*p++` directly, and an inline SeedKey(stream, name) helper with
+// the seed in three positions (with or without the strcat or the nameKey
+// store inside it). A scan over 0..63 leading typedefs is flat at 255.
 int FileStream::WriteHeader(const char* path)
 {
     char drive[_MAX_DRIVE];

@@ -29,6 +29,9 @@
 // scheduling relative to the 0x005119c0 pushes is.
 // Session 21, flags: /ML, /Op, /GB and /G5 keep 1776; /Oa (674), /Ow (677)
 // and /G6 (1288) are worse.
+// Session 24, unchanged (1776): the format read through an `unsigned long`
+// view or an `unsigned long` local, the size stored through an `int` view or
+// a `DDSurfaceDesc2*` local, and a PCRenderTarget cast.
 #include <stdio.h>
 #include <string.h>
 

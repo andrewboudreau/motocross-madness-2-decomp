@@ -22,6 +22,12 @@
 // `races = savedDifficulty = difficulty = 2`, the four detail levels chained
 // in either direction, through a `level` local or a countdown loop, and
 // `savedDifficulty = difficulty = 2` in either order.
+// Session 24, unchanged (383): `int one = 1` and/or `int two = 2` locals
+// (declared at the top or before the stores) and a `detail` local; the two
+// difficulty stores moved first (209), `savedDifficulty = raceSettings.races`
+// (204) and `raceSettings.races = difficulty = 2` (332) are worse. A
+// preceding function of any size leaves the code unchanged, so the placement
+// of the second `rep movsd` is decided inside this function.
 //
 // TrackGameMode::FindDataFile (0x005238f0, 355 bytes): candidate 357 bytes.
 // The old 353-byte extent cut off the final ret 8 operand; see docs/UIINFO.md.

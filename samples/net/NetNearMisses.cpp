@@ -41,6 +41,17 @@
 // every k = 0..63, so the ebx/ebp swap is not the symbol-arena tie-break;
 // retail keeps index in ebp and gives ebx to `last`'s loop-top reload, the
 // vtable and the message pointer. /ML keeps 361; /G6 gives 72.
+// Session 24, on that 197 form (all keep the swap unless noted): a `from`
+// local read through MessageAt before the pointer is taken, the pointer taken
+// before the test, a `NetMessage&` (232, 368 bytes), an assignment inside the
+// test (232), a `NetMessage* base = messages` local (83); the system block
+// with or without the `system` local or the pointer (no pointer: 60), an
+// `unsigned long*` view; `index++` then the test, a ternary or if/else
+// increment (144), `more` after `offset` (190), `last != index` (198) or
+// `index - last` (79); all six declaration orders of index/last/more before
+// or after the name buffers, `value` reused as `last`, a `next` local,
+// `offset` at function scope, `for (;;)` with a break, `while (more != 0)`,
+// a `bool more` (76) and `last = index - 1` (57).
 #include <windows.h>
 #include <stdio.h>
 #include <string.h>
