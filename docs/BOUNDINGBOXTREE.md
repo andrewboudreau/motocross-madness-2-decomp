@@ -13,7 +13,7 @@ stand-in is now the shared `FileStream`. BuildModelPointTree
 needs a `TreeVec3* p = &points[count]` local in both vertex loops for
 retail's operand order. Near miss
 (`samples/physics/bvh/BoundingBoxTreeBuildNearMisses.cpp`):
-GatherModelTriangles `0x0042c260`.
+GatherModelTriangles `0x0042c260` (1626/1627).
 
 The code before `0x0042ad30` is a separate, unattested unit. It has its
 own kVec3 `$E` set (`0x00429400`), its own bss, and the five empty `$E`

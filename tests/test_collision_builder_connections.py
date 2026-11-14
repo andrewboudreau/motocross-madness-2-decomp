@@ -122,7 +122,7 @@ class CollisionBuilderConnectionsTests(unittest.TestCase):
             result = compare(retail, partial, entry.name, 0x42c260, 1627,
                              (ROOT / PARTIAL).with_suffix('.bindings.json'))
             self.assertFalse(result['strict_exact'])
-            self.assertEqual(result['strict_match']['matching_positions'], 1622)
+            self.assertEqual(result['strict_match']['matching_positions'], 1626)
 
 
 if __name__ == '__main__':

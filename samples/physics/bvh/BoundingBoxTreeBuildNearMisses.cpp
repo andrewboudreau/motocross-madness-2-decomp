@@ -9,11 +9,20 @@
 // in that frame's vertex range are taken, with positions from the mesh's +0x14 array.  Every
 // corner gets its own position, then equal positions are merged: the result is *verts
 // (*vertCount unique positions) and *indices (three per triangle, *triCount triangles).
-// PARTIAL 99.67%: same size and instructions apart from two spots: before the 0x348 allocation
-// retail reloads numCorners before remap (VC6 gives the other order), and the remap pass reads
-// keep[corners[k]] as [keep + offset] where VC6 gives [offset + keep].  The loop-variable names
-// of the merge passes (j outer, k inner, i for the copy) are the ones that put every local in
-// retail's stack slot; other choices only move slots.
+// PARTIAL 1626/1627: same size and instructions apart from one ModRM/SIB byte: the remap pass
+// reads keep[corners[k]] as [keep + offset] where VC6 gives [offset + keep].  The loop-variable
+// names of the merge passes (j outer, k inner, i for the copy) are the ones that put every local
+// in retail's stack slot; other choices only move slots.
+// Round 9: `remap = 0;` at the top of the function is what gives retail's reload order before
+// the 0x348 allocation (numCorners, then remap; without it VC6 reloads remap first, 1622).
+// Clearing any other single local there is inert or worse (keep 1614, k/i 1622, the rest
+// 1618), and clearing keep as well, or numCorners before remap, loses it again (1622).  With it,
+// for the remaining byte: any second local cleared after remap, the remap pass on i/j/n/t/
+// first/end/inside/numTaken, a while loop, keep declared before remap, `!= 0`, `*(keep + c)`,
+// `corners[k][keep]`, `*&keep[...]` and an `int* slot = &keep[corners[k]]` local are all 1626;
+// `== 1` is 1624, `> 0` 1625, the negated test 1609, `n = remap[...]; if (!keep[...]) n =
+// remap[n];` 1481, a ternary 1472 and a descending loop 1378.
+// The older sessions below were measured without `remap = 0;`.
 // Session 14: for the remap read, *(keep + c), corners[k][keep], != 0, a corner local (t, n, i
 // or first), a ternary and the negated test leave [offset + keep] or reshape the pass (57+ lines).
 // For the reload order, numCorners set just before the 0x348 allocation (from numTris, n or
@@ -52,6 +61,7 @@ void GatherModelTriangles(TreeModelSource* model, TreeSceneNode* frame, int* tri
     int k;
     int t;
 
+    remap = 0;
     numTris = 0;
     reinterpret_cast<SoultreeObject*>(model)->GetMatrixIn(0, reinterpret_cast<Matrix4*>(&saved));
     model->SetAxesIn(0, &kVec3ZAxis, &kVec3YAxis, 0, 1);
