@@ -869,10 +869,10 @@ static inline Vec3 VehCrossCtor(const Vec3& a, const Vec3& b)
 // 0x5004a0.  Afterwards it caches |*velA| in linearSpeed and worldAngularVelocity = the frame
 // transform of angularVelocity (tier 3).  The offsets are Math3D operator
 // expressions (retail stores each sum and product through its own temporary); the crosses
-// go through VehCrossCtor, which gives retail's product loads (381 -> 405/555 strict).
-// Left: VC6 evaluates the inertia ?: argument ahead of the pushes where retail tests first
-// and branches between them (ternary, lvalue, inline-helper and if/else-local spellings
-// measured identical or worse), and the A-offset sum's y/z temporaries sit 0xc lower.
+// go through VehCrossCtor, which gives retail's product loads.  The solver call is written
+// out once per crashState arm, as ApplyStaticContactImpulse does: VC6 merges the two calls
+// around the inertia choice (test first, the shared pushes, then the branch between the two
+// addresses), which is retail's code.  A ?: argument is evaluated ahead of the pushes.
 void Vehicle::ApplyBodyContactImpulse(const Vec3* normal, Vec3* velA, const Vec3* worldAngVelA,
                                   const Vec3* armA, int eventKind, float invMassB, int nodeB,
                                   const Vec3* velB, const Vec3* worldAngVelB, const Vec3* armB,
@@ -883,10 +883,14 @@ void Vehicle::ApplyBodyContactImpulse(const Vec3* normal, Vec3* velA, const Vec3
     Vec3 pointVelA = (*velA + scratchVector) * scale;
     scratchVector = VehCrossCtor(*worldAngVelB, *armB);
     Vec3 pointVelB = (scratchVector + *velB) * scale;
-    ContactSolveImpulse(restitution, normal, invMass, modelNode, &pointVelA, armA,
-                        crashState ? &shapeInvInertia : &invInertia, &angularVelocity, velA, invMassB,
-                        (SoultreeObject*)nodeB, &pointVelB, armB, invInertiaB, angVelB,
-                        (Vec3*)velBOrNull, impulseOut);
+    if (crashState)
+        ContactSolveImpulse(restitution, normal, invMass, modelNode, &pointVelA, armA, &shapeInvInertia,
+                            &angularVelocity, velA, invMassB, (SoultreeObject*)nodeB, &pointVelB, armB,
+                            invInertiaB, angVelB, (Vec3*)velBOrNull, impulseOut);
+    else
+        ContactSolveImpulse(restitution, normal, invMass, modelNode, &pointVelA, armA, &invInertia,
+                            &angularVelocity, velA, invMassB, (SoultreeObject*)nodeB, &pointVelB, armB,
+                            invInertiaB, angVelB, (Vec3*)velBOrNull, impulseOut);
     float len2 = velA->z * velA->z + (velA->x * velA->x + velA->y * velA->y);
     linearSpeed = (len2 == 1.0f) ? 1.0f : (float)sqrt(len2);
     worldAngularVelocity = modelNode->LocalToWorldDirection(angularVelocity);

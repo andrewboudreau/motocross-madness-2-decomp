@@ -3,17 +3,17 @@
     "src/krusty2/vehicle/Vehicle.cpp": {
       "sections": 151,
       "relocations": 720,
-      "sha256": "dda3b31769d18a52b43c003efabbbe2afa4bb69bb5eb27c9820ee0a076a000c8"
+      "sha256": "43e7d2054529291123476739bdab2186a89ae42f9d4fcf62dbb790f11f90f687"
     },
     "src/krusty2/vehicle/Bike.cpp": {
       "sections": 243,
       "relocations": 1105,
-      "sha256": "df5b5fbe400bb84004926eeb6a18094b9c050ddeeefbd1098e8ee6dc7ce664ab"
+      "sha256": "1166c39578e8e7b26c7fe9ed6964445c950e418b3d89597a1f47a63c37e43908"
     },
     "src/krusty2/vehicle/KrustyBike.cpp": {
       "sections": 248,
       "relocations": 1082,
-      "sha256": "5ee7026c56699fcbdd5c50ace35abb5c6dc572daedfc7519ba5857326e752749"
+      "sha256": "277319b0d470c6450f0d033abd0e42aa7343867917d5e1a0d32df8d7847cc7d5"
     },
     "src/reconstructed/VehicleDefaults.cpp": {
       "sections": 13,
@@ -43,7 +43,7 @@
     "samples/physics/krustybike/KrustyBikeNearMisses.cpp": {
       "sections": 271,
       "relocations": 1443,
-      "sha256": "aff7ca93381beb7ee8c3c0c2963c465f0a42fc685083b2f54ea55ee76c3d6a11"
+      "sha256": "949c4fede04c7672ec0b7e60be41838f352340a0aa4218ae12ea437ce009ac4d"
     },
     "src/reconstructed/InputDevice.cpp": {
       "sections": 11,
@@ -733,7 +733,7 @@
     },
     {
       "source": "src/krusty2/vehicle/Vehicle.cpp",
-      "symbol": "ApplyShockDamping",
+      "symbol": "Method_005293E0",
       "va": "0x5293e0",
       "extent": 104,
       "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
@@ -1006,7 +1006,7 @@
     },
     {
       "source": "src/krusty2/vehicle/Vehicle.cpp",
-      "symbol": "ApplyShockForces@Vehicle",
+      "symbol": "Method_00529450@Vehicle",
       "va": "0x529450",
       "extent": 1415,
       "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
@@ -1739,7 +1739,7 @@
       "va": "0x5265d0",
       "extent": 555,
       "candidate": 555,
-      "matching": 405
+      "matching": 555
     },
     {
       "source": "src/krusty2/vehicle/Vehicle.cpp",
@@ -1759,7 +1759,7 @@
     },
     {
       "source": "src/krusty2/vehicle/Vehicle.cpp",
-      "symbol": "?ApplyWheelDriveAndFriction@Vehicle@@QAEXPAMPAUVec3@@1@Z",
+      "symbol": "?Method_00527A20@Vehicle@@QAEXPAMPAUVec3@@1@Z",
       "va": "0x527a20",
       "extent": 870,
       "candidate": 870,

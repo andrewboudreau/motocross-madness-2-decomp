@@ -126,7 +126,7 @@ class GameplayDefaultTests(unittest.TestCase):
                 provider=compile_source(source,ROOT/source)
                 self.assertTrue(compare(pe,provider,symbol,address,size,(ROOT/source).with_suffix('.bindings.json'))['strict_exact'])
                 strict+=1
-            self.assertEqual(strict,213)
+            self.assertEqual(strict,214)
             for source,query,start,destination,sites in (
                 ('Bike','??1Bike@@',0x409a10,PROVIDERS[0][0],[0x409acc]),
                 ('Vehicle','??1Vehicle@@',0x526380,PROVIDERS[1][0],[0x52640f]),

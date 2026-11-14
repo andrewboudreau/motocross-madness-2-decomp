@@ -20,37 +20,37 @@
     "src/krusty2/soultree/SoulTreePhysics.cpp": {
       "sections": 161,
       "relocations": 784,
-      "sha256": "c80520bb94ced5d374886f99399e9d367fcb724e17b5893f7001fec0f4861503"
+      "sha256": "3d8645485e3c81e5ce1d42b9622d4b362248c6bf3965f5f73bb2b650c3ecb04f"
     },
     "src/krusty2/vehicle/Vehicle.cpp": {
       "sections": 151,
       "relocations": 720,
-      "sha256": "dda3b31769d18a52b43c003efabbbe2afa4bb69bb5eb27c9820ee0a076a000c8"
+      "sha256": "43e7d2054529291123476739bdab2186a89ae42f9d4fcf62dbb790f11f90f687"
     },
     "src/krusty2/vehicle/Bike.cpp": {
       "sections": 243,
       "relocations": 1105,
-      "sha256": "df5b5fbe400bb84004926eeb6a18094b9c050ddeeefbd1098e8ee6dc7ce664ab"
+      "sha256": "1166c39578e8e7b26c7fe9ed6964445c950e418b3d89597a1f47a63c37e43908"
     },
     "src/krusty2/vehicle/KrustyBike.cpp": {
       "sections": 248,
       "relocations": 1082,
-      "sha256": "5ee7026c56699fcbdd5c50ace35abb5c6dc572daedfc7519ba5857326e752749"
+      "sha256": "277319b0d470c6450f0d033abd0e42aa7343867917d5e1a0d32df8d7847cc7d5"
     },
     "src/krusty2/collision/CollisionObject.cpp": {
       "sections": 136,
       "relocations": 732,
-      "sha256": "19bb8de22243c06c7950fa73aa3afd53489b0110508c5c764343c9c63b31f333"
+      "sha256": "dffa667125dd940d67671f0c6121b069fcefcd89b01dc60a274870f2a74e34e1"
     },
     "src/krusty2/motion/D3DIMSoultreeMotnctrl.cpp": {
       "sections": 62,
       "relocations": 273,
-      "sha256": "6eb9cec3e348017a0e1280fabf49611db98d16cc74e2a2e9c0cc092fe30cac44"
+      "sha256": "eb676e96ecf5d6dca12751a818a79bd5e6be4fea793223f80539abe2cf5262d5"
     },
     "samples/physics/krustybike/KrustyBikeNearMisses.cpp": {
       "sections": 271,
       "relocations": 1443,
-      "sha256": "aff7ca93381beb7ee8c3c0c2963c465f0a42fc685083b2f54ea55ee76c3d6a11"
+      "sha256": "949c4fede04c7672ec0b7e60be41838f352340a0aa4218ae12ea437ce009ac4d"
     }
   },
   "strict": [
