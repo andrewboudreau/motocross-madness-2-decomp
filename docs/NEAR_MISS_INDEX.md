@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 2, b 110, c 77, total 189. The three class (a) functions of the
+Counts: a 2, b 110, c 76, total 188. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -138,7 +138,8 @@ before the extent products (`float minX = data->gridMinX; ... cell * minX`), so 
 are the newer leaves and load first; the copies fold away. MultiPlayerDlg::AddChatLine
 `0x004f3720` (class b, 92/380) is exact in src/reconstructed/SelectGamePicProcs.cpp:
 the name lookup is its own early return ahead of the system/player split, which gives
-VC6 retail's flow graph before jump threading.
+VC6 retail's flow graph before jump threading. PoseRotation `0x004a7fd0` (class c, 1097/1121) is exact
+in its sample through the function-local definition count (docs/VC6_OPERAND_ORDER.md 2.4).
 Compiler flags (s21, `MCM2_EXTRA_FLAGS` of `tools/rank_near_misses.py`): EcoSystem `0x00456890` and `0x00457ed0`,
 Griddraw `0x0047e600`, CacheTexture `0x005102d0`, ResourceManager `0x004e9030`,
 TextService `0x0050ba00` and the FollowCamera constructor `0x00462ee0` are unchanged
@@ -254,7 +255,6 @@ BuildFaceGeometry `0x0043dc60` from 121/1064 to 1100/1104.
 | physics/motion/Motnctrl | `0x004a5e40` | 505/1090 | b | register permutation: retail file in ebx, poses and the zero constant in ebp, path in esi; the candidate swaps ebx/ebp and esi/edi |
 | physics/motion/Motnctrl | `0x004a70c0` | 234/3412 | b | aligned 693/958 (was 342): two blend inlines (3 and 5 unused poses) give retail's 2/4 CharacterPose ctor calls, the playback extrapolation is an inline helper with retail's call order; left: `this` in edi vs esi, the blend loop's unused sums/extrapolation (retail calls operator-/*/*/+), the frame |
 | physics/motion/Motnctrl | `0x004a7dc0` | 476/523 | b | 4 code diffs: `fld [esi + 0x20]` vs `mov [esp + N], ecx`; retail lacks `mov [esp + N], ecx`; slots differ |
-| physics/motion/Motnctrl | `0x004a7fd0` | 1097/1121 | c | axisZ cross product loads b's component first in each product (retail a's) |
 | physics/shadow/D3DIMSoultreeShadow | `0x00446c30` | 721/771 | c | x87 term order of the inlined 4x4 product: one term pair in each of _11, _21, _31, _41 (retail's sum orders differ from slot 27's with the same helper) (samples/physics/shadow/D3DIMSoultreeShadowNearMisses.cpp); 748/771 with 1, 2, 9, 10, 18, 25, 26, 33 or 34 locals at the top; exact only with 5-6 locals inside the shared helper, which break the exact slot 27 |
 | physics/shadow/D3DIMSoultreeShadow | `0x00446f40` | 122/1533 | b | retail's inline __asm fld/fistp rounding helper forces an ebp frame (0xe4 locals), which a `#pragma optimize("y", off)` region keeps (docs/GAME_BUILD.md#frame-pointer-units); linked with /QIfist through FistpFloatToInt (masked 0.862, 0.891 with the frame); ruled out: ProjectedShadow's range-checked `__int64` cast (0.807), a plain cast without the binary32 memcpy (0.870 but skips the argument's float rounding) |
 | physics/shadow/ProjectedShadow | `0x004da7b0` | 153/777 (masked) | b | block layout, both release-and-return blocks and the clip rectangle match (841/842 B); register choice in the sprintf/QueryFlag set-up and the saved render-target fields |
