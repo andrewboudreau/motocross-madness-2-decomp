@@ -475,10 +475,15 @@ static inline void SoultreeCopyBits(Vec3& d, const Vec3& s)
 }
 
 // slot 13 (0x00501e90): per-contact response; accumulates into *force / *localTorque.
-// PARTIAL at full length: normalForceMagnitude = 0 is scheduled after the zero copy
+// PARTIAL at full length (456/483): normalForceMagnitude = 0 is scheduled after the zero copy
 // (retail: between its second and third temporary loads, as in Vehicle 0x00527a20), and
-// the y and z cross terms that use leverArm.x load it before frictionForce (operand order,
-// a by-value, pointer, swapped-parameter or contact-member cross are inert or worse).
+// the y and z cross terms that use frictionForce.x load the leverArm component first.
+// Keeping the dot product in the member (no normalComponent local) moved 450 -> 456: it
+// fixes the leverArm.x terms and flips the frictionForce.x ones (leaf age).  Forms tried
+// on top of it: the magnitude store after the zero copy fixes the fstp st(0) position but
+// sinks the store one pair too late (455); an operator* or constructor share (452/450);
+// a torque or cross local (longer or 399); k dead int locals, k = 0..7: 456 456 452 444
+// 454 458 454 456 (458 = cross terms right, first localTorque add flipped; not applied).
 void SoultreePhysicsBaseObject::AccumulateContactForces(Vec3* force, Vec3* localTorque, float torqueScale)
 {
     if (!touchingPointCount)
@@ -492,15 +497,14 @@ void SoultreePhysicsBaseObject::AccumulateContactForces(Vec3* force, Vec3* local
         share.x = weight * force->x;
         share.y = weight * force->y;
         share.z = weight * force->z;
-        float normalComponent = SoultreeDot(share, contact->contactNormal);
-        contact->normalForceMagnitude = normalComponent;
-        if (normalComponent >= 0.0f) {
+        contact->normalForceMagnitude = SoultreeDot(share, contact->contactNormal);
+        if (contact->normalForceMagnitude >= 0.0f) {
             contact->normalForceMagnitude = 0.0f;
             SoultreeCopyBits(contact->normalForce, Vec3(0.0f, 0.0f, 0.0f));
         } else {
-            contact->normalForceMagnitude = -normalComponent;
+            contact->normalForceMagnitude = -contact->normalForceMagnitude;
             Vec3 scaled;
-            SoultreeCopyBits(contact->normalForce, *Vec3ScaleCall(&scaled, &contact->contactNormal, -normalComponent));
+            SoultreeCopyBits(contact->normalForce, *Vec3ScaleCall(&scaled, &contact->contactNormal, contact->normalForceMagnitude));
         }
         contact->ComputeFrictionForce();
         *force += contact->frictionForce;
