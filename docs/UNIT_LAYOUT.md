@@ -266,11 +266,10 @@ None of them was moved; the reasons are below.
     be a matching-only form, so it was not done. The unit stays `differs`
     until the inline headers are in place.
 
-`gap_missing` findings name owners in `samples/` too. Two examples are
-`FileStream`'s `CheckHeader` in `samples/io/FileStream.cpp` and the vector
+`gap_missing` findings name owners in `samples/` too, for example the vector
 helpers of `BikeRace` in `samples/physics/helpers/VectorOps.cpp`.
 
-Six units differ only through `gap_missing`. None can move to identical by
+Five units differ only through `gap_missing`. None can move to identical by
 moving a strict body, because every gap holds a function that is not strict
 exact (2026-11-12 sweep):
 
@@ -279,9 +278,11 @@ exact (2026-11-12 sweep):
 | `BoundingBoxTreeBuild.cpp` | `0x0042c260..0x0042c8c0` | `GatherModelTriangles`, near miss (`samples/physics/bvh/BoundingBoxTreeBuildNearMisses.cpp`) |
 | `D3DIMSoulTree.cpp` | `0x00440f30..0x00442e00`, `0x00442f40..0x00442f70` | `DrawCurrentLod`, near miss (`samples/render/D3DIMSoulTreeNearMisses.cpp`), and the atexit `ret` stubs of its three function-local statics. The stubs are strict exact in that sample, but they are emitted with `DrawCurrentLod` and cannot move without it |
 | `DebugOverlay.cpp` | `0x00447a00..0x00447de0` | `LoadFont`, near miss (`samples/render/DebugOverlayNearMisses.cpp`) |
-| `FileStream.cpp` | `0x00460db0..0x00460e70` | `CheckHeader`, partial target (`samples/io/FileStream.cpp`) |
 | `MSZoneInterface.cpp` | `0x004aa150..0x004aa350` | the seven `SoultreePhysicsBaseObject` methods, left for the reason above |
 | `ResourceManager.cpp` | `0x004e9030..0x004e9360` | `AddArchive`, near miss (`samples/render/ResourceManagerNearMisses.cpp`) |
+
+`FileStream.cpp` left this list on 2026-11-13: `CheckHeader` (`0x00460db0`) is
+now strict exact in `src/reconstructed/FileStream.cpp`.
 
 In the other 24 units with `gap_missing`, the only strict-exact owners in a
 gap are the `BikeRace` vector helpers and `Vehicle` slots 78 and 79
