@@ -170,7 +170,7 @@ def setup(ctx, c):
         ctx.pack(at + 0x4c, 'I', int(max(0.0, stamp)) if c['replay'] else t)
         stamp -= rng.uniform(40, 120)
         # motion (6 bits, 17 without one, 0x12.. a chained trick), then crashDirection:3,
-        # crashed:1 (usually the bike's current crash state), flag4..flag7, flag8, flag9
+        # crashed:1 (usually the bike's current crash state), spawnProtected..throttleOn, driveDisengaged, trickPoseHeld
         # (a running motion usually gets its chained trick, so the chain test runs)
         chain = 0x11 + (c['motion_index'] & 0x3f)
         motion = rng.choice([0, rng.randrange(1, 0x11), 0x11, chain, rng.randrange(64)]

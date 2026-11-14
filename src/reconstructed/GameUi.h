@@ -372,7 +372,7 @@ public:
 class UIEditBox : public UIControl {
 public:
     // 0x00473630: `size` is the text's capacity.
-    UIEditBox(int id, CameraRect* area, UIDialog* owner, int size, int a, int b);
+    UIEditBox(int id, CameraRect* area, UIDialog* owner, int size, int keyClickSound, int fullTextSound);
     virtual ~UIEditBox();                     // 0x00473770 (deleting wrapper 0x00473750)
     virtual int OnChar(int value);               // 0x00474150
     virtual int OnKeyDown(int value);            // 0x00474570

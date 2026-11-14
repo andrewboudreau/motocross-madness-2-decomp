@@ -432,7 +432,7 @@ void MultiPlayerDlg::SendSettings() {
         message.minutes = (int)game->mode.raceSettings.timeLimitMinutes;
         message.eventType = game->mode.raceSettings.eventType;
         message.raceMode = game->mode.raceSettings.raceMode;
-        message.field_0x2d78 = game->mode.raceSettings.series;
+        message.series = game->mode.raceSettings.series;
         message.laps = game->mode.raceSettings.lapCount;
         message.opponents = game->mode.raceSettings.multiplayerAiRacerCount;
         message.players = game->mode.raceSettings.networkPlayerCount;
@@ -828,7 +828,7 @@ int MultiPlayerDlg::OnNetworkMessage(int type, void* data, int from, int to, int
         g_TrackGame->mode.raceSettings.timeLimitMinutes = settings->minutes;
         g_TrackGame->mode.raceSettings.eventType = settings->eventType;
         g_TrackGame->mode.raceSettings.raceMode = settings->raceMode;
-        g_TrackGame->mode.raceSettings.series = settings->field_0x2d78;
+        g_TrackGame->mode.raceSettings.series = settings->series;
         g_TrackGame->mode.raceSettings.lapCount = settings->laps;
         g_TrackGame->mode.raceSettings.multiplayerAiRacerCount = settings->opponents;
         g_TrackGame->mode.raceSettings.networkPlayerCount = settings->players;

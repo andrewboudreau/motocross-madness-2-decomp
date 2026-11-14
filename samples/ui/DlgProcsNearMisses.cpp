@@ -46,7 +46,7 @@
 //   in a callee-saved register (edi, `this` live afterwards) it takes the
 //   pointer first and copies x, y, z in order, whatever the struct type.
 //   VC6 gives retail's order when the callee is one load (EventManager slot
-//   10 0x0045f200, `podiumCamera->UnknownVirtualSlot29(field_0x3d8)`, is
+//   10 0x0045f200, `podiumCamera->LookAt(podiumFocus)`, is
 //   exact) or when the camera comes from a separate tested block, a
 //   volatile local or a register source pointer, all of which add code;
 //   with the two-load chain g_TrackGame->ui->garageCamera it takes edi = esp

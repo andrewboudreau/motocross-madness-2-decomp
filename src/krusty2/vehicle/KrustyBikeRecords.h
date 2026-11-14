@@ -37,12 +37,12 @@ struct KbBikeMessage {
     unsigned char pad_0x50 : 2;
     unsigned char crashDirection : 3;    // +0x51
     unsigned char crashed : 1;
-    unsigned char flag4 : 1;             // vehicle slot 51
-    unsigned char flag5 : 1;             // +0x7a4
-    unsigned char flag6 : 1;             // +0x78c
-    unsigned char flag7 : 1;             // +0x478
-    unsigned char flag8 : 1;             // +0x52 +0x479
-    unsigned char flag9 : 1;             //       +0x153c
+    unsigned char spawnProtected : 1;    // vehicle slot 51
+    unsigned char finished : 1;          // +0x7a4
+    unsigned char onTrack : 1;           // +0x78c
+    unsigned char throttleOn : 1;        // +0x478
+    unsigned char driveDisengaged : 1;   // +0x52 +0x479
+    unsigned char trickPoseHeld : 1;     //       +0x153c
     unsigned char lapGate;  // +0x53  KrustyBike+0x7b8 lapGate (0x00492892; +0x7a0 in modes 2 and 3)
     unsigned char loaderKind;  // +0x54  KrustyBike+0x11c0 loaderKind (0x00492723)
 };

@@ -134,16 +134,16 @@ void TireBuildFrame(CollisionMatrix4* out, const CollisionVec3* pos, const Colli
 // The only layout facts known about the other object's owner (tier 3): three Vec3 members.
 struct TireContactOwner {
     char pad0[0x40];
-    CollisionVec3 field_0x40;
+    CollisionVec3 carPathVelocity;
     char pad1[0x64 - 0x4c];
-    CollisionVec3 field_0x64;
+    CollisionVec3 physicsVelocity;
     char pad2[0x224 - 0x70];
-    CollisionVec3 field_0x224;
+    CollisionVec3 characterVelocity;
 };
 
 // 0x00512e80.  Records a contact vector taken from the other object's owner:
-// field_0x1e4 = "contact valid", field_0x1f4 = the vector.  Which vector is chosen by the
-// tag of the other object (tier 3 semantics; the owner offsets 0x40/0x64/0x224 are literal).
+// hasContactObjectVelocity and contactObjectVelocity.  The owner's tag picks the velocity
+// (0x64/0x68 physics body +0x64, 0x2711 CollisionCharacter +0x224, 0x69 car +0x40).
 void Tire::HandleContact(int unused, int tag, CollisionObject* other)
 {
     // Each case copies its own vector (VC6 merges the three copies into one tail and keeps
@@ -151,13 +151,13 @@ void Tire::HandleContact(int unused, int tag, CollisionObject* other)
     switch (tag) {
     case 0x64:
     case 0x68:
-        contactObjectVelocity = ((TireContactOwner*)other->ownerObject)->field_0x64;
+        contactObjectVelocity = ((TireContactOwner*)other->ownerObject)->physicsVelocity;
         break;
     case 0x2711:
-        contactObjectVelocity = ((TireContactOwner*)other->ownerObject)->field_0x224;
+        contactObjectVelocity = ((TireContactOwner*)other->ownerObject)->characterVelocity;
         break;
     case 0x69:
-        contactObjectVelocity = ((TireContactOwner*)other->ownerObject)->field_0x40;
+        contactObjectVelocity = ((TireContactOwner*)other->ownerObject)->carPathVelocity;
         break;
     case 0x65:
         hasContactObjectVelocity = 0;

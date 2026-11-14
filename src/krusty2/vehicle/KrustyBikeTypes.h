@@ -121,7 +121,7 @@ struct KbNetState {
 // Message type 10 (8 bytes): the bike's +0x11c0 flag and +0x768.
 struct KbBikePing {
     char type;                   // +0x00 SendRaw (0x004ad280) writes the type byte here
-    unsigned char loaderKind;    // +0x01 KrustyBike::loaderKind (+0x11c0)
+    unsigned char loaderKind;            // +0x01 KrustyBike::loaderKind (+0x11c0)
     char pad_0x02[2];
     float score;                 // +0x04 KrustyBike::score (+0x768)
 };
@@ -143,19 +143,19 @@ struct KbBikeDeltaMessage {
     unsigned char pad_0x0e : 2;
     unsigned char crashDirection : 3;    // +0x0f
     unsigned char crashed : 1;
-    unsigned char flag4 : 1;
-    unsigned char flag5 : 1;
-    unsigned char flag6 : 1;
-    unsigned char flag7 : 1;
-    unsigned char flag8 : 1;             // +0x10
-    unsigned char flag9 : 1;
-    unsigned char field_0x11;            // +0x11
+    unsigned char spawnProtected : 1;
+    unsigned char finished : 1;
+    unsigned char onTrack : 1;
+    unsigned char throttleOn : 1;
+    unsigned char driveDisengaged : 1;   // +0x10
+    unsigned char trickPoseHeld : 1;
+    unsigned char lapGate;               // +0x11 lapGate (lapCount in event types 2 and 3)
     unsigned char poseIndex : 4;         // +0x12
     unsigned char poseState : 4;
     unsigned char poseParam;             // +0x13 x 100
     unsigned char poseBlend;             // +0x14 x 100
     unsigned char poseLeanBlend;         // +0x15 x 100
-    unsigned char field_0x16;            // +0x16 +0x11c0
+    unsigned char loaderKind;            // +0x16 +0x11c0
 };
 #pragma pack(pop)
 

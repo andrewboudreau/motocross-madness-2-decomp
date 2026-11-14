@@ -207,7 +207,7 @@ void KrustyBike::SendStateDelta(float dt, int record)
         KbBikePing ping;
         Vec3 carried;
         Vec3 diff;
-        message.field_0x16 = loaderKind;
+        message.loaderKind = loaderKind;
         KbSub(&diff, velocity, state->velocity);
         carried = diff + state->velocityError;
         if (KB_DELTA_FITS(carried.x, 30.0f) &&
@@ -275,18 +275,18 @@ void KrustyBike::SendStateDelta(float dt, int record)
                                     } else {
                                         message.motion = 0;
                                     }
-                                    message.flag7 = throttleOn;
-                                    message.flag8 = driveDisengaged;
-                                    message.flag9 = trickPoseHeld;
+                                    message.throttleOn = throttleOn;
+                                    message.driveDisengaged = driveDisengaged;
+                                    message.trickPoseHeld = trickPoseHeld;
                                     message.crashDirection = crashDirection;
                                     message.crashed = crashState;
-                                    message.flag4 = IsSpawnProtected();
-                                    message.flag5 = hasFinished != 0;
-                                    message.flag6 = onTrack;
+                                    message.spawnProtected = IsSpawnProtected();
+                                    message.finished = hasFinished != 0;
+                                    message.onTrack = onTrack;
                                     if (reinterpret_cast<KbGame*>(g_TrackGame)->eventType == 2 || reinterpret_cast<KbGame*>(g_TrackGame)->eventType == 3)
-                                        message.field_0x11 = (unsigned char)lapCount;
+                                        message.lapGate = (unsigned char)lapCount;
                                     else
-                                        message.field_0x11 = lapGate;
+                                        message.lapGate = lapGate;
                                     if (!record) {
                                         if (reinterpret_cast<KbGame*>(g_TrackGame)->network)
                                             reinterpret_cast<NetworkInterface*>(reinterpret_cast<KbGame*>(g_TrackGame)->network)->Send(13, &message, sizeof(message), netId, record);
@@ -826,21 +826,21 @@ void KrustyBike::InterpolateNetworkState(float dt, int copyRaceProgress)
                 }
             }
             if (!isGhost) {
-                SetSpawnProtection(states[0]->flag4, 5.0f, 0);
+                SetSpawnProtection(states[0]->spawnProtected, 5.0f, 0);
                 if (spawnProtectEndPending) {
                     ApplySpawnCollisionIgnores(0);
                     spawnProtectEndPending = 0;
                 }
             }
-            if (states[0]->flag6)
+            if (states[0]->onTrack)
                 onTrack = 1;
             else
                 onTrack = 0;
             prevCrash = crashState;
             crashState = states[0]->crashed;
-            throttleOn = states[0]->flag7;
-            driveDisengaged = states[0]->flag8;
-            trickPoseHeld = states[0]->flag9;
+            throttleOn = states[0]->throttleOn;
+            driveDisengaged = states[0]->driveDisengaged;
+            trickPoseHeld = states[0]->trickPoseHeld;
             if (crashState && !prevCrash) {
                 crashHeading = Vec3(bodyForward.x, 0.0f, bodyForward.z);
                 crashedUpsideDown = bodyUp.y < 0.0f;
@@ -921,24 +921,24 @@ void KrustyBike::InterpolateNetworkState(float dt, int copyRaceProgress)
                 }
             }
             if (!isGhost) {
-                SetSpawnProtection(interpSource->flag4, 5.0f, 0);
+                SetSpawnProtection(interpSource->spawnProtected, 5.0f, 0);
                 if (spawnProtectEndPending) {
                     ApplySpawnCollisionIgnores(0);
                     spawnProtectEndPending = 0;
                 }
             }
-            if (interpSource->flag6)
+            if (interpSource->onTrack)
                 onTrack = 1;
             else
                 onTrack = 0;
             prevCrash = crashState;
             crashState = interpSource->crashed;
             if (!this->race->replayPaused && this->race->lastRecordKind != -2)
-                throttleOn = interpSource->flag7;
+                throttleOn = interpSource->throttleOn;
             else
                 throttleOn = 0;
-            driveDisengaged = interpSource->flag8;
-            trickPoseHeld = interpSource->flag9;
+            driveDisengaged = interpSource->driveDisengaged;
+            trickPoseHeld = interpSource->trickPoseHeld;
             if (crashState && !prevCrash) {
                 crashHeading = Vec3(bodyForward.x, 0.0f, bodyForward.z);
                 crashedUpsideDown = bodyUp.y < 0.0f;

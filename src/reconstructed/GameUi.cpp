@@ -687,7 +687,7 @@ int UIButton::ButtonUp(int button, int* position) {
 // UIEditBox
 
 // 0x00473630
-UIEditBox::UIEditBox(int id, CameraRect* area, UIDialog* owner, int size, int a, int b)
+UIEditBox::UIEditBox(int id, CameraRect* area, UIDialog* owner, int size, int keyClickSound, int fullTextSound)
     : UIControl(0xb, id, area, owner) {
     char* text = controlText;
     if (!text) {
@@ -702,8 +702,8 @@ UIEditBox::UIEditBox(int id, CameraRect* area, UIDialog* owner, int size, int a,
         int length = strlen(text);
         textCapacity = length > capacity ? length : capacity;
     }
-    field_0x204 = a;
-    field_0x208 = b;
+    field_0x204 = keyClickSound;
+    field_0x208 = fullTextSound;
     textScrollX = 0;
     textLength = 0;
     controlTextLength = 0;

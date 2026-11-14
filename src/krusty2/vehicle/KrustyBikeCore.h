@@ -238,7 +238,7 @@ public:
     float trickPoints;                        // +0x1530  slot 42 adds 2500 per trick second; 0x00495ff0 rounds it to 100 and shows it with the multiplier (tier 3)
     float field_0x1534; // 0x1534
     float trickMultiplier;                    // +0x1538  slot 42 sets it to trickCount, +0.5 when chained; multiplies trickPoints (tier 3)
-    char trickPoseHeld;                       // +0x153C  set while the trick pose is held in the s_kbTrickFrame window; sent as message flag9 (tier 3)
+    char trickPoseHeld;                       // +0x153C  set while the trick pose is held in the s_kbTrickFrame window; sent as message trickPoseHeld (tier 3)
     unsigned char trickCount;                 // +0x153D  tricks finished since the last score (slot 42 increments it) (tier 3)
     char trickPoseHeldPrev;                   // +0x153E  trickPoseHeld of the previous frame (slot 49) (tier 3)
     char trickChained;                        // +0x153F  set by the chain start 0x0048d990; +0.5 multiplier in 0x00495ff0 (tier 3)

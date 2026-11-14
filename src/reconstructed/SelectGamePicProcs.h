@@ -157,7 +157,7 @@ struct LobbySettingsMessage {
     unsigned char opponents : 4;              // +0x2d98
     unsigned char players : 4;                // +0x2da5
     unsigned char races : 3;                  // +0x2d7c
-    unsigned char field_0x2d78 : 3;           // +0x2d78
+    unsigned char series : 3;                 // +0x2d78
     unsigned char treeCollision : 1;          // +0x2d80
     unsigned char riderCollision : 1;         // +0x2d84
     unsigned char fastFinishes : 1;           // +0x2d88

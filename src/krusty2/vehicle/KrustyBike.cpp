@@ -1592,14 +1592,14 @@ void KrustyBike::SendFullState(KbBikeState* state, float dt, int record)
     } else {
         message.motion = 0;
     }
-    message.flag7 = throttleOn;
-    message.flag8 = driveDisengaged;
-    message.flag9 = trickPoseHeld;
+    message.throttleOn = throttleOn;
+    message.driveDisengaged = driveDisengaged;
+    message.trickPoseHeld = trickPoseHeld;
     message.crashDirection = crashDirection;
     message.crashed = crashState;
-    message.flag4 = IsSpawnProtected();
-    message.flag5 = hasFinished != 0;
-    message.flag6 = onTrack;
+    message.spawnProtected = IsSpawnProtected();
+    message.finished = hasFinished != 0;
+    message.onTrack = onTrack;
     if (reinterpret_cast<KbGame*>(g_TrackGame)->eventType == 2 || reinterpret_cast<KbGame*>(g_TrackGame)->eventType == 3)
         message.lapGate = (unsigned char)lapCount;
     else
