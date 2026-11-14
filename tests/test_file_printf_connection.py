@@ -198,8 +198,8 @@ class FilePrintfConnectionTests(unittest.TestCase):
                                     capture_output=True, text=True, timeout=30)
             self.assertEqual(result.returncode, 0, result.stdout+result.stderr)
             self.assertEqual(result.stdout.strip(), 'FilePrintf: 227 real CRT output, return and stream-error cases pass')
-        self.assertEqual(strict, 75)
-        print('75 strict checks; four complete objects; seven cdecl call sites; ' + result.stdout.strip())
+        self.assertEqual(strict, 76)
+        print('76 strict checks; four complete objects; seven cdecl call sites; ' + result.stdout.strip())
 
 
 if __name__ == '__main__':

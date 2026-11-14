@@ -21,7 +21,8 @@ TARGETS = {0x460DB0: 186, 0x461340: 702, 0x461640: 663,
            0x4618E0: 152, 0x461B90: 282}
 # Methods of the differential set that are exact now: their bodies are taken from
 # the canonical unit and compiled with the remaining candidates.
-PROMOTED = ('int FileStream::Write(',)
+PROMOTED = ('static inline int HeaderMatches(', 'int FileStream::CheckHeader(',
+            'int FileStream::Write(')
 PROMOTED_PRELUDE = ('int WriteXorEncoded(const unsigned char* buffer, int size, int count, '
                     'FILE* file, unsigned char* key);\n')
 DEPENDENCIES = {0x534EAC, 0x534C3D, 0x5365D6, 0x534F65, 0x5350B7,

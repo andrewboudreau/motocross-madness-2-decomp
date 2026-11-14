@@ -1,7 +1,7 @@
 // FileStream.cpp -- near misses of the buffered file stream (FileStream,
 // declared in src/reconstructed/TextureMap.h), 0x00460d10..0x00461d57. The thirteen
-// methods that match retail are in src/reconstructed/FileStream.cpp; these four
-// (header check, seek, read, write-header) stay here with
+// methods that match retail are in src/reconstructed/FileStream.cpp; these three
+// (seek, read, write-header) stay here with
 // their notes. The bindings file covers both.
 //
 // A stream reads a file directly or a slice (+0x130, +0x04) of an inner stream (+0x1c);
@@ -33,6 +33,12 @@
 //   stay at 257 or below; VC6 keeps the store out of the rep movsd/movsb pair.
 //   Session 21: the seed between strcat and strlen lands after strlen's
 //   `or ecx, -1` (257, lea esi hoisted with it); /ML keeps 255.
+// - 0x00460db0 (CheckHeader) is exact in src/reconstructed/FileStream.cpp for
+//   the same reason as Write: both fseek calls take the handle from a FILE*
+//   local. That puts the first fclose argument in eax and the second in edx,
+//   so the two failure blocks no longer merge and the first stays inline.
+//   About 60 control-flow shapes (||, &&, goto, nested, result locals, seek
+//   helpers, re-tests) had scored 25-29/186.
 // - 0x004618e0 (Write) is exact in src/reconstructed/FileStream.cpp: the file
 //   handle goes through a FILE* local for ftell, fseek and fwrite (not for
 //   fclose or the encoded write). VC6 hands expression temporaries eax, ecx
@@ -66,67 +72,6 @@ static inline FileStream* InnermostStream(FileStream* stream)
         stream = stream->innerStream;
     }
     return stream;
-}
-
-// Whether the next four bytes are the "FAOE" header. As an inline helper the
-// failure path of the four tests falls through, as in retail.
-static inline int HeaderMatches(FileStream* stream)
-{
-    if (stream->ReadByte() != stream->headerByte0
-        || stream->ReadByte() != stream->headerByte1
-        || stream->ReadByte() != stream->headerByte2
-        || stream->ReadByte() != stream->headerByte3) {
-        return 0;
-    }
-    return 1;
-}
-
-// 0x00460db0: 1 when the file starts with the header; the file is closed when a
-// seek fails. Near miss (16%): retail keeps the first fseek-failure block inline and
-// cross-jumps only from its fclose call into the second one (the two load +0x14
-// into different registers), and stores fileEncoded = 0 as an immediate; VC6 here
-// merges the whole first block into the second and stores fseek's zero result.
-// The plain ||, &&, goto, nested, result-variable and seek-helper shapes compile
-// to the same or worse code; so do inline SeekOrClose/SeekOnly helpers for either
-// or both blocks and `!= 0` tests (27/186 over the whole 186-byte extent).
-// Also swept (20 forms, best 28): a result local, `!= 0`, `0L`, an extra
-// `&& fileHandle` and an unsigned `> 0` test for the first seek, each with the
-// `encoded`/+0x124/`fileEncoded = 0` statements in three orders and a cast zero.
-// Nested `if (!fseek(...)) { ... } else { fclose ...}` forms, with the header
-// test negated or not, and an if/else-if chain give 25-28. Session 14: the
-// first seek as `if (fseek(...) == 0) {} else { fclose ... }` keeps the two
-// fclose blocks apart and gives retail's registers from bufferEnd through the
-// four header compares, but places the first block after the function (26/204).
-// Session 22: a second test of the first seek's result (`if (failed)
-// fclose(...); if (failed) { fileHandle = 0; return 0; }`, or the close block
-// followed by `if (failed) return 0;`) is threaded back to the same code
-// (27/186); `if (!fileHandle) return 0;` after the close block keeps the test
-// (29/211). The fseek zero stored for fileEncoded follows from the layout:
-// with the first failure block out of line the success path is the
-// fall-through of `jne`, where VC6 knows eax is 0; retail's inline block makes
-// it a jump target, hence the immediate.
-int FileStream::CheckHeader()
-{
-    if (fseek(fileHandle, 0, SEEK_SET)) {
-        fclose(fileHandle);
-        fileHandle = 0;
-        return 0;
-    }
-    int encoded = fileEncoded;
-    bufferPos = bufferEnd;
-    fileEncoded = 0;
-    if (!HeaderMatches(this)) {
-        fileEncoded = encoded;
-        return 0;
-    }
-    if (fseek(fileHandle, 4, SEEK_SET)) {
-        fclose(fileHandle);
-        fileHandle = 0;
-        return 0;
-    }
-    fileEncoded = encoded;
-    bufferPos = bufferEnd;
-    return 1;
 }
 
 // 0x00461340: seeks to `offset` (origin as fseek). An encoded file cannot

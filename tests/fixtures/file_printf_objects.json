@@ -5,9 +5,9 @@
   },
   "objects": {
     "src/reconstructed/FileStream.cpp": {
-      "sections": 21,
-      "relocations": 66,
-      "sha256": "c570e5c6a8cb6c0af18bf9a86ba6821236b6c101f811296463d896d194ac7af2"
+      "sections": 22,
+      "relocations": 73,
+      "sha256": "6a5bc7317cab0b8c2ea493d8d2c4643551dcb7777ddd0fdf034addd560187750"
     },
     "src/reconstructed/ManagedTextureGroup.cpp": {
       "sections": 50,

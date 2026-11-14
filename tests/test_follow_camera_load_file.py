@@ -167,7 +167,8 @@ class FollowCameraLoadFileTests(unittest.TestCase):
             stream=(ROOT/'src/reconstructed/FileStream.cpp').read_text()
             head=stream[stream.index('#include'):stream.index('// The stream that holds')]
             prefixes=['FileStream::FileStream(','FileStream::~FileStream(',
-                      'FileStream* FileStream::FindArchive(','int FileStream::IsValidFile(',
+                      'FileStream* FileStream::FindArchive(','static inline int HeaderMatches(',
+                      'int FileStream::CheckHeader(','int FileStream::IsValidFile(',
                       'int FileStream::Open(','int FileStream::SetBufferSize(','int FileStream::Tell(']
             parts=[extract(stream,'static inline FileStream* InnermostStream(')]+[extract(stream,p)for p in prefixes]
             for prefix in ['int FileStream::ReadByte(','int FileStream::ReadLine(']:
@@ -179,7 +180,7 @@ class FollowCameraLoadFileTests(unittest.TestCase):
                 'finditem':'#include <string.h>\n#include "TextureMap.h"\n#include "ResourceManager.h"\n'+extract((ROOT/'src/reconstructed/ResourceManager.cpp').read_text(),'ResourceItem* ResourceManager::FindItem('),
                 'readxor':'#include <stdio.h>\n'+extract((ROOT/'src/reconstructed/EcoSystem.cpp').read_text(),'int ReadXorDecoded(')}
             sample=(TOOL_ROOT/'samples/io/FileStream.cpp').read_text()
-            helper_sources['stream_candidates']='#include <stdio.h>\n#include "FileStream.h"\nint ReadXorDecoded(unsigned char*,int,int,FILE*,unsigned char*);\n'+'\n'.join(extract(sample,p)for p in ['static inline int HeaderMatches(','int FileStream::CheckHeader(','int FileStream::Seek('])
+            helper_sources['stream_candidates']='#include <stdio.h>\n#include "FileStream.h"\nint ReadXorDecoded(unsigned char*,int,int,FILE*,unsigned char*);\n'+'\n'.join(extract(sample,p)for p in ['int FileStream::Seek('])
             helpers={};helper_paths=[]
             for name,text in helper_sources.items():
                 path=out/(name+'.cpp');path.write_text(text+'\n');obj,o=compile_source(path,name);helpers[name]=o;helper_paths.append(obj)
@@ -207,7 +208,7 @@ class FollowCameraLoadFileTests(unittest.TestCase):
                 proof=compare(image,selected,symbol,va,size,bindings);self.assertTrue(proof['strict_exact'],proof);strict+=1
                 self.assertEqual(signature(selected,symbol),signature(canonical[unit],symbol))
             _,whole_stream=compile_source(TOOL_ROOT/'samples/io/FileStream.cpp','whole_stream')
-            for symbol in ('?CheckHeader@','?Seek@'):
+            for symbol in ('?Seek@',):
                 self.assertEqual(signature(helpers['stream_candidates'],symbol),signature(whole_stream,symbol))
             # Same actual command as the game build, including current includes/profile.
             spec=json.loads((TOOL_ROOT/'config/game_build.json').read_text())
@@ -263,8 +264,8 @@ class FollowCameraLoadFileTests(unittest.TestCase):
                 negative=execute(obj,source,name)
                 self.assertEqual(negative.returncode,3,negative.stdout+negative.stderr)
                 self.assertIn(diagnostic,negative.stdout)
-            self.assertEqual(strict,42)
-            print(f'CameraLoad: 40 strict game helper/caller checks, 2 CRT bodies also checked in each linked executable; complete object pins; '+run.stdout.strip())
+            self.assertEqual(strict,43)
+            print(f'CameraLoad: 41 strict game helper/caller checks, 2 CRT bodies also checked in each linked executable; complete object pins; '+run.stdout.strip())
 
 
 if __name__=='__main__':unittest.main()

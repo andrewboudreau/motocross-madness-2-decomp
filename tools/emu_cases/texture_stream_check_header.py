@@ -1,6 +1,6 @@
 """FileStream::CheckHeader 0x00460db0, the "FAOE" header test (tools/emu_diff.py case).
 
-The linked body is samples/io/FileStream.cpp. Field offsets are in src/reconstructed/FileStream.h
+The linked body is src/reconstructed/FileStream.cpp. Field offsets are in src/reconstructed/FileStream.h
 (header bytes +0x02/+0x00/+0x20/+0x18, fileEncoded +0x08, fileHandle +0x14, bufferPos/bufferEnd
 +0x124/+0x128). fseek 0x00534eac answers 0 or nonzero per call (scripted), fclose 0x00534c3d is
 logged and ReadByte 0x00461980 answers the scripted bytes: the header, the header with one byte
@@ -9,7 +9,7 @@ writes (fileEncoded restored or not, fileHandle cleared, bufferPos) are compared
 """
 RETAIL_VA = 0x00460db0
 SYMBOL = '?CheckHeader@FileStream@@QAEHXZ'
-SOURCE = 'samples/io/FileStream.cpp'
+SOURCE = 'src/reconstructed/FileStream.cpp'
 PROBES = {0x00460dc8: 'first seek ok', 0x00460e27: 'header matched'}
 
 

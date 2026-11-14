@@ -83,6 +83,54 @@ FileStream* FileStream::FindArchive(const char* name)
     return 0;
 }
 
+// Whether the next four bytes are the "FAOE" header. As an inline helper the
+// failure path of the four tests falls through, as in retail.
+static inline int HeaderMatches(FileStream* stream)
+{
+    if (stream->ReadByte() != stream->headerByte0
+        || stream->ReadByte() != stream->headerByte1
+        || stream->ReadByte() != stream->headerByte2
+        || stream->ReadByte() != stream->headerByte3) {
+        return 0;
+    }
+    return 1;
+}
+
+// 0x00460db0: 1 when the file starts with the header; the file is closed when a
+// seek fails. The header bytes are read undecoded.
+// Both fseek calls take the handle from a local, as 0x004618e0 does: a named
+// local takes no turn in VC6's eax/ecx/edx rotation for expression temporaries,
+// so the first fclose block loads the handle into eax and the second into edx.
+// The two blocks then differ, which keeps the first one inline (only its call is
+// cross-jumped) and makes the success path a jump target, where VC6 stores
+// `fileEncoded = 0` as an immediate. With `fseek(fileHandle, ...)` both blocks
+// used one register and merged (27/186).
+int FileStream::CheckHeader()
+{
+    FILE* file = fileHandle;
+    if (fseek(file, 0, SEEK_SET)) {
+        fclose(fileHandle);
+        fileHandle = 0;
+        return 0;
+    }
+    int encoded = fileEncoded;
+    bufferPos = bufferEnd;
+    fileEncoded = 0;
+    if (!HeaderMatches(this)) {
+        fileEncoded = encoded;
+        return 0;
+    }
+    file = fileHandle;
+    if (fseek(file, 4, SEEK_SET)) {
+        fclose(fileHandle);
+        fileHandle = 0;
+        return 0;
+    }
+    fileEncoded = encoded;
+    bufferPos = bufferEnd;
+    return 1;
+}
+
 // 0x00460e70. The NULL test guards the rest, so its message comes last.
 int FileStream::IsValidFile(const char* path)
 {

@@ -453,7 +453,7 @@
     {
       "path": "samples/io/FileStream.cpp",
       "status": "reviewed-nonexact",
-      "reason": "Four complete buffered/archive stream methods reviewed against retail and checked (with the exact Write) in 12390 native differential scenarios; VC6 bytes remain nonexact.",
+      "reason": "Three complete buffered/archive stream methods reviewed against retail and checked (with the exact CheckHeader and Write) in 12390 native differential scenarios; VC6 bytes remain nonexact.",
       "evidence": "docs/FILESTREAM.md#functional-build-review"
     },
     {

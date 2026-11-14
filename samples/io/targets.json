@@ -1,15 +1,6 @@
 [
   {
     "source": "FileStream.cpp",
-    "candidate_symbol_contains": "?CheckHeader@FileStream@@QAEHXZ",
-    "target_va": "0x00460db0",
-    "target_size": 186,
-    "expect": "partial",
-    "bindings": "FileStream.bindings.json",
-    "status": "Complete behavior reviewed against retail; 176-byte VC6 candidate remains nonexact."
-  },
-  {
-    "source": "FileStream.cpp",
     "candidate_symbol_contains": "?Seek@FileStream@@QAEHHHH@Z",
     "target_va": "0x00461340",
     "target_size": 702,

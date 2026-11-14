@@ -21911,6 +21911,15 @@ CASES = [
         'reason': 'stream methods called by Track/SceneManager/Motnctrl, contiguous (tier 3)',
     },
     {
+        'name': 'FileStream ?CheckHeader@',
+        'bindings': 'src/reconstructed/FileStream.bindings.json',
+        'source': 'src/reconstructed/FileStream.cpp',
+        'symbol': '?CheckHeader@FileStream@@QAEHXZ',
+        'target_va': '0x00460db0',
+        'target_size': 186,
+        'reason': 'stream methods called by Track/SceneManager/Motnctrl, contiguous (tier 3)',
+    },
+    {
         'name': 'FileStream ?Write@',
         'bindings': 'src/reconstructed/FileStream.bindings.json',
         'source': 'src/reconstructed/FileStream.cpp',

@@ -166,7 +166,7 @@ class TerrainConnectionsTests(unittest.TestCase):
             for source, symbol, va, size, bindings in dict.fromkeys(cases):
                 self.assertTrue(compare(retail, objects[source], symbol, va, size, bindings)['strict_exact'],
                                 (source, symbol))
-            self.assertEqual(len(dict.fromkeys(cases)), 192)
+            self.assertEqual(len(dict.fromkeys(cases)), 193)
             # Load remains nonexact; keep its complete candidate instruction
             # bytes, while joining only the three evidenced stream calls.
             entry = provider.find_symbol('?Load@Terrain@@')
