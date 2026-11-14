@@ -39,7 +39,7 @@ struct InstrumentKrustyBikeView {
     int position;                             // position
     unsigned char field_0x788[0x7a0 - 0x788];
     unsigned short lapsDone;                  // laps done
-    unsigned char field_0x7a2[0x7a4 - 0x7a2];
+    unsigned char prevLapCount[0x7a4 - 0x7a2];  // +0x7a2 KrustyBike prevLapCount (bytes kept)
     char finished;                            // +0x7a4 RaceView.h's racer hasFinished
     unsigned char field_0x7a5[0x7b8 - 0x7a5];
     int lapGate;                              // gate of the lap
@@ -182,7 +182,7 @@ public:
     // 0x00464e80: the shared empty `ret 4` body (QuarryStuntEvent.cpp
     // 0x004de4a3 passes the visual cue index).
     void UnknownFunction464e80(int index);
-    int SetStatsSource(int value);     // 0x00519880
+    int SetStatsSource(int source);     // 0x00519880
     int Redraw();                             // 0x005198a0
     int DrawStandings();              // 0x00519a20
     void DrawTimeLeft();                      // 0x00519e10

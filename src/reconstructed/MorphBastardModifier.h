@@ -104,7 +104,7 @@ struct MorphBastardVertex {
 };
 
 struct MorphBastardFace {
-    unsigned short field_0x00[3];
+    unsigned short vertexIndices[3];  // SoultreeSurface indices, three per face
 };
 
 // A vertex group of a mesh (0x14 bytes); the pointers index the mesh arrays.

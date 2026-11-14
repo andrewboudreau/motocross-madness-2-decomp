@@ -73,7 +73,7 @@ public:
     Cube* Load(FileStream* stream, int a, ManagedTextureGroup* group,
                                 int baseOffset);
     // 0x0043d400: copies whichever of the three vectors are given.
-    int SetVectors(const Vector3* a, const Vector3* b, const Vector3* c);
+    int SetVectors(const Vector3* newCenter, const Vector3* b, const Vector3* c);
     // 0x0043d460: creates texture `index` of face `face` and reads it.
     int LoadTexture(int face, int index, UnknownTexturePalette* palette,
                               UnknownCubeTextureContext* context);

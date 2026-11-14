@@ -9,7 +9,7 @@ SparkParticleEmitter::SparkParticleEmitter(int flags) : GameObject(flags)
     int i;
     firstUpdate = 1;
     particleLifetime = 500.0f;
-    field_0x3c = 1.0f;
+    speed = 1.0f;
     field_0x38 = 0;
     emitRate = 2400.0f;
     position.x = 0;
@@ -21,7 +21,7 @@ SparkParticleEmitter::SparkParticleEmitter(int flags) : GameObject(flags)
     previousPosition = position;
     emitRemainder = 0;
     field_0x6c = 0;
-    field_0x5c = 0;
+    previousSpeed = 0;
     burstPending = 0;
     idleTime = 0;
     nextFrame = 0x2d;
@@ -86,7 +86,7 @@ int SparkParticleEmitter::Tick(float dt)
         int i;
         for (i = 0; (float)i < n; i++) {
             if (manager->activeCount == 1000) {
-                field_0x5c = field_0x3c;
+                previousSpeed = speed;
                 burstPending = 0;
                 idleTime = 0;
                 return 1;
@@ -114,7 +114,7 @@ int SparkParticleEmitter::Tick(float dt)
             randomTableIndex++;
             if (randomTableIndex > 0x100) randomTableIndex = 0;
         }
-        field_0x5c = field_0x3c;
+        previousSpeed = speed;
         burstPending = 0;
         idleTime = 0;
     }

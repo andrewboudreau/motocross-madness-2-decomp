@@ -231,7 +231,7 @@ void TerrainShadow::BuildShadowVertices()
                             FistpFloatToInt(&points[5], clipped[k + 2].y - 0.5f);
                             ShadowFillTriangle(shadow->sizeShift, pixels, shadow->colorKeyLow, points, 0);
                         }
-                    } else if (cell->field_0x40) {
+                    } else if (cell->childMask) {
                         for (int k = 0; k < 3; k++) {
                             int idx = (unsigned short)corner[k] + vertexBase;
                             vertices[vertexCount].x = ((TerrainLitVertex*)cell->owner->vertices)[idx].x;

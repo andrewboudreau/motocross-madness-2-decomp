@@ -13,7 +13,7 @@ VCRFile::VCRFile(int memory, int count) {
         this->count = count;
     if (memory) {
         for (int i = 0; i < this->count; i++) {
-            entries[i].field_0x00 = 0;
+            entries[i].isOpen = 0;
             entries[i].name[0] = 0;
             entries[i].mode[0] = 0;
             entries[i].position = 0;
@@ -46,7 +46,7 @@ VCRFile::~VCRFile() {
 void VCRFile::Load(char* path, char* name) {
     if (!memory) return;
     for (int i = 0; i < count; i++) {
-        if (!entries[i].field_0x00 && !entries[i].size) {
+        if (!entries[i].isOpen && !entries[i].size) {
             int sourceLength = strlen(name);
             int length = sourceLength > 0x103 ? 0x103 : sourceLength;
             strncpy(entries[i].name, name, length);
@@ -98,7 +98,7 @@ void VCRFile::Save(char* path) {
 
 // fopen-like: returns a handle index or -1. In memory mode an existing name
 // is reopened with the new mode ("w..." truncates it); otherwise the first
-// unused entry is claimed. Nothing in this file sets field_0x00.
+// unused entry is claimed. Nothing in this file sets isOpen.
 int VCRFile::Open(char* name, char* mode) {
     int i;
     if (memory) {
@@ -114,7 +114,7 @@ int VCRFile::Open(char* name, char* mode) {
             }
         }
         for (i = 0; i < count; i++) {
-            if (!entries[i].field_0x00 && !entries[i].size) {
+            if (!entries[i].isOpen && !entries[i].size) {
                 int sourceLength = strlen(name);
                 int length = sourceLength > 0x103 ? 0x103 : sourceLength;
                 strncpy(entries[i].name, name, length);
@@ -145,8 +145,8 @@ int VCRFile::Open(char* name, char* mode) {
 // fclose-like.
 void VCRFile::Close(int handle) {
     if (memory) {
-        if (handle >= 0 && entries[handle].field_0x00) {
-            entries[handle].field_0x00 = 0;
+        if (handle >= 0 && entries[handle].isOpen) {
+            entries[handle].isOpen = 0;
             entries[handle].position = 0;
         }
     } else if (handle >= 0 && files[handle]) {

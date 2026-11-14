@@ -309,7 +309,7 @@ public:
     ShadowTexture* texture;       // +0x54 created in Init, released by dtor
     ShadowCameraProxy* camera;    // +0x58 created in Init, released by dtor
     int field_0x5c;               // +0x5c Init stores its first argument
-    void* field_0x60;             // +0x60 Init stores texture->pixels
+    void* texturePixels;          // +0x60 Init stores texture->pixels
     short* heightMap;             // +0x64 ctor 0
     ShadowRect clipRect;          // +0x68 left/top/right/bottom ints (ctor 0, Init 0,0,size-1,size-1)
     int prevMinX;                 // +0x78 ctor 0x7fffffff

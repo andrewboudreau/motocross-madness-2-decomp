@@ -99,7 +99,7 @@ struct EventKrustyBikeView : virtual public GameObject {
     // 0x00496f90 (KrustyBike.cpp's code): this racer hears about `other`.
     void IgnoreCollisionsWith(EventKrustyBikeView* other);
 
-    unsigned char field_0x008[0x0c - 0x08];
+    unsigned char sceneNode[0x0c - 0x08];  // +0x08 KrustyBike sceneNode (SoultreePhysicsBaseObject) (bytes kept)
     Vector3 position;                         // +0x00c position (KrustyBikeCamera slot 10 adds 2 to y)
     unsigned char field_0x018[0x50 - 0x18];
     float heading;                            // +0x050 heading; RadarOverlay 0x0051bed0 negates it for the map
@@ -140,7 +140,7 @@ struct EventKrustyBikeView : virtual public GameObject {
     unsigned char isGhost;  // +0x736  KrustyBike +0x736 isGhost (loader kind 0xff)
     char fourStroke;                          // +0x737 selects engine 2 over 1 (racesnd.cpp 0x004e3430)
     int engineSize;                           // +0x738 engine size; below 250 uses engine 0
-    unsigned char field_0x73c[0x740 - 0x73c];
+    unsigned char plateNumber[0x740 - 0x73c];  // +0x73c KrustyBike plateNumber (bytes kept)
     EventBikeRaceView* bikeView;          // +0x740 the view (RaceStatus.cpp compares its +0x38 and +0x50)
     RaceStatusNode* statusNode;        // +0x744 race status node (BikeRaceKrustyBikeView)
     int finishTimeStamp;                      // +0x748 time stamp; 0x7ffffffe until finished
@@ -156,7 +156,7 @@ struct EventKrustyBikeView : virtual public GameObject {
     float offTrackTime;                       // +0x76c time off the track (RaceStatus.cpp 0x004e63e0)
     float timeBehindLeader;                   // +0x770 time behind the leader (RaceStatus.cpp 0x004e6210)
     float lapStartTime;                       // +0x774 lap start time
-    unsigned char field_0x778[0x77c - 0x778];
+    unsigned char aiCrashImpactLimit[0x77c - 0x778];  // +0x778 KrustyBike aiCrashImpactLimit (bytes kept)
     float* lapStartTimes;                     // +0x77c lap start times, by lap % 100
     float* gateTimes;                         // +0x780 gate times, by gate count % 600
     int finishPosition;                       // +0x784 finishing position (1-based)
@@ -165,7 +165,7 @@ struct EventKrustyBikeView : virtual public GameObject {
     int gatesPassed;                          // +0x790 gates passed
     unsigned char field_0x794[0x7a0 - 0x794];
     unsigned short lapCount;                  // +0x7a0 laps
-    unsigned char field_0x7a2[0x7a4 - 0x7a2];
+    unsigned char prevLapCount[0x7a4 - 0x7a2];  // +0x7a2 KrustyBike prevLapCount (bytes kept)
     char hasFinished;                         // +0x7a4 finished
     unsigned char field_0x7a5[0x7ac - 0x7a5];
     float repairDamage;                       // +0x7ac KrustyBike repairDamage; EventManager 0x0045c8b0 copies it to the result
@@ -233,7 +233,7 @@ struct EventBikeRaceView : public GameObject {
     unsigned char field_0x18f[0x19c - 0x18f];
     ChatOverlay* chatOverlay;                 // +0x19c the name tags (TrackOverlay 0x0051bed0 updates them)
     EventKrustyVCRView* replayVcr;   // +0x1a0 replay being played (InGameProcs.cpp VCRDlg)
-    unsigned char field_0x1a4[0x1a8 - 0x1a4];
+    unsigned char ghostVcr[0x1a8 - 0x1a4];  // +0x1a4 BikeRace ghostVcr (bytes kept)
     VCRFile* vcrFile;             // +0x1a8 VCR file the recordings open; EventManager 0x0045cdc0 saves it as Record\*.gho
     unsigned char field_0x1ac[0x1b8 - 0x1ac];
     float replayTime;                         // +0x1b8 replay time (InGameProcs.cpp VCRDlg)
@@ -241,7 +241,7 @@ struct EventBikeRaceView : public GameObject {
     float replaySeekTarget;                   // +0x1c4 replay seek target, -1 when none
     unsigned char field_0x1c8[0x1dc - 0x1c8];
     int replayMode;                           // +0x1dc replay mode (4 play ... 14)
-    unsigned char field_0x1e0[0x1e4 - 0x1e0];
+    unsigned char appliedReplayMode[0x1e4 - 0x1e0];  // +0x1e0 BikeRace appliedReplayMode (bytes kept)
     int lastRecordKind;  // +0x1E4  BikeRace +0x1e4 lastRecordKind: RecordFrame's last record kind (-2: no replay / tape end)
     int ghostLap;                             // +0x1e8 lap count when the ghost lap restarted
     unsigned char field_0x1ec[0x3f8 - 0x1ec];

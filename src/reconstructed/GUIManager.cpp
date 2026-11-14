@@ -457,9 +457,9 @@ Sound* GUIManager::FindSectionObject(const char* name) {
 }
 
 // 0x00485ee0
-int GUIManager::SwapModalDialog(int value) {
+int GUIManager::SwapModalDialog(int dialog) {
     int previous = modalDialog;
-    modalDialog = value;
+    modalDialog = dialog;
     return previous;
 }
 

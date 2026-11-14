@@ -67,7 +67,7 @@ struct UnknownPodiumSoultree {
     void ReplaceMaterialTexture(int index, const char* name, void* context); // 0x00444c70
 
     unsigned char field_0x000[0x290];
-    UnknownPodiumTextureEntry** field_0x290;       // the racer model's texture
+    UnknownPodiumTextureEntry** materialTable;     // +0x290 D3DIMSoultreeObject::materialTable; [0] gives the racer model's texture
 };
 
 // cdecl 0x004aef40: deletes TrackGame's NetworkInterface (+0x08), sets +0x18

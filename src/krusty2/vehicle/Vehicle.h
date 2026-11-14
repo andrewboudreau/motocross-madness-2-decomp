@@ -219,7 +219,7 @@ struct VehicleSparkEmitter {
 // to the base loader's a20.
 struct VehicleTrackView {
     char pad_0x00[0x88];
-    unsigned char field_0x88;
+    unsigned char probeMask;  // +0x88 LoadVehicle passes it as LoadPhysicsModel's probeMask (stored in groundProbeMask)
 };
 struct VehicleTicker {               // elements of Vehicle+0x554/+0x560: the bike adds its two Shock objects
     virtual void Reset();            // Shock slot 0 (0x004f9ba0); only this slot is called
@@ -308,7 +308,7 @@ struct VehicleWheel {
     Vec3 relativePosition;  // +0xF0 CollisionPoint+0x38 relativePosition (base at +0xb8); crossed with the friction force for the torque
     Vec3 appliedShare;              // +0xfc per-wheel share of the applied vector
     Vec3 frictionDirection;  // +0x108 CollisionPoint+0x50 frictionDirection (base at +0xb8)
-    Vec3 field_0x114;
+    Vec3 rotationalVelocity;  // +0x114 CollisionPoint+0x5c rotationalVelocity (base at +0xb8); UpdateContactPatch writes it, UpdateShock hands it to the shock solve
     Vec3 normalLoadVector;                    // +0x120  CollisionPoint+0x68 (base at +0xb8); ApplyWheelDriveAndFriction: = groundNormal * normalLoad, zero when appliedShare points away from the ground
     float normalLoad;                         // +0x12C  CollisionPoint+0x74 (named frictionCoefficient in the base); = -(appliedShare . groundNormal) when negative, else 0 (ApplyWheelDriveAndFriction, before the contact point's slot 1)
     Vec3 frictionForce;  // +0x130 CollisionPoint+0x78 frictionForce (base at +0xb8)
@@ -324,7 +324,7 @@ struct VehicleWheel {
     int impactPosted;                 // +0x160 impact-handled flag (slot 18)
     int slidePosted;                 // +0x164 impact-handled flag (slot 19)
     int scrapePosted;                 // +0x168 impact-handled flag (slot 20)
-    int field_0x16c;
+    int contactState;  // +0x16C CollisionPoint+0xb4 contactState (base at +0xb8); AccumulateWheelContacts scales the torque and clears it when it is 2
     char pad_0x170[4];
     unsigned char surfaceMaterial;       // +0x174 surface material id
     char pad_0x175[0x47];
@@ -338,7 +338,7 @@ struct VehicleWheel {
     char pad_0x1F4[0xC];
     Vec3 nodePosition;                // +0x200 wheel node position (written by slot 33)
     char pad_0x20C[0x1C];
-    float field_0x228;
+    float bodyPositionY;  // +0x228 y of Tire.h bodyPosition (+0x224, UpdateSuspensionProbe's position argument); SettleBodyToWheels measures the body height from it
     char pad_0x22C[4];
     Vec3 rollDirection;              // +0x230 Tire.h: normalise(cross(normal, side))
     Vec3 sideAxis;                   // +0x23c Tire.h: wheel axle direction

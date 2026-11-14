@@ -56,11 +56,11 @@ void GatherModelTriangles(TreeModelSource* model, TreeSceneNode* frame, int* tri
     reinterpret_cast<SoultreeObject*>(model)->GetMatrixIn(0, reinterpret_cast<Matrix4*>(&saved));
     model->SetAxesIn(0, &kVec3ZAxis, &kVec3YAxis, 0, 1);
     model->SetPositionIn(0, &kVec3Zero);
-    savedField = model->field_0x1a4;
-    model->field_0x1a4 = 0;
+    savedField = model->useLighting;
+    model->useLighting = 0;
     model->MarkSubtreeDirty();
     reinterpret_cast<D3DIMSoultreeObject*>(model)->TransformVertexGroups(-1);
-    model->field_0x1a4 = savedField;
+    model->useLighting = savedField;
     model->MarkSubtreeDirty();
 
     if (frame == 0) {
@@ -105,7 +105,7 @@ void GatherModelTriangles(TreeModelSource* model, TreeSceneNode* frame, int* tri
         if (frame == 0)
             source = mesh->vertices;
         else
-            source = mesh->field_0x14;
+            source = mesh->drawnVertices;
         first = 0;
         end = 0;
         if (frame != 0) {

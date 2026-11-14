@@ -173,7 +173,7 @@ public:
     unsigned char field_0x398[0x3b0 - 0x398];
     QuarryLoadKrustyBikeView* bike;  // +0x3B0 BikeCamera bike
     QuarryLoadKrustyBikeView* krustyBike;  // +0x3B4 KrustyBikeCamera krustyBike
-    unsigned char field_0x3b8[0x3bc - 0x3b8];
+    unsigned char raceView[0x3bc - 0x3b8];  // +0x3b8 KrustyBikeCamera raceView (bytes kept)
 };
 
 // The visibility quadtree (0x8a0 bytes); 0x0052d460 returns its GameObject
@@ -209,7 +209,7 @@ public:
     explicit QuarryLoadFogOnView(int flags);                  // 0x00462e90
     GameObject* Create(void* target, Fog* fog);  // 0x00486a10
 
-    unsigned char field_0x2c[0x30 - 0x2c];
+    unsigned char fog[0x30 - 0x2c];  // +0x2c FogOn fog (bytes kept)
 };
 
 // The last race object (0x48 bytes).

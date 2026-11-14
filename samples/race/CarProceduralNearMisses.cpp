@@ -229,9 +229,9 @@ static inline void CarFrame(Matrix4* m, Vector3 forwardAxis, Vector3 upAxis, con
 // The sensor collider's contact record: the penetration depth at +0 and
 // the surface normal at +0x08 (tier 3 roles).
 struct CarProceduralSensorContact {
-    float field_0x00;
-    float field_0x04;
-    Vector3 field_0x08;
+    float fraction;   // +0x00 CollisionBoxResult fraction
+    float point;      // +0x04 CollisionBoxResult point
+    Vector3 normal;
 };
 
 // v limited to [lo, hi].
@@ -311,7 +311,7 @@ int CarProcedural::Tick(float frameTime)
         Vector3 lifted = kVec3YAxis * ((1.0f - contact->contactOffset.x) * sensorHalfHeight * 2.0f - sensorHalfHeight) + position;
         if (lifted.y > ground.y) {
             ground = lifted;
-            normal = ((CarProceduralSensorContact*)contact)->field_0x08;
+            normal = ((CarProceduralSensorContact*)contact)->normal;
         }
     }
     if (skipSmoothing)

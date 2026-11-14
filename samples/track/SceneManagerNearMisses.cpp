@@ -142,7 +142,7 @@ public:
                                              int maxSteps, float drag, float elasticity, float radius, int shape,
                                              int minPoints, char probeMask, int createCollision);
 
-    int field_0x04;
+    int vbptr;                            // +0x04: vbtable 0x557ff8 (ctor 0x005037c0), compiler generated
     void* followedNode;                   // +0x08: the scene node the collision points follow
     unsigned char field_0x0c[0x12c - 0x0c];
     void** collisionPoints;               // +0x12c

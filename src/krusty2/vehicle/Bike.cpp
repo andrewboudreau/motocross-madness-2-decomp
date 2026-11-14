@@ -558,7 +558,7 @@ static inline float BikeDistanceAcc(const Vec3& a, const Vec3& b)
 struct BikeQuadTreeHead {
     virtual void UnknownVirtualSlot0();
     int field_0x04;
-    int field_0x08;
+    int objectTypeId;           // +0x08 QuadTreeObject objectTypeId (a char there)
 };
 struct BikeTireObject : BikeQuadTreeHead, GameObject {
 };
@@ -632,10 +632,10 @@ GameObject* Bike::LoadBike(int context, const char* engineName, const char* mode
             ((D3DIMSoultreeCharacter*)riderCharacter)->LoadCharacter(
                 (int)GameObject::renderContext, riderModel, desc, (int)info, 1, 1), -1))
         riderCharacter = 0;
-    if (desc && (desc->field_0x25 & 1))
+    if (desc && (desc->statusFlags & 1))
         reinterpret_cast<D3DIMSoultreeObject*>(riderCharacter->c_0x1a0)->SetUseLighting(1);
     if (info)
-        field_0x5c8 = *info;
+        loadInfo = *info;
     bodyForward = kVec3ZAxis;
     bodyUp = kVec3YAxis;
     StoreBodyAxes(1, 1);
@@ -1904,7 +1904,7 @@ struct BikeBodyObj {
     Vec3 currentPoint;          // +0x154
     char pad_0x160[0x0c];
     Vec3 angularVelocity;       // +0x16c, slot 38's otherAngVel
-    float field_0x178;
+    float mass;                 // +0x178 PhysicsBody mass
     float invMass;              // +0x17c
     char pad_0x180[0x50];
     float invInertiaXX;         // +0x1d0: the inverse inertia diagonal, 0x14 apart
@@ -1920,7 +1920,7 @@ struct BikeBodyObj {
 };
 struct BikeKindInfo {           // reached through the other party's +0x5c
     char pad_0x00[0x24];
-    float field_0x24;
+    float fraction;             // +0x24 CollisionSweepQuery fraction (the contact record)
 };
 struct BikeKindParty {          // other party of kind 0x3ea
     char pad_0x00[0x5c];
@@ -2042,11 +2042,11 @@ void Bike::ApplyCollisionEvent(int notify, int eventKind, void* event)
         otherWorldAngVel = *other->body->GetWorldAngularVelocity(&tmp);
         otherVel = &blend;
         otherAngVel = &other->body->angularVelocity;
-        // other point: interpolate body->previousPoint toward body->currentPoint by kind->field_0x24; retail
+        // other point: interpolate body->previousPoint toward body->currentPoint by kind->fraction; retail
         // adds a struct copy of previousPoint (int moves into the low temporaries) as a named copy does
         {
             Vec3 prev = other->body->previousPoint;
-            blend = (other->body->currentPoint - prev) * kind->field_0x24 + prev;
+            blend = (other->body->currentPoint - prev) * kind->fraction + prev;
         }
         otherInvMass = other->body->invMass;
         otherInvInertia.x = other->body->invInertiaXX;

@@ -18,7 +18,7 @@ struct VCRFileBlock {
 };
 
 struct VCRFileEntry {
-    int field_0x00;                     // tested and cleared by 0x00525000
+    int isOpen;                         // tested and cleared by 0x00525000; nothing sets it
     char name[0x104];                   // +0x004
     char mode[8];                       // +0x108, fopen-style mode string
     int position;                       // +0x110

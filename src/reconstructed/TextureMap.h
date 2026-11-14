@@ -93,8 +93,8 @@ public:
     BaseObject* sourcePalette;                // +0x28 released by the destructor
     UnknownTexturePalette* colorMapper;       // +0x2c CreateSurface's palette; handed to the Pixtrans converters
     int usesColorKey;                         // +0x30 has a colour key
-    int colorKeyValue;                        // +0x34 colour key (also +0x38)
-    int field_0x38;
+    int colorKeyValue;                        // +0x34 colour key (DDCOLORKEY low; high +0x38)
+    int colorKeyHighValue;
     int averageColor;                         // +0x3C  Pixtrans AverageColor 0x004d24d0 (slot 4); Terrain.h's name
     int field_0x40;
     int statePairCount;                       // +0x44 render-state pair count

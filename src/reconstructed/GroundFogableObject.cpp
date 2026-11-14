@@ -4,5 +4,5 @@
 
 GroundFogableObject::GroundFogableObject()
 {
-    field_0x00 = 0;
+    groundFog = 0;
 }

@@ -532,7 +532,7 @@ int TrackGameMode::WaitForCd() {
 }
 
 // 0x00523a60
-int TrackGameMode::FindFileDirectory(int value, char* name, const char* kind, char* path) {
+int TrackGameMode::FindFileDirectory(int subdirectory, char* name, const char* kind, char* path) {
     char drive[4];
     char file[0x104];
     char directory[0x100];
@@ -542,10 +542,10 @@ int TrackGameMode::FindFileDirectory(int value, char* name, const char* kind, ch
     int result;
 
     strcpy(path, "");
-    if (!*(char*)value)
+    if (!*(char*)subdirectory)
         sprintf(file, "%s.%s", name, kind);
     else
-        sprintf(file, "%s\\%s.%s", (char*)value, name, kind);
+        sprintf(file, "%s\\%s.%s", (char*)subdirectory, name, kind);
     result = FindDataFile(file, found);
     if (!result)
         return 0;

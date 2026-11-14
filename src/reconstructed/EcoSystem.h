@@ -188,7 +188,7 @@ public:
     virtual void SetAlphaReference(int value);
     virtual void DisableAlphaTest();
 
-    unsigned char field_0x04[4];
+    unsigned char targetDisplay[4];  // +0x04 RenderTarget targetDisplay (bytes kept)
     EcoCameraView* camera;                 // +0x08
     int width;                                // +0x0c
     unsigned char field_0x10[0x38 - 0x10];

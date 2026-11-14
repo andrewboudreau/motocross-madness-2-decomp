@@ -58,11 +58,11 @@ public:
     ParticleManager* manager; // +0x30 stored by slot 27 (null in the ctor)
     float particleLifetime;   // +0x34 ctor 375.0; slot 10 stores it as each new particle's lifetime
     float field_0x38;         // +0x38 ctor 6.0
-    float field_0x3c;         // +0x3c ctor 1.0
+    float speed;              // +0x3c ctor 1.0, never changed here; slot 10 copies it to previousSpeed (DustParticleEmitter's speed)
     float emitRate;           // +0x40 ctor 200.0; slot 10 emits dt * it particles per tick
     ParticleVec3 position;    // +0x44 ctor 0
     ParticleVec3 previousPosition; // +0x50 ctor 0
-    float field_0x5c;         // +0x5c ctor 0
+    float previousSpeed;      // +0x5c ctor 0; slot 10 stores speed here after emitting, as Dust's slot 10 does (no reader)
     int activeThisFrame;      // +0x60 ctor 0; slot 10 emits only while it is set (Bike attaches it as SoulTree's slide emitter, whose slot 21 clears +0x60 every frame)
     float emitRemainder;      // +0x64 ctor 0; slot 10 carries the fractional particle count between ticks
     int field_0x68;           // +0x68 ctor 0
@@ -88,11 +88,11 @@ public:
     ParticleManager* manager; // +0x30 stored by slot 27 (null in the ctor)
     float particleLifetime;   // +0x34 ctor 750.0; slot 10 stores it as each new particle's lifetime
     float field_0x38;         // +0x38 ctor 6.0
-    float field_0x3c;         // +0x3c ctor 1.0
+    float speed;              // +0x3c ctor 1.0, never changed here; slot 10 copies it to previousSpeed (DustParticleEmitter's speed)
     float emitRate;           // +0x40 ctor 200.0; slot 10 emits dt * it particles per tick
     ParticleVec3 position;    // +0x44 ctor 0
     ParticleVec3 previousPosition; // +0x50 ctor 0
-    float field_0x5c;         // +0x5c ctor 0
+    float previousSpeed;      // +0x5c ctor 0; slot 10 stores speed here after emitting, as Dust's slot 10 does (no reader)
     int active;               // +0x60 ctor 0; slot 10 emits only while it is set
     float emitRemainder;      // +0x64 ctor 0; slot 10 carries the fractional particle count between ticks
     int field_0x68;           // +0x68 ctor 0
@@ -119,11 +119,11 @@ public:
     ParticleManager* manager; // +0x30 stored by slot 27 (null in the ctor)
     float particleLifetime;   // +0x34  ctor 500.0; slot 10 stores it as each new particle's lifetime
     float field_0x38;         // +0x38 ctor 0
-    float field_0x3c;         // +0x3c ctor 1.0
+    float speed;              // +0x3c ctor 1.0, never changed here; slot 10 copies it to previousSpeed (DustParticleEmitter's speed)
     float emitRate;           // +0x40  ctor 2400.0; slot 10 emits dt * it particles per tick
     ParticleVec3 position;    // +0x44 ctor 0; SetPosition's arguments
     ParticleVec3 previousPosition; // +0x50 SetPosition copies position here first
-    float field_0x5c;         // +0x5c ctor 0
+    float previousSpeed;      // +0x5c ctor 0; slot 10 stores speed here after emitting, as Dust's slot 10 does (no reader)
     int burstPending;  // +0x60  ctor 0; slot 10 idles while it is clear and clears it after emitting one burst; Vehicle/Bike impact handlers set it after SetPosition
     float idleTime;  // +0x64  ctor 0; slot 10 adds dt while no burst is pending and clears it after a burst; above 0.25 the burst restarts from the current position
     float emitRemainder;      // +0x68  ctor 0; fractional particle remainder carried between ticks

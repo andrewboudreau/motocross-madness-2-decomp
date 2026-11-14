@@ -225,7 +225,7 @@ struct KbGame {
     KbMode mode;  // +0x578  TrackGame +0x578 mode (TrackGameMode; only the first 0x94 bytes are modelled here)
     int difficulty;  // +0x60C  TrackGame mode.difficulty (+0x578 + 0x94)
     char pad_0x0610[0x640];
-    int field_0xc50; // 0xC50
+    int wreckResetOnTrack; // +0xC50 TrackGame mode.wreckResetOnTrack (+0x578 + 0x6d8, ChkWreckResetOnTrack)
     char pad_0x0C54[0x38C];
     int steeringSlider;                       // +0xFE0  OptionProcs.h UnknownOptControlSettings (TrackGame+0xfe0) +0x00: SteeringSlider
     int crossupSlider;                        // +0xFE4  UnknownOptControlSettings +0x04: CrossupSlider
@@ -445,9 +445,9 @@ struct KbXform {
 // Element of the array at Bike+0x12c (count at +0x130).
 struct KbChild {
     int pad_0[1];
-    int field_0x4;
+    int ownerNode;   // +0x04 CollisionPoint ownerNode
     char pad_8[0x9c];
-    int field_0xa4;
+    int inContact;   // +0xa4 CollisionPoint inContact
 };
 // Opaque storage view of the ghost modifier; allocation/calls use GhostMod1.
 struct KbObj128 {

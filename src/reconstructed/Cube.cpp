@@ -123,10 +123,10 @@ Cube* Cube::Load(FileStream* stream, int a, ManagedTextureGroup* group,
 }
 
 // 0x0043d400
-int Cube::SetVectors(const Vector3* a, const Vector3* b, const Vector3* c)
+int Cube::SetVectors(const Vector3* newCenter, const Vector3* b, const Vector3* c)
 {
-    if (a)
-        center = *a;
+    if (newCenter)
+        center = *newCenter;
     if (b)
         field_0x20 = *b;
     if (c)

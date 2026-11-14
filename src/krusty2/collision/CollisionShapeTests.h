@@ -53,7 +53,7 @@ struct CollisionModelBody {
     int* elementHighlight;               // +0x08, one flag per element (0x00432b30 draws a set
                                    // element green)
     int swept;                     // +0x0c, nonzero selects the swept element test
-    int field_0x10;
+    int sceneNode;
     CollisionHullBody* elements;   // +0x14, elements are 0x198 bytes apart
     CollisionVec3 center;          // +0x18 model bounds center
     CollisionVec3 halfExtents;     // +0x24 model bounds half extents

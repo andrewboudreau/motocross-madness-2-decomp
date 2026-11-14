@@ -146,8 +146,8 @@ struct TreeModelPart {
     TreeSceneNode* frame;       // +0x00 compared with the frame argument of 0x0042d390/0x0042c260
     int vertexCount;            // +0x04 length of the range
     TreeModelVertex* firstVertex;  // +0x08 start of the range inside the mesh's vertices
-    int field_0x0c;
-    int field_0x10;
+    int transformedVertices;
+    int normals;
 };
 
 // Triangle of a render mesh: three 16-bit vertex indices, 6 bytes (stride in 0x0042c260).
@@ -162,9 +162,9 @@ struct TreeModelMesh {
     int vertexCount;            // +0x08 summed for the point list size; loop bound over vertices
     int triangleCount;          // +0x0c summed by 0x0042c260; loop bound over triangles
     TreeModelVertex* vertices;  // +0x10 base of the parts' firstVertex ranges
-    TreeModelVertex* field_0x14;  // +0x14 0x0042c260 reads positions from here instead of
-                                  // +0x10 when it gathers a single frame's triangles
-    int field_0x18;
+    TreeModelVertex* drawnVertices;  // +0x14 0x0042c260 reads positions from here instead of
+                                     // +0x10 when it gathers a single frame's triangles
+    int normals;
     TreeModelTriangle* triangles;  // +0x1c read by 0x0042c260
     char pad_0x20[0x38 - 0x20];
 };
@@ -179,7 +179,7 @@ struct TreeModelLod {
 class TreeModelSource : public TreeSceneNode {
 public:
     char pad_0x000[0x1a4];
-    int field_0x1a4;            // +0x1a4 saved, cleared around TransformVertexGroups(-1) and restored by
+    int useLighting;            // +0x1a4 saved, cleared around TransformVertexGroups(-1) and restored by
                                 // 0x0042c260
     char pad_0x1a8[0x27c - 0x1a8];
     int currentLod;             // +0x27c index into lods (0x00440d40 stores its argument here)

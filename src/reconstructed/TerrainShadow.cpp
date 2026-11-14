@@ -93,7 +93,7 @@ public:
     virtual void Slot16(); virtual void Slot17();
     virtual void Slot18(int value);
     char pad_0x04[0x1c8 - 0x04];
-    unsigned char field_0x1c8;                   // bit 2 tested by slot 14
+    unsigned char triTextureBlendCaps;           // bit 2 tested by slot 14
 };
 
 // The shadow texture's slot 19 (0x4c) binds it to texture stage 0 (PCTextureMap slot 19).  Tier 3.
@@ -122,7 +122,7 @@ int TerrainShadow::Render3D()
         if (shadow->surfaceFormat == 0x613) {
             ((TerrainShadowRenderTarget*)renderContext)->SetRenderState(0x21, 1, 0);
             ((TerrainShadowRenderTarget*)renderContext)->SetRenderState(0x1b, 1, 0);
-            if (((TerrainShadowRenderTarget*)renderContext)->field_0x1c8 & 4) {
+            if (((TerrainShadowRenderTarget*)renderContext)->triTextureBlendCaps & 4) {
                 ((TerrainShadowRenderTarget*)renderContext)->SetTextureStageState(0, 1, 4);
                 ((TerrainShadowRenderTarget*)renderContext)->SetTextureStageState(0, 2, 2);
                 ((TerrainShadowRenderTarget*)renderContext)->SetTextureStageState(0, 3, 0);

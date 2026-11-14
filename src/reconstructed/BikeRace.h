@@ -410,7 +410,7 @@ public:
     unsigned char field_0x10a[0x10c - 0x10a];
     Vector3 startPosition;                    // +0x10c start position (0x004210f0)
     Vector3 startDirection;                   // +0x118 start direction
-    unsigned char field_0x124[0x128 - 0x124];
+    unsigned char particleManager[0x128 - 0x124];  // +0x124 KrustyBike particleManager (SoultreePhysicsBaseObject) (bytes kept)
     CollisionObject* collisionObject;  // +0x128  SoultreePhysicsBaseObject+0x128 collisionObject; its +0x68 is set without tree collision (the loader)
     unsigned char field_0x12c[0x3bc - 0x12c];
     RacerD3DIMSoultreeObjectView* modelNode;          // +0x3bc
@@ -434,16 +434,16 @@ public:
     int plateNumber;                          // +0x73c plate number (the setup paints it)
     LodBikeRaceView* bikeView;       // +0x740 the racer's view (RaceView.h)
     RaceStatusNode* statusNode;        // +0x744 race status node (RaceView.h)
-    unsigned char field_0x748[0x74c - 0x748];
+    unsigned char finishTimeStamp[0x74c - 0x748];  // +0x748 KrustyBike finishTimeStamp (bytes kept)
     float lastLapTime;                        // +0x74c (EventKrustyBikeView's last lap time)
     float fastestLap;                         // +0x750 (0x0045c8b0 copies it to the entry's ZoneReport "FastestLap")
     unsigned char field_0x754[0x768 - 0x754];
     float score;                              // +0x768 score (network message 10)
-    unsigned char field_0x76c[0x770 - 0x76c];
+    unsigned char offTrackTime[0x770 - 0x76c];  // +0x76c KrustyBike offTrackTime (bytes kept)
     int timeBehindLeader;  // +0x770  KrustyBike +0x770 timeBehindLeader; replayed from message 1's +0x2c
     unsigned char field_0x774[0x7a0 - 0x774];
     unsigned short lapCount;                  // +0x7a0 laps (EventKrustyBikeView)
-    unsigned char field_0x7a2[0x7a4 - 0x7a2];
+    unsigned char prevLapCount[0x7a4 - 0x7a2];  // +0x7a2 KrustyBike prevLapCount (bytes kept)
     char finished;                            // +0x7a4 finished
     unsigned char field_0x7a5[0x7b8 - 0x7a5];
     int lapGate;                              // +0x7b8 RaceView.h's racer lapGate
@@ -456,7 +456,7 @@ public:
     unsigned char field_0x11c1[0x11c4 - 0x11c1];
     float messageDelay;                       // +0x11c4 the player's message delay (racer slot +0xd0)
     ReceivedRacerState* receivedStates[4]; // +0x11c8 received network states, newest first
-    unsigned char field_0x11d8[0x1358 - 0x11d8];
+    unsigned char stateBuffers[0x1358 - 0x11d8];  // +0x11d8 KrustyBike stateBuffers (bytes kept)
     Vector3 deltaBaseVelocity;  // +0x1358  base state message 13 deltas accumulate into (0x004933e0); set from message 1 velocity (+0x3c)
     Vector3 deltaBasePosition;  // +0x1364  message 13 delta base; set from message 1 position (+0x08)
     Vector3 deltaBaseAngularVelocity;  // +0x1370  message 13 delta base; set from message 1 angular velocity (+0x30)
@@ -713,7 +713,7 @@ struct PickSceneStaticModelView {
     unsigned char field_0x01[0x08 - 0x01];
     PickPhysicsObjectView* physicsObject;  // +0x8  SceneStaticModel+0x08 physicsObject
     int collisionObject;  // +0xC  SceneStaticModel+0x0c collisionObject; compared with the pick
-    unsigned char field_0x10[0x28 - 0x10];
+    unsigned char fileName[0x28 - 0x10];  // +0x10 SceneStaticModel fileName (bytes kept)
 };
 
 struct PickCollisionCharacterView {

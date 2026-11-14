@@ -2052,9 +2052,9 @@ Sound* UIDialog::FindSectionObject(const char* name) {
 }
 
 // 0x0046ea60
-void UIDialog::SetShown(int value) {
-    isShown = value;
-    if (value)
+void UIDialog::SetShown(int shown) {
+    isShown = shown;
+    if (shown)
         GameObject::Enable();
     else
         GameObject::Disable();
@@ -2212,8 +2212,8 @@ void UIDialog::AbortWithoutNotify() {
 }
 
 // 0x0046ffc0
-void UIDialog::SetPopupAlignment(int value) {
-    popupAlignment = value;
+void UIDialog::SetPopupAlignment(int alignment) {
+    popupAlignment = alignment;
 }
 
 // 0x0046ffd0

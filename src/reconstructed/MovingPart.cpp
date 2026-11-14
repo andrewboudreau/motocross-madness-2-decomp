@@ -12,10 +12,10 @@ Vector3 GetMatrixRow(const Matrix4* m, int row)
 }
 
 // 0x004a23a0
-MovingPart::MovingPart(const char* name, SoultreeObject* root, int field_0x44_)
+MovingPart::MovingPart(const char* name, SoultreeObject* root, int ownerRef_)
 {
     node = root->FindByName(name);
     node->GetLocalMatrix(&matrix);
     field_0x48 = 0;
-    field_0x44 = field_0x44_;
+    ownerRef = ownerRef_;
 }

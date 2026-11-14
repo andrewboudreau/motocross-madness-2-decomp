@@ -170,9 +170,9 @@ public:
     virtual void LeaveHover(GuiControlView* next);
     virtual void KillFocus(GuiControlView* next);
 
-    unsigned char field_0x2c[0x3c - 0x2c];
+    unsigned char screenArea[0x3c - 0x2c];  // +0x2c UIControl screenArea (bytes kept)
     CameraRect area;                          // +0x3c: area
-    unsigned char field_0x4c[0x5c - 0x4c];
+    unsigned char visibleArea[0x5c - 0x4c];  // +0x4c UIControl visibleArea (bytes kept)
     int controlType;                          // +0x5c: control type (11: edit field)
     unsigned char field_0x60[0xb8 - 0x60];
     UIDialog* ownerDialog;            // +0xb8

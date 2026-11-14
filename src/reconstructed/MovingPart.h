@@ -30,10 +30,10 @@ class MovingPart {
 public:
     // 0x004a23a0 (ret 0xc): finds `name` below `root` and copies its local
     // matrix. The destructor is the shared empty function 0x00464e90.
-    MovingPart(const char* name, SoultreeObject* root, int field_0x44_);
+    MovingPart(const char* name, SoultreeObject* root, int ownerRef_);
 
     Matrix4 matrix;          // +0x00 the node's local matrix at construction
     SoultreeObject* node;    // +0x40
-    int field_0x44;          // +0x44 constructor argument
+    int ownerRef;            // +0x44 constructor argument (Tire.h, Suspension.h: ownerRef)
     int field_0x48;          // +0x48 0
 };

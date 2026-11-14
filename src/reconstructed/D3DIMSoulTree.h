@@ -201,7 +201,7 @@ struct UnknownSoultreeCameraView {
     Vector3 viewDirection;                     // view direction (drawing mode 5)
     unsigned char field_0x188[0x198 - 0x188];
     float imagePlaneDistance;                  // image plane distance
-    int field_0x19c;
+    int displayAspect;
     unsigned int viewportX;                    // viewport x
     unsigned int viewportY;                    // viewport y
 };

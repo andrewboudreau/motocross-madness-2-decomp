@@ -255,7 +255,7 @@ public:
 
 // The 0x8dc-byte file chunk message (type 0xcf).
 struct NetFileChunk {
-    int field_0x00;
+    int header;                                       // +0x00 SendRaw (0x004ad280) writes the type byte (0xcf) here
     char data[0x8ce];
     int byteCount;                                    // byte count
     int index;                                    // chunk index
@@ -263,7 +263,7 @@ struct NetFileChunk {
 
 // The file announcement NetFile::BeginReceive reads.
 struct NetFileHeader {
-    int field_0x00;
+    int messageHeader;                                // +0x00 the message type byte (0xcd) and sequence
     char name[0x104];                             // file name
     int size;                                    // size
 };

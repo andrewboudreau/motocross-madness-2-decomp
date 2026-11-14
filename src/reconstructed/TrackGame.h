@@ -339,10 +339,10 @@ public:
     void CopyCurrentSeriesDirectory(char* name);   // 0x00523b70 (SelectGamePicProcs.cpp)
     int CopySeriesDirectory(short a, short b, char* name); // 0x00523bb0: copies the series' directory
     // 0x00523a60 (near uiinfo.cpp's literals): finds `name`.`kind` (under
-    // directory `value` when nonempty) and stores the directory it is in
+    // directory `subdirectory` when nonempty) and stores the directory it is in
     // (EventManager 0x0045cb70 asks for "env", OpenHelp for "hlp").
     // Returns 0 when the file is not found.
-    int FindFileDirectory(int value, char* name, const char* kind, char* path);
+    int FindFileDirectory(int subdirectory, char* name, const char* kind, char* path);
 
     char profileName[16];                     // +0x00 "ui\profile\%s\control.ctl", string 0x1466 "Current Profile:"; slot 4 sets it from the network object
     char playerName[0x80];                // +0x10: player name (NetProcs.cpp opens sessions with it)

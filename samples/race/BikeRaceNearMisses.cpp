@@ -57,7 +57,7 @@
 // is decoded and the arithmetic matches where VC6 makes the same inlining
 // choices. Retail calls the out-of-line Vector3 constructor (0x00404e60)
 // for the last two expansions of the mode 2/3 case and inlines
-// Scale(field_0x170, 20.0f) in the mode 4 case; this candidate does the
+// Scale(gridSlotStep, 20.0f) in the mode 4 case; this candidate does the
 // opposite (VC6's inline budget). Call sequence (D dot, I FastInvSqrt,
 // S scale, C constructor): retail DIS..CCDISCCCCCCDISCCCCCCDISCC-CSS+,
 // candidate differs only in the mode 2/3 case (retail D I S, two

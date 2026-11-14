@@ -78,8 +78,8 @@ struct D3DIMShadowMesh {
     int vertexCount;                // +0x08
     int triangleCount;              // +0x0c
     float* vertices;                // +0x10 0x20-byte vertices, position first
-    void* field_0x14;
-    int field_0x18;
+    void* drawnVertices;
+    int normals;
     unsigned short* triangles;      // +0x1c three indices per triangle
     char pad_0x20[0x38 - 0x20];
 };

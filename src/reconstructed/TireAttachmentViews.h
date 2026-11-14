@@ -32,7 +32,7 @@ public:
                       const CollisionVec3* point, const CollisionVec3* normal, const CollisionVec3* offsetA,
                       const CollisionVec3* offsetB, float limit, float* outLoad,
                       int* outActive);   // 0x004fac60 (ret 0x28)
-    int field_0x00;
+    int vtable;                          // +0x00 the Shock vptr (slot 0 Reset); G3ShockView names it vtable
     CollisionMatrix4 restMatrix;         // +0x04
     TireNode* node;                      // +0x44
     char field_0x48[0x54 - 0x48];

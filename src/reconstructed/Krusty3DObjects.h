@@ -47,7 +47,7 @@ struct NumberCameraView {
     Vector3 eyePosition;                      // +0x170
     Vector3 viewDirection;                    // +0x17c forward
     Vector3 upDirection;                      // +0x188 up
-    unsigned char field_0x194[0x198 - 0x194];
+    unsigned char roll[0x198 - 0x194];  // +0x194 Camera roll (bytes kept)
     float focalLength;                        // +0x198
 };
 
@@ -147,7 +147,7 @@ struct VisualCueBikeRaceView {
     RunwayKrustyBikeView* ownRacer;             // +0x38 its own racer
     unsigned char field_0x03c[0x48 - 0x3c];
     RunwayTrackView* raceTrack;            // +0x48 BikeRace's raceTrack
-    unsigned char field_0x04c[0x50 - 0x4c];
+    unsigned char raceTerrain[0x50 - 0x4c];  // +0x4c BikeRace raceTerrain (bytes kept)
     VisualCueKrustyBikeCameraView* raceCamera;       // +0x50 BikeRace's raceCamera
     unsigned char field_0x054[0x18a - 0x54];
     bool racing;                              // +0x18a

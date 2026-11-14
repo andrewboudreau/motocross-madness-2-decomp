@@ -217,7 +217,7 @@ public:
     void* display;                               // +0x04
     D3DIMShadowCamera* camera;                   // +0x08
     char pad_0x0c[0x1c8 - 0x0c];
-    unsigned char field_0x1c8;                   // bit 2 tested by slot 14
+    unsigned char triTextureBlendCaps;           // bit 2 tested by slot 14
 };
 
 // Slot 14 (0x00447540): draws the receiver's shadow triangles (vertexCount vertices and indices)
@@ -242,7 +242,7 @@ int D3DIMSoultreeShadow::Render3D()
         if (shadow->surfaceFormat == 0x613) {
             ((D3DIMShadowRenderTarget*)renderContext)->SetRenderState(0x21, 1, 0);
             ((D3DIMShadowRenderTarget*)renderContext)->SetRenderState(0x1b, 1, 0);
-            if (((D3DIMShadowRenderTarget*)renderContext)->field_0x1c8 & 4) {
+            if (((D3DIMShadowRenderTarget*)renderContext)->triTextureBlendCaps & 4) {
                 ((D3DIMShadowRenderTarget*)renderContext)->SetTextureStageState(0, 1, 4);
                 ((D3DIMShadowRenderTarget*)renderContext)->SetTextureStageState(0, 2, 2);
                 ((D3DIMShadowRenderTarget*)renderContext)->SetTextureStageState(0, 3, 0);

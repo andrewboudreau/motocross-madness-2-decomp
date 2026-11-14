@@ -10,6 +10,6 @@ SAME_OFFSET(textureManager,manager);
 SAME_OFFSET(opaqueTextures,opaqueGroup);
 SAME_OFFSET(alphaTextures,alphaGroup);
 SAME_OFFSET(format,opaqueFormat);
-SAME_OFFSET(field_0x10,alphaFormat);
-SAME_OFFSET(field_0x14,halvings);
+SAME_OFFSET(alphaFormat,alphaFormat);
+SAME_OFFSET(halvings,halvings);
 #undef SAME_OFFSET

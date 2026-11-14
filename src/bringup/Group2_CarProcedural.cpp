@@ -222,8 +222,8 @@ static inline void CarFrame(Matrix4* m, Vector3 forwardAxis, Vector3 upAxis, con
 // The sensor collider's contact record: the penetration depth at +0 and
 // the surface normal at +0x08 (tier 3 roles).
 struct CarProceduralSensorContact {
-    float field_0x00;
-    float field_0x04;
+    float fraction;   // +0x00 CollisionBoxResult fraction
+    float point;      // +0x04 CollisionBoxResult point
     Vector3 normal;
 };
 

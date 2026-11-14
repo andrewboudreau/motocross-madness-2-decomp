@@ -336,7 +336,7 @@ int EventManager::CreatePodiumScene() {
             character->SetMotion(podiumMotions[place - 1]);
             character->motionTime = 0.0f;
             if (racer) {
-                UnknownPodiumTextureEntry** texture = ((UnknownPodiumRacer*)racer)->riderCharacter->modelNode->field_0x290;
+                UnknownPodiumTextureEntry** texture = ((UnknownPodiumRacer*)racer)->riderCharacter->modelNode->materialTable;
                 if (texture)
                     PODIUM_MODEL(character)->ReplaceMaterialTexture(0, (*texture)->field_0x2c, &context);
             }

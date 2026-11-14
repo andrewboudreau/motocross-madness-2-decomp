@@ -29,8 +29,8 @@ struct SoultreeTextureOptions {
     ManagedTextureGroup* opaqueTextures; // textures without alpha
     ManagedTextureGroup* alphaTextures; // textures with alpha
     int format;                               // format; 1555 when colour keyed
-    int field_0x10;
-    int field_0x14;
+    int alphaFormat;
+    int halvings;
 };
 
 // 0x0050a590 (Texmap.cpp, cdecl): loads the texture file `name`; 0 on failure.

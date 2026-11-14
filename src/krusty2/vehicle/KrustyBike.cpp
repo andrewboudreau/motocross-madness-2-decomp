@@ -415,8 +415,8 @@ void KrustyBike::ClearCrashState()
     UseBikeAndRiderCollision();
     for (int i = 0; i < collisionPointCount; i++) {
         KbChild* point = ((KbChild**)collisionPoints)[i];
-        if (point->field_0x4)
-            point->field_0xa4 = 0;
+        if (point->ownerNode)
+            point->inContact = 0;
     }
     crashState = 0;
     crashTimer = 0;

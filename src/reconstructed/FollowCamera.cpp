@@ -511,7 +511,7 @@ bool FollowCamera::IsTargetViewHeld() {
 // already sit on (within 0.01) is fed through slot 44 and reported as
 // settled; +0x277 records that the check ran. The result is one variable
 // joined at a single return: retail's disabled exit stores the zero from al
-// (`xor al, al; mov [esi+0x277], al`), which `field_0x277 = false;
+// (`xor al, al; mov [esi+0x277], al`), which `settleChecked = false;
 // return false;` does not give (VC6 stores the immediate).
 bool FollowCamera::TrySettleOnPoint(const Vector3& point, bool enable, bool force) {
     bool result;

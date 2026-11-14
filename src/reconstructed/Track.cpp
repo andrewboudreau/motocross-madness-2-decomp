@@ -107,7 +107,7 @@ struct TrackProbe {
     TrackVec3 direction;            // +0x0c
     TrackVec3 halfExtents;          // +0x18
     float width;                    // +0x24, as BikeRaceNode.h
-    float field_0x28;               // 150 after loading
+    float height;                   // +0x28 RaceGate::height; 150 after loading
     TrackPos pos;                   // +0x2c
 };
 
@@ -314,12 +314,12 @@ int Track::LoadTrack(FileStream* stream, void* start, void* finish, int* hasStar
     DebugFree(nodes, __FILE__, 315);
     if (*hasStart) {
         TrackProbe* probe = (TrackProbe*)start;
-        probe->field_0x28 = 150.0f;
+        probe->height = 150.0f;
         ClosestPointOnTrack(*(Vector3*)&probe->centre, &probe->pos, 0);
     }
     if (*hasFinish) {
         TrackProbe* probe = (TrackProbe*)finish;
-        probe->field_0x28 = 150.0f;
+        probe->height = 150.0f;
         ClosestPointOnTrack(*(Vector3*)&probe->centre, &probe->pos, 0);
     }
     {

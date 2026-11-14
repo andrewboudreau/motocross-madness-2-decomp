@@ -9,7 +9,7 @@ DirtSprayParticleEmitter::DirtSprayParticleEmitter(int flags) : GameObject(flags
     int i;
     firstUpdate = 1;
     particleLifetime = 750.0f;
-    field_0x3c = 1.0f;
+    speed = 1.0f;
     field_0x38 = 6.0f;
     emitRate = 200.0f;
     position.x = 0;
@@ -21,7 +21,7 @@ DirtSprayParticleEmitter::DirtSprayParticleEmitter(int flags) : GameObject(flags
     previousPosition = position;
     emitRemainder = 0;
     field_0x68 = 0;
-    field_0x5c = 0;
+    previousSpeed = 0;
     active = 0;
     nextFrame = 0;
     manager = 0;
@@ -102,7 +102,7 @@ int DirtSprayParticleEmitter::Tick(float dt)
             randomTableIndex++;
             if (randomTableIndex > 0x100) randomTableIndex = 0;
         }
-        field_0x5c = field_0x3c;
+        previousSpeed = speed;
     }
     return 1;
 }

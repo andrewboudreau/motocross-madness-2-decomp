@@ -48,7 +48,7 @@ public:
     virtual int DrawIndexedPrimitive(int primitive, int format, void* vertices, int vertexCount,
                                      unsigned short* indices, int indexCount, int flags) = 0;
 
-    void* field_0x04;
+    void* targetDisplay;
     GridCamera* camera;                        // +0x08 the camera the box test takes (0x00481de0)
 };
 
@@ -68,7 +68,7 @@ public:
 class GridVertexLighter {
 public:
     void FogVertices(GridVertex* vertices, int count);  // 0x00484f10 (ret 8)
-    int field_0x00;
+    int groundFog;
     int field_0x04;
     int field_0x08;
 };
@@ -304,7 +304,7 @@ public:
     virtual GridNode* CreateChildNode(FileStream* stream, int loadChildren, DrawableGridNode* parent,
                                       int level, int shift, int x, int z, int index,
                                       void* boundsMin, void* boundsMax) { return 0; }   // 0x004806e0
-    virtual void SelectTexture(float a) {}                // 0x004806f0 (shared)
+    virtual void SelectTexture(float distance) {}                // 0x004806f0 (shared)
     virtual void RequestTextureSize(int a) {}                  // 0x004806f0 (shared)
     virtual void ReadExtraData(FileStream* stream) {} // 0x004806f0 (shared)
     virtual void BindNodeTexture() {}                       // 0x0044d710 (shared)

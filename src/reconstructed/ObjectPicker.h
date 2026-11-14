@@ -26,7 +26,7 @@ struct UnknownPickCamera {
     Vector3 eyePosition;                      // +0x170 (Camera::eyePosition)
     unsigned char field_0x17c[0x198 - 0x17c];
     float focalLength;                        // +0x198
-    int field_0x19c;
+    int displayAspect;
     unsigned int viewportX;                   // +0x1a0 viewport x
     unsigned int viewportY;                   // +0x1a4 viewport y
     unsigned int viewportWidth;               // +0x1a8 viewport width

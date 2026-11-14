@@ -524,7 +524,7 @@ void Vehicle::SettleBodyToWheels(Vec3* settleUp, int keepPlacement)
         LoadBodyAxes();
         modelNode->GetPositionIn(0, &position);
         if (keepPlacement == 0) {
-            float height = top->field_0x228 - top->wheelPosition.y + top->groundPoint.y;
+            float height = top->bodyPositionY - top->wheelPosition.y + top->groundPoint.y;
             position.y = height;
             modelNode->SetPosition(position.x, height, position.z);
         }
@@ -1954,11 +1954,11 @@ void Vehicle::AccumulateWheelContacts(Vec3* force, Vec3* localTorque, float torq
         for (int i = 0; i < wheelCount; i++) {
             VehicleWheel* wheel = wheelList[i];
             if (wheel->inContact) {
-                if (wheel->field_0x16c == 2) {
+                if (wheel->contactState == 2) {
                     localTorque->x = torqueScale * localTorque->x;
                     localTorque->y = torqueScale * localTorque->y;
                     localTorque->z = torqueScale * localTorque->z;
-                    wheel->field_0x16c = 0;
+                    wheel->contactState = 0;
                 }
                 if (wheel->aux) {
                     *force += wheel->driveForce;
@@ -1992,9 +1992,9 @@ void Vehicle::ResetWheelContacts()
         wheel->tangentCos = 0.0f;
         wheel->shockExtending = 0;
         wheel->sceneNode->GetPositionIn(0, &wheel->nodePosition);
-        wheel->field_0x16c = 0;
+        wheel->contactState = 0;
         wheel->frictionDirection = kVec3Zero;
-        wheel->field_0x114 = kVec3Zero;
+        wheel->rotationalVelocity = kVec3Zero;
         wheel->penetration = -999.0f;
         wheel->tangentSpeed = 0;
         wheel->spinSpeed = 0;
@@ -2103,7 +2103,7 @@ GameObject* Vehicle::LoadVehicle(int context, const char* engineName, const char
                                                    startForward, startUp, terrainProbe, linkedObject,
                                                    weight, wheelCap + extraContacts, attachmentSlots,
                                                    trackObject, 0.02f, 100, 0.001f, 0.1f, 3,
-                                                   trackObject ? ((VehicleTrackView*)trackObject)->field_0x88 : 0,
+                                                   trackObject ? ((VehicleTrackView*)trackObject)->probeMask : 0,
                                                    createCollision);
     if (particleManager) {
         sparkEmitter = reinterpret_cast<VehicleSparkEmitter*>(

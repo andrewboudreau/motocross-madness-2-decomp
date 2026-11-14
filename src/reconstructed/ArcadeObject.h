@@ -25,7 +25,7 @@ typedef void (*UnknownPickCallback)(CollisionObject* self, CollisionObject* othe
 struct ArcadeCameraView {
     unsigned char field_0x000[0xac];
     float cameraMatrix[4][4];                 // +0x0ac camera matrix (rows of 4)
-    unsigned char field_0x0ec[0x16c - 0xec];
+    unsigned char screenMatrix[0x16c - 0xec];  // +0xec Camera screenMatrix[2] (bytes kept)
     float fieldOfView;                        // +0x16c field of view, degrees
     Vector3 cameraPosition;                   // +0x170 position
     unsigned char field_0x17c[0x198 - 0x17c];

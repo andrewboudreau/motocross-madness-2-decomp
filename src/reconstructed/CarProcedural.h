@@ -50,7 +50,7 @@ public:
     void SetAxesPtr(const Vector3* axisZ, const Vector3* axisY, int orthogonalize, int keepZ); // 0x004fbd70
 
     int field_0x04;
-    int field_0x08;
+    int objectTypeId;   // +0x08 QuadTreeObject objectTypeId (a char there)
 };
 
 // D3DIMSoultreeObject (constructor 0x0043f160, new 0x2d8 at line 0x63): a

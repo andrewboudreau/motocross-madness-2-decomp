@@ -82,7 +82,7 @@ public:
 
     // gameui.cpp (provisional names).
     UIControl* SetupControl(UIControl* control, int group, int region); // 0x0046a840
-    void SetShown(int value);    // 0x0046ea60
+    void SetShown(int shown);    // 0x0046ea60
     void EndControlDraw(void* dc);            // 0x0046eeb0: restores the font and releases `dc`
     int LoadDialogResource(const char* name); // 0x0046a8e0: the .dtm `name` from the resource manager
     int ReadDialogResource(void* stream, int offset); // 0x0046a920
@@ -110,7 +110,7 @@ public:
     // 0x0046ffc0: stores popupAlignment; the loader passes a popup's "DlgAlignV"
     // (TOP 8, BOTTOM 0x20, else 0x10) or'd with "DlgAlignH" (RIGHT 4, LEFT 1,
     // else 2); see samples/ui/GameUiNearMisses.cpp.
-    void SetPopupAlignment(int value);
+    void SetPopupAlignment(int alignment);
     void SetBackground(void* background); // 0x0046ffd0: the background, also for its parents
     void SetModalPause(int pause, int dim, CameraRect* rect); // 0x00470070
     void GrabBackground(int dim, CameraRect* rect); // 0x004700b0: grabs the screen behind it

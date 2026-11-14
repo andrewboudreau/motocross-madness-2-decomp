@@ -25,7 +25,7 @@ GameCursor::GameCursor(int flags) : GameObject(flags) {
     hotSpotY = 1;
     backgroundImage = 0;
     backgroundRegion = -1;
-    field_0x4c = 0;
+    redrawFrames = 0;
     drawScale = 1.0f;
 }
 
@@ -196,7 +196,7 @@ int GameCursor::RenderPost3D() {
     if (backgroundImage) {
         PCTextureMap* frame = currentFrame ? (PCTextureMap*)currentFrame : cursorTexture;
         backgroundImage->DrawImageRect(frame, s_destination.left, s_destination.top, (CameraRect*)&s_source,
-                                          (frame->usesColorKey != 0) + 0x10, backgroundRegion, 0, &field_0x4c, 0);
+                                          (frame->usesColorKey != 0) + 0x10, backgroundRegion, 0, &redrawFrames, 0);
     } else if (currentFrame) {
         if (((PCRenderTarget*)renderContext)->renderSurface->Blt(&s_destination, ((PCTextureMap*)currentFrame)->systemSurface, &s_source,
                 (((PCTextureMap*)currentFrame)->usesColorKey ? 0x8000 : 0) + 0x1000000, 0))

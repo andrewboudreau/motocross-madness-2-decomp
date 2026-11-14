@@ -23,9 +23,9 @@ PeakHold g_visibilityTickStat(5000);        // 0x0068ab90
 QuadTree* g_collisionQuadTree;  // 0x0068aba4
 
 struct VisibilityGlobalEntry {   // 0x20-byte entries at 0x0068a774, reset by the ctor
-    int field_0x00;
-    int field_0x04;
-    int field_0x08;
+    int reserved;
+    int color;
+    int specular;
     char field_0x0c[0x14];
 };
 extern VisibilityGlobalEntry g_visibilityEntries[16];
@@ -55,9 +55,9 @@ VisibilityQuadTree::VisibilityQuadTree(int flags)
     liveNodeCount = 0;
     rootNode = 0;
     for (int i = 0; i < 16; i++) {
-        g_visibilityEntries[i].field_0x04 = 0x2000ffff;
-        g_visibilityEntries[i].field_0x08 = 0;
-        g_visibilityEntries[i].field_0x00 = 0;
+        g_visibilityEntries[i].color = 0x2000ffff;
+        g_visibilityEntries[i].specular = 0;
+        g_visibilityEntries[i].reserved = 0;
     }
 }
 

@@ -74,7 +74,7 @@ void QuadTree::Reset()
 }
 
 // Tier 3 semantics: field_0x40..0x4c = world rectangle (x0, x1, z0, z1), field_0x50/0x54
-// its extents, field_0x0c = 32768 / max extent (quantization scale), field_0x10[] = cell
+// its extents, quantScale = 32768 / max extent (quantization scale), cellSizes[] = cell
 // size per depth (0x4000 >> depth) until the cell is no larger than minCell in grid units.
 void QuadTree::Init(float x0, float z0, float x1, float z1, float minCell)
 {
@@ -84,7 +84,7 @@ void QuadTree::Init(float x0, float z0, float x1, float z1, float minCell)
     worldMinZ = z0;
     worldMaxZ = z1;
     // The extents are kept in locals as well (chained assignment): retail stores z1 - z0 with
-    // fst into field_0x54 and spills the same value for the compare (0x4dc6c0).
+    // fst into extentZ and spills the same value for the compare (0x4dc6c0).
     float spanX = extentX = x1 - x0;
     float spanZ = extentZ = z1 - z0;
 
@@ -115,7 +115,7 @@ void QuadTree::Init(float x0, float z0, float x1, float z1, float minCell)
 // Tier 3 name: turns a world rectangle (x0, z0)-(x1, z1) into a "locational code" (0xf =
 // outside the tree).  Decoded behavior: coordinates are made relative to the tree origin
 // (field_0x40/0x48), rejected if outside [0, extent], clamped, quantized with
-// field_0x0c (32768 / extent), and the depth d is the deepest level whose cell size still
+// quantScale (32768 / extent), and the depth d is the deepest level whose cell size still
 // contains the rectangle.  Bits 0..3 = depth, 4..7 = flags (0x10 always, 0x20 if z range
 // is not a single cell, 0x40 if x range is not, 0x80 if both).  NOTE the retail clamps
 // compare against field_0x40/0x44/0x48/0x4c (the world min/max) even though the values are
@@ -185,7 +185,7 @@ unsigned int QuadTree::ComputeCode(float x0, float z0, float x1, float z1)
     return (((ix0 << 12) | iz0) << 5) | flags | depth;
 }
 
-// Tier 3: widens this node's Y interval (field_0x0c = centre, field_0x10 = half extent)
+// Tier 3: widens this node's Y interval (yCenter = centre, yHalfExtent = half extent)
 // to include [y0, y1]; skipped when y0 >= y1.  Arithmetic: c = (hi + lo) * 0.5,
 // h = (hi - lo) * 0.5 (0x4dcb92..0x4dcbae).
 inline void QuadTreeNode::ExtendY(float y0, float y1)
@@ -203,7 +203,7 @@ inline void QuadTreeNode::ExtendY(float y0, float y1)
 }
 
 // Same as QuadTreeNode::ExtendY on the root node; retail reloads the root pointer for the
-// last store (0x4dce17), which is reproduced by writing the store through field_0x5c.
+// last store (0x4dce17), which is reproduced by writing the store through rootNode.
 inline void QuadTree::ExtendRootY(float y0, float y1)
 {
     QuadTreeNode* node = rootNode;
@@ -509,7 +509,7 @@ QuadTreeResultLink* QuadTreeNode::GatherAll(QuadTreeResultLink* tail)
 }
 
 // Tier 3 name.  Starts an AABB query over the world rectangle (x0, z0)-(x1, z1): builds the
-// list of overlapping nodes in field_0x70 and arms the iteration state.  Returns 0 when the
+// list of overlapping nodes in queryListHead and arms the iteration state.  Returns 0 when the
 // rectangle misses the tree or a query is already active (flag bit 0).
 int QuadTree::BeginQuery(float x0, float z0, float x1, float z1)
 {
@@ -552,7 +552,7 @@ int QuadTree::BeginQuery(float x0, float z0, float x1, float z1)
 }
 
 // Tier 3 name.  Iterates the objects of the nodes found by BeginQuery, returning each object
-// once (the per-query stamp in QuadTreeObject::field_0x04 is compared with field_0x6c).
+// once (the per-query stamp in QuadTreeObject::queryStamp is compared with queryStamp).
 QuadTreeObject* QuadTree::NextObject()
 {
     if (!(stateFlags & 1))
@@ -597,7 +597,7 @@ static int CompareObjectKey(const void* a, const void* b)
 }
 
 // Tier 3 name.  Like NextObject, but gathers the objects of one node at a time into the
-// sorted stack field_0x84 (sorted by field_0x06) and pops them from the back.
+// sorted stack sortedStack (sorted by sortKey) and pops them from the back.
 QuadTreeObject* QuadTree::NextObjectSorted()
 {
     if (!(stateFlags & 1))
@@ -676,7 +676,7 @@ void QuadTree::EndQuery()
 }
 
 // Tier 3 name.  Appends the not-yet-stamped objects of an item-block chain to the result
-// array field_0x864 (capacity field_0x870, count field_0x86c).
+// array resultArray (capacity resultCapacity, count resultCount).
 void QuadTree::CollectItems(QuadTreeItemLink* link)
 {
     for (; link; link = link->next) {

@@ -135,7 +135,7 @@ struct TerrainCell {
     char pad_0x28[0x38 - 0x28];
     TerrainCellOwner* owner;                                   // +0x38
     char pad_0x3c[4];
-    int field_0x40;                                            // +0x40 nonzero lets TerrainShadow slot 30 emit the cell's vertices
+    int childMask;                                             // +0x40 nonzero lets TerrainShadow slot 30 emit the cell's vertices
 };
 
 class Terrain;
@@ -220,7 +220,7 @@ struct TerrainDisplay {
     TerrainDirectDraw* directDraw;                              // +0x190
 };
 struct TerrainHost {
-    int field_0x00;
+    int vtable;
     TerrainDisplay* display;                                    // +0x04
     TerrainSharedState* sharedState;  // +0x08 pointer to the 0x220-byte block copied to g_terrainSharedState by slot 23
 };

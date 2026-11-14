@@ -65,7 +65,7 @@ void VCR::SetFirstPosition(int position){int n=Ring(this);Begin(20,n,position);F
 int VCR::GetFirstPosition(){int n=Ring(this);Begin(21,n,firstPosition);Finish();return firstPosition;}
 void VCR::ResetSlots(){int n=Ring(this);Begin(22,n);Finish();writeCursor=playCursor=fillCursor=0;slots[0].state=0;}
 int VCRFile::Open(char* name,char* mode){int n=File(this);int which=Which(name,world.names[0],world.names[1]);int kind=!strcmp(mode,"wb")?0:!strcmp(mode,"rb+")?1:!strcmp(mode,"rb")?2:-1;if(kind<0)Fail(90);Event& e=Begin(30,n,which,kind);if(name){e.size=strlen(name)+1;if(e.size>512)Fail(91);memcpy(e.bytes,name,e.size);}Finish();return scenario.fail&1?-1:scenario.handle;}
-void VCRFile::Close(int handle){int n=File(this);Begin(31,n,handle);Finish();entries[0].field_0x00=0;}
+void VCRFile::Close(int handle){int n=File(this);Begin(31,n,handle);Finish();entries[0].isOpen=0;}
 int VCRFile::Read(void* buffer,int size,int count,int handle){int n=File(this);int role=Buffer(buffer);if(count!=1 || size<0 || size>1024)Fail(92);Begin(32,n,role,size,count,handle);Finish();++observed.reads;
     if(!size)return 0;
     if((role==20 && (scenario.fail&4)) || (role>=10 && role<12 && (scenario.fail&16)) || ((role<4 || role==-1) && (scenario.fail&8)))return 0;

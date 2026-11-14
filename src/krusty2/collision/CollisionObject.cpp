@@ -28,7 +28,7 @@
 //   Broadphase helpers: SphereContainsPointXZ (0x43a1e0, point-in-circle in XZ),
 //     BoundingSpheresOverlap (0x43a270). Vector helpers: CollisionRejectFrom
 //     (0x43b190, a - proj_b a), CollisionLength (0x435ec0), CollisionDivide (0x43c890).
-//   Narrow phase (CollisionShapeTests.cpp, tier 3 names; shape type = field_0x50:
+//   Narrow phase (CollisionShapeTests.cpp, tier 3 names; shape type = shapeType:
 //     0 hull/oriented box, 1 model = array of hulls, 2 static mesh, 3 capsule, 4 sphere):
 //     TestAgainst 0x436430 filters and picks TestHull/Model/MeshAgainst (0x438b90/0x438c10/0x438c90);
 //     the first two jump-table into HullVs{Hull 0x436720, Model 0x436e50, Capsule 0x437aa0,
@@ -48,8 +48,8 @@ struct CollisionHullElement : CollisionHullBody {
 };
 struct CollisionModelShapeData {   // type 1: count + array of CollisionHullShape (stride 0x198)
     int hullCount;
-    void* field_0x04;
-    void* field_0x08;
+    void* elementEnabled;
+    void* elementHighlight;
     char field_0x0c[8];
     CollisionHullElement* hulls;   // hull elements, 0x198 bytes each
 };
@@ -78,8 +78,8 @@ void CollisionModelShape_Free(void* shape) {
     for (int i = 0; i < model.hullCount; i++)
         CollisionHullShape_Free((CollisionHullShape*)&model.hulls[i]);
     operator delete(shapeData->hulls);
-    operator delete(shapeData->field_0x04);
-    operator delete(shapeData->field_0x08);
+    operator delete(shapeData->elementEnabled);
+    operator delete(shapeData->elementHighlight);
     operator delete(shapeData);
 }
 
@@ -268,7 +268,7 @@ void CollisionObject::ReadShape(void* node, CollisionFileStream* stream)
     }
     case 1: {
         CollisionModelBody* model = (CollisionModelBody*)operator new(0x120, __FILE__, 0x9f0);
-        model->field_0x10 = (int)node;
+        model->sceneNode = (int)node;
         shape = model;
         ReadModelShape(node, stream, model);
         break;
@@ -383,7 +383,7 @@ void CollisionObject::SetModelShape(void* nodeArg, int buildPointTrees, int swep
         if (reinterpret_cast<D3DIMSoultreeObject*>(node)->NodeMovesVertices(reinterpret_cast<SoultreeObject*>(list[i]), filter))
             model->elementCount++;
     }
-    model->field_0x10 = (int)node;
+    model->sceneNode = (int)node;
     model->elements = new(__FILE__, 0xf3) CollisionHullElement[model->elementCount];
     model->elementEnabled = (int*)operator new(model->elementCount * 4, __FILE__, 0xf4);
     model->elementHighlight = (int*)operator new(model->elementCount * 4, __FILE__, 0xf5);
@@ -663,7 +663,7 @@ int CollisionObject::OnControlPress(ControlEvent* a, InputButtonState* b)
 }
 
 // 0x00434a10: clears the hit state and (re)initialises the per-object query record that the
-// shape tests fill (allocated lazily at field_0x5c; 0x2c bytes for hulls/models, 0x14 for meshes).
+// shape tests fill (allocated lazily at contactRecord; 0x2c bytes for hulls/models, 0x14 for meshes).
 int g_CollisionScratchHits;                      // 0x00579060 (cleared here, tier 3 meaning)
 void SetCollisionBoxResult(CollisionBoxResult* record);    // sets g_CollisionBoxResult
 
@@ -842,7 +842,7 @@ int CollisionObject::TestMeshBounds(CollisionObject* other)
 //    draw 0x0047c270), and two children at +0x1c/+0x20, both recursed into.  A triangle
 //    leaf has three ushort vertex indices at +4/+6/+8 into a 12-byte vertex array and a
 //    normal at +0xc.  A point-tree leaf keeps its point at +4.
-//  * The trees are CollisionHullBody::field_0x188 / field_0x18c (CollisionShapeTests.h),
+//  * The trees are CollisionHullBody::triangleTree / pointTree (CollisionShapeTests.h),
 //    so CollisionBoxBounds is this node's box view.
 //  * Retail turns the second recursive call into a loop (VC6 tail-recursion
 //    elimination).  The source recurses into both children.
@@ -1530,7 +1530,7 @@ int CollisionObject::QueryCollisions()
 // Filter logic (decoded): other must be a different object with +0x70 set and bit 0 of the
 // byte at +0x31; then each side's list (ptr array +0x78, count +0x7c, mode +0x74) is
 // consulted: a listed partner is rejected when mode == 1, an unlisted partner is rejected
-// when mode == 0.  The survivor dispatches on this->field_0x50 to 0x438b90/0x438c10/0x438c90.
+// when mode == 0.  The survivor dispatches on this->shapeType to 0x438b90/0x438c10/0x438c90.
 int CollisionObject::TestAgainst(CollisionObject* other)
 {
     if (other == this)
@@ -1620,9 +1620,9 @@ int CollisionObject::TestModelAgainst(CollisionObject* other)
     return 0;
 }
 
-// 0x004379c0: hull vs sphere.  The sphere center is scaled by sphere->field_0x18 and moved
+// 0x004379c0: hull vs sphere.  The sphere center is scaled by sphere->centerScale and moved
 // to world space by the sphere's own matrix (+0x1c); the effective radius is
-// field_0x14 * radius.  The contact generator 0x00429570 does the rest.
+// radiusScale * radius.  The contact generator 0x00429570 does the rest.
 int CollisionObject::HullVsSphere(CollisionHullBody* hull, CollisionSphereShape* sphere)
 {
     CollisionVec3 localCenter = sphere->center * sphere->centerScale;
@@ -1637,9 +1637,9 @@ int CollisionObject::HullVsSphere(CollisionHullBody* hull, CollisionSphereShape*
         reinterpret_cast<QueryTreeNode*>(hull->pointTree), &hull->worldTransform, 0);
 }
 
-// 0x00437aa0: hull vs capsule.  Both capsule endpoints are scaled by capsule->field_0x24 and
+// 0x00437aa0: hull vs capsule.  Both capsule endpoints are scaled by capsule->endpointScale and
 // moved to world space by the capsule matrix (+0x28); effective radius is
-// field_0x20 * radius.  The contact generator 0x00429890 does the rest.
+// radiusScale * radius.  The contact generator 0x00429890 does the rest.
 int CollisionObject::HullVsCapsule(CollisionHullBody* hull, CollisionCapsuleShape* capsule)
 {
     CollisionVec3 ends[2];

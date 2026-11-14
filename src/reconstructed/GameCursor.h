@@ -54,7 +54,7 @@ public:
     ControlBinding* bindingY;          // +0x40 y
     BackgroundImage* backgroundImage;         // +0x44
     int backgroundRegion;                     // +0x48 background region, -1 when none
-    int field_0x4c;
+    int redrawFrames;
     float drawScale;                          // +0x50 scale of the destination's far corner (1.0)
     int cursorX;                              // +0x54 position, clamped to the target
     int cursorY;                              // +0x58

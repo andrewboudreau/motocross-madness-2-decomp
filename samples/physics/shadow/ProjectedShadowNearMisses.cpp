@@ -57,8 +57,8 @@ ProjectedShadow* ProjectedShadow::Init(ShadowRenderTarget* target, void* texture
         && texture->Create(0, 0x80, 0x80, 0x80, 0x80, surfaceFormat, surfaceFormat, 0, 8, 0, 0, 0,
                            formatA, formatB, 0, 0x80, 0xff00ff)) {
         texture->CreateTextureSurface(1, 0, 1);
-        field_0x60 = texture->pixels;
-        if (field_0x60) {
+        texturePixels = texture->pixels;
+        if (texturePixels) {
             texture->surface->PageLock(0);
 
             int savedHeight = Host()->height;

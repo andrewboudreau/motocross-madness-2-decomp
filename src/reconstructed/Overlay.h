@@ -53,7 +53,7 @@ public:
     TextureMap* sharedTexture;                // shared 256x256 texture (0x00689110)
     TextService* textService;          // +0x38 fonts for the overlay (0x0050ae80), or 0
     OverlayIconService* iconService;          // +0x3c
-    int field_0x40;
+    int pixelFormat;                          // +0x40 Attach copies the target's surfacePixelFormat
     TLVertex quadVertices[5];     // cleared by the constructor
     int scaleRect;                            // +0xe4 ctor 1, Attach's argument: LayOutQuad scales screenRect from 640x480 to the viewport
     OverlayRect screenRect;            // screen rectangle

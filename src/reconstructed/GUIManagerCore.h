@@ -101,7 +101,7 @@ public:
     void SetDialogDirectory(const char* directory); // 0x00485d70
     UIDialog* FindInputDialog();      // 0x00485df0: the dialog taking input
     Sound* FindSectionObject(const char* name); // 0x00485ec0: the opened dialog's section object
-    int SwapModalDialog(int value);     // 0x00485ee0: sets +0x2c, returns the old value
+    int SwapModalDialog(int dialog);     // 0x00485ee0: sets +0x2c, returns the old value
     void CreateBackground();                  // 0x00485ef0: creates the background
     void ReleaseBackground();             // 0x00485fc0: releases it
     void GrabBackground(int dim);      // 0x004860a0: grabs the screen as the background

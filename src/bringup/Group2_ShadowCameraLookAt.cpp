@@ -24,15 +24,15 @@ struct LookAtView {                  // the ShadowCameraProxy members touched he
     ShadowVec3 eyePosition;          // +0x170
     ShadowVec3 forward;              // +0x17c best guess: look direction (normalised)
     ShadowVec3 up;                   // +0x188 best guess: up direction (normalised)
-    int field_0x194;                 // +0x194 *c
+    int roll;                        // +0x194 *c
     char pad_0x198[0x1d0 - 0x198];
-    int field_0x1d0;                 // +0x1d0 0x0042e930: renderContext->+0x14 plus one
+    int projectionChangeFrames;      // +0x1d0 0x0042e930: renderContext->+0x14 plus one
 };
 
 // The render context's +0x14 counter read by 0x0042e930 (provisional view).
 struct LensRenderContextView {
     char pad_0x00[0x14];
-    int field_0x14;
+    int frameModulus;
 };
 
 void StoreNormalised(ShadowVec3* out, const ShadowVec3* v)
@@ -56,7 +56,7 @@ void SetLensScaleOf(ShadowCameraProxy* camera, float scale)
     LookAtView* view = (LookAtView*)camera;
     if (scale != 0.0)
         view->lensScale = scale;
-    view->field_0x1d0 = view->renderContext->field_0x14 + 1;
+    view->projectionChangeFrames = view->renderContext->frameModulus + 1;
 }
 
 } // namespace
@@ -71,7 +71,7 @@ void ShadowCameraProxy::SetLookAt(const ShadowVec3* eye, int a, int b, int c, fl
     if (b)
         StoreNormalised(&view->up, (const ShadowVec3*)b);
     if (c)
-        view->field_0x194 = *(const int*)c;
+        view->roll = *(const int*)c;
     if (fov)
         SetLensScaleOf(this, *fov);
 }

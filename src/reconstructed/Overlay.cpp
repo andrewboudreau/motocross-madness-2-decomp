@@ -21,7 +21,7 @@ static TextureMap* g_UnknownOverlayTexture689110;
 Overlay::Overlay(int flags, int layOutOnRender) : GameObject(flags) {
     overlayTexture = 0;
     backingTexture = 0;
-    field_0x40 = 0;
+    pixelFormat = 0;
     scaleRect = 1;
     memset(quadVertices, 0, sizeof(quadVertices));
     memset(&sourceRect, 0, sizeof(sourceRect));
@@ -63,7 +63,7 @@ Overlay* Overlay::Attach(RenderTarget* target, TextureMap* texture,
     overlayTexture = texture;
     this->scaleRect = scaleRect;
     // Through the Target() accessor VC6 allocates the registers differently.
-    field_0x40 = ((RenderTarget*)renderContext)->surfacePixelFormat;
+    pixelFormat = ((RenderTarget*)renderContext)->surfacePixelFormat;
     screenRect = *rect;
     if (source) {
         sourceRect = *source;

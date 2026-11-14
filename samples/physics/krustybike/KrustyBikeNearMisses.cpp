@@ -80,7 +80,7 @@ int KrustyBike::FindPlacement(int respawn, Vec3* outPosition, Vec3* outForward, 
     case 2:
     case 3:
         if (reinterpret_cast<KbGame*>(g_TrackGame)->raceMode || onTrack || aiKind || isGhost || respawn == 2 ||
-            reinterpret_cast<KbGame*>(g_TrackGame)->field_0xc50) {
+            reinterpret_cast<KbGame*>(g_TrackGame)->wreckResetOnTrack) {
             *outPosition = respawnPosition;
             *outForward = respawnHeading;
             position = *outPosition;

@@ -1139,7 +1139,7 @@ GameObject* SoultreePhysicsObject::LoadPhysicsModel(int renderContext, const cha
     SoultreePhysicsBaseObject::InitializePhysics(renderContext, 1, startPosition, startForward, startUp, terrainProbe, linkedObject, weight, contactCapacity, attachmentSlots,
                                                    trackObject, fixedStep, maxSteps, drag, elasticity, radius, shapeMode, restThreshold,
                                                    probeMask, createCollision);
-    if (desc && (desc->field_0x25 & 1)) {
+    if (desc && (desc->statusFlags & 1)) {
         reinterpret_cast<D3DIMSoultreeObject*>(SoultreePhysicsBaseObject::sceneNode)->SetUseLighting(1);
     }
 
@@ -1210,7 +1210,7 @@ GameObject* SoultreePhysicsCharacter::LoadPhysicsModel(int renderContext, int cr
     SoultreePhysicsBaseObject::InitializePhysics(renderContext, createCenterNode, startPosition, startForward, startUp, terrainProbe, linkedObject, weight, contactCapacity, attachmentSlots,
                                                    trackObject, fixedStep, maxSteps, drag, elasticity, 0.0f, 0, restThreshold, probeMask,
                                                    createCollision);
-    if (desc && (desc->field_0x25 & 1)) {
+    if (desc && (desc->statusFlags & 1)) {
         reinterpret_cast<D3DIMSoultreeObject*>(sceneNode)->SetUseLighting(1);
     }
 

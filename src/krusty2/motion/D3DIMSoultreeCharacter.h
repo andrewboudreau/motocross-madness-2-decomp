@@ -150,7 +150,7 @@ public:
 // sceneNode->SetUseLighting(1) call (tier 1 offset; the type and its meaning are tier 3).
 struct SoultreeLoadDesc {
     char field_0x00[0x25];
-    unsigned char field_0x25;
+    unsigned char statusFlags;
 };
 
 class D3DIMSoultreeCharacter : public Character {

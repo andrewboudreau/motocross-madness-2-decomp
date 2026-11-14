@@ -620,7 +620,7 @@ void PCTextureMap::SetColorKey(unsigned int color) {
         key = colorMapper->indexFrom555[Pack555(color)];
     else
         key = color;
-    colorKeyValue = field_0x38 = key;
+    colorKeyValue = colorKeyHighValue = key;
 }
 
 // 0x004c7ef0: replaces magenta in `surface` with `color` and makes `color`
@@ -640,7 +640,7 @@ int PCTextureMap::ColorKeyLevel(DirectDrawSurface* surface, unsigned int color) 
     if (mapFormat == 8888) {
         RgbaPixel from;
         RgbaPixel to;
-        colorKeyValue = field_0x38 = color;
+        colorKeyValue = colorKeyHighValue = color;
         from.red = 0xff;
         from.green = 0;
         from.blue = 0xff;
@@ -655,7 +655,7 @@ int PCTextureMap::ColorKeyLevel(DirectDrawSurface* surface, unsigned int color) 
     if (mapFormat == 888) {
         RgbPixel from;
         RgbPixel to;
-        colorKeyValue = field_0x38 = color;
+        colorKeyValue = colorKeyHighValue = color;
         from.red = 0xff;
         from.green = 0;
         from.blue = 0xff;
@@ -666,15 +666,15 @@ int PCTextureMap::ColorKeyLevel(DirectDrawSurface* surface, unsigned int color) 
                               desc.pitch / PixelFormatBytesPerPixel(888));
     }
     if (mapFormat == 555 || mapFormat == 1555) {
-        colorKeyValue = field_0x38 = Pack555(color);
+        colorKeyValue = colorKeyHighValue = Pack555(color);
         ReplaceColor16(desc.surface, 0x7c1f, Pack555(color), desc.width, desc.height,
                               desc.pitch / PixelFormatBytesPerPixel(mapFormat));
     } else if (mapFormat == 565) {
-        colorKeyValue = field_0x38 = Pack565(color);
+        colorKeyValue = colorKeyHighValue = Pack565(color);
         ReplaceColor16(desc.surface, 0xf81f, Pack565(color), desc.width, desc.height,
                               desc.pitch / PixelFormatBytesPerPixel(565));
     } else if (mapFormat == 8) {
-        colorKeyValue = field_0x38 = colorMapper->indexFrom555[Pack555(color)];
+        colorKeyValue = colorKeyHighValue = colorMapper->indexFrom555[Pack555(color)];
         ReplaceColor8(desc.surface, colorMapper->indexFrom555[0x7c1f],
                               colorMapper->indexFrom555[Pack555(color)], desc.width, desc.height, desc.pitch);
     }

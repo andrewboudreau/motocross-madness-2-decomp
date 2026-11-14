@@ -45,7 +45,7 @@
 // 1002): draws the track outline through a TrackListItem work list. The
 // control flow, the calls and the stores match once the node is read
 // through a reference to the list entry (`TrackNode*& node`, retail keeps
-// &list->field_0x04 in edi), the visited/unvisited branches are an if/else
+// &list->node in edi), the visited/unvisited branches are an if/else
 // and the segment walk is `if (segment) do ... while (segment)`. Left: the
 // frame (retail 0x8c bytes, here 0x74; retail groups the clip arrays as
 // both circles, both line ends, both hits, and keeps the work list and the
@@ -55,7 +55,7 @@
 
 // RadarOverlay::DrawRacers (0x0051bed0, 1160 bytes; 1129 match):
 // the map update. Every call, loop and store matches with the racer read
-// through `field_0x134[i]` each time, the own position through a reference,
+// through `racers[i]` each time, the own position through a reference,
 // the rim point as a Vector3 (its third slot is unused) and the chosen
 // screen point as the ternaries below. Left: retail allocates the
 // int-to-float slot of `outside` right above `x` (here it is the last

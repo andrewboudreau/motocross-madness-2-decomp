@@ -26,10 +26,10 @@ class UIDialog;
 // 8-byte record; KrustyUI keeps eight at +0x634 (the constructor's loop
 // clears both fields of each).
 struct UnknownKrustyUISlot {
-    UnknownKrustyUISlot() : field_0x00(0), field_0x04(0) {}
+    UnknownKrustyUISlot() : playerId(0), points(0) {}
 
-    int field_0x00;
-    char field_0x04;
+    int playerId;
+    char points;
 };
 
 // 0x54-byte record in KrustyUI's +0x60 list (appended by 0x0049ba70): a
@@ -135,6 +135,6 @@ public:
     int field_0x4ac;
     int userNameDialogOpen;                   // +0x4b0: set while UserNameDlg is open (DlgProcs.cpp)
     unsigned char field_0x4b4[0x634 - 0x4b4];
-    UnknownKrustyUISlot field_0x634[8];
+    UnknownKrustyUISlot gridOrder[8];         // +0x634: header +0x180, RaceSettings::gridOrder
     unsigned char field_0x674[0x1364 - 0x674];
 };

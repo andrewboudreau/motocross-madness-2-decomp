@@ -537,9 +537,9 @@ StatsOverlay* StatsOverlay::LoadPanel(RenderTarget* target, TextureMapManager* m
 }
 
 // 0x00519880
-int StatsOverlay::SetStatsSource(int value)
+int StatsOverlay::SetStatsSource(int source)
 {
-    statsSource = (StatsBikeRaceView*)value;
+    statsSource = (StatsBikeRaceView*)source;
     return 1;
 }
 

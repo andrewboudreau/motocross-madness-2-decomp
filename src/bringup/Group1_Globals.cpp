@@ -41,9 +41,9 @@ ParticleUVRect g_particleCellUVs[61];
 // best guess: two separate arrays (C++ cannot alias them); DrawBox's debug lines then use
 // zero colours.  The layouts repeat VisibilityQuadTree.cpp's local declarations.
 struct VisibilityGlobalEntry {
-    int field_0x00;
-    int field_0x04;
-    int field_0x08;
+    int reserved;
+    int color;
+    int specular;
     char field_0x0c[0x14];
 };
 struct VisibilityBoxVertex {
