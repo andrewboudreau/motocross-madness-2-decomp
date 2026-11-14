@@ -1,6 +1,6 @@
 """HandleReceivedMessage 0x004afa90, the network message dispatcher (tools/emu_diff.py case).
 
-Linked from samples/net/NetThreadNearMisses.cpp. The network interface (g_TrackGame
+Linked from src/reconstructed/NetThread.cpp. The network interface (g_TrackGame
 0x0056e26c +8) is a fresh block with the offsets retail reads: localPlayer +0x0c, isHost
 +0x10, connectionMode +0x18 (3 = routed through the host in some runs), the message ring
 +0x34 (0x8f4-byte records: type +0, from +4, size +0x10, data +0x14), ringFull +0x38,
@@ -31,7 +31,7 @@ import struct
 
 RETAIL_VA = 0x004afa90
 SYMBOL = '?HandleReceivedMessage@@YAXPAEIHHI@Z'
-SOURCE = 'samples/net/NetThreadNearMisses.cpp'
+SOURCE = 'src/reconstructed/NetThread.cpp'
 TRACK_GAME = 0x0056e26c
 DUPLICATE_TOGGLE, DUPLICATE_FILTER = 0x006886e0, 0x006886e4
 ENTER_CS_IAT, LEAVE_CS_IAT = 0x0055025c, 0x00550284

@@ -10301,6 +10301,15 @@ CASES = [
         'reason': 'between NetThread.cpp xrefs 0x4af9b8 and 0x4afc16; clears file static 0x6886e0',
     },
     {
+        'name': 'NetThread.cpp NetThread.cpp 0x4afa90 received-message dispatcher',
+        'bindings': 'src/reconstructed/NetThread.bindings.json',
+        'source': 'src/reconstructed/NetThread.cpp',
+        'symbol': '?HandleReceivedMessage@@YAXPAEIHHI@Z',
+        'target_va': '0x004afa90',
+        'target_size': 1252,
+        'reason': 'NetThread.cpp __FILE__ 0x56ec6c at lines 414/484; only caller is the receive loop 0x4af8e0',
+    },
+    {
         'name': 'AuralScape.cpp SoundGroup constructor',
         'bindings': 'src/reconstructed/AuralScape.bindings.json',
         'source': 'src/reconstructed/AuralScape.cpp',
