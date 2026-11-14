@@ -264,7 +264,7 @@ int ComputeTimeBehind(RaceStatusNode* list, int mode) {
 
 // 0x004e62d0
 int RankByScore(int keepRacing) {
-    UnknownEventScore scores[11];
+    RacerScoreRank scores[11];
     int iterator;
     int count;
     int i;
@@ -281,7 +281,7 @@ int RankByScore(int keepRacing) {
                 count++;
             }
         }
-        qsort(scores, count, sizeof(UnknownEventScore), CompareScoresDescending);
+        qsort(scores, count, sizeof(RacerScoreRank), CompareScoresDescending);
         for (i = 0; i < count; i++)
             scores[i].racer->finishPosition = i + 1;
         if (!keepRacing) {

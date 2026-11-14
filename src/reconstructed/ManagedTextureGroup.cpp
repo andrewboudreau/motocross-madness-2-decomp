@@ -196,7 +196,7 @@ void ManagedTextureGroup::RepackPages() {
 
 // 0x0050ee70: qsort order of ManagedTexture pointers, by +0xac descending,
 // then by address.
-int UnknownCompare50ee70(const void* first, const void* second) {
+int CompareTexturesByPlannedLevel(const void* first, const void* second) {
     ManagedTexture* a = *(ManagedTexture**)first;
     ManagedTexture* b = *(ManagedTexture**)second;
     int difference = b->plannedLevel - a->plannedLevel;
@@ -206,7 +206,7 @@ int UnknownCompare50ee70(const void* first, const void* second) {
 }
 
 // 0x0050eeb0: by (+0xa8 - +0xac) descending, then by address.
-int UnknownCompare50eeb0(const void* first, const void* second) {
+int CompareTexturesByLevelSurplus(const void* first, const void* second) {
     ManagedTexture* a = *(ManagedTexture**)first;
     ManagedTexture* b = *(ManagedTexture**)second;
     int difference = b->allocatedLevel - b->plannedLevel - a->allocatedLevel + a->plannedLevel;
@@ -216,7 +216,7 @@ int UnknownCompare50eeb0(const void* first, const void* second) {
 }
 
 // 0x0050ef00: by 0x005109b0 descending, then by address (descending).
-int UnknownCompare50ef00(const void* first, const void* second) {
+int CompareTexturesByUnhappiness(const void* first, const void* second) {
     ManagedTexture* a = *(ManagedTexture**)first;
     ManagedTexture* b = *(ManagedTexture**)second;
     float difference = -(a->Unhappiness() - b->Unhappiness());
@@ -423,7 +423,7 @@ static inline int FindPosition(ContainerList<ManagedTexture*>* list, ManagedText
 // of the least needy texture until the planned texels fit `budget`; a
 // texture already at level 5 is dropped (level -1). Returns the texels.
 int FitTexturesToBudget(ContainerList<ManagedTexture*>* list, int budget) {
-    qsort(list->m_data, list->m_count, sizeof(ManagedTexture*), UnknownCompare50ef00);
+    qsort(list->m_data, list->m_count, sizeof(ManagedTexture*), CompareTexturesByUnhappiness);
     int area = 0;
     for (int i = 0; i < list->m_count; i++)
         area += LevelArea(list->Get(i)->plannedLevel);

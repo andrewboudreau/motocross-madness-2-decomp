@@ -148,7 +148,7 @@ public:
 };
 
 // The lobby settings message (type 0xf, 0xb4 bytes) the host sends.
-struct UnknownLobbySettingsMessage {
+struct LobbySettingsMessage {
     int header;                               // +0x00 SendRaw (0x004ad280) writes the type byte here and the sequence at +0x02
     unsigned char minutes : 5;                // TrackGame+0x2eb0
     unsigned char eventType : 3;              // +0x2d74

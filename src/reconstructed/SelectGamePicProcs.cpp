@@ -105,7 +105,7 @@ struct ChatMessage {
 };
 
 // A player's state (type 2).
-struct UnknownPlayerStateMessage {
+struct PlayerStateMessage {
     unsigned char type;                       // +0x00 SendRaw (0x004ad280) writes the type byte here
     unsigned char ready;                      // +0x01: ready
     char bikeName[0x40];                      // +0x02: bike name (racer slot +0x40)
@@ -428,7 +428,7 @@ void MultiPlayerDlg::SendSettings() {
         if (optionsPage)
             optionsPage->UpdateBoundValues(1);
         TrackGame* game = g_TrackGame;
-        UnknownLobbySettingsMessage message;
+        LobbySettingsMessage message;
         message.minutes = (int)game->mode.raceSettings.timeLimitMinutes;
         message.eventType = game->mode.raceSettings.eventType;
         message.raceMode = game->mode.raceSettings.raceMode;
@@ -744,7 +744,7 @@ void MultiPlayerDlg::RemoveLobbyPlayer(int index) {
 int MultiPlayerDlg::OnNetworkMessage(int type, void* data, int from, int to, int flags) {
     int i;
     if (from && type == 2) {
-        UnknownPlayerStateMessage* state = (UnknownPlayerStateMessage*)data;
+        PlayerStateMessage* state = (PlayerStateMessage*)data;
         for (i = 0; i < 8; i++) {
             if (g_LobbyRemotePlayers[i].id != from)
                 continue;
@@ -824,7 +824,7 @@ int MultiPlayerDlg::OnNetworkMessage(int type, void* data, int from, int to, int
             FollowTrackChange();
         }
     } else if (from && type == 0xf) {
-        UnknownLobbySettingsMessage* settings = (UnknownLobbySettingsMessage*)data;
+        LobbySettingsMessage* settings = (LobbySettingsMessage*)data;
         g_TrackGame->mode.raceSettings.timeLimitMinutes = settings->minutes;
         g_TrackGame->mode.raceSettings.eventType = settings->eventType;
         g_TrackGame->mode.raceSettings.raceMode = settings->raceMode;
@@ -916,7 +916,7 @@ int g_UnknownGlobal689e04;
 void MultiPlayerDlg::HandleEvent(DialogEvent* event) {
     char name[0x10];
     char text[0x80];
-    UnknownPlayerStateMessage state;
+    PlayerStateMessage state;
     char prompt[1024];
     int i;
     switch (event->kind) {

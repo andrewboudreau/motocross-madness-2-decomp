@@ -502,7 +502,7 @@ int AuralScapeListener::SetVelocity(Vector3 velocity) {
 }
 
 // 0x00402d40: qsort order with bit 2 set first.
-static int UnknownCompare402d40(const void* a, const void* b) {
+static int CompareWaitingEmitters(const void* a, const void* b) {
     SoundEmitter* first = *(SoundEmitter**)a;
     SoundEmitter* second = *(SoundEmitter**)b;
     if (second->field_0x1a0_bit2 < first->field_0x1a0_bit2)
@@ -511,7 +511,7 @@ static int UnknownCompare402d40(const void* a, const void* b) {
 }
 
 // 0x00402d70: qsort order, farthest first.
-static int UnknownCompare402d70(const void* a, const void* b) {
+static int CompareEmittersFarthestFirst(const void* a, const void* b) {
     SoundEmitter* first = *(SoundEmitter**)a;
     SoundEmitter* second = *(SoundEmitter**)b;
     if (first->listenerDistance > second->listenerDistance)
@@ -658,11 +658,11 @@ void AuralScape::PickEmittersToPlay() {
             }
         }
     }
-    qsort(waitingEmitters.m_data, waitingEmitters.m_count, sizeof(SoundEmitter*), UnknownCompare402d40);
+    qsort(waitingEmitters.m_data, waitingEmitters.m_count, sizeof(SoundEmitter*), CompareWaitingEmitters);
 
     int available = SoundSystem()->soundCaps.freeHw3DAllBuffers + soundBudget - soundsLoaded;
     if (waiting3D > available) {
-        qsort(allEmitters.m_data, allEmitters.m_count, sizeof(SoundEmitter*), UnknownCompare402d70);
+        qsort(allEmitters.m_data, allEmitters.m_count, sizeof(SoundEmitter*), CompareEmittersFarthestFirst);
         for (i = 0; i < allEmitters.m_count; i++) {
             emitter = allEmitters.Get(i);
             if (!emitter->IsPlaying() && (emitter->emitterFlags & 0x10)) {

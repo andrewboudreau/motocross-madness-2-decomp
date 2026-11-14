@@ -21,7 +21,7 @@ extern "C" __declspec(dllimport) int __stdcall DrawTextA(void* dc, const char* t
 
 int StatsOverlay::DrawStandings()
 {
-    UnknownEventScore scores[11];
+    RacerScoreRank scores[11];
     char time[0x80];
     char label[0x80];
     int iterator;
@@ -47,7 +47,7 @@ int StatsOverlay::DrawStandings()
             count++;
         }
     }
-    qsort(scores, count, sizeof(UnknownEventScore), CompareScoresDescending);
+    qsort(scores, count, sizeof(RacerScoreRank), CompareScoresDescending);
     for (i = 0; i < count; i++) {
         if (scores[i].racer == view->localRacer) {
             own = i;

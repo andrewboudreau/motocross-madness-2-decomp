@@ -16,7 +16,7 @@
 
 // The 0x14-byte message 0x89 that a network player sends when it leaves
 // (EventManager slot 24 marks the sender done).
-struct UnknownPlayerLeftMessage {
+struct LeaveRaceMessage {
     int header;                               // +0x00
     char playerName[16];                      // +0x04
 };
@@ -44,7 +44,7 @@ void ExitDlg::HandleEvent(DialogEvent* event) {
             } else {
                 if (g_TrackGame->network) {
                     char name[128];
-                    UnknownPlayerLeftMessage message;
+                    LeaveRaceMessage message;
                     NetworkInterface* network = g_TrackGame->network;
                     int player = network->localPlayer;
                     network->GetPlayerName(player, name);

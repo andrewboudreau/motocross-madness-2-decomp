@@ -97,12 +97,12 @@ void PCLastRaceDlg::PayOutRace()
         racer->totalStats.points += racer->raceStats.points;
     }
 
-    UnknownProCircuitRank order[11];
+    CircuitPointsRank order[11];
     for (i = 0; i < circuit->racerCount; i++) {
         order[i].points = circuit->racers[i].raceStats.points;
         order[i].racer = i;
     }
-    qsort(order, circuit->racerCount, sizeof(UnknownProCircuitRank), CompareRankPoints);
+    qsort(order, circuit->racerCount, sizeof(CircuitPointsRank), CompareRankPoints);
     for (i = 0; i < circuit->racerCount; i++)
         circuit->racers[order[i].racer].raceStats.rank = i + 1;
     int rest = purse - paid;
@@ -113,7 +113,7 @@ void PCLastRaceDlg::PayOutRace()
         order[i].points = circuit->racers[i].totalStats.points;
         order[i].racer = i;
     }
-    qsort(order, circuit->racerCount, sizeof(UnknownProCircuitRank), CompareRankPoints);
+    qsort(order, circuit->racerCount, sizeof(CircuitPointsRank), CompareRankPoints);
     for (i = 0; i < circuit->racerCount; i++)
         circuit->racers[order[i].racer].totalStats.rank = i + 1;
 }

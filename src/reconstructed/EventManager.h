@@ -13,20 +13,20 @@ struct UnknownKrustyBikeView;
 class Camera;
 
 // 8-byte record sorted with 0x0045e930.
-struct UnknownEventRanking {
+struct RacerTimeRank {
     UnknownEventRacer* racer;
     float value;
 };
 
 // 8-byte record sorted with TrackOverlay's 0x005199f0 (higher value first).
-struct UnknownEventScore {
+struct RacerScoreRank {
     float value;
     UnknownEventRacer* racer;
 };
 int CompareScoresDescending(const void* a, const void* b); // cdecl 0x005199f0
 
 // 16-byte record sorted with 0x0045d3d0.
-struct UnknownEventStanding {
+struct RacerStanding {
     int points;                                    // the result's points (EventManager.cpp)
     float field_0x04;
     float field_0x08;
@@ -75,8 +75,8 @@ struct UnknownPodiumSoultree {
 // it once when +0x3c is set.
 void EndNetworkGame();  // 0x004aef40
 
-struct UnknownEventEntry {
-    UnknownEventEntry();                           // 0x0045c830 (resets through 0x0045c840)
+struct RacerResult {
+    RacerResult();                           // 0x0045c830 (resets through 0x0045c840)
     void Reset();                  // 0x0045c840: reset
 
     // 0x0045c8b0: copies the racer's id, name and the fields noted below
@@ -169,7 +169,7 @@ public:
     int allRacersFinished;                         // +0x44: every racer has +0x7a4 or +0x4a0 set (0x0045eef0)
     unsigned char racesRun;                        // +0x48: RankRacers counts mode-2 races; dialogs show it as "%d/%d"
     int resultCount;                               // +0x4c: entries filled by 0x0045e9d0
-    UnknownEventEntry results[11];                 // +0x50: one per racer, copied by RankRacers
+    RacerResult results[11];                 // +0x50: one per racer, copied by RankRacers
     float endTimer;                                // +0x3c0: seconds since a racer finished (0x0045eef0); the "End Timer" debug row (TrackOverlay.cpp)
     Vector3 podiumPosition;                        // +0x3c4: where 0x0045d480 places the podium; characters stand at offsets from it
     ArcadeObject* podiumObject;                     // the podium (0x0045d480)

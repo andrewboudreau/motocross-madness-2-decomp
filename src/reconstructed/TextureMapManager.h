@@ -31,9 +31,9 @@ public:
 };
 
 // qsort comparators of ManagedTexture pointers (TextureCache.cpp).
-int UnknownCompare50ee70(const void* first, const void* second);
-int UnknownCompare50eeb0(const void* first, const void* second);
-int UnknownCompare50ef00(const void* first, const void* second);
+int CompareTexturesByPlannedLevel(const void* first, const void* second);
+int CompareTexturesByLevelSurplus(const void* first, const void* second);
+int CompareTexturesByUnhappiness(const void* first, const void* second);
 
 // 0x0050d800 (cdecl): fits a size list's planned levels into `budget` texels.
 int FitTexturesToBudget(ContainerList<ManagedTexture*>* list, int budget);

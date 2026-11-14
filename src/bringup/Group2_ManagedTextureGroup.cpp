@@ -165,7 +165,7 @@ void ManagedTextureGroup::RepackWholePages() {
         }
     }
 
-    qsort(growingTextures.m_data, growingTextures.m_count, sizeof(ManagedTexture*), UnknownCompare50eeb0);
+    qsort(growingTextures.m_data, growingTextures.m_count, sizeof(ManagedTexture*), CompareTexturesByLevelSurplus);
     int smallest = 0x7fffffff;
     if (growingTextures.m_count > 0)
         smallest = LevelArea(growingTextures.Get(0)->plannedLevel);
@@ -205,7 +205,7 @@ void ManagedTextureGroup::RepackWholePages() {
         managed->ReleasePage();
     }
 
-    qsort(unplacedTextures.m_data, unplacedTextures.m_count, sizeof(ManagedTexture*), UnknownCompare50ee70);
+    qsort(unplacedTextures.m_data, unplacedTextures.m_count, sizeof(ManagedTexture*), CompareTexturesByPlannedLevel);
     int levels[9];
     memset(levels, 0, sizeof(levels));
     for (i = 0; i < unplacedTextures.m_count; i++)
@@ -357,7 +357,7 @@ void ManagedTextureGroup::RepackWithPartialBlits() {
         managed = static_cast<ManagedTexture*>(managedTextures.Next());
     }
 
-    SortTextures(&usedTextures, UnknownCompare50ef00);
+    SortTextures(&usedTextures, CompareTexturesByUnhappiness);
     int texels = 0;
     int i;
     for (i = 0; i < usedTextures.m_count; i++) {
@@ -506,7 +506,7 @@ void ManagedTextureGroup::RepackWithPartialBlits() {
         }
     }
     cachePages.AppendList(&emptied);
-    SortTextures(&usedTextures, UnknownCompare50ee70);
+    SortTextures(&usedTextures, CompareTexturesByPlannedLevel);
     if (usedTextures.m_count > 0) {
         texture = cachePages.Last();
         while (usedTextures.m_count > 0 && usedTextures.Get(0)->plannedLevel == 8) {

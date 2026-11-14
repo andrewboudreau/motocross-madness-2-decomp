@@ -32,7 +32,7 @@ int CompareCashDescending(const void* a, const void* b);
 void OpenCareerDialog();
 
 // A view of EventManager's 0x50-byte race entries (EventManager.h's
-// UnknownEventEntry) as the results code reads them: +0x34..+0x3c are loaded
+// RacerResult) as the results code reads them: +0x34..+0x3c are loaded
 // as floats.
 struct UnknownProCircuitResult {
     int racer;                                // +0x00: the circuit racer
@@ -47,12 +47,12 @@ struct UnknownProCircuitResult {
 };
 
 // One row of the rankings 0x004d8c40 sorts (with 0x004d8c20).
-struct UnknownProCircuitRank {
+struct CircuitPointsRank {
     int points;                               // +0x00: points
     int racer;                                // +0x04: racer
 };
 
-// 0x004d8c20: qsort order of UnknownProCircuitRank rows, most points first.
+// 0x004d8c20: qsort order of CircuitPointsRank rows, most points first.
 int CompareRankPoints(const void* a, const void* b);
 
 // The skinned models the garage shows (a bike model's +0xc0->+0x1a0, and the

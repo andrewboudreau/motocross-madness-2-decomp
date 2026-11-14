@@ -202,7 +202,7 @@ public:
     Win32Size rowExtent;              // extent of the first row (GetTextExtentPoint32A)
 };
 
-// 0x005199f0 (cdecl): qsort comparator for UnknownEventScore records
+// 0x005199f0 (cdecl): qsort comparator for RacerScoreRank records
 // (EventManager.h), larger value first.
 int CompareScoresDescending(const void* a, const void* b);
 

@@ -742,8 +742,8 @@ void PCLastRaceDlg::HandleEvent(DialogEvent* event)
 // 0x004d8c20
 int CompareRankPoints(const void* a, const void* b)
 {
-    int first = ((const UnknownProCircuitRank*)a)->points;
-    int second = ((const UnknownProCircuitRank*)b)->points;
+    int first = ((const CircuitPointsRank*)a)->points;
+    int second = ((const CircuitPointsRank*)b)->points;
     if (first > second)
         return -1;
     return first != second;

@@ -25,7 +25,7 @@ consumes it). `RankRacers` names the result block: `racesRun` (+0x48, a
 byte it increments in mode 2; the dialogs show it as "%d/%d" against the
 series length), `resultCount` (+0x4c) and `results` (+0x50, the 11 entries it
 fills). +0x3c0 keeps its placeholder name because TrackOverlay.cpp (render
-lane) reads it. In each `results` entry (`UnknownEventEntry`), `CopyFromRacer`
+lane) reads it. In each `results` entry (`RacerResult`), `CopyFromRacer`
 names `playerId` (+0x00, racer +0x11bc), `position` (+0x04, 99 for a racer
 with +0x4a0 set), `finished` (+0x20, racer +0x7a4) and `name` (+0x40, racer
 +0x5e0); `points` (+0x28) is what `AddChampionshipPoints` adds to.
@@ -109,7 +109,7 @@ Exact (31 calibration cases):
   GameObject slot 4 on the GraphicsTest base (+0xc) of each
   `CollisionObject`. The quadtree classes are TU-local views because the
   `src/krusty2` declarations cannot share a TU with these headers;
-- `UnknownEventEntry`'s constructor `0x0045c830`, reset `0x0045c840`
+- `RacerResult`'s constructor `0x0045c830`, reset `0x0045c840`
   (position 1, empty name from the shared `""` literal `0x00577738`) and
   racer copy `0x0045c8b0` (id, name truncated to 15 characters, the fields
   the header lists; with racer +0x4a0 set it clears them and sets position

@@ -203,7 +203,7 @@ class StatsStandingsTests(unittest.TestCase):
             layout.write_text('#include <stddef.h>\n#include "TrackOverlay.h"\n#include "TrackGame.h"\n'
                 '#include "BikeRaceCore.h"\n#include "PCTextureMap.h"\n#include "PCVideoCard.h"\n'
                 'typedef char Layout[(sizeof(StatsOverlay)==0x9b8 && sizeof(int(StatsOverlay::*)())==4 && '
-                'sizeof(BikeRace)==0x400 && sizeof(PCTextureMap)==0x80 && sizeof(UnknownEventScore)==8 && '
+                'sizeof(BikeRace)==0x400 && sizeof(PCTextureMap)==0x80 && sizeof(RacerScoreRank)==8 && '
                 'offsetof(StatsOverlay,largeFont)==0x11c && offsetof(StatsOverlay,rowRects)==0x130 && '
                 'offsetof(StatsOverlay,drawnRowText)==0x1b0 && offsetof(StatsOverlay,rowText)==0x5b0 && '
                 'offsetof(StatsOverlay,rowExtent)==0x9b0 && offsetof(TrackGame,quarryEvent)==0x55c && '
@@ -215,7 +215,7 @@ class StatsStandingsTests(unittest.TestCase):
                 'offsetof(TextureMap,usesColorKey)==0x30 && offsetof(PCTextureMap,systemSurface)==0x70 && '
                 'offsetof(PCTextureMap,textureSurface)==0x74 && '
                 'offsetof(PCVideoCard,partialTextureUploadResult)==0x5bc)?1:-1];\n')
-            # UnknownEventScore lives with the event callback declarations.
+            # RacerScoreRank lives with the event callback declarations.
             layout.write_text('#include "EventManager.h"\n'+layout.read_text())
             compile_source(layout,'layout')
             spec=json.loads((ROOT/'config/game_build.json').read_text())

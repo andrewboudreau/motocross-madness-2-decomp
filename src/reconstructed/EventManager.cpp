@@ -43,7 +43,7 @@ struct UnknownEventPlayerMessage {
     int player;                                    // +0x04: player (types 0xcc and 0x8e)
     int dpId;                                      // +0x08: DPSYS_DESTROYPLAYERORGROUP
 };
-struct UnknownEventRacerMessage {                  // type 0x86
+struct RacerResultsMessage {                  // type 0x86
     int header;                                    // +0x00: type byte and sequence
     char racerIndex;                               // +0x04: the sender's racer index
     char finished;                                 // +0x05: racer +0x7a4
@@ -57,12 +57,12 @@ struct UnknownEventRacerMessage {                  // type 0x86
 };
 
 // 0x0045c830
-UnknownEventEntry::UnknownEventEntry() {
+RacerResult::RacerResult() {
     Reset();
 }
 
 // 0x0045c840: an empty entry in position 1.
-void UnknownEventEntry::Reset() {
+void RacerResult::Reset() {
     playerId = 0;
     position = 1;
     fastestLap = 0;
@@ -85,7 +85,7 @@ void UnknownEventEntry::Reset() {
 // 0x0045c8b0: the racer's results. A racer with +0x4a0 set is listed in
 // position 99 with nothing else; in modes 0 and 4 every racer counts as
 // finished.
-void UnknownEventEntry::CopyFromRacer(UnknownEventRacer* racer) {
+void RacerResult::CopyFromRacer(UnknownEventRacer* racer) {
     playerId = racer->networkPlayerId;
     int length = strlen(racer->racerName);
     int count = length > 15 ? 15 : length;
@@ -309,8 +309,8 @@ void EventManager::WaitForRemoteRacers(float) {
 
 // 0x0045e930
 int CompareRankings(const void* a, const void* b) {
-    const UnknownEventRanking* first = (const UnknownEventRanking*)a;
-    const UnknownEventRanking* second = (const UnknownEventRanking*)b;
+    const RacerTimeRank* first = (const RacerTimeRank*)a;
+    const RacerTimeRank* second = (const RacerTimeRank*)b;
     if (first->value < second->value)
         return -1;
     if (first->value == second->value) {
@@ -349,8 +349,8 @@ void EventManager::AddChampionshipPoints(UnknownEventRacer* racer, int* points) 
 
 // 0x0045d3d0
 int CompareStandings(const void* a, const void* b) {
-    const UnknownEventStanding* first = (const UnknownEventStanding*)a;
-    const UnknownEventStanding* second = (const UnknownEventStanding*)b;
+    const RacerStanding* first = (const RacerStanding*)a;
+    const RacerStanding* second = (const RacerStanding*)b;
     if (first->points > second->points)
         return -1;
     if (first->points == second->points) {
@@ -424,7 +424,7 @@ int EventManager::OnNetworkMessage(int type, void* data, int from, int to, int f
             if (g_TrackGame->mode.raceSettings.raceMode == 2 && !FindRaceMode())
                 RemovePlayer(from);
         } else if (type == 0x86) {
-            UnknownEventRacerMessage* update = (UnknownEventRacerMessage*)data;
+            RacerResultsMessage* update = (RacerResultsMessage*)data;
             UnknownKrustyBikeView* view = FindRaceView();
             if (!view || g_TrackGame->uiInteractionBlocked)
                 return 0;
@@ -539,7 +539,7 @@ void EventManager::RemovePlayer(int player) {
         }
     }
     if (g_TrackGame->mode.racerCount)
-        qsort(results, g_TrackGame->mode.racerCount - 1, sizeof(UnknownEventEntry), CompareUnsigned);
+        qsort(results, g_TrackGame->mode.racerCount - 1, sizeof(RacerResult), CompareUnsigned);
 }
 
 // 0x0045f9a0: once, sends the local racer's state and then each AI racer's
@@ -552,7 +552,7 @@ void EventManager::SendRacerResults() {
         view->localRacer->totalRunningTime = FLT_MAX;
         view->localRacer->finishTimeStamp = 0x7ffffffe;
     }
-    UnknownEventRacerMessage message;
+    RacerResultsMessage message;
     message.score = view->localRacer->score;
     message.totalRunningTime = view->localRacer->totalRunningTime;
     message.fastestLap = view->localRacer->fastestLap;
@@ -744,7 +744,7 @@ void EventManager::RankRacers() {
     case 3:
     case 5: {
         if (g_TrackGame->playerCount > 1) {
-            UnknownEventRanking rankings[11];
+            RacerTimeRank rankings[11];
             int ranked = 0;
             int next = 0;
             while ((racer = reinterpret_cast<UnknownEventRacer*>(reinterpret_cast<BikeRace*>(view)->NextBike(&next))) != 0) {
@@ -769,7 +769,7 @@ void EventManager::RankRacers() {
         break;
     }
     case 0: {
-        UnknownEventScore scores[11];
+        RacerScoreRank scores[11];
         int scored = 0;
         int next = 0;
         while ((racer = reinterpret_cast<UnknownEventRacer*>(reinterpret_cast<BikeRace*>(view)->NextBike(&next))) != 0) {
@@ -793,7 +793,7 @@ void EventManager::RankRacers() {
     }
     case 4:
         if (g_TrackGame->mode.raceSettings.stuntMode) {
-            UnknownEventScore scores[11];
+            RacerScoreRank scores[11];
             int scored = 0;
             int next = 0;
             while ((racer = reinterpret_cast<UnknownEventRacer*>(reinterpret_cast<BikeRace*>(view)->NextBike(&next))) != 0) {
@@ -814,7 +814,7 @@ void EventManager::RankRacers() {
                 count++;
             }
         } else {
-            UnknownEventScore scores[11];
+            RacerScoreRank scores[11];
             int scored = 0;
             int next = 0;
             while ((racer = reinterpret_cast<UnknownEventRacer*>(reinterpret_cast<BikeRace*>(view)->NextBike(&next))) != 0) {
@@ -839,7 +839,7 @@ void EventManager::RankRacers() {
     }
     resultCount = count;
     if (g_TrackGame->mode.raceSettings.raceMode == 2) {
-        UnknownEventStanding standings[11];
+        RacerStanding standings[11];
         int next = 0;
         int standing = 0;
         while ((racer = reinterpret_cast<UnknownEventRacer*>(reinterpret_cast<BikeRace*>(view)->NextBike(&next))) != 0) {

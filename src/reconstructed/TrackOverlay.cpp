@@ -838,7 +838,7 @@ fail:
 // by score with the player's own row last, and in row 5 who holds the tag.
 int StatsOverlay::DrawTagStandings()
 {
-    UnknownEventScore scores[11];
+    RacerScoreRank scores[11];
     char tag[0x40];
     char time[0x80];
     char label[0x80];
@@ -864,7 +864,7 @@ int StatsOverlay::DrawTagStandings()
             scores[count].racer = racer;
             count++;
         }
-        qsort(scores, count, sizeof(UnknownEventScore), CompareScoresDescending);
+        qsort(scores, count, sizeof(RacerScoreRank), CompareScoresDescending);
         for (i = 0; i < count; i++) {
             if (scores[i].racer == view->localRacer) {
                 own = i;

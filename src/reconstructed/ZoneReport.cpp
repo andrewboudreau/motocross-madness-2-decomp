@@ -181,14 +181,14 @@ int MSZoneInterface::ReportRaceToZone()
 static int kBikeTypeCounts[7] = {3, 3, 5, 4, 5, 5, 5};
 
 // One track of an event type: its name and variant (0x14 bytes).
-struct UnknownTrackNameEntry {
+struct LobbyTrackEntry {
     char name[16];
     int variant;
 };
 
-struct UnknownTrackNameList {
+struct LobbyTrackList {
     int count;
-    UnknownTrackNameEntry* entries;
+    LobbyTrackEntry* entries;
 };
 
 // 0x0049ca60: converts between the lobby's numbering and the game's.
@@ -201,40 +201,40 @@ struct UnknownTrackNameList {
 // (retail folds the +1 into the >= 30 branch as `add ebx, -0x1a`).
 void MSZoneInterface::ConvertLobbyNumbering(int direction)
 {
-    UnknownTrackNameEntry quarry[5] = {
+    LobbyTrackEntry quarry[5] = {
         {"Quarry05", 0}, {"Quarry01", 0}, {"Quarry04", 0}, {"Quarry03", 0}, {"Quarry02", 0},
     };
-    UnknownTrackNameEntry baja[15] = {
+    LobbyTrackEntry baja[15] = {
         {"baja01", 1}, {"baja01", 2}, {"baja01", 3}, {"baja03", 1}, {"baja03", 2},
         {"baja03", 3}, {"baja02", 1}, {"baja02", 2}, {"baja02", 3}, {"baja04", 1},
         {"baja04", 2}, {"baja04", 3}, {"baja05", 1}, {"baja05", 2}, {"baja05", 3},
     };
-    UnknownTrackNameEntry national[16] = {
+    LobbyTrackEntry national[16] = {
         {"Nat12", 0}, {"Nat01", 0}, {"Nat05", 0}, {"Nat08", 0}, {"Nat10", 0}, {"Nat03", 0},
         {"Nat09", 0}, {"iffendic", 0}, {"hillside", 0}, {"Nat11", 0}, {"Nat07", 0},
         {"Nat06", 0}, {"SkyLab2", 0}, {"Nat02", 0}, {"VV", 0}, {"Nat04", 0},
     };
-    UnknownTrackNameEntry supercross[16] = {
+    LobbyTrackEntry supercross[16] = {
         {"SX01", 0}, {"SX02", 0}, {"SX03", 0}, {"SX04", 0}, {"SX05", 0}, {"SX06", 0},
         {"SX07", 0}, {"SX08", 0}, {"SX09", 0}, {"SX10", 0}, {"SX11", 0}, {"SX12", 0},
         {"SX13", 0}, {"SX14", 0}, {"SX15", 0}, {"SX16", 0},
     };
-    UnknownTrackNameEntry tag[3] = {
+    LobbyTrackEntry tag[3] = {
         {"Tag01", 0}, {"Tag02", 0}, {"Tag03", 0},
     };
-    UnknownTrackNameEntry stunt[15] = {
+    LobbyTrackEntry stunt[15] = {
         {"SkiLodge", 1}, {"SkiLodge", 2}, {"SkiLodge", 3}, {"OpenPit", 1}, {"OpenPit", 2},
         {"OpenPit", 3}, {"Farm", 1}, {"Farm", 2}, {"Farm", 3}, {"Trailer", 1},
         {"Trailer", 2}, {"Trailer", 3}, {"Airfield", 1}, {"Airfield", 2}, {"Airfield", 3},
     };
-    UnknownTrackNameList lists[6] = {
+    LobbyTrackList lists[6] = {
         {5, quarry}, {15, baja}, {16, national}, {16, supercross}, {3, tag}, {15, stunt},
     };
     int i;
     int index;
     int first;
     int type;
-    UnknownTrackNameEntry* entry;
+    LobbyTrackEntry* entry;
 
     switch (direction) {
     case 1:
