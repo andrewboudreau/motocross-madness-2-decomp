@@ -8,6 +8,12 @@
 // 0x004c3790: reads the immediate state. Non-gamepads feed the six axes to
 // their bindings (axis 1 flipped by the JoyDirectionFlipped bit, axis 2
 // always); button changes are queued as events, and the POV values kept.
+// 373 of 454: from the button loop on retail's eax/ecx/edx rotation is one
+// step ahead. Unchanged or worse (2026-11-13): a result local, a subtype
+// local, the previous/pressed order and either inlined, an unsigned char
+// pressed (309), joystick index and ControlInterface locals, explicit POV
+// stores (460 bytes), a shared loop index, chained zero stores (369),
+// swapped branches (356), `!pressed` and a button pointer.
 int PCJoystickDevice::ReadImmediateState(int value) {
     DIJoyState state;
     if (!device)

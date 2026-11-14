@@ -105,6 +105,8 @@
 //   does not allow), so retail's load is an ordinary one that VC6 did not
 //   carry across the branch. Not adopted. Casts through int, char* + 0x570,
 //   `const&`, `void**` and `results + i` stay at 589.
+//   An inline `Events(TrackGame*)` accessor at all or any group of the
+//   EventManager reads of 0x004513a0 changes nothing (583, 2026-11-13).
 
 #include "../../src/reconstructed/DlgProcs.cpp"
 
