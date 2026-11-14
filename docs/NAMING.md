@@ -326,7 +326,8 @@ Left as placeholders in wave 5:
   `UnknownOptSoundSettings::field_0x00`):
   - EventManager `0x0045e7b6` calls `StopCDAudio` (`0x00521a40`) when it is 0.
   - `ResetSoundOptions` (`0x005227d0`) clears it.
-  - No dialog control or INI key is bound to it, so "CD music on" is only tier 3.
+  - No dialog control or INI key is bound to it, so "CD music on" is only tier 3
+    (Wave 20 names it `cdAudioOn` at that tier).
 - `TrackGameMode` fields:
   - +0x6a4 and +0x1bdc are only written.
   - +0x25e8 is only created and destroyed.
@@ -1725,17 +1726,20 @@ Left as placeholders:
   of `Win32Rect` and `DDBltFx`. Using those names would be a merge, not a
   rename.
 - `UnknownPlayerLeftMessage` (InGameProcs.cpp): application message 0x89,
-  a different record from the type-5 view renamed above.
+  a different record from the type-5 view renamed above (Wave 20 names it
+  `LeaveRaceMessage`).
 - `UnknownSceneKeyword`: the type of the static `s_lightTypes`.
   `UnknownSceneShapeKeyword` and `UnknownSceneEmitterKeyword` (samples) wait
   with it.
 - The `UnknownOpt*Settings` types (globals), `UnknownFunction4ea7e0`,
   `UnknownFunction4864f0`, and the `UnknownCompare*` comparators: no literal
-  names them, and the sort keys were not decoded this wave.
+  names them, and the sort keys were not decoded this wave (Wave 20 names
+  the comparators and `IsPaletteLocked`).
 - `TrackGameMode::field_0xa20` and `UnknownOptSoundSettings::field_0x00`
   (TrackGame+0xf98): the default is 0, and LeaveRaceForMenu and EventManager
   (`0x0045e7b6`) call StopCDAudio when it is clear. That suggests a CD music
-  option, but no dialog control or literal names it.
+  option, but no dialog control or literal names it (Wave 20: tier 3
+  `cdAudioOn`).
 - `Scene::field_0x88`: Scene's initialiser (`0x004ea7e0`) stores its char
   argument, and 0x004ecd60 passes it to a constructor whose parameter is not
   decoded.
@@ -1744,3 +1748,165 @@ Left as placeholders:
 - The union arms `UIScrollBar::field_0x1ec/0x204/0x218`,
   `UIEditBox::field_0x204` and `UIListBox::field_0x218` are already named by
   their typed arms.
+
+## Wave 20: comparators, race result records, lobby messages and read-backed fields
+
+Wave 20 decodes the sort keys of the `UnknownCompare*` comparators, names
+the race result and lobby records and the messages Wave 19 left, and names
+fields whose only reader or writer decides their role. Names only: no
+declaration, typedef, forward declaration or member was added or removed,
+and no static or type of a static was renamed.
+`git grep -ohE '\bUnknown[A-Z][A-Za-z0-9_]*' -- src samples` fell from 394
+unique names and 2946 uses to 377 unique names and 2840 uses. `field_0x`
+lines fell from 1872 to 1844 (1991 to 1973 occurrences).
+
+Method: work/naming/w20/storers.py lists the stores to `[reg + offset]` in a
+VA range with their containing function. work/naming/xref.py and writers.py
+were used as in Wave 19, and so was classreads.py v2 (`layouts`, then `scan`).
+The type and comparator renames are work/naming/w20/map-A.json, applied with
+work/naming/rename.py. InGameProcs.cpp is the only unit where
+`UnknownPlayerLeftMessage` was renamed. The field renames are the scripts
+work/naming/w20/t1.py, cdaudio.py and fields.py, plus the four
+`fullState` uses in Group3_KrustyBike.cpp. The method rename is
+work/naming/w20/map-B.json.
+
+Result: two proofs, each run over every unit whose closure reaches a changed
+file.
+
+- Batch A runs from 0eb90ea3 to 98ffa4f3 with map-A (16 entries). It has
+  250 units: 242 IDENTICAL, 3 IDENTICAL-COMDAT-ORDER and 5 NAME-ONLY.
+  - The COMDAT-ORDER units are DlgProcsNearMisses.cpp, Group4_DlgMain.cpp
+    and KrustyUI.cpp, as in Wave 19.
+  - The NAME-ONLY units are AuralScape.cpp, EventManager.cpp,
+    ManagedTextureGroup.cpp, ManagedTextureGroupNearMisses.cpp and
+    Group2_ManagedTextureGroup.cpp. These are the units whose decorated names
+    carry a renamed comparator or record.
+- Batch B runs from 98ffa4f3 to 04cbe105 with map-B (1 entry). It
+  has 139 units: 125 IDENTICAL, 9 IDENTICAL-COMDAT-ORDER and 5 NAME-ONLY.
+  - The COMDAT-ORDER units are BikeRaceNearMisses.cpp,
+    DlgProcsNearMisses.cpp, SelectGamePicProcsNearMisses.cpp,
+    Group4_DlgMain.cpp, Group6_BikeRaceCreate.cpp, DlgProcs.cpp, KrustyUI.cpp,
+    OptionProcs.cpp and SelectGamePicProcs.cpp.
+  - The NAME-ONLY units are GUIManager.cpp, GameUi.cpp,
+    GUIManagerNearMisses.cpp, GameUiNearMisses.cpp and
+    Group2_UIDialogResource.cpp. These are the units that define or call
+    `IsPaletteLocked`.
+  - The first run gave one compile failure: Group3_KrustyBike.cpp still read
+    `field_0x5c`. Those four uses were renamed, and the unit is IDENTICAL.
+
+There was no DIFF, and no .bss or .data offset moved. No unit is NAME-ONLY
+because of a field rename.
+
+Negative controls:
+
+- Without the map:
+  - EventManager.obj gives DIFF: `??0UnknownEventEntry@@QAE@XZ` is in the
+    old `.text` only.
+  - GUIManager.obj gives DIFF in the same way through
+    `?UnknownFunction4864f0@GUIManager@@QAEHXZ`.
+- A live change gives DIFF in the bytes of
+  `?CompareEmittersFarthestFirst@@YAHPBX0@Z`. The change is `return -1` to
+  `return -2` in the new tree's CompareEmittersFarthestFirst
+  (work/naming/w20/live.py). After the change is reverted, the unit is
+  IDENTICAL again.
+
+Fixture pins: only whole-object digests of NAME-ONLY units were repinned. In
+each case the pinned section and relocation counts still held.
+
+- ManagedTextureGroup.cpp in file_printf_objects.json and
+  texture_history_timer_objects.json, and ManagedTextureGroupNearMisses.cpp
+  in texture_history_timer_objects.json.
+- GUIManager.cpp and GUIManagerNearMisses.cpp in
+  uianim_connection_objects.json.
+- GameUiNearMisses.cpp's aggregate view in edit_box_draw_aggregate.json,
+  multi_state_draw_aggregate.json (the same digest) and
+  edit_box_on_char_aggregate.json.
+
+work/naming/repin.py made the `{relocations, sections, sha256}` pins. The
+aggregate-view pins were changed by hand after the same check
+(work/naming/w20/swap.py).
+
+The renamed mangled names were also updated in the bindings of AuralScape,
+EventManager, ManagedTextureGroup (source and sample), GUIManager and GameUi
+(source and sample) and in tools/run_calibration.py.
+docs/EVENTMANAGER.md and the layout snippet in
+tests/test_stats_standings_draw.py follow the record names.
+
+### Types
+
+| Old name | New name | Tier | Evidence |
+| --- | --- | --- | --- |
+| `UnknownEventEntry` | `RacerResult` | 2 | EventManager's `results[11]`, one per racer; CopyFromRacer fills it from the racer's score and times. |
+| `UnknownEventRanking` | `RacerTimeRank` | 2 | {racer, totalRunningTime}, sorted by CompareRankings. |
+| `UnknownEventScore` | `RacerScoreRank` | 2 | {value, racer} (8 bytes), sorted by CompareScoresDescending. |
+| `UnknownEventStanding` | `RacerStanding` | 2 | The points row that CompareStandings sorts. |
+| `UnknownProCircuitRank` | `CircuitPointsRank` | 2 | {points, racer index}, sorted by CompareRankPoints (`0x004d8c20`). |
+| `UnknownTrackNameEntry`, `UnknownTrackNameList` | `LobbyTrackEntry`, `LobbyTrackList` | 2 | ZoneReport's ConvertLobbyNumbering tables, which map lobby track numbers to the game's tracks. |
+| `UnknownEventRacerMessage` | `RacerResultsMessage` | 3 | Application message 0x86: one racer's score and times, which EventManager copies into its results. |
+| `UnknownPlayerStateMessage` | `PlayerStateMessage` | 3 | Application message type 2, the player state. |
+| `UnknownLobbySettingsMessage` | `LobbySettingsMessage` | 3 | Application message 0xf: the 0xb4-byte lobby settings. |
+| `UnknownPlayerLeftMessage` (InGameProcs.cpp) | `LeaveRaceMessage` | 3 | Application message 0x89: ExitDlg's leave button (ButLeft) sends it, and EventManager marks the sender done. This is not the system message 5 that Wave 19 named `DPMsgDestroyPlayerOrGroup`. |
+
+### Comparators
+
+These are qsort callbacks named after their decoded keys.
+
+| Old name | New name | Tier | Key |
+| --- | --- | --- | --- |
+| `UnknownCompare402d40` | `CompareWaitingEmitters` | 3 | AuralScape (static): emitters with SoundEmitter+0x1a0 bit 2 set sort first. It sorts `waitingEmitters` in PickEmittersToPlay (`0x00403150`). |
+| `UnknownCompare402d70` | `CompareEmittersFarthestFirst` | 2 | `listenerDistance` descending. |
+| `UnknownCompare50ee70` | `CompareTexturesByPlannedLevel` | 2 | ManagedTextureGroup: `plannedLevel` descending, then address. |
+| `UnknownCompare50eeb0` | `CompareTexturesByLevelSurplus` | 2 | `allocatedLevel - plannedLevel` descending, then address. |
+| `UnknownCompare50ef00` | `CompareTexturesByUnhappiness` | 2 | Unhappiness() descending, then address descending (the "unhappy=%.2f" literal). |
+
+### Methods
+
+| Old name | New name | Tier | Evidence |
+| --- | --- | --- | --- |
+| `GUIManager::UnknownFunction4864f0` | `IsPaletteLocked` | 3 | 0x004864f0 returns +0x1f8; see `paletteLocked` below. |
+
+### Fields
+
+| Class | Offset | Old name | New name | Tier | Evidence |
+| --- | --- | --- | --- | --- | --- |
+| `UnknownEcoTrackGame::display` view | +0x1c0 | `capabilityBits` | `driverColorKeyCaps` | 2 | The DDCAPS `dwCKeyCaps` that PCVideoCard keeps as `driverColorKeyCaps`. EcoSystem tests bit 8. This is a member rename; the view was not merged. |
+| `TrackGameMode` | +0xa20 | `field_0xa20` | `cdAudioOn` | 3 | The first word of the 0x2c-byte sound block. Its only reader is LeaveRaceForMenu (`0x0045e7b6`, `cmp [eax+0xf98]`), which calls StopCDAudio (`0x00521a40`) when it is clear. Its writers are the defaults (ResetSoundOptions `0x00522780`, 0), the options file (UiInfo) and the options dialog's block copies. The CDAudio class (`0x00431050..0x004312a8`) sends only open, set, status, stop and close. The same name is used for the sound block views `UnknownTrackGameModeOptionsA20::field_0x00` and `UnknownOptSoundSettings::field_0x00`. |
+| `LightEmitter` | +0xa8 | `field_0xa8` | `lastColor` | 3 | SetColor (`0x0049e020`) returns early when the colour equals it. Only the constructor (`0x0049deb0`) writes it (0). |
+| `GUIManager` | +0x1f8 | `field_0x1f8` | `paletteLocked` | 3 | When it is set, an 8-bit UIDialog skips its "PaletteFile" load (the code near `0x0046a920`), and UIDialog's destructor (`0x0046a070`) skips the palette restore. Only the constructor (`0x00485219`) writes it (0). |
+| `KbBikeNetState` | +0x5c | `field_0x5c` | `fullState` | 2 | BikeRace sets the matching +0x5c to 1 on message 1 (full state) and to 0 on message 13 (delta). KrustyBike reads the lap and race fields only when it is set. |
+| `UnknownAuralScapeReverbOwner` | +0xa4 | `field_0xa4` | `environment` | 2 | The owner is read as a Scene: Scene+0xa4 is the SceneEnvironment. |
+| `UnknownAuralScapeReverbTable` | +0x410 | `field_0x410` | `enviroID` | 2 | SceneEnvironment's `enviroID[4]` (the "EnviroID" key), indexed by reverb zone. |
+| `GridNodeExtra` | +0x10 | `field_0x10` | `builtTexture` | 2 | Grid1.h's view of the same record names it `builtTexture`. SelectTexture (`0x0047caa0`) stores the result of AcquireOwnedObject (`0x00505600`) there. |
+
+Left as placeholders:
+
+- `UnknownEventPlayerMessage`: an overlay of several message types. Naming it
+  would be a merge.
+- `UnknownBikeRaceNetMessage13`, `UnknownProCircuitResult` and
+  `UnknownProCircuitSkinned`: views of `KbNetDelta`, `RacerResult` and
+  `D3DIMSoultreeObject`. Merging them would add or remove declarations
+  (Wave 18). The tests also name `UnknownProCircuitSkinned`.
+- SoundEmitter+0x1a0 bit 2 (`field_0x1a0_bit2`): Create sets it when
+  `!(flags & 2) || (flags & 4) || is2D`, and it is counted as `waiting3D`.
+  Its meaning is not settled, so its comparator stays tier 3.
+- `TrackGameViewOwner::field_0xac`: it has two roles, an int gate count and,
+  in the bike race owner, a float.
+- The Terrain/FollowCamera subject +0xbe8: the first dword of the TRN header.
+  A value of 1 selects crash limit 0.766 and camera rate 0.25. What it means
+  needs track data to settle.
+- Sound block +0x0c/+0x24 and graphics block +0x0c/+0x14: nothing reads them.
+- `RaceSound::field_0x40`: only ever 0.
+- `Cube::field_0x10`: only 0 is written, and bit 1 is tested.
+- `RacerStanding::field_0x04/0x08`: nothing sets them.
+- `GridTerrain::field_0xc9c/0xca0`: union arms.
+- `UIDialog::field_0xd4`: the slot 30 callback; its writer is not known.
+- `FollowCamera::field_0x33c`: the tenth CAMERA value; its meaning is not
+  known.
+- From Wave 19:
+  - `UnknownBltRect` and `UnknownBltEffects`: views.
+  - `UnknownSceneKeyword`: the type of a static.
+  - The `UnknownOpt*Settings` types: globals.
+  - `UnknownFunction4ea7e0` and `Scene::field_0x88`: Scene's initialiser
+    argument is not decoded.
+  - `UIDialog::field_0x180`.
+  - The union arms.
