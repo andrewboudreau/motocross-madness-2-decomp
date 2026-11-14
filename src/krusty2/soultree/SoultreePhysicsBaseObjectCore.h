@@ -176,7 +176,7 @@ public:
     Vec3 position;  // +0x0c node-local translation: slots 2/33 SetPosition then GetPosition(&position); slot 28 subtracts the collision push-out (CollisionObject +0x5c) and writes it back; slot 39 restores it from respawnPosition; Vehicle slot 49 writes it to the node each step
     Vec3 centerOfMass;            // +0x18 position (tier 3): subtracted from contact points
     float invMass;                   // +0x24 1 / bodyMass (slot 0)
-    float field_0x28;                   // ctor: 1.0f
+    float inverseLoadMass;                   // +0x28: 32.2f / loadWeight (Bike::LoadBike), ctor: 1.0f
     float bodyRoll;                   // 0x2c..0x44: filled by 0x4b5a60(...), previous
     float bodyPitch;                   // +0x30 copy at 0x48..0x60 (slots 1, 33, 36, 7 tail)
     float bodyYaw;  // +0x34 'yaw' out-parameter of OrientationAnglesFromVectors (slot 2, Vehicle slot 49); copied to savedYaw by slot 29

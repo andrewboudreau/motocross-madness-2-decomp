@@ -101,7 +101,7 @@ public:
     // 0x0046f6c0: draws `control`'s text inside its margins.
     void DrawControlText(void* dc, UIControl* control, int transparent);
     // 0x0046ed70: a DC for drawing `control` inside `rect`, with its font and clip region.
-    int BeginControlDraw(void** dc, CameraRect* rect, int* a, UIControl* control);
+    int BeginControlDraw(void** dc, CameraRect* rect, int* more, UIControl* control);
     // 0x0046fc80: whether `position` is in a double-byte character of `text`.
     int IsInDoubleByteCharacter(const char* text, const char* position, int length);
     void UpdatePointerHover();             // 0x0046f120

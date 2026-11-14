@@ -17,14 +17,14 @@ public:
     virtual ~VideoCard();                         // 0x0052d240 (deleting wrapper 0x0052d200)
     virtual void ReleaseResources();              // 0x0052d220: frees the mode table
     // PCGame slot 32: width, height, depth, 2, 0, windowed, 1.
-    virtual int SetDisplayMode(int width, int height, int bitDepth, int a, int refreshRate,
+    virtual int SetDisplayMode(int width, int height, int bitDepth, int bufferCount, int refreshRate,
                                int windowed, int c) = 0;
     virtual int Present() = 0;                    // presents a frame
     virtual void RetryFlip(int value) = 0;           // called with 0 and 1 around a frame
 
     // 0x0052d250: sorts the modes and returns the index of the matching one
-    // (a zero `a`/`refreshRate` matches any mode bufferCount/refresh rate), or -1.
-    int FindDisplayMode(int width, int height, int bitDepth, int a, int refreshRate);
+    // (a zero `bufferCount`/`refreshRate` matches any mode bufferCount/refresh rate), or -1.
+    int FindDisplayMode(int width, int height, int bitDepth, int bufferCount, int refreshRate);
 
     // Inline (PCVideoCard.cpp): time since the last present and the
     // shortest such time.
@@ -40,7 +40,7 @@ public:
     int displayModeCount;                      // +0x08: display mode count
     int currentDisplayMode;                    // +0x0c: current display mode (-1: none)
     DisplayMode* displayModes;          // +0x10: DebugRealloc'd mode table
-    int field_0x14[16];                           // per texture kind (TextureMapManager 0x00511580)
+    int textureKindCost[16];                      // +0x14: cost per texture kind (TextureMapManager 0x00511580)
     int totalVideoMemory;                      // +0x54: "Total VidMem"
     int textureMemory;                         // +0x58: the mode's texture memory (windowed: MeasureTextureMemory)
     int nonLocalTextureMemory;                 // +0x5c: non-local (AGP) texture memory (windowed: ProbeNonLocalTextureMemory, else 0)

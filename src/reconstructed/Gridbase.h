@@ -13,7 +13,7 @@ struct GridBaseCell {
     unsigned char errorIndex;  // +0x1  index into g_gridBaseCurve: CanDropVertex's vertex error; compared with the error limits' curve index
     unsigned short height;                   // +2 (relative to the block's +0xd4c)
     signed char normal[3];                   // +4..+6 (scaled by 1/127)
-    unsigned char field_0x7_b0 : 1;          // +7 bit 0 (Griddraw's 0x0047fe70)
+    unsigned char flipDiagonal : 1;          // +7 bit 0 (Griddraw's 0x0047fe70)
     unsigned char field_0x7_b1 : 7;
 };
 

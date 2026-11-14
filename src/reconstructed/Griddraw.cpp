@@ -627,40 +627,40 @@ void DrawableGridNode::EmitLeafEdgeFan(int x, int z, int dx, int dz, int n)
     int shift;
     if (dx == 0) {
         if (dz == 1) {
-            shift = block->cells[i - 18].field_0x7_b0 && (data->vertexFlags[i - 18] & 0x80);
+            shift = block->cells[i - 18].flipDiagonal && (data->vertexFlags[i - 18] & 0x80);
             g_gridIndices[firstIndex] = g_gridVertexCache.GetVertex(x, z);
             g_gridIndices[firstIndex + 1] = g_gridVertexCache.GetVertex(x, z - 1);
             g_gridIndices[firstIndex + 2] = g_gridVertexCache.GetVertex(x - 1, z - shift);
-            shift = (1 - block->cells[i - 17].field_0x7_b0) && (data->vertexFlags[i - 16] & 0x80);
+            shift = (1 - block->cells[i - 17].flipDiagonal) && (data->vertexFlags[i - 16] & 0x80);
             g_gridIndices[firstIndex + 3] = g_gridVertexCache.GetVertex(x, z);
             g_gridIndices[firstIndex + 4] = g_gridVertexCache.GetVertex(x + 1, z - shift);
             g_gridIndices[firstIndex + 5] = g_gridVertexCache.GetVertex(x, z - 1);
         } else {
-            shift = block->cells[i].field_0x7_b0 && (data->vertexFlags[i + 18] & 0x80);
+            shift = block->cells[i].flipDiagonal && (data->vertexFlags[i + 18] & 0x80);
             g_gridIndices[firstIndex] = g_gridVertexCache.GetVertex(x, z);
             g_gridIndices[firstIndex + 1] = g_gridVertexCache.GetVertex(x, z + 1);
             g_gridIndices[firstIndex + 2] = g_gridVertexCache.GetVertex(x + 1, z + shift);
-            shift = (1 - block->cells[i - 1].field_0x7_b0) && (data->vertexFlags[i + 16] & 0x80);
+            shift = (1 - block->cells[i - 1].flipDiagonal) && (data->vertexFlags[i + 16] & 0x80);
             g_gridIndices[firstIndex + 3] = g_gridVertexCache.GetVertex(x, z);
             g_gridIndices[firstIndex + 4] = g_gridVertexCache.GetVertex(x - 1, z + shift);
             g_gridIndices[firstIndex + 5] = g_gridVertexCache.GetVertex(x, z + 1);
         }
     } else {
         if (dx == 1) {
-            shift = block->cells[i - 18].field_0x7_b0 && (data->vertexFlags[i - 18] & 0x80);
+            shift = block->cells[i - 18].flipDiagonal && (data->vertexFlags[i - 18] & 0x80);
             g_gridIndices[firstIndex] = g_gridVertexCache.GetVertex(x, z);
             g_gridIndices[firstIndex + 1] = g_gridVertexCache.GetVertex(x, z - 1);
             g_gridIndices[firstIndex + 2] = g_gridVertexCache.GetVertex(x - 1, z - shift);
-            shift = (1 - block->cells[i - 1].field_0x7_b0) && (data->vertexFlags[i + 16] & 0x80);
+            shift = (1 - block->cells[i - 1].flipDiagonal) && (data->vertexFlags[i + 16] & 0x80);
             g_gridIndices[firstIndex + 3] = g_gridVertexCache.GetVertex(x, z);
             g_gridIndices[firstIndex + 4] = g_gridVertexCache.GetVertex(x - 1, z + shift);
             g_gridIndices[firstIndex + 5] = g_gridVertexCache.GetVertex(x, z + 1);
         } else {
-            shift = block->cells[i].field_0x7_b0 && (data->vertexFlags[i + 18] & 0x80);
+            shift = block->cells[i].flipDiagonal && (data->vertexFlags[i + 18] & 0x80);
             g_gridIndices[firstIndex] = g_gridVertexCache.GetVertex(x, z);
             g_gridIndices[firstIndex + 1] = g_gridVertexCache.GetVertex(x, z + 1);
             g_gridIndices[firstIndex + 2] = g_gridVertexCache.GetVertex(x + 1, z + shift);
-            shift = (1 - block->cells[i - 17].field_0x7_b0) && (data->vertexFlags[i - 16] & 0x80);
+            shift = (1 - block->cells[i - 17].flipDiagonal) && (data->vertexFlags[i - 16] & 0x80);
             g_gridIndices[firstIndex + 3] = g_gridVertexCache.GetVertex(x, z);
             g_gridIndices[firstIndex + 4] = g_gridVertexCache.GetVertex(x + 1, z - shift);
             g_gridIndices[firstIndex + 5] = g_gridVertexCache.GetVertex(x, z - 1);

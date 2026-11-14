@@ -117,7 +117,7 @@ struct Group1ParticleCamera {
     Vector3 eyePosition;           // +0x170
     Vector3 viewDirection;         // +0x17c
     Vector3 upDirection;           // +0x188
-    char field_0x194[0x198 - 0x194];
+    char roll[0x198 - 0x194]; // +0x194: Camera::roll (bytes kept)
     float focalLength;             // +0x198
     char field_0x19c[0x1bc - 0x19c];
     float nearPlane;               // +0x1bc
@@ -133,7 +133,7 @@ static inline Group1ParticleCamera* Group1CameraView(Camera* camera)
 
 static inline Group1ParticleRect* Group1Rect(Particle* particle)
 {
-    return reinterpret_cast<Group1ParticleRect*>(particle->field_0x24);
+    return reinterpret_cast<Group1ParticleRect*>(particle->screenRect);
 }
 
 static inline unsigned int& Group1CornerColor(ParticleCornerVertex& corner)

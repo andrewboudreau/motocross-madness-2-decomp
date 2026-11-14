@@ -943,7 +943,7 @@ SoultreePhysicsBaseObject::SoultreePhysicsBaseObject(int flags)
 {
     restContactThreshold = 1;
     asleep = 0;
-    field_0x28 = 1.0f;
+    inverseLoadMass = 1.0f;
     loadWeight = 0.0f;
     weightForce = g_Zero;
     terrainScale = 1.0f;

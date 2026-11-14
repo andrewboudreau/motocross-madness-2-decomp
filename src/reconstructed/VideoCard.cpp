@@ -75,12 +75,12 @@ VideoCard::~VideoCard() {
 }
 
 // 0x0052d250
-int VideoCard::FindDisplayMode(int width, int height, int bitDepth, int a, int refreshRate) {
+int VideoCard::FindDisplayMode(int width, int height, int bitDepth, int bufferCount, int refreshRate) {
     qsort(displayModes, displayModeCount, sizeof(DisplayMode), CompareDisplayModes);
     for (int i = 0; i < displayModeCount; i++) {
         DisplayMode* mode = &displayModes[i];
         if (mode->bitDepth == bitDepth && mode->height == height && mode->width == width &&
-            (!a || mode->bufferCount == a) && (!refreshRate || mode->refreshRate == refreshRate))
+            (!bufferCount || mode->bufferCount == bufferCount) && (!refreshRate || mode->refreshRate == refreshRate))
             return i;
     }
     return -1;

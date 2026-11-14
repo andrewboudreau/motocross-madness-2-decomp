@@ -77,7 +77,7 @@ void TextService::SetFont(unsigned int index, FontTexture* font) {
 // 0x0050ae80
 TextService* TextService::Create(const char* archive, const char** names, int count,
                                                               int format, TextureMapManager* manager, float x,
-                                                              float y, float width, float height, int a10) {
+                                                              float y, float width, float height, int textureContext) {
     TextService* text;
     char path[80];
     char textureName[80];
@@ -92,7 +92,7 @@ TextService* TextService::Create(const char* archive, const char** names, int co
         strcat(path, ".cell");
         COPY_NAME(textureName, names[i]);
         strcat(textureName, ".tga");
-        FontTexture* font = FontTexture::Load(names[i], path, textureName, format, manager, a10);
+        FontTexture* font = FontTexture::Load(names[i], path, textureName, format, manager, textureContext);
         if (font)
             text->SetFont(i, font);
     }

@@ -32,7 +32,7 @@ Terrain::Terrain(int flags)
 {
     gridCellSize = 1.0f;
     stream = 0;
-    field_0x84 = 0;
+    runMeshChecks = 0;
     indicesDrawn = 0;
     vertexErrorTests = 0;
     field_0x94 = 0;

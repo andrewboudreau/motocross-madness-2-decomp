@@ -816,7 +816,7 @@
     "target_va": "0x005281b0",
     "target_size": 539,
     "expect": "exact",
-    "notes": "Exact: the product is stored straight into field_0x4e8 and the abs test reads the member (k is copied from it inside the branch), so VC6 stores the member before the fcom as retail (fst; fld st(0); fcom; 528 -> 539/539). Retail's dup form for u.x comes from the clamp assigned inside the first product (u.x = t.x * (s = (s < 1.0f) ? s : 1.0f)); the Math3D u + velocity operator schedules the scratchVector .y store; the nested-if layout with one trailing return 0 gives esi=dir/edi=this; VehDotG (x+y)+z loads y,x,z; angle = -angle before the second return keeps fchs ahead of the pops. A local k stored to the member, k copied from the member before the test, a VABS macro or != 0.0f leave the fcom ahead of the store (527-528).",
+    "notes": "Exact: the product is stored straight into scaledTurnRadius and the abs test reads the member (k is copied from it inside the branch), so VC6 stores the member before the fcom as retail (fst; fld st(0); fcom; 528 -> 539/539). Retail's dup form for u.x comes from the clamp assigned inside the first product (u.x = t.x * (s = (s < 1.0f) ? s : 1.0f)); the Math3D u + velocity operator schedules the scratchVector .y store; the nested-if layout with one trailing return 0 gives esi=dir/edi=this; VehDotG (x+y)+z loads y,x,z; angle = -angle before the second return keeps fchs ahead of the pops. A local k stored to the member, k copied from the member before the test, a VABS macro or != 0.0f leave the fcom ahead of the store (527-528).",
     "bindings": "Vehicle.bindings.json"
   },
   {

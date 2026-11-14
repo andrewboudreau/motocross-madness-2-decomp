@@ -50,7 +50,7 @@ public:
     // "<name>.tga") and selects the first.
     static TextService* Create(const char* archive, const char** names, int count,
                                                      int format, TextureMapManager* manager, float x,
-                                                     float y, float width, float height, int a10);
+                                                     float y, float width, float height, int textureContext);
 
     void SelectFont(const char* font);            // 0x0050ade0: selects the font named `font`
     void SetFont(unsigned int index, FontTexture* font);               // 0x0050ae60

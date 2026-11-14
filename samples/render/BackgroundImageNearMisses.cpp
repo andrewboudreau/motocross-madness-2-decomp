@@ -27,20 +27,20 @@ int g_GetDcRegionIndex;
 CameraRect g_GetDcClipRect;
 
 // 0x004049d0: a DC for drawing `rect`: the back buffer, or with the copy
-// current the surfaces in turn (`a` set when the copy is returned), clipped
+// current the surfaces in turn (`more` set when the copy is returned), clipped
 // to the next dirty region in `clip`.
-int BackgroundImage::GetDc(void** dc, CameraRect* rect, int index, int dirty, int* frames, int* a,
+int BackgroundImage::GetDc(void** dc, CameraRect* rect, int index, int dirty, int* frames, int* more,
                                            CameraRect* clip) {
     DirectDrawSurface* surface;
     *dc = 0;
-    *a = 0;
+    *more = 0;
     surface = 0;
     if (dirty) {
         if (copyValid) {
             if (*frames) {
                 if (copyDcNext) {
                     surface = offscreenCopy;
-                    *a = 1;
+                    *more = 1;
                     copyDcNext = 0;
                 } else {
                     surface = Target()->renderSurface;
@@ -67,7 +67,7 @@ int BackgroundImage::GetDc(void** dc, CameraRect* rect, int index, int dirty, in
                         } else {
                             continue;
                         }
-                        *a = 1;
+                        *more = 1;
                         *clip = g_GetDcClipRect;
                         lastDcRegion = g_GetDcRegionIndex;
                         break;

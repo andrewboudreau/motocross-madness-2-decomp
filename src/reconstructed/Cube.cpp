@@ -31,7 +31,7 @@ void Cube::Reset()
     textureGroup = 0;
     textureStream = 0;
     fileFormat = 0;
-    field_0x10 = 0;
+    headerFlags = 0;
     field_0x12 = 0xffff;
     center = kVec3Zero;
     field_0x20 = kVec3Zero;
@@ -159,7 +159,7 @@ int Cube::LoadTexture(int face, int index, TextureColorMapperView* palette,
         if (!textureGroup)
             faces[face].textures[index]->CreateTextureSurface(1, 0, 0);
     }
-    if (field_0x10 & 2)
+    if (headerFlags & 2)
         SkipToSector(textureStream, alignmentBase);
     return 1;
 }

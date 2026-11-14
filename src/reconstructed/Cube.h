@@ -82,7 +82,7 @@ public:
 
     FileStream* textureStream;        // +0x08 the stream Load read the header from
     int fileFormat;                             // file format (Tgafile.h)
-    short field_0x10;                           // bit 1: textures are 0x800-aligned
+    short headerFlags;                           // bit 1: textures are 0x800-aligned
     unsigned short field_0x12;
     Vector3 center;                             // +0x14 world translation (cubedraw.cpp; SkyCube sets it)
     Vector3 field_0x20;

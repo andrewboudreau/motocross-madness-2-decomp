@@ -65,8 +65,8 @@ public:
     virtual int OnDeactivate();
     virtual int OnActivate();
     virtual int OnInputEvent(int value);
-    virtual int OnChar(int value);
-    virtual int OnKeyDown(int value);
+    virtual int OnChar(int character);
+    virtual int OnKeyDown(int key);
     // Input events from Game slots 13 and 14, passed down the children.
     virtual int OnControlRelease(ControlEvent* event, InputButtonState* entry);
     virtual int OnControlPress(ControlEvent* event, InputButtonState* entry);

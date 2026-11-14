@@ -825,9 +825,9 @@ void BikeRace::ToggleReplayPause(int pauseOnly) {
 }
 
 // 0x0041f590
-int BikeRace::OnChar(int value) {
-    if (chatOpen && chatOverlay != 0 && chatOverlay->HandleChatKey(value, &value)) {
-        if (value == 0) {
+int BikeRace::OnChar(int character) {
+    if (chatOpen && chatOverlay != 0 && chatOverlay->HandleChatKey(character, &character)) {
+        if (character == 0) {
             chatHideTimer = 10.0f;
         }
         return 1;

@@ -1083,8 +1083,8 @@ void RaceSound::PlayIfEnabled(Sound* sound, int network, int stop, int loop, int
 
 // 0x004e57d0: bonus.wav for the listener's scores of 10000 and more
 // (modes 0 and 4); applause01 in mode 3 at most every 15 seconds.
-void RaceSound::PlayScoreSounds(EventKrustyBikeView* racer, float value) {
-    if (listenerRacer == racer && value >= 10000.0f &&
+void RaceSound::PlayScoreSounds(EventKrustyBikeView* racer, float score) {
+    if (listenerRacer == racer && score >= 10000.0f &&
         (!g_TrackGame->mode.raceSettings.eventType || g_TrackGame->mode.raceSettings.eventType == 4))
         PlayIfEnabled(bonusSound, 0, 0, 0, 0);
     if (g_TrackGame->mode.raceSettings.eventType == 3 && stuntApplauseClock > 15.0f) {

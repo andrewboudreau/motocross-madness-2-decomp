@@ -43,7 +43,7 @@ struct ProCircuitRacerResultView {
     float repairs;                            // +0x34: repairs (times 500 is the cost)
     float medical;                            // +0x38: medical (times 250)
     float stunts;                             // +0x3c: stunts (times 400)
-    char field_0x40[16];
+    char name[16];
 };
 
 // One row of the rankings 0x004d8c40 sorts (with 0x004d8c20).

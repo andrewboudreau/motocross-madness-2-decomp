@@ -211,7 +211,7 @@ public:
 
     unsigned char field_0x000[0x274];
     int detailLevelCount;                     // +0x274 detail level count
-    unsigned char field_0x278[0x27c - 0x278];
+    unsigned char lowestLod[0x27c - 0x278]; // +0x278: D3DIMSoultreeObject::lowestLod (bytes kept)
     int currentDetailLevel;                   // +0x27c current detail level
     float* detailDistances;                   // +0x280 automatic detail distances (slot 10's debug page)
     unsigned char field_0x284[0x28c - 0x284];
@@ -566,7 +566,7 @@ class StartObjectColliderBase {
 public:
     virtual void UnknownVirtualSlot0();
     int field_0x04;
-    int field_0x08;
+    int objectTypeId;                       // +0x08 QuadTreeObject objectTypeId (a char there)
 };
 
 class StartObjectCollider : public StartObjectColliderBase, public GameObject {
@@ -806,7 +806,7 @@ struct BikeRaceManufacturerRecord {
 
 struct BikeRaceBikeRecord {
     int manufacturer;  // +0x0  KrustyUI bike entry +0: index into the manufacturers (+0x48)
-    unsigned char field_0x04[0x48 - 0x04];
+    unsigned char displayName[0x48 - 0x04]; // +0x04: KrustyUIBikeRecord::displayName, "BikeName_%02d" (bytes kept)
     char bikeName[0x44];                      // +0x48 bike name (the loader's AI racers)
     int engineSize;                           // +0x8c engine size
     int fourStroke;                           // +0x90 four-stroke flag (KrustyUI "BikeFourStroke_%02d")

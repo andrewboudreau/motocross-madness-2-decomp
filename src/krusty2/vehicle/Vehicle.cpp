@@ -596,16 +596,16 @@ static inline Vec3 VehSum(const Vec3& a, const Vec3& b)
 // operator sum (`u + velocity`) schedules scratchVector's y store as retail (512 -> 523/539).
 // Clamping s inside the first product (`u.x = t.x * (s = ...)`) gives retail's dup form
 // (fld st(0); fmul [t.x]) for u.x only (523 -> 528/539).
-// The product is stored straight into field_0x4e8 and the member is what the abs test reads;
+// The product is stored straight into scaledTurnRadius and the member is what the abs test reads;
 // k is copied from it inside the branch.  Then VC6 stores the member before the abs compare
 // (fst; fld st(0); fcom) as retail does (528 -> 539/539).  With a local k stored to the
 // member, k copied from the member before the test, or `!= 0.0f`, the fcom moves ahead of
 // the store.
 float Vehicle::DeflectVelocity(Vec3* point, Vec3* dir, float c, float d)
 {
-    field_0x4e8 = GetTurnRadius(point, dir) * d;
-    if (VehAbsT(field_0x4e8) > 0.0f) {
-        float k = field_0x4e8;
+    scaledTurnRadius = GetTurnRadius(point, dir) * d;
+    if (VehAbsT(scaledTurnRadius) > 0.0f) {
+        float k = scaledTurnRadius;
         float m = forwardSpeed;
         float nk = -k;
         float r = m * m / nk * stepTime;
@@ -1552,7 +1552,7 @@ Vec3* Vehicle::GetContactGroundNormal(Vec3* out)
 void Vehicle::ResetDynamicState(float extraWeight)
 {
     SoultreePhysicsCharacter::ResetDynamicState(extraWeight);
-    field_0x4e8 = 0.0f;
+    scaledTurnRadius = 0.0f;
     forwardSpeed = 0.0f;
     movingForward = 1;
     for (int i = 0; i < collisionPointCount; i++) {
@@ -2146,7 +2146,7 @@ GameObject* Vehicle::LoadVehicle(int context, const char* engineName, const char
 //   three 1.0f members.
 Vehicle::Vehicle(int flags) : GameObject(1), SoultreePhysicsCharacter(flags)
 {
-    field_0x28 = 1.0f;
+    inverseLoadMass = 1.0f;
     loadWeight = 0;
     engineState = 0;
     auxWheelCount = 0;

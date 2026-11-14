@@ -125,15 +125,15 @@ void SoultreeQuadTreeRenderer::RemoveNodesFromQuadtree()
 
 // slot 23, 0x005048d0: with the debug keys enabled, key 0x2d switches every
 // node on (InsertNodesInQuadtree) or, when some are on, off again (RemoveNodesFromQuadtree).
-int SoultreeQuadTreeRenderer::OnControlPress(ControlEvent* a, InputButtonState* b)
+int SoultreeQuadTreeRenderer::OnControlPress(ControlEvent* event, InputButtonState* entry)
 {
-    if ((reinterpret_cast<SoultreeStats*>(g_TrackGame)->debugFlags & 4) && TestInputEvent(0x2d, 0, a, 0x80)) {
+    if ((reinterpret_cast<SoultreeStats*>(g_TrackGame)->debugFlags & 4) && TestInputEvent(0x2d, 0, event, 0x80)) {
         if (!sceneObjectCount)
             InsertNodesInQuadtree();
         else
             RemoveNodesFromQuadtree();
     }
-    return GraphicsTest::OnControlPress(a, b);
+    return GraphicsTest::OnControlPress(event, entry);
 }
 
 // slot 8, 0x004452e0 (shared body): forwards to the base.

@@ -34,7 +34,7 @@ public:
     // other files leave in globals) while +0x34 is set.
     virtual int Render3D();
     virtual int SetPaused(int value);            // 0x0041d260
-    virtual int OnChar(int value);               // 0x0041f590
+    virtual int OnChar(int character);               // 0x0041f590
     // 0x00420040: network messages 1 (racer state), 13, 10 (score), 0x85
     // (chat text) and 0x84 (time stamps).
     virtual int OnNetworkMessage(int type, void* data, int from, int to, int flags);

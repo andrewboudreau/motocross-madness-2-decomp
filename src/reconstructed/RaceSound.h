@@ -102,7 +102,7 @@ public:
     // 0x004e5780: plays `sound` while sound is on (`network` sounds only in
     // network games); `stop` rewinds it first.
     void PlayIfEnabled(Sound* sound, int network, int stop, int loop, int unused);
-    void PlayScoreSounds(EventKrustyBikeView* racer, float value); // 0x004e57d0
+    void PlayScoreSounds(EventKrustyBikeView* racer, float score); // 0x004e57d0
     void PlayItSound();         // 0x004e5860: plays itSound
     // 0x004e5880 (qsort callback): orders channels by cameraDistance.
     static int CompareChannels(const void* a, const void* b);

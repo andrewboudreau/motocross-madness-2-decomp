@@ -154,8 +154,8 @@ public:
     virtual int Tick(float frameTime);                 // 0x00470e00
     virtual int RenderPre3D();                // 0x00471140
     virtual int RenderPost3D();               // 0x004711a0
-    virtual int OnChar(int value);               // 0x00472320
-    virtual int OnKeyDown(int value);            // 0x004723d0
+    virtual int OnChar(int character);               // 0x00472320
+    virtual int OnKeyDown(int key);            // 0x004723d0
     virtual int OnControlRelease(ControlEvent* event, InputButtonState* entry);     // 0x00472130
     virtual int OnControlPress(ControlEvent* event, InputButtonState* entry);       // 0x00471fd0
 
@@ -168,10 +168,10 @@ public:
     // Slot 31 (0x004725b0): the pointer moved over it (guiUser +0x1d8, the
     // hovered control, is not yet this): state 1, sound 1, the tool tip.
     virtual int EnterHover();
-    virtual void LeaveHover(int value); // slot 32, 0x00472630: state 0 if enabled, hides the tool tip
+    virtual void LeaveHover(int next); // slot 32, 0x00472630: state 0 if enabled, hides the tool tip
     // Slot 33: GUIUser calls it on the focused control with the control taking
     // the focus (or 0); the edit box reports kDialogEditDone.
-    virtual void KillFocus(int value); // 0x00464e80 (shared empty body)
+    virtual void KillFocus(int next); // 0x00464e80 (shared empty body)
     virtual int GetControlText(); // slot 34, 0x004703c0: controlText
     virtual int GetTextLength(); // slot 35, 0x004703d0: controlTextLength
     virtual int GetTextLines(); // slot 36, 0x004703e0: textLines
@@ -374,9 +374,9 @@ public:
     // 0x00473630: `size` is the text's capacity.
     UIEditBox(int id, CameraRect* area, UIDialog* owner, int size, int keyClickSound, int fullTextSound);
     virtual ~UIEditBox();                     // 0x00473770 (deleting wrapper 0x00473750)
-    virtual int OnChar(int value);               // 0x00474150
-    virtual int OnKeyDown(int value);            // 0x00474570
-    virtual void KillFocus(int value); // slot 33, 0x004740b0
+    virtual int OnChar(int character);               // 0x00474150
+    virtual int OnKeyDown(int key);            // 0x00474570
+    virtual void KillFocus(int next); // slot 33, 0x004740b0
     virtual void UpdateNeedsRedraw(); // slot 38, 0x00479100 (shared with UIStaticText)
     virtual int Draw();                   // slot 40, 0x004738a0
     virtual int ButtonDown(int button, int position); // slot 55, 0x00474120
@@ -630,7 +630,7 @@ class UIDDLScrollBar : public UIScrollBar {
 public:
     UIDDLScrollBar(int type, int id, CameraRect* area, UIDialog* owner,
                    UIDropDownList* list);     // 0x00479640
-    virtual void KillFocus(int value); // slot 33, 0x004796e0
+    virtual void KillFocus(int next); // slot 33, 0x004796e0
     virtual int ButtonDown(int button, int position); // slot 55, 0x00479a00
     virtual void ButtonHeld(int button, int* position); // slot 57, 0x00479710
 
@@ -643,7 +643,7 @@ public:
 class UIDDLStatic : public UIStatic {
 public:
     UIDDLStatic(int id, CameraRect* area, UIDialog* owner, UIDropDownList* list); // 0x00479b50
-    virtual void KillFocus(int value); // slot 33, 0x00479bc0
+    virtual void KillFocus(int next); // slot 33, 0x00479bc0
 
     UIDropDownList* ownerList;                // +0x1ec
 };
@@ -653,7 +653,7 @@ public:
 class UIDDLButton : public UIButton {
 public:
     UIDDLButton(int id, CameraRect* area, UIDialog* owner, UIDropDownList* list); // 0x00479bf0
-    virtual void KillFocus(int value); // slot 33, 0x00479ce0
+    virtual void KillFocus(int next); // slot 33, 0x00479ce0
     virtual int ButtonDown(int button, int position); // slot 55, 0x00479c90
 
     UIDropDownList* ownerList;                // +0x1f0
@@ -665,7 +665,7 @@ class UIDDLListBox : public UIListBox {
 public:
     UIDDLListBox(int id, int rows, CameraRect* area, UIDialog* owner,
                  UIDropDownList* list);       // 0x00479d10
-    virtual void KillFocus(int value); // slot 33, 0x00479e70
+    virtual void KillFocus(int next); // slot 33, 0x00479e70
     virtual int SetSelectedRow(int row); // slot 65, 0x00479db0
     virtual void ReportClick(int* handled); // slot 66, 0x00479df0
 
@@ -680,7 +680,7 @@ public:
     UIDropDownList(int id, CameraRect* area, UIDialog* owner, const char* text, unsigned int color);
     virtual ~UIDropDownList();                // 0x0047a1f0 (deleting wrapper 0x0047a1d0)
     virtual int IsInteractive(); // slot 30, 0x00467ae0 (shared body: returns 1)
-    virtual void KillFocus(int value); // slot 33, 0x0047a7d0
+    virtual void KillFocus(int next); // slot 33, 0x0047a7d0
     virtual void SetAttachId(int id); // slot 52, 0x0047a290
     virtual int ButtonDown(int button, int position); // slot 55, 0x0047add0
     virtual void SyncBoundValue(int value); // slot 59, 0x0047ad80

@@ -619,9 +619,9 @@ GameObject* Bike::LoadBike(int context, const char* engineName, const char* mode
     leanPoseMax = 1.8f;
     riderMass = loadWeight * 0.0310559f;
     if (loadWeight != 0.0f)
-        field_0x28 = 32.2f / loadWeight;
+        inverseLoadMass = 32.2f / loadWeight;
     else
-        field_0x28 = 1.0f;
+        inverseLoadMass = 1.0f;
     UpdateMass(loadWeight);
     wobbleTime = 0.0f;
     crashGraceTime = crashTimerReload - 0.5f;

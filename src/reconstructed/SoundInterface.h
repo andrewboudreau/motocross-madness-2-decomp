@@ -172,8 +172,8 @@ public:
     virtual ~PCSoundInterface();  // 0x004be4b0 (deleting wrapper 0x004be490)
 
     // 0x004be5a0: starts the audio (TrackGame slot 4 passes 22050, 1, 8 or
-    // 16, 4000000 and a mode value); 0 or a DirectSound-style error.
-    long InitializeSound(int rate, int stereo, int bits, int value, int allowEax);
+    // 16, a 4000000 budget and a mode value); 0 or a DirectSound-style error.
+    long InitializeSound(int rate, int stereo, int bits, int budget, int allowEax);
     // 0x004be7b0: device enumeration callback; records up to four devices.
     static int __stdcall EnumSoundDeviceCallback(Guid* guid, const char* description, const char* module,
         void* context);

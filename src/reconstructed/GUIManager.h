@@ -182,7 +182,7 @@ public:
     unsigned char field_0xf4[0x130 - 0xf4];
     char fontFace[0x158 - 0x130];             // +0x130
     int bold;                                 // +0x158: bold
-    unsigned char field_0x15c[0x160 - 0x15c];
+    unsigned char italic[0x160 - 0x15c];     // +0x15c: UIControl::italic (bytes kept)
     int fontHeight;                           // +0x160
     unsigned char field_0x164[0x210 - 0x164];
     char* acceptedCharacters;                 // +0x210: accepted characters

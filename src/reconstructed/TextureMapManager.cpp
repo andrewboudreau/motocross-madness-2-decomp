@@ -340,7 +340,7 @@ void TextureMapManager::CountTextureMemory() {
                  width /= 2, height /= 2)
                 pixels += height * width;
             bytes += PixelFormatBytesPerPixel(texture->mapFormat) * pixels;
-            cost += g_TrackGame->display->field_0x14[kind];
+            cost += g_TrackGame->display->textureKindCost[kind];
         }
     }
     sprintf(text, "\nTexture Memory 32x32 = %d, 64x64 = %d, 128x128 = %d, 256x256 = %d, total = %d \n", count32,

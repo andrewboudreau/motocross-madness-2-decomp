@@ -54,7 +54,7 @@ struct CollisionModelShapeData {   // type 1: count + array of CollisionHullShap
     CollisionHullElement* hulls;   // hull elements, 0x198 bytes each
 };
 struct CollisionMeshShapeData {    // type 2
-    int field_0x00;
+    int sceneNode;
     void* boxTree;                 // +0x04 tree root (see CollisionMeshShapeBlock)
 };
 void CollisionModelShape_Free(void* s);                // 0x00431df0
@@ -433,7 +433,7 @@ static inline void SetIdentity(CollisionMatrix4* r)
 }
 
 struct CollisionMeshShapeBlock {                 // type 2, 0x48 bytes
-    int field_0x00;
+    int sceneNode;
     void* boxTree;                               // +0x04 0x24-byte root, filled by 0x0042dc90
     CollisionMatrix4 bodyTransform;              // +0x08 identity; CollisionMeshBody's view
 };
@@ -476,7 +476,7 @@ void CollisionObject::SetMeshShape(int count, void* points)
     CollisionMeshShapeBlock* mesh = (CollisionMeshShapeBlock*)operator new(0x48, __FILE__, 0x183);
     shapeType = 2;
     shape = mesh;
-    mesh->field_0x00 = 0;
+    mesh->sceneNode = 0;
     mesh->boxTree = operator new(0x24, __FILE__, 0x18a);
     SetIdentity(&mesh->bodyTransform);
     BuildModelBoxTree(reinterpret_cast<BoxTreeNode*>(mesh->boxTree),
@@ -617,7 +617,7 @@ void CollisionObject::GetShapePosition(CollisionVec3* out)
 
 // Primary scene-graph pointers held by the shape payloads (GetMatrixIn = 0x004fca80).
 
-struct HullNodeView { int field_0x00; CollisionSceneNode* node; };      // hull: node at +4
+struct HullNodeView { int swept; CollisionSceneNode* node; };      // hull: node at +4
 struct ModelNodeView { char pad[0x10]; CollisionSceneNode* node; };     // model: node at +0x10
 struct MeshNodeView { CollisionSceneNode* node; };                      // mesh: node at +0
 
@@ -1425,7 +1425,7 @@ public:
     int GetObjectCount();                     // 0x00457080
     CollisionObject* GetObject(int index);    // 0x004570a0 (ret 4)
     unsigned short cellX;                     // +0x0c
-    unsigned short field_0x0e;
+    unsigned short cellY;
     unsigned short cellZ;                     // +0x10
 };
 struct CollisionVegetationGrid {   // object at *0x0059aebc (tier 3): a view of EcoSystem (g_EcoSystem)

@@ -36,7 +36,7 @@ struct VisualCueKrustyBikeView : virtual public GameObject {
     virtual void UnknownVirtualSlot0();
     int IsCueRacerEnabled() { return isEnabled; }
 
-    unsigned char field_0x08[0x0c - 0x08];
+    unsigned char sceneNode[0x0c - 0x08]; // +0x08: the view's sceneNode, as RaceView.h (bytes kept)
     Vector3 position;                         // +0x0c
 };
 

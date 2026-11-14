@@ -65,7 +65,7 @@ public:
     MovingPart(void* name, int root, int ownerRef);
     ~MovingPart();
 
-    char field_0x00[0x40];
+    char matrix[0x40]; // +0x00: MovingPart::matrix, a Matrix4 (bytes kept)
     ShockNode* sceneNode;   // +0x40 (+0x44 in a Shock): the node the shocks move
     int ownerRef;           // +0x44 ctor arg ownerRef
     int field_0x48;

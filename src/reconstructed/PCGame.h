@@ -51,8 +51,8 @@ public:
     virtual RenderTarget* CreateRenderTarget();   // 0x004c0a90: creates the render target
     virtual int InitializeDisplay();          // 0x004c0c60: sets the display mode
     virtual int FilterDisplayModes(PCVideoCard* display);   // 0x004c05a0: filters display modes
-    virtual int OnChar(int value);               // 0x004c0340: root slot 20 unless input is held
-    virtual int OnKeyDown(int value);            // 0x004c0370: root slot 21 unless input is held
+    virtual int OnChar(int character);               // 0x004c0340: root slot 20 unless input is held
+    virtual int OnKeyDown(int key);            // 0x004c0370: root slot 21 unless input is held
     virtual int CheckLobbyLaunch();           // 0x004c0c10: the "lobby" command-line switch
 
     // Game+0x10 is always the PCRenderTarget that slot 31 creates.

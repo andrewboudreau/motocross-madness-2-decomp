@@ -81,7 +81,7 @@ public:
     void ClearEntries();             // 0x0049bb80: frees +0x60
     void LoadGarageTables();             // 0x0049a540: loads the garage tables
     void LoadBikesAndRiders();                // 0x0049a8b0: bikes.pb and riders.pb
-    GameObject* Create(RenderTarget* target, int value); // 0x004988a0
+    GameObject* Create(RenderTarget* target, int showIntro); // 0x004988a0
     void BuildGarageScene(int value);                         // 0x00498cf0
     void OpenMenu(int menu);                                       // 0x00499b20: opens a menu
     void StepProgressBar();                                  // 0x0049b530
@@ -123,7 +123,7 @@ public:
     SelectGameD3DIMSoultreeCharacterView* riderPreview; // +0x46c: the rider preview (dlgprocs.cpp SPBikeRiderDlg slot 13)
     SelectGameD3DIMSoultreeCharacterView* garageCharacter; // +0x470: the garage character (dlgprocs.cpp SPBikeRiderDlg slot 10)
     Vector3 garageFocus;                      // +0x474: the +0x464 scene's focus (SelectGamePicProcs.cpp)
-    unsigned char field_0x480[0x48c - 0x480];
+    unsigned char riderPosition[0x48c - 0x480]; // +0x480: the rider model's position, a Vector3 (bytes kept; 0x00498cf0)
     int profileLoaded;                        // +0x48c: set once a profile is loaded or saved (UiInfo.cpp LoadProfile/SaveProfile)
     UIDialog* progressDialog;                 // +0x490: the dialog holding "ProgressBar" (DlgProcs.cpp sets and clears it)
     void* savedInputContext;                  // +0x494: ImmAssociateContext's result (DlgProcs.cpp), restored to the window (EventManager 0x0045e710)

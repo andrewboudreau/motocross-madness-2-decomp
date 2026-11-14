@@ -53,8 +53,8 @@ void SetTaskSwitchAllowed(int value);
 // The Soultree object at a character's +0x1a0.
 struct KrustyUISoultreeObjectView {
     void SetPosition(const Vector3* position);   // 0x004fc660
-    void SetAxes(float a, float b, float c, float d, float e, float f, float g,
-                               int h);                     // 0x004fbd10
+    void SetAxes(float zx, float zy, float zz, float yx, float yy, float yz, float g,
+                               int keepZ);                     // 0x004fbd10
 };
 
 // RTTI D3DIMSoultreeCharacter (0x240 bytes, constructor 0x004455b0): vfptr
@@ -75,9 +75,9 @@ public:
     virtual void CopyModelFrom();
     virtual void DumpNodeTransforms();
     virtual GameObject* LoadCharacter(void* owner, const char* name, GameObject* lights,
-                                               void* context, int a, int b);
+                                               void* context, int useOptions, int unused);
     void SetMotionByName(const char* motion);        // 0x004a8b10: plays a motion
-    int AdvanceMotion(float time, int a, int b);   // 0x004a6bb0: advances it
+    int AdvanceMotion(float time, int mirror, int mask);   // 0x004a6bb0: advances it
 
     unsigned char field_0x008[0x1a0 - 0x8];
     KrustyUISoultreeObjectView* modelNode;           // +0x1a0
@@ -260,12 +260,12 @@ GameObject* KrustyUI::Create(RenderTarget* target, int showIntro) {
 }
 
 
-// KrustyUI.h leaves +0x480 as bytes and types +0x46c and +0x470 as the
+// KrustyUI.h keeps riderPosition (+0x480) as bytes and types +0x46c and +0x470 as the
 // selection dialogs' model views; 0x00498cf0 stores the garage character at
 // +0x470, the rider at +0x46c and the rider's position (a Vector3) at +0x480.
 #define KRUSTYUI_GARAGE (*(KrustyUID3DIMSoultreeCharacterView**)&garageCharacter)
 #define KRUSTYUI_RIDER (*(KrustyUID3DIMSoultreeCharacterView**)&riderPreview)
-#define KRUSTYUI_RIDER_POSITION (*(Vector3*)field_0x480)
+#define KRUSTYUI_RIDER_POSITION (*(Vector3*)riderPosition)
 #define KRUSTYUI_TARGET ((PCRenderTarget*)renderContext)
 #define KRUSTYUI_MODELS ((KrustyUIModelRecord*)manufacturers)
 // The manufacturers' UI models, seen through this unit's character view.

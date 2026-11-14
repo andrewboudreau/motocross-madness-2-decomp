@@ -77,7 +77,7 @@ void TrackGameViewOwner::SetFollowedRacer(EventKrustyBikeView* racer, EventKrust
         previous->tagRun = 0.0f;
         FOLLOWED_RACER_SLOTS(previous)->SetSpawnProtection(1, 5.0f, 0);
         if (ball)
-            ball->field_0x10a = 0;
+            ball->asleep = 0;
     }
     *(float*)&gateCount = 5.0f;
     if (tell)

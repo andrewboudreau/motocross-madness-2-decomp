@@ -299,10 +299,10 @@ int GameObject::AttachRenderContext(void* context) {
 }
 
 // 0x00469c00: unlike slots 19/22/23, not gated by childFlags.
-int GameObject::OnChar(int value) {
+int GameObject::OnChar(int character) {
     for (GameObject* child = firstChild; child; child = child->nextSibling) {
         if (child->isEnabled && !child->pendingRelease) {
-            if (child->OnChar(value))
+            if (child->OnChar(character))
                 return 1;
         }
     }
@@ -310,10 +310,10 @@ int GameObject::OnChar(int value) {
 }
 
 // 0x00469c40: like slot 20, not gated by childFlags.
-int GameObject::OnKeyDown(int value) {
+int GameObject::OnKeyDown(int key) {
     for (GameObject* child = firstChild; child; child = child->nextSibling) {
         if (child->isEnabled && !child->pendingRelease) {
-            if (child->OnKeyDown(value))
+            if (child->OnKeyDown(key))
                 return 1;
         }
     }

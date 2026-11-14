@@ -57,7 +57,7 @@ Overlay* Overlay::Attach(RenderTarget* target, TextureMap* texture,
                                         const OverlayRect* rect, int scaleRect,
                                         const OverlayRect* source, float depth,
                                         char withText, const char* textArchive, const char** fontNames,
-                                        int fontCount, int textFormat, int a12) {
+                                        int fontCount, int textFormat, int textureContext) {
     GameObject::SetRenderContext(target);
     overlayDepth = depth;
     overlayTexture = texture;
@@ -74,7 +74,7 @@ Overlay* Overlay::Attach(RenderTarget* target, TextureMap* texture,
     if (withText)
         textService = TextService::Create(
             textArchive, fontNames, fontCount, textFormat, g_TrackGame->textureManager, quadVertices[0].sx, quadVertices[0].sy,
-            quadVertices[2].sx - quadVertices[0].sx, quadVertices[2].sy - quadVertices[0].sy, a12);
+            quadVertices[2].sx - quadVertices[0].sx, quadVertices[2].sy - quadVertices[0].sy, textureContext);
     else
         textService = 0;
 

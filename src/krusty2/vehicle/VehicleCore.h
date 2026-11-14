@@ -219,7 +219,7 @@ public:
     float suspensionMass;                     // +0x4DC  slot 0: = (suspensionWeightScale * baseWeight + arg) / 32.2 (weight to slugs); ApplyShockDamping passes it to Shock::ApplyDamping as the mass factor of the critical damping (tier 2)
     float targetLeanAngle;  // +0x4e0 Bike clamps it to +-maxLeanAngle and subtracts it from the current lean (slot 57)
     float leanError;        // +0x4e4 Bike slot 92 (0x0040ba30): _finite()/fabs on it (float, tier 2)
-    float field_0x4e8;
+    float scaledTurnRadius; // +0x4e8 DeflectVelocity (0x005281cf): GetTurnRadius(point, dir) * d
     float wheelBase;  // +0x4ec slot 73 returns wheelBase / sin(steer angle) (bicycle-model turn radius)
     int spawnProtected;  // +0x4f0 slot 50 stores protect here, slot 51 returns it; slot 33 (respawn) sets it using slot 45 (3.0)
     float spawnProtectTimer;   // +0x4f4 tier 2: countdown; slot 49 tests > 0 and subtracts stepTime (frame dt), slot 50 stores it
@@ -295,7 +295,7 @@ VEH_CHECK_OFFSET(Vehicle, suspensionWeightScale, 0x4D8);
 VEH_CHECK_OFFSET(Vehicle, suspensionMass, 0x4DC);
 VEH_CHECK_OFFSET(Vehicle, targetLeanAngle, 0x4E0);
 VEH_CHECK_OFFSET(Vehicle, leanError, 0x4E4);
-VEH_CHECK_OFFSET(Vehicle, field_0x4e8, 0x4E8);
+VEH_CHECK_OFFSET(Vehicle, scaledTurnRadius, 0x4E8);
 VEH_CHECK_OFFSET(Vehicle, wheelBase, 0x4EC);
 VEH_CHECK_OFFSET(Vehicle, spawnProtected, 0x4F0);
 VEH_CHECK_OFFSET(Vehicle, spawnProtectTimer, 0x4F4);

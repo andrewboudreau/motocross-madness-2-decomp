@@ -1291,7 +1291,7 @@ PCSoundInterface::~PCSoundInterface() {
 // that option first, so it never is), the primary buffer and the helper,
 // sets the format and queries the listener. 0x8878000a is returned when
 // already started or without a primary buffer.
-long PCSoundInterface::InitializeSound(int rate, int stereo, int bits, int value, int allowEax) {
+long PCSoundInterface::InitializeSound(int rate, int stereo, int bits, int budget, int allowEax) {
     long result;
 
     if (audioStarted)
@@ -1323,7 +1323,7 @@ long PCSoundInterface::InitializeSound(int rate, int stereo, int bits, int value
     if (!primaryBuffer)
         return 0x8878000a;
     soundMemoryManager = new (__FILE__, 2367) SoundMemoryManager;
-    if (!soundMemoryManager || !soundMemoryManager->StartLoaderThread(value))
+    if (!soundMemoryManager || !soundMemoryManager->StartLoaderThread(budget))
         return 0;
     audioStarted = 1;
     RefreshSoundCaps();

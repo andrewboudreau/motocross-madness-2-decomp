@@ -579,7 +579,7 @@ int UIControl::EnterHover() {
 }
 
 // 0x00472630
-void UIControl::LeaveHover(int value) {
+void UIControl::LeaveHover(int next) {
     if (enabled)
         SetState(0);
     ToolTip* tip = ownerDialog->guiUser->userToolTip;
@@ -780,7 +780,7 @@ void UIEditBox::SetBackgroundColor(unsigned long color) {
 }
 
 // 0x004740b0
-void UIEditBox::KillFocus(int value) {
+void UIEditBox::KillFocus(int next) {
     DialogEvent event;
     event.handled = 0;
     event.kind = kDialogEditDone;
@@ -791,7 +791,7 @@ void UIEditBox::KillFocus(int value) {
     event.control = this;
     ownerDialog->HandleEvent(&event);
     RequestRedraw();
-    UIControl::KillFocus(value);
+    UIControl::KillFocus(next);
 }
 
 // 0x00474120
@@ -1622,9 +1622,9 @@ UIDDLScrollBar::UIDDLScrollBar(int type, int id, CameraRect* area, UIDialog* own
 }
 
 // 0x004796e0
-void UIDDLScrollBar::KillFocus(int value) {
-    UIControl::KillFocus(value);
-    if (!ownerList->IsPart((UIControl*)value))
+void UIDDLScrollBar::KillFocus(int next) {
+    UIControl::KillFocus(next);
+    if (!ownerList->IsPart((UIControl*)next))
         ownerList->SetOpen(0);
 }
 
@@ -1635,9 +1635,9 @@ UIDDLStatic::UIDDLStatic(int id, CameraRect* area, UIDialog* owner, UIDropDownLi
 }
 
 // 0x00479bc0
-void UIDDLStatic::KillFocus(int value) {
-    UIControl::KillFocus(value);
-    if (!ownerList->IsPart((UIControl*)value))
+void UIDDLStatic::KillFocus(int next) {
+    UIControl::KillFocus(next);
+    if (!ownerList->IsPart((UIControl*)next))
         ownerList->SetOpen(0);
 }
 
@@ -1656,9 +1656,9 @@ int UIDDLButton::ButtonDown(int button, int position) {
 }
 
 // 0x00479ce0
-void UIDDLButton::KillFocus(int value) {
-    UIControl::KillFocus(value);
-    if (!ownerList->IsPart((UIControl*)value))
+void UIDDLButton::KillFocus(int next) {
+    UIControl::KillFocus(next);
+    if (!ownerList->IsPart((UIControl*)next))
         ownerList->SetOpen(0);
 }
 
@@ -1679,9 +1679,9 @@ int UIDDLListBox::SetSelectedRow(int row) {
 }
 
 // 0x00479e70
-void UIDDLListBox::KillFocus(int value) {
-    UIControl::KillFocus(value);
-    if (!ownerList->IsPart((UIControl*)value))
+void UIDDLListBox::KillFocus(int next) {
+    UIControl::KillFocus(next);
+    if (!ownerList->IsPart((UIControl*)next))
         ownerList->SetOpen(0);
 }
 
@@ -1748,9 +1748,9 @@ void UIDropDownList::SetAttachId(int id) {
 }
 
 // 0x0047a7d0
-void UIDropDownList::KillFocus(int value) {
-    UIControl::KillFocus(value);
-    if (!IsPart((UIControl*)value))
+void UIDropDownList::KillFocus(int next) {
+    UIControl::KillFocus(next);
+    if (!IsPart((UIControl*)next))
         SetOpen(0);
 }
 
@@ -2629,7 +2629,7 @@ int UIControl::ButtonDown(int button, int position) {
 }
 
 // 0x00472320
-int UIControl::OnChar(int value) {
+int UIControl::OnChar(int character) {
     DialogEvent event;
     event.handled = 0;
     if (ownerDialog->guiUser->focusControl == (GuiControlView*)this) {
@@ -2639,7 +2639,7 @@ int UIControl::OnChar(int value) {
         event.dialog = ownerDialog;
         event.gui = ownerGui;
         event.control = this;
-        event.key = value;
+        event.key = character;
         event.param = 1;
         ownerDialog->HandleEvent(&event);
         if (event.handled)
@@ -2647,11 +2647,11 @@ int UIControl::OnChar(int value) {
         if (!event.param)
             return 1;
     }
-    return GameObject::OnChar(value);
+    return GameObject::OnChar(character);
 }
 
 // 0x004723d0
-int UIControl::OnKeyDown(int value) {
+int UIControl::OnKeyDown(int key) {
     DialogEvent event;
     event.handled = 0;
     if (ownerDialog->guiUser->focusControl == (GuiControlView*)this) {
@@ -2661,7 +2661,7 @@ int UIControl::OnKeyDown(int value) {
         event.dialog = ownerDialog;
         event.gui = ownerGui;
         event.control = this;
-        event.key = value;
+        event.key = key;
         event.param = 1;
         ownerDialog->HandleEvent(&event);
         if (event.handled)
@@ -2669,7 +2669,7 @@ int UIControl::OnKeyDown(int value) {
         if (!event.param)
             return 1;
     }
-    return GameObject::OnKeyDown(value);
+    return GameObject::OnKeyDown(key);
 }
 
 // 0x00472480
@@ -3683,21 +3683,21 @@ CameraRect g_ControlDrawRect;                 // 0x0065b5f0: the background's co
 int g_ControlDrawResult;                      // 0x0065b5ec: GetDc's result, returned
 
 // 0x0046ed70
-int UIDialog::BeginControlDraw(void** dc, CameraRect* rect, int* a, UIControl* control) {
+int UIDialog::BeginControlDraw(void** dc, CameraRect* rect, int* more, UIControl* control) {
     g_ControlDrawClipRect = rect;
-    *a = 0;
+    *more = 0;
     previousFont = 0;
     if (dialogBackground) {
         g_ControlDrawClipRect = &g_ControlDrawRect;
         g_ControlDrawRect = *rect;
         if (control) {
             g_ControlDrawResult = dialogBackground->GetDc(
-                dc, rect, control->backgroundRegion, control->needsRedraw, &control->redrawFrames, a,
+                dc, rect, control->backgroundRegion, control->needsRedraw, &control->redrawFrames, more,
                 &g_ControlDrawRect);
         } else {
             int frames = 1;
             g_ControlDrawResult =
-                dialogBackground->GetDc(dc, rect, -1, 0, &frames, a, &g_ControlDrawRect);
+                dialogBackground->GetDc(dc, rect, -1, 0, &frames, more, &g_ControlDrawRect);
         }
     } else {
         ((PCRenderTarget*)GetRenderContext())->renderSurface->GetDC(dc);
@@ -4350,14 +4350,14 @@ int UIControl::Draw() {
 
 // 0x00474570: the caret keys (Home, End, Left, Right, Delete); measures the
 // text and the caret's offset.
-int UIEditBox::OnKeyDown(int value) {
-    if (!UIControl::OnKeyDown(value) &&
+int UIEditBox::OnKeyDown(int key) {
+    if (!UIControl::OnKeyDown(key) &&
         ownerDialog->guiUser->focusControl == (GuiControlView*)this) {
         if (clickSound) {
             clickSound->SetVolume(ownerGui->soundVolume, 0);
             clickSound->PlayWithOptions(1, 0, 0);
         }
-        switch (value) {
+        switch (key) {
         case VK_HOME:
             textLength = 0;
             textWidth = 0;

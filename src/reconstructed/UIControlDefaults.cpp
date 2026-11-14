@@ -3,7 +3,7 @@
 #include "GameUi.h"
 
 // UIControl primary slots 33, 59 and 60 each select RET 4 at 0x00464e80.
-void UIControl::KillFocus(int value) {
+void UIControl::KillFocus(int next) {
 }
 
 void UIControl::SyncBoundValue(int value) {

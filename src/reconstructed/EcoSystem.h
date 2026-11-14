@@ -103,7 +103,7 @@ class EcoLightEmitterView {
 public:
     unsigned char field_0x00[0x54];
     float colour[4];                          // +0x54
-    unsigned char field_0x64[0x70 - 0x64];
+    unsigned char lightPosition[0x70 - 0x64]; // +0x64: LightEmitter::lightPosition, a Vector3 (bytes kept)
     Vector3 direction;                        // +0x70
 };
 class LightEmitter;

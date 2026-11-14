@@ -258,7 +258,7 @@ public:
 struct GridBlockRecord {
     int textureReference;  // +0x0  stream header word; Grid1BlockTexture packs own bit and table index (0xfffe/0xffff: none)
     int texture;  // +0x4 Grid1BlockTexture texture (Grid1.h)
-    unsigned char field_0x08[0x1c - 0x08];
+    unsigned char ageEntry[0x1c - 0x08]; // +0x08: Grid1.h AgeEntry ageEntry (bytes kept)
     float mappingScale;  // +0x1C  RemapTexCoordsIfMoved scale; 1.0 after a rebuild (0x0047f210)
     float mappingOffsetU;  // +0x20  RemapTexCoordsIfMoved offsetU; 0 after a rebuild
     float mappingOffsetV;  // +0x24  RemapTexCoordsIfMoved offsetV; 0 after a rebuild
@@ -273,13 +273,13 @@ struct GridNodeExtra {
     GridManagedTexture* texture;               // +0x08 tested before slot 4(-1)
     int textureReference;  // +0xC  stream header; Grid1NodeExtra packs own bit and texture table index
     int builtTexture;                          // +0x10 Grid1.h's builtTexture: the node texture BuildNodeTexture takes from Terrain's pool
-    unsigned char field_0x14[0x28 - 0x14];
+    unsigned char ageEntry[0x28 - 0x14]; // +0x14: Grid1.h AgeEntry ageEntry (bytes kept)
     float mappingScale;  // +0x28  RemapTexCoordsIfMoved scale; 1.0 after a rebuild
     float mappingOffsetU;  // +0x2C  RemapTexCoordsIfMoved offsetU; 0 after a rebuild
     float mappingOffsetV;  // +0x30  RemapTexCoordsIfMoved offsetV; 0 after a rebuild
     float detail;                              // +0x34 detail of the whole node
     GridBlockRecord* blockRecords;             // +0x38 sixteen records or null
-    unsigned char field_0x3c[4];
+    unsigned char textureFlags[4]; // +0x3c: Grid1.h textureFlags (bytes kept)
 };
 
 // Twelve-byte entries at GridNodeDrawData::blockRanges, one per 4 x 4 block

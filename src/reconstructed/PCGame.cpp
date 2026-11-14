@@ -268,17 +268,17 @@ int PCGame::OnDeactivate() {
 }
 
 // 0x004c0340
-int PCGame::OnChar(int value) {
+int PCGame::OnChar(int character) {
     if (inputSuspended)
         return 1;
-    return rootObject->OnChar(value);
+    return rootObject->OnChar(character);
 }
 
 // 0x004c0370
-int PCGame::OnKeyDown(int value) {
+int PCGame::OnKeyDown(int key) {
     if (inputSuspended)
         return 1;
-    return rootObject->OnKeyDown(value);
+    return rootObject->OnKeyDown(key);
 }
 
 // 0x004c03a0: control 0xb7 released (kind 0) triggers the +0x10 object.

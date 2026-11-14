@@ -334,7 +334,7 @@ public:
     float distanceRatioSq;  // +0x78  ComputeRatios: square of distanceRatio; Griddraw's vertex error limit factor
     float invDistanceRatioSq;  // +0x7C  ComputeRatios: 1 / distanceRatioSq
     float invDistanceRatio;  // +0x80  ComputeRatios: 1 / distanceRatio
-    int field_0x84;
+    int runMeshChecks;
     int indicesDrawn;  // +0x88  GridTerrain: Griddraw adds each draw's index count; slot 14 zeroes it, then divides by 3
     int verticesDrawn;  // +0x8C  GridTerrain: Griddraw adds each draw's vertex count; zeroed by slot 14
     int vertexErrorTests;  // +0x90  GridTerrain: incremented per vertex error test; slot 14 prints it in "Eval %d[%d]"

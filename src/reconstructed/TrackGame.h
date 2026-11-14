@@ -40,7 +40,7 @@ public:
     void SetRecorder(KrustyVCR* vcr); // 0x004a9d10: keeps the recorder at +0x708
 
     unsigned char field_0x000[0x10a];
-    unsigned char field_0x10a;                // cleared when the followed racer changes (0x004a9e80)
+    unsigned char asleep;                     // +0x10a SoultreePhysicsBaseObject::asleep; cleared when the followed racer changes (0x004a9e80)
     unsigned char field_0x10b[0x708 - 0x10b];
     KrustyVCR* recorder;                      // +0x708
 };

@@ -459,7 +459,7 @@ struct KbObj128 {
 // feedback methods: 6 CreateConstantForce, 7 SetConstantForce, 11 StopEffect, 12 StartEffect;
 // +0x0c is InputDevice's deviceKind.  KbEffectParams is SetConstantForce's direction array
 // (0x4650 = 180 degrees in DirectInput hundredths).
-struct KbEffectParams { int field_0x0; int field_0x4; };
+struct KbEffectParams { int angle; int field_0x4; };
 struct KbPad {
     virtual void RemoveBindings();
     virtual void UnknownVirtualSlot1();

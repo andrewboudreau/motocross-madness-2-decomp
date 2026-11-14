@@ -39,12 +39,12 @@
 #include "../../src/reconstructed/PCRenderTarget.h"
 #include "../../src/reconstructed/RenderInterfaces.h"
 
-int UIEditBox::OnChar(int value) {
+int UIEditBox::OnChar(int character) {
     DialogEvent event;
-    char c = (char)value;
+    char c = (char)character;
     int result = 0;
     event.handled = 0;
-    if (!UIControl::OnChar(value) &&
+    if (!UIControl::OnChar(character) &&
         ownerDialog->guiUser->focusControl == (GuiControlView*)this) {
         if (clickSound) {
             clickSound->SetVolume(ownerGui->soundVolume, 0);

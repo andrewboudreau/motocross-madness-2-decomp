@@ -70,7 +70,7 @@ struct CollisionModelBody {
 
 // View of a type-2 static-mesh payload (only the parts 0x00436100 / 0x00438c90 read).
 struct CollisionMeshBody {
-    void* field_0x00;
+    void* sceneNode;
     CollisionBoxBounds* boxTree;      // +0x04 tree root; bounds object (center at +4, half
                                       // extents at +0x10)
     Matrix4 bodyTransform;            // +0x08 mesh -> world; SetTransform stores the matrix here

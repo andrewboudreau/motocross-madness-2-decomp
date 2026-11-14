@@ -130,7 +130,7 @@ struct Particle {
     float lifetime;          // +0x18 slot 10 recycles the particle once age > lifetime
     float size;              // +0x1c grows by dt*growth every tick while flag 8 is set
     float growth;            // +0x20 see size
-    char field_0x24[0x34 - 0x24];  // +0x24..+0x30 written by Render (projected corner values)
+    char screenRect[0x34 - 0x24];  // +0x24..+0x30 written by Render (projected corner values)
     unsigned int flags;      // +0x34 bit 8: size grows, bit 4: velocity moves it, bit 0x10: gravity applies
     ParticleVec3 velocity;   // +0x38 added to position * dt (flag 4); gravity is added to it (flag 0x10)
     ParticleVertex* vertex;  // +0x44 Render points it into the locked vertex buffer (0x20 bytes per particle); the depth sort reads vertex->z

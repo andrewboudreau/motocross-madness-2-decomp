@@ -168,7 +168,7 @@ int Terrain::PrepareGeometry()
     profileEval = now - last;
     last = now;
 
-    if (field_0x84) {
+    if (runMeshChecks) {
         GridRoot()->TestDroppableVertices();      // 0x00481580
         GridRoot()->CountEdgeDifferences();       // 0x004813e0
     }

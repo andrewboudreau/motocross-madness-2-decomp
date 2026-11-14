@@ -58,7 +58,7 @@ public:
                               int dirty, int* frames, unsigned char* table);
     // 0x004049d0: a DC clipped to `rect` (gameui.cpp 0x0046ed70; near miss in
     // samples/render/BackgroundImageNearMisses.cpp).
-    int GetDc(void** dc, CameraRect* rect, int index, int dirty, int* frames, int* a,
+    int GetDc(void** dc, CameraRect* rect, int index, int dirty, int* frames, int* more,
                               CameraRect* clip);
     // Region `index`'s rectangle for the target's current frame.
     CameraRect& CurrentRegionRect(int index) {

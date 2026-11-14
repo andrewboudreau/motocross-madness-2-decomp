@@ -74,7 +74,7 @@ struct SelectGameD3DIMSoultreeCharacterView : virtual public GameObject {
     virtual void AdvanceMotionInterpolated(float frameTime, int a, int b);
     void SetMotionByName(const char* motion); // 0x004a8b10: plays a motion ("WaitR")
 
-    unsigned char field_0x008[0x0c - 0x08];
+    unsigned char sltFile[0x0c - 0x08]; // +0x08: D3DIMSoultreeCharacter::sltFile (bytes kept)
     int motionFinished;                       // +0x0c: the motion has finished
     unsigned char field_0x010[0x1a0 - 0x10];
     void* plateTexture;                       // +0x1a0: the texture the plate number goes on
@@ -105,7 +105,7 @@ struct KrustyUIBikeRecord {
 struct SelectGameRaceSettingsView {
     int raceMode;                             // +0x00: race mode (+0x2d70)
     int eventType;                            // +0x04: event type (+0x2d74)
-    unsigned char field_0x08[0x0c - 0x08];
+    unsigned char series[0x0c - 0x08]; // +0x08: RaceSettings::series (bytes kept)
     int races;                                // +0x0c: races (+0x2d7c)
     int treeCollision;                        // +0x10: tree collision (+0x2d80)
     unsigned char field_0x14[0x20 - 0x14];

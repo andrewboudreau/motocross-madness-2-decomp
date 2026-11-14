@@ -45,7 +45,7 @@ public:
     MovingPart(void* name, int root, int ownerRef); // 0x004a23a0 (ret 0xc)
     ~MovingPart();                          // 0x00464e90, an empty out-of-line dtor
 
-    char field_0x00[0x40];
+    char matrix[0x40]; // +0x00: MovingPart::matrix, a Matrix4 (bytes kept)
     TireNode* sceneNode;                   // +0x40 root->FindByName(name) (0x004fdae0)
     int ownerRef;                         // +0x44 ctor arg ownerRef
     int field_0x48;                         // 0

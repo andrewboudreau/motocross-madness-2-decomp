@@ -265,11 +265,11 @@ int PCVideoCard::SetWindowedCooperativeLevel(int x, int y, int width, int height
 }
 
 // 0x004c9ec0
-int PCVideoCard::SetDisplayMode(int width, int height, int bitDepth, int a, int refreshRate, int windowed,
+int PCVideoCard::SetDisplayMode(int width, int height, int bitDepth, int bufferCount, int refreshRate, int windowed,
                                    int c) {
     if (cooperativeLevel & DDSCL_NORMAL)
         return CreateWindowedSurfaces(width, height, windowed);
-    int mode = FindDisplayMode(width, height, bitDepth, a, refreshRate);
+    int mode = FindDisplayMode(width, height, bitDepth, bufferCount, refreshRate);
     if (mode == -1)
         return 0;
     return SetFullscreenDisplayMode(mode, windowed);
