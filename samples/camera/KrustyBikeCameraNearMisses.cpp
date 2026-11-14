@@ -41,6 +41,11 @@
 // local. Probe only: a virtual view of the FIRST 0x004210f0 call fixes
 // every later register (14 instruction diffs, sizes shift); virtual at the
 // second call does not (19).
+// Wave 26 (33 renderings, all 313 of 376 with the table, the same code):
+// the static flag copied into a bool or int local (declared with the copy
+// or assigned inside the test) and that known-zero local passed as the
+// first call's last argument, stored back negated, or selected through a
+// ternary. The call ahead of the flag store is far worse (150).
 #include "../../src/reconstructed/KrustyBikeCamera.h"
 
 // .bss state used by slot 10. There is no initialisation guard, so these are
