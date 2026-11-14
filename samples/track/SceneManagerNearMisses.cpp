@@ -30,25 +30,38 @@
 // that loop then keeps retail's strength-reduced entries offset in ebx,
 // stores/reloads `dot` around strlen and stores an immediate 0 at
 // token[dot], and the "Cannot find" errors keep retail's two sprintf tails
-// (4393 -> 5113 of 5335). Left: the frame is 0xd00 where retail has 0xcfc,
-// one scalar slot too many, so most offsets above the low slots are 4 off.
-// Frame symbols mapped to retail's offsets (a /FAs listing against the
-// matched instructions): retail's low slots are {sequence j, axes,
-// random-set j, temporaries} 0, {dot, automatic} 4, {fps, the random-set
-// entries-offset spill} 8, animations 0xc, i 0x10 (alone); here they are
-// {sequence j, temporaries, spill} 0, {i, dot} 4, {axes, random-set j} 8,
-// with automatic and fps alone higher up. So retail lets the strcspn result
-// and the spill reuse the two address-taken GetInt/GetFloat homes once the
-// animation loop is done and keeps i's home to itself; VC6 here gives both
-// i's dead home. Reusing `automatic` for dot gives 0xcfc but loses the
-// store/reload shape (4349). Without effect on the low slots (72 scope
-// combinations measured): automatic at function, loop-body or keyFramed
-// scope; fps at function or loop-body scope or in a block around the loop;
-// dot as a loop-body, random-set-block or function local; i as a function
-// local or `for (int i` (separate random-set index too); axes at function
-// scope; any declaration order of automatic, fps and i; i kept live past
-// the random-set loop. A function-scope `length` shared with the SLT name
-// length and `next` dropped from the animation loop also keep 0xd00.
+// (4393 -> 5113 of 5335). The frame: the five sound-settings scalars
+// (flags, oneShotDistance, randomTriggerPercent, oneShot, force2D) are
+// locals of the `if (strcmp(sound, "") && ...)` block and `automatic` is a
+// local of the keyFramed block (it serves both GetInt calls there). Both
+// are needed together; either one alone leaves the frame at 0xd00 (5113).
+// With them the frame is retail's 0xcfc, slot 0 holds retail's {sequence j,
+// axes, random-set j, temporaries} and every slot from useLighting (0x24)
+// up is retail's (5288). heading and pitch as loop-body locals give one
+// more byte (5289); any other single scalar moved to the loop body gives
+// the same byte, more of them nothing further.
+// Left (46 bytes): (1) the low scalar slots. Retail: {dot, automatic} 4,
+// {fps, the random-set entries-offset spill} 8, animations 0xc, i 0x10,
+// frontWheelsTurn 0x14, lagDistance 0x18, next 0x1c, tires 0x20. Here:
+// {spill, i} 4, {automatic, dot} 8, animations 0xc, frontWheelsTurn 0x10,
+// next 0x14, lagDistance 0x18, fps 0x1c, tires 0x20. So retail lets the
+// spill reuse fps's home and keeps i's home to itself. (2) The
+// motions allocation tests and reloads motionCount as [ebx + ecx + 0x1c]
+// (i offset first) where this gives [ecx + ebx + 0x1c].
+// Without effect on (1), on top of the form above: fps (alone or with
+// lagDistance, frontWheelsTurn, tires) in the loop body, in a block around
+// the loop or in a bare block inside the loop body; any order of the
+// loop-body declarations; a separate random-set index (`for (int k` or a
+// function local). Before the form above, 72 scope combinations of
+// automatic, fps, dot, i and axes were flat too; `automatic` as two
+// separate bare-block locals around the two GetInt calls gives slot 0
+// retail's contents and moves the spill into the first one's home (5129,
+// frame still 0xd00). Reusing `automatic` for dot loses the store/reload
+// shape (4349).
+// Tried for (2): no `table` local or a named count (5268), `table` taken
+// before the test (3076) or used for the store too (2688), an entries or
+// entry pointer local (2736, 2869), `i = 0;` or `next = 0;` at the top
+// of the function (5289, no change).
 #include <float.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -463,7 +476,6 @@ int Scene::ReadStaticModels(LightManager* lights, int particleManager, int textu
 // optional sound emitter; then the "RandomSet<n>" sections.
 int Scene::ReadAnimations(LightManager* lights, int textureManager, int modelTextures, void (*progress)(int), int interval)
 {
-    int automatic;
     float fps;
     int animations;
     int i;
@@ -472,17 +484,10 @@ int Scene::ReadAnimations(LightManager* lights, int textureManager, int modelTex
     int next;
     int tires;
     int useLighting;
-    float randomTriggerPercent;
-    float oneShotDistance;
     int exclude;
-    unsigned long flags;
-    float heading;
-    float pitch;
-    int force2D;
     char name[0x40];
     Vector3 up;
     Vector3 look;
-    int oneShot;
     char motion[0x14];
     char number[0x18];
     char setName[0x44];
@@ -515,6 +520,8 @@ int Scene::ReadAnimations(LightManager* lights, int textureManager, int modelTex
     LogParameter("Animations", "NumberOfAnimations", animations);
     animationTable->entries = new(__FILE__, 2181) SceneAnimation[animations];
     for (i = 0; i < animationTable->entryCount; i = next) {
+        float heading;
+        float pitch;
         if (i % interval == interval - 1 && progress)
             progress(0);
         animationTable->entries[i].inRandomSet = 0;
@@ -633,6 +640,7 @@ int Scene::ReadAnimations(LightManager* lights, int textureManager, int modelTex
         parameters.GetInt("ExcludeFromCameraIteration", 0, &exclude);
         animationTable->entries[i].excludeFromCameraIteration = exclude;
         if (animationTable->entries[i].keyFramed) {
+            int automatic;
             LogParameter(name, "MCF", file);
             animationTable->entries[i].character->modelNode->SetPosition(&animationTable->entries[i].position);
             if (axes)
@@ -701,6 +709,11 @@ int Scene::ReadAnimations(LightManager* lights, int textureManager, int modelTex
             if (auralScape) {
                 parameters.GetString("SoundResourceFile", "", sound, 0x103);
                 if (strcmp(sound, "") && _stricmp(sound, "NONE")) {
+                    unsigned long flags;
+                    float oneShotDistance;
+                    float randomTriggerPercent;
+                    int oneShot;
+                    int force2D;
                     ReadSoundSettings(name, sound, 0, &params, &flags, &oneShotDistance, &randomTriggerPercent,
                                           &oneShot, &force2D);
                     parameters.GetString("SoundAttachToObject", "", attach, 0x40);

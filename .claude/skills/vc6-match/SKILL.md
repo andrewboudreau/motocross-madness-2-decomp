@@ -124,6 +124,13 @@ near misses; `tools/near_miss_drops.py` lists ones whose gap is a single drop.
   constant arguments, a repeated guard) do not. EcoSystem 0x00458da0 reaches 461/461 this
   way; apply it only with evidence for the test's wording (it is otherwise dead code).
 
+- Frame one scalar slot too big with every instruction aligned: look at the scope of the address-taken
+  scalars (`GetInt(..., &x)` out-parameters). VC6 only lets a home be shared once its block is closed, and which
+  locals share decides the slot order of the others. Scene::ReadAnimations `0x004edfe0`: the five sound-settings
+  scalars as locals of the sound `if` block plus `automatic` as a local of the keyFramed block give retail's
+  0xcfc frame and upper slots (5113 -> 5288); either change alone, or moving scalars to the loop body, does
+  nothing. Map candidate and retail slots by paired instruction index first to see which variables retail shares.
+
 ## 4. Record and ship
 - Exact: set `"expect": "exact"` in the neighbouring `targets.json`, update tests if they hash objects
   (`tests/` object-pin fixtures), regenerate `PYTHONPATH=. python tools/decompilation_progress.py` then `--check`.

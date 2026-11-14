@@ -393,7 +393,7 @@ before it, even if that arm already matches.
 | render/TextService | `0x0050b700` | 398/758 | b | 31 differing instructions: w and v trade esi and a stack slot; row offsets in other registers |
 | render/TextService | `0x0050ba00` | 770/802 | b | scheduling of the v3.sx and v5.sx stores |
 | render/Tgafile | `0x00512990` | 354/982 (masked) | c | 49 code diffs |
-| track/SceneManager | `0x004edfe0` | 5113/5335 | b | instruction stream aligned; the frame is 0xd00 for retail 0xcfc (one scalar slot too many, low slots ordered spill/dot/j for retail j/dot/spill), and three [base + index] operand orders (NumberOfMotions, random-set keyFramed test) |
+| track/SceneManager | `0x004edfe0` | 5289/5335 | b | instruction stream aligned, frame 0xcfc as retail (sound scalars local to the sound block, `automatic` local to the keyFramed block); left: the low scalar slots 4..0x20 (retail puts the random-set spill in fps's home at 8 and keeps i alone at 0x10; here the spill shares i's home at 4 and fps sits at 0x1c) and the [base + index] order of the two motionCount reads at the motions allocation |
 | track/Track | `0x00517340` | 57/655 (masked) | b | 44 code diffs: retail lacks `mov [esp + N], 0`; `add esp, 0x24` vs `add esp, 0x20`; frame 0x24 vs 0x20 |
 | track/TrackOverlay | `0x00519a20` | 535/894 (masked) | c | 31 code diffs: retail lacks `mov ebp, ecx`; retail adds `push edi ; mov edi, ecx ; xor ebx, ebx` |
 | track/TrackOverlay | `0x0051bed0` | 1057/1088 (masked) | b | 3 code diffs: retail lacks `add edx, 0x5e0 ; push edx ; push ecx`; retail adds `add edx, 0x5e0`; slots differ |

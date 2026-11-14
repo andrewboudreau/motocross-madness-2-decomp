@@ -24,6 +24,6 @@
     "target_size": 4536,
     "expect": "exact",
     "bindings": "SceneManagerNearMisses.bindings.json",
-    "status": "Strict exact (4536/4536 code bytes; the jump table follows): `count` is a function-scope local zeroed at the top, so its leaf is older than the casters[i] offset and the name terminator adds the offset first. Kept as a sample with ReadAnimations (0x004edfe0, still partial)."
+    "status": "Strict exact (4536/4536 code bytes; the jump table follows): `count` is a function-scope local zeroed at the top, so its leaf is older than the casters[i] offset and the name terminator adds the offset first. Kept as a sample with ReadAnimations (0x004edfe0, 5289/5335, still partial)."
   }
 ]
