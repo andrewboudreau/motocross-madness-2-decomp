@@ -102,7 +102,9 @@ near misses; `tools/near_miss_drops.py` lists ones whose gap is a single drop.
   scope, makes its leaf older than values computed later, which flips the operand order of an integer add or
   `[base + index]` it takes part in (Scene::ReadStaticModels `0x004ecd60`, 4534 -> exact) and the order of two
   reloads before a call (`remap = 0;`, GatherModelTriangles `0x0042c260`, 1622 -> 1626). A declaration alone, or
-  the initialiser at first use, does not. Sweep one `x = 0;` per local first; pairs can cancel.
+  the initialiser at first use, does not. When the local is assigned again before any read, that clear is a dead
+  store: diagnostic only, never applied (both functions stay at the lower score). Apply it only where the zero is
+  actually read.
 - Two strength-reduced induction variables of mirrored expressions (`column * 128 - 256` and `256 - column * 128`)
   spilled in the wrong order: name one (`int x = column * 128 - 256;`) and write the other as `-x`. Every spelling
   of the two written out is canonicalised to the same code (BuildFaceGeometry `0x0043dc60`, 1100 -> exact).

@@ -9,11 +9,15 @@
 // in that frame's vertex range are taken, with positions from the mesh's +0x14 array.  Every
 // corner gets its own position, then equal positions are merged: the result is *verts
 // (*vertCount unique positions) and *indices (three per triangle, *triCount triangles).
-// PARTIAL 1626/1627: same size and instructions apart from one ModRM/SIB byte: the remap pass
-// reads keep[corners[k]] as [keep + offset] where VC6 gives [offset + keep].  The loop-variable
+// PARTIAL 1622/1627: same size and instructions. Retail reloads numCorners before remap ahead
+// of the 0x348 allocation (VC6 reloads remap first), and the remap pass reads keep[corners[k]]
+// as [keep + offset] where VC6 gives [offset + keep].
+// NOT APPLIED (compiler gaming, no evidence): a dead `remap = 0;` at the top of the function
+// (remap is assigned by DebugMalloc before any read) gives the reload order, 1626/1627. The
+// notes below that say "with `remap = 0;`" were measured with that store in place.  The loop-variable
 // names of the merge passes (j outer, k inner, i for the copy) are the ones that put every local
 // in retail's stack slot; other choices only move slots.
-// Round 9: `remap = 0;` at the top of the function is what gives retail's reload order before
+// Round 9: `remap = 0;` (not applied, see above) at the top of the function gives retail's reload order before
 // the 0x348 allocation (numCorners, then remap; without it VC6 reloads remap first, 1622).
 // Clearing any other single local there is inert or worse (keep 1614, k/i 1622, the rest
 // 1618), and clearing keep as well, or numCorners before remap, loses it again (1622).  With it,
@@ -69,7 +73,6 @@ void GatherModelTriangles(TreeModelSource* model, TreeSceneNode* frame, int* tri
     int k;
     int t;
 
-    remap = 0;
     numTris = 0;
     reinterpret_cast<SoultreeObject*>(model)->GetMatrixIn(0, reinterpret_cast<Matrix4*>(&saved));
     model->SetAxesIn(0, &kVec3ZAxis, &kVec3YAxis, 0, 1);

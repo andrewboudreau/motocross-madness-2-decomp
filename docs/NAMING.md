@@ -3498,9 +3498,9 @@ The rest has no new evidence and should wait for matching work to produce it.
 ## Wave 29: the Scene loader names
 
 Wave 29 is the Scene loader follow-up that Wave 28 deferred while
-Scene::ReadStaticModels `0x004ecd60` was being matched. That function is now
-strict exact, so the names used in it and in the rest of the Scene readers
-could be taken. Names only: no declaration, typedef or member was added,
+Scene::ReadStaticModels `0x004ecd60` was being matched. That function was then
+strict exact (4534/4536 since its dead `count = 0;` was reverted), so the
+names used in it and in the rest of the Scene readers could be taken. Names only: no declaration, typedef or member was added,
 removed or reordered, and every edited file keeps its line count and line
 endings. No static, global or type of a static was renamed, and no type whose
 RTTI descriptor is emitted.
