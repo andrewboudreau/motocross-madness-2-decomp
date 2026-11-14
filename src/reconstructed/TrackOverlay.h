@@ -255,9 +255,9 @@ public:
 
     // 0x0051b840: loads the map for the screen rectangle `screen` (only its
     // top and right edges are read).
-    RadarOverlay* LoadMap(RenderTarget* target, TextureMapManager* manager, int a3,
+    RadarOverlay* LoadMap(RenderTarget* target, TextureMapManager* manager, int camera,
                                         OverlayRect screen);
-    int TakeRacers(UnknownKrustyBikeView* view, int a2); // 0x0051baf0: collects the racers
+    int TakeRacers(UnknownKrustyBikeView* view, int chat); // 0x0051baf0: collects the racers
     int DrawForViewMode();                    // 0x0051bc60: draws for the view mode
     void DrawFrameRate();                     // 0x0051bdc0: frame-rate readout
     // 0x0051bed0: places every racer's name tag and draws its map dot, then

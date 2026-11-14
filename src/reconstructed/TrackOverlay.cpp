@@ -1176,7 +1176,7 @@ RadarOverlay::~RadarOverlay()
 
 // 0x0051b840
 RadarOverlay* RadarOverlay::LoadMap(RenderTarget* target, TextureMapManager* manager,
-                                                  int a3, OverlayRect screen)
+                                                  int camera, OverlayRect screen)
 {
     const char* font;
     OverlayRect source;
@@ -1212,7 +1212,7 @@ RadarOverlay* RadarOverlay::LoadMap(RenderTarget* target, TextureMapManager* man
         frameRateRect.top = mapRect.top + 112;
         frameRateRect.bottom = mapRect.top + 124;
     }
-    radarCamera = (UnknownRadarCamera*)a3;
+    radarCamera = (UnknownRadarCamera*)camera;
     backingTexture = TerrainLoadTexture(manager, name, 4444, 0, 8, 5, 6, 0, 0x10, 0xff00ff, 1, 1);
     if (!backingTexture) {
         Release();
@@ -1234,7 +1234,7 @@ RadarOverlay* RadarOverlay::LoadMap(RenderTarget* target, TextureMapManager* man
 }
 
 // 0x0051baf0: takes the racers from `view`.
-int RadarOverlay::TakeRacers(UnknownKrustyBikeView* view, int a2)
+int RadarOverlay::TakeRacers(UnknownKrustyBikeView* view, int chat)
 {
     int iterator;
     UnknownEventRacer* racer;

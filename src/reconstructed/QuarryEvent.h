@@ -47,9 +47,9 @@ class VisualCue : public GameObject {
 public:
     explicit VisualCue(int flags);            // 0x0048ad60
     // 0x0048adf0 (ret 0x34): loads the cue; returns this, or 0.
-    VisualCue* LoadVisualCue(void* target, LightManager* lights, int value, UnknownTerrain* terrain,
+    VisualCue* LoadVisualCue(void* target, LightManager* lights, int options, UnknownTerrain* terrain,
                                      Vector3 offset, UnknownKrustyBikeView* view, int count,
-                                     UnknownQuarryCamera* camera, float a9, float a10, float a11);
+                                     UnknownQuarryCamera* camera, float size, float screenXFraction, float screenYFraction);
     // 0x0048bc30: the next cue index when it changed, else -1.
     int NextCueIndex();
     // 0x0048bc80: 1 while a cue is active and more than one exists.

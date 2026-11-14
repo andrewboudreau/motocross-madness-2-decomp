@@ -36,20 +36,20 @@ public:
                              UnknownArcadeView* camera, float size, float screenXFraction,
                              float screenYFraction);
     // QuarryEvent.h
-    VisualCue* LoadVisualCue(void* target, LightManager* lights, int value, UnknownTerrain* terrain,
+    VisualCue* LoadVisualCue(void* target, LightManager* lights, int options, UnknownTerrain* terrain,
                              Vector3 offset, UnknownKrustyBikeView* view, int count,
-                             UnknownQuarryCamera* camera, float a9, float a10, float a11);
+                             UnknownQuarryCamera* camera, float size, float screenXFraction, float screenYFraction);
 };
 
 // 0x0048adf0, QuarryStuntEvent's view.
-VisualCue* VisualCue::LoadVisualCue(void* target, LightManager* lights, int value,
+VisualCue* VisualCue::LoadVisualCue(void* target, LightManager* lights, int options,
                                     UnknownTerrain* terrain, Vector3 offset,
                                     UnknownKrustyBikeView* view, int count,
-                                    UnknownQuarryCamera* camera, float a9, float a10, float a11)
+                                    UnknownQuarryCamera* camera, float size, float screenXFraction, float screenYFraction)
 {
-    return LoadVisualCue(target, (int)lights, value, (UnknownRunwayTerrain*)terrain, offset,
+    return LoadVisualCue(target, (int)lights, options, (UnknownRunwayTerrain*)terrain, offset,
                          (UnknownVisualCueView*)view, count, (UnknownArcadeView*)camera,
-                         a9, a10, a11);
+                         size, screenXFraction, screenYFraction);
 }
 
 class Terrain {
