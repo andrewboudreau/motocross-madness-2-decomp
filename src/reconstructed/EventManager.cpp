@@ -15,6 +15,10 @@
 #include "MenuId.h"
 #include "QuarryEvent.h"
 #include "TrackGame.h"
+#include "SoundInterface.h"
+
+// IMM32, called through the linker's import thunk.
+extern "C" void* __stdcall ImmAssociateContext(void* window, void* context);
 
 extern "C" __declspec(dllimport) int __stdcall GetDateFormatA(unsigned long locale, unsigned long flags,
                                                               const void* date, const char* format,
@@ -305,6 +309,49 @@ void EventManager::WaitForRemoteRacers(float) {
         if (g_TrackGame->networkGameObject)
             g_TrackGame->networkGameObject->ReportRaceToZone();
     }
+}
+
+// The tool tip's on/off switch (ToolTip +0x5c).
+static inline void EnableToolTips(UnknownKrustyUIToolTipView* tip, int enabled) {
+    tip->enabled = enabled;
+}
+
+// 0x0045e710: leaves the race for `menu`: restores the UI, the window's
+// input context and 640x480x16, and shows the transition dialog.
+// The tool tip option goes through the inline setter: its parameter is a
+// named local, so the option read takes no turn in VC6's eax/ecx/edx rotation
+// of expression temporaries. Stored with a plain assignment the read lands in
+// edx and every later scratch register is one step off retail's.
+void EventManager::LeaveRaceForMenu(int menu) {
+    if (!g_TrackGame->ui)
+        return;
+    UIDialog* item = g_TrackGame->ui->gui->FindInputDialog();
+    if (item)
+        item->EndDialog(0);
+    if (g_TrackGame->ui->savedInputContext)
+        ImmAssociateContext(g_TrackGame->windowHandle, g_TrackGame->ui->savedInputContext);
+    if (g_TrackGame->ui->allowIme)
+        g_TrackGame->ui->gui->EnableWindowClipper(1);
+    g_TrackGame->uiInteractionBlocked = 0;
+    g_TrackGame->podiumFinished = 0;
+    g_TrackGame->uiBlockedSeconds = 0;
+    if (!g_TrackGame->mode.cdAudioOn)
+        g_TrackGame->StopCDAudio();
+    DisplayMode* current = &g_TrackGame->display->displayModes[g_TrackGame->mode.displayModeIndex];
+    if (current->width != 640 || current->height != 480 || current->bitDepth != 16)
+        g_TrackGame->SwitchDisplayMode(
+            g_TrackGame->display->FindDisplayMode(640, 480, 16, 0, 0));
+    g_TrackGame->ui->gui->CreateBackground();
+    UnknownKrustyUIGuiLayer* layer = g_TrackGame->ui->gui->GetUser(0);
+    EnableToolTips((UnknownKrustyUIToolTipView*)layer->userToolTip, g_TrackGame->mode.toolTips);
+    if (!g_TrackGame->playingReplay && !g_TrackGame->ui->playingDemo &&
+        g_TrackGame->mode.raceSettings.raceMode != 0 && g_TrackGame->mode.raceSettings.raceMode != 4)
+        g_TrackGame->ui->RecordRaceResults();
+    g_TrackGame->ui->gui->ShowCursors(1);
+    TransDlg* dialog = new(__FILE__, 1064) TransDlg;
+    g_TrackGame->ui->gui->ShowDialog(dialog, 0, 2, 0, 0, 0, 0, 1);
+    dialog->SetNextMenu(menu);
+    ((PCSoundInterface*)g_TrackGame->soundInterface)->SetPrimaryVolume(0);
 }
 
 // 0x0045e930

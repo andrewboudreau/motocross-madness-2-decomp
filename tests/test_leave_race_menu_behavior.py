@@ -1,4 +1,9 @@
-"""Private complete race-to-menu operation and its allocation unwind state."""
+"""Private complete race-to-menu operation and its allocation unwind state.
+
+The operation is exact in src/reconstructed/EventManager.cpp. Its body (and
+the inline tool tip setter it uses) is taken from that unit and compiled alone,
+so the differential harness links without the rest of the event manager.
+"""
 import json
 import os
 from pathlib import Path
@@ -12,10 +17,23 @@ from mcm2tool.coff import CoffObject
 from mcm2tool.pe import PEImage
 from mcm2tool.toolchain import find_child_ci, find_vc6_bin, infer_vc98_root, sha256_file
 from tools.match import compare
+from test_edit_box_on_char import extract
 
 ROOT = Path(__file__).resolve().parents[1]
 SYMBOL = '?LeaveRaceForMenu@EventManager@@QAEXH@Z'
 RANGES = {0x45e710: 531, 0x54ab30: 23, 0x54ab47: 10}
+CANONICAL = 'src/reconstructed/EventManager.cpp'
+BINDINGS = 'src/reconstructed/EventManager.bindings.json'
+PRELUDE = '''#include "GUIManagerCore.h"
+#include "DebugAlloc.h"
+#include "GameUi.h"
+#include "SoundInterface.h"
+#include "TrackGame.h"
+#include "EventManager.h"
+#include "UIDialog.h"
+extern "C" void* __stdcall ImmAssociateContext(void* window, void* context);
+'''
+EXTRACTED = ('static inline void EnableToolTips(', 'void EventManager::LeaveRaceForMenu(')
 DEPENDENCIES = {0x485df0,0x46ff30,0x53305e,0x4868b0,0x521a40,0x52d250,
                 0x485ef0,0x486540,0x49bbb0,0x486630,0x4a3010,0x469db0,
                 0x485a70,0x455c40,0x4be9b0,0x4a3060,0x53471a}
@@ -72,21 +90,24 @@ class LeaveRaceForMenuBehaviorTests(unittest.TestCase):
         libraries=find_child_ci(infer_vc98_root(compiler),'lib')
         with tempfile.TemporaryDirectory(prefix='mcm2-leave-race-menu-') as directory:
             output=Path(directory);objects=[]
-            for source in ('samples/game/LeaveRaceForMenu.cpp','tests/fixtures/leave_race_menu_compare.cpp'):
-                obj=output/(Path(source).stem+'.obj')
-                result=subprocess.run([sys.executable,str(ROOT/'tools/compile.py'),str(ROOT/source),'-o',str(obj),
+            canonical=(ROOT/CANONICAL).read_text()
+            standalone=output/'EventManager.cpp'
+            standalone.write_text(PRELUDE+'\n'.join(extract(canonical,prefix) for prefix in EXTRACTED)+'\n')
+            for source in (standalone,ROOT/'tests/fixtures/leave_race_menu_compare.cpp'):
+                obj=output/(source.stem+'.obj')
+                result=subprocess.run([sys.executable,str(ROOT/'tools/compile.py'),str(source),'-o',str(obj),
                     '--vc6-root',str(compiler),'--profile','vc6_o2_mt','--include',str(ROOT/'src/krusty2'),
-                    *(['--extra','/Od'] if source.startswith('tests/') else [])],cwd=ROOT,capture_output=True,text=True,
+                    '--include',str(ROOT/'src/reconstructed'),
+                    *(['--extra','/Od'] if source is not standalone else [])],cwd=ROOT,capture_output=True,text=True,
                     encoding='latin-1',env={**os.environ,'PYTHONPATH':str(ROOT)})
                 self.assertEqual(result.returncode,0,result.stdout+result.stderr);objects.append(str(obj))
-                if source.startswith('samples/'):
+                if source is standalone:
                     candidate=CoffObject(obj);entry=candidate.find_symbol(SYMBOL)
-                    self.assertEqual(entry.function_size,533)
+                    self.assertEqual(entry.function_size,531)
                     self.assertEqual({s.name for s in candidate.symbols if s.storage_class==2 and s.section_number>0 and s.type==0x20},
                                      {SYMBOL,'??_GTransDlg@@UAEPAXI@Z','??1TransDlg@@UAE@XZ'})
-                    report=compare(image,candidate,SYMBOL,0x45e710,531,ROOT/'samples/game/LeaveRaceForMenu.bindings.json')
-                    self.assertFalse(report['strict_exact'])
-                    self.assertEqual(report['strict_match']['matching_positions'],454)
+                    report=compare(image,candidate,SYMBOL,0x45e710,531,ROOT/BINDINGS)
+                    self.assertTrue(report['strict_exact'])
                     self.assertFalse(any(s.name.startswith('.CRT') for s in candidate.sections))
                     def relocated(section,offset):
                         rows=[r for r in candidate.relocations if r.section_number==section and r.virtual_address==offset]
@@ -108,7 +129,7 @@ class LeaveRaceForMenuBehaviorTests(unittest.TestCase):
                     # wrapper and destructor. Their distinct class identity is
                     # supplied by the primary table and its direct call, not by
                     # the shared five-byte destructor address alone.
-                    binding_path=ROOT/'samples/game/LeaveRaceForMenu.bindings.json'
+                    binding_path=ROOT/BINDINGS
                     for name,address,size in (('??_GTransDlg@@UAEPAXI@Z',0x49bdb0,30),
                                               ('??1TransDlg@@UAE@XZ',0x450fc0,5)):
                         self.assertTrue(compare(image,candidate,name,address,size,binding_path)['strict_exact'])
@@ -131,24 +152,6 @@ class LeaveRaceForMenuBehaviorTests(unittest.TestCase):
                     self.assertEqual(image.bytes_at_va(descriptor+8,15),b'.?AVTransDlg@@\0')
                     self.assertEqual(image.bytes_at_va(0x45e8c7,6),b'\xc7\x06'+struct.pack('<I',0x552624))
                     self.assertEqual(image.bytes_at_va(0x56aad0,10),b'Trans.dtm\0')
-            # Compare the complete emitted main body against its included
-            # aggregate form, preserving bytes and normalized relocation roles.
-            aggregate_path=output/'aggregate.obj'
-            result=subprocess.run([sys.executable,str(ROOT/'tools/compile.py'),str(ROOT/'samples/game/EventManagerNearMisses.cpp'),
-                '-o',str(aggregate_path),'--vc6-root',str(compiler),'--profile','vc6_o2_mt','--include',str(ROOT/'src/krusty2')],
-                cwd=ROOT,capture_output=True,text=True,encoding='latin-1',env={**os.environ,'PYTHONPATH':str(ROOT)})
-            self.assertEqual(result.returncode,0,result.stdout+result.stderr)
-            aggregate=CoffObject(aggregate_path)
-            def normalized(coff,name):
-                symbol=coff.find_symbol(name);body,size,rs=coff.symbol_extent(symbol);rows=[]
-                for r in rs:
-                    target=coff.symbol_by_index[r.symbol_index];key=target.name
-                    if key.startswith(('$L','$T')):key=f'{coff.section(target.section_number).name}+{target.value}'
-                    rows.append((r.virtual_address-symbol.value,r.type,key))
-                return body,size,rows
-            self.assertEqual(normalized(candidate,SYMBOL),normalized(aggregate,SYMBOL))
-            aggregate_report=compare(image,aggregate,SYMBOL,0x45e710,531,ROOT/'samples/game/EventManagerNearMisses.bindings.json')
-            self.assertEqual(aggregate_report['strict_match']['matching_positions'],454)
             patch_file=output/'calls.bin';patch_file.write_bytes(b''.join(patches))
             executable=output/'create.exe';map_path=output/'create.map'
             result=subprocess.run([str(linker),'/nologo','/subsystem:console','/base:0x100000','/fixed','/opt:ref',

@@ -3443,6 +3443,15 @@ CASES = [
         'reason': 'redundant blocked-without-pending return kept as in retail',
     },
     {
+        'name': 'EventManager ?LeaveRaceForMenu@',
+        'bindings': 'src/reconstructed/EventManager.bindings.json',
+        'source': 'src/reconstructed/EventManager.cpp',
+        'symbol': '?LeaveRaceForMenu@EventManager@@QAEXH@Z',
+        'target_va': '0x0045e710',
+        'target_size': 531,
+        'reason': 'called by EndRace and the dialog procedures; tool tip option through an inline setter',
+    },
+    {
         'name': 'EventManager slot24 network messages',
         'bindings': 'src/reconstructed/EventManager.bindings.json',
         'source': 'src/reconstructed/EventManager.cpp',

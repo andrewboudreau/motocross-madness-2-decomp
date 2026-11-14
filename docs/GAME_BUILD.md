@@ -533,9 +533,10 @@ now use GameObject's existing methods, **456 → 454**; all eighteen calls and
 the complete 5,980-byte BikeRace tick remain strict.
 
 The complete [race-to-menu transition](LEAVE_RACE_FOR_MENU.md#functional-build-review)
-is admitted as reviewed-nonexact after 9,437 native state, callback, allocation,
-fault and unwind cases. Its 533-byte body retains 454 matching positions
-against the complete 531-byte retail body. All sixteen dependency providers
+was admitted as reviewed-nonexact after 9,437 native state, callback, allocation,
+fault and unwind cases, with 454 matching positions of the 531-byte retail body;
+it is byte-exact in `src/reconstructed/EventManager.cpp` now and the sample entry
+is gone. All sixteen dependency providers
 are strict, but the native comparison scripts those GUI, display, input-method,
 result-recording and audio boundaries. Actual menu/device transitions remain
 untested. The isolated real link removes only LeaveRaceForMenu, **454 → 453**.

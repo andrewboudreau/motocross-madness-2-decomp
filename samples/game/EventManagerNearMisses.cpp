@@ -2,15 +2,12 @@
 // Near-miss EventManager candidates, kept out of src/reconstructed until
 // they match. See docs/EVENTMANAGER.md.
 //
-// EventManager::LeaveRaceForMenu (0x0045e710, 531 bytes): leaves the
-// race for a menu. Control flow, calls, the TransDlg `new` (retail line 1064)
-// and its EH state match; 454 of 533 bytes. After the `new` retail loads the
-// global into eax (the short form, 2 bytes less) and the menu into edx where
-// VC6 here picks ecx and eax; it also reuses ecx for TrackGame+0xc4c. Local,
-// base-pointer, assignment-in-argument and declaration-placement forms do
-// not change it; nor do (40-form sweep) the layer store through GetUser
-// directly, a layer-item local or a value local, a GUI local for
-// ShowDialog or the `new` assigned inside the ShowDialog call.
+// EventManager::LeaveRaceForMenu (0x0045e710) is exact in
+// src/reconstructed/EventManager.cpp: the tool tip option is stored through an
+// inline setter, whose parameter keeps the option read out of VC6's
+// eax/ecx/edx rotation of expression temporaries. A plain assignment, a value
+// local, a layer-item local and about 40 other local/base-pointer forms had
+// left every later scratch register one step off (454 of 533 bytes).
 //
 // EventManager::CreatePodiumScene (0x0045d480, 4247 bytes): the podium
 // scene; 4139 of 4247 bytes (bindings: EventManagerNearMisses.bindings.json,
@@ -52,11 +49,6 @@
 // EventManager.cpp's per-file vectors (0x0059af48, 0x0059af18).
 static Vector3 kVec3YAxis = Vector3(0.0f, 1.0f, 0.0f);
 static Vector3 kVec3ZAxis = Vector3(0.0f, 0.0f, 1.0f);
-
-// IMM32, called through the linker's import thunk.
-extern "C" void* __stdcall ImmAssociateContext(void* window, void* context);
-
-#include "LeaveRaceForMenu.cpp"
 
 // Views for the podium scene 0x0045d480. Only what it calls is declared.
 struct UnknownPodiumModel {                         // the view part's +0xa4

@@ -1,10 +1,10 @@
 # Race-to-menu transition
 
-`samples/game/LeaveRaceForMenu.cpp` contains the unchanged complete
-`EventManager::LeaveRaceForMenu(int)` candidate. Its semantic name and the
-source grouping remain provisional. `EventManagerNearMisses.cpp` includes
-the same maintained body; this extraction does not establish an original
-translation-unit boundary.
+`EventManager::LeaveRaceForMenu(int)` is byte-exact in
+`src/reconstructed/EventManager.cpp` (strict calibration case
+`EventManager ?LeaveRaceForMenu@`). Its semantic name remains provisional.
+The differential test below compiles that body alone, taken from the
+canonical unit, so the harness links without the rest of the event manager.
 
 ## Complete extent and identity
 
@@ -29,29 +29,20 @@ The table, constructor store and wrapper's direct destructor call support
 that role; shared short-function addresses alone do not identify the class.
 The 0x7f64 allocation and `Trans.dtm` resource string are checked independently.
 
-Authentic VC6 SP3 `/O2` emits **533 bytes / 454 matching positions** for
-the operation, after resolving every relocation. This remains explicitly
-nonexact. The standalone and aggregate operation have identical complete
-bytes and normalized relocations. The standalone emits only the operation
+Authentic VC6 SP3 `/O2` emits the retail **531 bytes** for the operation,
+after resolving every relocation. The tool tip option is stored through an
+inline setter (`EnableToolTips`): its parameter keeps the option read out of
+VC6's eax/ecx/edx rotation of expression temporaries, which a plain
+assignment left one step off retail's from that store to the end (533 bytes,
+454 matching positions). The standalone body emits only the operation
 and its two generated destructor helpers, with no CRT initializer. Existing
 source-built objects provide its game dependencies. All thirteen directly
 called game methods and both debug allocation/deallocation functions remain
 strict, as does the concrete PCGame display-switch method (sixteen complete
-provider bodies checked in `build-5u6vd8ni`). The new candidate does not rely
+provider bodies checked in `build-5u6vd8ni`). The function does not rely
 on a partial helper. Its scripted test still does not execute these actual
 providers. The remaining external runtime imports are the normal CRT and
 IMM32 dependencies.
-
-An independent extraction check against `b04b9376` preserves all **nine
-emitted aggregate functions** and all **50 nondebug sections apart from
-checked filename storage**, including their complete bytes, relocation
-kinds/destinations/addends, EH data, vtables, initializers and constants.
-The original aggregate's one `__FILE__` string becomes separate strings for
-`LeaveRaceForMenu.cpp` and the retained aggregate. Only those verified
-filename strings are normalized; their changed storage counts are recorded.
-Generated local symbols are compared by section/offset, not generated names.
-The ignored script/report are `work/game-build/check_leave_race_extraction.py`
-and `work/game-build/leave-race-extraction-proof.json`.
 
 ## Functional build review
 
@@ -65,8 +56,8 @@ sets primary sound volume to zero. Callback return values are retained or
 ignored exactly where the instructions do.
 
 `tests/test_leave_race_menu_behavior.py` runs **9,437 native scenarios**
-against the complete hash-pinned retail function and the actual standalone
-candidate, compiled separately with `/O2`; the independent fixture uses
+against the complete hash-pinned retail function and the canonical body
+compiled alone with `/O2`; the independent fixture uses
 `/Od`. Only audited external calls in the private reference mapping are
 redirected. The candidate's complete machine code runs without patches.
 No copied reference code, retail dispatch or test-only implementation enters
@@ -103,12 +94,8 @@ or live menu rendering. Invalid arbitrary pointers and out-of-range mode
 array indexes are outside the supplied storage contract. Original source
 identity and whole-game behavior are not established by these comparisons.
 
-The individually reviewed candidate is explicitly admitted as
-**reviewed-nonexact** in `config/game_build.json`. Isolated build
-`build-kngsl_c0` compiles **210/210 translation units** and reduces unresolved
-names **454 to 453**, relative to `build-5u6vd8ni`: only
-`EventManager::LeaveRaceForMenu(int)` disappears and no missing name is added.
-The game still does not link; live startup, menus and racing remain unverified.
+The build takes the function from `src/reconstructed/EventManager.cpp`; the
+former reviewed-nonexact sample entry in `config/game_build.json` is gone.
 
 ```powershell
 $env:VC6_ROOT = (Resolve-Path work/vc6sp3-disc).Path

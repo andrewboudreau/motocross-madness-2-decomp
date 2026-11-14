@@ -808,6 +808,14 @@ without effect, as noted.
   136 to exact). It also decides whether two failure tails merge: with different
   registers for the `fclose` argument the first stays inline (FileStream `0x00460db0`,
   27 to exact).
+  An inline function's parameter is such a variable too: storing a member through an
+  inline setter (`EnableToolTips(tip, g_TrackGame->mode.toolTips)` for
+  `tip->enabled = g_TrackGame->mode.toolTips`) keeps the read in the base
+  register (`mov ecx, [ecx + N]`) instead of a fresh edx, and the calls after it
+  get retail's registers (EventManager `0x0045e710`, 454 to exact). A value local
+  for the same read (`int tips = ...; tip->enabled = tips;`) is propagated away
+  and changes nothing; with the setter and no local for the receiver the function
+  gets shorter and worse.
 - **Not moved by any of these:** byte-store parity in EcoSystem `0x00458da0` (each
   variable-index byte store toggles the later SIB order), the `memset` + `.size`
   store placement in PCGame `0x004c0d10`
