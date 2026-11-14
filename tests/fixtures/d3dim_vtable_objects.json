@@ -25,7 +25,7 @@
     "src/krusty2/vehicle/Vehicle.cpp": {
       "sections": 151,
       "relocations": 720,
-      "sha256": "395fe6e7f9f9a6e98f8e1b1b97cb9b1e8ad82c9a228331fc54165110ef8ac342"
+      "sha256": "cae67578dc0ae117dedbe3782f96165b1d2d6b3540f62754cc4bef7015588cfc"
     },
     "src/krusty2/vehicle/Bike.cpp": {
       "sections": 243,
@@ -40,7 +40,7 @@
     "src/krusty2/collision/CollisionObject.cpp": {
       "sections": 136,
       "relocations": 732,
-      "sha256": "3b2e48e90a6a84e0c04b9862419974ee863904e16d443a09cdff865604d980f5"
+      "sha256": "00d9b5874d706640866db6e97c81e369800f63f4f49d7ee60ba27c8ef7eeb823"
     },
     "src/krusty2/motion/D3DIMSoultreeMotnctrl.cpp": {
       "sections": 62,
