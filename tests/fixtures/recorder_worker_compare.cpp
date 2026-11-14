@@ -9,7 +9,7 @@
 #include "../../src/reconstructed/Recorder.h"
 #include "../../src/reconstructed/VCR.h"
 #include "../../src/reconstructed/VCRfile.h"
-unsigned __stdcall UnknownRecorderThread(void*);
+unsigned __stdcall RecorderWorkerThread(void*);
 static BYTE referenceSpace[0x800000]={1};
 struct World {BYTE recorder[0xd8],rings[2][0x101c],files[2][0x248],buffers[4][0x400],headers[2][128];char names[2][512];};
 static World world;
@@ -28,7 +28,7 @@ static int Buffer(const void* p){if(!p)return -1;for(int n=0;n<4;++n)if(p==world
 static void Finish(){
     if(scenario.mutateAt==observed.count){VCRInterface* v=Vcr();switch(scenario.mutation){
     case 0:v->isBusy=!v->isBusy;v->fileReady=!v->fileReady;v->isStopped^=17;v->workerAcknowledged^=7;v->recordTimeMs^=0x345678;break;
-    case 1:v->frameRing=(VCR*)world.rings[1];v->vcrFile=(UnknownRecorderOwner*)world.files[1];break;
+    case 1:v->frameRing=(VCR*)world.rings[1];v->vcrFile=(RecorderVCRFileView*)world.files[1];break;
     case 2:v->threadParameters.header=(int)world.headers[1];v->threadParameters.headerSize=33;v->threadParameters.fileName=(int)world.names[1];break;
     case 3:v->writeEvent=(HANDLE)0x2100;v->readForwardEvent=(HANDLE)0x2103;v->readReverseEvent=(HANDLE)0x2105;break;
     }}
@@ -114,7 +114,7 @@ static int MapReference(const char* path,const char* patches){
         memcpy(mapped+section[i].VirtualAddress,raw+section[i].PointerToRawData,section[i].SizeOfRawData);
     }free(raw);
     *(DWORD*)0x5500d8=(DWORD)Wait;*(DWORD*)0x55025c=(DWORD)Enter;*(DWORD*)0x550284=(DWORD)Leave;*(DWORD*)0x5500e8=(DWORD)Set;*(DWORD*)0x5500e0=(DWORD)Reset;
-    BYTE* candidate=(BYTE*)UnknownRecorderThread;if(!VirtualProtect(candidate,2148,PAGE_EXECUTE_READWRITE,&old))return 0;
+    BYTE* candidate=(BYTE*)RecorderWorkerThread;if(!VirtualProtect(candidate,2148,PAGE_EXECUTE_READWRITE,&old))return 0;
     f=fopen(patches,"rb");if(!f)return 0;DWORD entry[3];int records=0;
     while(fread(entry,sizeof(entry),1,f)==1){++records;
         if(entry[0]==0){BYTE* site=(BYTE*)entry[1];if(site<(BYTE*)0x4e6f80 || site+5>(BYTE*)0x4e77b5 || *site!=0xe8 || (DWORD)(site+5)+*(DWORD*)(site+1)!=entry[2])return 0;*(DWORD*)(site+1)=Hook(entry[2])-(DWORD)(site+5);}
@@ -124,12 +124,12 @@ static int MapReference(const char* path,const char* patches){
     }fclose(f);return records==103 && FlushInstructionCache(GetCurrentProcess(),0,0);
 }
 static int Filter(EXCEPTION_POINTERS* e){DWORD code=e->ExceptionRecord->ExceptionCode;if(code!=EXCEPTION_ACCESS_VIOLATION && code!=0xe0410001)return EXCEPTION_CONTINUE_SEARCH;observed.exception=code;if(code==EXCEPTION_ACCESS_VIOLATION){observed.faultKind=e->ExceptionRecord->ExceptionInformation[0];observed.faultAddress=e->ExceptionRecord->ExceptionInformation[1];}return EXCEPTION_EXECUTE_HANDLER;}
-static void Invoke(){unsigned(__stdcall* call)(void*)=retailActive?(unsigned(__stdcall*)(void*))0x4e6f80:UnknownRecorderThread;__try{observed.result=call(scenario.invalid==1?0:&Vcr()->threadParameters);}__except(Filter(GetExceptionInformation())){}}
+static void Invoke(){unsigned(__stdcall* call)(void*)=retailActive?(unsigned(__stdcall*)(void*))0x4e6f80:RecorderWorkerThread;__try{observed.result=call(scenario.invalid==1?0:&Vcr()->threadParameters);}__except(Filter(GetExceptionInformation())){}}
 static void Run(int retail){
     retailActive=retail;memset(&observed,0,sizeof(observed));observed.result=-501;memset(&world,0x53+(scenario.seed%19),sizeof(world));VCRInterface* v=Vcr();
     HANDLE* handles[]={&v->writeEvent,&v->createFileEvent,&v->reopenFileEvent,&v->readForwardEvent,&v->openPlaybackEvent,&v->readReverseEvent,&v->seekEvent,&v->rewindEvent,&v->stopReadingEvent,&v->closeFileEvent,&v->stopEvent};
     for(int n=0;n<11;++n)*handles[n]=(HANDLE)(0x1100+n);
-    v->frameRing=(VCR*)world.rings[0];v->vcrFile=(UnknownRecorderOwner*)world.files[0];v->isBusy=scenario.busy;v->isStopped=-7;v->fileReady=0;v->workerAcknowledged=0;v->readsReset=0;v->recordTimeMs=-19;
+    v->frameRing=(VCR*)world.rings[0];v->vcrFile=(RecorderVCRFileView*)world.files[0];v->isBusy=scenario.busy;v->isStopped=-7;v->fileReady=0;v->workerAcknowledged=0;v->readsReset=0;v->recordTimeMs=-19;
     v->threadParameters.owner=scenario.invalid==2?0:v;v->threadParameters.header=(int)world.headers[0];v->threadParameters.headerSize=scenario.headerSize;v->threadParameters.fileName=scenario.invalid==3?0:(int)world.names[0];
     if(scenario.invalid==4)v->frameRing=0;
     for(n=0;n<2;++n){((VCR*)world.rings[n])->firstPosition=83+n*17;((VCRFile*)world.files[n])->entries[0].position=123+n*19;for(int i=0;i<128;++i)world.headers[n][i]=(BYTE)(scenario.seed+i*13+n*37);for(i=0;i<scenario.nameLength;++i)world.names[n][i]='A'+(i+n)%26;world.names[n][scenario.nameLength]=0;}

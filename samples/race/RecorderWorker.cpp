@@ -13,7 +13,7 @@
 // file, plays them back into the ring and seeks, driven by the eleven events;
 // `message` keeps the last status text (the retail literals) but is not
 // otherwise used.
-unsigned __stdcall UnknownRecorderThread(void* parameters) {
+unsigned __stdcall RecorderWorkerThread(void* parameters) {
     RecorderThreadParameters* params = (RecorderThreadParameters*)parameters;
     VCRInterface* vcr;
     VCRFile* file;

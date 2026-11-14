@@ -555,7 +555,7 @@ void SPEventDlg::HandleEvent(DialogEvent* event) {
     char text[128];
     switch (event->kind) {
     case kDialogInit: {
-        UnknownRaceSettings* settings = (UnknownRaceSettings*)&g_TrackGame->mode.raceSettings.raceMode;
+        SelectGameRaceSettingsView* settings = (SelectGameRaceSettingsView*)&g_TrackGame->mode.raceSettings.raceMode;
         UIListBox* list = static_cast<UIDropDownList*>(FindControl("EventTypeDropDown", 6))->listPart;
         g_TrackGame->LoadResourceString(0x13ed, text, 0x80);
         list->AddRow(text, 1, 0);
@@ -823,7 +823,7 @@ void SPEventDlg::ApplyEventType() {
 // 0x0044e6c0
 void SPEventDlg::SyncValues(int apply) {
     char seed[128];
-    UnknownRaceSettings* settings = (UnknownRaceSettings*)&g_TrackGame->mode.raceSettings.raceMode;
+    SelectGameRaceSettingsView* settings = (SelectGameRaceSettingsView*)&g_TrackGame->mode.raceSettings.raceMode;
     if (apply) {
         if (settings->eventType != 0 && settings->eventType != 4)
             settings->laps = static_cast<UIListBox*>(FindControl("LapsListBox", 3))->GetRowData(-1);
@@ -1355,7 +1355,7 @@ void LoadingDlg::HandleEvent(DialogEvent* event) {
         UIProgressBar* bar = new(__FILE__, 2878) UIProgressBar(0, (CameraRect*)area->bounds, this);
         AddControl(bar, 0, 0);
         bar->SetName("ProgressBar");
-        UnknownDialogImage* image = (UnknownDialogImage*)FindSectionObject("BlueBar");
+        DialogUIAnimView* image = (DialogUIAnimView*)FindSectionObject("BlueBar");
         bar->SetBarTexture(reinterpret_cast<int>(
             reinterpret_cast<UIAnim*>(image)->GetCurrentTexture()), 0);
         bar->stepCount = 20;

@@ -58,7 +58,7 @@ Source forms that mattered:
 
 Header changes: `ParserList` gains its constructor (the shared
 one-dword-zero body `0x004aae20`). `MSZoneInterfaceBase` gains
-the preset fields and `UnknownZoneRaceStatus`. The three methods return
+the preset fields and `ZoneRaceStatus`. The three methods return
 `int`, so the SelectGamePicProcs and EventManager bindings were renamed.
 
 ## Reproduce

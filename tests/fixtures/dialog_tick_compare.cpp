@@ -121,7 +121,7 @@ template<class T> static DWORD Address(T method) {
     if (sizeof(method)!=4) ExitProcess(87);DWORD value;memcpy(&value,&method,4);return value;
 }
 
-void GUIUser::SetCursorAnimation(UnknownCursorAnimation* animation) {
+void GUIUser::SetCursorAnimation(CursorUIAnimView* animation) {
     UserIndex(this);Event& e=Record(4,this);e.args[0]=(int)animation;
     cursorAnimation=animation;Mutate(4);
 }
@@ -192,7 +192,7 @@ static void Reset() {
     world.dialog[0x25]=(scenario.state&1)?4:0;d->isClosing=(scenario.state>>1)&1;
     d->guiUser=User(0);d->guiManager=Manager(0);d->lastFrameTime=scenario.seed%3?0.125f:0.0f;
     d->sendFrameEvent=scenario.seed&1;d->joystickCentred=(scenario.seed>>1)&1;
-    d->cursorAnimation=scenario.seed&4?(UnknownCursorAnimation*)(cursorTokens+1):0;
+    d->cursorAnimation=scenario.seed&4?(CursorUIAnimView*)(cursorTokens+1):0;
     const unsigned int times[]={0,1,15,1000,0x7fffffff,0x80000000,0xfffffffe,0xffffffff};
     for(int i=0;i<4;++i) {
         UITimer* t=Timer(i);t->timerId=100+i;t->elapsedTime=times[(scenario.seed+i)%8];

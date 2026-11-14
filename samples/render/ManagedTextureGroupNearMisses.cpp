@@ -533,7 +533,7 @@ void ManagedTextureGroup::RepackWithPartialBlits() {
                 break;
             texture = cachePages.Next();
             if (!texture)
-                UnknownFunction464e90();
+                OnOutOfPageSpace();
         }
     }
 

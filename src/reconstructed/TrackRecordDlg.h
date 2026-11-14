@@ -16,7 +16,7 @@ struct TrackRecordRow {
 // (vtable 0x00553100) and UIDDLListBox have a slot 66, so this is probably
 // UIListBox (strong inference). Only slot 66 is called: UIListBox::ReportClick
 // (GameUi.h, 0x00477d30), which sends the list-select event.
-class UnknownTrackRecordListBox {
+class TrackRecordUIListBoxView {
 public:
     virtual void UnknownVirtualSlot0();
     virtual void AddRef();

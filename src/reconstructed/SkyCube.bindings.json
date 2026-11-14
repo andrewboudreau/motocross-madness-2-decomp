@@ -7,7 +7,7 @@
   "??_7SkyCube@@6B@": "0x00557ba8",
   "??_GSkyCube@@UAEPAXI@Z": "0x004fb200",
   "?SetVectors@Cube@@QAEHPBUVector3@@00@Z": "0x0043d400",
-  "?Load@DrawableCube@@QAEPAV1@PAXPAVFileStream@@PAUUnknownCubeTextureContext@@@Z": "0x0043d980",
-  "?Create@SkyCube@@QAEPAV1@PAXPAVFileStream@@PAUUnknownCubeTextureContext@@M@Z": "0x004fb230",
+  "?Load@DrawableCube@@QAEPAV1@PAXPAVFileStream@@PAUCubeTextureContextView@@@Z": "0x0043d980",
+  "?Create@SkyCube@@QAEPAV1@PAXPAVFileStream@@PAUCubeTextureContextView@@M@Z": "0x004fb230",
   "?Tick@SkyCube@@UAEHM@Z": "0x004fb260"
 }

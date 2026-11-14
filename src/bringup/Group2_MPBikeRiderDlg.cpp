@@ -47,10 +47,10 @@ static inline Vector3 VectorSum(const Vector3& a, const Vector3& b) {
 }
 
 // 0x004a8b10, the model's SetMotionByName, is Character::SetMotionByName
-// (Motnctrl.cpp); SelectGamePicProcs.h's UnknownKrustyUIModelObject view
+// (Motnctrl.cpp); SelectGamePicProcs.h's SelectGameD3DIMSoultreeCharacterView view
 // declares it under its own name, which nothing defines.  Call the defined
 // one on the same object pointer (as BikeRace.cpp does for the flag girl).
-static inline void PlayModelMotion(UnknownKrustyUIModelObject* model, const char* motion) {
+static inline void PlayModelMotion(SelectGameD3DIMSoultreeCharacterView* model, const char* motion) {
     reinterpret_cast<Character*>(model)->SetMotionByName(motion);
 }
 

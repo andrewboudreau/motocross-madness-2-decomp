@@ -188,7 +188,7 @@ float Vec3Magnitude(const Vec3* v);                    // 0x00413190 (BikeAI.cpp
 int PredictLanding(Vec3 start, Vec3 velocity, float* outTime, Vec3* outDelta,
                    Vec3* outNormal, Terrain* terrain); // 0x0040e370 (BikeAI.cpp)
 #include "vehicle/KrustyBike.h"
-int PredictPathMotion(Vec3 pos, Vec3 vel, UnknownBikeAIPath* path, Vec3* outDir,
+int PredictPathMotion(Vec3 pos, Vec3 vel, BikeAIRacingLine* path, Vec3* outDir,
                       float maxTime, float dt, Terrain* terrain, float side,
                       float* outTakeoffTime, Vec3* outVel);   // 0x0040d200 (BikeAI.cpp)
 #include "../reconstructed/GearRatios.h"
@@ -200,7 +200,7 @@ int PredictPathMotion(Vec3 pos, Vec3 vel, UnknownBikeAIPath* path, Vec3* outDir,
 #include <stdlib.h>
 #include <string.h>
 
-// The AI racing line UnknownBikeAIPath is declared in vehicle/KrustyBikeTypes.h
+// The AI racing line BikeAIRacingLine is declared in vehicle/KrustyBikeTypes.h
 // (KrustyBike+0x838 holds one).
 
 // 0x0047b800 (cdecl, after gameui.cpp): 2D (x, z) intersection of the line a + s*da
@@ -245,7 +245,7 @@ inline float BikeAISegmentLength(const Vec3& v)
 // kinds 2 and 3) along the path, and returns in *outDir the flat unit direction from
 // 'pos' to that point shifted sideways by 'side'.  Stores the reached segment/parameter
 // in the path.  Callers: 0x0040f1ef and 0x0041256c.  Names tier 3.
-int PathSteeringDirection(Vec3* outDir, Vec3 pos, UnknownBikeAIPath* path, float speed,
+int PathSteeringDirection(Vec3* outDir, Vec3 pos, BikeAIRacingLine* path, float speed,
                           float side)
 {
     if (!path || !outDir || path->count < 1)
@@ -491,13 +491,13 @@ inline Vec3 BikeAINormalizeScaleCall(const Vec3& v)
 // Owners of the obstacle collision objects (CollisionObject::ownerObject) by ownerType:
 // 0x64 / 0x65 a segment (start +0x0c, direction +0x64), 0x69 a direction at +0x40.
 // Offsets tier 1 (0x00415db6, 0x00416732), roles tier 3.
-struct UnknownBikeAISegmentOwner {
+struct BikeAISegmentObstacle {
     char pad_0x00[0x0c];
     Vec3 start;          // +0x0c
     char pad_0x18[0x4c];
     Vec3 dir;            // +0x64
 };
-struct UnknownBikeAIPointOwner {
+struct BikeAIDirectionObstacle {
     char pad_0x00[0x40];
     Vec3 dir;            // +0x40
 };
@@ -616,7 +616,7 @@ int QuerySegmentObstacles(Vec3* seg, float radius, int skipVegetation, int ignor
                     continue;
                 obj->queryTouched = 1;
                 if (obj->ownerType == 0x64 || obj->ownerType == 0x65) {
-                    UnknownBikeAISegmentOwner* owner = (UnknownBikeAISegmentOwner*)obj->ownerObject;
+                    BikeAISegmentObstacle* owner = (BikeAISegmentObstacle*)obj->ownerObject;
                     d = owner->start - seg[0];
                     distSq = BikeAISquareMagnitude(d);
                     d = BikeAINormalizeVS(d);
@@ -635,7 +635,7 @@ int QuerySegmentObstacles(Vec3* seg, float radius, int skipVegetation, int ignor
                             acc -= d * push;
                     }
                 } else if (obj->ownerType == 0x69) {
-                    UnknownBikeAIPointOwner* owner = (UnknownBikeAIPointOwner*)obj->ownerObject;
+                    BikeAIDirectionObstacle* owner = (BikeAIDirectionObstacle*)obj->ownerObject;
                     Vec3* center = (Vec3*)&obj->boundCenter;
                     d = *center - seg[0];
                     distSq = BikeAISquareMagnitude(d);
@@ -826,7 +826,7 @@ int SimulateLookAhead(Vec3* steer, Vec3* frontVel, Vec3* rearVel, Vec3* outVel, 
                           Vec3* center, Vec3* forward, Vec3* side, float maxTime, float dt,
                           Terrain* terrain, unsigned char* outAirborne, float* outImpact, CollisionObject* probe,
                           float* frontSusp, float* rearSusp, int* outFrontContact, int* outRearContact,
-                          UnknownBikeAIPath* path, float* speedTable, float sideOffset, int nearOnly)
+                          BikeAIRacingLine* path, float* speedTable, float sideOffset, int nearOnly)
 {
     int frontContact = 1;
     int rearContact = 1;
@@ -1927,7 +1927,7 @@ int KrustyBike::UpdateAIRacingLine(float dt)
     int i;
     // Kinds 1/5 store the point count through a pointer: retail reloads statusNode after
     // those stores as after an indirect store (aligned 1181 -> 1188 of 1302).
-    UnknownBikeAIPath* path = &aiPath;
+    BikeAIRacingLine* path = &aiPath;
 
     memset(&aiPath, 0, sizeof(aiPath));
     list = 0;

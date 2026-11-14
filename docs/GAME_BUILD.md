@@ -1575,7 +1575,7 @@ inference, not checked in a trace. `BikeRace::AimCamera` 0x0041eb20 and `NextCam
 first and then scales by 1/255. The two agree at 53-bit; at 24-bit 20333 of the
 65025 channel and probability pairs differ by one ulp (exhaustive check), which
 can flip a draw that lands on the threshold. The source now uses retail's order
-(`UnknownEcoSampleTgaWeighted`; `fild; fmul weight; fmul 1/255` as at retail
+(`SampleEcoProbabilityTgaWeighted`; `fild; fmul weight; fmul 1/255` as at retail
 0x0045a7e9), accepting VC6's different register allocation of the body.
 
 A gameplay sweep added replay cases for linked bodies below 1.000 masked that no
@@ -1815,7 +1815,7 @@ needed a fix. The emu counts below are at 0x007f with seed 11.
 - Forwarders to the soultree.obj transforms, which are strict-exact: CarProceduralNode
   0x004fd5c0 and 0x004fd710, ConNode 0x004fd660, SoultreeObject 0x004fd7f0. The forwarders are
   `TireNode::LocalToWorldDirection`, `KbXform::WorldToLocalDirection`, the
-  `UnknownSoultreeNodeView` views, Group4_SoultreeBridge and `Group4Veh_LocalToWorldPoint`. They
+  `DrawSoultreeObjectView` views, Group4_SoultreeBridge and `Group4Veh_LocalToWorldPoint`. They
   call those bodies and copy the result back, with no arithmetic of their own.
 - `ShadowCameraProxy::SetLookAt` 0x0042e9b0 (retail `Camera::SetFrame`). The inline normalise
   at 0x0042e9e1..0x0042ea03 sums (x\*x + y\*y) + z\*z and compares the unrounded sum with 1.0,

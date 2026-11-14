@@ -11,7 +11,7 @@
 // each of the target's buffered frames. Names are provisional.
 
 // One tracked region (0x40 bytes, a DebugMalloc'd array at +0x50).
-struct UnknownBackgroundRegion {
+struct BackgroundRegion {
     int framesLeft;              // frames left (the target's +0x14 plus one); 0 when free
     CameraRect frameRects[3];    // the region per buffered frame
     int pendingFrame;            // frame whose rectangle is pending reset, or -1
@@ -21,7 +21,7 @@ struct UnknownBackgroundRegion {
 
 // The fields BackgroundImage reads from the target's camera (Camera.h keeps
 // them protected): GameObject's +0x25 bit 0 and the slot 13 viewport.
-struct UnknownBackgroundCamera {
+struct BackgroundCameraView {
     unsigned char field_0x000[0x25];
     unsigned char isEnabled : 1;              // +0x25
     unsigned char field_0x026[0x1a8 - 0x26];
@@ -79,7 +79,7 @@ public:
     int field_0x44;
     int regionCapacity;                    // regions allocated
     int regionCount;                       // regions in use
-    UnknownBackgroundRegion* regionTable;
+    BackgroundRegion* regionTable;
     int field_0x54;
     int fullRestoreFrames;                 // frames left to restore fully
     int drawnBefore;                       // +0x5c  ctor 0; RenderPost3D (0x00403ec0) passes it as DrawImage's `dirty` and then sets it. Tier 3

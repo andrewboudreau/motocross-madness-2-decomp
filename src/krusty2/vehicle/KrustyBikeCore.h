@@ -198,7 +198,7 @@ public:
     float aiLineOffset;  // +0x824 random in [-7,7) (or [-3,3) in event types 1/5); the look-ahead's sideways shift from the AI path (0x0040e510 `side`)
     Vec3 predictedLandingNormal;  // +0x828  ground normal under the predicted landing (0x00413200)
     float predictedLandingTime;  // +0x834  predicted time to landing (PredictLanding 0x0040e370)
-    UnknownBikeAIPath aiPath; // 0x838  racing line rebuilt by 0x00414370 each frame
+    BikeAIRacingLine aiPath; // 0x838  racing line rebuilt by 0x00414370 each frame
     int avoidNearOnly;  // +0x11B0 last argument of the look-ahead 0x0040eca0, forwarded to the obstacle query: when set only hits within 10 count
     float aiOffTrackTime;  // +0x11B4  BikeAI: seconds the AI bike is off the track (onTrack clear) while raceMode is 0; at 5 it is put back
     char hasFullState;  // +0x11B8  BikeRace racer +0x11b8: set when a message 1 state arrives; message 13 deltas wait for it

@@ -27,7 +27,7 @@
   "?OnNetworkMessage@GameObject@@UAEHHPAXHHH@Z": "0x00469620",
   "?AttachRenderContext@GameObject@@UAEHPAX@Z": "0x00469720",
   "?MarkPendingRelease@GameObject@@UAEXXZ": "0x004692c0",
-  "?ModifyMesh@TransparencyMod@@UAEXPAVD3DIMSoultreeObject@@PAUUnknownSoultreeMesh@@PAPAU3@@Z": "0x005206f0",
+  "?ModifyMesh@TransparencyMod@@UAEXPAVD3DIMSoultreeObject@@PAUModifierSoultreeSurfaceView@@PAPAU3@@Z": "0x005206f0",
   "?Disable@GameObject@@UAEXXZ": "0x004690a0",
   "?Enable@GameObject@@UAEXXZ": "0x004690b0",
   "?OnDisable@GameObject@@UAEXXZ": "0x00469050",

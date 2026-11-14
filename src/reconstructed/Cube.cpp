@@ -135,8 +135,8 @@ int Cube::SetVectors(const Vector3* newCenter, const Vector3* b, const Vector3* 
 }
 
 // 0x0043d460
-int Cube::LoadTexture(int face, int index, UnknownTexturePalette* palette,
-                                UnknownCubeTextureContext* context)
+int Cube::LoadTexture(int face, int index, TextureColorMapperView* palette,
+                                CubeTextureContextView* context)
 {
     int size = DecodeTextureSize(faces[face].sizeCodes, index % 4, index / 4);
     int dataSize;
@@ -165,7 +165,7 @@ int Cube::LoadTexture(int face, int index, UnknownTexturePalette* palette,
 }
 
 // 0x0043d630
-int Cube::LoadMissingTextures(UnknownTexturePalette* palette, UnknownCubeTextureContext* context)
+int Cube::LoadMissingTextures(TextureColorMapperView* palette, CubeTextureContextView* context)
 {
     textureStream->Seek(textureDataOffset, 0, 1);
     for (int face = 0; face < 6; face++) {

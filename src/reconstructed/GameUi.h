@@ -67,7 +67,7 @@ public:
 
 // RTTI: UIAnim : BaseObject (vtable 0x00552ccc; 0xf8 bytes, new'd at
 // gameui.cpp line 0xc10). A control's image for one state: up to 49
-// UIFrames played in turn. DlgProcs.h's UnknownDialogImage is the same
+// UIFrames played in turn. DlgProcs.h's DialogUIAnimView is the same
 // object.
 class UIAnim : public BaseObject {
 public:
@@ -78,7 +78,7 @@ public:
     void SetFrameDelay(int delay);    // 0x00472f40: milliseconds per frame
     void Rewind();             // 0x00472f50: rewinds
     UIFrame* GetCurrentFrame();         // 0x00472f80: the current frame
-    UIFrame* UnknownInlineFrame(int index) { return frameList[index]; }
+    UIFrame* GetFrameAt(int index) { return frameList[index]; }
     TextureMap* GetCurrentTexture();      // 0x00472f90: the current frame's texture
     int AddFrame(UIFrame* frame); // 0x00472fb0: appends a frame
     UIFrame* Advance();         // 0x00472fe0: advances
@@ -131,7 +131,7 @@ public:
 
 // One state of a UIMultiState (32 bytes; the slots 34-37 overrides read
 // it the way UIControl's read its own +0xc0..+0xe4).
-struct UnknownGameUiState {
+struct UIMultiStateEntry {
     UIAnim* image;                            // +0x00
     UIAnim* focusImage;                       // +0x04
     char* text;                               // +0x08
@@ -232,7 +232,7 @@ public:
     void SetDropColor(int value);             // 0x00470d80: "DropColor"
     void SetName(const char* name);           // 0x00470dc0: the .dtm section name
     char* GetName();                          // 0x00470df0
-    void UnknownInlineSetField18(void* value) { renderContext = value; }
+    void StoreRenderContext(void* value) { renderContext = value; }
     // 0x00470870: starts transition `type` (100-106: the loader's "FX" GROW,
     // LSLIDE, RSLIDE, TSLIDE, BSLIDE and ANIM).
     void StartTransition(int type, int sound, int show, int delay, int frameCount);
@@ -310,7 +310,7 @@ public:
     int transitionFrame;                      // +0x164: the transition step's frame (or ANIM phase)
     int moveable;                             // +0x168: "Moveable"
     UIAnim* stateImages[5];                   // +0x16c: "AnimNorm", "AnimFocus", "AnimPush", ...
-    int mouseAnim;                            // +0x180: "MouseAnim" (a UnknownCursorAnimation*)
+    int mouseAnim;                            // +0x180: "MouseAnim" (a CursorUIAnimView*)
     UIAnim* fxAnimIn;                         // +0x184: "FXAnimIn"
     UIAnim* fxAnimOut;                        // +0x188: "FXAnimOut"
     UIControl* anchorControl;      // +0x18c: "Anchor"
@@ -592,7 +592,7 @@ public:
 
     int stateCount;                           // +0x1ec
     int selectedState;                        // +0x1f0
-    UnknownGameUiState* stateTable;           // +0x1f4: the states
+    UIMultiStateEntry* stateTable;           // +0x1f4: the states
 };
 
 // RTTI: UIStaticText : UIControl (vtable 0x00553420; 0x1ec bytes, `new` at
@@ -698,7 +698,7 @@ public:
     // accessor; reading buttonPart directly lets VC6 merge the two branches
     // of 0x004f3260 and 0x004f8700, which retail does not. Defined after the
     // class (an in-class body flips ProCircuitProcsNearMisses' 0x004d59a0).
-    UIDDLButton* UnknownInlineButton();
+    UIDDLButton* GetButtonPart();
 
     UIDDLButton* buttonPart;                  // +0x1ec
     UIDDLStatic* staticPart0;                 // +0x1f0: the static parts
@@ -711,7 +711,7 @@ public:
     int openArea[4];                          // +0x20c: the dropped-down CameraRect, button to list bottom (LayoutParts)
 };
 
-inline UIDDLButton* UIDropDownList::UnknownInlineButton() { return buttonPart; }
+inline UIDDLButton* UIDropDownList::GetButtonPart() { return buttonPart; }
 
 // MediaControl (RTTI, vtable 0x005551c0; 0x80 bytes, new'd by UIVideoStatic
 // 0x0047ae90), the movie player, is declared in MediaControl.h.

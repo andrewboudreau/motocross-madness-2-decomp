@@ -25,8 +25,8 @@ SOURCES = ('src/reconstructed/GUIManager.cpp', 'src/reconstructed/DlgProcs.cpp',
 FILENAMES = SOURCES + ('src/reconstructed/ContainerList.h', 'samples/ui/GuiScreenTexture.cpp')
 GETTER = '?GetCurrentTexture@UIAnim@@QAEPAVTextureMap@@XZ'
 ADVANCE = '?AdvancePastSounds@UIAnim@@QAEPAVTextureMap@@XZ'
-RENAMES = {'?GetCurrentTexture@UnknownDialogImage@@QAEHXZ': GETTER,
-           '?AdvancePastSounds@UnknownCursorAnimation@@QAEHXZ': ADVANCE}
+RENAMES = {'?GetCurrentTexture@DialogUIAnimView@@QAEHXZ': GETTER,
+           '?AdvancePastSounds@CursorUIAnimView@@QAEHXZ': ADVANCE}
 
 
 def pin(rows):

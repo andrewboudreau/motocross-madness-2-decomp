@@ -34,7 +34,7 @@ void OpenCareerDialog();
 // A view of EventManager's 0x50-byte race entries (EventManager.h's
 // RacerResult) as the results code reads them: +0x34..+0x3c are loaded
 // as floats.
-struct UnknownProCircuitResult {
+struct ProCircuitRacerResultView {
     int racer;                                // +0x00: the circuit racer
     int position;                             // +0x04: finishing position
     unsigned char field_0x08[0x28 - 0x08];

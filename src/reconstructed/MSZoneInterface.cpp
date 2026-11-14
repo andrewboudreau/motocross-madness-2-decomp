@@ -50,7 +50,7 @@ struct DPLMsgGetPropertyResponse {
 };
 
 // The COM object 0x004aa670 creates; the called slots are named after their arguments (tier 3).
-struct UnknownZoneScore {
+struct ZoneScoreInterface {
     virtual long __stdcall QueryInterface(const GUID& iid, void** result);
     virtual unsigned long __stdcall AddRef();
     virtual unsigned long __stdcall Release();
@@ -172,7 +172,7 @@ failed:
 // 0x004aa670: creates the score object, adds `count` players and sends the
 // result through the lobby.
 int MSZoneInterface::SubmitScores(unsigned int count, void* a, void* b) {
-    UnknownZoneScore* score = 0;
+    ZoneScoreInterface* score = 0;
     unsigned int i;
     int flags;
 

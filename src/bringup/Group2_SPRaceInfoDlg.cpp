@@ -44,7 +44,7 @@
 
 // The replay tape's header ("VCRtape.dat", 0xeb0 bytes): the race settings
 // at +0x34 and the garage engine size and stroke at +0x33c.
-struct UnknownReplayTapeHeader {
+struct ReplayTapeHeader {
     unsigned char field_0x00[0x34];
     RaceSettings raceSettings;      // +0x34
     unsigned char field_0x220[0x33c - 0x220];
@@ -154,7 +154,7 @@ void SPRaceInfoDlg::HandleEvent(DialogEvent* event) {
     }
     case kDialogCommand:
         if (!_stricmp("ButViewReplay", event->controlName)) {
-            UnknownReplayTapeHeader header;
+            ReplayTapeHeader header;
             FILE* file = fopen("VCRtape.dat", "rb");
             if (file) {
                 fread(&header, sizeof(header), 1, file);

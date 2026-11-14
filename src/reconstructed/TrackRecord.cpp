@@ -482,7 +482,7 @@ void TrackRecordDlg::FillLists(DialogEvent* event, int series)
     control = static_cast<UIListBox*>(FindControl("LstTrack", 3));
     control->RemoveAllRows();
     ListHighScoreTracks(control, g_TrackGame->mode.highScoreDirectoryList, series);
-    ((UnknownTrackRecordListBox*)control)->ReportClick(0);
+    ((TrackRecordUIListBoxView*)control)->ReportClick(0);
 }
 
 void TrackRecordDlg::AddStatsRow(DialogEvent* event, const char* name, float value,

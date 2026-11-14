@@ -42,20 +42,20 @@ static void Fill(TrackGameMode* self,void* pointer,int size,int op){
     if(offset<0||offset+size>sizeof(TrackGameMode))Fail(83);
     for(int i=0;i<size;++i)((unsigned char*)pointer)[i]=(unsigned char)(seed*11+op*7+i);
 }
-void TrackGameMode::ResetInterfaceOptions(UnknownTrackGameModeOptions6ac* p){
+void TrackGameMode::ResetInterfaceOptions(TrackGameInterfaceOptions* p){
     Fill(this,p,sizeof(*p),1);if(switchGlobal==1)SetGlobal(1);
 }
-void TrackGameMode::ResetSoundOptions(UnknownTrackGameModeOptionsA20* p){Fill(this,p,sizeof(*p),2);}
-void TrackGameMode::ResetGraphicsOptions(UnknownTrackGameModeOptionsA4c* p){
+void TrackGameMode::ResetSoundOptions(TrackGameSoundOptions* p){Fill(this,p,sizeof(*p),2);}
+void TrackGameMode::ResetGraphicsOptions(TrackGameGraphicsOptions* p){
     Fill(this,p,sizeof(*p),3);detailLevel=seed-31;if(switchGlobal==2)SetGlobal(1);
 }
 void TrackGameMode::ChooseDisplayMode(const void* guid,int* out){
     Record(4,this,(char*)out-(char*)mode,(int)guid);if(guid)Fail(84);
     *out=100+seed;field_0x6a4^=0xabcdef;
 }
-void TrackGameMode::ResetControlOptions(UnknownTrackGameModeOptionsA68* p){Fill(this,p,sizeof(*p),5);}
+void TrackGameMode::ResetControlOptions(TrackGameControlOptions* p){Fill(this,p,sizeof(*p),5);}
 void TrackGameMode::ReloadResourceStrings(char(*p)[0x80]){Fill(this,p,sizeof(resourceStrings),6);}
-void TrackGameMode::ResetGarageOptions(UnknownTrackGameModeOptionsFd8* p){Fill(this,p,sizeof(*p),7);}
+void TrackGameMode::ResetGarageOptions(TrackGameGarageOptions* p){Fill(this,p,sizeof(*p),7);}
 void TrackGameMode::ResetSettingsEntries(){Fill(this,&raceSettings,sizeof(raceSettings),8);}
 int TrackGameMode::FindCdDirectory(){
     Record(9,this);if(mutation&1)strcpy(cdDataDirectory,newCd);

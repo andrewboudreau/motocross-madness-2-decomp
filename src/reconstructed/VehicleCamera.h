@@ -118,7 +118,7 @@ public:
     virtual bool ShouldFollowSubject();
 
     // Inlined by slot 75: no vehicle mode, or the vehicle's +0x444 is clear.
-    int UnknownInlineIdle() {
+    int IsSubjectUncrashed() {
         if (!vehicleMode)
             return 1;
         return vehicle->crashState == 0;

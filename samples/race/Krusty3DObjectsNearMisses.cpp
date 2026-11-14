@@ -35,7 +35,7 @@
 // hides, `finished` tested as `*(bool*)&`, `!= 0` or `(unsigned char)`, and
 // `scale` initialised (0, 1 or modelScale) before the switch.
 // Retail computes `0.5f - screenY` as `fld 0.5; fsub [esi+0x4c]`; reading
-// the field directly (not through UnknownScreenY) gives that order but
+// the field directly (not through ScreenYFraction) gives that order but
 // changes the `position +=` x87 sequence (fxch/fadd/fstp), 401 -> 383; a
 // screenY local: 401. The half field of view goes through a macro: as an
 // inline function, VC6 folded `* 0.5f * 0.01745329f` into one 0.0087266f
@@ -70,7 +70,7 @@ static const Vector3 kVec3YAxis = Vector3(0.0f, 1.0f, 0.0f);
 
 
 // The owner a VisualCue compares its camera with (its +0x18).
-struct UnknownCueOwner {
+struct VisualCueRenderTargetView {
     unsigned char field_0x00[0x08];
     ArcadeCameraView* currentCamera;          // +0x08
 };
@@ -88,8 +88,8 @@ struct UnknownCueOwner {
     if (arcadeView->fieldOfView != builtFieldOfView) { \
         builtFieldOfView = arcadeView->fieldOfView; \
         float half = (float)tan(UNKNOWN_DEGREES_TO_RADIANS(builtFieldOfView * 0.5f)) * viewDistance; \
-        screenOffsetX = (UnknownScreenX() - 0.5f) * half * 2.0f; \
-        screenOffsetY = (0.5f - UnknownScreenY()) * arcadeView->aspectRatio * half * 2.0f; \
+        screenOffsetX = (ScreenXFraction() - 0.5f) * half * 2.0f; \
+        screenOffsetY = (0.5f - ScreenYFraction()) * arcadeView->aspectRatio * half * 2.0f; \
         modelScale = targetPixels * viewDistance / (arcadeView->focalLength * modelSize); \
     } \
     Vector3 position = arcadeView->cameraPosition; \
@@ -107,7 +107,7 @@ int VisualCue::Tick(float frameTime) {
     if (!ArcadeObject::Tick(frameTime))
         return 1;
     if (!cycleCues) {
-        if (((UnknownCueOwner*)renderContext)->currentCamera != arcadeView ||
+        if (((VisualCueRenderTargetView*)renderContext)->currentCamera != arcadeView ||
             cueView->raceCamera->followedBike != cueView->ownRacer || !cueView->ownRacer ||
             cueView->ownRacer->finished) {
             isVisible = 0;

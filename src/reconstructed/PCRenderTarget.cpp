@@ -161,7 +161,7 @@ int PCRenderTarget::EndScene() {
 
 // 0x004c53f0
 int PCRenderTarget::Blit(void* destination, void* source, void* sourceRect, int flags) {
-    return renderSurface->Blt(destination, static_cast<UnknownBlitSource*>(source)->systemSurface,
+    return renderSurface->Blt(destination, static_cast<BlitPCTextureMapView*>(source)->systemSurface,
                                       sourceRect, flags, 0) == 0;
 }
 

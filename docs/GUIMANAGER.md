@@ -30,7 +30,7 @@ hover/capture, IME state, a ToolTip and a GUICursor. HiResMeter is the
 "MS Timers" overlay at `0x0067b468` (Game.h's `g_HiResMeter`
 points to it); its timer fields are named after the overlay's column header
 (`callsThisTick`, `msThisTick`, `peakMs`, ...). KrustyUI's former
-`UnknownKrustyUIGui` / `UnknownKrustyUIGuiLayer` declarations now alias
+`KrustyUIGuiManager` / `KrustyUIGuiUser` declarations now alias
 GUIManager / GUIUser. Their unchanged canonical class declarations live in
 `GUIManagerCore.h`; Windows drawing types remain in `GUIManager.h`.
 KrustyUI.h only forward-declares the shared classes, so unrelated TrackGame

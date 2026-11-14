@@ -50,7 +50,7 @@ static const Vector3 kVec3YAxis = Vector3(0.0f, 1.0f, 0.0f);
 static const Vector3 kVec3ZAxis = Vector3(0.0f, 0.0f, 1.0f);
 // Inline: the racers in the race, own and AI (a single player race) or
 // own and remote.
-static inline int UnknownFunctionRacerCount() {
+static inline int CountRaceRacers() {
     if (g_TrackGame->playerCount == 1) {
         if (g_TrackGame->mode.raceSettings.raceMode == 4) {
             return g_TrackGame->playerCount;
@@ -165,7 +165,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, TextureContext* te
         if (g_TrackGame->mode.raceSettings.raceMode == 4)
             racerCount = 1;
         else
-            racerCount = UnknownFunctionRacerCount();
+            racerCount = CountRaceRacers();
         recordIndex = 0;
         if (replayVcr)
             replayVcr->racerCount = racerCount;

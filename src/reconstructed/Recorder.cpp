@@ -15,7 +15,7 @@
         handle = 0;                   \
     }
 
-unsigned __stdcall UnknownRecorderThread(void* parameters); // 0x004e6f80 (samples/race/RecorderNearMisses.cpp)
+unsigned __stdcall RecorderWorkerThread(void* parameters); // 0x004e6f80 (samples/race/RecorderNearMisses.cpp)
 
 // 0x004e77f0
 VCRInterface::VCRInterface() : GameObject(1) {
@@ -95,14 +95,14 @@ void VCRInterface::SignalAndWait(HANDLE event, DWORD interval) {
 
 // 0x004e7a90
 int VCRInterface::Start(int callback, int header, int headerSize, int mode, int fileName,
-                        unsigned int size, UnknownRecorderOwner* owner) {
+                        unsigned int size, RecorderVCRFileView* owner) {
     DWORD interval;
 
     frameRing = new (__FILE__, 477) VCR(size);
     if (!frameRing)
         return 0;
     vcrFile = owner;
-    recordCallback = (UnknownRecorderCallback)callback;
+    recordCallback = (RecorderCallbackProc)callback;
     writeEvent = CreateEventA(0, 0, 0, 0);
     createFileEvent = CreateEventA(0, 0, 0, 0);
     reopenFileEvent = CreateEventA(0, 0, 0, 0);
@@ -123,7 +123,7 @@ int VCRInterface::Start(int callback, int header, int headerSize, int mode, int 
     threadParameters.fileName = fileName;
     threadParameters.owner = this;
     InitializeCriticalSection(&lock);
-    workerThread = (HANDLE)_beginthreadex(0, 0, UnknownRecorderThread, &threadParameters, 0, &workerThreadId);
+    workerThread = (HANDLE)_beginthreadex(0, 0, RecorderWorkerThread, &threadParameters, 0, &workerThreadId);
     if (!workerThread)
         return 0;
     interval = vcrFile->memory ? 10 : 200;

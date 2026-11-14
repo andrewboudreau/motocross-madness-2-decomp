@@ -2,7 +2,7 @@
 #include "../math/Vec3.h"
 
 // Value records embedded in the canonical KrustyBike class.
-struct UnknownBikeAIPath {
+struct BikeAIRacingLine {
     int count;          // +0x000
     int index;          // +0x004 current segment
     float t;            // +0x008 parameter along the current segment

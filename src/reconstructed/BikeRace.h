@@ -91,7 +91,7 @@ public:
 
     // 0x0049bf10: opens `name` in `file` through `callback` for recording
     // (mode 0) or playback (mode 1); 0 on failure.
-    int OpenRecording(UnknownRecorderCallback callback, int mode, char* name,
+    int OpenRecording(RecorderCallbackProc callback, int mode, char* name,
                               VCRFile* file);
     float RecordedLength();            // 0x0049c000: the recorded length
     void SetReplayLength(float time, int flag); // 0x0049bff0
@@ -854,7 +854,7 @@ extern Vector3 g_GateDebugBoxLine[2];
 extern Vector3 g_GateDebugDirectionLine[2];
 extern Vector3 g_PathTargetDebugLine[2];    // 0x00578dc0 position to path target, both raised by 3
 
-// 0x004230e0 (cdecl; an UnknownRecorderCallback, its address is passed at
+// 0x004230e0 (cdecl; an RecorderCallbackProc, its address is passed at
 // 0x0041918a and later): the replay time in milliseconds, then 0x00421d50.
 int RecorderCallback(int kind, void* data, int flag, int recorderId, int* keep, int time,
                      int* milliseconds);

@@ -275,7 +275,7 @@ void BikeRace::SetSceneTime(float time) {
 
 // Inline: the racers in the race, own and AI (a single player race) or
 // own and remote.
-static inline int UnknownFunctionRacerCount() {
+static inline int CountRaceRacers() {
     if (g_TrackGame->playerCount == 1) {
         if (g_TrackGame->mode.raceSettings.raceMode == 4) {
             return g_TrackGame->playerCount;
@@ -420,9 +420,9 @@ int BikeRace::Tick(float frameTime) {
                             recordTickCount++;
                             TrackGameViewOwner* owner = g_TrackGame->tagEvent;
                             if (owner != 0 && owner->ball != 0 && owner->followedRacer == 0) {
-                                recordTickRecordCount = UnknownFunctionRacerCount() + 1;
+                                recordTickRecordCount = CountRaceRacers() + 1;
                             } else {
-                                recordTickRecordCount = UnknownFunctionRacerCount();
+                                recordTickRecordCount = CountRaceRacers();
                             }
                             int camera = g_TrackGame->mode.raceSettings.eventType;
                             if (camera == 0 || (camera == 4 && g_TrackGame->mode.raceSettings.stuntMode)) {
@@ -1879,7 +1879,7 @@ void BikeRace::ClearRacerParts() {
     racer->receivedStates[1]->state.position = kVec3Zero;
     racer->receivedStates[2]->state.position = kVec3Zero;
     racer->receivedStates[3]->state.position = kVec3Zero;
-    for (int i = 0; i < UnknownFunctionRacerCount() - 1; i++) {
+    for (int i = 0; i < CountRaceRacers() - 1; i++) {
         racer = aiRacers[i];
         if (racer != 0) {
             racer->receivedStates[0]->state.position = kVec3Zero;

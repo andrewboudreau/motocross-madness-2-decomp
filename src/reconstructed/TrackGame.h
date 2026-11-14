@@ -26,7 +26,7 @@ class FollowCamera;
 // bits). Their members at +0x2c..+0x9c sit where BaseQuarryEvent
 // (QuarryEvent.h) keeps its scene, overlays and AuralScape; the exact
 // class of each owner is not established.
-struct UnknownTrackGameViewPart {
+struct TrackGameSceneView {
     unsigned char field_0x00[0xc4];
     GameObject* soundGroup;  // +0xC4  racesnd.cpp mutes it with slot 16 beside the engine/effects groups; the podium's sound group
 };
@@ -35,7 +35,7 @@ struct UnknownTrackGameViewPart {
 // the new replay recorder (0x004a9d10). It is the tag ball BikeRace.h
 // declares as TagBall (FollowRacer.cpp implements both views).
 class KrustyVCR;
-class UnknownTrackGameViewOwnerDc {
+class TrackGameTagBallView {
 public:
     void SetRecorder(KrustyVCR* vcr); // 0x004a9d10: keeps the recorder at +0x708
 
@@ -53,7 +53,7 @@ struct UnknownTrackGameViewEntryTarget {
     unsigned char field_0x00[0x44];
     int field_0x44;
 };
-struct UnknownTrackGameViewEntry {
+struct TrackGameRaceGateView {
     unsigned char field_0x00[0x58];
     UnknownTrackGameViewEntryTarget* field_0x58;
 };
@@ -78,10 +78,10 @@ struct TrackGameViewOwner : public GameObject {
     // flagging the two it leaves; `racer` is unused.
     void SelectLapGates(int gate, int nextGate, void* racer);
 
-    UnknownTrackGameViewPart* eventScene;     // +0x2C  BaseQuarryEvent::eventScene (0x004df108 stores the Scene that 0x004ea7e0 sets up)
-    unsigned char field_0x30[0x34 - 0x30];
+    TrackGameSceneView* eventScene;     // +0x2C  BaseQuarryEvent::eventScene (0x004df108 stores the Scene that 0x004ea7e0 sets up)
+    unsigned char skyCube[0x34 - 0x30];  // +0x30 BaseQuarryEvent skyCube (bytes kept)
     EventBikeRaceView* raceView;          // +0x34
-    unsigned char field_0x38[0x3c - 0x38];
+    unsigned char visualCue[0x3c - 0x38];  // +0x38 BaseQuarryEvent visualCue (bytes kept)
     FollowCamera* raceCamera;                 // +0x3c the race camera (InGameProcs.cpp VCRDlg)
     unsigned char field_0x40[0x5c - 0x40];
     GameObject* statsOverlay;                 // +0x5C  BaseQuarryEvent::statsOverlay (StatsOverlay ctor 0x00519370, stored by 0x004e07c0)
@@ -103,22 +103,22 @@ struct TrackGameViewOwner : public GameObject {
     int lapGate;  // +0xB0  picked gate: bikerace/KrustyBike pass the racer's lapGate (0x00404df0)
     int nextLapGate;  // +0xB4  picked gate: the racer's nextLapGate = (lapGate + 1) % count (0x00404df0)
     unsigned char field_0xb8[0xdc - 0xb8];
-    UnknownTrackGameViewOwnerDc* ball;        // +0xdc string 0x14b7 "FREE BALL!" while set and no racer "is IT!" (StatsOverlay 0x0051aa40); BikeRace.cpp reads it as TagBall
+    TrackGameTagBallView* ball;        // +0xdc string 0x14b7 "FREE BALL!" while set and no racer "is IT!" (StatsOverlay 0x0051aa40); BikeRace.cpp reads it as TagBall
     unsigned char field_0xe0[0x420 - 0xe0];
-    UnknownTrackGameViewEntry* gates[1];  // +0x420  BikeRace 0x0041d170 builds gateList from the first +0xac entries
+    TrackGameRaceGateView* gates[1];  // +0x420  BikeRace 0x0041d170 builds gateList from the first +0xac entries
 };
 
 // Settings blocks of TrackGameMode, passed to its reset helpers (0x00522720,
 // 0x00522780, 0x005227d0, 0x00522800, 0x00522cb0); 0x005231f0 saves each one
 // whole, which gives their sizes.
-// The last 0x14 bytes of UnknownTrackGameModeOptions6ac. 0x00522720 clears
+// The last 0x14 bytes of TrackGameInterfaceOptions. 0x00522720 clears
 // them through a pointer advanced to +0x360 with a fresh zero register, which
 // suggests an inline helper (provisional; that function is still a near miss).
 // One chosen garage curve row per bike class, in the order of
 // g_BikeClassEngineSizes (0x0056cb6c: 125, 250, 400, 500, 600 in retail
 // .data); OptionProcs.h indexes the same five ints as curveRows[BikeClassOf(cc)].
-struct UnknownTrackGameModeOptions6ac360 {
-    void UnknownReset() {
+struct GarageCurveChoice {
+    void ClearCurveChoices() {
         curve125cc = 0;
         curve250cc = 0;
         curve400cc = 0;
@@ -133,7 +133,7 @@ struct UnknownTrackGameModeOptions6ac360 {
     int curve600cc;                           // +0x10 bike class 4
 };
 
-struct UnknownTrackGameModeOptions6ac {       // TrackGameMode+0x6ac, 0x374 bytes
+struct TrackGameInterfaceOptions {       // TrackGameMode+0x6ac, 0x374 bytes
     int instrumentOverlayOn;                  // +0x00 (TrackGameMode +0x6ac)
     int showRaceStatistics;                   // +0x04 (+0x6b0: TrackOverlay 0x00519980)
     int chatInputLine;                        // +0x08 (+0x6b4: 1 shows the chat input line)
@@ -153,10 +153,10 @@ struct UnknownTrackGameModeOptions6ac {       // TrackGameMode+0x6ac, 0x374 byte
     int field_0x40;
     int field_0x44;
     unsigned char field_0x48[0x360 - 0x48];
-    UnknownTrackGameModeOptions6ac360 garageCurveChoice;  // +0x360  TrackGameMode+0xa0c garageCurveChoice[5] (0x6ac + 0x360); OptionProcs.h curveRows
+    GarageCurveChoice garageCurveChoice;  // +0x360  TrackGameMode+0xa0c garageCurveChoice[5] (0x6ac + 0x360); OptionProcs.h curveRows
 };
 
-struct UnknownTrackGameModeOptionsA20 {       // TrackGameMode+0xa20, 0x2c bytes
+struct TrackGameSoundOptions {       // TrackGameMode+0xa20, 0x2c bytes
     int cdAudioOn;                            // +0x00 (TrackGameMode+0xa20): CD audio on, reset to 0
     int uiSounds;                             // +0x04 UserInterfaceSoundsCheckBox (OptionProcs.h)
     int soundOn;                              // +0x08 (TrackGameMode+0xa28): sound on
@@ -170,7 +170,7 @@ struct UnknownTrackGameModeOptionsA20 {       // TrackGameMode+0xa20, 0x2c bytes
     int use16BitSound;                        // +0x28 (TrackGameMode+0xa48): 16-bit (else 8-bit) primary format in LoadProfile
 };
 
-struct UnknownTrackGameModeOptionsA4c {       // TrackGameMode+0xa4c, 0x1c bytes
+struct TrackGameGraphicsOptions {       // TrackGameMode+0xa4c, 0x1c bytes
     int displayMode;                          // +0x00 (TrackGameMode+0xa4c): display mode index
     int shadows;                              // +0x04 (TrackGameMode+0xa50): shadows on
     int particles;                            // +0x08 (TrackGameMode+0xa54): particles on
@@ -180,7 +180,7 @@ struct UnknownTrackGameModeOptionsA4c {       // TrackGameMode+0xa4c, 0x1c bytes
     int detailLevel;                          // +0x18 (TrackGameMode+0xa64): detail level 0..9
 };
 
-struct UnknownTrackGameModeOptionsA68 {       // TrackGameMode+0xa68, 0x30 bytes (ResetControlOptions)
+struct TrackGameControlOptions {       // TrackGameMode+0xa68, 0x30 bytes (ResetControlOptions)
     int responseSliders[7];                   // +0x00 50 each: Steering, Crossup, Pitch, PressThrottle, PressBrakes, ReleaseThrottle, ReleaseBrakes sliders (OptionProcs.h)
     int feedback;                             // +0x1c FeedbackSlider
     int joystickOn;                           // +0x20 TrackGameMode+0xa88 joystickOn, reset to 1
@@ -190,7 +190,7 @@ struct UnknownTrackGameModeOptionsA68 {       // TrackGameMode+0xa68, 0x30 bytes
 };
 
 // TrackGameMode+0xfd8, +0x1034 and +0x1090 (0x5c bytes each).
-struct UnknownTrackGameModeOptionsFd8 {
+struct TrackGameGarageOptions {
     int engineSize;                           // +0x00
     int fourStroke;                           // +0x04
     int weight;                               // +0x08 KrustyUI "Weight" (OptionProcs.h)
@@ -210,8 +210,8 @@ struct GridEntry {
         points = 0;
     }
 
-    int playerId;  // +0x0  SelectGamePicProcs' UnknownGridEntry view: network player id (BikeRace compares it)
-    char points;  // +0x4  UnknownGridEntry view: championship points, the start grid sort key
+    int playerId;  // +0x0  SelectGamePicProcs' SelectGameGridEntryView view: network player id (BikeRace compares it)
+    char points;  // +0x4  SelectGameGridEntryView view: championship points, the start grid sort key
 };
 
 // The 0x1ec-byte race settings block. TrackGameMode holds three: the current
@@ -252,7 +252,7 @@ struct RaceSettings {
 // out-of-line destroyer (0x00522420, `this` in ecx) that the destructor
 // inlines, which is the shape of an implicit destructor of an enclosing
 // class (strong inference).
-struct UnknownTrackGameSessionList {
+struct SessionList {
     SessionInfoType entries[5];  // +0x0  NetProcs.cpp enumerates sessions into it and indexes it by selectedSession
 };
 
@@ -320,15 +320,15 @@ public:
     // clears the selected session, the racers and the entries.
     int ResetNetworkRace();
     // Reset helpers called by 0x00522440.
-    void ResetInterfaceOptions(UnknownTrackGameModeOptions6ac* options);
-    void ResetSoundOptions(UnknownTrackGameModeOptionsA20* options);
-    void ResetGraphicsOptions(UnknownTrackGameModeOptionsA4c* options);
-    void ResetControlOptions(UnknownTrackGameModeOptionsA68* options); // 0x00522800: +0xa68..+0xa94
+    void ResetInterfaceOptions(TrackGameInterfaceOptions* options);
+    void ResetSoundOptions(TrackGameSoundOptions* options);
+    void ResetGraphicsOptions(TrackGameGraphicsOptions* options);
+    void ResetControlOptions(TrackGameControlOptions* options); // 0x00522800: +0xa68..+0xa94
     void ReloadResourceStrings(char (*names)[0x80]);   // reloads resourceStrings
-    void CopyGarageTables(UnknownTrackGameModeOptionsFd8* options);
-    void ResetSuspension(UnknownTrackGameModeOptionsFd8* options); // 0x00522c70: all six at 0.5f
-    void ResetEngineOptions(UnknownTrackGameModeOptionsFd8* options); // 0x00522c90: 250, two stroke, tables
-    void ResetGarageOptions(UnknownTrackGameModeOptionsFd8* options); // 0x00522cb0: the two above
+    void CopyGarageTables(TrackGameGarageOptions* options);
+    void ResetSuspension(TrackGameGarageOptions* options); // 0x00522c70: all six at 0.5f
+    void ResetEngineOptions(TrackGameGarageOptions* options); // 0x00522c90: 250, two stroke, tables
+    void ResetGarageOptions(TrackGameGarageOptions* options); // 0x00522cb0: the two above
     void ResetSettingsEntries();              // 0x00522cd0: raceSettings +0x14c
     // 0x00522e20: picks the display mode (640x480x16 preferred) on the
     // adapter whose GUID is `guid`, and stores the adapter GUID.
@@ -395,7 +395,7 @@ public:
     int gasGyro;                              // +0xa8c toggled by key 0x22, shown as string 0x140d "Gas Gyro" ON/OFF (bikerace.cpp slot 23)
     int brakeGyro;                            // +0xa90 toggled by key 0x30, shown as string 0x142d "Brake Gyro" ON/OFF (bikerace.cpp slot 23)
     int analogAxes;                           // +0xa94 ChkAnalogAxes (OptionProcs.h's TrackGame+0xfe0 block +0x2c)
-    UnknownTrackGameSessionList sessions; // +0xa98: enumerated sessions (NetProcs.cpp)
+    SessionList sessions; // +0xa98: enumerated sessions (NetProcs.cpp)
     int selectedSession;                  // +0xfd4: selected session (NetProcs.cpp)
     unsigned char garageOptions[0x5c];       // +0xfd8 garage settings (UNKNOWN_GARAGE_SETTINGS); restored from +0x1034 when a replay is left (InGameProcs.cpp)
     unsigned char optionsBackup[0x5c];        // +0x1034: copy of +0xfd8 (DlgProcs.cpp, InGameProcs.cpp)
@@ -442,7 +442,7 @@ public:
 };
 
 // Object returned by (TrackGame+0x56c)->+0x2c->0x00485df0.
-class UnknownTrackGameObject56cItem {
+class TrackGameUIDialogView {
 public:
     void EndDialog(int value);    // 0x0046ff30 (EventManager 0x0045e710)
     virtual void UnknownVirtualSlot0();
@@ -517,7 +517,7 @@ public:
 };
 
 // One player reported by 0x004aa670 (0x48 bytes).
-struct UnknownZonePlayerRecord {
+struct ZonePlayerRecord {
     char name[0x40];                          // +0x00
     unsigned char position;                   // +0x40: 1, other nonzero or zero: flags 2, 4 or 16
     int score;                                // +0x44
@@ -525,7 +525,7 @@ struct UnknownZonePlayerRecord {
 
 // One racer's line of the race status (0x10 bytes). The names are the
 // labels of 0x0049c770's debug messages.
-struct UnknownZoneRaceRecord {
+struct ZoneRaceRecord {
     unsigned char bikeManufacturer;           // +0x00: "Bike %d-%d": the bike manufacturer
     unsigned char bikeType;                   // +0x01: and the bike type
     unsigned char position;                   // +0x02: "Position"
@@ -536,13 +536,13 @@ struct UnknownZoneRaceRecord {
 };
 
 // The race status 0x0049c770 passes to 0x004aa670 with its size (0x88).
-struct UnknownZoneRaceStatus {
+struct ZoneRaceStatus {
     unsigned char eventType;                  // +0x00: event type index plus one
     unsigned char trackEntry;                 // +0x01: 0x0049ca60(2): the track's 1-based entry, 0 when not found
     unsigned char laps;                       // +0x02: laps
     unsigned char field_0x03;
     int longestRunningTime;                   // +0x04: the longest total running time
-    UnknownZoneRaceRecord records[8];         // +0x08
+    ZoneRaceRecord records[8];         // +0x08
 };
 
 // Base of the +0x3410 object; its constructor sits among
@@ -555,7 +555,7 @@ public:
     // (MSZoneInterface.cpp).
     DirectPlay4A* directPlay;          // +0x00
     DirectPlayLobby3A* lobby;          // +0x04
-    UnknownZonePlayerRecord players[8];       // +0x08: reported by 0x004aa670
+    ZonePlayerRecord players[8];       // +0x08: reported by 0x004aa670
     unsigned char field_0x248[0x24c - 0x248];
     // 0x0049c2f0 fills these from the lobby preset: a tag's value minus
     // one, or -1 when the tag is missing.
@@ -566,7 +566,7 @@ public:
     int bikeManufacturer;                     // +0x298: the lobby's bike model (SelectGamePicProcs.cpp); "BikeManufacturer"
     int bikeType;                             // +0x29c: "BikeType"
     int bikeIndex;                            // +0x2a0: tested after 0x0049ca60(1)
-    UnknownZoneRaceStatus raceStatus;         // +0x2a4: sent through 0x004aa670 by 0x0049c770
+    ZoneRaceStatus raceStatus;         // +0x2a4: sent through 0x004aa670 by 0x0049c770
 };
 
 // Object at TrackGame+0x3410, created for network games. It has no

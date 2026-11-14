@@ -577,7 +577,7 @@ void AuralScape::SetListener(int index, Vector3* position, Vector3* front, Vecto
 }
 
 // The volume of `emitter` from its nearest listener (pan is always 0).
-static inline void UnknownPlaceEmitter(const int& count, AuralScapeListener** listeners, SoundEmitter* emitter) {
+static inline void ApplyNearestListenerVolume(const int& count, AuralScapeListener** listeners, SoundEmitter* emitter) {
     int j;
     for (j = 0; j < count; j++) {
         listeners[j]->GetPosition(&s_UnknownListenerPositions5776f8[j]);
@@ -606,10 +606,10 @@ static inline void UnknownPlaceEmitter(const int& count, AuralScapeListener** li
     emitter->SetPan(pan);
 }
 
-// Inline in 0x00403150. With this helper and UnknownPlaceEmitter VC6's
+// Inline in 0x00403150. With this helper and ApplyNearestListenerVolume VC6's
 // inline budget for 0x00403150 covers ContainerList::Reserve only in the
 // last Add, as in retail.
-inline void AuralScape::UnknownUpdateDistances() {
+inline void AuralScape::UpdateListenerDistances() {
     for (int i = 0; i < allEmitters.m_count; i++)
         allEmitters.Get(i)->UpdateListenerDistance(listenerCount, listeners);
 }
@@ -620,7 +620,7 @@ void AuralScape::PickEmittersToPlay() {
     SoundEmitter* emitter;
     int waiting3D = 0;
 
-    UnknownUpdateDistances();
+    UpdateListenerDistances();
 
     audibleEmitters.Clear();
     for (i = 0; i < allEmitters.m_count; i++) {
@@ -697,7 +697,7 @@ void AuralScape::PickEmittersToPlay() {
     for (i = 0; i < playingEmitters.m_count; i++) {
         emitter = playingEmitters.Get(i);
         if (emitter->emitterFlags & 0x20) {
-            UnknownPlaceEmitter(listenerCount, listeners, emitter);
+            ApplyNearestListenerVolume(listenerCount, listeners, emitter);
         }
     }
 }
@@ -710,7 +710,7 @@ int AuralScape::Tick(float frameTime) {
     unsigned long environment = 0;
     unsigned char material = 0;
     if (reverbEnabled && groundSubject && reverbOwner) {
-        Vector3 position = ((UnknownAuralScapeTarget*)renderContext)->currentCamera->eyePosition;
+        Vector3 position = ((AuralScapeRenderTargetView*)renderContext)->currentCamera->eyePosition;
         reinterpret_cast<Terrain*>(groundSubject)->QueryGround(reinterpret_cast<TerrainVec3*>(&position), 0, 0, &material);
         zone = (material >> 4) & 3;
         environment = reverbOwner->environment->enviroID[zone];

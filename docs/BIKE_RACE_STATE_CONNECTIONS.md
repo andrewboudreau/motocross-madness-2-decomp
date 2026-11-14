@@ -76,7 +76,7 @@ typedef units (VC6_OPERAND_ORDER.md section 2; measured weights in NAMING.md
 Wave 18). Replacing the sample's own `UnknownBikeRaceDemoDlg` stand-in with the
 canonical `DemoDlg` (`DemoDlg.h`) gave the 13,390 order, and an extra class with
 an inline constructor restores 13,396, but so do other counts; the
-UnknownCursorAnimation-to-UIAnim merge alone also restores 13,396. CreateRacers never uses that class, so the sample
+CursorUIAnimView-to-UIAnim merge alone also restores 13,396. CreateRacers never uses that class, so the sample
 keeps the canonical class rather than a matching-only declaration.
 The count of initialised locals inside CreateRacers moves the same six bytes (13,396 at 1..4, 6, 7
 and 10..14 extra locals, 13,390 otherwise). The sample now names the "Res" directory it spells nine

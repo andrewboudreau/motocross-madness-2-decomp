@@ -15,7 +15,7 @@ extern "C" void __cdecl __CxxFrameHandler();
 static BYTE referenceSpace[0x800000]={1};
 struct World {
     BYTE games[2][sizeof(TrackGame)],uis[2][sizeof(KrustyUI)],guis[2][sizeof(GUIManager)];
-    BYTE users[2][sizeof(GUIUser)],tips[2][sizeof(UnknownKrustyUIToolTipView)];
+    BYTE users[2][sizeof(GUIUser)],tips[2][sizeof(KrustyUIToolTipView)];
     BYTE displays[2][sizeof(PCVideoCard)],sounds[2][sizeof(PCSoundInterface)];
     BYTE dialogs[2][sizeof(UIDialog)],transition[sizeof(TransDlg)];
     DisplayMode modes[2][3];
@@ -169,7 +169,7 @@ static int Count(int kind){int count=0;for(int i=0;i<observed.count;++i)if(obser
 int main(int argc,char** argv){if(argc!=4)return 3;sourceTable=strtoul(argv[3],0,16);if(!MapReference(argv[1],argv[2]))return 4;
     gameTables[0][19]=Address(&VirtualHooks::Switch0);gameTables[1][19]=Address(&VirtualHooks::Switch1);
     if(sizeof(TransDlg)!=0x7f64 || sizeof(KrustyUI)!=0x1364 || sizeof(GUIManager)!=0x3e0)return 5;
-    Base();Compare();if(!observed.completed || !observed.live || observed.allocations!=1 || observed.deletes || Count(7)!=1 || Count(10)!=1 || Count(16)!=1 || ((TransDlg*)world.transition)->nextMenu!=3001 || GameAt(0)->uiInteractionBlocked || GameAt(0)->podiumFinished || GameAt(0)->uiBlockedSeconds || ((UnknownKrustyUIToolTipView*)world.tips[0])->enabled!=-7)return 6;
+    Base();Compare();if(!observed.completed || !observed.live || observed.allocations!=1 || observed.deletes || Count(7)!=1 || Count(10)!=1 || Count(16)!=1 || ((TransDlg*)world.transition)->nextMenu!=3001 || GameAt(0)->uiInteractionBlocked || GameAt(0)->podiumFinished || GameAt(0)->uiBlockedSeconds || ((KrustyUIToolTipView*)world.tips[0])->enabled!=-7)return 6;
     Base();scenario.mask=0;Compare();if(!observed.completed || observed.count || observed.allocations)return 7;
     Base();scenario.mask=1;scenario.mode=0;Compare();if(!observed.completed || Count(6) || Count(7) || Count(10) || Count(3) || Count(4) || Count(2) || Count(5)!=1)return 12;
     Base();Compare();int findAt=0;for(int i=0;i<observed.count;++i)if(observed.events[i].kind==6)findAt=i+1;

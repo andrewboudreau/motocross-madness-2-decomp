@@ -78,7 +78,7 @@ Overlay* Overlay::Attach(RenderTarget* target, TextureMap* texture,
     else
         textService = 0;
 
-    iconService = UnknownCreateOverlayIconService();
+    iconService = CreateOverlayIconService();
 
     if (!g_UnknownOverlayTexture689110) {
         g_UnknownOverlayTexture689110 =

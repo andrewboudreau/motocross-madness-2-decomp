@@ -89,7 +89,7 @@ class BackgroundDcBehaviorTests(unittest.TestCase):
             s=gameui.find_symbol(caller);_,_,rs=gameui.symbol_extent(s)
             self.assertEqual(sum(gameui.symbol_by_index[r.symbol_index].name==SYMBOL for r in rs),1)
             layout=output/'layout.cpp';layout.write_text('#include "BackgroundImage.h"\n#include <stddef.h>\n'
-                'class LayoutCheck:public BackgroundImage {public:static void Check(){typedef char Layout[(sizeof(BackgroundImage)==0x74 && sizeof(UnknownBackgroundRegion)==64 && sizeof(CameraRect)==16 && '
+                'class LayoutCheck:public BackgroundImage {public:static void Check(){typedef char Layout[(sizeof(BackgroundImage)==0x74 && sizeof(BackgroundRegion)==64 && sizeof(CameraRect)==16 && '
                 'offsetof(LayoutCheck,renderContext)==0x18 && offsetof(BackgroundImage,offscreenCopy)==0x3c && '
                 'offsetof(BackgroundImage,copyValid)==0x40 && offsetof(BackgroundImage,regionCapacity)==0x48 && '
                 'offsetof(BackgroundImage,regionTable)==0x50 && offsetof(BackgroundImage,copyDcNext)==0x60 && '

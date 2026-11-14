@@ -312,7 +312,7 @@ void EventManager::WaitForRemoteRacers(float) {
 }
 
 // The tool tip's on/off switch (ToolTip +0x5c).
-static inline void EnableToolTips(UnknownKrustyUIToolTipView* tip, int enabled) {
+static inline void EnableToolTips(KrustyUIToolTipView* tip, int enabled) {
     tip->enabled = enabled;
 }
 
@@ -342,8 +342,8 @@ void EventManager::LeaveRaceForMenu(int menu) {
         g_TrackGame->SwitchDisplayMode(
             g_TrackGame->display->FindDisplayMode(640, 480, 16, 0, 0));
     g_TrackGame->ui->gui->CreateBackground();
-    UnknownKrustyUIGuiLayer* layer = g_TrackGame->ui->gui->GetUser(0);
-    EnableToolTips((UnknownKrustyUIToolTipView*)layer->userToolTip, g_TrackGame->mode.toolTips);
+    KrustyUIGuiUser* layer = g_TrackGame->ui->gui->GetUser(0);
+    EnableToolTips((KrustyUIToolTipView*)layer->userToolTip, g_TrackGame->mode.toolTips);
     if (!g_TrackGame->playingReplay && !g_TrackGame->ui->playingDemo &&
         g_TrackGame->mode.raceSettings.raceMode != 0 && g_TrackGame->mode.raceSettings.raceMode != 4)
         g_TrackGame->ui->RecordRaceResults();

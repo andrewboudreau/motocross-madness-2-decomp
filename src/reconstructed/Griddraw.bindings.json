@@ -20,7 +20,7 @@
   "?MarkUsed@AgeManager@@QAEXPAUAgeEntry@@@Z": "0x00401250",
   "?Seek@FileStream@@QAEHHHH@Z": "0x00461340",
   "?Read@FileStream@@QAEHPAXHH@Z": "0x00461640",
-  "?UnknownFunction464e90@DrawableGridNode@@QAEXXZ": "0x00464e90",
+  "?OnMaskCleared@DrawableGridNode@@QAEXXZ": "0x00464e90",
   "?BuildCurveTables@@YAXXZ": "0x0047db60",
   "?FindEdgeNeighbours@@YAXHHHHHHPAUGridEdge@@@Z": "0x0047e340",
   "?BuildEdgeLevel@@YAXHHHH@Z": "0x0047e430",

@@ -488,7 +488,7 @@ int g_unknown579668;
 // g_CollisionBoxResult; CollisionShapeTests.h's CollisionSweepQuery).
 struct QuerySweepRecord {
     Vec3 offset;                    // +0x00
-    unsigned char field_0x0c[0x0c];
+    unsigned char contactNormal[0x0c]; // +0x0c CollisionSweepQuery contactNormal (bytes kept)
     Vec3 contact;                   // +0x18
     float scale;                    // +0x24
     int count;                      // +0x28

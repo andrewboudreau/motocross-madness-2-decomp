@@ -73,7 +73,7 @@ struct FollowCameraEase {
 // resets both vectors to the zero vector; slot 38 compares +0x28 (the z of
 // screenPoint). The Vector3 members give the record an empty constructor, which
 // leaves a dead loop counter in 0x00463140's `new[]`.
-struct UnknownFollowCameraPoint {
+struct FollowCameraPoint {
     Vector3 position;
     float distanceRate;  // +0xC  slot 38: followDistance += dt * it for an off-screen point
     float raiseRate;  // +0x10  slot 38 code 4: followHeight += dt * it
@@ -97,8 +97,8 @@ struct FollowCameraTerrainView {
 
 // FollowCamera's view of ControlInterface's active joystick (+0x0c): slot 45
 // tests only the low byte of slot 4's result (JoystickDevice.h declares int),
-// as with UnknownKeyboardBoolView. Slot 4 reads stick `index` into *x/*y.
-class UnknownJoystickBoolView {
+// as with FollowCameraKeyboardDeviceView. Slot 4 reads stick `index` into *x/*y.
+class FollowCameraJoystickDeviceView {
 public:
     virtual void RemoveBindings();
     virtual void UnknownVirtualSlot1();
@@ -107,11 +107,11 @@ public:
     virtual bool GetPovDirection(int index, float* x, float* y);
 };
 
-// The object at 0x00575a98 (TrackOverlay.h's UnknownProjector views the same
+// The object at 0x00575a98 (TrackOverlay.h's OverlayVisibilityClipperView views the same
 // pointer). 0x0052f340 projects `point` with the camera and its +0xec matrix
 // into `screen`; slot 38 switches on the int it writes through `code` when it
 // returns 0. Names and the meaning of `code` are provisional.
-class UnknownFollowCameraProjector {
+class FollowCameraVisibilityClipperView {
 public:
     int ProjectPoint(Camera* camera, const void* matrix, const Vector3* point,
                               Vector3* screen, int* code);
@@ -281,7 +281,7 @@ protected:
     float lift;                      // +0x2d8, lift eased by VehicleCamera slot 35
     int pointCapacity;               // +0x2dc, capacity of points (0x00463140)
     int pointCount;                  // +0x2e0, number of entries in points
-    UnknownFollowCameraPoint* points; // +0x2e4, owned table
+    FollowCameraPoint* points; // +0x2e4, owned table
     float yawOffset;                 // +0x2e8, yaw offset (0x00463140, slot 49)
     float subjectCellSize;                    // +0x2EC  ctor 3.0f; SetSubject copies the Terrain's gridCellSize here. No reader found in retail
     float state4FieldOfView;         // +0x2f0 state-4 saved targetFieldOfView (slot 71)

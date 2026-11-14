@@ -95,9 +95,9 @@ void MorphBastardModifier::UpdateChannels(MorphBastardObject* object)
 }
 
 // 0x004a5290
-void MorphBastardModifier::CopyMesh(UnknownSoultreeMesh* mesh)
+void MorphBastardModifier::CopyMesh(ModifierSoultreeSurfaceView* mesh)
 {
-    meshCopy = new (__FILE__, 854) UnknownSoultreeMesh;
+    meshCopy = new (__FILE__, 854) ModifierSoultreeSurfaceView;
     meshCopy->groupCount = mesh->groupCount;
     meshCopy->vertexCount = mesh->vertexCount;
     meshCopy->faceCount = mesh->faceCount;

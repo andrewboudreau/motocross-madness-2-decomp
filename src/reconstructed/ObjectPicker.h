@@ -19,7 +19,7 @@ struct ControlBinding;
 // camera-to-world rows of the matrix at +0xac, the position, the image
 // plane distance and the viewport (x, y, width, height). Camera.h declares
 // +0x198 as int and keeps these members protected.
-struct UnknownPickCamera {
+struct PickerCameraView {
     unsigned char field_0x000[0xac];
     float viewMatrix[3][4];                   // +0x0ac
     unsigned char field_0x0dc[0x170 - 0xdc];

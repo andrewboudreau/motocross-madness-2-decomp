@@ -21,6 +21,6 @@
 #include "Wrecker.h"       // GraphicsTest
 #include "LightEmitter.h"  // D3DIMSoultreeObject
 
-struct UnknownSoultreeMesh;      // MorphBastardModifier.h
+struct ModifierSoultreeSurfaceView;      // MorphBastardModifier.h
 
 #include "D3DIMSoultreeModifierCore.h"

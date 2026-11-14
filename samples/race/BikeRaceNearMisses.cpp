@@ -313,7 +313,7 @@ int BikeRace::AimCamera(int caster) {
 // remote racers). The player count is read at each test: retail re-tests
 // `playerCount > 1` after the `index == 0` miss (`cmp ecx, 1` twice at
 // 0x0041f2f6/0x0041f304), which a `players` local lets VC6 thread away.
-inline BikeRaceKrustyBikeView* BikeRace::UnknownFunctionRacerAt(int index) {
+inline BikeRaceKrustyBikeView* BikeRace::RacerAtIndex(int index) {
     if (g_TrackGame->playerCount == 1 && index == 0) {
         return localRacer;
     }
@@ -370,7 +370,7 @@ void BikeRace::NextCameraTarget(int forward, int racers, int objects) {
                 RaceCameraView()->followingRacer = 1;
                 return;
             }
-        } while (UnknownFunctionRacerAt(targetRacer)->outOfRace != 0);
+        } while (RacerAtIndex(targetRacer)->outOfRace != 0);
     } else if (objects) {
         caster = 0;
         Scene* scene = raceScene;
@@ -974,11 +974,11 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
     BikeNumberPainter* painter = new(__FILE__, 0x367) BikeNumberPainter(textures->manager);
     if (g_TrackGame->playingReplay) {
         painter->PaintNumber(reinterpret_cast<D3DIMSoultreeObject*>(localRacer->modelNode), localRacer->plateNumber);
-        for (int i = 0; i < UnknownFunctionRacerCount() - 1; i++)
+        for (int i = 0; i < CountRaceRacers() - 1; i++)
             painter->PaintNumber(reinterpret_cast<D3DIMSoultreeObject*>(aiRacers[i]->modelNode), aiRacers[i]->plateNumber);
     } else if (g_TrackGame->playerCount > 1) {
-        for (int i = 0; i < UnknownFunctionRacerCount(); i++) {
-            for (int j = 0; j < UnknownFunctionRacerCount(); j++) {
+        for (int i = 0; i < CountRaceRacers(); i++) {
+            for (int j = 0; j < CountRaceRacers(); j++) {
                 BikeRaceKrustyBikeView* racer = racerSlots[i];
                 RacerSlot* slot = &g_TrackGame->mode.racers[j];
                 if (racer->recorderId == slot->networkPlayerId && racer->aiMessageIndex == slot->racerIndex)
@@ -1097,7 +1097,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, TextureContext* te
         if (g_TrackGame->mode.raceSettings.raceMode == 4)
             racerCount = 1;
         else
-            racerCount = UnknownFunctionRacerCount();
+            racerCount = CountRaceRacers();
         recordIndex = 0;
         if (replayVcr)
             replayVcr->racerCount = racerCount;

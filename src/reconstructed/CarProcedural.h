@@ -27,15 +27,15 @@
 // src/krusty2/core/SoultreeObject.h for the canonical view.
 class CarProceduralNode {
 public:
-    virtual void UnknownNodeVirtualSlot0();
-    virtual void UnknownNodeVirtualSlot1();
-    virtual void UnknownNodeVirtualSlot2();
-    virtual void UnknownNodeVirtualSlot3();
-    virtual void UnknownNodeVirtualSlot4();
-    virtual void UnknownNodeVirtualSlot5();
-    virtual void UnknownNodeVirtualSlot6();
-    virtual void UnknownNodeVirtualSlot7();
-    virtual void UnknownNodeVirtualSlot8();
+    virtual void ComputeSortKey();
+    virtual void ComputeQuadTreeCode();
+    virtual void LoadHierarchy();
+    virtual void LoadHierarchyFromParameters();
+    virtual void CreateNode();
+    virtual void UpdateLocalBounds();
+    virtual void ResetLocalMatrices();
+    virtual void CloneFrom();
+    virtual void CopySubtree();
     // Slot 9 (+0x24): loads the model (CarProcedural passes its slot 27
     // arguments 0, 1, 3 and 4, then 1).
     virtual void LoadModel(void* owner, const char* name, int lights, int options, int useOptions);

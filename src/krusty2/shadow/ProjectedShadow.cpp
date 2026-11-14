@@ -44,7 +44,7 @@ ProjectedShadow::ProjectedShadow(int flags)
     field_0x50 = 0;
     texture = 0;
     camera = 0;
-    field_0x5c = 0;
+    renderTarget = 0;
     memset(&clipRect, 0, sizeof(clipRect));
     mode = 1;
     downsampleOnPresent = 1;

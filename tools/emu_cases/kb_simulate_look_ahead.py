@@ -37,7 +37,7 @@ import math
 import struct
 
 RETAIL_VA = 0x0040eca0
-SYMBOL = '?SimulateLookAhead@@YAHPAUVec3@@000PAM000MMPAVTerrain@@PAE1PAVCollisionObject@@11PAH5PAUUnknownBikeAIPath@@1MH@Z'
+SYMBOL = '?SimulateLookAhead@@YAHPAUVec3@@000PAM000MMPAVTerrain@@PAE1PAVCollisionObject@@11PAH5PAUBikeAIRacingLine@@1MH@Z'
 SOURCE = 'src/bringup/Group3_KrustyBikeAI.cpp'
 TRACK_GAME = 0x0056e26c
 PROBES = {0x0040f78a: 'terrain', 0x0040f7ac: 'no terrain', 0x0040f834: 'probe contact', 0x00410a43: 'obstacles',

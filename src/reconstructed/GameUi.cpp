@@ -1058,7 +1058,7 @@ UIFrame::UIFrame(const char* file, void* textures, int soundGroup, int duplicate
             Palette8* pal = (Palette8*)palette;
             frameTexture->CreateSurface(image->bits, image->width, image->height, image->width,
                                             image->width, 0x22b, format,
-                                            (UnknownTexturePalette*)(pal ? pal->colorMapper : 0), 4,
+                                            (TextureColorMapperView*)(pal ? pal->colorMapper : 0), 4,
                                             pal ? pal->ddPalette : 0, 0, 0, 2, 1, 0, 0x80, 0xff00ff);
             if (TextureHasColor(frameTexture, 0xff00ff))
                 frameTexture->ApplyColorKey(0xff00ff);
@@ -1508,7 +1508,7 @@ void UIMultiState::SetCurrentState(int value) {
 
 // 0x00478d10
 void UIMultiState::SelectNextState() {
-    UnknownGameUiState* states = stateTable;
+    UIMultiStateEntry* states = stateTable;
     if (!states)
         return;
     int start = selectedState;
@@ -1914,7 +1914,7 @@ UIDialog::~UIDialog() {
             guiManager->SwapModalDialog(previousModalDialog);
         if (g_TrackGame->renderTarget->surfacePixelFormat == 8) {
             if (!guiManager || !guiManager->IsPaletteLocked())
-                guiManager->UnknownFunction464e90();
+                guiManager->OnPaletteChanged();
         }
         if (isModal && parentDialog)
             parentDialog->SetModalPause(0, 0, 0);
@@ -2002,7 +2002,7 @@ int UIDialog::OnControlRelease(ControlEvent* event, InputButtonState* entry) {
 // 0x0046a840
 UIControl* UIDialog::SetupControl(UIControl* control, int group, int region) {
     if (control) {
-        control->UnknownInlineSetField18(renderContext);
+        control->StoreRenderContext(renderContext);
         control->post3D = controlsPost3D;
         control->ownerGui = guiManager;
         control->groupId = group;
@@ -3023,11 +3023,11 @@ int UIMultiState::SetStateCount(int count) {
             if (stateTable[i].textLines)
                 DebugFree(stateTable[i].textLines, __FILE__, 0x21b9);
         }
-        stateTable = (UnknownGameUiState*)ResizeDebugBlock(stateTable,
-                                                                         count * sizeof(UnknownGameUiState));
+        stateTable = (UIMultiStateEntry*)ResizeDebugBlock(stateTable,
+                                                                         count * sizeof(UIMultiStateEntry));
     } else if (stateCount < count) {
-        stateTable = (UnknownGameUiState*)ResizeDebugBlock(stateTable,
-                                                                         count * sizeof(UnknownGameUiState));
+        stateTable = (UIMultiStateEntry*)ResizeDebugBlock(stateTable,
+                                                                         count * sizeof(UIMultiStateEntry));
         for (int i = stateCount; i < count; i++) {
             stateTable[i].image = 0;
             stateTable[i].focusImage = 0;
@@ -5349,7 +5349,7 @@ int UIFrame::LoadFromStream(void* stream, int offset, void* palette) {
             Palette8* pal = (Palette8*)palette;
             frameTexture->CreateSurface(image->bits, image->width, image->height, image->width,
                                             image->width, 0x22b, format,
-                                            (UnknownTexturePalette*)(pal ? pal->colorMapper : 0), 4,
+                                            (TextureColorMapperView*)(pal ? pal->colorMapper : 0), 4,
                                             pal ? pal->ddPalette : 0, 0, 0, 2, 1, 0, 0x80, 0xff00ff);
             if (TextureHasColor(frameTexture, 0xff00ff))
                 frameTexture->ApplyColorKey(0xff00ff);

@@ -42,7 +42,7 @@ int CompareGridEntries(const void* a, const void* b);  // 0x004f2080
 int CompareGridDraws(const void* a, const void* b);    // 0x004f20a0
 
 // A racer's random grid key (12 bytes).
-struct UnknownGridDraw {
+struct GridDrawKey {
     int playerId;                             // +0x00: player id
     float key;                                // +0x04: random key
     char racerIndex;                          // +0x08: racer index
@@ -64,8 +64,8 @@ struct LobbyStartMessage {
 };
 
 // A grid entry at race settings +0x14c with the racer index at +5.
-struct UnknownGridEntry {
-    UnknownGridEntry() {
+struct SelectGameGridEntryView {
+    SelectGameGridEntryView() {
         playerId = 0;
         points = 0;
     }
@@ -134,30 +134,30 @@ void MultiPlayerDlg::SendStartMessage(short start) {
         if (g_TrackGame->mode.raceSettings.raceMode == 2 && g_TrackGame->eventManager->racesRun > 0) {
             // By the championship points.
             for (i = 0; i < racer; i++) {
-                UnknownGridEntry entry;
+                SelectGameGridEntryView entry;
                 entry.playerId = g_TrackGame->mode.racers[i].networkPlayerId;
                 entry.points = g_TrackGame->eventManager->results[i].points;
                 entry.racerIndex = g_TrackGame->mode.racers[i].racerIndex;
-                ((UnknownGridEntry*)g_TrackGame->mode.raceSettings.gridOrder)[i] = entry;
+                ((SelectGameGridEntryView*)g_TrackGame->mode.raceSettings.gridOrder)[i] = entry;
             }
-            qsort(g_TrackGame->mode.raceSettings.gridOrder, racer, sizeof(UnknownGridEntry),
+            qsort(g_TrackGame->mode.raceSettings.gridOrder, racer, sizeof(SelectGameGridEntryView),
                   CompareGridEntries);
         } else {
             // At random.
-            UnknownGridDraw draws[8];
+            GridDrawKey draws[8];
             for (i = 0; i < racer; i++) {
-                UnknownGridDraw draw;
+                GridDrawKey draw;
                 draw.playerId = g_TrackGame->mode.racers[i].networkPlayerId;
                 draw.key = RandomUnit() * 10.0f;
                 draw.racerIndex = g_TrackGame->mode.racers[i].racerIndex;
                 draws[i] = draw;
             }
-            qsort(draws, racer, sizeof(UnknownGridDraw), CompareGridDraws);
+            qsort(draws, racer, sizeof(GridDrawKey), CompareGridDraws);
             for (i = 0; i < racer; i++) {
-                UnknownGridEntry entry;
+                SelectGameGridEntryView entry;
                 entry.playerId = draws[i].playerId;
                 entry.racerIndex = draws[i].racerIndex;
-                ((UnknownGridEntry*)g_TrackGame->mode.raceSettings.gridOrder)[i] = entry;
+                ((SelectGameGridEntryView*)g_TrackGame->mode.raceSettings.gridOrder)[i] = entry;
             }
         }
         if (names)

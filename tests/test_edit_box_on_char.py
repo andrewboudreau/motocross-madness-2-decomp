@@ -23,7 +23,7 @@ HELPERS = [('GameUi','?OnChar@UIControl@@',0x472320,166),
            ('GameUi','?GetName@UIControl@@',0x470df0,7),
            ('GameUi','?RequestRedraw@UIControl@@',0x470640,21),
            ('GameObject','?OnChar@GameObject@@',0x469c00,60),
-           ('PCAudio','??0UnknownSoundNotifier@@',0x4bb720,26),
+           ('PCAudio','??0SoundRefillNotifier@@',0x4bb720,26),
            ('PCAudio','?SetVolume@Sound@@',0x4bcbe0,185),
            ('PCAudio','?PlayWithOptions@Sound@@',0x4bc6b0,656),
            ('PCAudio','?IsPlaying@Sound@@',0x4bca80,172)]
@@ -171,7 +171,7 @@ class EditBoxOnCharBehaviorTests(unittest.TestCase):
             ui=(ROOT/'src/reconstructed/GameUi.cpp').read_text();audio=(ROOT/'src/reconstructed/PCAudio.cpp').read_text();game=(ROOT/'src/reconstructed/GameObject.cpp').read_text()
             helpers='#include <string.h>\n#include "GameUi.h"\n#include "DialogProc.h"\n#include "PCAudio.h"\n#include "SoundInterface.h"\n#include "TrackGame.h"\n#include "DebugAlloc.h"\n#define SoundSystem() ((PCSoundInterface*)g_TrackGame->soundInterface)\n'
             for sig in ['int UIControl::OnChar(','char UIEditBox::FilterCharacter(','char* UIControl::GetName(','void UIControl::RequestRedraw(']:helpers+=extract(ui,sig)+'\n'
-            helpers+=extract(game,'int GameObject::OnChar(')+'\n'+extract(audio,'UnknownSoundNotifier::UnknownSoundNotifier(')+'\n'
+            helpers+=extract(game,'int GameObject::OnChar(')+'\n'+extract(audio,'SoundRefillNotifier::SoundRefillNotifier(')+'\n'
             for sig in ['int Sound::SetVolume(','int Sound::PlayWithOptions(','int Sound::IsPlaying(']:helpers+=extract(audio,sig)+'\n'
             helper_file=output/'helpers.cpp';helper_file.write_text(helpers)
             helper_path,helper=compile_source(helper_file,'helpers')
@@ -189,8 +189,8 @@ class EditBoxOnCharBehaviorTests(unittest.TestCase):
             # branches. Those dependencies fail closed; none are simulated as success.
             fail=output/'unvisited.cpp'
             fail.write_text('#include "PCAudio.h"\n#include "DebugAlloc.h"\nextern "C" void Unexpected();\n'
-                'UnknownSoundNotifier::~UnknownSoundNotifier(){Unexpected();}\n'
-                'int UnknownSoundNotifier::StartRefillThread(Sound*){Unexpected();return 0;}\n'
+                'SoundRefillNotifier::~SoundRefillNotifier(){Unexpected();}\n'
+                'int SoundRefillNotifier::StartRefillThread(Sound*){Unexpected();return 0;}\n'
                 'int Sound::Play(){Unexpected();return 0;}\n'
                 'void* operator new(unsigned int,const char*,int){Unexpected();return 0;}\n'
                 'void operator delete(void*,const char*,int){Unexpected();}\n'

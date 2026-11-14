@@ -58,7 +58,7 @@ static inline int ModeWidth(PCVideoCard* display)
 // frames are left to restore) the whole copy is restored.
 int BackgroundImage::RenderPre3D() {
     if (!fullRestoreFrames) {
-        UnknownBackgroundCamera* camera = (UnknownBackgroundCamera*)Target()->currentCamera;
+        BackgroundCameraView* camera = (BackgroundCameraView*)Target()->currentCamera;
         if (!camera || !camera->isEnabled || !camera->redrawFrames ||
             camera->viewportHeight != ModeHeight(g_TrackGame->display) ||
             camera->viewportWidth != ModeWidth(g_TrackGame->display)) {
@@ -119,7 +119,7 @@ GameObject* BackgroundImage::SetRenderContext(void* context) {
     field_0x44 = 0;
     regionCapacity = 4;
     regionCount = 0;
-    regionTable = (UnknownBackgroundRegion*)DebugMalloc(0x100, __FILE__, 212);
+    regionTable = (BackgroundRegion*)DebugMalloc(0x100, __FILE__, 212);
     for (i = 0; i < regionCapacity; i++)
         regionTable[i].framesLeft = 0;
     return this;
@@ -171,7 +171,7 @@ int BackgroundImage::AllocRegion(int owner) {
         }
         return -1;
     }
-    regionTable = (UnknownBackgroundRegion*)DebugRealloc(regionTable, (regionCapacity + 4) * sizeof(UnknownBackgroundRegion),
+    regionTable = (BackgroundRegion*)DebugRealloc(regionTable, (regionCapacity + 4) * sizeof(BackgroundRegion),
                                                         __FILE__, 270);
     if (regionTable) {
         for (i = regionCapacity; i < regionCapacity + 4; i++) {
@@ -409,11 +409,11 @@ void BackgroundImage::ClearRegionRect(int index) {
 // camera to redraw).
 void BackgroundImage::MarkAllDirty() {
     fullRestoreFrames = Target()->frameModulus + 1;
-    UnknownBackgroundCamera* camera = (UnknownBackgroundCamera*)Target()->currentCamera;
+    BackgroundCameraView* camera = (BackgroundCameraView*)Target()->currentCamera;
     if (camera) {
         camera->redrawFrames = Target()->frameModulus + 1;
-        if ((unsigned)((UnknownBackgroundCamera*)Target()->currentCamera)->viewportHeight < (unsigned)Target()->targetHeight)
-            ((UnknownBackgroundCamera*)Target()->currentCamera)->viewportEnabled = Target()->frameModulus + 1;
+        if ((unsigned)((BackgroundCameraView*)Target()->currentCamera)->viewportHeight < (unsigned)Target()->targetHeight)
+            ((BackgroundCameraView*)Target()->currentCamera)->viewportEnabled = Target()->frameModulus + 1;
     }
 }
 

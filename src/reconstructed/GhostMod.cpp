@@ -16,8 +16,8 @@ GhostMod1::GhostMod1(int flags)
 }
 
 // 0x0047bb70
-void GhostMod1::ModifyMesh(D3DIMSoultreeObject* object, UnknownSoultreeMesh* mesh,
-                           UnknownSoultreeMesh** out)
+void GhostMod1::ModifyMesh(D3DIMSoultreeObject* object, ModifierSoultreeSurfaceView* mesh,
+                           ModifierSoultreeSurfaceView** out)
 {
     *out = mesh;
     if (timeRemaining > 0.0f) {

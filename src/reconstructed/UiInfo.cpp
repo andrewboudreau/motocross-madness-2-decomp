@@ -5,7 +5,7 @@
 // starts at 0x00524110. Near misses are in samples/game/UiInfoNearMisses.cpp.
 // The constructor also makes VC6 emit SessionInfoType's inline constructor
 // (0x00523b90), its implicit destructor (0x00523c80, the same bytes as
-// InfoType's) and UnknownTrackGameSessionList's implicit destructor
+// InfoType's) and SessionList's implicit destructor
 // (0x00522420), which the constructor's and destructor's unwind actions call.
 #include <float.h>
 #include <stdio.h>
@@ -163,7 +163,7 @@ int TrackGameMode::ResetNetworkRace() {
 // 0x00522720: the defaults of the TrackGameMode+0x6ac options (overlay,
 // name tags, intro movie; the name is inference); the last
 // 0x14 bytes are cleared with an inline memset.
-void TrackGameMode::ResetInterfaceOptions(UnknownTrackGameModeOptions6ac* options) {
+void TrackGameMode::ResetInterfaceOptions(TrackGameInterfaceOptions* options) {
     options->instrumentOverlayOn = 1;
     options->showRaceStatistics = 1;
     options->uiAnimations = 1;
@@ -187,7 +187,7 @@ void TrackGameMode::ResetInterfaceOptions(UnknownTrackGameModeOptions6ac* option
 
 // 0x00522780: the defaults of +0xa20..+0xa4b, mostly sound settings (sound
 // on at +0xa28, volume 100 at +0xa40, 8-bit at +0xa48); the name is inference.
-void TrackGameMode::ResetSoundOptions(UnknownTrackGameModeOptionsA20* options) {
+void TrackGameMode::ResetSoundOptions(TrackGameSoundOptions* options) {
     options->cdAudioOn = 0;
     options->soundOn = 1;
     options->uiSounds = 1;
@@ -203,7 +203,7 @@ void TrackGameMode::ResetSoundOptions(UnknownTrackGameModeOptionsA20* options) {
 
 // 0x005227d0: the defaults of +0xa4c..+0xa67: display mode 0, shadows,
 // particles and sky cube on, detail level 6.
-void TrackGameMode::ResetGraphicsOptions(UnknownTrackGameModeOptionsA4c* options) {
+void TrackGameMode::ResetGraphicsOptions(TrackGameGraphicsOptions* options) {
     options->displayMode = 0;
     options->shadows = 1;
     options->particles = 1;
@@ -213,7 +213,7 @@ void TrackGameMode::ResetGraphicsOptions(UnknownTrackGameModeOptionsA4c* options
 }
 
 // 0x00522800
-void TrackGameMode::ResetControlOptions(UnknownTrackGameModeOptionsA68* options) {
+void TrackGameMode::ResetControlOptions(TrackGameControlOptions* options) {
     options->responseSliders[0] = 50;
     options->feedback = 50;
     options->joystickOn = 1;
@@ -257,7 +257,7 @@ void TrackGameMode::ReloadResourceStrings(char (*names)[0x80]) {
 #undef UNKNOWN_LOAD_NAME
 
 // 0x00522bf0: the garage tables from KrustyUI (defaults when there is none).
-void TrackGameMode::CopyGarageTables(UnknownTrackGameModeOptionsFd8* options) {
+void TrackGameMode::CopyGarageTables(TrackGameGarageOptions* options) {
     int i;
     int j;
     int k;
@@ -274,7 +274,7 @@ void TrackGameMode::CopyGarageTables(UnknownTrackGameModeOptionsFd8* options) {
 }
 
 // 0x00522c70
-void TrackGameMode::ResetSuspension(UnknownTrackGameModeOptionsFd8* options) {
+void TrackGameMode::ResetSuspension(TrackGameGarageOptions* options) {
     options->suspension[0] = 0.5f;
     options->suspension[1] = 0.5f;
     options->suspension[2] = 0.5f;
@@ -284,14 +284,14 @@ void TrackGameMode::ResetSuspension(UnknownTrackGameModeOptionsFd8* options) {
 }
 
 // 0x00522c90
-void TrackGameMode::ResetEngineOptions(UnknownTrackGameModeOptionsFd8* options) {
+void TrackGameMode::ResetEngineOptions(TrackGameGarageOptions* options) {
     options->engineSize = 250;
     options->fourStroke = 0;
     CopyGarageTables(options);
 }
 
 // 0x00522cb0
-void TrackGameMode::ResetGarageOptions(UnknownTrackGameModeOptionsFd8* options) {
+void TrackGameMode::ResetGarageOptions(TrackGameGarageOptions* options) {
     ResetSuspension(options);
     ResetEngineOptions(options);
 }

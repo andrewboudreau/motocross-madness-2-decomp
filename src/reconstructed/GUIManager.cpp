@@ -116,7 +116,7 @@ GUICursor::~GUICursor() {
 }
 
 // 0x00485150
-void GUICursor::SetAnimation(UnknownCursorAnimation* animation) {
+void GUICursor::SetAnimation(CursorUIAnimView* animation) {
     cursorAnimation = animation;
     if (!animation)
         currentFrame = 0;
@@ -287,7 +287,7 @@ int GUIManager::Tick(float frameTime) {
     GameObject::Tick(frameTime);
     if (paletteChanged) {
         paletteChanged = 0;
-        UnknownFunction464e90();
+        OnPaletteChanged();
     }
     g_MemTagStack->Pop(previous);
     return 1;
@@ -611,7 +611,7 @@ void GUIManager::SetToolTipFont(const char* font) {
 }
 
 // A pixel of 0x00486740's 24-bit fill.
-struct UnknownGuiRgb {
+struct FilledTexturePixel {
     unsigned char red;
     unsigned char green;
     unsigned char blue;
@@ -620,12 +620,12 @@ struct UnknownGuiRgb {
 // 0x00486740
 PCTextureMap* GUIManager::CreateFilledTexture(int width, int height, unsigned long color) {
     PCTextureMap* texture = new(__FILE__, 1140) PCTextureMap(guiTextures, 1);
-    UnknownGuiRgb* bits;
-    UnknownGuiRgb* pixel;
-    UnknownGuiRgb fill;
+    FilledTexturePixel* bits;
+    FilledTexturePixel* pixel;
+    FilledTexturePixel fill;
 
     if (texture) {
-        bits = new(__FILE__, 1144) UnknownGuiRgb[width * height];
+        bits = new(__FILE__, 1144) FilledTexturePixel[width * height];
         fill.red = (unsigned char)(color >> 16);
         fill.green = (unsigned char)(color >> 8);
         fill.blue = (unsigned char)color;
@@ -633,7 +633,7 @@ PCTextureMap* GUIManager::CreateFilledTexture(int width, int height, unsigned lo
             *pixel = fill;
         if (texture->CreateSurface(bits, width, height, width, width, 0x378,
                                    g_TrackGame->renderTarget->surfacePixelFormat,
-                                   (UnknownTexturePalette*)(guiPalette ? guiPalette->colorMapper : 0), 4,
+                                   (TextureColorMapperView*)(guiPalette ? guiPalette->colorMapper : 0), 4,
                                    guiPalette ? guiPalette->ddPalette : 0, 1, 0, 2, 1, 0, 0x80, 0xff00ff))
             texture->ApplyColorKey(0xff00ff);
         delete bits;
@@ -1232,8 +1232,8 @@ void GUIUser::CreateCursor(const char* image, int visible) {
 }
 
 // 0x00487fb0
-void GUIUser::SetCursorAnimation(UnknownCursorAnimation* animation) {
-    UnknownCursorAnimation* current;
+void GUIUser::SetCursorAnimation(CursorUIAnimView* animation) {
+    CursorUIAnimView* current;
 
     if (!userCursor)
         return;

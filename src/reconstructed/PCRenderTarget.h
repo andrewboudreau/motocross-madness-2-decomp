@@ -6,13 +6,13 @@
 
 // Object passed as the Blt source to PCRenderTarget slot 3; its surface is at
 // +0x70.
-struct UnknownBlitSource {
+struct BlitPCTextureMapView {
     unsigned char field_0x00[0x70];
     DirectDrawSurface* systemSurface;
 };
 
 // One cached render state (PCRenderTarget+0x264, 300 entries).
-struct UnknownRenderStateEntry {
+struct CachedRenderState {
     int state;
     int value;
 };
@@ -87,5 +87,5 @@ public:
     DDPixelFormat* textureFormats;  // EnumTextureFormats results (DebugRealloc'd; freed by the destructor)
     int zbufferFormatCount;
     DDPixelFormat* zbufferFormats;  // EnumZBufferFormats results (DebugRealloc'd; freed by the destructor)
-    UnknownRenderStateEntry renderStates[300]; // SetRenderState cache (slot 8)
+    CachedRenderState renderStates[300]; // SetRenderState cache (slot 8)
 };

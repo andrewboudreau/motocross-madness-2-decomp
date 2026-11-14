@@ -468,7 +468,7 @@ int BaseQuarryEvent::LoadEventObjects(LoadProgressFn progress) {
     particleManager = new(__FILE__, 613) ParticleManager(g_TrackGame->mode.particlesOn);
     g_MemTagStack->Push("Scene");
     eventScene = (new(__FILE__, 624) Scene(isEnabled))
-                     ->UnknownFunction4ea7e0(g_TrackGame->sceneObject, (int)auralScape, (int)&modelTextures, 8);
+                     ->AttachSceneManager(g_TrackGame->sceneObject, (int)auralScape, (int)&modelTextures, 8);
     if (!eventScene) {
         sprintf(text, "Scene not created.\n");
         return 0;
@@ -531,7 +531,7 @@ int BaseQuarryEvent::LoadEventObjects(LoadProgressFn progress) {
             return 0;
         }
         skyCube = (new(__FILE__, 744) SkyCube(g_TrackGame->mode.skyCubeOn))
-                         ->Create(renderContext, stream, (UnknownCubeTextureContext*)&skyTextures, 1024.0f);
+                         ->Create(renderContext, stream, (CubeTextureContextView*)&skyTextures, 1024.0f);
         if (!AppendChild((GameObject*)skyCube, -1))
             sprintf(text, "SkyCube not created.\n");
         AppendChild((new(__FILE__, 750) FogOn(1))->Create(renderContext, eventFog), -1);

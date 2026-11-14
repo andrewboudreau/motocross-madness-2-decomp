@@ -57,7 +57,7 @@ public:
     // Inline (no out-of-line copy): whether an item still comes from
     // `archive`. Written inline, 0x004e8f40 saves ebp only on the path that
     // uses it, as retail does; open-coded, VC6 saves it in the prologue.
-    int UnknownInlineArchiveUsed(FileStream* archive)
+    int IsArchiveInUse(FileStream* archive)
     {
         for (int i = 0; i < itemCount; i++) {
             if (archive == items[i]->archive)

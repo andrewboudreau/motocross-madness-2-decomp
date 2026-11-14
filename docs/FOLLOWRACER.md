@@ -87,12 +87,12 @@ PYTHONPATH=. python tools/run_calibration.py --exe work/game/mcm2.exe --compiler
 
 The five cases are the `FollowRacer.cpp` and `FollowRacerNearMisses.cpp`
 entries. Shared headers touched for this unit: `RaceView.h`
-(`SendFollowedRacer`/`IgnoreCollisionsWith`, `UnknownScoreBoard`, race
+(`SendFollowedRacer`/`IgnoreCollisionsWith`, `EventKbScoreBoardView`, race
 view +0xbc), `TrackGame.h` (ball fields +0x10a/+0x708, the method
 declarations, view owner +0xac as an int/float union) and `BikeRace.h`
 (`TagBallStateDelta`, `VcrFollowRecord`, the ball state's
 float fields). The racer's slot 50 is viewed by a struct local to the
 near-miss sample: 50 placeholder slots in `RaceView.h` flipped a register
 choice in TrackGame slot 1 (`0x00520ab0`, header-content chaos; removing
-`UnknownScoreBoard` flips it too), and the +0xac float on its own turned
+`EventKbScoreBoardView` flips it too), and the +0xac float on its own turned
 the StatsOverlay race panel's `%d` (`0x0051a560`) into a float load.

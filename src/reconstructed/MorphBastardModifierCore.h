@@ -14,8 +14,8 @@ public:
     explicit MorphBastardModifier(int flags);        // 0x004a3150 (ret 4)
     virtual ~MorphBastardModifier();                 // 0x004a31a0 (deleting wrapper 0x004a3180)
     // 0x004a4c60 (ret 0xc)
-    virtual void ModifyMesh(D3DIMSoultreeObject* object, UnknownSoultreeMesh* mesh,
-                            UnknownSoultreeMesh** out);
+    virtual void ModifyMesh(D3DIMSoultreeObject* object, ModifierSoultreeSurfaceView* mesh,
+                            ModifierSoultreeSurfaceView** out);
 
     // 0x004a33b0 (ret 0xc): slot 8 of the base, then loads `path` with the
     // nodes of `model`.
@@ -27,9 +27,9 @@ public:
     // 0x00464e80 (ret 4): the shared empty stub, called with the object index.
     void UnknownFunction464e80(int index);
     // 0x004a5290 (ret 4): makes meshCopy a copy of `mesh`.
-    void CopyMesh(UnknownSoultreeMesh* mesh);
+    void CopyMesh(ModifierSoultreeSurfaceView* mesh);
 
-    UnknownSoultreeMesh* meshCopy;  // +0x40  CopyMesh (0x004a5290) allocates it as a copy of the mesh slot 27 receives
+    ModifierSoultreeSurfaceView* meshCopy;  // +0x40  CopyMesh (0x004a5290) allocates it as a copy of the mesh slot 27 receives
     int objectCount;                  // morph object count
     MorphBastardObject* morphObjects; // line 0x57
     Vector3* deltaSums;               // summed deltas per vertex (lines 0x21d..0x21f)

@@ -1,5 +1,5 @@
 {
-  "?UnknownRecorderThread@@YGIPAX@Z": "0x004e6f80",
+  "?RecorderWorkerThread@@YGIPAX@Z": "0x004e6f80",
   "__endthreadex": "0x00537c9f",
   "??_C@_0BP@GKOM@Received?5normal?5Kill?5message?4?6?$AA@": "0x005729b8",
   "??_C@_0CB@DGPE@VCRtape?5file?5header?5write?5error?6@": "0x005729d8",

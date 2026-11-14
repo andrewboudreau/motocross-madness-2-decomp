@@ -810,7 +810,7 @@ void OptionsDlg::HandleEvent(DialogEvent* event)
             KrustyUI* ui = g_TrackGame->ui;
             int count = ui->bikeCount;
             for (int i = 0; i < count; i++) {
-                if (((UnknownOptKrustyUIRecord*)ui->bikes)[i].engineSize == 0xfa) {
+                if (((OptionsBikeRecord*)ui->bikes)[i].engineSize == 0xfa) {
                     g_TrackGame->mode.racerChoice.bikeIndex = i; // TrackGame+0x1fb0
                     break;
                 }

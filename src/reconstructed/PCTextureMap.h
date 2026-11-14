@@ -4,7 +4,7 @@
 #include "RenderInterfaces.h"
 #include "Pixtrans.h"
 #include "TextureMap.h"
-#include "VfwDeco.h"   // UnknownVideoDecoder at PCTextureMap+0x7c
+#include "VfwDeco.h"   // VfwDecompressor at PCTextureMap+0x7c
 
 // 0x00689964 (.bss, read 4 times, never written): when set, PCTextureMap
 // has the manager recount texture memory (0x00511580) after it releases or
@@ -40,13 +40,13 @@ public:
     virtual ~PCTextureMap();                  // 0x004c5f50 (deleting wrapper 0x004c5f30)
     // 0x004c69c0: creates the surfaces from `bits`.
     virtual int CreateSurface(void* bits, int width, int height, int stride, int minimumSize,
-                              int sourceFormat, int format, UnknownTexturePalette* palette,
+                              int sourceFormat, int format, TextureColorMapperView* palette,
                               int flags, void* surfacePalette, int checkMemory, int unused,
                               int addressU, int addressV, TextureContext* choice,
                               int alphaThreshold, unsigned int key);
     // 0x004c6080: reads the texture from `stream`, then creates it through slot 4.
     virtual int LoadSurface(FileStream* stream, int width, int height, int minimumSize,
-                            int fileFormat, int dataSize, int format, UnknownTexturePalette* palette,
+                            int fileFormat, int dataSize, int format, TextureColorMapperView* palette,
                             int flags, void* surfacePalette, int addressU, int addressV,
                             TextureContext* choice, int alphaThreshold, unsigned int key);
     virtual TextureMap* Clone();               // 0x004c71c0: a copy of the texture
@@ -88,5 +88,5 @@ public:
     DirectDrawSurface* systemSurface;    // +0x70: system-memory surface (counted in DirectX memory)
     DirectDrawSurface* textureSurface;   // +0x74: texture surface
     void* texturePalette;                      // +0x78: palette for 8-bit textures
-    UnknownVideoDecoder* videoDecoder;
+    VfwDecompressor* videoDecoder;
 };

@@ -37,7 +37,7 @@ int g_EnumeratedSoundDeviceCount;
 
 // 0x004bb630: waits for the half-played events and refills the half that
 // just finished playing, until the stop event.
-unsigned __stdcall UnknownSoundNotifier::UnknownThreadProc(void* context) {
+unsigned __stdcall SoundRefillNotifier::RefillThreadProc(void* context) {
     Sound* sound = (Sound*)context;
     HANDLE events[3];
     unsigned long result;
@@ -78,7 +78,7 @@ stopped:
 }
 
 // 0x004bb720
-UnknownSoundNotifier::UnknownSoundNotifier() {
+SoundRefillNotifier::SoundRefillNotifier() {
     ownerSound = 0;
     notify = 0;
     firstHalfEvent = 0;
@@ -90,7 +90,7 @@ UnknownSoundNotifier::UnknownSoundNotifier() {
 
 // 0x004bb740: creates the events and thread and asks for notifications at
 // the start of each half of the buffer.
-int UnknownSoundNotifier::StartRefillThread(Sound* sound) {
+int SoundRefillNotifier::StartRefillThread(Sound* sound) {
     DSBPositionNotify positions[2];
     unsigned threadId;
 
@@ -98,7 +98,7 @@ int UnknownSoundNotifier::StartRefillThread(Sound* sound) {
     firstHalfEvent = CreateEventA(0, 0, 0, 0);
     secondHalfEvent = CreateEventA(0, 0, 0, 0);
     stopEvent = CreateEventA(0, 0, 0, 0);
-    refillThread = (HANDLE)_beginthreadex(0, 0, UnknownThreadProc, sound, 0, &threadId);
+    refillThread = (HANDLE)_beginthreadex(0, 0, RefillThreadProc, sound, 0, &threadId);
     if (!firstHalfEvent || !secondHalfEvent || !stopEvent || !refillThread)
         return 0;
     if (sound->dsBuffer->QueryInterface(IID_IDirectSoundNotify, (void**)&notify) < 0)
@@ -112,7 +112,7 @@ int UnknownSoundNotifier::StartRefillThread(Sound* sound) {
 }
 
 // 0x004bb810: stops the thread and closes the handles.
-UnknownSoundNotifier::~UnknownSoundNotifier() {
+SoundRefillNotifier::~SoundRefillNotifier() {
     if (ownerSound) {
         if (refillThread) {
             SetEvent(stopEvent);
@@ -528,7 +528,7 @@ int Sound::PlayWithOptions(int restart, unsigned long playFlags, int preferHardw
             if (soundFlags & 2) {
                 if (notifier)
                     delete notifier;
-                notifier = new (__FILE__, 816) UnknownSoundNotifier;
+                notifier = new (__FILE__, 816) SoundRefillNotifier;
                 if (!notifier || !notifier->StartRefillThread(this))
                     goto failed;
                 filledHalf = bufferBytes / 2;

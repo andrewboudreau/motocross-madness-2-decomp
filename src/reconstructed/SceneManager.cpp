@@ -49,7 +49,7 @@ SceneArchiveFinder::SceneArchiveFinder()
 // 0x004e9a10
 int SceneArchiveFinder::CountSceneObjects(int* count)
 {
-    Scene* scene = (new(__FILE__, 115) Scene(0))->UnknownFunction4ea7e0(this, 0, 0, 0);
+    Scene* scene = (new(__FILE__, 115) Scene(0))->AttachSceneManager(this, 0, 0, 0);
     if (!scene)
         return 0;
     scene->CountObjects(count);
@@ -65,7 +65,7 @@ int SceneArchiveFinder::CountSceneTextures(unsigned long* counts, char* width, c
     counts[1] = 0;
     counts[2] = 0;
     counts[3] = 0;
-    Scene* scene = (new(__FILE__, 151) Scene(0))->UnknownFunction4ea7e0(this, 0, 0, 0);
+    Scene* scene = (new(__FILE__, 151) Scene(0))->AttachSceneManager(this, 0, 0, 0);
     if (!scene)
         return 0;
     int result = scene->CountTextures(counts, (float*)width, (int*)hasCube, (char*)ecosystem);
@@ -309,7 +309,7 @@ Scene::Scene(int flags) : GameObject(flags)
 }
 
 // 0x004ea7e0
-Scene* Scene::UnknownFunction4ea7e0(SceneArchiveFinder* manager, int value, int,
+Scene* Scene::AttachSceneManager(SceneArchiveFinder* manager, int value, int,
                                     char probeMask)
 {
     sceneManager = manager;
@@ -1221,7 +1221,7 @@ void Scene::SetDetailLevel(int level)
 }
 
 // 0x004f00e0
-int CountTexture(UnknownSceneTextureInfo* texture, int* counts)
+int CountTexture(SceneTextureRecord* texture, int* counts)
 {
     if (!_stricmp(texture->textureName, "PROCEDURAL")) {
         counts[2]++;
@@ -1376,7 +1376,7 @@ int CountModelTextures(const char* path, UnknownSceneResourceManager* resources,
                 if (material->hasTextureName) {
                     if (!AddResource(resources, material->textureName, 0))
                         return 1;
-                    if (!CountTexture((UnknownSceneTextureInfo*)material, (int*)counts))
+                    if (!CountTexture((SceneTextureRecord*)material, (int*)counts))
                         return 0;
                 }
                 entry->archive->Seek(position, 0, 0);
@@ -1414,7 +1414,7 @@ int CountModelTextures(const char* path, UnknownSceneResourceManager* resources,
                 delete stream;
                 return 1;
             }
-            if (!CountTexture((UnknownSceneTextureInfo*)&material, (int*)counts)) {
+            if (!CountTexture((SceneTextureRecord*)&material, (int*)counts)) {
                 delete stream;
                 return 0;
             }

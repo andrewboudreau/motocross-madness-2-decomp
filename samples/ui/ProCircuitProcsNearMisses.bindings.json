@@ -233,7 +233,7 @@
   "?ShowScene@KrustyUI@@QAEXPAVGameObject@@@Z": "0x004999f0",
   "?HideScene@KrustyUI@@QAEXXZ": "0x00499a20",
   "?OpenMenu@KrustyUI@@QAEXH@Z": "0x00499b20",
-  "?SetMotionByName@UnknownKrustyUIModelObject@@QAEXPBD@Z": "0x004a8b10",
+  "?SetMotionByName@SelectGameD3DIMSoultreeCharacterView@@QAEXPBD@Z": "0x004a8b10",
   "?StartCareer@ProCircuit@@QAEXPBDHHH@Z": "0x004d3b00",
   "?LoadSaved@ProCircuit@@QAEHPBD@Z": "0x004d4100",
   "?Save@ProCircuit@@QAEHPBD@Z": "0x004d4150",

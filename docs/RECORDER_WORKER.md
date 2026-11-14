@@ -110,7 +110,7 @@ proofs and from functional source-build admission.
 The reviewed candidate is explicitly admitted as **reviewed-nonexact** in
 `config/game_build.json`. The isolated real build `build-pl4kpvmo` compiles
 **209/209 translation units**. Relative to `build-l99te5t5`, unresolved names
-decrease **462 to 461**: only `UnknownRecorderThread` disappears and no new
+decrease **462 to 461**: only `RecorderWorkerThread` disappears and no new
 missing name appears. The game still does not link; startup, live menus,
 racing and integrated replay behavior remain unverified.
 

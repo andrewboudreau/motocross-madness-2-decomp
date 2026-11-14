@@ -1,14 +1,14 @@
 {
-  "baseline": "Published 7ecf5ff4 same-path old/current objects preserve every nondebug byte and resolved destination under exactly two method-name joins. Portable pins normalize only the checkout prefix and lexical spelling of the four source paths, ContainerList.h and GuiScreenTexture.cpp; no section is excluded. DlgProcs canonical and aggregate pins were independently reproduced from published round52 before objects, then advanced under only the verified UnknownModelTexture to D3DIMSoultreeObject ReplaceMaterialTexture external-name join; all section bytes, flags and destination offsets remain identical.",
+  "baseline": "Published 7ecf5ff4 same-path old/current objects preserve every nondebug byte and resolved destination under exactly two method-name joins. Portable pins normalize only the checkout prefix and lexical spelling of the four source paths, ContainerList.h and GuiScreenTexture.cpp; no section is excluded. DlgProcs canonical and aggregate pins were independently reproduced from published round52 before objects, then advanced under only the verified DialogSoultreeObjectView to D3DIMSoultreeObject ReplaceMaterialTexture external-name join; all section bytes, flags and destination offsets remain identical.",
   "renames": {
-    "?GetCurrentTexture@UnknownDialogImage@@QAEHXZ": "?GetCurrentTexture@UIAnim@@QAEPAVTextureMap@@XZ",
-    "?AdvancePastSounds@UnknownCursorAnimation@@QAEHXZ": "?AdvancePastSounds@UIAnim@@QAEPAVTextureMap@@XZ"
+    "?GetCurrentTexture@DialogUIAnimView@@QAEHXZ": "?GetCurrentTexture@UIAnim@@QAEPAVTextureMap@@XZ",
+    "?AdvancePastSounds@CursorUIAnimView@@QAEHXZ": "?AdvancePastSounds@UIAnim@@QAEPAVTextureMap@@XZ"
   },
   "objects": {
     "src/reconstructed/GUIManager.cpp": {
       "sections": 202,
       "relocations": 834,
-      "sha256": "7f5ebcd8e6605971e68c4059ab60be4044390d2df96b3ef32411628b6974d1cf"
+      "sha256": "60e195f694003f57603a9aa883e5bee2a4274596ed47183f6f52e68a9a908d6f"
     },
     "src/reconstructed/DlgProcs.cpp": {
       "sections": 421,
@@ -18,12 +18,12 @@
     "samples/ui/GUIManagerNearMisses.cpp": {
       "sections": 209,
       "relocations": 871,
-      "sha256": "a566ce90f5d40ec8237131e80df85c89bc0b1948b02a7ec9c6891b641fe052ac"
+      "sha256": "06e27190847707f9c74aefcf748aab82b52b2d20d76afe2cec097565fbf2f019"
     },
     "samples/ui/DlgProcsNearMisses.cpp": {
       "sections": 558,
       "relocations": 4155,
-      "sha256": "99d22c5793c948e7349c1470db6656cd65d500bd198797518889c57e55cd628d"
+      "sha256": "fdf5bc3e00c15bf5ca5e1bebd0f645a819a721b0a9b0e4894f28c3ea83601211"
     }
   }
 }

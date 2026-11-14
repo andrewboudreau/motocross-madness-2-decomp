@@ -37,7 +37,7 @@
 // The racer's own vtable (EventKrustyBikeView+0; RaceView.h models only slot
 // 0): 0x004a9e80 calls slot 50 (+0xc8) with (1, 5.0f, 0) on the racer it
 // stops and the one it starts following (tier 3 roles).
-struct UnknownFollowedRacerSlots {
+struct FollowRacerKrustyBikeView {
     virtual void UpdateMass();
     virtual void ResetDynamicState(); virtual void InitializePhysics(); virtual void ApplyStaticContactImpulse();
     virtual void ApplyBodyContactImpulse(); virtual void ShouldRefreshContacts(); virtual void ApplyDrag();
@@ -58,7 +58,7 @@ struct UnknownFollowedRacerSlots {
     virtual void SimulateFrame();
     virtual void SetSpawnProtection(int a, float seconds, int b);
 };
-#define FOLLOWED_RACER_SLOTS(racer) ((UnknownFollowedRacerSlots*)(racer))
+#define FOLLOWED_RACER_SLOTS(racer) ((FollowRacerKrustyBikeView*)(racer))
 
 #include "FollowedRacerPicker.cpp"
 

@@ -66,7 +66,7 @@ Near misses (`samples/ui/ProCircuitProcsNearMisses.cpp`):
 
 Also exact: PCCentralBikeRiderDlg slot 29 `0x004d6770` and `0x004d7900`.
 The `UnknownProCircuitSkinned` view is the same object as DlgProcs.h's
-`UnknownModelTexture`; one should eventually replace the other.
+`DialogSoultreeObjectView`; one should eventually replace the other.
 
 **`$E` attribution.** A shared-header vector set is emitted after its
 unit's functions (see CUBE.md). `.CRT$XCU` lists `0x004d3340`, `0x004d49e0`,

@@ -1,4 +1,4 @@
-"""UnknownRecorderThread 0x004e6f80, the VCR (replay) tape worker thread (tools/emu_diff.py
+"""RecorderWorkerThread 0x004e6f80, the VCR (replay) tape worker thread (tools/emu_diff.py
 case, call-record/replay mode).
 
 The linked body is samples/race/RecorderWorker.cpp. The parameter block holds the header,
@@ -20,7 +20,7 @@ path stores 0xff through it). _endthreadex is replayed.
 import random
 
 RETAIL_VA = 0x004e6f80
-SYMBOL = '?UnknownRecorderThread@@YGIPAX@Z'
+SYMBOL = '?RecorderWorkerThread@@YGIPAX@Z'
 SOURCE = 'samples/race/RecorderWorker.cpp'
 PROBES = {0x004e7055: 'write', 0x004e70f3: 'create', 0x004e7148: 'reopen', 0x004e71f9: 'read forward',
           0x004e7327: 'open playback', 0x004e73f9: 'read reverse', 0x004e757e: 'seek',

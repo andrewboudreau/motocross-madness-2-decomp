@@ -165,7 +165,7 @@ failure included. As `return 0` there, VC6 cross-jumped it with the `& 5`
 branch's `Play()` failure; with `goto failed` the streamed failure keeps its
 own epilogue (returning Play's zero from eax) and the `& 5` one falls into
 `failed`, like retail. It needs PCAudio.cpp's notifier constructor to drop
-the EH frame of `new UnknownSoundNotifier`.
+the EH frame of `new SoundRefillNotifier`.
 
 Near misses (`samples/audio/PCAudioNearMisses.cpp`, notes there):
 `0x004be910` and the manager's thread `0x004bdc00`.

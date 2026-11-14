@@ -306,7 +306,7 @@ static inline float EcoRandomUnit() {
 // the green channel of a 32- or 24-bit image, the green field of a 16-bit
 // one, scaled to 0..1. Inline shape only (the three branches are expanded
 // at every sample site of the generator).
-static inline float UnknownEcoSampleTga(TgaFile* tga, float x, float z) {
+static inline float SampleEcoProbabilityTga(TgaFile* tga, float x, float z) {
     float worldX = g_collisionQuadTree->extentX;
     int width = tga->width;
     int column = (int)(x / worldX * width);
@@ -325,10 +325,10 @@ static inline float UnknownEcoSampleTga(TgaFile* tga, float x, float z) {
     return ((((unsigned short*)tga->bits)[index] >> 5) & 0x1f) * (1.0f / 31.0f);
 }
 
-// UnknownEcoSampleTga times `weight`, multiplied in retail's order: the
+// SampleEcoProbabilityTga times `weight`, multiplied in retail's order: the
 // channel times the weight first, then the 1/255 (1/31) scale. At 24-bit
 // precision this rounds differently from scaling the channel first.
-static inline float UnknownEcoSampleTgaWeighted(TgaFile* tga, float x, float z, float weight) {
+static inline float SampleEcoProbabilityTgaWeighted(TgaFile* tga, float x, float z, float weight) {
     float worldX = g_collisionQuadTree->extentX;
     int width = tga->width;
     int column = (int)(x / worldX * width);
@@ -383,7 +383,7 @@ static inline int EcoTgaIsSet(TgaFile* tga, float x, float z) {
 // product rounds: 20333 of the 65025 channel/probability pairs then differ by
 // one ulp (exhaustive check, third emu_diff sweep); whether that ever flips a
 // placement draw is open. The definition TGA is therefore weighted in retail's
-// order (UnknownEcoSampleTgaWeighted), at a small cost in linked score (VC6
+// order (SampleEcoProbabilityTgaWeighted), at a small cost in linked score (VC6
 // reallocates ebx/ebp across the body): behaviour over code shape.
 int EcoSystem::GenerateObjects(int checkCodes) {
     TgaFile* tgas[256];
@@ -517,13 +517,13 @@ int EcoSystem::GenerateObjects(int checkCodes) {
         float threshold = random * 3.0f;
         float probability;
         if (tga)
-            probability = UnknownEcoSampleTga(tga, probe.x, probe.z);
+            probability = SampleEcoProbabilityTga(tga, probe.x, probe.z);
         else
             probability = 1.0f;
         if (probability <= threshold)
             continue;
         if (tgas[selected])
-            probability = UnknownEcoSampleTgaWeighted(tgas[selected], probe.x, probe.z, probability);
+            probability = SampleEcoProbabilityTgaWeighted(tgas[selected], probe.x, probe.z, probability);
         if (probability <= threshold)
             continue;
         groundTerrain->QueryGround(&probe, &normal, 0, 0);

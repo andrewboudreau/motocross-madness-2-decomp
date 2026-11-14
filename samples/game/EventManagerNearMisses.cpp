@@ -59,21 +59,21 @@ static Vector3 kVec3YAxis = Vector3(0.0f, 1.0f, 0.0f);
 static Vector3 kVec3ZAxis = Vector3(0.0f, 0.0f, 1.0f);
 
 // Views for the podium scene 0x0045d480. Only what it calls is declared.
-struct UnknownPodiumModel {                         // the view part's +0xa4
+struct PodiumSceneEnvironmentView {                         // the view part's +0xa4
     unsigned char field_0x000[0x398];
-    float racerCount;                               // +0x398
+    float terrainBreadth;                           // +0x398 SceneEnvironment terrainBreadth
 };
-struct UnknownPodiumGrid {                          // TrackGameViewOwner+0x2c
+struct PodiumSceneView {                          // TrackGameViewOwner+0x2c
     unsigned char field_0x00[0x8c];
     Vector3 position;                               // +0x8c podium position
     Vector3 direction;                              // +0x98 podium direction (0 when none)
-    UnknownPodiumModel* model;                      // +0xa4
+    PodiumSceneEnvironmentView* model;                      // +0xa4
     unsigned char field_0xa8[0xc4 - 0xa8];
     GameObject* soundGroup;                         // +0xc4
 };
-struct UnknownPodiumOwner : public GameObject {     // TrackGameViewOwner
-    UnknownPodiumGrid* grid;                        // +0x2c
-    unsigned char field_0x30[0x34 - 0x30];
+struct PodiumBaseQuarryEventView : public GameObject {     // TrackGameViewOwner
+    PodiumSceneView* grid;                        // +0x2c
+    unsigned char skyCube[0x34 - 0x30];  // +0x30 BaseQuarryEvent skyCube (bytes kept)
     EventBikeRaceView* raceView;                // +0x34
     unsigned char field_0x38[0x7c - 0x38];
     GameObject* lights;                             // +0x7c
@@ -81,38 +81,38 @@ struct UnknownPodiumOwner : public GameObject {     // TrackGameViewOwner
     int opaqueTextureGroup;                         // +0x94, as BaseQuarryEvent.h
     int alphaTextureGroup;                          // +0x98
 };
-struct UnknownPodiumTrackObject {                   // the view's +0x4c
+struct PodiumTerrainView {                   // the view's +0x4c
     void QueryGround(Vector3* point, int a, int b, int c); // 0x00507c10
     unsigned char field_0x00[0x40];
-    float gridSpacing;                              // +0x40
+    float gridCellSize;                             // +0x40 Terrain gridCellSize
 };
-struct UnknownPodiumNode {
+struct PodiumSoultreeObjectView {
     void GetPosition(Vector3* position);              // 0x004fc970
     void GetAxes(Vector3* direction, Vector3* up); // 0x004fc4f0
 };
-struct UnknownPodiumNodeOwner {                     // the view's +0x64
+struct PodiumStartGateView {                     // the view's +0x64
     unsigned char field_0x000[0x1a0];
-    UnknownPodiumNode* modelNode;                   // +0x1a0 the characters' model node
+    PodiumSoultreeObjectView* modelNode;                   // +0x1a0 the characters' model node
 };
-struct UnknownPodiumViewFields {
+struct PodiumBikeRaceView {
     unsigned char field_0x00[0x4c];
-    UnknownPodiumTrackObject* trackObject;          // +0x4c
+    PodiumTerrainView* trackObject;          // +0x4c
     unsigned char field_0x50[0x64 - 0x50];
-    UnknownPodiumNodeOwner* nodeOwner;              // +0x64
+    PodiumStartGateView* nodeOwner;              // +0x64
 };
-struct UnknownPodiumRacerModel {                    // racer +0x5c4
+struct PodiumRiderView {                    // racer +0x5c4
     unsigned char field_0x000[0x1a0];
-    UnknownPodiumSoultree* modelNode;             // +0x1a0
+    PodiumD3DIMSoultreeObjectView* modelNode;             // +0x1a0
 };
-struct UnknownPodiumRacer {
+struct PodiumKrustyBikeView {
     unsigned char field_0x000[0x5c4];
-    UnknownPodiumRacerModel* riderCharacter;      // +0x5c4
+    PodiumRiderView* riderCharacter;      // +0x5c4
     unsigned char field_0x5c8[0x784 - 0x5c8];
     int place;                                      // +0x784
 };
 // Game+0x1c's resource context, as the podium characters' slot 11 takes it
 // (laid out like TextureMap.h's TextureContext).
-struct UnknownPodiumContext {
+struct PodiumTextureContextView {
     TextureMapManager* textureManager;              // +0x00
     int opaqueGroup;                                // +0x04
     int alphaGroup;                                 // +0x08
@@ -120,15 +120,15 @@ struct UnknownPodiumContext {
     int alphaFormat;                                // +0x10
     int halvings;                                   // +0x14
 };
-class UnknownPodiumSound {                          // PCAudio.h's Sound
+class PodiumSoundView {                          // PCAudio.h's Sound
 public:
-    UnknownPodiumSound(GameObject* group, int type);                    // 0x004bba10
+    PodiumSoundView(GameObject* group, int type);                    // 0x004bba10
     int Load(const char* name, FileStream* stream, int flags, int a,
                               int b, int c);                            // 0x004bc320
     int PlayWithOptions(int restart, unsigned long playFlags, int preferHardware); // 0x004bc6b0
     unsigned char field_0x000[0x1f8];
 };
-class UnknownPodiumArcade {                         // ArcadeObject (+0x3d0)
+class PodiumArcadeObjectView {                         // ArcadeObject (+0x3d0)
 public:
     virtual void UnknownVirtualSlot0();
     virtual void AddRef();
@@ -139,7 +139,7 @@ public:
     void SetPosition(const Vector3* position);                // 0x004014f0
     void SetAxes(const Vector3* a, const Vector3* b, int c, int d); // 0x00401520
     unsigned char field_0x04[0x2c - 0x4];
-    UnknownPodiumSoultree* soultree;                // +0x2c
+    PodiumD3DIMSoultreeObjectView* soultree;                // +0x2c
 };
 
 extern "C" Vector3* __stdcall D3DRMVectorRotate(Vector3* result, Vector3* vector, Vector3* axis,
@@ -162,10 +162,10 @@ static inline Vector3 operator-(const Vector3& a, const Vector3& b) {
     return Vector3(a.x - b.x, a.y - b.y, a.z - b.z);
 }
 
-#define PODIUM_OWNER(o) ((UnknownPodiumOwner*)(o))
-#define PODIUM_VIEW(v) ((UnknownPodiumViewFields*)(v))
-#define PODIUM_ARCADE ((UnknownPodiumArcade*)podiumObject)
-#define PODIUM_MODEL(c) ((UnknownPodiumSoultree*)(c)->modelNode)
+#define PODIUM_OWNER(o) ((PodiumBaseQuarryEventView*)(o))
+#define PODIUM_VIEW(v) ((PodiumBikeRaceView*)(v))
+#define PODIUM_ARCADE ((PodiumArcadeObjectView*)podiumObject)
+#define PODIUM_MODEL(c) ((PodiumD3DIMSoultreeObjectView*)(c)->modelNode)
 
 // Whether v is the zero vector (the grid's "no podium direction").
 static inline int PodiumIsZero(const Vector3& v) {
@@ -215,8 +215,8 @@ int EventManager::CreatePodiumScene() {
         return 0;
     ((RenderTarget*)renderContext)->SetCamera(podiumCamera);
     podiumCamera->InsertBefore(view->raceCamera, -1);
-    UnknownPodiumGrid* grid = PODIUM_OWNER(owner)->grid;
-    float rows = grid->model->racerCount;
+    PodiumSceneView* grid = PODIUM_OWNER(owner)->grid;
+    float rows = grid->model->terrainBreadth;
     if (!((int)rows & 1))
         rows -= 1.0f;
     float column = rows * 0.5f;
@@ -231,7 +231,7 @@ int EventManager::CreatePodiumScene() {
             PODIUM_VIEW(PODIUM_OWNER(owner)->raceView)->nodeOwner->modelNode->GetPosition(&podiumPosition);
             PODIUM_VIEW(PODIUM_OWNER(owner)->raceView)->nodeOwner->modelNode->GetAxes(&direction, &up);
         } else {
-            float spacing = PODIUM_VIEW(PODIUM_OWNER(owner)->raceView)->trackObject->gridSpacing;
+            float spacing = PODIUM_VIEW(PODIUM_OWNER(owner)->raceView)->trackObject->gridCellSize;
             podiumPosition = Vector3((int)column * spacing * 256.0f, 0.0f, (int)row * spacing * 256.0f);
             direction = kVec3ZAxis;
         }
@@ -276,7 +276,7 @@ int EventManager::CreatePodiumScene() {
         D3DRMVectorRotate(&rotated, &facings[i], &kVec3YAxis, angle);
         facings[i] = rotated * PodiumLength(facings[i]);
     }
-    UnknownPodiumContext context;
+    PodiumTextureContextView context;
     context.textureManager = g_TrackGame->textureManager;
     context.opaqueGroup = PODIUM_OWNER(owner)->opaqueTextureGroup;
     context.alphaGroup = PODIUM_OWNER(owner)->alphaTextureGroup;
@@ -295,7 +295,7 @@ int EventManager::CreatePodiumScene() {
         EventKrustyBikeView* racer = 0;
         iterator = 0;
         racer = PODIUM_OWNER(owner)->raceView->NextBike(&iterator);
-        while (racer && ((UnknownPodiumRacer*)racer)->place != place)
+        while (racer && ((PodiumKrustyBikeView*)racer)->place != place)
             racer = PODIUM_OWNER(owner)->raceView->NextBike(&iterator);
         if (g_TrackGame->InProCircuitCareer()) {
             ProCircuit* circuit = g_TrackGame->proCircuit;
@@ -336,15 +336,15 @@ int EventManager::CreatePodiumScene() {
             character->SetMotion(podiumMotions[place - 1]);
             character->motionTime = 0.0f;
             if (racer) {
-                UnknownPodiumTextureEntry** texture = ((UnknownPodiumRacer*)racer)->riderCharacter->modelNode->materialTable;
+                PodiumSoultreeMaterialView** texture = ((PodiumKrustyBikeView*)racer)->riderCharacter->modelNode->materialTable;
                 if (texture)
-                    PODIUM_MODEL(character)->ReplaceMaterialTexture(0, (*texture)->field_0x2c, &context);
+                    PODIUM_MODEL(character)->ReplaceMaterialTexture(0, (*texture)->textureName, &context);
             }
         }
     }
     delete stream;
     if (g_TrackGame->mode.soundOn && g_TrackGame->mode.networkGame) {
-        UnknownPodiumSound* sound = new(__FILE__, 0x34e) UnknownPodiumSound(PODIUM_OWNER(owner)->grid->soundGroup, 1);
+        PodiumSoundView* sound = new(__FILE__, 0x34e) PodiumSoundView(PODIUM_OWNER(owner)->grid->soundGroup, 1);
         FileStream* audio = new(__FILE__, 0x34f) FileStream(g_ResourceManager);
         if (!g_TrackGame->sceneObject->OpenArchiveFile(audio, "CrowdLoop.wav", "rb", 0)) {
             char text[0x80];

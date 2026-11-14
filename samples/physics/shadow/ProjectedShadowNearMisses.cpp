@@ -18,7 +18,7 @@
 ProjectedShadow* ProjectedShadow::Init(ShadowRenderTarget* target, void* textureOwner)
 {
     GameObject::SetRenderContext((void*)target);
-    field_0x5c = (int)target;
+    renderTarget = (int)target;
 
     char name[0x100];
     sprintf(name, "DriverInfo\\%s\\DestColorShadow", Host()->display->driverName);

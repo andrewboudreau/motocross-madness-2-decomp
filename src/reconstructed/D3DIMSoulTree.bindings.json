@@ -55,7 +55,7 @@
   "?ComputeSubtreeBounds@D3DIMSoultreeObject@@QAEXXZ": "0x004434b0",
   "?DrawAxisGizmo@D3DIMSoultreeObject@@QAEXXZ": "0x004435b0",
   "?DrawBoxOutline@D3DIMSoultreeObject@@QAEXUVector3@@0H@Z": "0x00443740",
-  "?DrawScreenRect@D3DIMSoultreeObject@@QAEXPAUUnknownSoultreeScreenRect@@@Z": "0x004439c0",
+  "?DrawScreenRect@D3DIMSoultreeObject@@QAEXPAUSoultreeScreenRect@@@Z": "0x004439c0",
   "?SelectLod@D3DIMSoultreeObject@@QAEXPAUVector3@@0@Z": "0x00443de0",
   "?ComputeAllBounds@D3DIMSoultreeObject@@QAEXXZ": "0x00444440",
   "?SetUseLighting@D3DIMSoultreeObject@@QAEXH@Z": "0x004444c0",

@@ -14,7 +14,7 @@ from tools.match import compare
 from tools.run_calibration import CASES
 
 ROOT = Path(__file__).resolve().parents[1]
-GUI = '?UnknownFunction464e90@GUIManager@@QAEXXZ'
+GUI = '?OnPaletteChanged@GUIManager@@QAEXXZ'
 FINDER = '??1SceneArchiveFinder@@QAE@XZ'
 PROVIDERS = {'GUIManagerHooks': GUI, 'SceneArchiveFinderLifetime': FINDER}
 CALLERS = ('GUIManager', 'GameUi', 'TrackGame', 'SceneManager')

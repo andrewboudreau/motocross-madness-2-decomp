@@ -51,7 +51,7 @@ before it. `0x005206a0` writes another class's vtable (`0x005588c4`) and
   see [the loading-dialog connection](DIALOGPROCS.md#loading-progress-dialog-connection).
 - `0x00520390` calls control slot 66 (`+0x108`) on the track list. Vtable
   `0x00553100` (67 slots, probably UIListBox) is the nearest fit, so the
-  cast type `UnknownTrackRecordListBox` stays provisional.
+  cast type `TrackRecordUIListBoxView` stays provisional.
 
 ## Status
 

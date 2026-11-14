@@ -77,7 +77,7 @@ class GarageSetterConnectionsTests(unittest.TestCase):
             char_start = caller.index('class KrustyUID3DIMSoultreeCharacterView :')
             char_end = caller.index('\n};', char_start)+3
             layout.write_text('#include <stddef.h>\n#include "D3DIMSoulTree.h"\n'
-                'struct UnknownKrustyUISoultree;\n' + caller[char_start:char_end] + '\n'
+                'struct KrustyUISoultreeObjectView;\n' + caller[char_start:char_end] + '\n'
                 'typedef char ModelOffset[(offsetof(KrustyUID3DIMSoultreeCharacterView,modelNode)==0x1a0)?1:-1];\n'
                 'typedef char LocalOffset[(offsetof(SoultreeObject,localMatrix)==0xb8)?1:-1];\n'
                 'typedef char ValidOffset[(offsetof(SoultreeObject,worldValid)==0x138)?1:-1];\n'
@@ -110,7 +110,7 @@ class GarageSetterConnectionsTests(unittest.TestCase):
             imports = {s.name for s in objects[GARAGE].symbols if s.section_number == 0}
             self.assertIn(BODIES[2][1], imports)
             self.assertIn(BODIES[4][1], imports)
-            self.assertFalse(any('UnknownKrustyUISoultree@@' in name for name in imports))
+            self.assertFalse(any('KrustyUISoultreeObjectView@@' in name for name in imports))
             self.assertIn('?Init@UnknownKrustyUIShadow@@QAEPAV1@PAXPAVTextureMapManager@@@Z', imports)
             cases = [(c['source'], c['symbol'], int(c['target_va'], 0), c['target_size'], ROOT / c['bindings'])
                      for c in CASES if c['source'] in sources]

@@ -13,7 +13,7 @@ typedef char Layout[(sizeof(D3DIMSoultreeObject) == 0x2d8 &&
                      offsetof(D3DIMSoultreeObject, materialCount) == 0x294 &&
                      offsetof(SoultreeMaterial, textureName) == 0x2c &&
                      offsetof(SoultreeMaterial, hasTextureName) == 0x9c &&
-                     offsetof(UnknownKrustyUIModelObject, plateTexture) == 0x1a0 &&
+                     offsetof(SelectGameD3DIMSoultreeCharacterView, plateTexture) == 0x1a0 &&
                      offsetof(KrustyUIModelRecord, uiModel) == 0xc0)
                         ? 1
                         : -1];

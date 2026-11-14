@@ -136,7 +136,7 @@
   "?LoadModel@VegetationDefinition@@QAEHPAVTextureMapManager@@H@Z": "0x00456050",
   "?LoadModel@VegetationDefinition@@QAEHPAVTextureMapManager@@H@Z$ehhandler": "0x0054a8b4",
   "?PlaceQuantized@Vegetation@@QAEXEPAVTextureMapManager@@PBGEE@Z": "0x004567a0",
-  "?PlaceQuantized@Vegetation@@QAEXPAVTextureMapManager@@EPBUUnknownEcoCoordinates@@EE@Z": "0x004567a0",
+  "?PlaceQuantized@Vegetation@@QAEXPAVTextureMapManager@@EPBUEcoQuantizedPosition@@EE@Z": "0x004567a0",
   "?Place@Vegetation@@QAEXEPAVTextureMapManager@@PBUVector3@@EE@Z": "0x004567e0",
   "?Place@Vegetation@@QAEXPAVTextureMapManager@@EPBUVector3@@EE@Z": "0x004567e0",
   "?EvictGeometry@@YAHPAVVegetation@@H@Z": "0x00456850",

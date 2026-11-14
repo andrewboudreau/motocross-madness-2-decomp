@@ -235,14 +235,14 @@ extern "C" __declspec(dllimport) int __stdcall LineTo(void* dc, int x, int y);
 extern "C" __declspec(dllimport) int __stdcall TextOutA(void* dc, int x, int y, const char* text, int length);
 
 // The rectangle and fill effects of DirectDraw's Blt.
-struct UnknownBltRect {
+struct BltDestinationRect {
     long left;
     long top;
     long right;
     long bottom;
 };
 
-struct UnknownBltEffects {
+struct BltFillEffects {
     unsigned long size;
     unsigned char field_0x04[0x50 - 0x04];
     unsigned long fillColor;
@@ -323,11 +323,11 @@ int ManagedTextureGroup::DrawSelection(PCRenderTarget* target) {
                 page = cachePages.Next();
         }
         if (page) {
-            UnknownBltEffects effects;
+            BltFillEffects effects;
             memset(&effects, 0, sizeof(effects));
             effects.size = sizeof(effects);
             effects.fillColor = 0;
-            UnknownBltRect rect;
+            BltDestinationRect rect;
             rect.left = 0;
             rect.top = 20;
             rect.right = page->textureWidth;

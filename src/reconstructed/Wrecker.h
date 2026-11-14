@@ -36,7 +36,7 @@ extern QuadTree* g_collisionQuadTree;
 // A 4x4 transform read as four Vector3 rows (right, up, forward,
 // position). Retail copies these rows with integer moves, which is how VC6
 // copies a Vector3 struct (a Matrix4 element-wise copy would use the FPU).
-struct UnknownWreckerFrame {
+struct WreckerPoseFrame {
     Vector3 right;
     float rightW;                             // +0xC  fourth column of the right row (the 4x4's _14)
     Vector3 up;
@@ -51,8 +51,8 @@ struct UnknownWreckerFrame {
 // translation in row 4). Slot 10 keeps three of these as locals; the
 // element names (not m[r][c] indexing) give retail's operand order in the
 // inlined inverse and products.
-struct UnknownWreckerMatrix {
-    UnknownWreckerMatrix() {}
+struct WreckerD3DMatrix {
+    WreckerD3DMatrix() {}
     float _11, _12, _13, _14;
     float _21, _22, _23, _24;
     float _31, _32, _33, _34;
@@ -64,7 +64,7 @@ struct UnknownWreckerMatrix {
 #include "../krusty2/math/Vec3.h"
 
 // The character's current motion (src/krusty2 Motion, Motnctrl.h).
-struct UnknownWreckerMotion {
+struct WreckerMotionView {
     unsigned char field_0x00[0xa8];
     int frameCount;                    // +0xa8 "FrameCount"
     unsigned char field_0xac[0xb4 - 0xac];
@@ -89,7 +89,7 @@ typedef D3DIMSoultreeCharacter UnknownWreckerCharacter;
 // One particle of the manager below (the layout src/krusty2/effects/
 // ParticleManager.h documents; 0x00531740 fills position, frame, age,
 // lifetime, size, growth, flags and velocity directly).
-struct UnknownWreckerParticle {
+struct WreckerParticleView {
     Vector3 position;          // +0x00 position
     int color;                 // +0x0c colour
     int frame;                 // +0x10 sprite frame
@@ -114,7 +114,7 @@ public:
     int activeCount;           // +0x2c live particle count (the next free index)
     int visibleCount;                         // +0x30  ParticleManager +0x30 (src/krusty2/effects/ParticleManager.h); not read here
     unsigned char field_0x34[0x40 - 0x34];
-    UnknownWreckerParticle* particles[1000]; // +0x40
+    WreckerParticleView* particles[1000]; // +0x40
     unsigned char field_0xfe0[0x1f98 - 0xfe0];
     Vector3 gravity;           // +0x1f98 gravity (0, -64, 0)
 };
@@ -177,7 +177,7 @@ public:
     CollisionObject** ignoreObjects; // +0x60
     int ignoreObjectCount;     // +0x64
     float inertiaFactor;       // +0x68
-    UnknownWreckerFrame lastPose; // +0x6c last pose of poseNode
+    WreckerPoseFrame lastPose; // +0x6c last pose of poseNode
     int hadContact;                           // +0xac
     int contactThisFrame;                     // +0xb0
     int carryRiderPose;        // +0xb4 slot 10 carries the rider's root over by poseNode's motion

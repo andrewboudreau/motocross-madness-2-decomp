@@ -22,6 +22,6 @@ public:
 };
 
 // The allocation Overlay 0x004b5f50 inlines (OverlayIconService.h line 90).
-inline OverlayIconService* UnknownCreateOverlayIconService() {
+inline OverlayIconService* CreateOverlayIconService() {
     return new(__FILE__, 90) OverlayIconService(10);
 }

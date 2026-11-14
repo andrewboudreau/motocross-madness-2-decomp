@@ -8,7 +8,7 @@
 #include "TextureMap.h"
 #include "Quantize.h"
 typedef char PaletteLayout[sizeof(ColorMapper)==0x18b10 && offsetof(ColorMapper,indexFrom555)==0x710 && offsetof(ColorMapper,indexFrom565)==0x8710 ? 1:-1];
-typedef char PrefixLayout[sizeof(UnknownTexturePalette)==0x8710 && offsetof(UnknownTexturePalette,indexFrom555)==0x710 ? 1:-1];
+typedef char PrefixLayout[sizeof(TextureColorMapperView)==0x8710 && offsetof(TextureColorMapperView,indexFrom555)==0x710 ? 1:-1];
 typedef char PixelLayout[sizeof(RgbPixel)==3 && offsetof(RgbPixel,red)==0 && offsetof(RgbPixel,green)==1 && offsetof(RgbPixel,blue)==2 ? 1:-1];
 static BYTE referenceSpace[0x800000]={1};
 static BYTE initial[0x1d000],storage[0x1d000],oracle[0x1d000];
@@ -16,7 +16,7 @@ static BYTE* page;
 struct Result { BYTE bytes[0x1d000],page[4096]; DWORD result,exception,kind,address; };
 static Result actual,expected;
 static int checks,faults;
-int DitherConvert(void*,int,int,int,int,int,void*,void*,void*,void*,UnknownTexturePalette*) { ExitProcess(90);return 0; }
+int DitherConvert(void*,int,int,int,int,int,void*,void*,void*,void*,TextureColorMapperView*) { ExitProcess(90);return 0; }
 static int MapReference(const char* path) {
     BYTE* mapped=(BYTE*)0x400000;DWORD old;
     if((DWORD)referenceSpace>0x400000||(DWORD)referenceSpace+sizeof(referenceSpace)<0x690000||!VirtualProtect(mapped,0x290000,PAGE_EXECUTE_READWRITE,&old))return 0;
@@ -43,7 +43,7 @@ static int Filter(EXCEPTION_POINTERS* e) {
     actual.address=e->ExceptionRecord->ExceptionInformation[1];
     return EXCEPTION_EXECUTE_HANDLER;
 }
-typedef int (__cdecl* Convert)(void*,void*,int,int,int,int,int,UnknownTexturePalette*);
+typedef int (__cdecl* Convert)(void*,void*,int,int,int,int,int,TextureColorMapperView*);
 static void Seed(unsigned seed) {
     DWORD random=seed+1;
     for(int i=0;i<sizeof(initial);i++) {random=random*1664525+1013904223;initial[i]=(BYTE)(random>>24);}
@@ -69,7 +69,7 @@ static void Run(int retail,int format,int width,int height,int ds,int ss,int ali
     }
     if(fault==10) {src=0;dst=0;palette=0;}
     Convert function=retail?(Convert)(format==24?0x4d0aa0:0x4d0b90):(format==24?&Convert24To8:&Convert565To8);
-    __try {actual.result=function(dst,src,width,height,ds,ss,0,(UnknownTexturePalette*)palette);}
+    __try {actual.result=function(dst,src,width,height,ds,ss,0,(TextureColorMapperView*)palette);}
     __except(Filter(GetExceptionInformation())) {}
     memcpy(actual.bytes,storage,sizeof(storage));memcpy(actual.page,page,4096);
 }

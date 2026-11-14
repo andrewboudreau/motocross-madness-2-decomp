@@ -114,26 +114,26 @@ public:
 
 // What AuralScape+0x94 points at: +0xa4 holds a table whose +0x410 has four
 // reverb presets (tier 3).
-struct UnknownAuralScapeReverbTable {
+struct AuralScapeSceneEnvironmentView {
     unsigned char field_0x000[0x410];
     unsigned long enviroID[4];                // +0x410 SceneEnvironment::enviroID, per reverb zone
 };
 
 // GameObject+0x18 as AuralScape's slot 10 reads it: +0x08 points at an
 // object whose +0x170 is the position the reverb zone is looked up for.
-struct UnknownAuralScapeViewer {
+struct AuralScapeCameraView {
     unsigned char field_0x000[0x170];
     Vector3 eyePosition;                      // +0x170
 };
 
-struct UnknownAuralScapeTarget {
+struct AuralScapeRenderTargetView {
     unsigned char field_0x00[0x08];
-    UnknownAuralScapeViewer* currentCamera;   // +0x08
+    AuralScapeCameraView* currentCamera;   // +0x08
 };
 
-struct UnknownAuralScapeReverbOwner {
+struct AuralScapeSceneView {
     unsigned char field_0x00[0xa4];
-    UnknownAuralScapeReverbTable* environment; // +0xa4 Scene::environment
+    AuralScapeSceneEnvironmentView* environment; // +0xa4 Scene::environment
 };
 
 // RTTI: AuralScape : GameObject. Created by QuarryStuntEvent.cpp
@@ -153,7 +153,7 @@ public:
     void SetListener(int index, Vector3* position, Vector3* front, Vector3* top,
                                Vector3* velocity); // 0x004030a0
     void PickEmittersToPlay();                 // 0x00403150: picks the emitters to play
-    void UnknownUpdateDistances();                // inline: each emitter's nearest listener
+    void UpdateListenerDistances();                // inline: each emitter's nearest listener
     int AddEmitter(SoundEmitter* emitter); // 0x00403b20
     int RemoveEmitter(SoundEmitter* emitter); // 0x00403bc0
 
@@ -166,7 +166,7 @@ public:
     ContainerList<SoundEmitter*> audibleEmitters; // +0x58 audible
     ContainerList<SoundEmitter*> playingEmitters; // +0x6c playing
     ContainerList<SoundEmitter*> waitingEmitters; // +0x80 waiting for a sound
-    UnknownAuralScapeReverbOwner* reverbOwner; // +0x94
+    AuralScapeSceneView* reverbOwner; // +0x94
     FollowCameraTerrainView* groundSubject; // +0x98
     int debugPage;                            // +0x9c debug page
     unsigned char reverbEnabled : 1;          // +0xa0 reverb enabled

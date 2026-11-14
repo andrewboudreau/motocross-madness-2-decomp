@@ -178,7 +178,7 @@ struct SoultreeSurface {
 // (0x00443de0) passes it to the clipper's TestBox (0x0052f570) and
 // DrawScreenRect (0x004439c0) outlines x in [+0x00, +0x08) and y in
 // [+0x04, +0x0c) on the locked render surface.
-struct UnknownSoultreeScreenRect {
+struct SoultreeScreenRect {
     int left;                                  // +0x00
     int top;                                   // +0x04
     int right;                                 // +0x08
@@ -192,8 +192,8 @@ struct SoultreeLod {
 };
 
 // The camera fields 0x004439c0 reads (RenderTarget+0x08): the viewport
-// origin (ObjectPicker.h's UnknownPickCamera names the same fields).
-struct UnknownSoultreeCameraView {
+// origin (ObjectPicker.h's PickerCameraView names the same fields).
+struct D3DIMSoultreeCameraView {
     unsigned char field_0x000[0xec];
     Matrix4 viewMatrix;                        // view matrix (slot 12's visibility test)
     unsigned char field_0x12c[0x170 - 0x12c];
@@ -255,7 +255,7 @@ public:
     void TransformVertexGroups(int lod);           // 0x00440d40 (ret 4): transforms the vertex groups
     void DrawCurrentLod();                         // 0x00440f30: draws the current level of detail
     void SelectLod(Vector3* center, Vector3* extents);             // 0x00443de0 (ret 8): picks the level of detail
-    void DrawScreenRect(UnknownSoultreeScreenRect* rect); // 0x004439c0 (ret 4): outlines a screen rectangle
+    void DrawScreenRect(SoultreeScreenRect* rect); // 0x004439c0 (ret 4): outlines a screen rectangle
     void ComputeSubtreeBounds();                   // 0x004434b0: bounding boxes of the subtree
     void DrawAxisGizmo();                  // 0x004435b0: axes of the subtree
     void DrawBoxOutline(Vector3 center, Vector3 extents, int flag); // 0x00443740 (ret 0x1c)
@@ -306,8 +306,8 @@ public:
     SoultreeLod* lodTable;                     // +0x28c
     SoultreeMaterial** materialTable;          // +0x290 materials
     int materialCount;                         // +0x294 material count
-    UnknownSoultreeScreenRect screenRect;      // +0x298 projected bounds (SelectLod); slot 14 bumps right and bottom
-    UnknownSoultreeScreenRect field_0x2a8;     // +0x2a8
+    SoultreeScreenRect screenRect;      // +0x298 projected bounds (SelectLod); slot 14 bumps right and bottom
+    SoultreeScreenRect field_0x2a8;     // +0x2a8
     float lastFrameTime;                       // +0x2b8 frame time (slot 10)
     Vector3 lastScrollPosition;                // +0x2bc world position at the last mode 2 texture scroll
     float textureScroll;                       // +0x2c8 texture scroll (drawing modes 1 and 2)

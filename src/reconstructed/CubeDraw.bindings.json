@@ -16,10 +16,10 @@
   "?GetRefCount@BaseObject@@UAEHXZ": "0x00401940",
   "?Release@GameObject@@UAEHXZ": "0x004696c0",
   "?Load@Cube@@QAEPAV1@PAVFileStream@@HPAVManagedTextureGroup@@H@Z": "0x0043d230",
-  "?Load@DrawableCube@@QAEPAV1@PAXPAVFileStream@@PAUUnknownCubeTextureContext@@@Z": "0x0043d980",
-  "?Load@DrawableCube@@QAEPAV1@PAXPAVFileStream@@PAUUnknownCubeTextureContext@@@Z$ehhandler": "0x00549fb8",
+  "?Load@DrawableCube@@QAEPAV1@PAXPAVFileStream@@PAUCubeTextureContextView@@@Z": "0x0043d980",
+  "?Load@DrawableCube@@QAEPAV1@PAXPAVFileStream@@PAUCubeTextureContextView@@@Z$ehhandler": "0x00549fb8",
   "?BuildFaceGeometry@DrawableCube@@QAEHXZ": "0x0043dc60",
-  "?LoadTexturesAndCoords@DrawableCube@@QAEHPAVCube@@PAUUnknownCubeTextureContext@@@Z": "0x0043e0b0",
+  "?LoadTexturesAndCoords@DrawableCube@@QAEHPAVCube@@PAUCubeTextureContextView@@@Z": "0x0043e0b0",
   "?RecordTextureUse@DrawableCube@@QAEHXZ": "0x0043e210",
   "?MarkVisibleCells@DrawableCube@@QAEXXZ": "0x0043e330",
   "?SetTextMode@FileStream@@QAEXD@Z": "0x0043e9b0",
@@ -77,7 +77,7 @@
   "?s_facePoints@@3PAY0BJ@UVector3@@A": "0x00579af8",
   "?s_viewPoints@@3PAUVector3@@A": "0x00579930",
   "?DecodeTextureSize@@YAHHHH@Z": "0x0043d080",
-  "?LoadMissingTextures@Cube@@QAEHPAUUnknownTexturePalette@@PAUUnknownCubeTextureContext@@@Z": "0x0043d630",
+  "?LoadMissingTextures@Cube@@QAEHPAUTextureColorMapperView@@PAUCubeTextureContextView@@@Z": "0x0043d630",
   "?HasMipLevels@@YAHH@Z": "0x00511850",
   "__real@4@3fff8000000000000000": "0x00550748"
 }

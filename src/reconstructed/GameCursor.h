@@ -18,7 +18,7 @@ class TextureMapManager;
 struct ControlBinding;
 
 // Cursor position in pixels (0x0043f100's result).
-struct UnknownCursorPosition {
+struct CursorPixelPosition {
     int x;
     int y;
 };
@@ -44,7 +44,7 @@ public:
                               Palette8* palette8);
     // 0x0043f100: the bindings' values (or GetCursorPos's) plus the offset at
     // +0x2c/+0x30.
-    UnknownCursorPosition CursorPosition();
+    CursorPixelPosition CursorPosition();
 
     int hotSpotX;                             // +0x2c hot spot offset
     int hotSpotY;                             // +0x30

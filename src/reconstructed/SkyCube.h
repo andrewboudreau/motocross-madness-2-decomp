@@ -14,7 +14,7 @@ public:
     explicit SkyCube(int flags);              // 0x004fb1e0
     virtual int Tick(float frameTime);                 // 0x004fb260: recentres the cube
     // 0x004fb230: DrawableCube's loader, then the height above the camera.
-    SkyCube* Create(void* value, FileStream* stream, UnknownCubeTextureContext* context,
+    SkyCube* Create(void* value, FileStream* stream, CubeTextureContextView* context,
                                    float height);
 
     float centerHeight;                       // height of the cube's centre above the camera

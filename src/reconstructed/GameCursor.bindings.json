@@ -20,7 +20,7 @@
   "?Create@GameCursor@@QAEPAVGameObject@@PAXPBDPAVTextureMapManager@@PAVBackgroundImage@@0PAVPalette8@@@Z": "0x0043eaf0",
   "?LoadCursorTexture@GameCursor@@QAEHPBDPAVTextureMapManager@@PAXPAVPalette8@@@Z": "0x0043ebd0",
   "?LoadCursorTexture@GameCursor@@QAEHPBDPAVTextureMapManager@@PAXPAVPalette8@@@Z$ehhandler": "0x0054a027",
-  "?CursorPosition@GameCursor@@QAE?AUUnknownCursorPosition@@XZ": "0x0043f100",
+  "?CursorPosition@GameCursor@@QAE?AUCursorPixelPosition@@XZ": "0x0043f100",
   "?LoadFile@@YAPAUTgaFile@@PBDPAU1@H@Z": "0x005125c0",
   "?FreeFile@@YAXPAUTgaFile@@@Z": "0x00512dd0",
   "?Tick@GameObject@@UAEHM@Z": "0x004693d0",

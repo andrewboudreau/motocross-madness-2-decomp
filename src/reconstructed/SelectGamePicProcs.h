@@ -60,7 +60,7 @@ void FillTrackList(int largePictures, const char* picture, const char* listName,
 // A bike or rider model: a vfptr at +0, GameObject reached through the
 // vbptr at +4 (the bike dialogs hide and show the models with its slots 4
 // and 5).
-struct UnknownKrustyUIModelObject : virtual public GameObject {
+struct SelectGameD3DIMSoultreeCharacterView : virtual public GameObject {
     // Its own vtable (the slots past GameObject's; names provisional).
     virtual void BuildModel();
     virtual void LoadFromSlt();
@@ -84,7 +84,7 @@ struct KrustyUIModelRecord {                // a KrustyUI manufacturer or rider 
     char displayName[0x40];                   // +0x00: "Name"
     char modelFile[0x40];                     // +0x40: "ModelFile" (a rider's "File")
     char uiModelFile[0x40];                   // +0x80: "UIModelFile"
-    UnknownKrustyUIModelObject* uiModel;      // +0xc0
+    SelectGameD3DIMSoultreeCharacterView* uiModel;      // +0xc0
     int availability;                         // +0xc4: "Availability"
 };
 
@@ -102,7 +102,7 @@ struct KrustyUIBikeRecord {
 // The race settings at TrackGame+0x2d70 (0x1ec bytes; InGameProcs.cpp
 // saves and restores the block). Declared as a view: TrackGame.h names the
 // same fields individually.
-struct UnknownRaceSettings {
+struct SelectGameRaceSettingsView {
     int raceMode;                             // +0x00: race mode (+0x2d70)
     int eventType;                            // +0x04: event type (+0x2d74)
     unsigned char field_0x08[0x0c - 0x08];

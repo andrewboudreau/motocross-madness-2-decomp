@@ -7,7 +7,7 @@
     "src/reconstructed/EcoSystem.cpp": {
       "sections": 132,
       "relocations": 720,
-      "sha256": "406df161393a7f8b894bd104d6364569d404aebfcdc879f40c0053308abb41f9"
+      "sha256": "5f5d0e10cc34940857e18492facac40020207319087003065d6726874cde7066"
     },
     "src/reconstructed/LightEmitter.cpp": {
       "sections": 57,
@@ -17,7 +17,7 @@
     "src/reconstructed/SceneManager.cpp": {
       "sections": 272,
       "relocations": 1273,
-      "sha256": "5365f1990cf24d723973fcf67667246461ffec61205eee27b30729b64e874c54"
+      "sha256": "b3cd7b3bcecbe07e6e90710388572181b427934b58292e63246928d91641c113"
     },
     "src/reconstructed/KrustyUI.cpp": {
       "sections": 317,
@@ -57,7 +57,7 @@
     "samples/render/D3DIMSoulTreeNearMisses.cpp": {
       "sections": 29,
       "relocations": 148,
-      "sha256": "f1765bb6f969fe91cbcb3b213ba8a4641239b4af0fcc0b3043dbea936402aa88"
+      "sha256": "4253d8de080af600ebd528efc965bed0c3b4cca769eda75bbd3514dcce3d2c0d"
     },
     "samples/game/QuarryStuntEventNearMisses.cpp": {
       "sections": 23,
@@ -67,7 +67,7 @@
     "samples/game/QuarryStuntEventLoaderNearMiss.cpp": {
       "sections": 50,
       "relocations": 435,
-      "sha256": "73a5a5144f9b82318c41c9802749ae02c26316d96f76ed2aabff7031112c3a3f"
+      "sha256": "1da7379235d6b964135e3d79f96d39924266ac558eb7b52b98fa8183e9f09aa4"
     }
   },
   "strict_cases": [
@@ -289,7 +289,7 @@
     },
     {
       "source": "src/reconstructed/EcoSystem.cpp",
-      "symbol": "?PlaceQuantized@Vegetation@@QAEXPAVTextureMapManager@@EPBUUnknownEcoCoordinates@@EE@Z",
+      "symbol": "?PlaceQuantized@Vegetation@@QAEXPAVTextureMapManager@@EPBUEcoQuantizedPosition@@EE@Z",
       "va": "0x004567a0",
       "size": 53
     },

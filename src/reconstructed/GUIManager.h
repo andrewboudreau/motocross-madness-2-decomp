@@ -137,7 +137,7 @@ struct GroundFogCacheOwner {
 // Cursor animation passed to GUICursor 0x00485150 (GUIUser+0x1c8). Its
 // AdvancePastSounds is UIAnim's (0x004730b0) and dialogs cast a control's
 // "MouseAnim" UIAnim to it, so the members follow GameUi.h's UIAnim.
-struct UnknownCursorAnimation {
+struct CursorUIAnimView {
     int AdvancePastSounds();              // 0x004730b0: current frame
     unsigned char field_0x00[0x08];
     int currentFrame;                         // +0x08 UIAnim::currentFrame
@@ -154,9 +154,9 @@ public:
     explicit GUICursor(int flags);            // 0x00485100
     virtual ~GUICursor();                     // 0x00485140 (deleting wrapper 0x00485120)
     virtual int RenderPost3D();               // 0x00485170
-    void SetAnimation(UnknownCursorAnimation* animation); // 0x00485150
+    void SetAnimation(CursorUIAnimView* animation); // 0x00485150
 
-    UnknownCursorAnimation* cursorAnimation;  // +0x5c: SetAnimation; advanced by slot 15
+    CursorUIAnimView* cursorAnimation;  // +0x5c: SetAnimation; advanced by slot 15
 };
 
 // A dialog control as GUIUser and ToolTip see it. Never constructed as such.

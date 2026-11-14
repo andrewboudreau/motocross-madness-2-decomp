@@ -25,7 +25,7 @@ ObjectPicker::ObjectPicker(int flags) : GameObject(flags) {
 
 // 0x004b04c0
 int ObjectPicker::PickAtCursor() {
-    UnknownCursorPosition position = pickCursor->CursorPosition();
+    CursorPixelPosition position = pickCursor->CursorPosition();
 
     return PickAt(position.x, ((RenderTarget*)renderContext)->targetHeight - position.y - 1);
 }
@@ -40,7 +40,7 @@ ObjectPicker::~ObjectPicker() {
 
 // 0x004b0500
 int ObjectPicker::PickAt(int x, int y) {
-    UnknownPickCamera* camera;
+    PickerCameraView* camera;
     Vector3 direction;
     Vector3 position;
     Vector3 segment[2];
@@ -51,7 +51,7 @@ int ObjectPicker::PickAt(int x, int y) {
 
     lastPickX = x;
     lastPickY = y;
-    camera = (UnknownPickCamera*)((RenderTarget*)renderContext)->currentCamera;
+    camera = (PickerCameraView*)((RenderTarget*)renderContext)->currentCamera;
     position = camera->eyePosition;
     u = (float)x - camera->viewportX - camera->viewportWidth / 2;
     v = (float)y - (((RenderTarget*)renderContext)->targetHeight - camera->viewportY - camera->viewportHeight) -
@@ -103,10 +103,10 @@ ObjectPicker* ObjectPicker::Create(void* target, TextureMapManager* textures,
         pickCursor = cursor;
     } else {
         cursorBindingX = new(__FILE__, 59)
-            ControlBinding(0.0f, (float)((UnknownPickCamera*)((RenderTarget*)renderContext)->currentCamera)->cursorRangeX,
+            ControlBinding(0.0f, (float)((PickerCameraView*)((RenderTarget*)renderContext)->currentCamera)->cursorRangeX,
                                   0.0f, g_TrackGame->controlInterface->NextBindingId(), 0, 0.1f);
         cursorBindingY = new(__FILE__, 60)
-            ControlBinding(0.0f, (float)((UnknownPickCamera*)((RenderTarget*)renderContext)->currentCamera)->cursorRangeY,
+            ControlBinding(0.0f, (float)((PickerCameraView*)((RenderTarget*)renderContext)->currentCamera)->cursorRangeY,
                                   0.0f, g_TrackGame->controlInterface->NextBindingId(), 1, 0.1f);
         if (g_TrackGame->controlInterface->mouse) {
             g_TrackGame->controlInterface->mouse->AttachBinding(cursorBindingX);

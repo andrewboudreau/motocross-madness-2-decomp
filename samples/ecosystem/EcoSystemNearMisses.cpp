@@ -497,7 +497,7 @@ static inline float EcoRandomUnit() {
 // the green channel of a 32- or 24-bit image, the green field of a 16-bit
 // one, scaled to 0..1. Inline shape only (the three branches are expanded
 // at every sample site of the generator).
-static inline float UnknownEcoSampleTga(TgaFile* tga, float x, float z) {
+static inline float SampleEcoProbabilityTga(TgaFile* tga, float x, float z) {
     float worldX = g_collisionQuadTree->extentX;
     int width = tga->width;
     int column = (int)(x / worldX * width);
@@ -674,13 +674,13 @@ int EcoSystem::GenerateObjects(int checkCodes) {
         float threshold = random * 3.0f;
         float probability;
         if (tga)
-            probability = UnknownEcoSampleTga(tga, probe.x, probe.z);
+            probability = SampleEcoProbabilityTga(tga, probe.x, probe.z);
         else
             probability = 1.0f;
         if (probability <= threshold)
             continue;
         if (tgas[selected])
-            probability = UnknownEcoSampleTga(tgas[selected], probe.x, probe.z) * probability;
+            probability = SampleEcoProbabilityTga(tgas[selected], probe.x, probe.z) * probability;
         if (probability <= threshold)
             continue;
         groundTerrain->QueryGround(&probe, &normal, 0, 0);

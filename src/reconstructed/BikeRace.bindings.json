@@ -115,7 +115,7 @@
   "?SaveRecording@KrustyVCR@@QAEXMPADH@Z": "0x0049c010",
   "?SetRacer@KrustyVCR@@QAEXHDHPAD0000HHH@Z": "0x0049c070",
   "?ApplyReplayDelta@TagBall@@QAEXPBUTagBallStateDelta@@PAUTagBallReceivedState@@@Z": "0x004a9aa0",
-  "?SetRecorder@UnknownTrackGameViewOwnerDc@@QAEXPAVKrustyVCR@@@Z": "0x004a9d10",
+  "?SetRecorder@TrackGameTagBallView@@QAEXPAVKrustyVCR@@@Z": "0x004a9d10",
   "?PickFollowedRacer@TrackGameViewOwner@@QAEXXZ": "0x004a9d20",
   "?GetPlayerName@NetworkInterface@@QAEHHPAD@Z": "0x004ac720",
   "?FindPlayer@NetworkInterface@@QAEPAVNetPlayer@@H@Z": "0x004ac800",

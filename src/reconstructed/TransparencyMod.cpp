@@ -16,8 +16,8 @@ TransparencyMod::TransparencyMod(int flags)
 }
 
 // 0x005206f0
-void TransparencyMod::ModifyMesh(D3DIMSoultreeObject* object, UnknownSoultreeMesh* mesh,
-                                 UnknownSoultreeMesh** out)
+void TransparencyMod::ModifyMesh(D3DIMSoultreeObject* object, ModifierSoultreeSurfaceView* mesh,
+                                 ModifierSoultreeSurfaceView** out)
 {
     *out = mesh;
     if (isTransparent == appliedState) {

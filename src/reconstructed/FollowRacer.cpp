@@ -48,7 +48,7 @@ void TagBall::ApplyReplayDelta(const TagBallStateDelta* delta,
 }
 
 // 0x004a9d10
-void UnknownTrackGameViewOwnerDc::SetRecorder(KrustyVCR* vcr)
+void TrackGameTagBallView::SetRecorder(KrustyVCR* vcr)
 {
     recorder = vcr;
 }

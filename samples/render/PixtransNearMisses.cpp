@@ -248,7 +248,7 @@ int Halve1555(void* destination, void* source, int width, int height, int destin
 // palette holds magenta (255, 0, 255) that index is the key: key pixels are
 // left out of the average and a block with fewer than two others stays the key.
 int Halve8(void* destination, void* source, int width, int height, int destinationStride,
-                          int sourceStride, UnknownTexturePalette* palette) {
+                          int sourceStride, TextureColorMapperView* palette) {
     unsigned char* sourceRow = (unsigned char*)source;
     unsigned char* row = (unsigned char*)destination;
     if (palette) {
@@ -375,7 +375,7 @@ static inline void ReadRow(int format, void* source, int* channels, int width)
 
 int DitherConvert(void* source, int format, int width, int height, int sourceStride,
                   int destinationStride, void* output24, void* output565, void* output555,
-                  void* output8, UnknownTexturePalette* palette)
+                  void* output8, TextureColorMapperView* palette)
 {
     int bytesPerPixel = PixelFormatBytesPerPixel(format);
     unsigned char* indices;

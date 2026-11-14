@@ -59,7 +59,7 @@ DrawableCube::DrawableCube(int flags) : GameObject(flags)
 
 // 0x0043d980
 DrawableCube* DrawableCube::Load(void* value, FileStream* stream,
-                                                  UnknownCubeTextureContext* context)
+                                                  CubeTextureContextView* context)
 {
     int offset;
     int paletteCount;
@@ -122,10 +122,10 @@ fail:
 // 0x0043e0b0: loads the cube's textures and sets each cell's texture
 // coordinates, inset half a texel (1/32 for mipmapped files, else by the
 // cell's decoded texture size).
-int DrawableCube::LoadTexturesAndCoords(Cube* cube, UnknownCubeTextureContext* context)
+int DrawableCube::LoadTexturesAndCoords(Cube* cube, CubeTextureContextView* context)
 {
     cubeObject = cube;
-    cube->LoadMissingTextures((UnknownTexturePalette*)loadPalette, context);
+    cube->LoadMissingTextures((TextureColorMapperView*)loadPalette, context);
     if (HasMipLevels(cubeObject->fileFormat)) {
         for (int face = 0; face < 6; face++) {
             int index = 0;
@@ -208,10 +208,10 @@ DrawableCube::~DrawableCube()
 void DrawableCube::MarkVisibleCells()
 {
     Vector3 forward;
-    forward.x = ((UnknownCubeCameraView*)((RenderTarget*)renderContext)->currentCamera)->viewMatrix.m[0][2];
-    forward.y = ((UnknownCubeCameraView*)((RenderTarget*)renderContext)->currentCamera)->viewMatrix.m[1][2];
-    forward.z = ((UnknownCubeCameraView*)((RenderTarget*)renderContext)->currentCamera)->viewMatrix.m[2][2];
-    const Vector3& eye = ((UnknownCubeCameraView*)((RenderTarget*)renderContext)->currentCamera)->position;
+    forward.x = ((CubeCameraView*)((RenderTarget*)renderContext)->currentCamera)->viewMatrix.m[0][2];
+    forward.y = ((CubeCameraView*)((RenderTarget*)renderContext)->currentCamera)->viewMatrix.m[1][2];
+    forward.z = ((CubeCameraView*)((RenderTarget*)renderContext)->currentCamera)->viewMatrix.m[2][2];
+    const Vector3& eye = ((CubeCameraView*)((RenderTarget*)renderContext)->currentCamera)->position;
     const Vector3& center = cubeObject->center;
     Vector3 offset(center.x - eye.x, center.y - eye.y, center.z - eye.z);
     for (int face = 0; face < 6; face++) {
@@ -229,7 +229,7 @@ void DrawableCube::MarkVisibleCells()
         reinterpret_cast<VisibilityClipper*>(g_visibilityClipper)->TransformVectors(
             reinterpret_cast<const VisibilityBoxVec*>(s_viewPoints),
             reinterpret_cast<VisibilityBoxVec*>(s_viewPoints),
-            reinterpret_cast<const VisibilityMatrix*>(&((UnknownCubeCameraView*)((RenderTarget*)renderContext)->currentCamera)->viewMatrix), 25);
+            reinterpret_cast<const VisibilityMatrix*>(&((CubeCameraView*)((RenderTarget*)renderContext)->currentCamera)->viewMatrix), 25);
         for (int i = 0; i < 16; i++) {
             int corner = i + i / 4;
             if (reinterpret_cast<VisibilityClipper*>(g_visibilityClipper)->CullQuad(

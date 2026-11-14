@@ -3,17 +3,17 @@
     "src/reconstructed/ManagedTextureGroup.cpp": {
       "sections": 50,
       "relocations": 239,
-      "sha256": "3c3295000e21e67e660fcc65079b8376f9bc9a37b9b1f0bac10a2ee1edbd53c7"
+      "sha256": "ce45226c039e8c05866714fbc977a944fe84062bde148fcbdda64db2713d9ecb"
     },
     "samples/render/ManagedTextureGroupNearMisses.cpp": {
       "sections": 36,
       "relocations": 275,
-      "sha256": "ae1aaa24c0739516215a0f4faff45b683b74c3f2e35a24dd4dcf35789a45c1bd"
+      "sha256": "6f99e99e0b72131c16b66cef94cece8d71d325c02264e30712fa598be514e66e"
     },
     "src/reconstructed/SceneManager.cpp": {
       "sections": 272,
       "relocations": 1273,
-      "sha256": "5365f1990cf24d723973fcf67667246461ffec61205eee27b30729b64e874c54"
+      "sha256": "b3cd7b3bcecbe07e6e90710388572181b427934b58292e63246928d91641c113"
     },
     "src/reconstructed/ProCircuitProcs.cpp": {
       "sections": 336,

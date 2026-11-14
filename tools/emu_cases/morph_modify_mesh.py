@@ -17,7 +17,7 @@ already exists, delta arrays that already exist, and the draw-unchanged early re
 import struct
 
 RETAIL_VA = 0x004a4c60
-SYMBOL = ('?ModifyMesh@MorphBastardModifier@@UAEXPAVD3DIMSoultreeObject@@PAUUnknownSoultreeMesh@@'
+SYMBOL = ('?ModifyMesh@MorphBastardModifier@@UAEXPAVD3DIMSoultreeObject@@PAUModifierSoultreeSurfaceView@@'
           'PAPAU3@@Z')
 SOURCE = 'src/bringup/Group3_MorphBastard.cpp'
 COPY_MESH = 0x004a5290
@@ -34,7 +34,7 @@ PROBES = {0x004a4c74: 'draw unchanged',
 
 
 def _copy_mesh(ctx, rec):
-    # CopyMesh(UnknownSoultreeMesh* mesh): this->meshCopy = a copy with its own vertices.
+    # CopyMesh(ModifierSoultreeSurfaceView* mesh): this->meshCopy = a copy with its own vertices.
     mesh = rec.args[0]
     count = ctx.unpack(mesh + 8, 'i')[0]
     copy = ctx.alloc(0x38)

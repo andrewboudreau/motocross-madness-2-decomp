@@ -1,7 +1,7 @@
 # vfwdeco.cpp
 
 `src/reconstructed/VfwDeco.h` / `VfwDeco.cpp`. The whole unit is a single
-function: `UnknownVideoDecoder`'s destructor `0x0052d050`. The object is
+function: `VfwDecompressor`'s destructor `0x0052d050`. The object is
 the one at PCTextureMap+0x7c, and PCTextureMap.h now includes VfwDeco.h
 instead of its own stub.
 

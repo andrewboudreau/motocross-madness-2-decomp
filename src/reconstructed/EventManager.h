@@ -56,18 +56,18 @@ int CompareUnsigned(const void* a, const void* b);  // 0x0045fbb0
 
 // The Soultree object at a podium character's +0x1a0 (D3DIMSoulTree.h's
 // D3DIMSoultreeObject methods, seen from the podium scene).
-struct UnknownPodiumTextureEntry {
+struct PodiumSoultreeMaterialView {
     unsigned char field_0x00[0x2c];
-    char field_0x2c[4];                            // texture name
+    char textureName[4];                           // +0x2c SoultreeMaterial textureName
 };
-struct UnknownPodiumSoultree {
+struct PodiumD3DIMSoultreeObjectView {
     void SetUseLighting(int value);                      // 0x004444c0
     void SetPosition(const Vector3* position);        // 0x004fc660
     void SetAxesPtr(const Vector3* look, const Vector3* up, int orthogonalize, int keepZ); // 0x004fbd70
     void ReplaceMaterialTexture(int index, const char* name, void* context); // 0x00444c70
 
     unsigned char field_0x000[0x290];
-    UnknownPodiumTextureEntry** materialTable;     // +0x290 D3DIMSoultreeObject::materialTable; [0] gives the racer model's texture
+    PodiumSoultreeMaterialView** materialTable;     // +0x290 D3DIMSoultreeObject::materialTable; [0] gives the racer model's texture
 };
 
 // cdecl 0x004aef40: deletes TrackGame's NetworkInterface (+0x08), sets +0x18

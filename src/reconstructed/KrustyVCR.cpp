@@ -26,7 +26,7 @@
 // 0x0049bf10: starts the recorder on `file` (mode 0 records, 1 plays back).
 // A new recording first stamps the "MCMVCR" signature, the version string and
 // the current race settings into the block it hands over.
-int KrustyVCR::OpenRecording(UnknownRecorderCallback callback, int mode, char* name,
+int KrustyVCR::OpenRecording(RecorderCallbackProc callback, int mode, char* name,
                                      VCRFile* file)
 {
     replayLength = 0;
@@ -37,7 +37,7 @@ int KrustyVCR::OpenRecording(UnknownRecorderCallback callback, int mode, char* n
         memcpy(raceSettings, &g_TrackGame->mode.raceSettings.raceMode, 0x1ec);
     }
     return Start((int)callback, (int)magic, 0xeb0, mode, (int)name, 0x58,
-                 (UnknownRecorderOwner*)file);
+                 (RecorderVCRFileView*)file);
 }
 
 // 0x0049bff0

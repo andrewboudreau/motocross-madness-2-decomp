@@ -3,7 +3,7 @@
 // Shared complete declaration; D3DIMSoultreeModifier.h documents its provenance.
 #include "Wrecker.h"
 class D3DIMSoultreeObject;
-struct UnknownSoultreeMesh;
+struct ModifierSoultreeSurfaceView;
 
 class D3DIMSoultreeModifier : public GraphicsTest {
 public:
@@ -13,8 +13,8 @@ public:
     // _purecall in this table. D3DIMSoultreeObject 0x00440ded calls it for
     // each modifier with itself, its mesh and the address of the mesh to
     // draw (MorphBastardModifier 0x004a4c60 gives the signature).
-    virtual void ModifyMesh(D3DIMSoultreeObject* object, UnknownSoultreeMesh* mesh,
-                            UnknownSoultreeMesh** out) = 0;
+    virtual void ModifyMesh(D3DIMSoultreeObject* object, ModifierSoultreeSurfaceView* mesh,
+                            ModifierSoultreeSurfaceView** out) = 0;
 
     // 0x004452f0 (ret 4): appends `object` (lines 26 and 33).
     void AddObject(D3DIMSoultreeObject* object);

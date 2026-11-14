@@ -12,7 +12,7 @@ class MouseDevice;
 // bool), while KeyboardDevice's own callers test the
 // full eax (int). The two declarations cannot be one type, so FollowCamera
 // reads the member through this view.
-class UnknownKeyboardBoolView {
+class FollowCameraKeyboardDeviceView {
 public:
     virtual void RemoveBindings();
     virtual void UnknownVirtualSlot1();

@@ -19,7 +19,7 @@ class VCR;
 
 // The record buffer at VCRInterface+0x7c (0x400 bytes): slot 10 reads a time
 // in seconds and a count from its head.
-struct UnknownRecorderRecord {
+struct RecorderRecordHeader {
     float time;                           // seconds; stored at +0xd4 in ms
     int field_0x04;
     int count;
@@ -27,7 +27,7 @@ struct UnknownRecorderRecord {
 
 // The function pointer at VCRInterface+0x80 (cdecl, seven arguments). Slot 10
 // passes -2 and -3 as `kind` for control calls; the result selects its next step.
-typedef int (*UnknownRecorderCallback)(int kind, void* data, int flag, int recorderId, int* keep, int time,
+typedef int (*RecorderCallbackProc)(int kind, void* data, int flag, int recorderId, int* keep, int time,
                                        int* milliseconds);
 
 // What 0x004e7a90 passes to the worker thread (VCRInterface+0x90).
@@ -42,7 +42,7 @@ struct RecorderThreadParameters {
 // poll interval. The worker thread calls VCRFile (VCRfile.h) methods on
 // it and +0x23c is that class's memory flag, so it is the VCR file object; the
 // type is kept for the 0x004e7a90 symbol.
-struct UnknownRecorderOwner {
+struct RecorderVCRFileView {
     unsigned char field_0x000[0x23c];
     int memory;                           // +0x23c VCRFile's memory flag (VCRfile.h)
 };
@@ -59,7 +59,7 @@ public:
     // 0x004e7a90: creates the ring (`size`), the events and the worker, then
     // starts `mode` (0, 1 or 2); 0 on failure.
     int Start(int callback, int header, int headerSize, int mode, int fileName,
-              unsigned int size, UnknownRecorderOwner* owner);
+              unsigned int size, RecorderVCRFileView* owner);
     // 0x004e86d0: stores the header for worker event 9 (rewrite it, close
     // the file) and signals it, waiting for the worker with `wait`.
     void CloseFile(int header, int headerSize, int wait);
@@ -90,7 +90,7 @@ public:
     CRITICAL_SECTION lock;
     int recordMode;                       // mode
     void* recordBuffer;                     // 0x400-byte buffer (mode 1)
-    UnknownRecorderCallback recordCallback;
+    RecorderCallbackProc recordCallback;
     int recordPending;                        // +0x84  slot 10 hands the last taken record to the callback again while set (set on its answers 3 and 5)
     int readingReverse;                       // +0x88  set when the callback answers 11 at a record end; slot 10 then reads backwards until it stops
     unsigned char field_0x8c[0x90 - 0x8c];
@@ -98,7 +98,7 @@ public:
     int recordType;                           // +0xA0  type of the last taken record (QueueRecord's first header word; -1 marks a tick record)
     int recordId;                             // +0xA4  the last taken record's second header word (the sender's network id)
     int recordPosition;                       // +0xA8  ring position of the last taken tick record (AppendPosition)
-    UnknownRecorderOwner* vcrFile;
+    RecorderVCRFileView* vcrFile;
     VCR* frameRing;
     int isStopped;                       // stopped
     int isBusy;                       // busy

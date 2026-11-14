@@ -3,8 +3,8 @@
 // Macros, not inline functions: with inline helpers VC6 runs out of inline
 // budget in slot 45 and calls the Vector3 constructor out of line.
 #define FOLLOWCAMERA_CONTROLS() (g_TrackGame->controlInterface)
-static inline UnknownJoystickBoolView* FollowCameraJoystick(ControlInterface* controls) {
-    return (UnknownJoystickBoolView*)controls->activeJoystick;
+static inline FollowCameraJoystickDeviceView* FollowCameraJoystick(ControlInterface* controls) {
+    return (FollowCameraJoystickDeviceView*)controls->activeJoystick;
 }
 #define FOLLOWCAMERA_KEY(control) (FOLLOWCAMERA_CONTROLS()->IsDeviceButtonDown((control), 0, 0x3f, 0))
 

@@ -56,15 +56,15 @@
 
 // 0x00522440: restores the default settings.
 void TrackGameMode::ResetDefaults() {
-    ResetInterfaceOptions((UnknownTrackGameModeOptions6ac*)&instrumentOverlayOn);
-    ResetSoundOptions((UnknownTrackGameModeOptionsA20*)&cdAudioOn);
-    ResetGraphicsOptions((UnknownTrackGameModeOptionsA4c*)&displayModeIndex);
+    ResetInterfaceOptions((TrackGameInterfaceOptions*)&instrumentOverlayOn);
+    ResetSoundOptions((TrackGameSoundOptions*)&cdAudioOn);
+    ResetGraphicsOptions((TrackGameGraphicsOptions*)&displayModeIndex);
     g_TrackGame->mode.ChooseDisplayMode(0, &displayModeIndex);
-    ResetControlOptions((UnknownTrackGameModeOptionsA68*)responseSliders);
+    ResetControlOptions((TrackGameControlOptions*)responseSliders);
     ReloadResourceStrings(resourceStrings);
-    ResetGarageOptions((UnknownTrackGameModeOptionsFd8*)garageOptions);
-    ResetGarageOptions((UnknownTrackGameModeOptionsFd8*)optionsBackup);
-    ResetGarageOptions((UnknownTrackGameModeOptionsFd8*)multiplayerGarageOptions);
+    ResetGarageOptions((TrackGameGarageOptions*)garageOptions);
+    ResetGarageOptions((TrackGameGarageOptions*)optionsBackup);
+    ResetGarageOptions((TrackGameGarageOptions*)multiplayerGarageOptions);
     ResetSettingsEntries();
     raceSettings.gateSeed = 1;
     raceSettings.races = 2;

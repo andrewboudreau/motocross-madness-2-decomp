@@ -122,7 +122,7 @@ struct MorphBastardMeshPair {
 };
 
 // The mesh slot 27 receives and returns (0x38 bytes).
-struct UnknownSoultreeMesh {
+struct ModifierSoultreeSurfaceView {
     int groupCount;                   // group count
     MorphBastardMeshGroup* groups;  // +0x4  SoultreeSurface+0x04 groups (D3DIMSoulTree.h)
     int vertexCount;                  // vertex count

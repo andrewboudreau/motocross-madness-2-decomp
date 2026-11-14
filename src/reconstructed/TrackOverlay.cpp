@@ -514,7 +514,7 @@ StatsOverlay* StatsOverlay::LoadPanel(RenderTarget* target, TextureMapManager* m
     logFont.lfPitchAndFamily = 2;
     logFont.lfItalic = 0;
     logFont.lfHeight = 16;
-    UnknownKrustyUIGui* gui = g_TrackGame->ui->gui;
+    KrustyUIGuiManager* gui = g_TrackGame->ui->gui;
     const char* face = gui ? gui->toolTipFontFace : "";
     if (*face != '\0') {
         logFont.lfWeight = gui->toolTipBold ? 700 : 500;
@@ -1031,7 +1031,7 @@ TextQueueOverlay::~TextQueueOverlay()
 TextQueueOverlay* TextQueueOverlay::Setup(void* target, OverlayRect rect)
 {
     GameObject::SetRenderContext(target);
-    UnknownKrustyUIGui* gui = g_TrackGame->ui->gui;
+    KrustyUIGuiManager* gui = g_TrackGame->ui->gui;
     const char* face = gui ? gui->toolTipFontFace : "";
     int weight = 700;
     int italic = 1;
@@ -1554,7 +1554,7 @@ ChatOverlay* ChatOverlay::Setup(RenderTarget* target, TextureMapManager* manager
     logFont.lfPitchAndFamily = 2;
     logFont.lfItalic = 0;
     logFont.lfHeight = 9;
-    UnknownKrustyUIGui* gui = g_TrackGame->ui->gui;
+    KrustyUIGuiManager* gui = g_TrackGame->ui->gui;
     const char* face = gui ? gui->toolTipFontFace : "";
     if (*face != '\0') {
         logFont.lfWeight = gui->toolTipBold ? 700 : 500;

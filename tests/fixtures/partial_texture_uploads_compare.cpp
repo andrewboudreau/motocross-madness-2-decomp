@@ -111,7 +111,7 @@ PCTextureMap::PCTextureMap(TextureMapManager* manager,int value):TextureMap(mana
 }
 PCTextureMap::~PCTextureMap(){Event(9,Identity(this));}
 int PCTextureMap::CreateSurface(void* bits,int w,int h,int stride,int minimum,int source,int format,
-    UnknownTexturePalette* palette,int flags,void* surfacePalette,int check,int unused,int au,int av,
+    TextureColorMapperView* palette,int flags,void* surfacePalette,int check,int unused,int au,int av,
     TextureContext* choice,int alpha,unsigned int key){
     EventRecord& r=Event(10,Identity(this),Identity(bits),w,h,stride);
     int a[]={minimum,source,format,(int)palette,flags,(int)surfacePalette,check,unused,au,av,(int)choice,alpha,(int)key};
@@ -284,7 +284,7 @@ int PCRenderTarget::DrawIndexedPrimitiveVB(int,int,int,int,int,int,int){Fail(86)
 void PCRenderTarget::SetAlphaTest(int){Fail(86);}
 void PCRenderTarget::DisableAlphaTest(){Fail(86);}
 
-int PCTextureMap::LoadSurface(FileStream*,int,int,int,int,int,int,UnknownTexturePalette*,int,void*,int,int,TextureContext*,int,unsigned int){Fail(86);return 0;}
+int PCTextureMap::LoadSurface(FileStream*,int,int,int,int,int,int,TextureColorMapperView*,int,void*,int,int,TextureContext*,int,unsigned int){Fail(86);return 0;}
 TextureMap* PCTextureMap::Clone(){Fail(86);return 0;}
 int PCTextureMap::IsResident(){Fail(86);return 0;}
 int PCTextureMap::Upload(Win32Rect*,int){Fail(86);return 0;}

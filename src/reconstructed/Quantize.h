@@ -8,7 +8,7 @@ class FileStream;
 // RTTI: ColorMapper : BaseObject (vtable 0x00557658, four slots; slot 0 is
 // the deleting destructor 0x004ddea0). A 256-colour palette loaded from a
 // resource stream with its 555/565 lookup tables. TextureMap.h views the
-// same object as UnknownTexturePalette. Member names are provisional.
+// same object as TextureColorMapperView. Member names are provisional.
 class ColorMapper : public BaseObject {
 public:
     explicit ColorMapper(FileStream* stream); // 0x004ddf40 (ret 4)

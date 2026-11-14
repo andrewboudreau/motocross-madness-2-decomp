@@ -2,7 +2,7 @@
 
 Pixtrans now calls the existing `ColorMapper::GetIndexFrom555` and
 `ColorMapper::GetIndexFrom565` providers through the verified primary pointer.
-The public `UnknownTexturePalette*` parameters and provisional prefix view stay
+The public `TextureColorMapperView*` parameters and provisional prefix view stay
 unchanged. Four canonical call sites and two sample call sites use explicit
 receiver casts; no wrapper, alias, duplicate provider, storage or compiler flag
 was added.
@@ -46,7 +46,7 @@ and propagation chain establishes which pointer reaches these calls:
 The retained test checks these raw instructions, complete strict bodies,
 primary COL/type bytes and the actual header layouts. `ColorMapper` has the
 full `0x18b10` allocation, including both lookup tables. The provisional
-`UnknownTexturePalette` view describes only a prefix through `0x8710`; this
+`TextureColorMapperView` view describes only a prefix through `0x8710`; this
 change does not claim complete type equivalence or justify allocating that
 smaller view as a `ColorMapper`.
 
@@ -71,9 +71,9 @@ Before and after compilation at the same private source paths preserves all
 objects under exactly two external-name substitutions:
 
 ```
-?GetIndexFrom555@UnknownTexturePalette@@QAEPAEXZ
+?GetIndexFrom555@TextureColorMapperView@@QAEPAEXZ
     -> ?GetIndexFrom555@ColorMapper@@QAEPAEXZ
-?GetIndexFrom565@UnknownTexturePalette@@QAEPAEXZ
+?GetIndexFrom565@TextureColorMapperView@@QAEPAEXZ
     -> ?GetIndexFrom565@ColorMapper@@QAEPAEXZ
 ```
 

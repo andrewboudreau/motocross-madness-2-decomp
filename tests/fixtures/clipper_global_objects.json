@@ -7,17 +7,17 @@
     "?UnknownVirtualSlot8@DrawableGridNode@@UAEHH@Z": "?GetBlockTextureSize@DrawableGridNode@@UAEHH@Z",
     "?UnknownVirtualSlot4@DrawableGridNode@@UAEXH@Z": "?RequestTextureSize@DrawableGridNode@@UAEXH@Z",
     "?g_visibilityClipper@@3PAVD3DIMShadowClipper@@A": "?g_visibilityClipper@@3PAVVisibilityClipper@@A",
-    "?g_visibilityClipper@@3PAVUnknownCubeClipper@@A": "?g_visibilityClipper@@3PAVVisibilityClipper@@A",
+    "?g_visibilityClipper@@3PAVCubeVisibilityClipperView@@A": "?g_visibilityClipper@@3PAVVisibilityClipper@@A",
     "?g_visibilityClipper@@3PAVEcoVisibilityClipperView@@A": "?g_visibilityClipper@@3PAVVisibilityClipper@@A",
-    "?g_visibilityClipper@@3PAVUnknownFollowCameraProjector@@A": "?g_visibilityClipper@@3PAVVisibilityClipper@@A",
+    "?g_visibilityClipper@@3PAVFollowCameraVisibilityClipperView@@A": "?g_visibilityClipper@@3PAVVisibilityClipper@@A",
     "?g_visibilityClipper@@3PAVGridVisibilityClipper@@A": "?g_visibilityClipper@@3PAVVisibilityClipper@@A",
-    "?g_UnknownGlobal575a98@@3PAVUnknownProjector@@A": "?g_visibilityClipper@@3PAVVisibilityClipper@@A"
+    "?g_UnknownGlobal575a98@@3PAVOverlayVisibilityClipperView@@A": "?g_visibilityClipper@@3PAVVisibilityClipper@@A"
   },
   "objects": {
     "src/reconstructed/CubeDraw.cpp": {
       "sections": 49,
       "relocations": 183,
-      "sha256": "f8533ffe51997552bd9ef54bd78dc54785df1de0cde440885ea3fa4fc44604aa"
+      "sha256": "432b6da8b118f775a099215f79ca6618c2bb43313f7ac2cb9bd47fc5599185a3"
     },
     "src/reconstructed/FollowCamera.cpp": {
       "sections": 98,
@@ -32,7 +32,7 @@
     "src/reconstructed/EcoSystem.cpp": {
       "sections": 132,
       "relocations": 720,
-      "sha256": "f7cad24a83af91493079bd8a4e850efb9df8f560e9d07dff3cbca8c95947c007"
+      "sha256": "9a4570d2a2a51e62f4c966bff35d859b23a9f3e853d26717e8ef620eca987cbf"
     },
     "src/reconstructed/Griddraw.cpp": {
       "sections": 89,
@@ -72,7 +72,7 @@
     "samples/render/GriddrawNearMisses.cpp": {
       "sections": 16,
       "relocations": 112,
-      "sha256": "561066fe72df1456bd0c7c905a5f7dbf4637fddd5a43addf99abad3053dedc70"
+      "sha256": "fc35d329805cb3005782232c9b478e877dfe37d6ebd7d712d5eda27a5b17a38c"
     },
     "samples/physics/shadow/D3DIMSoultreeShadowNearMisses.cpp": {
       "sections": 7,

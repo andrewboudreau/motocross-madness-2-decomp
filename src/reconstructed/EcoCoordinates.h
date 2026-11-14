@@ -1,6 +1,6 @@
 #pragma once
 
-struct UnknownEcoCoordinates {
+struct EcoQuantizedPosition {
     unsigned short x;
     unsigned short y;
     unsigned short z;

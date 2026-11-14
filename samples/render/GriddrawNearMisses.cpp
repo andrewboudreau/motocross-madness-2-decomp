@@ -545,7 +545,7 @@ int DrawableGridNode::WalkVisibilityQuadrants(void* stream, void* screenMatrix, 
                         } else if (child->childMask) {
                             child->childMask = 0;
                             changed = 1;
-                            child->UnknownFunction464e90();
+                            child->OnMaskCleared();
                         }
                     }
                 }
@@ -564,7 +564,7 @@ int DrawableGridNode::WalkVisibilityQuadrants(void* stream, void* screenMatrix, 
                 if (child && child->childMask) {
                     child->childMask = 0;
                     changed = 1;
-                    child->UnknownFunction464e90();
+                    child->OnMaskCleared();
                 }
             }
         }
@@ -594,6 +594,6 @@ int DrawableGridNode::WalkVisibilityQuadrants(void* stream, void* screenMatrix, 
         } while (node);
     }
     if (oldMask != 0 && childMask == 0)
-        UnknownFunction464e90();
+        OnMaskCleared();
     return count;
 }

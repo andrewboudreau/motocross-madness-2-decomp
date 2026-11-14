@@ -204,7 +204,7 @@ public:
 
 // The 0x94-byte records at KrustyUI+0x50 (+0x54 counts them) as OptionsDlg
 // reads them.
-struct UnknownOptKrustyUIRecord {
+struct OptionsBikeRecord {
     unsigned char field_0x00[0x8c];
     int engineSize;                           // +0x8c: engine size (cc), as KrustyUI's bike table
     unsigned char field_0x90[0x94 - 0x90];

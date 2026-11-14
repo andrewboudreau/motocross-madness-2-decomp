@@ -42,7 +42,7 @@ TextureMap* TerrainLoadTexture(TextureMapManager* manager, const char* name, int
                                   unsigned int key, int addRef, int fromArchive)
 {
     char* paletteName = 0;
-    UnknownTexturePalette* texturePalette = 0;
+    TextureColorMapperView* texturePalette = 0;
     int fromFile = 1;
     void* surfacePalette = 0;
     TgaFile* file = 0;
@@ -80,7 +80,7 @@ TextureMap* TerrainLoadTexture(TextureMapManager* manager, const char* name, int
                     texturePalette = 0;
                     surfacePalette = 0;
                 } else {
-                    texturePalette = (UnknownTexturePalette*)palette->colorMapper;
+                    texturePalette = (TextureColorMapperView*)palette->colorMapper;
                     surfacePalette = palette->ddPalette;
                 }
                 entry->archive->Seek(position, 0, 0);
@@ -115,7 +115,7 @@ failed:
         }
     }
     if (palette) {
-        texturePalette = (UnknownTexturePalette*)palette->colorMapper;
+        texturePalette = (TextureColorMapperView*)palette->colorMapper;
         surfacePalette = palette->ddPalette;
         map->sourcePalette = palette;
         if (addRef)

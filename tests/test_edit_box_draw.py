@@ -211,7 +211,7 @@ class EditBoxDrawTests(unittest.TestCase):
                 'sizeof(UIDialog)==0x7f58 && offsetof(UIDialog,drawClipRegion)==0x7f00 && '
                 'offsetof(UIDialog,previousFont)==0x7f04 && '
                 'offsetof(BackgroundImage,heldDcSurface)==0x6c && offsetof(BackgroundImage,regionTable)==0x50 && '
-                'sizeof(UnknownBackgroundRegion)==64 && offsetof(PCRenderTarget,renderSurface)==0x48)?1:-1];\n')
+                'sizeof(BackgroundRegion)==64 && offsetof(PCRenderTarget,renderSurface)==0x48)?1:-1];\n')
             compile_source(layout,'layout')
             spec=json.loads((ROOT/'config/game_build.json').read_text())
             built=game_compile(ROOT/SOURCE,output/'game-command',compiler,[ROOT/p for p in spec['includes']],spec['profile'],{**os.environ,'PYTHONPATH':str(ROOT)})

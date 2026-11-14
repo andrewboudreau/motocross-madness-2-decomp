@@ -62,7 +62,7 @@ struct KbGate {
 extern Vec3 g_kbZeroVec;
 
 // Object reached through the global at 0x0056E26C (game/session singleton).
-struct KbTrackRec { Vec3 field_0x00; char pad_0x0C[0xC]; };
+struct KbTrackRec { Vec3 position; char pad_0x0C[0xC]; };
 struct KbMode { char pad_0x00[0x94]; int GetSelectedSeries(); };
 struct KbGameCfg {
     char pad_0x0000[0x10]; int isHost;  // +0x10 NetworkInterface::isHost (Net.h)

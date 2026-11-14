@@ -18,14 +18,14 @@
 // otherwise, and the object's materials get the matching alpha flag.
 
 #include "D3DIMSoultreeModifier.h"
-#include "MorphBastardModifier.h"   // UnknownSoultreeMesh
+#include "MorphBastardModifier.h"   // ModifierSoultreeSurfaceView
 
 class TransparencyMod : public D3DIMSoultreeModifier {
 public:
     explicit TransparencyMod(int flags);       // 0x005206a0 (ret 4)
     virtual ~TransparencyMod();                // 0x00520810 (deleting wrapper 0x005206d0)
-    virtual void ModifyMesh(D3DIMSoultreeObject* object, UnknownSoultreeMesh* mesh,
-                            UnknownSoultreeMesh** out); // 0x005206f0
+    virtual void ModifyMesh(D3DIMSoultreeObject* object, ModifierSoultreeSurfaceView* mesh,
+                            ModifierSoultreeSurfaceView** out); // 0x005206f0
 
     int appliedState;                          // +0x40 state last applied to a whole level of detail
     int isTransparent;                         // +0x44 1: transparent

@@ -51,7 +51,7 @@ void SetTaskSwitchAllowed(int value);
 // shadow boundaries it calls are declared here; their names are provisional.
 
 // The Soultree object at a character's +0x1a0.
-struct UnknownKrustyUISoultree {
+struct KrustyUISoultreeObjectView {
     void SetPosition(const Vector3* position);   // 0x004fc660
     void SetAxes(float a, float b, float c, float d, float e, float f, float g,
                                int h);                     // 0x004fbd10
@@ -80,7 +80,7 @@ public:
     int AdvanceMotion(float time, int a, int b);   // 0x004a6bb0: advances it
 
     unsigned char field_0x008[0x1a0 - 0x8];
-    UnknownKrustyUISoultree* modelNode;           // +0x1a0
+    KrustyUISoultreeObjectView* modelNode;           // +0x1a0
     unsigned char field_0x1a4[0x214 - 0x1a4];
 };
 
@@ -213,7 +213,7 @@ GameObject* KrustyUI::Create(RenderTarget* target, int showIntro) {
         strncpy(font, "Arial", count);
     }
     font[count] = 0;
-    gui = new(__FILE__, 121) UnknownKrustyUIGui(1);
+    gui = new(__FILE__, 121) KrustyUIGuiManager(1);
     if (!AppendSibling(gui->SetUp(
             renderContext, (Palette8*)g_TrackGame->display->palette, g_TrackGame->textureManager, 0,
             0, 0, "Arial", 15, "ui\\cursor.tga", (int)GuiProgressCallback), -1)) {
@@ -240,8 +240,8 @@ GameObject* KrustyUI::Create(RenderTarget* target, int showIntro) {
     g_TrackGame->mode.LoadProfile();
     gui->uiAnimations = g_TrackGame->mode.uiAnimations;
     if (!g_TrackGame->mode.toolTips) {
-        UnknownKrustyUIToolTipView* view =
-            (UnknownKrustyUIToolTipView*)gui->GetUser(0)->userToolTip;
+        KrustyUIToolTipView* view =
+            (KrustyUIToolTipView*)gui->GetUser(0)->userToolTip;
         view->enabled = 0;
     }
     if (g_TrackGame->controlInterface->activeJoystick)
@@ -385,7 +385,7 @@ void KrustyUI::BuildGarageScene(int value) {
         BikeNumberPainter painter(g_TrackGame->textureContext);
         for (int i = 0; i < manufacturerCount; i++) {
             sprintf(text, "Animations\\UIbike\\%s", KRUSTYUI_MODELS[i].uiModelFile);
-            KRUSTYUI_MODELS[i].uiModel = reinterpret_cast<UnknownKrustyUIModelObject*>(new(__FILE__, 0x1b4) D3DIMSoultreeCharacter(0));
+            KRUSTYUI_MODELS[i].uiModel = reinterpret_cast<SelectGameD3DIMSoultreeCharacterView*>(new(__FILE__, 0x1b4) D3DIMSoultreeCharacter(0));
             garageScene->AppendChild(
                 KRUSTYUI_MODEL_CHARACTER(i)->LoadCharacter(renderContext, text, lights,
                                                                       &g_TrackGame->textureContext,
@@ -880,7 +880,7 @@ int KrustyUI::ResolveRiderFile(const char* name, char* text, int size) {
 
 // 0x0049ba70
 int KrustyUI::AddEntry(int directoryIndex, int scene, int series, const char* name, int fileTime, int fileSize) {
-    entries = (UnknownKrustyUIEntry*)ResizeDebugBlock(entries, (entryCount + 1) * sizeof(UnknownKrustyUIEntry));
+    entries = (KrustyUITrackEntry*)ResizeDebugBlock(entries, (entryCount + 1) * sizeof(KrustyUITrackEntry));
     entries[entryCount].directoryIndex = directoryIndex;
     entries[entryCount].scene = scene;
     entries[entryCount].series = series;
@@ -987,7 +987,7 @@ void KrustyUI::PickRandomRacers(int* bikeChoices, int count, int* riderChoices) 
     int* usedBikes = (int*)DebugCalloc(bikeCount, sizeof(int), __FILE__, 1164);
     int* usedRiders = (int*)DebugCalloc(riderCount, sizeof(int), __FILE__, 1165);
     int playerClass = BikeClassOf(
-        ((UnknownTrackGameModeOptionsFd8*)g_TrackGame->mode.garageOptions)->engineSize);
+        ((TrackGameGarageOptions*)g_TrackGame->mode.garageOptions)->engineSize);
     srand(ReadClock());
     int i;
     for (i = 0; i < riderCount; i++) {

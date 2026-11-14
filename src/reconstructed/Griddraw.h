@@ -362,7 +362,7 @@ public:
                           int minLevel);                   // 0x00483200 (ret 0x18)
     void PropagateBorderChange(DrawableGridNode* child, int x, int z, int flag, int dir,
                                GridBaseCell* cell);             // 0x004835c0 (ret 0x18)
-    void UnknownFunction464e90();                               // 0x00464e90 (shared empty body)
+    void OnMaskCleared();                               // 0x00464e90 (shared empty body)
 
     GridTerrain* terrain;                      // +0x34
     GridNodeDrawData* data;                    // +0x38

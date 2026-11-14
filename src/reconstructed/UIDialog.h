@@ -20,7 +20,7 @@ class GUIUser;
 class BackgroundImage;
 class PCTextureMap;
 class FileStream;
-struct UnknownCursorAnimation;
+struct CursorUIAnimView;
 struct DialogEvent;
 
 // One .dtm section of a dialog (0x3c bytes; the table is at UIDialog+0x9cc):
@@ -158,7 +158,7 @@ public:
     int field_0x184;
     int field_0x188;
     UIAnim* imageTable[500];                  // +0x18c: the "Set_Anim" sections' images
-    UnknownCursorAnimation* cursorAnimation;  // +0x95c: the cursor over it
+    CursorUIAnimView* cursorAnimation;  // +0x95c: the cursor over it
     Sound* soundTable[20];                    // +0x960: the "Set_Sound" sections' sounds
     int imageCount;                           // +0x9b0
     int soundCount;                           // +0x9b4

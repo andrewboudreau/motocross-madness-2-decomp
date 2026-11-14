@@ -51,10 +51,10 @@ static inline Vector3& operator*=(Vector3& v, float scale) {
 static const Vector3 kVec3YAxis = Vector3(0.0f, 1.0f, 0.0f);
 
 // 0x004a8b10, the model's SetMotionByName, is Character::SetMotionByName
-// (Motnctrl.cpp); SelectGamePicProcs.h's UnknownKrustyUIModelObject view declares it
+// (Motnctrl.cpp); SelectGamePicProcs.h's SelectGameD3DIMSoultreeCharacterView view declares it
 // under its own name, which nothing defines. Retail passes the model pointer
 // unchanged as `this`, so call the defined one on the same pointer.
-static inline void PlayModelMotion(UnknownKrustyUIModelObject* model, const char* motion) {
+static inline void PlayModelMotion(SelectGameD3DIMSoultreeCharacterView* model, const char* motion) {
     reinterpret_cast<Character*>(model)->SetMotionByName(motion);
 }
 

@@ -33,7 +33,7 @@ class Cube;
 class ManagedTextureGroup;
 class RenderTarget;
 class FileStream;
-struct UnknownCubeTextureContext;
+struct CubeTextureContextView;
 
 // 0x20-byte lit vertex (FVF 0x1e2: position, reserved, diffuse, specular,
 // one texture coordinate pair), the D3DLVERTEX layout.
@@ -56,7 +56,7 @@ struct UnknownCubeTextureMapping {
 
 // The camera fields 0x0043e330 reads (Camera.h keeps them protected): the
 // view matrix's third column (+0xb4, +0xc4, +0xd4) and the position.
-struct UnknownCubeCameraView {
+struct CubeCameraView {
     unsigned char field_0x000[0xac];
     Matrix4 viewMatrix;                       // view matrix
     unsigned char field_0x0ec[0x170 - 0xec];
@@ -65,7 +65,7 @@ struct UnknownCubeCameraView {
 
 // The object at 0x00575a98 (TrackOverlay.h and Griddraw.h view other
 // members of it). Tier 3 semantics.
-class UnknownCubeClipper {
+class CubeVisibilityClipperView {
 public:
     // 0x0052f0a0: transforms `count` points of `source` by `matrix`.
     void TransformPoints(Vector3* destination, Vector3* source, Matrix4* matrix, int count);
@@ -86,10 +86,10 @@ public:
 
     // 0x0043d980: reads the palettes and cubes listed in `stream`.
     DrawableCube* Load(void* value, FileStream* stream,
-                                        UnknownCubeTextureContext* context);
+                                        CubeTextureContextView* context);
     int BuildFaceGeometry();              // 0x0043dc60: builds the face geometry
     // 0x0043e0b0: loads the cube's textures and sets the cells' texture coordinates.
-    int LoadTexturesAndCoords(Cube* cube, UnknownCubeTextureContext* context);
+    int LoadTexturesAndCoords(Cube* cube, CubeTextureContextView* context);
     int RecordTextureUse();                   // 0x0043e210: records texture use
     void MarkVisibleCells();             // 0x0043e330: marks the visible cells
 

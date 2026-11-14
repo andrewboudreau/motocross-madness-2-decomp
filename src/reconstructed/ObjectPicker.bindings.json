@@ -21,7 +21,7 @@
   "?QueryCollisions@CollisionObject@@QAEHXZ": "0x00438e70",
   "?NextBindingId@ControlInterface@@QAEHXZ": "0x0043ce90",
   "?CreateBound@GameCursor@@QAEPAVGameObject@@PAXPAUControlBinding@@1PBDPAVTextureMapManager@@PAVBackgroundImage@@0PAVPalette8@@@Z": "0x0043ea70",
-  "?CursorPosition@GameCursor@@QAE?AUUnknownCursorPosition@@XZ": "0x0043f100",
+  "?CursorPosition@GameCursor@@QAE?AUCursorPixelPosition@@XZ": "0x0043f100",
   "?AppendChild@GameObject@@QAEHPAV1@H@Z": "0x00469190",
   "?AttachBinding@MouseDevice@@QAEHPAUControlBinding@@@Z": "0x0048a420",
   "?Create@ObjectPicker@@QAEPAV1@PAXPAVTextureMapManager@@P6AXPAVCollisionObject@@2@ZPAVGameCursor@@@Z": "0x004b0210",

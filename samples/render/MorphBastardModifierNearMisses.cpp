@@ -292,8 +292,8 @@ MorphBastardModifier* MorphBastardModifier::LoadParameterFile(void* value, const
 }
 
 // 0x004a4c60
-void MorphBastardModifier::ModifyMesh(D3DIMSoultreeObject* object, UnknownSoultreeMesh* mesh,
-                                      UnknownSoultreeMesh** out)
+void MorphBastardModifier::ModifyMesh(D3DIMSoultreeObject* object, ModifierSoultreeSurfaceView* mesh,
+                                      ModifierSoultreeSurfaceView** out)
 {
     if (((MorphBastardSoultreeView*)object)->drawUnchanged) {
         *out = mesh;

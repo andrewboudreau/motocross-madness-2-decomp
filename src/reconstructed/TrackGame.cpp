@@ -56,7 +56,7 @@ extern "C" __declspec(dllimport) void __stdcall GlobalMemoryStatus(MemoryStatus*
 
 // EBUEula.dll's entry point: shows the EULA for the registry key; nonzero
 // when accepted.
-typedef int (*UnknownEulaProc)(const char* key, const char* path, int a, int b);
+typedef int (*EulaEntryProc)(const char* key, const char* path, int a, int b);
 
 // IMM32, called through the linker's import thunks.
 extern "C" void* __stdcall ImmGetContext(void* window);
@@ -175,7 +175,7 @@ int TrackGame::Startup() {
     void* library = LoadLibraryA("EBUEula.dll");
     if (!library)
         return 0;
-    UnknownEulaProc eula = (UnknownEulaProc)GetProcAddress(library, "EBUEula");
+    EulaEntryProc eula = (EulaEntryProc)GetProcAddress(library, "EBUEula");
     if (!eula) {
         FreeLibrary(library);
         return 0;

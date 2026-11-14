@@ -480,5 +480,5 @@ float VehicleCamera::GetRoll() {
 
 // 0x0052d010
 bool VehicleCamera::ShouldFollowSubject() {
-    return FollowCamera::ShouldFollowSubject() || UnknownInlineIdle();
+    return FollowCamera::ShouldFollowSubject() || IsSubjectUncrashed();
 }

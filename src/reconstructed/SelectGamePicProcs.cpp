@@ -127,7 +127,7 @@ struct RemovePlayerMessage {
 };
 
 // A racer's random grid key (12 bytes; 0x004f2340 sorts them).
-struct UnknownGridDraw {
+struct GridDrawKey {
     int playerId;                             // +0x00: player id
     float key;                                // +0x04: random key
     char racerIndex;                          // +0x08: racer index
@@ -157,8 +157,8 @@ struct LobbyStartMessage {
 
 // A grid entry at race settings +0x14c (TrackGame.h's
 // GridEntry) with the racer index at +5.
-struct UnknownGridEntry {
-    UnknownGridEntry() {
+struct SelectGameGridEntryView {
+    SelectGameGridEntryView() {
         playerId = 0;
         points = 0;
     }
@@ -329,8 +329,8 @@ int CompareGridEntries(const void* a, const void* b) {
 
 // 0x004f20a0: qsort order of the grid draws, by the key, largest first.
 int CompareGridDraws(const void* a, const void* b) {
-    const UnknownGridDraw* x = (const UnknownGridDraw*)a;
-    const UnknownGridDraw* y = (const UnknownGridDraw*)b;
+    const GridDrawKey* x = (const GridDrawKey*)a;
+    const GridDrawKey* y = (const GridDrawKey*)b;
     if (x->key > y->key)
         return -1;
     if (x->key == y->key)
@@ -602,10 +602,10 @@ void MultiPlayerDlg::EnableReadyControls() {
             bikeRiderPage->FindControl("BikeLeft", 0)->Show(0, 1);
             bikeRiderPage->FindControl("BikeRight", 0)->Show(0, 1);
             bikeRiderPage->FindControl("DDLEngineSize", 0)->SetEnabled(0);
-            static_cast<UIDropDownList*>(bikeRiderPage->FindControl("DDLEngineSize", 0))->UnknownInlineButton()->Show(0, 1);
+            static_cast<UIDropDownList*>(bikeRiderPage->FindControl("DDLEngineSize", 0))->GetButtonPart()->Show(0, 1);
             if (g_TrackGame->network->isHost) {
                 bikeRiderPage->FindControl("LargestOpponentDropDown", 0)->SetEnabled(0);
-                static_cast<UIDropDownList*>(bikeRiderPage->FindControl("LargestOpponentDropDown", 0))->UnknownInlineButton()
+                static_cast<UIDropDownList*>(bikeRiderPage->FindControl("LargestOpponentDropDown", 0))->GetButtonPart()
                     ->Show(0, 1);
             }
         }
@@ -619,10 +619,10 @@ void MultiPlayerDlg::EnableReadyControls() {
             bikeRiderPage->FindControl("BikeLeft", 0)->Show(1, 1);
             bikeRiderPage->FindControl("BikeRight", 0)->Show(1, 1);
             bikeRiderPage->FindControl("DDLEngineSize", 0)->SetEnabled(1);
-            static_cast<UIDropDownList*>(bikeRiderPage->FindControl("DDLEngineSize", 0))->UnknownInlineButton()->Show(1, 1);
+            static_cast<UIDropDownList*>(bikeRiderPage->FindControl("DDLEngineSize", 0))->GetButtonPart()->Show(1, 1);
             if (g_TrackGame->network->isHost) {
                 bikeRiderPage->FindControl("LargestOpponentDropDown", 0)->SetEnabled(1);
-                static_cast<UIDropDownList*>(bikeRiderPage->FindControl("LargestOpponentDropDown", 0))->UnknownInlineButton()
+                static_cast<UIDropDownList*>(bikeRiderPage->FindControl("LargestOpponentDropDown", 0))->GetButtonPart()
                     ->Show(1, 1);
             }
         }
@@ -1496,7 +1496,7 @@ void MPEventDlg::HandleEvent(DialogEvent* event) {
     switch (event->kind) {
     case kDialogInit: {
         selectTrackByName = 0;
-        UnknownRaceSettings* settings = (UnknownRaceSettings*)&g_TrackGame->mode.raceSettings.raceMode;
+        SelectGameRaceSettingsView* settings = (SelectGameRaceSettingsView*)&g_TrackGame->mode.raceSettings.raceMode;
         UIListBox* list = static_cast<UIDropDownList*>(FindControl("EventTypeDropDown", 6))->listPart;
         g_TrackGame->LoadResourceString(0x13ed, text, 0x80);
         list->AddRow(text, 1, 0);
@@ -1571,7 +1571,7 @@ void MPEventDlg::HandleEvent(DialogEvent* event) {
             EnableChangeableControls();
         } else if (!_stricmp("DDLTextBox", event->controlName)) {
             int index = static_cast<UIListBox*>(event->control)->GetRowData(-1);
-            UnknownRaceSettings* settings = (UnknownRaceSettings*)&g_TrackGame->mode.raceSettings.raceMode;
+            SelectGameRaceSettingsView* settings = (SelectGameRaceSettingsView*)&g_TrackGame->mode.raceSettings.raceMode;
             g_TrackGame->mode.SelectSeries(g_TrackGame->ui->entries[index].series);
             {
                 char* name = g_TrackGame->ui->entries[index].fileName;
@@ -1606,12 +1606,12 @@ void MPEventDlg::EnableChangeableControls() {
         ((UIControl*)control)->SetEnabled(enable);
     if (enable) {
         ShowGroup(0x141, 1);
-        static_cast<UIDropDownList*>(FindControl("EventTypeDropDown", 6))->UnknownInlineButton()->Show(1, 1);
-        static_cast<UIDropDownList*>(FindControl("RaceModeDropDown", 6))->UnknownInlineButton()->Show(1, 1);
+        static_cast<UIDropDownList*>(FindControl("EventTypeDropDown", 6))->GetButtonPart()->Show(1, 1);
+        static_cast<UIDropDownList*>(FindControl("RaceModeDropDown", 6))->GetButtonPart()->Show(1, 1);
     } else {
         ShowGroup(0x141, 0);
-        static_cast<UIDropDownList*>(FindControl("EventTypeDropDown", 6))->UnknownInlineButton()->Show(0, 1);
-        static_cast<UIDropDownList*>(FindControl("RaceModeDropDown", 6))->UnknownInlineButton()->Show(0, 1);
+        static_cast<UIDropDownList*>(FindControl("EventTypeDropDown", 6))->GetButtonPart()->Show(0, 1);
+        static_cast<UIDropDownList*>(FindControl("RaceModeDropDown", 6))->GetButtonPart()->Show(0, 1);
         if (g_TrackGame->network->isHost && !(g_TrackGame->mode.lobbyPresetFlags & 2)) {
             FindControl("DDLTextBox", 6)->SetEnabled(1);
             FindControl("TrackLeft", 0)->SetEnabled(1);
@@ -1752,7 +1752,7 @@ void MPEventDlg::ApplyEventType() {
 
 // 0x004f7210
 void MPEventDlg::SyncValues(int apply) {
-    UnknownRaceSettings* settings = (UnknownRaceSettings*)&g_TrackGame->mode.raceSettings.raceMode;
+    SelectGameRaceSettingsView* settings = (SelectGameRaceSettingsView*)&g_TrackGame->mode.raceSettings.raceMode;
     if (!g_TrackGame->network || !g_TrackGame->network->isHost)
         return;
     if (apply) {
@@ -2041,10 +2041,10 @@ void MPBikeRiderDlg::ApplyLargestOpponentClass() {
 void MPBikeRiderDlg::EnableLargestOpponent() {
     if (g_TrackGame->network->isHost) {
         FindControl("LargestOpponentDropDown", 0)->SetEnabled(1);
-        static_cast<UIDropDownList*>(FindControl("LargestOpponentDropDown", 6))->UnknownInlineButton()->Show(1, 1);
+        static_cast<UIDropDownList*>(FindControl("LargestOpponentDropDown", 6))->GetButtonPart()->Show(1, 1);
     } else {
         FindControl("LargestOpponentDropDown", 0)->SetEnabled(0);
-        static_cast<UIDropDownList*>(FindControl("LargestOpponentDropDown", 6))->UnknownInlineButton()->Show(0, 1);
+        static_cast<UIDropDownList*>(FindControl("LargestOpponentDropDown", 6))->GetButtonPart()->Show(0, 1);
     }
 }
 

@@ -3,7 +3,7 @@
   "?RequestHover@UIDialog@@QAEHPAVUIControl@@HH@Z": "0x00470000",
   "?PreviousFocusableControl@UIControl@@QAEPAV1@XZ": "0x004727c0",
   "?NextFocusableControl@UIControl@@QAEPAV1@XZ": "0x00472810",
-  "?SetCursorAnimation@GUIUser@@QAEXPAUUnknownCursorAnimation@@@Z": "0x00487fb0",
+  "?SetCursorAnimation@GUIUser@@QAEXPAUCursorUIAnimView@@@Z": "0x00487fb0",
   "?GetAcceptedDevice@GUIUser@@QAEPAVGUIInputDevice@@H@Z": "0x00488310",
   "?Tick@GameObject@@UAEHM@Z": "0x004693d0",
   "?Tick@UIDialog@@UAEHM@Z": "0x0046ef00",

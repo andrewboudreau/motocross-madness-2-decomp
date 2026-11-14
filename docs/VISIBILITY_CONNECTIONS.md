@@ -8,11 +8,11 @@ or establish that the game can render a frame.
 
 | Previous declaration | Existing method | Complete retail extent | Strict caller and direct site |
 | --- | --- | --- | --- |
-| `UnknownCubeClipper::TransformPoints` | `VisibilityClipper::TransformVectors` | `0x52f0a0`, 156 bytes | `DrawableCube::MarkVisibleCells`, 398 bytes; `0x43e43b` |
-| `UnknownCubeClipper::CanFaceCamera` | `VisibilityClipper::TestDot` | `0x52f140`, 72 bytes | same caller; `0x43e3c1` |
-| `UnknownCubeClipper::IsQuadOnScreen` | `VisibilityClipper::CullQuad` | `0x52f4d0`, 155 bytes | same caller; `0x43e46e` |
-| `UnknownFollowCameraProjector::ProjectPoint` | `VisibilityClipper::ProjectPoint` | `0x52f340`, 389 bytes | `FollowCamera::SteerToKeepPointsOnScreen`, 780 bytes; `0x463754` |
-| `UnknownProjector::ProjectPoint` | same `ProjectPoint` | same 389 bytes | `NameOverlay::UnknownVirtualSlot14`, 654 bytes; `0x519300` |
+| `CubeVisibilityClipperView::TransformPoints` | `VisibilityClipper::TransformVectors` | `0x52f0a0`, 156 bytes | `DrawableCube::MarkVisibleCells`, 398 bytes; `0x43e43b` |
+| `CubeVisibilityClipperView::CanFaceCamera` | `VisibilityClipper::TestDot` | `0x52f140`, 72 bytes | same caller; `0x43e3c1` |
+| `CubeVisibilityClipperView::IsQuadOnScreen` | `VisibilityClipper::CullQuad` | `0x52f4d0`, 155 bytes | same caller; `0x43e46e` |
+| `FollowCameraVisibilityClipperView::ProjectPoint` | `VisibilityClipper::ProjectPoint` | `0x52f340`, 389 bytes | `FollowCamera::SteerToKeepPointsOnScreen`, 780 bytes; `0x463754` |
+| `OverlayVisibilityClipperView::ProjectPoint` | same `ProjectPoint` | same 389 bytes | `NameOverlay::UnknownVirtualSlot14`, 654 bytes; `0x519300` |
 
 `CullQuad` calls the existing complete 234-byte `CullPolygon` at `0x52fac0`.
 All five provider bodies and the three affected callers remain strict with

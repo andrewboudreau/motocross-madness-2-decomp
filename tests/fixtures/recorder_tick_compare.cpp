@@ -28,7 +28,7 @@ static void EventAt(int kind,int a=0,int b=0,int c=0,int d=0,int e=0){
         switch(scenario.mutation){
         case 0:v->recordPending=!v->recordPending;v->readingReverse=!v->readingReverse;v->readsReset=!v->readsReset;v->reverseReadRestarted=!v->reverseReadRestarted;v->recordTimeMs^=0x12345678;v->recordId^=0x7654;v->recordType=-1;break;
         case 1:v->recordBuffer=world.buffers[1];v->frameRing=(VCR*)world.rings[1];break;
-        case 2:((UnknownRecorderRecord*)v->recordBuffer)->count=2;((UnknownRecorderRecord*)v->recordBuffer)->time=-.0009999f;break;
+        case 2:((RecorderRecordHeader*)v->recordBuffer)->count=2;((RecorderRecordHeader*)v->recordBuffer)->time=-.0009999f;break;
         case 3:v->recordCallback=0;break;
         }
     }
@@ -44,8 +44,8 @@ int VCRInterface::TakeRecord(int* type,int* id,int* position,void* data,unsigned
     if(index>=5)result=4; // Finite source of records, including malformed negative counts.
     EventAt(3,Buffer(data),position==&recordPosition,signal,result,index);
     if(!result){
-        *type=index==0?scenario.recordType:((scenario.seed&1)?-1:10);*id=0x170+index;*position=0x1280+index*31;*size=sizeof(UnknownRecorderRecord);
-        UnknownRecorderRecord* r=(UnknownRecorderRecord*)data;r->time=scenario.time;r->field_0x04=0x416000+index;r->count=scenario.count;
+        *type=index==0?scenario.recordType:((scenario.seed&1)?-1:10);*id=0x170+index;*position=0x1280+index*31;*size=sizeof(RecorderRecordHeader);
+        RecorderRecordHeader* r=(RecorderRecordHeader*)data;r->time=scenario.time;r->field_0x04=0x416000+index;r->count=scenario.count;
     }
     return result;
 }
@@ -108,7 +108,7 @@ static void Run(int retail){
     for(unsigned n=0;n<sizeof(world);++n)((BYTE*)&world)[n]=(BYTE)(Random(seed)>>24);
     VCRInterface* v=Vcr();v->recordMode=scenario.mode;v->fileReady=scenario.ready;v->readingReverse=scenario.reverse;v->readsReset=scenario.reset;v->reverseReadRestarted=scenario.restarted;v->recordPending=scenario.pending;
     v->recordBuffer=world.buffers[0];v->frameRing=(VCR*)world.rings[0];v->recordCallback=Callback;v->recordType=scenario.recordType;v->recordId=0x123;v->recordTimeMs=-234;v->recordPosition=0x8192;
-    for(int i=0;i<2;++i){((UnknownRecorderRecord*)world.buffers[i])->time=scenario.time;((UnknownRecorderRecord*)world.buffers[i])->count=scenario.count;}
+    for(int i=0;i<2;++i){((RecorderRecordHeader*)world.buffers[i])->time=scenario.time;((RecorderRecordHeader*)world.buffers[i])->count=scenario.count;}
     if(scenario.invalid==1)v->recordCallback=0;
     if(scenario.invalid==2)v->recordBuffer=0;
     _control87(_MCW_EM|_PC_64|(scenario.round<<8),_MCW_EM|_MCW_PC|_MCW_RC);_clear87();

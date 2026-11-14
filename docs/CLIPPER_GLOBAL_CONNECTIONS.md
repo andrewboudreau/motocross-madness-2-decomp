@@ -6,9 +6,9 @@ same retail pointer cell at `0x00575a98`. This removes six duplicate unresolved
 names; it does **not** supply that cell, its pointed-to object, or another
 clipper method.
 
-The retired pointer types are `D3DIMShadowClipper`, `UnknownCubeClipper`,
-`EcoVisibilityClipperView`, `UnknownFollowCameraProjector`,
-`GridVisibilityClipper`, and `UnknownProjector`. The last view used the variable
+The retired pointer types are `D3DIMShadowClipper`, `CubeVisibilityClipperView`,
+`EcoVisibilityClipperView`, `FollowCameraVisibilityClipperView`,
+`GridVisibilityClipper`, and `OverlayVisibilityClipperView`. The last view used the variable
 name `g_UnknownGlobal575a98`; the other five used `g_visibilityClipper`.
 All now import `?g_visibilityClipper@@3PAVVisibilityClipper@@A`.
 The provisional classes remain separate. Shared pointer storage does not prove

@@ -199,7 +199,7 @@ static inline void WreckerStepModel(ConstraintMethodCollisionModel* model, float
 
 // In-place inverse of a rigid transform (the InvertRigid helper of
 // src/krusty2/bvh/BoundingBoxTreeQuery.h on a Matrix4).
-static inline void WreckerInvertRigid(UnknownWreckerMatrix* m) {
+static inline void WreckerInvertRigid(WreckerD3DMatrix* m) {
     float swap;
     swap = m->_12; m->_12 = m->_21; m->_21 = swap;
     swap = m->_13; m->_13 = m->_31; m->_31 = swap;
@@ -214,7 +214,7 @@ static inline void WreckerInvertRigid(UnknownWreckerMatrix* m) {
 }
 
 // Rebuilds the rotation rows of a pose from its up and forward rows.
-static inline void WreckerOrthonormalize(UnknownWreckerMatrix* m) {
+static inline void WreckerOrthonormalize(WreckerD3DMatrix* m) {
     Vec3 up = Vec3(m->_21, m->_22, m->_23);
     Vec3 forward = Vec3(m->_31, m->_32, m->_33);
     forward = Vec3Normalize(forward);
@@ -240,7 +240,7 @@ static inline void WreckerOrthonormalize(UnknownWreckerMatrix* m) {
 // can change under it: the member pose (a, rep movsd) in the first product
 // of slot 10 and the output itself (b) in the second; an unmodified local
 // is read in place.
-static inline void WreckerMatrixProduct(UnknownWreckerMatrix* out, UnknownWreckerMatrix a, UnknownWreckerMatrix b) {
+static inline void WreckerMatrixProduct(WreckerD3DMatrix* out, WreckerD3DMatrix a, WreckerD3DMatrix b) {
     out->_11 = a._11 * b._11 + a._21 * b._12 + a._31 * b._13 + a._41 * b._14;
     out->_12 = a._12 * b._11 + a._22 * b._12 + a._32 * b._13 + a._42 * b._14;
     out->_13 = a._13 * b._11 + a._23 * b._12 + a._33 * b._13 + a._43 * b._14;
@@ -346,7 +346,7 @@ int Wrecker::Tick(float frameTime) {
         }
         if (wreckState) {
             if (wreckState == 1) {
-                UnknownWreckerMotion* motion = reinterpret_cast<UnknownWreckerMotion*>(character->currentMotion);
+                WreckerMotionView* motion = reinterpret_cast<WreckerMotionView*>(character->currentMotion);
                 if ((float)(motion->frameCount - character->currentFrame->frameIndex) / motion->fps < 0.5f) {
                     ContinueAsTumble();
                     RebuildPoseSteps();
@@ -375,13 +375,13 @@ int Wrecker::Tick(float frameTime) {
     if (carryRiderPose) {
         // Carry the rider's root over by the motion of the wreck node since
         // the pose lastPose was taken, then re-orthonormalise its axes.
-        UnknownWreckerMatrix pose;
-        UnknownWreckerMatrix relative;
+        WreckerD3DMatrix pose;
+        WreckerD3DMatrix relative;
         poseNode->GetMatrixIn(0, reinterpret_cast<Matrix4*>(&pose));
-        UnknownWreckerFrame* frame = &lastPose;
+        WreckerPoseFrame* frame = &lastPose;
         Vector3 oldPosition = WreckerCopy(frame->position);
         WreckerInvertRigid(&pose);
-        WreckerMatrixProduct(&relative, *(UnknownWreckerMatrix*)frame, pose);
+        WreckerMatrixProduct(&relative, *(WreckerD3DMatrix*)frame, pose);
         character->modelNode->GetMatrixIn(0, reinterpret_cast<Matrix4*>(&pose));
         WreckerMatrixProduct(&pose, relative, pose);
         WreckerOrthonormalize(&pose);
@@ -545,7 +545,7 @@ inline Vector3 WreckerCross(const Vector3& a, const Vector3& b) {
 // and the forward copy around the up-row loads (a pointer, a reference to
 // linearStep for the subtract or the reference for up.x alone do the same).
 void Wrecker::RebuildPoseSteps() {
-    UnknownWreckerFrame pose;
+    WreckerPoseFrame pose;
     linearStep = WreckerCopy(lastPose.position);
     poseNode->GetMatrixIn(0, reinterpret_cast<Matrix4*>(&pose));
     linearStep = pose.position - linearStep;

@@ -58,7 +58,7 @@ each complete body both to retail and to its canonical source object:
 | UIEditBox::FilterCharacter | `0x473fc0` | 160 |
 | UIControl::GetName | `0x470df0` | 7 |
 | UIControl::RequestRedraw | `0x470640` | 21 |
-| UnknownSoundNotifier constructor | `0x4bb720` | 26 |
+| SoundRefillNotifier constructor | `0x4bb720` | 26 |
 | Sound::SetVolume | `0x4bcbe0` | 185 |
 | Sound::PlayWithOptions | `0x4bc6b0` | 656 |
 | Sound::IsPlaying | `0x4bca80` | 172 |

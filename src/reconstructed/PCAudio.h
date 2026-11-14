@@ -140,12 +140,12 @@ public:
 
 // 0x1c-byte notification helper a streaming Sound owns at +0x3c: a thread
 // that refills the buffer's halves when DirectSound signals them.
-class UnknownSoundNotifier {
+class SoundRefillNotifier {
 public:
-    UnknownSoundNotifier();                       // 0x004bb720
-    ~UnknownSoundNotifier();                      // 0x004bb810
+    SoundRefillNotifier();                       // 0x004bb720
+    ~SoundRefillNotifier();                      // 0x004bb810
     int StartRefillThread(Sound* sound);                // 0x004bb740: starts the thread
-    static unsigned __stdcall UnknownThreadProc(void* context); // 0x004bb630
+    static unsigned __stdcall RefillThreadProc(void* context); // 0x004bb630
 
     Sound* ownerSound;                 // +0x00
     DirectSoundNotify* notify;        // +0x04
@@ -227,7 +227,7 @@ public:
     Sound* duplicateSource;                  // +0x28: source of a duplicate
     SoundFade fade;                   // +0x2c
     int fadeVolume;                          // +0x38
-    UnknownSoundNotifier* notifier;          // +0x3c
+    SoundRefillNotifier* notifier;          // +0x3c
     FileStream* sourceStream;           // +0x40: stream of a streamed sound
     unsigned long filledHalf;                // +0x44: offset of the half last refilled
     CRITICAL_SECTION bufferLock;                  // +0x48

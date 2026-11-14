@@ -541,7 +541,7 @@ void D3DIMSoultreeObject::TransformVertexGroups(int lod)
         if (secondModifierCount > 0) {
             for (k = 0; k < secondModifierCount; k++)
                 ((D3DIMSoultreeModifier*)secondModifierList[k])->ModifyMesh(
-                    this, (UnknownSoultreeMesh*)surface, (UnknownSoultreeMesh**)&drawn);
+                    this, (ModifierSoultreeSurfaceView*)surface, (ModifierSoultreeSurfaceView**)&drawn);
         } else {
             drawn = surface;
         }
@@ -831,13 +831,13 @@ void D3DIMSoultreeObject::DrawBoxOutline(Vector3 center, Vector3 extents, int fl
 }
 
 // 0x004439c0
-void D3DIMSoultreeObject::DrawScreenRect(UnknownSoultreeScreenRect* rect)
+void D3DIMSoultreeObject::DrawScreenRect(SoultreeScreenRect* rect)
 {
     DDSurfaceDesc2 desc;
     memset(&desc, 0, sizeof(desc));
     desc.size = sizeof(desc);
     ((PCRenderTarget*)renderContext)->renderSurface->Lock(0, &desc, 1, 0);
-    UnknownSoultreeCameraView* camera = (UnknownSoultreeCameraView*)((RenderTarget*)renderContext)->currentCamera;
+    D3DIMSoultreeCameraView* camera = (D3DIMSoultreeCameraView*)((RenderTarget*)renderContext)->currentCamera;
     char* bits = (char*)desc.surface + camera->viewportY * desc.pitch + camera->viewportX;
     int i;
     for (i = rect->left; i < rect->right; i++) {
@@ -879,11 +879,11 @@ void D3DIMSoultreeObject::SelectLod(Vector3* center, Vector3* extents)
         GetSubtreeBounds(reinterpret_cast<Vec3*>(center), reinterpret_cast<Vec3*>(extents));
     }
     float distance = Magnitude(LocalToWorldPoint(*center) -
-                               ((UnknownSoultreeCameraView*)((RenderTarget*)renderContext)->currentCamera)->position);
+                               ((D3DIMSoultreeCameraView*)((RenderTarget*)renderContext)->currentCamera)->position);
     float range = distance - Magnitude(*extents);
     if (0.1f > range)
         range = 0.1f;
-    float scale = ((UnknownSoultreeCameraView*)((RenderTarget*)renderContext)->currentCamera)->imagePlaneDistance / range;
+    float scale = ((D3DIMSoultreeCameraView*)((RenderTarget*)renderContext)->currentCamera)->imagePlaneDistance / range;
     if (useAutoLod) {
         int lod = 0;
         for (int i = 0; i < lodCount - 1; i++) {

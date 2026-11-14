@@ -32,7 +32,7 @@ import struct
 
 RETAIL_VA = 0x0040eca0
 SYMBOL = ('?SimulateLookAhead@@YAHPAUVec3@@000PAM000MMPAVTerrain@@PAE1PAVCollisionObject@@11PAH5'
-          'PAUUnknownBikeAIPath@@1MH@Z')
+          'PAUBikeAIRacingLine@@1MH@Z')
 SOURCE = 'src/bringup/Group3_KrustyBikeAI.cpp'
 TRACK_GAME = 0x0056e26c
 SPEED_TABLE = 0x00566f74           # g_BikeAISpeedTable_00566f74[3][200]

@@ -81,7 +81,7 @@ class SPRaceInfoDlg;
 
 // The texture a bike or rider model object holds at +0x1a0 (0x00444c70
 // names it from `name`).
-class UnknownModelTexture {
+class DialogSoultreeObjectView {
 public:
     void ReplaceMaterialTexture(int index, const char* name, TextureMapManager** textures);
 };
@@ -232,7 +232,7 @@ public:
 };
 
 // The image a dialog resource names (UIDialog 0x0046e9a0 returns its entry).
-class UnknownDialogImage {
+class DialogUIAnimView {
 public:
     int GetCurrentTexture();              // 0x00472f90: the current frame's texture
 };
@@ -353,7 +353,7 @@ struct KrustyVCRHeader {
     unsigned char trackIndex;                 // +0x68: the track index (TrackGame+0x2da4)
     unsigned char networkPlayerCount;        // +0x69: RaceSettings+0x35 (TrackGame+0x2da5)
     char trackName[0x180 - 0x6a];             // +0x6a: the track (TrackGame+0x2da6)
-    UnknownKrustyUISlot gridOrder[8];         // +0x180: RaceSettings::gridOrder (TrackGame+0x2ebc)
+    KrustyUIGridEntryView gridOrder[8];         // +0x180: RaceSettings::gridOrder (TrackGame+0x2ebc)
     unsigned char field_0x1c0[0x229 - 0x1c0];
     char riderName[0x33c - 0x229];            // +0x229: the rider
     int engineSize;                           // +0x33c: garage engine size, copied to TrackGame+0x1550

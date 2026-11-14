@@ -17,7 +17,7 @@ int VCRInterface::Tick(float frameTime) {
     int value;
     int queued;
     unsigned int size;
-    UnknownRecorderRecord* record;
+    RecorderRecordHeader* record;
     int count;
     int result;
 
@@ -90,7 +90,7 @@ int VCRInterface::Tick(float frameTime) {
             Rewind();
             return 1;
         }
-        record = (UnknownRecorderRecord*)recordBuffer;
+        record = (RecorderRecordHeader*)recordBuffer;
         recordTimeMs = (int)(record->time * 1000.0f);
         count = record->count;
         recordPending = 0;
@@ -134,7 +134,7 @@ int VCRInterface::Tick(float frameTime) {
     if (recordType != -1)
         return 1;
     frameRing->AppendPosition(recordPosition, recordTimeMs);
-    record = (UnknownRecorderRecord*)recordBuffer;
+    record = (RecorderRecordHeader*)recordBuffer;
     recordTimeMs = (int)(record->time * 1000.0f);
     count = record->count;
     switch (recordCallback(recordType, recordBuffer, 0, recordId, &keep, recordTimeMs, &milliseconds)) {
@@ -190,7 +190,7 @@ int VCRInterface::Tick(float frameTime) {
                 return 1;
             result = recordCallback(recordType, recordBuffer, 1, recordId, &keep, recordTimeMs, &milliseconds);
             if (result == 1) {
-                record = (UnknownRecorderRecord*)recordBuffer;
+                record = (RecorderRecordHeader*)recordBuffer;
                 recordTimeMs = (int)(record->time * 1000.0f);
                 count = record->count;
                 while (count--) {
@@ -226,7 +226,7 @@ int VCRInterface::Tick(float frameTime) {
                 Rewind();
                 return 1;
             }
-            record = (UnknownRecorderRecord*)recordBuffer;
+            record = (RecorderRecordHeader*)recordBuffer;
             recordTimeMs = (int)(record->time * 1000.0f);
             count = record->count;
         }

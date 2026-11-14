@@ -8,7 +8,7 @@ typedef char FinderArchiveOffset[offsetof(SceneArchiveFinder, sceneArchive) == 0
 typedef char FinderSize[sizeof(SceneArchiveFinder) == 0x394 ? 1 : -1];
 
 void InvokeGuiEmptyHook(GUIManager* manager) {
-    manager->UnknownFunction464e90();
+    manager->OnPaletteChanged();
 }
 void DestroySceneFinder(SceneArchiveFinder* finder) {
     finder->~SceneArchiveFinder();

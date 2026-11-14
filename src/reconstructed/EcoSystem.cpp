@@ -290,7 +290,7 @@ unsigned int Vegetation::ComputeQuadTreeCode(EcoQuadTreeView* tree) {
 
 // 0x004567a0
 void Vegetation::PlaceQuantized(TextureMapManager* textures, unsigned char definition,
-                                       const UnknownEcoCoordinates* coordinates, unsigned char heightParameter,
+                                       const EcoQuantizedPosition* coordinates, unsigned char heightParameter,
                                        unsigned char radiusParameter) {
     definitionIndex = definition;
     quantizedPosition = *coordinates;
@@ -872,7 +872,7 @@ int EcoSystem::PlaceStoredObjects() {
     int i;
     for (i = 0; i < placedCount; i++) {
         unsigned char definitionByte;
-        UnknownEcoCoordinates coordinates;
+        EcoQuantizedPosition coordinates;
         unsigned char heightParameter;
         unsigned char radiusParameter;
         stream->Read(&definitionByte, 1, 1);

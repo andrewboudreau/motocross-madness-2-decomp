@@ -95,7 +95,7 @@ int GameCursor::LoadCursorTexture(const char* image, TextureMapManager* textures
         if (!cursorTexture->CreateSurface(file->bits, width, height, width, width,
                                              file->bitsPerPixel == 16 ? 0x22b : 0x378,
                                              ((PCRenderTarget*)renderContext)->surfacePixelFormat,
-                                             (UnknownTexturePalette*)palette, 4,
+                                             (TextureColorMapperView*)palette, 4,
                                              ((PCRenderTarget*)renderContext)->targetDisplay->surfacePalette, 0, 0, 2, 1, 0,
                                              0x80, 0xff00ff))
             goto failed;
@@ -213,9 +213,9 @@ failed:
 }
 
 // 0x0043f100
-UnknownCursorPosition GameCursor::CursorPosition() {
+CursorPixelPosition GameCursor::CursorPosition() {
     POINT point;
-    UnknownCursorPosition position;
+    CursorPixelPosition position;
 
     if (bindingX && bindingY) {
         point.x = (int)bindingX->currentValue;

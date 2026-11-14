@@ -5,17 +5,17 @@
 
 class Camera;
 class RenderTarget;
-struct UnknownKrustyUIModelObject;
+struct SelectGameD3DIMSoultreeCharacterView;
 
 // Shared GUI manager and user declarations. Legacy view names are aliases;
 // object storage and methods belong to the existing GUI implementations.
 class GUIManager;
 class GUIUser;
-typedef GUIManager UnknownKrustyUIGui;
-typedef GUIUser UnknownKrustyUIGuiLayer;
+typedef GUIManager KrustyUIGuiManager;
+typedef GUIUser KrustyUIGuiUser;
 
 // Tooltip option boundary used without importing the Windows drawing types.
-struct UnknownKrustyUIToolTipView {
+struct KrustyUIToolTipView {
     unsigned char field_0x00[0x5c];
     int enabled;
 };
@@ -25,8 +25,8 @@ class UIDialog;
 
 // 8-byte record; KrustyUI keeps eight at +0x634 (the constructor's loop
 // clears both fields of each).
-struct UnknownKrustyUISlot {
-    UnknownKrustyUISlot() : playerId(0), points(0) {}
+struct KrustyUIGridEntryView {
+    KrustyUIGridEntryView() : playerId(0), points(0) {}
 
     int playerId;
     char points;
@@ -35,7 +35,7 @@ struct UnknownKrustyUISlot {
 // 0x54-byte record in KrustyUI's +0x60 list (appended by 0x0049ba70): a
 // track list row; SelectGamePicProcs.cpp passes the scene number, series and
 // .env name.
-struct UnknownKrustyUIEntry {
+struct KrustyUITrackEntry {
     int directoryIndex;                       // +0x0  the track directory entry (SelectGamePicProcs.cpp passes it to GetEntryStem)
     int scene;                                // +0x04: scene number; copied to the settings' trackNumber
     int series;                               // +0x08
@@ -91,7 +91,7 @@ public:
     void RecordRaceResults();
     void RecordHighScoreTable(int table);                          // 0x0049bc50
 
-    UnknownKrustyUIGui* gui;                  // +0x2c: the GUIManager (constructor 0x00485190)
+    KrustyUIGuiManager* gui;                  // +0x2c: the GUIManager (constructor 0x00485190)
     int returnMenu;                           // +0x30: DlgProcs.cpp saves currentMenu here (events 0x104/0x105) and reopens it
     int previousMenu;                         // +0x34: OpenMenu saves currentMenu here before opening menu 0xd0
     int trackRecordReturnMenu;                // +0x38: menu the 0x911 track-record dialog reopens (0x0045314d); only the constructor writes it (0). Tier 3
@@ -105,7 +105,7 @@ public:
     int bikeCount;                            // +0x54
     void* riders;                             // +0x58: "Rider_%02d" entries
     int riderCount;                           // +0x5c
-    UnknownKrustyUIEntry* entries;            // +0x60: also freed by 0x0049bb80
+    KrustyUITrackEntry* entries;            // +0x60: also freed by 0x0049bb80
     int entryCount;                           // +0x64: entries in +0x60
     // Garage tables per bike class (OptionProcs.cpp's OptGarageDlg), read
     // from presets.pb by 0x0049a540 (keys in the comments).
@@ -120,8 +120,8 @@ public:
     int maxRange[5];                          // +0x450: slider maximum (the largest band maximum)
     GameObject* garageScene;                  // +0x464: the garage scene (built by 0x00498cf0); released by 0x004999b0
     Camera* garageCamera;                     // +0x468: made current while +0x464 is shown
-    UnknownKrustyUIModelObject* riderPreview; // +0x46c: the rider preview (dlgprocs.cpp SPBikeRiderDlg slot 13)
-    UnknownKrustyUIModelObject* garageCharacter; // +0x470: the garage character (dlgprocs.cpp SPBikeRiderDlg slot 10)
+    SelectGameD3DIMSoultreeCharacterView* riderPreview; // +0x46c: the rider preview (dlgprocs.cpp SPBikeRiderDlg slot 13)
+    SelectGameD3DIMSoultreeCharacterView* garageCharacter; // +0x470: the garage character (dlgprocs.cpp SPBikeRiderDlg slot 10)
     Vector3 garageFocus;                      // +0x474: the +0x464 scene's focus (SelectGamePicProcs.cpp)
     unsigned char field_0x480[0x48c - 0x480];
     int profileLoaded;                        // +0x48c: set once a profile is loaded or saved (UiInfo.cpp LoadProfile/SaveProfile)
@@ -135,6 +135,6 @@ public:
     int field_0x4ac;
     int userNameDialogOpen;                   // +0x4b0: set while UserNameDlg is open (DlgProcs.cpp)
     unsigned char field_0x4b4[0x634 - 0x4b4];
-    UnknownKrustyUISlot gridOrder[8];         // +0x634: header +0x180, RaceSettings::gridOrder
+    KrustyUIGridEntryView gridOrder[8];         // +0x634: header +0x180, RaceSettings::gridOrder
     unsigned char field_0x674[0x1364 - 0x674];
 };

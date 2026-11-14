@@ -14,7 +14,7 @@ class Palette8;
 class BackgroundImage;
 class TextureMapManager;
 class PCTextureMap;
-class UnknownCursorAnimation;
+class CursorUIAnimView;
 struct GuiDirectDrawClipper;
 
 // RTTI: GUIUser : GameObject (vtable 0x00554100; 0x1f4 bytes). One of
@@ -43,7 +43,7 @@ public:
     void AcceptKeyboardAndJoysticks();             // 0x00487d00: accepts the keyboard and joysticks
     void ForgetDevices();             // 0x00487d60: forgets every device
     void CreateCursor(const char* image, int visible); // 0x00487dd0: creates the cursor
-    void SetCursorAnimation(UnknownCursorAnimation* animation); // 0x00487fb0: default when null
+    void SetCursorAnimation(CursorUIAnimView* animation); // 0x00487fb0: default when null
     void RecreateCursor(const char* image, int redraw); // 0x00488010: recreates the cursor
     void ReleaseCursor();             // 0x004880c0: releases the cursor
     int SetPointerDevice(GUIInputDevice* device); // 0x00488120: sets the pointer device
@@ -63,7 +63,7 @@ public:
     int keepAnimationPhase;                   // +0xc4: SetCursorAnimation (0x00487fb0) carries the frame, direction and step time over to the new animation when set; the constructor clears it; no other writer is known. Tier 3
     char cursorImage[0x80];                   // +0xc8: cursor image ("cursor.tga")
     char waitImage[0x80];                     // +0x148: wait image ("wait.tga")
-    UnknownCursorAnimation* cursorAnimation;  // +0x1c8
+    CursorUIAnimView* cursorAnimation;  // +0x1c8
     GuiControlView* pendingHoverControl;   // +0x1cc: set by 0x00487730/0x00487790; UpdateFocus passes it to SetHoverControl
     GuiControlView* pendingFocusControl;   // +0x1d0: set by 0x00487790; UpdateFocus passes it to MoveFocus
     GuiControlView* focusControl;          // +0x1d4: focus
@@ -124,7 +124,7 @@ public:
     // 0x004868b0: creates (CreateClipper) and attaches (SetClipper, SetHWnd
     // with the game window) or detaches the primary surface's clipper.
     int EnableWindowClipper(int enable);
-    void UnknownFunction464e90();             // 0x00464e90 (shared empty body)
+    void OnPaletteChanged();             // 0x00464e90 (shared empty body)
 
     int modalDialog;                          // +0x2c the newest modal UIDialog (SwapModalDialog)
     UIDialog* openedDialog;           // +0x30: dialog opened by 0x00485c80

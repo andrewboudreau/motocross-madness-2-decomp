@@ -60,7 +60,7 @@ static inline int ReadRows(FileStream* stream, void* bits, int rowSize, int rows
 // skipped. Other files hold one image, which is halved as the choice asks
 // and handed to slot 4.
 int PCTextureMap::LoadSurface(FileStream* stream, int width, int height, int minimumSize,
-                              int fileFormat, int dataSize, int format, UnknownTexturePalette* palette,
+                              int fileFormat, int dataSize, int format, TextureColorMapperView* palette,
                               int flags, void* surfacePalette, int addressU, int addressV,
                               TextureContext* choice, int alphaThreshold, unsigned int key) {
     int offsets[12];

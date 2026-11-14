@@ -26,6 +26,6 @@ unsigned int UnknownSoultreeQuadTreeObject::QuadTreeVirtualSlot1(void*)
 }
 
 // 0x00464e90: shared empty body.
-void DrawableGridNode::UnknownFunction464e90()
+void DrawableGridNode::OnMaskCleared()
 {
 }

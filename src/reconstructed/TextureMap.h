@@ -8,7 +8,7 @@
 
 // Palette object at TextureMap+0x2c: +0x710 maps 555 colours to palette
 // indices.
-struct UnknownTexturePalette {
+struct TextureColorMapperView {
     // ColorMapper's table getters (Quantize.h): Pixtrans.cpp calls them on
     // its palette argument.
     unsigned char* GetColors();        // 0x004de270: &entries
@@ -39,7 +39,7 @@ struct TextureContext {
 #include "FileStream.h"
 
 // A render state and its value (RenderTarget slot 8).
-struct UnknownRenderStatePair {
+struct TextureRenderState {
     int state;
     int value;
 };
@@ -54,12 +54,12 @@ public:
     TextureMap(TextureMapManager* manager, int registered);
     virtual ~TextureMap();                            // 0x0050ab40 (deleting wrapper 0x0050a570)
     virtual int CreateSurface(void* bits, int width, int height, int stride, int minimumSize,
-                              int sourceFormat, int format, UnknownTexturePalette* palette,
+                              int sourceFormat, int format, TextureColorMapperView* palette,
                               int flags, void* surfacePalette, int checkMemory, int unused,
                               int addressU, int addressV, TextureContext* choice,
                               int alphaThreshold, unsigned int key) = 0;
     virtual int LoadSurface(FileStream* stream, int width, int height, int minimumSize,
-                            int fileFormat, int dataSize, int format, UnknownTexturePalette* palette,
+                            int fileFormat, int dataSize, int format, TextureColorMapperView* palette,
                             int flags, void* surfacePalette, int addressU, int addressV,
                             TextureContext* choice, int alphaThreshold, unsigned int key) = 0;
     virtual TextureMap* Clone() = 0;
@@ -91,14 +91,14 @@ public:
     int mapFormat;                            // +0x20 pixel format
     int mipCount;                             // +0x24 mip level count
     BaseObject* sourcePalette;                // +0x28 released by the destructor
-    UnknownTexturePalette* colorMapper;       // +0x2c CreateSurface's palette; handed to the Pixtrans converters
+    TextureColorMapperView* colorMapper;       // +0x2c CreateSurface's palette; handed to the Pixtrans converters
     int usesColorKey;                         // +0x30 has a colour key
     int colorKeyValue;                        // +0x34 colour key (DDCOLORKEY low; high +0x38)
     int colorKeyHighValue;
     int averageColor;                         // +0x3C  Pixtrans AverageColor 0x004d24d0 (slot 4); Terrain.h's name
     int field_0x40;
     int statePairCount;                       // +0x44 render-state pair count
-    UnknownRenderStatePair statePairs[4];     // +0x48 applied by slot 19 (length not established)
+    TextureRenderState statePairs[4];     // +0x48 applied by slot 19 (length not established)
     int mapFlags;                             // +0x68 bit 0: a ManagedTexture
     int halvings;                             // +0x6C  the format choice's halvings (slot 5)
 };

@@ -5,9 +5,9 @@
 // object lives at PCTextureMap+0x7c. Names and field types are provisional.
 struct HIC__;                                 // vfw.h's HIC handle type
 
-class UnknownVideoDecoder {
+class VfwDecompressor {
 public:
-    ~UnknownVideoDecoder();                   // 0x0052d050
+    ~VfwDecompressor();                   // 0x0052d050
 
     void* field_0x00;                         // debug-allocated buffer
     unsigned char field_0x04[0x10 - 0x04];

@@ -23,7 +23,7 @@
   "?Tell@FileStream@@QAEHXZ": "0x00461600",
   "?Read@FileStream@@QAEHPAXHH@Z": "0x00461640",
   "?LoadShared@Palette8@@SAPAV1@PBD@Z": "0x004b6b30",
-  "?Downsample@@YAHPAX0HHHHHHPAUUnknownTexturePalette@@H@Z": "0x004d1b90",
+  "?Downsample@@YAHPAX0HHHHHHPAUTextureColorMapperView@@H@Z": "0x004d1b90",
   "?SetItemObject@ResourceManager@@QAEXPAX0@Z": "0x004e9010",
   "?FindItem@ResourceManager@@QAEPAVResourceItem@@PBDH@Z": "0x004e9360",
   "?FindItemByObject@ResourceManager@@QAEPAXPAX@Z": "0x004e93f0",

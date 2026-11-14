@@ -29,7 +29,7 @@ class TextureMap;
 class TextureMapManager;
 class ManagedTextureGroup;
 class FileStream;
-struct UnknownTexturePalette;
+struct TextureColorMapperView;
 
 // cdecl 0x0043d080 (ControlInterface.h declares the same function): maps
 // the 2-bit field `index` of byte `byteIndex` of `bits` to 0x200, 0x40,
@@ -39,13 +39,13 @@ int DecodeTextureSize(int bits, int index, int byteIndex);
 // The texture context 0x0043d460 receives: the manager the textures belong
 // to and, when set, the group that takes ManagedTextures. The same pointer
 // is handed on as PCTextureMap slot 5's format-choice argument.
-struct UnknownCubeTextureContext {
+struct CubeTextureContextView {
     TextureMapManager* manager;                 // +0x00 owner of the textures
     ManagedTextureGroup* textureGroup;          // +0x04 takes ManagedTextures when set
 };
 
 // One face, 0xf8 bytes (stride from 0x0043d110, 0x0043d230, 0x0043d460).
-struct UnknownCubeFace {
+struct CubeFace {
     int sizeCodes;                      // 2-bit size codes (0x0043d080)
     unsigned short presentTextures;     // bit j: texture j is present
     unsigned short field_0x06;
@@ -75,10 +75,10 @@ public:
     // 0x0043d400: copies whichever of the three vectors are given.
     int SetVectors(const Vector3* newCenter, const Vector3* b, const Vector3* c);
     // 0x0043d460: creates texture `index` of face `face` and reads it.
-    int LoadTexture(int face, int index, UnknownTexturePalette* palette,
-                              UnknownCubeTextureContext* context);
+    int LoadTexture(int face, int index, TextureColorMapperView* palette,
+                              CubeTextureContextView* context);
     // 0x0043d630: seeks to the texture data and reads every missing texture.
-    int LoadMissingTextures(UnknownTexturePalette* palette, UnknownCubeTextureContext* context);
+    int LoadMissingTextures(TextureColorMapperView* palette, CubeTextureContextView* context);
 
     FileStream* textureStream;        // +0x08 the stream Load read the header from
     int fileFormat;                             // file format (Tgafile.h)
@@ -87,7 +87,7 @@ public:
     Vector3 center;                             // +0x14 world translation (cubedraw.cpp; SkyCube sets it)
     Vector3 field_0x20;
     Vector3 field_0x2c;
-    UnknownCubeFace faces[6];                   // +0x38
+    CubeFace faces[6];                   // +0x38
     int textureDataOffset;                      // texture data offset in the stream
     int alignmentBase;                          // alignment base
     ManagedTextureGroup* textureGroup;          // +0x610 Load's group; textures are not managed without one

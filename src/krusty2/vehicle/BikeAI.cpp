@@ -166,7 +166,7 @@ inline Vec3 BikeAINormalize(const Vec3& v)
 // sets the debug line 0x00578dc0 (pos and target raised by 3).  Returns 0 for a
 // missing path/terrain, an index outside the path or dt <= 0, else 1.
 // Callers: 0x0040f2c9 and 0x00412654.  Arithmetic tier 1, names tier 3.
-int PredictPathMotion(Vec3 pos, Vec3 vel, UnknownBikeAIPath* path, Vec3* outDir,
+int PredictPathMotion(Vec3 pos, Vec3 vel, BikeAIRacingLine* path, Vec3* outDir,
                           float maxTime, float dt, Terrain* terrain, float side,
                           float* outTakeoffTime, Vec3* outVel)
 {

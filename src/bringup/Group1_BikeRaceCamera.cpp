@@ -154,7 +154,7 @@ int BikeRace::AimCamera(int caster) {
 // remote racers). The player count is read at each test: retail re-tests
 // `playerCount > 1` after the `index == 0` miss (`cmp ecx, 1` twice at
 // 0x0041f2f6/0x0041f304), which a `players` local lets VC6 thread away.
-inline BikeRaceKrustyBikeView* BikeRace::UnknownFunctionRacerAt(int index) {
+inline BikeRaceKrustyBikeView* BikeRace::RacerAtIndex(int index) {
     if (g_TrackGame->playerCount == 1 && index == 0) {
         return localRacer;
     }
@@ -216,7 +216,7 @@ void BikeRace::NextCameraTarget(int forward, int racers, int objects) {
                 RaceCameraView()->followingRacer = 1;
                 return;
             }
-        } while (UnknownFunctionRacerAt(targetRacer)->outOfRace != 0);
+        } while (RacerAtIndex(targetRacer)->outOfRace != 0);
     } else if (objects) {
         caster = 0;
         Scene* scene = raceScene;

@@ -13,7 +13,7 @@
 // Also defined here because nothing in src/ provides them and only these
 // bodies call them: UnknownTimer::LargestRecentSample (0x004cb690) and
 // UnknownTimer::RecordSample (0x004cb6b0), written from the retail
-// disassembly, and ManagedTextureGroup::UnknownFunction464e90 (the shared
+// disassembly, and ManagedTextureGroup::OnOutOfPageSpace (the shared
 // empty body 0x00464e90).
 
 #include <stdio.h>
@@ -49,7 +49,7 @@ void UnknownTimer::RecordSample(int sample) {
 
 // 0x00464e90: the shared empty body (called when a texture finds no page
 // space).
-void ManagedTextureGroup::UnknownFunction464e90() {
+void ManagedTextureGroup::OnOutOfPageSpace() {
 }
 
 static inline void SortTextures(ContainerList<ManagedTexture*>* list, int (__cdecl* compare)(const void*, const void*)) {
@@ -522,7 +522,7 @@ void ManagedTextureGroup::RepackWithPartialBlits() {
                 break;
             texture = cachePages.Next();
             if (!texture)
-                UnknownFunction464e90();
+                OnOutOfPageSpace();
         }
     }
 

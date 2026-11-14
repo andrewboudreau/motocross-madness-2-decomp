@@ -2,7 +2,7 @@
 
 `SPBikeRiderDlg::RenderPre3D` and `PCCentralBikeRiderDlg::RenderPre3D` call the existing
 `D3DIMSoultreeObject::ReplaceMaterialTexture` provider for the selected bike and
-rider model. The old `UnknownModelTexture` and `UnknownProCircuitSkinned` method
+rider model. The old `DialogSoultreeObjectView` and `UnknownProCircuitSkinned` method
 spellings are retired from both canonical callers and their aggregate bindings.
 The provisional record views and all other interfaces remain unchanged.
 
@@ -46,7 +46,7 @@ sections/2,321 relocations under the second mapping. Together the four objects
 retain 1,675 sections and 11,596 relocations:
 
 ```
-?ReplaceMaterialTexture@UnknownModelTexture@@QAEXHPBDPAPAVTextureMapManager@@@Z
+?ReplaceMaterialTexture@DialogSoultreeObjectView@@QAEXHPBDPAPAVTextureMapManager@@@Z
   -> ?ReplaceMaterialTexture@D3DIMSoultreeObject@@QAEHHPBDH@Z
 ?ReplaceMaterialTexture@UnknownProCircuitSkinned@@QAEXHPBDPAPAVTextureMapManager@@@Z
   -> ?ReplaceMaterialTexture@D3DIMSoultreeObject@@QAEHHPBDH@Z

@@ -34,7 +34,7 @@ struct InputButtonState;
 // +4. Only the +0x25 bit 0 test is used.
 struct VisualCueKrustyBikeView : virtual public GameObject {
     virtual void UnknownVirtualSlot0();
-    int UnknownIsEnabled() { return isEnabled; }
+    int IsCueRacerEnabled() { return isEnabled; }
 
     unsigned char field_0x08[0x0c - 0x08];
     Vector3 position;                         // +0x0c
@@ -175,10 +175,10 @@ public:
 
     // The cue's screen fractions (0.5f, 0.1f from its callers). A plain
     // `return screenX;` emits the same code but renumbers VC6's $L/$T labels.
-    float UnknownScreenX() { return *(float*)&screenX; }
-    float UnknownScreenY() { return *(float*)&screenY; }
+    float ScreenXFraction() { return *(float*)&screenX; }
+    float ScreenYFraction() { return *(float*)&screenY; }
     // The placement block slot 10 repeats in each mode.
-    void UnknownPlace();
+    void PlaceCue();
 
     VisualCueBikeRaceView* cueView;
     RunwayTerrainView* groundTerrain;  // +0xAC  LoadVisualCue's terrain argument; slot 10 drops the cue target onto it with QueryGround

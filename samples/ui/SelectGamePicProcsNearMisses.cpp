@@ -212,30 +212,30 @@ void MultiPlayerDlg::SendStartMessage(short start) {
         if (g_TrackGame->mode.raceSettings.raceMode == 2 && g_TrackGame->eventManager->racesRun > 0) {
             // By the championship points.
             for (i = 0; i < racer; i++) {
-                UnknownGridEntry entry;
+                SelectGameGridEntryView entry;
                 entry.playerId = g_TrackGame->mode.racers[i].networkPlayerId;
                 entry.points = g_TrackGame->eventManager->results[i].points;
                 entry.racerIndex = g_TrackGame->mode.racers[i].racerIndex;
-                ((UnknownGridEntry*)g_TrackGame->mode.raceSettings.gridOrder)[i] = entry;
+                ((SelectGameGridEntryView*)g_TrackGame->mode.raceSettings.gridOrder)[i] = entry;
             }
-            qsort(g_TrackGame->mode.raceSettings.gridOrder, racer, sizeof(UnknownGridEntry),
+            qsort(g_TrackGame->mode.raceSettings.gridOrder, racer, sizeof(SelectGameGridEntryView),
                   CompareGridEntries);
         } else {
             // At random.
-            UnknownGridDraw draws[8];
+            GridDrawKey draws[8];
             for (i = 0; i < racer; i++) {
-                UnknownGridDraw draw;
+                GridDrawKey draw;
                 draw.playerId = g_TrackGame->mode.racers[i].networkPlayerId;
                 draw.key = RandomUnit() * 10.0f;
                 draw.racerIndex = g_TrackGame->mode.racers[i].racerIndex;
                 draws[i] = draw;
             }
-            qsort(draws, racer, sizeof(UnknownGridDraw), CompareGridDraws);
+            qsort(draws, racer, sizeof(GridDrawKey), CompareGridDraws);
             for (i = 0; i < racer; i++) {
-                UnknownGridEntry entry;
+                SelectGameGridEntryView entry;
                 entry.playerId = draws[i].playerId;
                 entry.racerIndex = draws[i].racerIndex;
-                ((UnknownGridEntry*)g_TrackGame->mode.raceSettings.gridOrder)[i] = entry;
+                ((SelectGameGridEntryView*)g_TrackGame->mode.raceSettings.gridOrder)[i] = entry;
             }
         }
         if (names)

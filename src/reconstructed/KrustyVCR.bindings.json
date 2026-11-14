@@ -1,7 +1,7 @@
 {
   "??_C@_04JMMN@2?40?$BK?$AA@": "0x0056da64",
   "??_C@_06KBGP@MCMVCR?$AA@": "0x0056da6c",
-  "?Start@VCRInterface@@QAEHHHHHHIPAUUnknownRecorderOwner@@@Z": "0x004e7a90",
+  "?Start@VCRInterface@@QAEHHHHHHIPAURecorderVCRFileView@@@Z": "0x004e7a90",
   "?OpenRecording@KrustyVCR@@QAEHP6AHHPAXHHPAHH1@ZHPADPAVVCRFile@@@Z": "0x0049bf10",
   "?SetReplayLength@KrustyVCR@@QAEXMH@Z": "0x0049bff0",
   "?RecordedLength@KrustyVCR@@QAEMXZ": "0x0049c000",

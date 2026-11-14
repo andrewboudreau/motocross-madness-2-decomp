@@ -164,7 +164,7 @@ public:
 // What 0x004f00e0 counts: a record with a texture name at +0x2c, built by
 // its two callers (0x004f0390, 0x004f0ec0) on the stack. Only the name is
 // known; its extent is provisional.
-struct UnknownSceneTextureInfo {
+struct SceneTextureRecord {
     unsigned char field_0x00[0x2c];
     char textureName[0x40];
 };
@@ -247,7 +247,7 @@ public:
     virtual int OnControlPress(ControlEvent* event, InputButtonState* entry);
 
     // 0x004ea7e0: stores the owner and settings, adds the sound group child.
-    Scene* UnknownFunction4ea7e0(SceneArchiveFinder* manager, int value, int unused,
+    Scene* AttachSceneManager(SceneArchiveFinder* manager, int value, int unused,
                                  char probeMask);
     // 0x004eaec0: the entry object named like `path`'s file name.
     SceneCollisionCharacterView* FindEntryByFileName(const char* path, int* index);
@@ -353,4 +353,4 @@ int CountModelTextures(const char* path, UnknownSceneResourceManager* resources,
 int FindKeyword(int* out, const char* name, const UnknownSceneKeyword* table); // 0x004e9980
 // 0x004f00e0: counts the texture by width (256, 128, 64 or 32) in counts[0..3];
 // "PROCEDURAL" textures count as 64.
-int CountTexture(UnknownSceneTextureInfo* texture, int* counts);
+int CountTexture(SceneTextureRecord* texture, int* counts);

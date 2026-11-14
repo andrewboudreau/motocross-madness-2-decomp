@@ -91,7 +91,7 @@ void PCLastRaceDlg::PayOutRace()
 
     int paid = 0;
     for (int j = 0; j < g_TrackGame->eventManager->resultCount; j++) {
-        UnknownProCircuitResult* result = &((UnknownProCircuitResult*)g_TrackGame->eventManager->results)[j];
+        ProCircuitRacerResultView* result = &((ProCircuitRacerResultView*)g_TrackGame->eventManager->results)[j];
         ProCircuitRacer* racer = &circuit->racers[result->racer];
         racer->raceStats.medicalCost = (int)__min(purse * circuit->medicalCapPct, result->medical * 250.0f);
         racer->raceStats.repairCost = (int)__min(purse * circuit->repairCapPct, result->repairs * 500.0f);

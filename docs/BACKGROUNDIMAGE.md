@@ -18,7 +18,7 @@ pending frame, the frame count when set and an owner value. Each frame it
 copies the regions back from the copy (BltFast) and clears their depth
 (device Clear), or restores the whole copy when the camera does not cover
 the screen. The camera's viewport fields are protected in Camera.h, so the
-file reads them through `UnknownBackgroundCamera`.
+file reads them through `BackgroundCameraView`.
 
 Exact (17 calibration cases): the constructor, the destructor and its deleting wrapper,
 slots 8, 15 and 18, `0x004040b0` (set image), `0x00404200` (release a

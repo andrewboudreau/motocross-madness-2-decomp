@@ -212,7 +212,7 @@
   "?ClearEntries@KrustyUI@@QAEXXZ": "0x0049bb80",
   "?ReadLobbyPreset@MSZoneInterface@@QAEHPAH@Z": "0x0049c2f0",
   "?WaitForLobbyRank@MSZoneInterface@@QAEHXZ": "0x0049c600",
-  "?SetMotionByName@UnknownKrustyUIModelObject@@QAEXPBD@Z": "0x004a8b10",
+  "?SetMotionByName@SelectGameD3DIMSoultreeCharacterView@@QAEXPBD@Z": "0x004a8b10",
   "?GetLocalAddress@NetworkInterface@@QAEHPAD@Z": "0x004ac2d0",
   "?SetSessionJoinable@NetworkInterface@@QAEHH@Z": "0x004ac510",
   "?CreateLocalPlayer@NetworkInterface@@QAEHPAD@Z": "0x004ac5e0",

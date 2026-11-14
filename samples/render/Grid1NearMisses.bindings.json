@@ -10,7 +10,7 @@
   "?TestBlockFrustum@DrawableGridNode@@QAEHH@Z": "0x00481a20",
   "?ForceBlockCentres@DrawableGridNode@@QAEHXZ": "0x00483040",
   "?ReleaseBlockCentres@DrawableGridNode@@QAEHXZ": "0x00483100",
-  "?Downsample@@YAHPAX0HHHHHHPAUUnknownTexturePalette@@H@Z": "0x004d1b90",
+  "?Downsample@@YAHPAX0HHHHHHPAUTextureColorMapperView@@H@Z": "0x004d1b90",
   "?Reregister@ManagedTexture@@QAEXXZ": "0x00510670",
   "?PixelFormatBytesPerPixel@@YAHH@Z": "0x00511970",
   "?g_grid1DetailDistance@@3MA": "0x0056c034",

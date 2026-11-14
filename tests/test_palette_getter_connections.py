@@ -21,7 +21,7 @@ SOURCES = ('src/reconstructed/Pixtrans.cpp', 'samples/render/PixtransNearMisses.
 FILENAMES = SOURCES
 PROOFS = ('src/reconstructed/Quantize.cpp', 'src/reconstructed/Palette8.cpp',
           'src/reconstructed/TextureMap.cpp', 'src/reconstructed/PCTextureMap.cpp')
-RENAMES = {'?GetIndexFrom%s@UnknownTexturePalette@@QAEPAEXZ' % n:
+RENAMES = {'?GetIndexFrom%s@TextureColorMapperView@@QAEPAEXZ' % n:
            '?GetIndexFrom%s@ColorMapper@@QAEPAEXZ' % n for n in ('555', '565')}
 NATIVE = ((SOURCES[0], 'int Convert24To8(', '?Convert24To8@@', 0x4d0aa0, 232),
           (SOURCES[0], 'int Convert565To8(', '?Convert565To8@@', 0x4d0b90, 171),
@@ -192,7 +192,7 @@ class PaletteGetterConnections(unittest.TestCase):
                 self.assertTrue(compare(image,obj,query,va,size,ROOT/Path(source).with_suffix('.bindings.json'))['strict_exact'])
                 strict+=1
             self.assertEqual({s.name for s in obj.symbols if s.section_number==0 and s.storage_class==2},
-                             {'?DitherConvert@@YAHPAXHHHHH0000PAUUnknownTexturePalette@@@Z'})
+                             {'?DitherConvert@@YAHPAXHHHHH0000PAUTextureColorMapperView@@@Z'})
             self.assertFalse(any(s.raw_size and (s.name.startswith('.CRT')or s.characteristics&0xc0)
                                  for s in obj.sections if not s.name.startswith('.debug')))
             fixture_path,_=compile_source(ROOT/'tests/fixtures/palette_getter_compare.cpp','fixture',True)

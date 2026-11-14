@@ -58,7 +58,7 @@ int CacheTexture::CollectOccupants(ContainerList<ManagedTexture*>* textures, Cac
 }
 
 // A step of the depth-first walk in 0x0050f9b0.
-struct UnknownRegionStep {
+struct CacheRegionWalkStep {
     CacheTextureRegion* region;
     int index;
 };
@@ -105,7 +105,7 @@ int CacheTexture::ReserveRegions(int* levels, int count) {
     if (same)
         return fitted;
 
-    UnknownRegionStep steps[10];
+    CacheRegionWalkStep steps[10];
     int depth = -1;
     int first = 1;
     CacheTextureRegion* region = rootRegion;

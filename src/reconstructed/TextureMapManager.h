@@ -73,7 +73,7 @@ public:
     void RepackPages();             // 0x0050c8c0: repacks the pages
     void RepackWholePages();             // 0x0050c960 (near miss in samples/render)
     void RepackWithPartialBlits();             // 0x0050dad0 (near miss in samples/render)
-    void UnknownFunction464e90();             // 0x00464e90 (shared empty body): out of page space
+    void OnOutOfPageSpace();             // 0x00464e90 (shared empty body): out of page space
     // 0x0050ef70 (manager slot 15): draws the debug-key selection into
     // `target`; 0 unless this is the manager's selected group.
     int DrawSelection(PCRenderTarget* target);

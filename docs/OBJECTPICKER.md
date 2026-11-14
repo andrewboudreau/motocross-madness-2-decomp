@@ -14,7 +14,7 @@ that CollisionObject and, unless a cursor is passed in, a GameCursor driven
 by two control bindings (+0x40, +0x44). `0x004b04c0` picks at the cursor
 (y measured from the bottom of the render target) through `0x004b0500`,
 which reads the camera's position, viewport and camera-to-world rows. The
-camera fields are read through `UnknownPickCamera`, because Camera.h keeps
+camera fields are read through `PickerCameraView`, because Camera.h keeps
 them protected and declares +0x198 as int while this code loads it as a
 float. GameCursor gained `CursorPosition` (`0x0043f100`), which
 returns the cursor position as two ints through a hidden pointer.

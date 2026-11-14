@@ -11,6 +11,6 @@ typedef char vector_y[offsetof(Vector3, y) == 4 && offsetof(Vec3, y) == 4 ? 1 : 
 typedef char vector_z[offsetof(Vector3, z) == 8 && offsetof(Vec3, z) == 8 ? 1 : -1];
 
 // The Wrecker caller writes rotation rows through this existing matrix view.
-typedef char matrix_size[sizeof(UnknownWreckerMatrix) == 64 ? 1 : -1];
-typedef char matrix_up[offsetof(UnknownWreckerMatrix, _21) == 16 ? 1 : -1];
-typedef char matrix_forward[offsetof(UnknownWreckerMatrix, _31) == 32 ? 1 : -1];
+typedef char matrix_size[sizeof(WreckerD3DMatrix) == 64 ? 1 : -1];
+typedef char matrix_up[offsetof(WreckerD3DMatrix, _21) == 16 ? 1 : -1];
+typedef char matrix_forward[offsetof(WreckerD3DMatrix, _31) == 32 ? 1 : -1];

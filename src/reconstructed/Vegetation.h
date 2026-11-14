@@ -17,7 +17,7 @@ public:
     // 0x004567a0 / 0x004567e0: place the object (quantised or world
     // coordinates); the first argument (EcoSystem::textureManager) is not used.
     void PlaceQuantized(TextureMapManager* textures, unsigned char definition,
-                               const UnknownEcoCoordinates* coordinates, unsigned char heightParameter,
+                               const EcoQuantizedPosition* coordinates, unsigned char heightParameter,
                                unsigned char radiusParameter);
     void Place(TextureMapManager* textures, unsigned char definition,
                                const Vector3* position, unsigned char heightParameter,
@@ -32,7 +32,7 @@ public:
     CollisionObject* GetCollisionObject(int index);
     float GetRadius();                        // 0x00457230: the radius
 
-    UnknownEcoCoordinates quantizedPosition;  // in EcoSystem::unitsPerCoordinate units
+    EcoQuantizedPosition quantizedPosition;  // in EcoSystem::unitsPerCoordinate units
     unsigned char definitionIndex;            // definition index
     unsigned char fadeLevel;                  // fade (0..255)
     unsigned char heightParam;                // height parameter

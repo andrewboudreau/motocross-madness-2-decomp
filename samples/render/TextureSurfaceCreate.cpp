@@ -20,7 +20,7 @@ static inline void AppendRenderStatePair(TextureMap* map, int state, int value) 
 // creates one (trying formats in order), converts the bits into it, builds
 // the mip levels and records the alpha or colour-key render states.
 int PCTextureMap::CreateSurface(void* bits, int width, int height, int stride, int minimumSize,
-                                int sourceFormat, int format, UnknownTexturePalette* palette,
+                                int sourceFormat, int format, TextureColorMapperView* palette,
                                 int flags, void* surfacePalette, int checkMemory, int unused,
                                 int addressU, int addressV, TextureContext* choice,
                                 int alphaThreshold, unsigned int key) {

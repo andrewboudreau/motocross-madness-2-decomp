@@ -69,7 +69,7 @@ int UIDialog::Tick(float frameTime) {
         }
         GUIUser* user = guiUser;
         UIControl* focus = (UIControl*)user->hoverControl;
-        user->SetCursorAnimation(focus && focus->mouseAnim ? (UnknownCursorAnimation*)focus->mouseAnim
+        user->SetCursorAnimation(focus && focus->mouseAnim ? (CursorUIAnimView*)focus->mouseAnim
                                                                  : cursorAnimation);
         GUIInputDevice* device;
         int j = 0;

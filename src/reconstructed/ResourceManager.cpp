@@ -97,7 +97,7 @@ int ResourceManager::MergeWithExisting(ResourceItem* item)
             FileStream* old = existing->archive;
             existing->archive = item->archive;
             if (old != item->archive) {
-                if (!UnknownInlineArchiveUsed(old) && old)
+                if (!IsArchiveInUse(old) && old)
                     delete old;
             }
             return 1;

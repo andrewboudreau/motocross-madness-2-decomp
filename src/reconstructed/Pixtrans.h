@@ -2,7 +2,7 @@
 
 #include "RenderInterfaces.h"
 
-struct UnknownTexturePalette;
+struct TextureColorMapperView;
 
 // A 24-bit 0xRRGGBB colour as a 555 or 565 pixel (blue first, cast as a
 // whole: VC6 then keeps retail's per-component shifts).
@@ -53,7 +53,7 @@ int Convert555To24(void* destination, void* source, int width, int height, int d
 // `palette`).
 int DitherConvert(void* source, int format, int width, int height, int sourceStride,
                           int destinationStride, void* output24, void* output565, void* output555,
-                          void* output8, UnknownTexturePalette* palette);
+                          void* output8, TextureColorMapperView* palette);
 // 0x004d0900, 0x004d09d0: 24-bit to 565 or 555, dithered when `dither`.
 int Convert24To565(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride, int dither);
@@ -62,11 +62,11 @@ int Convert24To555(void* destination, void* source, int width, int height, int d
 // 0x004d0aa0, 0x004d0b90, 0x004d0c40: 24-bit, 565 and 555 to palette
 // indices, dithered against `palette` when `dither` and `palette` are set.
 int Convert24To8(void* destination, void* source, int width, int height, int destinationStride,
-                          int sourceStride, int dither, UnknownTexturePalette* palette);
+                          int sourceStride, int dither, TextureColorMapperView* palette);
 int Convert565To8(void* destination, void* source, int width, int height, int destinationStride,
-                          int sourceStride, int dither, UnknownTexturePalette* palette);
+                          int sourceStride, int dither, TextureColorMapperView* palette);
 int Convert555To8(void* destination, void* source, int width, int height, int destinationStride,
-                          int sourceStride, int dither, UnknownTexturePalette* palette);
+                          int sourceStride, int dither, TextureColorMapperView* palette);
 // 0x004d0d40 (hand-written assembly): 555 to indices through `table`,
 // eight pixels a step; 0x004d0c40 calls it for rows of a multiple of eight
 // pixels with no padding.
@@ -80,13 +80,13 @@ int Convert565To555(void* destination, void* source, int width, int height, int 
                           int sourceStride);
 // 0x004d10b0: palette indices to 24-bit RGB.
 int Convert8To24(void* destination, void* source, int width, int height, int destinationStride,
-                          int sourceStride, UnknownTexturePalette* palette);
+                          int sourceStride, TextureColorMapperView* palette);
 // 0x004d1150, 0x004d11c0: palette indices to 565 / 555 through the
 // palette's 16-bit tables (entries565 at +0x510, entries555 at +0x310).
 int Convert8To565(void* destination, void* source, int width, int height, int destinationStride,
-                          int sourceStride, UnknownTexturePalette* palette);
+                          int sourceStride, TextureColorMapperView* palette);
 int Convert8To555(void* destination, void* source, int width, int height, int destinationStride,
-                          int sourceStride, UnknownTexturePalette* palette);
+                          int sourceStride, TextureColorMapperView* palette);
 
 // 0x004d1230: 8888 to 4444.
 int Convert8888To4444(void* destination, void* source, int width, int height, int destinationStride,
@@ -142,7 +142,7 @@ int Halve555(void* destination, void* source, int width, int height, int destina
 int Halve565(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride, int filter, unsigned short key);
 int Halve8(void* destination, void* source, int width, int height, int destinationStride,
-                          int sourceStride, UnknownTexturePalette* palette);
+                          int sourceStride, TextureColorMapperView* palette);
 
 // Per-format halving downsamplers behind 0x004d1b90 (one per format in its
 // switch); `levels` (the number of halvings) and `filter` are passed through.
@@ -159,7 +159,7 @@ int Downsample565(void* destination, void* source, int width, int height, int de
 int Downsample555(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride, int levels, int filter);
 int Downsample8(void* destination, void* source, int width, int height, int destinationStride,
-                          int sourceStride, int levels, UnknownTexturePalette* palette);
+                          int sourceStride, int levels, TextureColorMapperView* palette);
 
 // 0x004cf980, 0x004cf9c0, 0x004cfa10: the ditherer's row readers. Each
 // spreads `count` 24-bit, 565 or 555 pixels into 16.16 fixed-point channel
@@ -181,12 +181,12 @@ int Downsample24To8888(void* destination, void* source, int width, int height, i
 // 0x004d1b90: downsamples `source` into the width x height `destination`
 // with the helper for `format`; 0 for other formats.
 int Downsample(void* destination, void* source, int width, int height, int destinationStride,
-                          int sourceStride, int levels, int format, UnknownTexturePalette* palette, int filter);
+                          int sourceStride, int levels, int format, TextureColorMapperView* palette, int filter);
 
 // 0x004d1d20: copies `source` into `destination`, converting the format;
 // 0x004d24d0 inspects the converted bits.
 int ConvertPixels(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride, int format, int sourceFormat, int dither,
-                          UnknownTexturePalette* palette, int alphaThreshold, unsigned int key);
+                          TextureColorMapperView* palette, int alphaThreshold, unsigned int key);
 int AverageColor(void* bits, int width, int height, int stride, int format,
-                          UnknownTexturePalette* palette);
+                          TextureColorMapperView* palette);

@@ -84,7 +84,7 @@ class GuiConnectionTests(unittest.TestCase):
             self.assertIn('?AppendSibling@GameObject@@QAEHPAV1@H@Z',
                           imports(objects['KrustyUI']))
             for obj in objects.values():
-                self.assertFalse(any('UnknownKrustyUIGui' in name for name in imports(obj)))
+                self.assertFalse(any('KrustyUIGuiManager' in name for name in imports(obj)))
 
 
 if __name__ == '__main__':

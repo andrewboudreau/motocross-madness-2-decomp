@@ -1,52 +1,52 @@
 {
   "baseline": "Published 52cb3235, same-path complete canonical/sample objects preserve all nondebug bytes, section flags and resolved relocation destinations under only two getter names. Same-path proof has no exclusions; portable pins normalize only the two enumerated source filenames. All four sample partial bodies remain complete and unchanged.",
   "renames": {
-    "?GetIndexFrom555@UnknownTexturePalette@@QAEPAEXZ": "?GetIndexFrom555@ColorMapper@@QAEPAEXZ",
-    "?GetIndexFrom565@UnknownTexturePalette@@QAEPAEXZ": "?GetIndexFrom565@ColorMapper@@QAEPAEXZ"
+    "?GetIndexFrom555@TextureColorMapperView@@QAEPAEXZ": "?GetIndexFrom555@ColorMapper@@QAEPAEXZ",
+    "?GetIndexFrom565@TextureColorMapperView@@QAEPAEXZ": "?GetIndexFrom565@ColorMapper@@QAEPAEXZ"
   },
   "objects": {
     "src/reconstructed/Pixtrans.cpp": {
       "sections": 49,
       "relocations": 124,
-      "sha256": "39fa654f6396190c05867d686a8546c0248bc09dbe654a023f9c084798b0a6b6"
+      "sha256": "3c2a76ed82e34840d6d984b474f0dc00f31fe00c583d564328f55029a8c11ec4"
     },
     "samples/render/PixtransNearMisses.cpp": {
       "sections": 7,
       "relocations": 29,
-      "sha256": "bdba608de9534d79dfe01cea3492f5ebda0a3eb5fbff9720e31c1e0c49ece5c7"
+      "sha256": "ac37196462607e0b2a804034751b39a3b6f118bed36c3c398bf2a910a54745e9"
     }
   },
   "getter_calls": {
     "src/reconstructed/Pixtrans.cpp": [
       {
-        "caller": "?Convert24To8@@YAHPAX0HHHHHPAUUnknownTexturePalette@@@Z",
+        "caller": "?Convert24To8@@YAHPAX0HHHHHPAUTextureColorMapperView@@@Z",
         "offset": 91,
         "callee": "?GetIndexFrom555@ColorMapper@@QAEPAEXZ"
       },
       {
-        "caller": "?Convert565To8@@YAHPAX0HHHHHPAUUnknownTexturePalette@@@Z",
+        "caller": "?Convert565To8@@YAHPAX0HHHHHPAUTextureColorMapperView@@@Z",
         "offset": 85,
         "callee": "?GetIndexFrom565@ColorMapper@@QAEPAEXZ"
       },
       {
-        "caller": "?Convert555To8@@YAHPAX0HHHHHPAUUnknownTexturePalette@@@Z",
+        "caller": "?Convert555To8@@YAHPAX0HHHHHPAUTextureColorMapperView@@@Z",
         "offset": 109,
         "callee": "?GetIndexFrom555@ColorMapper@@QAEPAEXZ"
       },
       {
-        "caller": "?Convert555To8@@YAHPAX0HHHHHPAUUnknownTexturePalette@@@Z",
+        "caller": "?Convert555To8@@YAHPAX0HHHHHPAUTextureColorMapperView@@@Z",
         "offset": 162,
         "callee": "?GetIndexFrom555@ColorMapper@@QAEPAEXZ"
       }
     ],
     "samples/render/PixtransNearMisses.cpp": [
       {
-        "caller": "?Halve8@@YAHPAX0HHHHPAUUnknownTexturePalette@@@Z",
+        "caller": "?Halve8@@YAHPAX0HHHHPAUTextureColorMapperView@@@Z",
         "offset": 37,
         "callee": "?GetIndexFrom555@ColorMapper@@QAEPAEXZ"
       },
       {
-        "caller": "?DitherConvert@@YAHPAXHHHHH0000PAUUnknownTexturePalette@@@Z",
+        "caller": "?DitherConvert@@YAHPAXHHHHH0000PAUTextureColorMapperView@@@Z",
         "offset": 35,
         "callee": "?GetIndexFrom555@ColorMapper@@QAEPAEXZ"
       }

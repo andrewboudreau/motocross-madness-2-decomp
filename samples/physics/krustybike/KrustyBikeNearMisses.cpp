@@ -119,7 +119,7 @@ int KrustyBike::FindPlacement(int respawn, Vec3* outPosition, Vec3* outForward, 
     case 1:
     case 5: {
         if (respawnPending) scratchVector = respawnPosition + respawnHeading;
-        else scratchVector = reinterpret_cast<KbGame*>(g_TrackGame)->bajaEnduroEvent[lapGate + 9].field_0x00;
+        else scratchVector = reinterpret_cast<KbGame*>(g_TrackGame)->bajaEnduroEvent[lapGate + 9].position;
         return FindObjectPlacement(collisionObject, terrain, &position, terrainScale, flag, lim,
                            respawnPending ? 0x64 : 0x7fffffff, respawnPending ? 0x65 : 0x7fffffff,
                            3.0f, 8, 0, &scratchVector, !respawnPending, outPosition, outForward, outUp, outKeepPlacement);

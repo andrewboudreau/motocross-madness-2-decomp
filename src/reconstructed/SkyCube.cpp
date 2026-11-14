@@ -8,24 +8,24 @@
 // The render target in renderContext and its camera, as slot 10 reads them
 // (RenderTarget +0x08 is the current Camera; Camera +0x170 is its position,
 // which Camera.h keeps protected).
-struct UnknownSkyCubeCamera {
+struct SkyCubeCameraView {
     unsigned char field_0x000[0x170];
     Vector3 eyePosition;                       // +0x170
 };
 
-struct UnknownSkyCubeTarget {
+struct SkyCubeRenderTargetView {
     unsigned char field_0x00[8];
-    UnknownSkyCubeCamera* currentCamera;       // +0x08
+    SkyCubeCameraView* currentCamera;       // +0x08
 };
 
-#define CAMERA() (((UnknownSkyCubeTarget*)renderContext)->currentCamera)
+#define CAMERA() (((SkyCubeRenderTargetView*)renderContext)->currentCamera)
 
 // 0x004fb1e0
 SkyCube::SkyCube(int flags) : DrawableCube(flags) {
 }
 
 // 0x004fb230
-SkyCube* SkyCube::Create(void* value, FileStream* stream, UnknownCubeTextureContext* context,
+SkyCube* SkyCube::Create(void* value, FileStream* stream, CubeTextureContextView* context,
                                         float height) {
     if (DrawableCube::Load(value, stream, context)) {
         centerHeight = height;

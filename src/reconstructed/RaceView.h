@@ -182,7 +182,7 @@ struct EventKrustyBikeView : virtual public GameObject {
 // The score board at EventBikeRaceView+0xbc (the krustybike sample's
 // KbScoreBoard); only 0x0048d1e0 is declared: shows `score` with `multiplier`
 // (FollowRacer.cpp passes 2500 and 1 for taking over the followed racer).
-struct UnknownScoreBoard {
+struct EventKbScoreBoardView {
     void ShowValue(float score, float multiplier);  // 0x0048d1e0
 };
 
@@ -221,7 +221,7 @@ struct EventBikeRaceView : public GameObject {
     unsigned char field_0x054[0x60 - 0x54];
     GameObject* youIndicator;                 // +0x60 BikeRace: the "youind.slt" marker
     unsigned char field_0x064[0xbc - 0x64];
-    UnknownScoreBoard* scoreBoard;            // +0x0bc score board (FollowRacer.cpp 0x004a9e80)
+    EventKbScoreBoardView* scoreBoard;            // +0x0bc score board (FollowRacer.cpp 0x004a9e80)
     unsigned char field_0x0c0[0xc8 - 0xc0];
     RaceGate* gateList;                       // +0x0c8 gate list (BikeRace.h)
     unsigned char field_0x0cc[0x158 - 0xcc];

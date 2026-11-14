@@ -215,7 +215,7 @@ void VisualCue::CollectRacers(VisualCueBikeRaceView* view) {
 int VisualCue::OnControlPress(ControlEvent* event, InputButtonState* entry) {
     int active = 0;
     for (int i = 0; i < cueRacerCount; i++)
-        if (cueRacers[i]->UnknownIsEnabled())
+        if (cueRacers[i]->IsCueRacerEnabled())
             active++;
     if (TestInputEvent(0x14, 0, event, 0x80000000) && !cueView->chatOpen &&
         cueView->racing && active > 1) {
@@ -313,7 +313,7 @@ NumberObjectManager* NumberObjectManager::SetupDigits(void* context, int options
 }
 
 // The owner a NumberObjectManager compares its camera with (its +0x18).
-struct UnknownNumberOwner {
+struct NumberRenderTargetView {
     unsigned char field_0x00[0x08];
     NumberCameraView* currentCamera;        // +0x08
 };
@@ -324,7 +324,7 @@ int NumberObjectManager::Tick(float frameTime) {
     for (int i = 0; i < 5; i++)
         if (digitModels[i])
             digitModels[i]->isVisible = 0;
-    if (((UnknownNumberOwner*)renderContext)->currentCamera == digitCamera) {
+    if (((NumberRenderTargetView*)renderContext)->currentCamera == digitCamera) {
         int counting = countdownRacer->countdown > 0.0f && countdownRacer->thirtySecondMan == 0;
         if (!(countdownRacer->localRacer->offTrackTime > 1.0f) && !counting)
             return 1;

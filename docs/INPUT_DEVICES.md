@@ -85,7 +85,7 @@ zero-initialized storage.
   tests the full eax, so it is `int`. FollowCamera slot 56 returns it
   unconverted as `bool`, and KrustyBikeCamera overrides slot 56 as `bool`.
   ControlInterface types the keyboard as `KeyboardDevice*`, and FollowCamera
-  reads it through a separate `bool` view (`UnknownKeyboardBoolView`).
+  reads it through a separate `bool` view (`FollowCameraKeyboardDeviceView`).
 - **MouseDevice** (`0x0048a2d0`): `PCInputDevice(1)`, two binding lists at
   +0x2b0 and four button entries at +0x260. Slot 0 (`0x0048a4c0`) drops
   bindings by id. PCMouseDevice implements the rest:

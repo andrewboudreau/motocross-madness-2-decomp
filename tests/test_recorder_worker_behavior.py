@@ -15,7 +15,7 @@ from mcm2tool.toolchain import find_child_ci, find_vc6_bin, infer_vc98_root, sha
 from tools.match import compare
 
 ROOT = Path(__file__).resolve().parents[1]
-SYMBOL = '?UnknownRecorderThread@@YGIPAX@Z'
+SYMBOL = '?RecorderWorkerThread@@YGIPAX@Z'
 HELPERS = {
     '?HasSlotToWrite@VCR@@QAEHXZ': 0x524350,
     '?TakeSlotToWrite@VCR@@QAEXPAPAXPAH1@Z': 0x524300,
@@ -185,7 +185,7 @@ class RecorderWorkerBehaviorTests(unittest.TestCase):
                                         (ROOT / source).with_suffix('.bindings.json'))
                         self.assertTrue(proof['strict_exact'], name)
             _, caller = compile_source('src/reconstructed/Recorder.cpp')
-            start = '?Start@VCRInterface@@QAEHHHHHHIPAUUnknownRecorderOwner@@@Z'
+            start = '?Start@VCRInterface@@QAEHHHHHHIPAURecorderVCRFileView@@@Z'
             self.assertTrue(compare(image, caller, start, 0x4e7a90, 716,
                                     ROOT / 'src/reconstructed/Recorder.bindings.json')['strict_exact'])
             self.assertEqual(image.bytes_at_va(0x4e7c55, 5), b'\x68' + struct.pack('<I', 0x4e6f80))

@@ -9,7 +9,7 @@
 // pass. Net.cpp's body uses the argument as an int (the initial lost
 // player id), so its declaration keeps int and the true type is unresolved.
 // The thread calls the method through this view, as ControlInterface.h's
-// UnknownKeyboardBoolView does for a similar conflict. A second overload in
+// FollowCameraKeyboardDeviceView does for a similar conflict. A second overload in
 // Net.h is not used: it reorders operands in TrackGame slot 1.
 class NetKeepAliveView {
 public:

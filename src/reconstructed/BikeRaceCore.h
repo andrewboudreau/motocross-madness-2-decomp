@@ -81,7 +81,7 @@ public:
     // 0x0041eb20: points the camera at racer +0x14c (when it follows a
     // racer) or at scene object +0x154 / +0x150; 0 when that one is hidden.
     int AimCamera(int caster);
-    BikeRaceKrustyBikeView* UnknownFunctionRacerAt(int index);
+    BikeRaceKrustyBikeView* RacerAtIndex(int index);
     // 0x0041f1d0: the next (`forward`) or previous camera target: a racer
     // (`racers`), a scene object or a shadow caster.
     void NextCameraTarget(int forward, int racers, int objects);
