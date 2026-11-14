@@ -248,7 +248,7 @@ public:
 
     // 0x004ea7e0: stores the owner and settings, adds the sound group child.
     Scene* UnknownFunction4ea7e0(SceneArchiveFinder* manager, int value, int unused,
-                                 char flag);
+                                 char probeMask);
     // 0x004eaec0: the entry object named like `path`'s file name.
     UnknownSceneObject* FindEntryByFileName(const char* path, int* index);
     void EnableAutomaticSequence(int index);  // 0x004eafd0: sets entry `index`'s automaticSequence
@@ -315,7 +315,7 @@ public:
     char sceneName[0x40];                 // "SceneInfo" "SceneName"
     Vector3 defaultStartPosition;             // +0x70 "SceneInfo" "DefaultStartPosition"
     Vector3 defaultStartDirection;            // +0x7c "SceneInfo" "DefaultStartDirection"
-    char field_0x88;
+    char groundProbeMask;
     unsigned char field_0x89[3];
     Vector3 podiumPosition;                          // "PodiumPosition"
     Vector3 podiumDirection;                         // "PodiumDirection"

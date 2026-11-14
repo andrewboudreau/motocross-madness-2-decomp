@@ -136,7 +136,7 @@ struct UnknownGridDraw {
 // The player left message (type 5).
 struct DPMsgDestroyPlayerOrGroup {
     int type;                                 // +0x00 5: a DirectPlay system message (no Send passes 5; NetMessage::Set 0x004aacc0 reads the whole dword when from == 0)
-    int field_0x04;
+    int playerType;
     int playerId;                             // +0x08: player id
 };
 
@@ -818,7 +818,7 @@ int MultiPlayerDlg::OnNetworkMessage(int type, void* data, int from, int to, int
                 g_TrackGame->mode.racers[i].engineSize = start->engineSizes[i];
                 g_TrackGame->mode.racers[i].fourStroke = start->fourStrokes[i];
             }
-            memcpy(lobbySlots.slots, start->raceSettings.field_0x18c, sizeof(lobbySlots.slots));
+            memcpy(lobbySlots.slots, start->raceSettings.lobbySlots, sizeof(lobbySlots.slots));
             FillRacerSlots();
         } else {
             FollowTrackChange();

@@ -99,7 +99,7 @@ struct TrackGameViewOwner : public GameObject {
     // +0x568; +0xac is a gate count in the quarry/course owners and a float
     // (stored through a cast: a float member here moves TrackGame slot 1 and
     // TrackOverlay 0x0051a560) in the bike race owner.
-    int field_0xac;                           // RaceStatus.cpp 0x004e6a50 wraps a racer's next gate by it
+    int gateCount;                            // RaceStatus.cpp 0x004e6a50 wraps a racer's next gate by it
     int lapGate;  // +0xB0  picked gate: bikerace/KrustyBike pass the racer's lapGate (0x00404df0)
     int nextLapGate;  // +0xB4  picked gate: the racer's nextLapGate = (lapGate + 1) % count (0x00404df0)
     unsigned char field_0xb8[0xdc - 0xb8];
@@ -243,7 +243,7 @@ struct RaceSettings {
     int tagBall;                              // +0x144 tag ball (SelectGamePicProcs.cpp)
     int stuntMode;                            // +0x148 ChkStuntMode (MPEventDlg 0x004f6370); mode 4 ranks by score, else by tag run (EventManager 0x0045e9d0)
     GridEntry gridOrder[8];  // +0x14C  start grid entries, qsorted by championship points (SelectGamePicProcs); reset by 0x00522cd0
-    unsigned char field_0x18c[0x1ec - 0x18c];
+    unsigned char lobbySlots[0x1ec - 0x18c];
 };
 
 // The five enumerated network sessions at TrackGameMode+0xa98 (0x53c bytes).

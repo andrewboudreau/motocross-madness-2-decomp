@@ -224,7 +224,7 @@ static inline void CarFrame(Matrix4* m, Vector3 forwardAxis, Vector3 upAxis, con
 struct CarProceduralSensorContact {
     float field_0x00;
     float field_0x04;
-    Vector3 field_0x08;
+    Vector3 normal;
 };
 
 // v limited to [lo, hi].
@@ -304,7 +304,7 @@ int CarProcedural::Tick(float frameTime)
         Vector3 lifted = kVec3YAxis * ((1.0f - contact->contactOffset.x) * sensorHalfHeight * 2.0f - sensorHalfHeight) + position;
         if (lifted.y > ground.y) {
             ground = lifted;
-            normal = ((CarProceduralSensorContact*)contact)->field_0x08;
+            normal = ((CarProceduralSensorContact*)contact)->normal;
         }
     }
     if (skipSmoothing)

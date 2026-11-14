@@ -34,15 +34,15 @@ int UnknownTimer::LargestRecentSample() {
     unsigned int now = ReadClock();
     if (now - (unsigned int)timerStart > (unsigned int)timerInterval)
         return 0;
-    return field_0x04;
+    return peakSample;
 }
 
 // 0x004cb6b0: keeps `sample` as the new peak (restarting the interval) when
 // it is larger than the current peak or the current peak has expired.
 void UnknownTimer::RecordSample(int sample) {
     unsigned int now = ReadClock();
-    if (sample > field_0x04 || now - (unsigned int)timerStart > (unsigned int)timerInterval) {
-        field_0x04 = sample;
+    if (sample > peakSample || now - (unsigned int)timerStart > (unsigned int)timerInterval) {
+        peakSample = sample;
         timerStart = (int)now;
     }
 }

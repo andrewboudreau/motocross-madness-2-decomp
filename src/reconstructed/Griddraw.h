@@ -57,7 +57,7 @@ public:
 // coordinate update that 0x00510910 applies to a vertex range.
 class GridManagedTexture {
 public:
-    int RemapTexCoordsIfMoved(float* a, float* b, float* c, float* u, float* v, int count,
+    int RemapTexCoordsIfMoved(float* scale, float* offsetU, float* offsetV, float* u, float* v, int count,
                               unsigned int stride);  // 0x00510910 (ret 0x1c)
     unsigned char field_0x00[0x68];
     unsigned char mapFlags;  // +0x68  TextureMap.h mapFlags; bit 0 (ManagedTexture) enables the texture coordinate remap

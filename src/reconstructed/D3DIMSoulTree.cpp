@@ -215,9 +215,9 @@ void D3DIMSoultreeObject::LoadHierarchy(FileStream* stream)
                 stream->Read(&surface->vertexCount, 4, 1);
                 stream->Read(&surface->faceCount, 4, 1);
                 stream->Read(&surface->materialCount, 4, 1);
-                surface->field_0x30 = 0;
-                surface->field_0x34 = 0;
-                surface->field_0x2c = 1.0f;
+                surface->mappingOffsetU = 0;
+                surface->mappingOffsetV = 0;
+                surface->mappingScale = 1.0f;
                 surface->vertices = (SoultreeVertex*)DebugMalloc(surface->vertexCount * 0x20, __FILE__, 0x181);
                 stream->Read(surface->vertices, 0x20, surface->vertexCount);
                 surface->drawnVertices = (SoultreeVertex*)DebugMalloc(surface->vertexCount * 0x20, __FILE__, 0x184);
@@ -321,9 +321,9 @@ int D3DIMSoultreeObject::ReadLods()
         levelRef.surfaces = (SoultreeSurface*)DebugMalloc(levelRef.surfaceCount * 0x38, __FILE__, 0x206);
         for (int s = 0; s < level->surfaceCount; s++) {
             SoultreeSurface* surface = &level->surfaces[s];
-            surface->field_0x2c = 1.0f;
-            surface->field_0x30 = 0;
-            surface->field_0x34 = 0;
+            surface->mappingScale = 1.0f;
+            surface->mappingOffsetU = 0;
+            surface->mappingOffsetV = 0;
             sprintf(section, "LOD %i - Surface %i", lod, s);
             parameterBlock->SelectSection(section);
             parameterBlock->GetInt("NumberOfVertices", 0, &surface->vertexCount);
@@ -1092,9 +1092,9 @@ void D3DIMSoultreeObject::CloneFrom(SoultreeObject* sourceNode)
                 int k;
                 for (k = 0; k < toSurface->materialCount; k++)
                     toSurface->materialIndices[k] = fromSurface->materialIndices[k];
-                toSurface->field_0x2c = fromSurface->field_0x2c;
-                toSurface->field_0x30 = fromSurface->field_0x30;
-                toSurface->field_0x34 = fromSurface->field_0x34;
+                toSurface->mappingScale = fromSurface->mappingScale;
+                toSurface->mappingOffsetU = fromSurface->mappingOffsetU;
+                toSurface->mappingOffsetV = fromSurface->mappingOffsetV;
                 toSurface->vertices =
                     (SoultreeVertex*)DebugMalloc(toSurface->vertexCount * 0x20, __FILE__, 0x8bd);
                 toSurface->drawnVertices =

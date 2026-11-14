@@ -168,9 +168,9 @@ struct SoultreeSurface {
     int materialCount;                         // material count
     int* materialIndices;                      // material indices
     SoultreeUV* uvs;                           // texture coordinates
-    float field_0x2c;                          // 1.0 after loading
-    int field_0x30;
-    int field_0x34;
+    float mappingScale;                        // 1.0 after loading
+    int mappingOffsetU;
+    int mappingOffsetV;
 };
 
 // Two 16-byte blocks at +0x298 and +0x2a8, copied whole by slot 8 and

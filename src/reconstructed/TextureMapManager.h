@@ -47,7 +47,7 @@ public:
     void RecordSample(int sample);   // 0x004cb6b0: records a sample
 
     int timerStart;                           // +0x00 start time
-    int field_0x04;
+    int peakSample;                           // +0x04 largest recent sample
     int timerInterval;                        // +0x08 interval
 };
 

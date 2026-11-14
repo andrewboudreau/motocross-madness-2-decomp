@@ -307,7 +307,7 @@ int Scene::ReadStaticModels(LightManager* lights, int particleManager, int textu
             AppendChild(object->LoadPhysicsModel(renderContext, sltPath, lights, modelTextures, position, look, up,
                                                                0, particleManager, 5.0f, points, emitters, this,
                                                                0.033333f, 10, 0.025f, 0.05f, radius, shape,
-                                                               minPoints, field_0x88, 1),
+                                                               minPoints, groundProbeMask, 1),
                                   -1);
             staticModels->casters[i].physicsObject = object;
             staticModels->casters[i].model = (ShadowCaster*)(D3DIMSoultreeObject*)object;

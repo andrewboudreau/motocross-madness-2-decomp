@@ -79,7 +79,7 @@ void TrackGameViewOwner::SetFollowedRacer(UnknownEventRacer* racer, UnknownEvent
         if (ball)
             ball->field_0x10a = 0;
     }
-    *(float*)&field_0xac = 5.0f;
+    *(float*)&gateCount = 5.0f;
     if (tell)
         raceView->localRacer->SendFollowedRacer(racer, false);
     if (racer) {

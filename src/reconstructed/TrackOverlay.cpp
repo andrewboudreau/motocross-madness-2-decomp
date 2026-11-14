@@ -803,7 +803,7 @@ int StatsOverlay::DrawRacePanel()
     sprintf(rowText[4], "%s %s", label, time);
     g_TrackGame->LoadResourceString(0x13ad, label, 0x80);
     sprintf(rowText[5], "%s %d / %d", label, instrumentSource->state->lapGate + 1,
-            g_TrackGame->bajaEnduroEvent->field_0xac);
+            g_TrackGame->bajaEnduroEvent->gateCount);
     for (i = 0; i <= 5; i++) {
         if (strcmp(rowText[i], drawnRowText[i]) != 0)
             goto draw;

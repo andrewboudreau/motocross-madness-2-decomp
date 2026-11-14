@@ -440,7 +440,7 @@ int UpdateGateRace(RaceStatusNode** list, RaceGate* firstGate, float frameTime, 
                                        racer->isRemote, racer->forceGatePass))
                 return 0;
             if (g_TrackGame->bajaEnduroEvent && gate != racer->lapGate) {
-                racer->nextLapGate = (racer->lapGate + 1) % g_TrackGame->bajaEnduroEvent->field_0xac;
+                racer->nextLapGate = (racer->lapGate + 1) % g_TrackGame->bajaEnduroEvent->gateCount;
                 if (racer == ((UnknownRaceStatusCamera*)racer->bikeView->raceCamera)->followedRacer)
                     g_TrackGame->bajaEnduroEvent->SelectLapGates(racer->lapGate, racer->nextLapGate,
                                                                               racer);

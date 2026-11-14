@@ -589,8 +589,8 @@ void D3DIMSoultreeObject::DrawCurrentLod()
                 if (material->surfaceMap) {
                     ManagedTexture* texture = (ManagedTexture*)material->surfaceMap->texture;
                     if (texture->mapFlags & 1)
-                        texture->RemapTexCoordsIfMoved(&drawn->field_0x2c, (float*)&drawn->field_0x30,
-                                                       (float*)&drawn->field_0x34, &drawn->vertices->tu,
+                        texture->RemapTexCoordsIfMoved(&drawn->mappingScale, (float*)&drawn->mappingOffsetU,
+                                                       (float*)&drawn->mappingOffsetV, &drawn->vertices->tu,
                                                        &drawn->vertices->tv, drawn->vertexCount, 0x20);
                 }
                 ((RenderTarget*)renderContext)->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, D3DFVF_LVERTEX, (int)drawn->vertices, drawn->vertexCount,
@@ -607,9 +607,9 @@ void D3DIMSoultreeObject::DrawCurrentLod()
                     surface->vertices[k].tu = surface->uvs[k].u;
                     surface->vertices[k].tv = surface->uvs[k].v;
                 }
-                surface->field_0x2c = 1.0f;
-                surface->field_0x30 = 0;
-                surface->field_0x34 = 0;
+                surface->mappingScale = 1.0f;
+                surface->mappingOffsetU = 0;
+                surface->mappingOffsetV = 0;
             }
             material->RestoreRenderStates();
         }

@@ -7,7 +7,7 @@
 #include <new>
 #include "../../src/reconstructed/TextureMapManager.h"
 typedef char Layout[(sizeof(ManagedTextureGroup)==0x258 && sizeof(UnknownTimer)==12 && offsetof(UnknownTimer,timerStart)==0 &&
-    offsetof(UnknownTimer,field_0x04)==4 && offsetof(UnknownTimer,timerInterval)==8 &&
+    offsetof(UnknownTimer,peakSample)==4 && offsetof(UnknownTimer,timerInterval)==8 &&
     offsetof(ManagedTextureGroup,texelsBlittedHistory)==0x1d4 &&
     offsetof(ManagedTextureGroup,blitTimeHistory)==0x1e0 &&
     offsetof(ManagedTextureGroup,texturesBlittedHistory)==0x1ec)?1:-1];
@@ -61,7 +61,7 @@ static int throwStage,phase,scriptCalls,scriptThrows;
 static DWORD scriptTime,oldTime,oldInterval;
 static UnknownTimer* active;
 static void Boundary(int stage) {
-    if(stage!=phase+1 || active->field_0x04!=0 ||
+    if(stage!=phase+1 || active->peakSample!=0 ||
        (DWORD)active->timerStart!=oldTime || (DWORD)active->timerInterval!=oldInterval)ExitProcess(20);
     phase=stage;
     if(throwStage==stage)RaiseException(0xe1234567,0,0,0);

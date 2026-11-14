@@ -5,7 +5,7 @@
 unsigned int ReadClock();
 
 UnknownTimer::UnknownTimer(int interval) {
-    field_0x04 = 0;
+    peakSample = 0;
     timerStart = (int)ReadClock();
     timerInterval = interval;
 }

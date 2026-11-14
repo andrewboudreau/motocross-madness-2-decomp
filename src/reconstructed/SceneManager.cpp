@@ -301,7 +301,7 @@ Scene::Scene(int flags) : GameObject(flags)
     sounds.Init(4, 4);
     auralScape = 0;
     soundGroup = 0;
-    field_0x88 = 0;
+    groundProbeMask = 0;
     stadiumFile[0] = 0;
     logFile = 0;
     visible = 1;
@@ -310,11 +310,11 @@ Scene::Scene(int flags) : GameObject(flags)
 
 // 0x004ea7e0
 Scene* Scene::UnknownFunction4ea7e0(SceneArchiveFinder* manager, int value, int,
-                                    char flag)
+                                    char probeMask)
 {
     sceneManager = manager;
     auralScape = value;
-    field_0x88 = flag;
+    groundProbeMask = probeMask;
     soundGroup = new(__FILE__, 622) SoundGroup(isEnabled);
     AppendChild(soundGroup, -1);
     return this;

@@ -13,12 +13,12 @@ public:
 
 class GridManagedTexture {
 public:
-    int RemapTexCoordsIfMoved(float* a, float* b, float* c, float* u, float* v, int count,
+    int RemapTexCoordsIfMoved(float* scale, float* offsetU, float* offsetV, float* u, float* v, int count,
                               unsigned int stride);  // 0x00510910 (ret 0x1c)
 };
 
-int GridManagedTexture::RemapTexCoordsIfMoved(float* a, float* b, float* c, float* u, float* v, int count,
+int GridManagedTexture::RemapTexCoordsIfMoved(float* scale, float* offsetU, float* offsetV, float* u, float* v, int count,
                                               unsigned int stride)
 {
-    return reinterpret_cast<ManagedTexture*>(this)->RemapTexCoordsIfMoved(a, b, c, u, v, count, stride);
+    return reinterpret_cast<ManagedTexture*>(this)->RemapTexCoordsIfMoved(scale, offsetU, offsetV, u, v, count, stride);
 }
