@@ -3,6 +3,6 @@
   "baseline": "0b113a3b",
   "sections": 734,
   "relocations": 3914,
-  "sha256": "49af334af07ef83f98f3621a21788442ebf42018ff938c11e161311094498a5b",
+  "sha256": "6f1e809e39b87c98d6d5f2934ae393767e6ebccf3cf1a05bb02ac9955db194e7",
   "normalization": "Only the three known __FILE__ paths; private same-path extraction has no exceptions"
 }

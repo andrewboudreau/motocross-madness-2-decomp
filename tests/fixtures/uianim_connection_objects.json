@@ -8,22 +8,22 @@
     "src/reconstructed/GUIManager.cpp": {
       "sections": 202,
       "relocations": 834,
-      "sha256": "c3aab168f8815b5a8e7baa135848e99e4e0c34b3003228e2669edeb7aca86f86"
+      "sha256": "c9701171e313452075a25e0c0339f2b911232665254ecbdb34d801d500b8ad02"
     },
     "src/reconstructed/DlgProcs.cpp": {
       "sections": 421,
       "relocations": 3043,
-      "sha256": "c97874f748a81083174ea301dd7e80e3fe99cfdde5ee6fed0f01562865d07ee4"
+      "sha256": "64edd584ee1223109e7ca0e5819226a62cc41c37bcaccfc46f170772dda5391e"
     },
     "samples/ui/GUIManagerNearMisses.cpp": {
       "sections": 209,
       "relocations": 871,
-      "sha256": "e653fa4982c297dc11fa4cd79316cdaba1e320155f11b98943e03b8a6d958110"
+      "sha256": "408136f767eb059d09916a6bce67fb8748ba781a273bb441b32708b75588bd1b"
     },
     "samples/ui/DlgProcsNearMisses.cpp": {
       "sections": 558,
       "relocations": 4155,
-      "sha256": "4fb1f9066b4d27c1a0306d8bef3055495bda2cac2c780c6c18ea47a5a51ede40"
+      "sha256": "eb5dfc9c0e9b3c843b6b4d66c2ac2f17d0eab7ff04fb8818d179c1f27ac3d68b"
     }
   }
 }
