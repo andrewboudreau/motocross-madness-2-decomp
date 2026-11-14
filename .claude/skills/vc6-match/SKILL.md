@@ -93,6 +93,14 @@ near misses; `tools/near_miss_drops.py` lists ones whose gap is a single drop.
 - The initialised-local count is a weak lever: flat on most rows; when it varies, usually period 8, and it never moves
   scheduling (push order, `sub esp`, store placement). A named by-value copy into an inline helper is a stronger leaf-age
   lever (HullVsHull `0x00436720`).
+- An early clear ages an int local: `count = 0;` at the top of the function, with the local declared at function
+  scope, makes its leaf older than values computed later, which flips the operand order of an integer add or
+  `[base + index]` it takes part in (Scene::ReadStaticModels `0x004ecd60`, 4534 -> exact) and the order of two
+  reloads before a call (`remap = 0;`, GatherModelTriangles `0x0042c260`, 1622 -> 1626). A declaration alone, or
+  the initialiser at first use, does not. Sweep one `x = 0;` per local first; pairs can cancel.
+- Two strength-reduced induction variables of mirrored expressions (`column * 128 - 256` and `256 - column * 128`)
+  spilled in the wrong order: name one (`int x = column * 128 - 256;`) and write the other as `-x`. Every spelling
+  of the two written out is canonicalised to the same code (BuildFaceGeometry `0x0043dc60`, 1100 -> exact).
 - sweep_variants templates: an inline choice ending in `{` followed by `@|` parses as nested; keep braces outside choices.
 - In Git Bash, `/` compiler flags in env vars (`MCM2_EXTRA_FLAGS`) need `MSYS_NO_PATHCONV=1`, or they are ignored.
 

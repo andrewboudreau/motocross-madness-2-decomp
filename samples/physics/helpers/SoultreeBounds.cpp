@@ -25,6 +25,12 @@
 //   Session 15: the 13 products written out in Scale itself on a `Matrix4 m = localMatrix`
 //   copy (no helper parameters), in written or the k = 1,3,2,4 order: 45-52 (661 bytes)
 //   stored to the member, 580-586 through the `local` pointer; s13 stays s-first.
+//   Round 9 (2026-11-14): retail's emitted order per row is k = 2, 3, 4, 1 for row 1 (m
+//   first in the k = 3 and 4 products, s._12 loaded before the copy), 4, 3, 1, 2 for row
+//   2, 4, 2, 1, 3 for row 3 and 2, 1, 3, 4 for _44, the diagonal term last each time
+//   (folded to the parameter or to m._44). Writing row 1 literally that way is 550, with
+//   the three off-diagonal terms parenthesised 591 or 547, m._3J first in the present
+//   order 606; the diagonal stores in reverse order 618; no `local` pointer 38.
 #include <string.h>
 #include "math/Math3D.h"
 

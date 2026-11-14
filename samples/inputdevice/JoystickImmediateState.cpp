@@ -29,6 +29,19 @@
 // (461) or `buttonStates[i].state`, the press arm passing `pressed` (433,
 // one merged call), zero stores from an `int time = 0` local, chained, or
 // storing `pressed` (452).
+// Round 9 (2026-11-14): the scratch rotation runs on from the axis block
+// (its last temporary is edx) into the loop. Retail's release arm loads its
+// arguments into ecx, edx and the press arm into eax, ecx; with a literal 0
+// VC6 gives eax, ecx and edx, eax, one turn early (373). So retail spends
+// one more turn before the release arm, and the chained copy only imitates
+// that. All 373 or worse: the chained copy with a literal 0, the assignment
+// inside the condition, store then test the member, an empty else, the
+// subtype test inverted (`== 4`) or a goto around the axis block, `i` or
+// `axis` at function scope, static inline QueueButton helpers (three
+// shapes), inline ButtonDown helpers, a `continue` loop body, re-testing
+// `(state.buttons[i] >> 7) == 0` or `& 0x80` (321-326), a `changed` local
+// first (328), `if (previous)` (370), pressed before previous (372) and
+// the member as the argument (348).
 int PCJoystickDevice::ReadImmediateState(int value) {
     DIJoyState state;
     if (!device)

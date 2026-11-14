@@ -1660,6 +1660,10 @@ static const float kbSecondsPerMillisecond = 0.001f;
 // is where retail has them; with those two written right after the copy, VC6 hoists
 // forceGatePass/nextLapGate instead (472/532).  The statement order is the evidence; the
 // original grouping of these stores is not otherwise known.
+// Re-measured 2026-11-14: with the pair at ten other places VC6 always hoists the two
+// statements that have 31 and 30 statements after them; removing a later statement of any
+// kind (int, byte, float or Vec3 copy) moves the pick down by one, removing one between
+// the copy and the pair does not.  Vehicle's constructor does not behave this way.
 KrustyBike::KrustyBike(int flags) : GameObject(1), Bike(flags)
 {
     plateNumber = 0x65;

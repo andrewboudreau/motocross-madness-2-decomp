@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 2, b 106, c 70, total 178. The three class (a) functions of the
+Counts: a 2, b 106, c 68, total 176. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -181,15 +181,39 @@ KrustyBike's constructor `0x0048fa60` (class c, 472/532) is exact too, in
 src/krusty2/vehicle/KrustyBike.cpp: VC6 fills the load delay of a struct copy with the two
 stores that sit a fixed number of statements before the end of the block, not the next
 two. Writing the two stores retail hoists (+0x11b8/+0x604) at that position (after
-nextLapGate) reproduces retail; the earlier attempts kept them next to the copy. The same
-move takes Vehicle's constructor `0x005257a0` from 693 to 734/745. When a constructor
-hoists the wrong stores into a copy, move retail's pair to the position VC6 picks from.
+nextLapGate) reproduces retail; the earlier attempts kept them next to the copy.
+Re-measured 2026-11-14 for this constructor, and the claim holds here: with the pair at
+ten other places in the block VC6 always hoists the two statements that have 31 and 30
+statements after them, whatever they are; removing one statement after that position
+(an int, byte or float store, or a whole Vec3 copy, each counts one) moves the pick one
+statement down, and removing one between the copy and the pair does not move it.
+Vehicle's constructor `0x005257a0` (693 to 734/745 with the same move) does not follow
+the rule: there the pair lands in the copy from 66 different positions (see the comment
+above it in Vehicle.cpp). So measure before relying on the count: move the pair, or drop
+a late statement, and look at which two stores sit inside the copy.
 
 DrawableCube::LoadTexturesAndCoords `0x0043e0b0` (class c, 30/352) is exact too, in
 CubeDraw.cpp: a per-face running cell index (`int index = 0` per face, `index++` with
 the column) and direct `s_cellVertices[face][index][k]` stores give retail's row-exit
 pointer; every cell-pointer form folded the row away. The same counters take
 BuildFaceGeometry `0x0043dc60` from 121/1064 to 1100/1104.
+BuildFaceGeometry `0x0043dc60` (class c, 1100/1104) is exact too, in
+samples/render/CubeDrawNearMisses.cpp: the column coordinate is one named local,
+`int x = column * 128 - 256;` at the top of the loop body, and the two faces that need
+the mirrored value use `-x`. VC6 still strength-reduces `x` and `-x` into two induction
+variables, but spills `-x`'s first, as retail does; every spelling of the two expressions
+written out per case gives the other order. Naming the mirrored value instead, both
+values, or the row coordinate too is equal or worse. When two induction-variable spills
+of mirrored expressions swap, name one of them and negate it for the other.
+Scene::ReadStaticModels `0x004ecd60` (class c, 4534/4536) is exact too, in
+samples/track/SceneManagerNearMisses.cpp: `count` is declared at function scope and
+cleared (`count = 0;`) with the other counters at the top, so its leaf is older than the
+element offset's and the name terminator adds it last (`add edx, ebx` then the count).
+A block-local `int count = ...` at its first use, an uninitialised function-scope
+declaration, or clearing `length` instead do not. The same early clear (`remap = 0;`)
+fixes the reload order in GatherModelTriangles `0x0042c260`. When an integer
+`[base + index]` or add has its operands the other way round, give the younger local an
+early assignment at the top of the function (docs/VC6_OPERAND_ORDER.md 1.2).
 ChatOverlay::DrawNameTag `0x0051e3f0` (class b, 966/974) is exact too, in
 samples/track/ChatNameTagDraw.cpp: the growing arm of the width test ends with its own
 `SelectObject(dc, font); return;` and the clamp store follows the `if`. VC6 tail-merges
@@ -233,7 +257,7 @@ before it, even if that arm already matches.
 | game/UiInfo | `0x005238f0` | 190/357 | c | block layout and the single `return 0` tail are retail's; retail keeps fopen's result in eax until the found block (`mov edx, eax` there), VC6 here gives `file` edx after each fopen |
 | gameui/MediaControl | `0x004a2560` | 53/656 | b | 29 code diffs: retail adds `push ebp`; slots differ |
 | inputdevice/PCJoystickDevice | `0x004c3100` | 102/1449 (masked) | b | 90 code diffs: retail lacks `push ebp`; retail lacks `xor ebp, ebp`; slots differ. Linked 0.915. Retail's arm-local spike temporaries (ebx/ebp, a separate `mov eax, [edi]` on the unfiltered path) leave no register for VC6's zero; FilterAxisSpike taking `const unsigned long&` gives aligned 314 of 416 (from 356) |
-| inputdevice/PCJoystickDevice | `0x004c3790` | 453/454 | b | one instruction: retail pushes the zero register (`push ebp`) for the release arm's QueueEvent argument, the candidate pushes eax; `int pressed = buttonStates[i].state = state.buttons[i] >> 7;` took it from 373 (samples/inputdevice/PCJoystickDeviceNearMisses.cpp) |
+| inputdevice/PCJoystickDevice | `0x004c3790` | 453/454 | b | one instruction: retail pushes the zero register (`push ebp`) for the release arm's QueueEvent argument, the candidate pushes eax; `int pressed = buttonStates[i].state = state.buttons[i] >> 7;` took it from 373 (samples/inputdevice/PCJoystickDeviceNearMisses.cpp). The scratch rotation runs on from the axis block: retail's release arm starts one turn later than any form found (round 9 list in JoystickImmediateState.cpp) |
 | io/FileStream | `0x00461340` | 644/702 | c | inline `FileOf(FileStream*)` accessor at the three ReadXorDecoded calls and the tail as a nested `if`; left: origin/offset in ebx/ebp swapped, plus the scratch rotation of the fseek/fclose arguments |
 | io/FileStream | `0x00461640` | 545/663 | c | `FileOf` at the four fread calls and `if (!...) return count - 1; return count;` for the empty-buffer decoded read: every instruction is retail's, but one cross-jump keeps the other copy (36 return spellings and all 127 `FileOf` subsets tried) |
 | io/FileStream | `0x00461b90` | 255/282 | c | 3 code diffs: retail stores the 0xfa seed inside the inlined strcat and sets up the name pointer right after strlen |
@@ -272,7 +296,7 @@ before it, even if that arm already matches.
 | physics/bikeai/BikeAI | `0x0040eca0` | 1542/17585 | b | reads the complete TrackGame (`g_TrackGame->mode.raceSettings.eventType`, `childRoot`, ...) with no cast: aligned 3731 of 3966, frame 0x968 vs 0x93c; dir2's double cross in the parenthesised Vec3-constructor form gives 1479 and aligned 3740, the y + z grouped penetration dots 1542 and aligned 3739 (candidate 17382 bytes). With the cast views of the shared pointer it was 1218 and aligned 3402; a pointer declared with the view type gave the 1561/3760 state below. Before that: aligned 3760 of 3966 instructions (206 diffs); `right` built in a named copy; prologue matches (frame/flag initialisations before the dt clamp); frame 0x968 vs retail 0x93c (re-read with the fixed frame_layout; function-scope ground/normal vectors reach 0x938 with retail's temporary regions but move the inline switch-over, a bare post-loop block reaches 0x92c/0x938 with identical code and no strict gain); the ~60 two-use operator temporaries are the same set in a different quicksort-tie order. Retail keeps `up` (not address-taken) and the loop-head drag (`rf.x - 0.0`, `-32 - drag.y`) in memory; every drag spelling tried (7 drag x 3 force forms, address-taken/tracked padding, `v*0.0f`) is folded by VC6. Retail selects `side` by pointer and copies it to sideV and sideF at the merge (declaring sideF there: strict 1520 but aligned 3737 -> 3703, not kept) |
 | physics/bikeai/BikeAI | `0x00413200` | 2044/4112 | b | KrustyBike member (rear look-ahead cross as the unparenthesised Vec3-constructor helper): frame 0x74 and most slots exact; first three locals at other offsets (`a` needs disp32; retail: c 0x5c, b 0x50, a 0x44 shared with `start`, steps 0, the WorldToLocalDirection/negated-cross temp alone at 0x68 -- moving a/b into the hit block gives retail's a/b/c offsets but merges the temps and shrinks the frame to 0x68; no a/b/c placement x start form beats 2026); operand order of the second lever cross product; ground-branch lean clamp keeps the value on the FPU stack; smoother target kept in a register |
 | physics/bikeai/BikeAI | `0x00414370` | 727/4486 masked | b | KrustyBike member (candidate 4765 B, aligned 1188 of 1302; linked masked 0.951, strict 0.921): the point loops are `for (t = T0, i = 0; t <= T1; t += 0.1f)` with a leading `if (i >= aiPath.count) break;` (count test heads the loop, `t <= T1` is the back edge as retail; the former `while (1)` with a bottom `t > T1` break 589 masked / 1092 aligned, the `for` 679 / 1157); the finished bike's off-track exit is the else of `if (onTrack)` that frees the list and returns 1, which VC6 defers past the next jump as retail does (1159 -> 1181 aligned; `if (!onTrack) goto done` 1159, if/else with the goto 1162); difficulty and the uninitialised trick delay are separate locals sharing one slot (`fld [esp+0x20]`, as the former union, +7 masked); kinds 1/5 store the point count through `path = &aiPath`, so statusNode is reloaded after it and the points[1] copy cross-jumps into the single-point arm as in retail (1181 -> 1188 aligned, linked strict 0.914 -> 0.921, linked masked 0.962 -> 0.951; memset through path inert, path-> counts elsewhere inert or worse, path->points 1091..1132); ruled out: per-use `statusNode->nextGate` in the gate-distance tail as retail reloads it (1151 aligned, difficulty moves into ebp), do/while point loops (1078 aligned), gate-tail dot helper swaps (inert or worse), declaration order (inert); left: retail keeps difficulty in memory with ebp zero, holds count 1 in ebp and 40.0f in ebx in the kind 2/3 off-track path, reloads statusNode after the 3-point line's points[0] store (the candidate keeps it in edx), scales the random roam target through a stored temporary, and swaps the gate dot's x operands; roamTarget is a Vec3 copied whole; the roam offset is the function-scope `dir` (address-taken slot) |
-| physics/bvh/BoundingBoxTreeBuild | `0x0042c260` | 1622/1627 | c | retail reloads numCorners before remap; the remap pass reads `keep[corners[k]]` as `[offset + keep]` where retail has `[keep + offset]` |
+| physics/bvh/BoundingBoxTreeBuild | `0x0042c260` | 1626/1627 | c | one SIB byte: the remap pass reads `keep[corners[k]]` as `[offset + keep]` where retail has `[keep + offset]`. `remap = 0;` at the top of the function gave retail's reload order (numCorners before remap, was 1622); no second cleared local, loop variable or test spelling moves the last byte |
 | physics/bvh/BoundingBoxTreeQuery | `0x00425900` | 2450/4321 | b | aligned 1283/1300: corner distances as float locals squared through QuerySquares, corner signs through an if/return QuerySigned, one componentwise axis normalised in place with a named result, each axis test as named `dist`/`ra` (QueryDot projections) plus the z-first half-segment dot, box tests reading a named extent first; left: retail also calls DotProduct in the seventh normalisation, two fxch, c1z's slot and a permuted frame (ruled-out forms in the sample header) |
 | physics/bvh/BoundingBoxTreeQuery | `0x00426be0` | 1673/2572 | b | cross products match; min/max of the projections (retail keeps p2 on the x87 stack and stores p1 twice), one operand pair of a vertex transform and the frame (0x160 vs 0x164) |
 | physics/bvh/BoundingBoxTreeQuery | `0x00427c10` | 374/1110 | b | natural operator form: retail's helper call sequence; retail keeps the constant 1 in ebp and copies segment[1] at entry, so registers and slots differ |
@@ -319,7 +343,6 @@ before it, even if that arm already matches.
 | race/Wrecker | `0x005329e0` | 1200/1312 (inside Wrecker.cpp) | a | every instruction equal; slot order only (retail keeps `push` nearest esp, then the y/x extent copies, `p`) |
 | render/BackgroundImage | `0x004049d0` | 108/606 (masked) | c | block layout as retail; VC6 caches 0 in edi (`xor edi, edi`, `mov [esp + N], edi`) where retail stores immediates, which moves the region loop's registers; two counted zero stores (`surface`'s home, `copyDcNext`) with `edi` already pushed meet the cache threshold ([VC6_ZERO_REGISTER](VC6_ZERO_REGISTER.md)) |
 | render/CacheTexture | `0x005102d0` | 330/558 (masked) | b | 5 differing instructions (569 bytes; the extra spill shifts the rest); both failures as one `if (result) return 0;` after the loops place the shared `return 0` after the second loop as retail does (`jle; jmp top`); VC6 keeps `result` in a frame slot and tests it again at the loop's normal exit |
-| render/CubeDraw | `0x0043dc60` | 1100/1104 | c | 2 code diffs: retail spills the `256 - column * 128` induction value before `column * 128 - 256` at +0x228 |
 | render/D3DIMSoulTree | `0x00440f30` | 714/7851 | b | DrawCurrentLod: all relocations bound and linked from the same body (Group5 bring-up, Vector3Call aliased to Vec3Call); every float-constant operation in retail's order (mode 2 half as two float locals, the scroll step added after lastScrollPosition is stored, mode 3 light position copied by value); 317 differing insns in the linked metric (was 342); frame (0x9b4 vs 0x9e8), `this` in ebx for esi, x87-held vector temporaries (retail pops 21 stack values, here 11) and register allocation left |
 | render/D3DIMSoulTree | `0x00443aa0` | 799/832 | c | 11 code diffs: retail lacks `fmul [eax + 0x10] ; fld [esp + N]`; retail lacks `faddp st(1)` |
 | render/DebugOverlay | `0x00447a00` | 460/999 | b | body matches; VC6 copies the epilogue into the failure and success returns (retail: one shared epilogue) |
@@ -357,7 +380,6 @@ before it, even if that arm already matches.
 | render/TextService | `0x0050b700` | 398/758 | b | 31 differing instructions: w and v trade esi and a stack slot; row offsets in other registers |
 | render/TextService | `0x0050ba00` | 770/802 | b | scheduling of the v3.sx and v5.sx stores |
 | render/Tgafile | `0x00512990` | 354/982 (masked) | c | 49 code diffs |
-| track/SceneManager | `0x004ecd60` | 4534/4536 | c | the name terminator adds the count before the element offset (`add edx, esi`; retail `add edx, ebx`); ReadAnimations' identical terminator matches. Only deleting the whole later `if (auralScape)` block flips it; declaration shifts 0-63, 0-33 dead locals, count/length forms, aliases and pointer arithmetic do not |
 | track/SceneManager | `0x004edfe0` | 5113/5335 | b | instruction stream aligned; the frame is 0xd00 for retail 0xcfc (one scalar slot too many, low slots ordered spill/dot/j for retail j/dot/spill), and three [base + index] operand orders (NumberOfMotions, random-set keyFramed test) |
 | track/Track | `0x00517340` | 57/655 (masked) | b | 44 code diffs: retail lacks `mov [esp + N], 0`; `add esp, 0x24` vs `add esp, 0x20`; frame 0x24 vs 0x20 |
 | track/TrackOverlay | `0x00519a20` | 535/894 (masked) | c | 31 code diffs: retail lacks `mov ebp, ecx`; retail adds `push edi ; mov edi, ecx ; xor ebx, ebx` |
