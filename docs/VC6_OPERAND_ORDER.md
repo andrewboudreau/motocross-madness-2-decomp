@@ -327,6 +327,29 @@ dead initialised ones are not. Consequences:
   break may be a 128-entry limit, since the function has about 30 other
   definitions.
 
+**PoseRotation `0x004a7fd0` (2026-11-13): used locals count too.** This
+Motnctrl near miss (samples/physics/motion) is the first row the
+local-definition count has made exact with no dead code:
+
+- Extra initialised locals 0..7 before the axisZ block give 1089, 1089,
+  1087, 1097, 1113, 1121, 1113, 1097 of 1121. Here the period is 8, not 32.
+- Used locals count the same as dead ones, so the exact form uses five named
+  constants for the function's own literals: `minCosine` and `maxCosine` for
+  both `ClampFloat` calls, and `identityX/Y/Z` for the identity vector.
+- Initialised int, float, pointer and `const float` locals count. These do
+  not: uninitialised locals, static locals, local typedefs, empty blocks,
+  locals of inline helpers, prototypes, and file-scope typedefs (flat over
+  k = 0..17).
+- A local counts only if it is defined before the expression it influences.
+  Five locals after the `from`/`to` references give 1105.
+- Reference aliases (`const Vec3& from = a->axisZ;`) are path-specific: they
+  fix the axisZ cross but cost the axisY path.
+
+The bytes prove the count (five, mod 8), not which locals retail had. Other
+five-local sets match equally, so the named constants are provisional. Where
+a dead-local scan of another row reaches exact, try naming that function's
+literals, or other values it really uses, before ruling the row out.
+
 ## 3. Redundant parentheses around a product
 
 VC6 keeps a redundant pair of parentheses as a node of its own, and that
