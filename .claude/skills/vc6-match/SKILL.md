@@ -65,6 +65,13 @@ near misses; `tools/near_miss_drops.py` lists ones whose gap is a single drop.
 - A width conversion between locals (`unsigned char r = intVar`) blocks copy propagation and keeps a callee-saved copy
   plus the stack home alive (UIMultiState::ContainsPoint `0x00478e10`, 231 -> 288/329). Zero reuse from `test/jne`
   only happens on the fall-through edge; at a jump target VC6 emits the immediate.
+- Scratch-register rotation: VC6 hands expression temporaries eax, ecx, edx in turn; a named value (a local, an inline
+  function parameter, or an inline accessor result like `FileOf(stream)`) takes no turn, so a permutation that starts at
+  one call and persists usually means retail had (or lacked) a named value there. A local declared before an argument
+  list shifts the whole list; a pointer local held across a call goes to esi; a read-only local is propagated away, a
+  reassigned one survives (FileStream Write/CheckHeader, ShowControlToolTip, LeaveRaceForMenu, HandleReceivedMessage).
+- Struct copy then `+=` (`pos = dev->pointerPosition; pos.y += 16;`) beats component-wise stores (ShowControlToolTip).
+- PoseRotation: the function-local definition count has period 8 there; used named constants count like dead locals.
 - In Git Bash, `/` compiler flags in env vars (`MCM2_EXTRA_FLAGS`) need `MSYS_NO_PATHCONV=1`, or they are ignored.
 
 ## 4. Record and ship
