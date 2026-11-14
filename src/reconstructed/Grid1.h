@@ -87,11 +87,11 @@ struct Grid1RenderHost {
 
 class DrawableGridNodeSharedTextures : public DrawableGridNode {
 public:
-    DrawableGridNodeSharedTextures(FileStream* stream, int a1, GridNode* parent,
+    DrawableGridNodeSharedTextures(FileStream* stream, int loadChildren, GridNode* parent,
                                    GridTerrain* terrain, int level, int shift, int x, int z,
                                    int index, float* boundsMin, float* boundsMax);  // 0x0047c880 (ret 0x2c)
 
-    virtual GridNode* CreateChildNode(FileStream* stream, int a1, DrawableGridNode* parent,
+    virtual GridNode* CreateChildNode(FileStream* stream, int loadChildren, DrawableGridNode* parent,
                                       int level, int shift, int x, int z, int index,
                                       void* boundsMin, void* boundsMax);  // 0x0047c960
     virtual void SelectTexture(float a);                  // 0x0047caa0

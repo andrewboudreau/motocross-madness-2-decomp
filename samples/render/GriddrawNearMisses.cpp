@@ -71,8 +71,8 @@
 // mask; `a7` is the recursion level, `a8` the quadrant path and the
 // child blocks' masks are set to 0x3fffff (all visible), 0x1fffff (leaf)
 // or cleared with 0x00464e90. Structure and calls match; the frame is
-// the same size. VC6 here keeps `extent` in ebp and `a1` in ebx where
-// retail keeps `size` then `a9` in ebx and `a1` in ebp, and lays out the
+// the same size. VC6 here keeps `extent` in ebp and `screenMatrix` in ebx where
+// retail keeps `size` then `a9` in ebx and `screenMatrix` in ebp, and lays out the
 // subdivision block after the general tests rather than as the
 // fall-through of the `size <= 1` branch, so the body differs throughout.
 // Retail's order is: the size > 1 tests, the size <= 1 block falling into
@@ -439,7 +439,7 @@ float DrawableGridNode::ComputeViewerDetail(int coarse)
 }
 
 // 0x00481de0: the visibility walk (see the note at the top).
-int DrawableGridNode::WalkVisibilityQuadrants(void* stream, void* a1, float* center, float* extent, int x, int z,
+int DrawableGridNode::WalkVisibilityQuadrants(void* stream, void* screenMatrix, float* center, float* extent, int x, int z,
                                             int size, int depth, int path, int coarse)
 {
     int count = 0;
@@ -451,12 +451,12 @@ int DrawableGridNode::WalkVisibilityQuadrants(void* stream, void* a1, float* cen
     int j;
     if (size > 1) {
         g_gridBoxTests++;
-        visible = reinterpret_cast<GridVisibilityClipper*>(g_visibilityClipper)->TestBox(terrain->renderer->camera, (float*)a1, center, extent, 0, &corners, 0);
+        visible = reinterpret_cast<GridVisibilityClipper*>(g_visibilityClipper)->TestBox(terrain->renderer->camera, (float*)screenMatrix, center, extent, 0, &corners, 0);
         if (corners != 8)
             corners = 0;
         if (size == 16) {
             if (visible) {
-                UpdateLevelOfDetail((FileStream*)stream, a1, 0, coarse);
+                UpdateLevelOfDetail((FileStream*)stream, screenMatrix, 0, coarse);
                 if (data->b0) {
                     coarse = 1;
                     count = 1;
@@ -487,7 +487,7 @@ int DrawableGridNode::WalkVisibilityQuadrants(void* stream, void* a1, float* cen
                             if (child->children)
                                 child->data->b1 = 1;
                         }
-                        child->UpdateLevelOfDetail((FileStream*)stream, a1, 1, coarse);
+                        child->UpdateLevelOfDetail((FileStream*)stream, screenMatrix, 1, coarse);
                         count++;
                     }
                 }
@@ -508,26 +508,26 @@ int DrawableGridNode::WalkVisibilityQuadrants(void* stream, void* a1, float* cen
                 GridVec3 c2 = GridVec3(childExtent.x + center[0], center[1], center[2] - childExtent.z);
                 GridVec3 c3 = GridVec3(center[0] - childExtent.x, center[1], childExtent.z + center[2]);
                 GridVec3 c4 = GridVec3(childExtent.x + center[0], center[1], childExtent.z + center[2]);
-                count += WalkVisibilityQuadrants(stream, a1, &c1.x, &childExtent.x, x, z, size, depth + 1, path * 4, coarse);
-                count += WalkVisibilityQuadrants(stream, a1, &c2.x, &childExtent.x, x + size, z, size, depth + 1, path * 4 + 1, coarse);
-                count += WalkVisibilityQuadrants(stream, a1, &c3.x, &childExtent.x, x, z + size, size, depth + 1, path * 4 + 2, coarse);
-                count += WalkVisibilityQuadrants(stream, a1, &c4.x, &childExtent.x, x + size, z + size, size, depth + 1, path * 4 + 3, coarse);
+                count += WalkVisibilityQuadrants(stream, screenMatrix, &c1.x, &childExtent.x, x, z, size, depth + 1, path * 4, coarse);
+                count += WalkVisibilityQuadrants(stream, screenMatrix, &c2.x, &childExtent.x, x + size, z, size, depth + 1, path * 4 + 1, coarse);
+                count += WalkVisibilityQuadrants(stream, screenMatrix, &c3.x, &childExtent.x, x, z + size, size, depth + 1, path * 4 + 2, coarse);
+                count += WalkVisibilityQuadrants(stream, screenMatrix, &c4.x, &childExtent.x, x + size, z + size, size, depth + 1, path * 4 + 3, coarse);
             } else {
                 DrawableGridNode* child = (DrawableGridNode*)children[g_gridRow16[z] + x];
                 if (child) {
                     if (child->children) {
-                        count += child->WalkVisibilityQuadrants(stream, a1, &child->center.x, &child->extent.x, 0, 0, 16, 0, 0, coarse);
+                        count += child->WalkVisibilityQuadrants(stream, screenMatrix, &child->center.x, &child->extent.x, 0, 0, 16, 0, 0, coarse);
                         child->data->b1 = 1;
                     } else {
                         int dummy;
                         g_gridBoxTests++;
-                        if (reinterpret_cast<GridVisibilityClipper*>(g_visibilityClipper)->TestBox(terrain->renderer->camera, (float*)a1, &child->center.x,
+                        if (reinterpret_cast<GridVisibilityClipper*>(g_visibilityClipper)->TestBox(terrain->renderer->camera, (float*)screenMatrix, &child->center.x,
                                                          &child->extent.x, 0, 0, &dummy)) {
                             if (child->childMask != 0x1fffff) {
                                 child->childMask = 0x1fffff;
                                 changed = 1;
                             }
-                            child->UpdateLevelOfDetail((FileStream*)stream, a1, 0, coarse);
+                            child->UpdateLevelOfDetail((FileStream*)stream, screenMatrix, 0, coarse);
                             count++;
                         } else if (child->childMask) {
                             child->childMask = 0;

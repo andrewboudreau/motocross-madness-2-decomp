@@ -165,7 +165,7 @@ static void BuildEdgeTable()
 }
 
 // 0x0047e540
-DrawableGridNode::DrawableGridNode(int stream, int a1, GridNode* parent, GridTerrain* terrain, int level,
+DrawableGridNode::DrawableGridNode(int stream, int loadChildren, GridNode* parent, GridTerrain* terrain, int level,
                                    int shift, int x, int z, int index, int boundsMin, int boundsMax)
 {
     this->terrain = terrain;
@@ -198,7 +198,7 @@ static inline int GridExtentBelow(const GridVec3& v, float limit)
 // data (with per-block records when any of the 16 header words is not an
 // 0xfffe/0xffff marker), computes the bounding box and, when asked, creates
 // the child nodes through virtual slot 2.
-DrawableGridNode* DrawableGridNode::ReadNode(FileStream* stream, int a1,
+DrawableGridNode* DrawableGridNode::ReadNode(FileStream* stream, int loadChildren,
                                              DrawableGridNode* parent, int level, int shift,
                                              int x, int z, int index, float* boundsMin,
                                              float* boundsMax)
@@ -308,7 +308,7 @@ allocated:
     if (parent)
         terrain = parent->terrain;
     UnknownVirtualSlot5(stream);
-    if (a1 && childListOffset) {
+    if (loadChildren && childListOffset) {
         childOffsets = new (__FILE__, 776) int[256];
         children = new (__FILE__, 777) GridNode*[256];
         stream->Seek(terrain->childTableOffset + childListOffset, 0, 1);
@@ -316,7 +316,7 @@ allocated:
         for (i = 0; i < 256; i++) {
             if (childOffsets[i]) {
                 stream->Seek(terrain->childTableOffset + childOffsets[i], 0, 1);
-                children[i] = CreateChildNode(stream, a1, this, this->level - 1, this->shift - 4,
+                children[i] = CreateChildNode(stream, loadChildren, this, this->level - 1, this->shift - 4,
                                               (gridX + i % 16) * 16, (gridZ + i / 16) * 16, i,
                                               boundsMin, boundsMax);
             } else {
@@ -1156,7 +1156,7 @@ void DrawableGridNode::TestDroppableVertices()
 // 0x004824c0: updates the node's level of detail; nodes that stay coarse
 // release their children's buffers, finer ones load their child nodes from
 // the stream on first use (the same layout 0x0047e600 reads).
-void DrawableGridNode::UpdateLevelOfDetail(FileStream* stream, void* a1, int recurse, int coarse)
+void DrawableGridNode::UpdateLevelOfDetail(FileStream* stream, void* screenMatrix, int recurse, int coarse)
 {
     float detail = ComputeViewerDetail(coarse);
     SelectTexture(detail);
@@ -1197,7 +1197,7 @@ void DrawableGridNode::UpdateLevelOfDetail(FileStream* stream, void* a1, int rec
     if (recurse) {
         for (int i = 0; i < 256; i++) {
             if (children[i])
-                ((DrawableGridNode*)children[i])->UpdateLevelOfDetail(stream, a1, 1, data->b0 | coarse);
+                ((DrawableGridNode*)children[i])->UpdateLevelOfDetail(stream, screenMatrix, 1, data->b0 | coarse);
         }
     }
 }
@@ -1761,9 +1761,9 @@ float DrawableGridNode::BlockDistance(int block)
 
 // 0x00481db0: the root call of the visibility walk 0x00481de0 with the
 // node's bounding box (+0x44 centre, +0x50 half extents).
-int DrawableGridNode::TestVisibility(void* stream, void* a1)
+int DrawableGridNode::TestVisibility(void* stream, void* screenMatrix)
 {
-    return WalkVisibilityQuadrants(stream, a1, &center.x, &extent.x, 0, 0, 16, 0, 0, 0);
+    return WalkVisibilityQuadrants(stream, screenMatrix, &center.x, &extent.x, 0, 0, 16, 0, 0, 0);
 }
 
 // 0x00481cc0: screen-space error test of vertex (x, z): returns 1 when the

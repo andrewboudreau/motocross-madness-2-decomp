@@ -23,25 +23,25 @@ static int g_gridRow17[18] = {
 float g_grid1DetailDistance = 256.0f;
 
 // 0x0047c880
-DrawableGridNodeSharedTextures::DrawableGridNodeSharedTextures(FileStream* stream, int a1,
+DrawableGridNodeSharedTextures::DrawableGridNodeSharedTextures(FileStream* stream, int loadChildren,
                                                                GridNode* parent, GridTerrain* terrain,
                                                                int level, int shift, int x, int z,
                                                                int index, float* boundsMin,
                                                                float* boundsMax)
-    : DrawableGridNode((int)stream, a1, parent, terrain, level, shift, x, z, index, (int)boundsMin,
+    : DrawableGridNode((int)stream, loadChildren, parent, terrain, level, shift, x, z, index, (int)boundsMin,
                        (int)boundsMax)
 {
-    ReadNode(stream, a1, (DrawableGridNode*)parent, level, shift, x, z, index, boundsMin,
+    ReadNode(stream, loadChildren, (DrawableGridNode*)parent, level, shift, x, z, index, boundsMin,
              boundsMax);
 }
 
 // 0x0047c960
-GridNode* DrawableGridNodeSharedTextures::CreateChildNode(FileStream* stream, int a1,
+GridNode* DrawableGridNodeSharedTextures::CreateChildNode(FileStream* stream, int loadChildren,
                                                           DrawableGridNode* parent, int level,
                                                           int shift, int x, int z, int index,
                                                           void* boundsMin, void* boundsMax)
 {
-    return new (__FILE__, 61) DrawableGridNodeSharedTextures(stream, a1, this, parent->terrain, level,
+    return new (__FILE__, 61) DrawableGridNodeSharedTextures(stream, loadChildren, this, parent->terrain, level,
                                                              shift, x, z, index, (float*)boundsMin,
                                                              (float*)boundsMax);
 }

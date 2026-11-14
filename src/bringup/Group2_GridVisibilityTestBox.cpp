@@ -20,9 +20,9 @@
 // 0x0052f570
 int GridVisibilityClipper::TestBox(GridCamera* camera, const float* matrix, const float* center,
                                    const float* extent, int* screenRect, int* cornersInside,
-                                   int* a6)
+                                   int* unused)
 {
     return reinterpret_cast<VisibilityClipper*>(this)->TestBox(
         reinterpret_cast<VisibilityCamera*>(camera), matrix, center, extent, screenRect,
-        cornersInside, reinterpret_cast<int>(a6));
+        cornersInside, reinterpret_cast<int>(unused));
 }

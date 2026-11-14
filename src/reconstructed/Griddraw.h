@@ -104,7 +104,7 @@ struct GridCamera {
 class GridVisibilityClipper {
 public:
     int TestBox(GridCamera* camera, const float* matrix, const float* center, const float* extent,
-                int* screenRect, int* cornersInside, int* a6);  // 0x0052f570 (ret 0x1c)
+                int* screenRect, int* cornersInside, int* unused);  // 0x0052f570 (ret 0x1c)
 };
 #include "../krusty2/visibility/VisibilityClipperGlobal.h"   // 0x00575a98
 
@@ -295,13 +295,13 @@ class DrawableGridNode : public GridNode {
 public:
     // Only terrain and parent are used; the rest are DrawableGridNodeSharedTextures' arguments
     // (the stream and bounds passed as ints).
-    DrawableGridNode(int stream, int a1, GridNode* parent, GridTerrain* terrain, int level, int shift,
+    DrawableGridNode(int stream, int loadChildren, GridNode* parent, GridTerrain* terrain, int level, int shift,
                      int x, int z, int index, int boundsMin, int boundsMax);  // 0x0047e540 (ret 0x2c)
     virtual ~DrawableGridNode();                                // 0x0047ec60 (slot 0 0x0047e5e0)
-    DrawableGridNode* ReadNode(FileStream* stream, int a1, DrawableGridNode* parent,
+    DrawableGridNode* ReadNode(FileStream* stream, int loadChildren, DrawableGridNode* parent,
                                int level, int shift, int x, int z, int index,
                                float* boundsMin, float* boundsMax); // 0x0047e600 (ret 0x28)
-    virtual GridNode* CreateChildNode(FileStream* stream, int a1, DrawableGridNode* parent,
+    virtual GridNode* CreateChildNode(FileStream* stream, int loadChildren, DrawableGridNode* parent,
                                       int level, int shift, int x, int z, int index,
                                       void* boundsMin, void* boundsMax) { return 0; }   // 0x004806e0
     virtual void SelectTexture(float a) {}                // 0x004806f0 (shared)
@@ -339,13 +339,13 @@ public:
     float BlockDistance(int block);                     // 0x00481b30 (ret 4)
     float ComputeViewerDetail(int coarse);                    // 0x004815e0 (ret 4): from the viewer's distance to the bounds
     int CanDropVertex(int x, int z);                    // 0x00481cc0 (ret 8)
-    int TestVisibility(void* stream, void* a1);              // 0x00481db0 (ret 8)
+    int TestVisibility(void* stream, void* screenMatrix);              // 0x00481db0 (ret 8)
     // 0x00481de0 (ret 0x28): tests the box against the clipper and recurses
     // into the four quadrant boxes (x, z, size; depth and quadrant path)
     // down to the child blocks, updating childMask; returns the visible count.
-    int WalkVisibilityQuadrants(void* stream, void* a1, float* center, float* extent, int x, int z,
+    int WalkVisibilityQuadrants(void* stream, void* screenMatrix, float* center, float* extent, int x, int z,
                                 int size, int depth, int path, int coarse);
-    void UpdateLevelOfDetail(FileStream* stream, void* a1, int recurse,
+    void UpdateLevelOfDetail(FileStream* stream, void* screenMatrix, int recurse,
                                int coarse);                     // 0x004824c0 (ret 0x10)
     void PropagateFullMask();                               // 0x004826d0
     void RetestChangedVertices();                               // 0x00482760
