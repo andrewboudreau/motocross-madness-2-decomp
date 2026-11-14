@@ -107,6 +107,13 @@
 //   `const&`, `void**` and `results + i` stay at 589.
 //   An inline `Events(TrackGame*)` accessor at all or any group of the
 //   EventManager reads of 0x004513a0 changes nothing (583, 2026-11-13).
+//   0x004507a0's first loop again (wave 26, all 589): an `EventManager**`
+//   local assigned in the loop test (inside the comparison or before a
+//   comma) and dereferenced in the body, which is retail's `lea` and
+//   `mov edx, [eax]` written out, is forwarded away; so are
+//   `(*&eventManager)->`, `(&results[0])[i]`, the comparison reversed, an
+//   `(int)` cast and an unsigned comparison. A TrackGame local assigned in
+//   the test is kept and is far worse (142 of 1672).
 
 #include "../../src/reconstructed/DlgProcs.cpp"
 
