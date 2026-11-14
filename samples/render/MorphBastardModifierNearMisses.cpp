@@ -170,7 +170,7 @@ inline void MorphBastardInvertRigidInPlace(Matrix4* m)
 }
 
 // 0x004a33b0
-MorphBastardModifier* MorphBastardModifier::LoadParameterFile(void* value, const char* path,
+MorphBastardModifier* MorphBastardModifier::LoadParameterFile(void* renderContext, const char* path,
                                                                  MorphBastardNode* model)
 {
     float targetValue;
@@ -179,7 +179,7 @@ MorphBastardModifier* MorphBastardModifier::LoadParameterFile(void* value, const
     char controllerName[0x100];
     int targetCount;
 
-    D3DIMSoultreeModifier::SetRenderContext(value);
+    D3DIMSoultreeModifier::SetRenderContext(renderContext);
     FileStream* stream =
         new (__FILE__, 73) FileStream(g_ResourceManager);
     stream->Open(path, "r", 0);

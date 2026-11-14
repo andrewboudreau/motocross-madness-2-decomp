@@ -59,7 +59,25 @@ class GridManagedTexture {
 public:
     int RemapTexCoordsIfMoved(float* scale, float* offsetU, float* offsetV, float* u, float* v, int count,
                               unsigned int stride);  // 0x00510910 (ret 0x1c)
-    unsigned char field_0x00[0x68];
+    unsigned char field_0x00[0x04];                 // +0x00 vfptr (BaseObject)
+    int refCount;                               // +0x04 BaseObject refCount
+    void* nextTexture;                          // +0x08 TextureMap nextTexture
+    void* previousTexture;                      // +0x0c TextureMap previousTexture
+    void* ownerManager;                         // +0x10 TextureMap ownerManager
+    int textureWidth;                           // +0x14 TextureMap textureWidth
+    int textureHeight;                          // +0x18 TextureMap textureHeight
+    int minimumMipSize;                         // +0x1c TextureMap minimumMipSize
+    int mapFormat;                              // +0x20 TextureMap mapFormat
+    int mipCount;                               // +0x24 TextureMap mipCount
+    void* sourcePalette;                        // +0x28 TextureMap sourcePalette
+    void* colorMapper;                          // +0x2c TextureMap colorMapper
+    int usesColorKey;                           // +0x30 TextureMap usesColorKey
+    int colorKeyValue;                          // +0x34 TextureMap colorKeyValue
+    int colorKeyHighValue;                      // +0x38 TextureMap colorKeyHighValue
+    int averageColor;                           // +0x3c TextureMap averageColor
+    unsigned char field_0x40[0x44 - 0x40];
+    int statePairCount;                         // +0x44 TextureMap statePairCount
+    unsigned char statePairs[0x68 - 0x48];      // +0x48 TextureMap statePairs (TextureRenderState[4]; bytes kept)
     unsigned char mapFlags;  // +0x68  TextureMap.h mapFlags; bit 0 (ManagedTexture) enables the texture coordinate remap
 };
 
@@ -116,7 +134,7 @@ struct GridTerrain {
     unsigned char field_0x01c[0x2c - 0x1c];
     GridVertexLighter vertexLighter;           // +0x2c
     int updateTextureCoordinates;              // +0x38 enables texture coordinate updates
-    unsigned char field_0x03c[0x40 - 0x3c];
+    void* stream;                               // +0x3c Terrain stream (a TerrainStream*)
     float gridCellSize;                        // +0x40
     unsigned char field_0x044[0x60 - 0x44];
     float viewerX;                             // +0x60..+0x68 viewer position (0x00481cc0)
@@ -126,7 +144,9 @@ struct GridTerrain {
     int cameraFocalLength;                    // +0x70  Terrain cameraFocalLength (0x00507836)
     float drawDistanceRatio;  // +0x74  Terrain 0x00507bb0: appliedDrawDistance / cameraFocalLength; scales the error limits (0x004815e0)
     float drawDistanceRatioSquared;  // +0x78  Terrain 0x00507bb0: square of +0x74; CanDropVertex's limit factor (0x00481cc0)
-    unsigned char field_0x07c[0x88 - 0x7c];
+    float invDistanceRatioSq;                   // +0x7c Terrain invDistanceRatioSq
+    float invDistanceRatio;                     // +0x80 Terrain invDistanceRatio
+    int runMeshChecks;                          // +0x84 Terrain runMeshChecks
     int indicesDrawn;                          // +0x88 indices drawn
     int verticesDrawn;                         // +0x8c vertices drawn
     int vertexErrorTests;                     // +0x90 incremented per vertex error test
@@ -141,9 +161,21 @@ struct GridTerrain {
     int frameCount;                           // +0xB4  Terrain +0xb4, incremented by PrepareGeometry 0x00507610 (0x00507861) after the visibility walk
     int vertexRetestStamps[17 * 17];  // +0xB8  per vertex: set to retestStamp by 0x00482760, compared by 0x00482f00; cleared by the first node
     int retestStamp;  // +0x53C  incremented per RetestChangedVertices (0x00482760); stamps vertexRetestStamps
-    unsigned char field_0x540[0xc14 - 0x540];
+    int ownedObjectCount;                       // +0x540 Terrain ownedObjectCount
+    void* ownedObjects[(0xbe8 - 0x544) / 4];    // +0x544 Terrain ownedObjects (BaseObject*)
+    unsigned char field_0xbe8[0xbec - 0xbe8];
+    int drawDistance;                           // +0xbec Terrain drawDistance
+    int qualityIndex;                           // +0xbf0 Terrain qualityIndex
+    int drawDistanceDirty;                      // +0xbf4 Terrain drawDistanceDirty
+    unsigned char field_0xbf8[0xbfc - 0xbf8];
+    int profileEval;                            // +0xbfc Terrain profileEval
+    int profileMesh;                            // +0xc00 Terrain profileMesh
+    int profileSetup;                           // +0xc04 Terrain profileSetup
+    unsigned char field_0xc08[0xc10 - 0xc08];
+    int blockCount;                             // +0xc10 Terrain blockCount
     GridBaseBlock** blocks;                    // +0xc14
-    unsigned char field_0xc18[0xc34 - 0xc18];
+    unsigned char surfaceDesc[0xc30 - 0xc18];   // +0xc18 Terrain surfaceDesc (a TerrainSurfaceDesc; bytes kept)
+    float invGridCellSize;                      // +0xc30 Terrain invGridCellSize
     unsigned char useVertexNormals;  // +0xC34  Terrain::Load sets it with the +0xc40 sink; bit 0 -> node b2 (normals written, sink called)
     unsigned char field_0xc35[3];
     int childTableOffset;                     // +0xc38 stream offset of the child tables
@@ -153,7 +185,8 @@ struct GridTerrain {
     int textureAgeManager;  // +0xC84  Grid1.h's Grid1Terrain view: the node texture AgeManager
     AgeManager* ageManager;                    // +0xc88
     GridCamera* camera;                        // +0xc8c
-    unsigned char field_0xc90[0xc9c - 0xc90];
+    unsigned int detailAverageColor;            // +0xc90 Terrain detailAverageColor
+    unsigned char field_0xc94[0xc9c - 0xc94];
     union {
         float field_0xc9c;                     // +0xc9c
         int unlitColor;                        // copied into unlit vertices (0x00480c90)

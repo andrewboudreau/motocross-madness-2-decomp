@@ -169,7 +169,7 @@ CarProcedural* CarProcedural::Create(void* renderContext, const char* name, cons
     sensorCollider->AddIgnoredOwner(bodyCollider);
     g_MemTagStack->Pop(tag);
 
-    ReadPath(pathFile, carModel->field_0x38);
+    ReadPath(pathFile, carModel->nodeName);
     pathSpeed = speed;
     if (speed > 0.0)
         inversePathSpeed = 1.0f / speed;

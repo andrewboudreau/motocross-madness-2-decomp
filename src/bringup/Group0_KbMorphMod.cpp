@@ -48,7 +48,7 @@ inline void MorphBastardInvertRigidInPlace(Matrix4* m)
 }
 
 // 0x004a33b0
-MorphBastardModifier* MorphBastardModifier::LoadParameterFile(void* value, const char* path,
+MorphBastardModifier* MorphBastardModifier::LoadParameterFile(void* renderContext, const char* path,
                                                                  MorphBastardNode* model)
 {
     char section[0x100];
@@ -56,7 +56,7 @@ MorphBastardModifier* MorphBastardModifier::LoadParameterFile(void* value, const
     char controllerName[0x100];
     int targetCount;
 
-    D3DIMSoultreeModifier::SetRenderContext(value);
+    D3DIMSoultreeModifier::SetRenderContext(renderContext);
     FileStream* stream =
         new (kMorphBastardModifierFile, 73) FileStream(g_ResourceManager);
     stream->Open(path, "r", 0);
@@ -185,10 +185,10 @@ MorphBastardModifier* MorphBastardModifier::LoadParameterFile(void* value, const
 
 // The view KrustyBike.cpp calls through (0x58-byte MorphBastardModifier).
 struct KbMorphMod {
-    KbMorphMod* LoadParameterFile(void* a, const char* path, SoultreeObject* node);
+    KbMorphMod* LoadParameterFile(void* renderContext, const char* path, SoultreeObject* node);
 };
 
-KbMorphMod* KbMorphMod::LoadParameterFile(void* a, const char* path, SoultreeObject* node)
+KbMorphMod* KbMorphMod::LoadParameterFile(void* renderContext, const char* path, SoultreeObject* node)
 {
-    return (KbMorphMod*)((MorphBastardModifier*)this)->LoadParameterFile(a, path, node);
+    return (KbMorphMod*)((MorphBastardModifier*)this)->LoadParameterFile(renderContext, path, node);
 }

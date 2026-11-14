@@ -111,7 +111,10 @@ struct Group1ParticleGame {
 
 // The camera fields slot 14 reads (Camera.h keeps them protected; same offsets).
 struct Group1ParticleCamera {
-    char field_0x000[0xec];
+    char field_0x000[0x2c];          // +0x00 GameObject
+    float worldMatrix[16];         // +0x2c Camera worldMatrix
+    float projectionMatrix[16];    // +0x6c Camera projectionMatrix
+    float viewMatrix[16];          // +0xac Camera viewMatrix
     float screenMatrix[16];        // +0xec screen x view matrix (column 2 gives view depth)
     char field_0x12c[0x16c - 0x12c]; // +0x12c Camera screenMatrix[1]
     float fieldOfView;             // +0x16c Camera fieldOfView

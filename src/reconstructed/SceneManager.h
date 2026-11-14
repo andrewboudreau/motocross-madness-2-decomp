@@ -67,17 +67,51 @@ public:
                                float lagDistance, float a11, int tires, float a13,
                                float a14, float a15);
 
-    unsigned char field_0x2c[0x34 - 0x2c];
+    int drawColor;                            // +0x2c GraphicsTest drawColor (CarProcedural's base)
+    int specularColor;                        // +0x30 GraphicsTest specularColor
     SceneSoultreeObjectView* carModel;  // +0x34  CarProcedural +0x34 carModel; SetDetailLevel/BikeRace use it as the model node
     void* sensorCollider;  // +0x38  CarProcedural +0x38 sensorCollider (QuarryStuntEvent sets collision ignore lists)
     void* bodyCollider;  // +0x3C  CarProcedural +0x3c bodyCollider
-    unsigned char field_0x40[0x5c - 0x40];
+    Vector3 pathVelocity;                     // +0x40 CarProcedural pathVelocity
+    float groundSpeed;                        // +0x4c CarProcedural groundSpeed
+    int steersFrontWheels;                    // +0x50 CarProcedural steersFrontWheels
+    int started;                              // +0x54 CarProcedural started
+    unsigned char field_0x58[0x5c - 0x58];
     int skipSmoothing;                        // +0x5C  CarProcedural +0x5c; RestartEntry sets it unless the restart time was clamped
-    unsigned char field_0x60[0x194 - 0x60];
+    unsigned int numWheels;                   // +0x60 CarProcedural numWheels
+    unsigned int currentPathKey;              // +0x64 CarProcedural currentPathKey
+    unsigned char field_0x68[0x6c - 0x68];
+    unsigned int pathKeyCount;                // +0x6c CarProcedural pathKeyCount
+    char carName[0x100];                      // +0x70 CarProcedural carName
+    float pathSpeed;                          // +0x170 CarProcedural pathSpeed
+    float inversePathSpeed;                   // +0x174 CarProcedural inversePathSpeed
+    unsigned char field_0x178[0x184 - 0x178];
+    float inverseWheelRadius;                 // +0x184 CarProcedural inverseWheelRadius
+    float sensorHalfHeight;                   // +0x188 CarProcedural sensorHalfHeight
+    float wheelSpinAngle;                     // +0x18c CarProcedural wheelSpinAngle
+    float steeringAngle;                      // +0x190 CarProcedural steeringAngle
     float pathTime;  // +0x194  CarProcedural +0x194 pathTime; RestartEntry (0x004eb040) sets it to the restart time
+    float frontWheelZ;                        // +0x198 CarProcedural frontWheelZ
+    float trailDistance;                      // +0x19c CarProcedural trailDistance
+    float trailTimeOffset;                    // +0x1a0 CarProcedural trailTimeOffset
+    float lookAheadTime;                      // +0x1a4 CarProcedural lookAheadTime
+    float velocityScale;                      // +0x1a8 CarProcedural velocityScale
+    float backBlend;                          // +0x1ac CarProcedural backBlend
+    float normalBlend;                        // +0x1b0 CarProcedural normalBlend
+    void* pathKeys;                           // +0x1b4 CarProcedural pathKeys (a CarProceduralKey*)
+    unsigned char field_0x1b8[0x1c4 - 0x1b8];
+    Vector3 pathPosition;                     // +0x1c4 CarProcedural pathPosition
+    Vector3 pathOffset;                       // +0x1d0 CarProcedural pathOffset
+    Vector3 bodyOffset;                       // +0x1dc CarProcedural bodyOffset
+    unsigned char field_0x1e8[0x1f4 - 0x1e8];
+    Vector3 smoothedBack;                     // +0x1f4 CarProcedural smoothedBack
+    Vector3 smoothedNormal;                   // +0x200 CarProcedural smoothedNormal
     // +0x20c (the terrain) stays unnamed here: naming it together with
     // +0x38/+0x3c changes VC6's code for 0x004eb570.
-    unsigned char field_0x198[0x22c - 0x198];
+    unsigned char field_0x20c[0x210 - 0x20c];
+    void** wheelNodes;                        // +0x210 CarProcedural wheelNodes (CarProceduralNode**)
+    Vector3 bodyContactPoint;                 // +0x214 CarProcedural bodyContactPoint
+    Vector3 bodyContactNormal;                // +0x220 CarProcedural bodyContactNormal
 };
 
 // 0x44-byte element of SceneAnimationTable::entries (an "Animation<n>"

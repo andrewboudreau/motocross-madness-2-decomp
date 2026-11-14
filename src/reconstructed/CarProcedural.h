@@ -58,7 +58,8 @@ public:
 // node with a GameObject base at +0xc.
 class CarProceduralModel : public CarProceduralNode, public GameObject {
 public:
-    char field_0x38[0x2d8 - 0x38];            // starts with the model name (0x0042fa00)
+    char nodeName[0x80];                      // +0x38 SoultreeObject nodeName: the model name (0x0042fa00)
+    char field_0xb8[0x2d8 - 0xb8];
 };
 
 // Rigid body reached through CarProceduralCollision::shape.

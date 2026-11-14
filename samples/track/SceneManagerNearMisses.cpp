@@ -156,10 +156,95 @@ public:
 
     int vbptr;                            // +0x04: vbtable 0x557ff8 (ctor 0x005037c0), compiler generated
     void* followedNode;                   // +0x08: the scene node the collision points follow
-    unsigned char field_0x0c[0x12c - 0x0c];
+    Vector3 position;                         // +0x00c SoultreePhysicsBaseObject position
+    Vector3 centerOfMass;                     // +0x018 SoultreePhysicsBaseObject centerOfMass
+    float invMass;                            // +0x024 SoultreePhysicsBaseObject invMass
+    float inverseLoadMass;                    // +0x028 SoultreePhysicsBaseObject inverseLoadMass
+    float bodyRoll;                           // +0x02c SoultreePhysicsBaseObject bodyRoll
+    float bodyPitch;                          // +0x030 SoultreePhysicsBaseObject bodyPitch
+    float bodyYaw;                            // +0x034 SoultreePhysicsBaseObject bodyYaw
+    float bodySinRoll;                        // +0x038 SoultreePhysicsBaseObject bodySinRoll
+    float bodyCosRoll;                        // +0x03c SoultreePhysicsBaseObject bodyCosRoll
+    float bodySinPitch;                       // +0x040 SoultreePhysicsBaseObject bodySinPitch
+    float bodyCosPitch;                       // +0x044 SoultreePhysicsBaseObject bodyCosPitch
+    float savedRoll;                          // +0x048 SoultreePhysicsBaseObject savedRoll
+    float savedPitch;                         // +0x04c SoultreePhysicsBaseObject savedPitch
+    float savedYaw;                           // +0x050 SoultreePhysicsBaseObject savedYaw
+    float savedSinRoll;                       // +0x054 SoultreePhysicsBaseObject savedSinRoll
+    float savedCosRoll;                       // +0x058 SoultreePhysicsBaseObject savedCosRoll
+    float savedSinPitch;                      // +0x05c SoultreePhysicsBaseObject savedSinPitch
+    float savedCosPitch;                      // +0x060 SoultreePhysicsBaseObject savedCosPitch
+    Vector3 velocity;                         // +0x064 SoultreePhysicsBaseObject velocity
+    Vector3 acceleration;                     // +0x070 SoultreePhysicsBaseObject acceleration
+    Vector3 prevVelocity;                     // +0x07c SoultreePhysicsBaseObject prevVelocity
+    Vector3 bodyForward;                      // +0x088 SoultreePhysicsBaseObject bodyForward
+    Vector3 bodyUp;                           // +0x094 SoultreePhysicsBaseObject bodyUp
+    Vector3 savedForward;                     // +0x0a0 SoultreePhysicsBaseObject savedForward
+    Vector3 savedUp;                          // +0x0ac SoultreePhysicsBaseObject savedUp
+    float prevSpeed;                          // +0x0b8 SoultreePhysicsBaseObject prevSpeed
+    float linearSpeed;                        // +0x0bc SoultreePhysicsBaseObject linearSpeed
+    Vector3 angularAcceleration;              // +0x0c0 SoultreePhysicsBaseObject angularAcceleration
+    Vector3 worldAngularVelocity;             // +0x0cc SoultreePhysicsBaseObject worldAngularVelocity
+    Vector3 angularVelocity;                  // +0x0d8 SoultreePhysicsBaseObject angularVelocity
+    Vector3 invInertia;                       // +0x0e4 SoultreePhysicsBaseObject invInertia
+    Vector3 shapeInvInertia;                  // +0x0f0 SoultreePhysicsBaseObject shapeInvInertia
+    unsigned char field_0x0fc[0x108 - 0xfc];
+    char airborne;                            // +0x108 SoultreePhysicsBaseObject airborne
+    char respawnPending;                      // +0x109 SoultreePhysicsBaseObject respawnPending
+    char asleep;                              // +0x10a SoultreePhysicsBaseObject asleep
+    unsigned char field_0x10b[0x10c - 0x10b];
+    Vector3 respawnPosition;                  // +0x10c SoultreePhysicsBaseObject respawnPosition
+    Vector3 respawnHeading;                   // +0x118 SoultreePhysicsBaseObject respawnHeading
+    GameObject* particleManager;              // +0x124 SoultreePhysicsBaseObject particleManager
+    void* collisionObject;                    // +0x128 SoultreePhysicsBaseObject collisionObject
     void** collisionPoints;               // +0x12c
     int collisionPointCount;              // +0x130
-    unsigned char field_0x134[0x21c - 0x134];
+    int lastCollisionType;                    // +0x134 SoultreePhysicsBaseObject lastCollisionType
+    char wreckPending;                        // +0x138 SoultreePhysicsBaseObject wreckPending
+    unsigned char field_0x139[0x13c - 0x139];
+    float stepTime;                           // +0x13c SoultreePhysicsBaseObject stepTime
+    float invStepTime;                        // +0x140 SoultreePhysicsBaseObject invStepTime
+    float frameTime;                          // +0x144 SoultreePhysicsBaseObject frameTime
+    float dragCoefficient;                    // +0x148 SoultreePhysicsBaseObject dragCoefficient
+    float restitution;                        // +0x14c SoultreePhysicsBaseObject restitution
+    float baseWeight;                         // +0x150 SoultreePhysicsBaseObject baseWeight
+    float totalWeight;                        // +0x154 SoultreePhysicsBaseObject totalWeight
+    float bodyMass;                           // +0x158 SoultreePhysicsBaseObject bodyMass
+    float loadWeight;                         // +0x15c SoultreePhysicsBaseObject loadWeight
+    float collisionRadius;                    // +0x160 SoultreePhysicsBaseObject collisionRadius
+    unsigned char field_0x164[0x188 - 0x164];
+    Vector3 weightForce;                      // +0x188 SoultreePhysicsBaseObject weightForce
+    Vector3 rotationPivot;                    // +0x194 SoultreePhysicsBaseObject rotationPivot
+    Vector3 localCenterOfMass;                // +0x1a0 SoultreePhysicsBaseObject localCenterOfMass
+    Vector3 scratchVector;                    // +0x1ac SoultreePhysicsBaseObject scratchVector
+    Vector3 scratchVector2;                   // +0x1b8 SoultreePhysicsBaseObject scratchVector2
+    int collisionShape;                       // +0x1c4 SoultreePhysicsBaseObject collisionShape
+    int collisionPointCapacity;               // +0x1c8 SoultreePhysicsBaseObject collisionPointCapacity
+    int touchingPointCount;                   // +0x1cc SoultreePhysicsBaseObject touchingPointCount
+    char pointsTouching;                      // +0x1d0 SoultreePhysicsBaseObject pointsTouching
+    unsigned char field_0x1d1[0x1d4 - 0x1d1];
+    void* attachments;                        // +0x1d4 SoultreePhysicsBaseObject attachments
+    int attachmentCapacity;                   // +0x1d8 SoultreePhysicsBaseObject attachmentCapacity
+    int attachmentCount;                      // +0x1dc SoultreePhysicsBaseObject attachmentCount
+    float stepRemainder;                      // +0x1e0 SoultreePhysicsBaseObject stepRemainder
+    float fixedStepTime;                      // +0x1e4 SoultreePhysicsBaseObject fixedStepTime
+    float lastStepTime;                       // +0x1e8 SoultreePhysicsBaseObject lastStepTime
+    int maxStepsPerFrame;                     // +0x1ec SoultreePhysicsBaseObject maxStepsPerFrame
+    void* track;                              // +0x1f0 SoultreePhysicsBaseObject track
+    void* terrain;                            // +0x1f4 SoultreePhysicsBaseObject terrain
+    float terrainScale;                       // +0x1f8 SoultreePhysicsBaseObject terrainScale
+    char inShadow;                            // +0x1fc SoultreePhysicsBaseObject inShadow
+    unsigned char field_0x1fd[0x200 - 0x1fd];
+    void* shadowLight;                        // +0x200 SoultreePhysicsBaseObject shadowLight
+    int staggerPhase;                         // +0x204 SoultreePhysicsBaseObject staggerPhase
+    int staggerCounter;                       // +0x208 SoultreePhysicsBaseObject staggerCounter
+    char attachmentResetPending;              // +0x20c SoultreePhysicsBaseObject attachmentResetPending
+    char justReset;                           // +0x20d SoultreePhysicsBaseObject justReset
+    char settledLastFrame;                    // +0x20e SoultreePhysicsBaseObject settledLastFrame
+    unsigned char groundProbeMask;            // +0x20f SoultreePhysicsBaseObject groundProbeMask
+    int restContactThreshold;                 // +0x210 SoultreePhysicsBaseObject restContactThreshold
+    float restTimer;                          // +0x214 SoultreePhysicsBaseObject restTimer
+    void* centerNode;                         // +0x218 SoultreePhysicsBaseObject centerNode
 };
 class SceneSoultreePhysicsObjectView : public SceneSoultreePhysicsBaseObjectView, public D3DIMSoultreeObject {
 public:
@@ -178,9 +263,32 @@ public:
     void LoadShape(D3DIMSoultreeObject* model, const char* path); // 0x00432800: from a ".col" file
     void SnapPlacement();                      // 0x00435fe0
 
-    unsigned char field_0x38[0x60 - 0x38];
+    int drawColor;                            // +0x38 CollisionObject drawColor
+    int specularColor;                        // +0x3c CollisionObject specularColor
+    Vector3 boundCenter;                      // +0x40 CollisionObject boundCenter
+    float boundRadius;                        // +0x4c CollisionObject boundRadius
+    int shapeType;                            // +0x50 CollisionObject shapeType
+    void* shape;                              // +0x54 CollisionObject shape
+    int hasContact;                           // +0x58 CollisionObject hasContact
+    void* contactRecord;                      // +0x5c CollisionObject contactRecord
     D3DIMSoultreeObject* ownerObject;           // +0x60, CollisionObject.h's owner
-    unsigned char field_0x64[0xb8 - 0x64];
+    int ownerType;                            // +0x64 CollisionObject ownerType
+    int ignoreVegetation;                     // +0x68 CollisionObject ignoreVegetation
+    int collisionEnabled;                     // +0x6c CollisionObject collisionEnabled
+    int collidable;                           // +0x70 CollisionObject collidable
+    int ignoreListMode;                       // +0x74 CollisionObject ignoreListMode
+    int ignoreList;                           // +0x78 CollisionObject ignoreList
+    int ignoreCount;                          // +0x7c CollisionObject ignoreCount
+    int useBroadphase;                        // +0x80 CollisionObject useBroadphase
+    int quadtreeCell;                         // +0x84 CollisionObject quadtreeCell
+    void* onHitCallback;                      // +0x88 CollisionObject onHitCallback
+    void* onHitByCallback;                    // +0x8c CollisionObject onHitByCallback
+    int debugTreeDepth;                       // +0x90 CollisionObject debugTreeDepth
+    int debugDrawMode;                        // +0x94 CollisionObject debugDrawMode
+    int queryTouched;                         // +0x98 CollisionObject queryTouched
+    void* hitObject;                          // +0x9c CollisionObject hitObject
+    Vector3 hitPoint;                         // +0xa0 CollisionObject hitPoint
+    Vector3 hitNormal;                        // +0xac CollisionObject hitNormal
 };
 
 // 0x0043a330 (cdecl, CollisionPoint.cpp): adds a collision point at
