@@ -74,6 +74,18 @@ void GR_BitString::ShiftBitsTowardFront(int count) {
 // words; --i;)` loops, `--src`, `!*src`, a split `dst--` in the 0xffffffff
 // arm and the head's `dst++`/`src++` in either order. `i > 0` is 386, `dst--`
 // hoisted ahead of the value test 155 and ahead of the fill arms 343.
+// Wave 32: whenever VC6 folds `src = dst - 1; src++` away (src defined after
+// `dst++`, `src++` ahead of the store, `src = data + words - 2; dst = src +
+// 1`) src gets esi and dst edx as retail and the loop matches (149-151 of 158
+// instructions, 437-439 bytes), but the head then lacks retail's unfolded
+// `lea esi, [edx - 4]` .. `add edx, 4` / `add esi, 4`; every form that keeps
+// the pair unfolded gives dst esi. Also 387: the swap macro with its terms
+// reversed, `<< 24` forms or casts, an inline swap taking a reference or a
+// pointer, a `w = *--src` local, the head steps in the for initialiser
+// (`dst++, src++`; `src++, dst++` 6/443), `dst[0] =`. Worse: `dst[-1] =` 378,
+// an inline swap by value 170, `i` assigned before the first store 122, a
+// post-decrement mirror of the loop 60/417, an indexed `w[i]` loop 33/428, a
+// `last` temporary 13.
 void GR_BitString::ShiftBitsTowardBack(int count) {
     int words = (bitCount + 31) / 32;
     unsigned int* dst = (unsigned int*)data + words - 1;

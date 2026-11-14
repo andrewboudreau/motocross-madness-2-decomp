@@ -27,6 +27,10 @@
 // local altogether (130 of 385). The two loads VC6 emits are byte-identical
 // to retail's one and both sit directly before the join, so this is a loop
 // head retail has and the candidate does not, not a missed tail merge.
+// Wave 32: the arms swapped (`!= BUFFERTOOSMALL` first, with or without a
+// `continue`) follow the source order and do not merge the join (179, 335
+// bytes); the reload written in both arms of the size test 274, ahead of the
+// size test 272 of 342.
 //
 // HandleReceivedMessage (0x004afa90) is exact in src/reconstructed/NetThread.cpp:
 // the acknowledgement reads the local player into a local before SendRaw and

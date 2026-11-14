@@ -46,6 +46,9 @@
 // or assigned inside the test) and that known-zero local passed as the
 // first call's last argument, stored back negated, or selected through a
 // ternary. The call ahead of the flag store is far worse (150).
+// Wave 32 (337): a Vector3-derived local type with its own empty constructor
+// for either or both vectors, in either declaration order; with a destructor
+// as well the function gets an EH frame (412 bytes).
 #include "../../src/reconstructed/KrustyBikeCamera.h"
 
 // .bss state used by slot 10. There is no initialisation guard, so these are

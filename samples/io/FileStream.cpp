@@ -33,6 +33,9 @@
 //   stay at 257 or below; VC6 keeps the store out of the rep movsd/movsb pair.
 //   Session 21: the seed between strcat and strlen lands after strlen's
 //   `or ecx, -1` (257, lea esi hoisted with it); /ML keeps 255.
+//   Wave 32: the three seed positions crossed with `name[i]` loops (with and
+//   without the byte temporary), `p` in the for initialiser in either order
+//   and `(int)strlen(name)` as the loop bound: none above 257.
 // - 0x00460db0 (CheckHeader) is exact in src/reconstructed/FileStream.cpp for
 //   the same reason as Write: both fseek calls take the handle from a FILE*
 //   local. That puts the first fclose argument in eax and the second in edx,
