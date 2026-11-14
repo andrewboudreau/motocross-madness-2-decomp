@@ -26,6 +26,7 @@
   "?BuildEdgeLevel@@YAXHHHH@Z": "0x0047e430",
   "?BuildEdgeTable@@YAXXZ": "0x0047e4d0",
   "?EvictNodeBuffers@@YAHPAXH@Z": "0x0047ecc0",
+  "?ReadNode@DrawableGridNode@@QAEPAV1@PAVFileStream@@HPAV1@HHHHHPAM2@Z": "0x0047e600",
   "?ReleaseVertexBuffers@DrawableGridNode@@QAEXH@Z": "0x0047edb0",
   "?WalkVisibleFromRoot@DrawableGridNode@@QAEHXZ": "0x0047ef70",
   "?WalkVisibleQuadrants@DrawableGridNode@@QAEHHHHH@Z": "0x0047ef80",

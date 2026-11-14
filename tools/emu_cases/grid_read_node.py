@@ -1,7 +1,7 @@
 """DrawableGridNode::ReadNode 0x0047e600, the terrain quadtree node loader (tools/emu_diff.py
 case, call-record/replay mode).
 
-The linked body is samples/render/GriddrawNearMisses.cpp. FileStream::Read 0x00461640
+The linked body is src/reconstructed/Griddraw.cpp. FileStream::Read 0x00461640
 serves a synthetic node record from a byte queue: the four scale/height floats (ordinary,
 negative, zero, huge), maxError, a block index, the texture header, the 16 block words (all
 0xfffe/0xffff markers or one real reference, so both allocations run), an extra byte count
@@ -18,7 +18,7 @@ import struct
 
 RETAIL_VA = 0x0047e600
 SYMBOL = ('?ReadNode@DrawableGridNode@@QAEPAV1@PAVFileStream@@HPAV1@HHHHHPAM2@Z')
-SOURCE = 'samples/render/GriddrawNearMisses.cpp'
+SOURCE = 'src/reconstructed/Griddraw.cpp'
 PROBES = {0x0047e697: 'bounds', 0x0047ebc5: 'records', 0x0047e8ae: 'extra', 0x0047ea68: 'clamp',
           0x0047eacd: 'children', 0x0047eb39: 'child'}
 

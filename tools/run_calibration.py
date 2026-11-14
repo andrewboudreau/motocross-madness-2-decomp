@@ -6926,6 +6926,15 @@ CASES = [
         'reason': 'row counter with a named j = row * 16 keeps i + j grouped (lea) before the table entry is added',
     },
     {
+        'name': 'Griddraw node loader 0x47e600',
+        'bindings': 'src/reconstructed/Griddraw.bindings.json',
+        'source': 'src/reconstructed/Griddraw.cpp',
+        'symbol': '?ReadNode@DrawableGridNode@@QAEPAV1@PAVFileStream@@HPAV1@HHHHHPAM2@Z',
+        'target_va': '0x0047e600',
+        'target_size': 1617,
+        'reason': 'minimum copied to a local before each extent product loads it before the cell size; 0.1 test through a reference',
+    },
+    {
         'name': 'RaceSound.cpp constructor 0x4e1fb0',
         'bindings': 'src/reconstructed/RaceSound.bindings.json',
         'source': 'src/reconstructed/RaceSound.cpp',

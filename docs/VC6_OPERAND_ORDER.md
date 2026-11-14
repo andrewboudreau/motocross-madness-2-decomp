@@ -445,7 +445,9 @@ where the product of the choices is large).
   `(y*y)` gives the same, `(z*z)`, a flat sum and z- or y-first sums do not.
 - No change: Camera slot 29 `0x0042eb10`, MatrixUtil `0x004a1a50` (6208
   forms), Wrecker `0x00531da0`, `0x00532580` and slot 10 `0x005306e0`,
-  FollowCamera `0x00465720` and `0x004650e0`, Griddraw `0x0047e600`,
+  FollowCamera `0x00465720` and `0x004650e0`, Griddraw `0x0047e600`
+  (exact since with the leaf-age rule of 1.2: the two minimums copied
+  into locals before the extent products),
   EventManager `0x0045d480` and MorphBastardModifier `0x004a33b0`
   (D3DIMSoulTree `0x00444140`, also unmoved by them, is exact with the
   centre sum written per component). D3DIMSoulTree slot 12 `0x00443aa0` reaches

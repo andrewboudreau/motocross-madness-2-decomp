@@ -35,9 +35,9 @@
       "sha256": "b8eac094e80ead470fc5ed4a4dc5bdc894798079bafe7da3e9b502fd41f3157a"
     },
     "src/reconstructed/Griddraw.cpp": {
-      "sections": 86,
-      "relocations": 468,
-      "sha256": "334084506bb6c6488042457566e4e5e31294f7f9e0d96224953831fbf1218e10"
+      "sections": 89,
+      "relocations": 503,
+      "sha256": "1cb496ac563bb471c76ca90de8c16371ba363735efb65d00e7d4b2433a9f3b6b"
     },
     "src/krusty2/shadow/D3DIMSoultreeShadow.cpp": {
       "sections": 47,
@@ -70,9 +70,9 @@
       "sha256": "1d37cfd81e5ef7cf3613f1c292c21d136cb5b43ce8019209ac77009140b00771"
     },
     "samples/render/GriddrawNearMisses.cpp": {
-      "sections": 19,
-      "relocations": 147,
-      "sha256": "409f1476b5b348540f6739060882d765a51aff41b90e279674178eb339151a0c"
+      "sections": 16,
+      "relocations": 112,
+      "sha256": "561066fe72df1456bd0c7c905a5f7dbf4637fddd5a43addf99abad3053dedc70"
     },
     "samples/physics/shadow/D3DIMSoultreeShadowNearMisses.cpp": {
       "sections": 7,

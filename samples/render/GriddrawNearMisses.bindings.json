@@ -10,7 +10,6 @@
   "?FastSqrt@@YAMM@Z": "0x00460b50",
   "?GetVertex@GridVertexCache@@QAEHHH@Z": "0x0047de90",
   "?Read@FileStream@@QAEHPAXHH@Z": "0x00461640",
-  "?ReadNode@DrawableGridNode@@QAEPAV1@PAVFileStream@@HPAV1@HHHHHPAM2@Z": "0x0047e600",
   "?RebuildBlockBuffers@DrawableGridNode@@QAEHXZ": "0x0047f210",
   "?Register@AgeManager@@QAEXPAUAgeEntry@@P6AHPAXH@Z1HH@Z": "0x00401050",
   "?Reset@GridVertexCache@@QAEXPAVDrawableGridNode@@@Z": "0x0047de20",

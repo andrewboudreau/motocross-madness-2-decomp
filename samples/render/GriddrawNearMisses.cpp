@@ -17,33 +17,16 @@
 // order of the index and origin sums, and ten more packed-word spellings
 // (`* 65536` distributed or not, `- gz + z`, `x + -gx`), leave 1069.
 //
-// DrawableGridNode 0x0047e600 (node loader, 1617 bytes; 1091 of 1630): the
-// stream reads, both allocations, the bit fields and the child creation
-// match. The 0x540 allocation is reached by a `goto` out of the header scan
-// (its __LINE__ 687 precedes the small one's 698), which reproduces retail's
-// out-of-line block and keeps the header word in the dead stream-argument
-// slot. The 0.1 test reads the extent through a reference (an inline
-// helper), which gives retail's `fstp extent.y` and block layout (1605 of
-// 1617; a direct test keeps extent.y on the x87 stack, 1091). Remaining: the
-// extent.x/extent.y products load the cell size first (`fld cell; fmul
-// min`), retail the minimum (`fld min; fmul cell`). Not moved by either
-// operand order, the sum order in the centre terms, a `cell` local, inline
-// multiply helpers (value-first or cell-first), a GridVec3 constructor for
-// the centre, or a reordered 0x16c/0x170 sum; nor by 432 centre/extent forms
-// (centre product order and parentheses times extent operand order and
-// parentheses), all identical. Probes show the order follows the leaves:
-// extent.x with +0x168 gives min-first, extent.z with +0x164 cell-first, and
-// moving extent.x after the 0.1 test or using +0x18 keeps cell-first.
-// A reference to the cell size or the minimum, a terrain or draw-data
-// pointer alias, used in either product and either operand order (216
-// forms), keeps cell-first too.
-// 0..33 dead initialised int locals at the top keep 1605 at every count.
-// Deleting statements (s14, evidence only) shows that the earlier uses of the
-// leaves decide it. Without the centre.x statement both extent products load
-// the minimum first, as retail does. With centre.x reduced to
-// `cell * 0.5f`, only extent.x flips. Deleting centre.y, centre.z, extent.z,
-// the 0.1 test or the terrain reload flips neither. See
-// docs/VC6_PATTERN_CORPUS.md section 6 (two indirect words).
+// DrawableGridNode 0x0047e600 (node loader) is exact and lives in
+// src/reconstructed/Griddraw.cpp. Its last difference was the operand order
+// of the extent.x/extent.y products (`fld cell; fmul min` against retail's
+// `fld min; fmul cell`, 1605 of 1617). Copying the two minimums into float
+// locals just before the products makes them the newer leaves (1617; one
+// local alone gives 1613 for x, 1609 for y). Forms that did not move it:
+// either operand order, the sum order of the centre terms, a `cell` local,
+// inline multiply helpers, a GridVec3 constructor for the centre, 432
+// centre/extent spellings, references or pointer aliases to either operand
+// (216 forms), 0..33 dead locals and 0..63 prepended typedefs.
 //
 // DrawableGridNode 0x0047f210 (per-block buffer rebuild, 1576 bytes; 426 of
 // 1586): the calls, reallocations, copies and the bookkeeping after the loops
@@ -126,7 +109,7 @@
 //   0.632; ordering `size == 16 ||` first 0.721 (larger body); a split or
 //   goto form 0.620-0.638.
 // k-scan (s22): compiled behind 0..63 prepended typedefs, 0x0047de90,
-// 0x0047e600, 0x0047f210, 0x004815e0, 0x00481de0 have the same code at every
+// 0x0047f210, 0x004815e0, 0x00481de0 have the same code at every
 // count, so their differences are not a declaration-count effect
 // (docs/VC6_OPERAND_ORDER.md section 2).
 
@@ -221,144 +204,6 @@ int GridVertexCache::GetVertex(int x, int z)
         count++;
     }
     return slots[i].index;
-}
-
-
-// Every component of `v` below `limit`. Read through the reference, the
-// components are reloaded after their stores (retail 0x0047e600's `fstp
-// extent.y` followed by a reload); a direct test keeps extent.y on the x87
-// stack.
-static inline int GridExtentBelow(const GridVec3& v, float limit)
-{
-    return v.x < limit && v.y < limit && v.z < limit;
-}
-
-// 0x0047e600: reads the node header from the stream, allocates the draw
-// data (with per-block records when any of the 16 header words is not an
-// 0xfffe/0xffff marker), computes the bounding box and, when asked, creates
-// the child nodes through virtual slot 2.
-DrawableGridNode* DrawableGridNode::ReadNode(FileStream* stream, int a1,
-                                             DrawableGridNode* parent, int level, int shift,
-                                             int x, int z, int index, float* boundsMin,
-                                             float* boundsMax)
-{
-    int header;
-    int words[16];
-    int i;
-
-    stream->Read(&reliefScale, 4, 1);
-    stream->Read(&heightScale, 4, 1);
-    stream->Read(&minHeight, 4, 1);
-    stream->Read(&maxHeight, 4, 1);
-    stream->Read(&maxError, 2, 1);
-    this->level = level;
-    this->shift = shift;
-    gridX = x;
-    gridZ = z;
-    childIndex = index;
-    if (boundsMin && boundsMax) {
-        float fx = (float)x;
-        if (fx < boundsMin[0])
-            boundsMin[0] = fx;
-        float fz = (float)z;
-        if (fz < boundsMin[2])
-            boundsMin[2] = fz;
-        if (fx > boundsMax[0])
-            boundsMax[0] = fx;
-        if (fz > boundsMax[2])
-            boundsMax[2] = fz;
-        if (minHeight < boundsMin[1])
-            boundsMin[1] = minHeight;
-        if (maxHeight > boundsMax[1])
-            boundsMax[1] = maxHeight;
-    }
-    stream->Read(&blockIndex, 2, 1);
-    block = terrain->blocks[blockIndex];
-    stream->Read(&header, 4, 1);
-    stream->Read(words, 4, 16);
-    for (i = 0; i < 16; i++) {
-        if ((words[i] & 0xfffe) != 0xfffe) {
-            data = (GridNodeDrawData*)DebugCalloc(1, 0x540, __FILE__, 687);
-            data->blockRanges = (char*)data + 0x180;
-            extra = (GridNodeExtra*)((char*)data->blockRanges + 0xc0);
-            extra->blockRecords = (GridBlockRecord*)((char*)extra + 0x40);
-            for (int j = 0; j < 16; j++) {
-                extra->blockRecords[j].textureReference = words[j];
-                extra->blockRecords[j].field_0x04 = 0;
-            }
-            goto allocated;
-        }
-    }
-    data = (GridNodeDrawData*)DebugCalloc(1, 0x1c0, __FILE__, 698);
-    data->blockRanges = 0;
-    extra = (GridNodeExtra*)((char*)data + 0x180);
-    extra->blockRecords = 0;
-allocated:
-    extra->textureReference = header;
-    extra->field_0x10 = 0;
-    data->vertexBuffer = 0;
-    data->vertexBufferBytes = 0;
-    data->indexBufferBytes = 0;
-    data->vertexCount = 0;
-    data->indexCount = 0;
-    data->indexBuffer = 0;
-    data->b1 = 1;
-    data->testFrame = 0;
-    data->lowerErrorLimit = 0xffff;
-    data->previousLowerErrorLimit = 0xffff;
-    data->upperErrorLimit = 0;
-    data->previousUpperErrorLimit = 0;
-    data->b0 = 0;
-    data->triangleCount = 0;
-    data->childTriangleCount = 0;
-    data->inverseErrorScale = 1.0f;
-    data->b3 = 0;
-    data->b2 = terrain->useVertexNormals & 1;
-    stream->Read(extra, 4, 1);
-    if (extra->byteCount) {
-        extra->data = DebugMalloc(extra->byteCount, __FILE__, 732);
-        g_gridExtraBytes += extra->byteCount;
-        stream->Read(extra->data, extra->byteCount, 1);
-    }
-    stream->Read(&field_0x2b, 1, 1);
-    stream->Read(&childListOffset, 4, 1);
-    data->inverseErrorScale = 1.0f / (heightScale * reliefScale);
-    if (data->inverseErrorScale < 0.0f)
-        data->inverseErrorScale = -data->inverseErrorScale;
-    memset(data, 0, sizeof(data->vertexFlags));
-    data->visibleBlockMask = 0;
-    data->gridMinX = (float)(gridX << this->shift);
-    data->gridMinZ = (float)(gridZ << this->shift);
-    data->gridMaxX = (float)(16 << this->shift) + data->gridMinX;
-    data->gridMaxZ = (float)(16 << this->shift) + data->gridMinZ;
-    center.x = (data->gridMaxX + data->gridMinX) * terrain->gridCellSize * 0.5f;
-    center.y = (maxHeight + minHeight) * terrain->gridCellSize * 0.5f;
-    center.z = (data->gridMaxZ + data->gridMinZ) * terrain->gridCellSize * 0.5f;
-    extent.x = center.x - terrain->gridCellSize * data->gridMinX;
-    extent.y = center.y - terrain->gridCellSize * minHeight;
-    if (GridExtentBelow(extent, 0.1f))
-        extent = GridVec3(0.1f, 0.1f, 0.1f);
-    extent.z = center.z - data->gridMinZ * terrain->gridCellSize;
-    if (parent)
-        terrain = parent->terrain;
-    UnknownVirtualSlot5(stream);
-    if (a1 && childListOffset) {
-        childOffsets = new (__FILE__, 776) int[256];
-        children = new (__FILE__, 777) GridNode*[256];
-        stream->Seek(terrain->childTableOffset + childListOffset, 0, 1);
-        stream->Read(childOffsets, 0x400, 1);
-        for (i = 0; i < 256; i++) {
-            if (childOffsets[i]) {
-                stream->Seek(terrain->childTableOffset + childOffsets[i], 0, 1);
-                children[i] = CreateChildNode(stream, a1, this, this->level - 1, this->shift - 4,
-                                              (gridX + i % 16) * 16, (gridZ + i / 16) * 16, i,
-                                              boundsMin, boundsMax);
-            } else {
-                children[i] = 0;
-            }
-        }
-    }
-    return this;
 }
 
 

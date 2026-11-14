@@ -304,7 +304,9 @@ cell size is read in all six centre/extent statements but still loads first.
 Deleting centre.x (or its minimum term) makes it the memory operand there,
 as in retail. MatrixUtil `0x004a1a50` also departs from the model: retail
 loads `p->y` (displacement 0) before the matrix in every row. Probes:
-`work/s14/x87/ip/p1.cpp`, `p2.cpp` (untracked).
+`work/s14/x87/ip/p1.cpp`, `p2.cpp` (untracked). `0x0047e600` is now
+exact: copying each minimum into a float local right before its product
+makes it the newer leaf, which loads first (docs/VC6_OPERAND_ORDER.md 1.2).
 
 Rows checked with `tools/x87_slips.py` (s14). The rows below are not
 operand form: no x87 rule applies, so they need a different lever.

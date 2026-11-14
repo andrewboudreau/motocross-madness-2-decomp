@@ -185,6 +185,148 @@ DrawableGridNode::DrawableGridNode(int stream, int a1, GridNode* parent, GridTer
     this->parent = parent;
 }
 
+// Every component of `v` below `limit`. Read through the reference, the
+// components are reloaded after their stores (retail 0x0047e600's `fstp
+// extent.y` followed by a reload); a direct test keeps extent.y on the x87
+// stack.
+static inline int GridExtentBelow(const GridVec3& v, float limit)
+{
+    return v.x < limit && v.y < limit && v.z < limit;
+}
+
+// 0x0047e600: reads the node header from the stream, allocates the draw
+// data (with per-block records when any of the 16 header words is not an
+// 0xfffe/0xffff marker), computes the bounding box and, when asked, creates
+// the child nodes through virtual slot 2.
+DrawableGridNode* DrawableGridNode::ReadNode(FileStream* stream, int a1,
+                                             DrawableGridNode* parent, int level, int shift,
+                                             int x, int z, int index, float* boundsMin,
+                                             float* boundsMax)
+{
+    int header;
+    int words[16];
+    int i;
+
+    stream->Read(&reliefScale, 4, 1);
+    stream->Read(&heightScale, 4, 1);
+    stream->Read(&minHeight, 4, 1);
+    stream->Read(&maxHeight, 4, 1);
+    stream->Read(&maxError, 2, 1);
+    this->level = level;
+    this->shift = shift;
+    gridX = x;
+    gridZ = z;
+    childIndex = index;
+    if (boundsMin && boundsMax) {
+        float fx = (float)x;
+        if (fx < boundsMin[0])
+            boundsMin[0] = fx;
+        float fz = (float)z;
+        if (fz < boundsMin[2])
+            boundsMin[2] = fz;
+        if (fx > boundsMax[0])
+            boundsMax[0] = fx;
+        if (fz > boundsMax[2])
+            boundsMax[2] = fz;
+        if (minHeight < boundsMin[1])
+            boundsMin[1] = minHeight;
+        if (maxHeight > boundsMax[1])
+            boundsMax[1] = maxHeight;
+    }
+    stream->Read(&blockIndex, 2, 1);
+    block = terrain->blocks[blockIndex];
+    stream->Read(&header, 4, 1);
+    stream->Read(words, 4, 16);
+    for (i = 0; i < 16; i++) {
+        if ((words[i] & 0xfffe) != 0xfffe) {
+            data = (GridNodeDrawData*)DebugCalloc(1, 0x540, __FILE__, 687);
+            data->blockRanges = (char*)data + 0x180;
+            extra = (GridNodeExtra*)((char*)data->blockRanges + 0xc0);
+            extra->blockRecords = (GridBlockRecord*)((char*)extra + 0x40);
+            for (int j = 0; j < 16; j++) {
+                extra->blockRecords[j].textureReference = words[j];
+                extra->blockRecords[j].field_0x04 = 0;
+            }
+            goto allocated;
+        }
+    }
+    data = (GridNodeDrawData*)DebugCalloc(1, 0x1c0, __FILE__, 698);
+    data->blockRanges = 0;
+    extra = (GridNodeExtra*)((char*)data + 0x180);
+    extra->blockRecords = 0;
+allocated:
+    extra->textureReference = header;
+    extra->field_0x10 = 0;
+    data->vertexBuffer = 0;
+    data->vertexBufferBytes = 0;
+    data->indexBufferBytes = 0;
+    data->vertexCount = 0;
+    data->indexCount = 0;
+    data->indexBuffer = 0;
+    data->b1 = 1;
+    data->testFrame = 0;
+    data->lowerErrorLimit = 0xffff;
+    data->previousLowerErrorLimit = 0xffff;
+    data->upperErrorLimit = 0;
+    data->previousUpperErrorLimit = 0;
+    data->b0 = 0;
+    data->triangleCount = 0;
+    data->childTriangleCount = 0;
+    data->inverseErrorScale = 1.0f;
+    data->b3 = 0;
+    data->b2 = terrain->useVertexNormals & 1;
+    stream->Read(extra, 4, 1);
+    if (extra->byteCount) {
+        extra->data = DebugMalloc(extra->byteCount, __FILE__, 732);
+        g_gridExtraBytes += extra->byteCount;
+        stream->Read(extra->data, extra->byteCount, 1);
+    }
+    stream->Read(&field_0x2b, 1, 1);
+    stream->Read(&childListOffset, 4, 1);
+    data->inverseErrorScale = 1.0f / (heightScale * reliefScale);
+    if (data->inverseErrorScale < 0.0f)
+        data->inverseErrorScale = -data->inverseErrorScale;
+    memset(data, 0, sizeof(data->vertexFlags));
+    data->visibleBlockMask = 0;
+    data->gridMinX = (float)(gridX << this->shift);
+    data->gridMinZ = (float)(gridZ << this->shift);
+    data->gridMaxX = (float)(16 << this->shift) + data->gridMinX;
+    data->gridMaxZ = (float)(16 << this->shift) + data->gridMinZ;
+    center.x = (data->gridMaxX + data->gridMinX) * terrain->gridCellSize * 0.5f;
+    center.y = (maxHeight + minHeight) * terrain->gridCellSize * 0.5f;
+    center.z = (data->gridMaxZ + data->gridMinZ) * terrain->gridCellSize * 0.5f;
+    // The minimums are copied before the products: as the newer leaves they
+    // load first (`fld min; fmul cell`), where the members written in place
+    // load the cell size first (docs/VC6_OPERAND_ORDER.md section 1.2).
+    float minX = data->gridMinX;
+    float minY = minHeight;
+    extent.x = center.x - terrain->gridCellSize * minX;
+    extent.y = center.y - terrain->gridCellSize * minY;
+    if (GridExtentBelow(extent, 0.1f))
+        extent = GridVec3(0.1f, 0.1f, 0.1f);
+    extent.z = center.z - data->gridMinZ * terrain->gridCellSize;
+    if (parent)
+        terrain = parent->terrain;
+    UnknownVirtualSlot5(stream);
+    if (a1 && childListOffset) {
+        childOffsets = new (__FILE__, 776) int[256];
+        children = new (__FILE__, 777) GridNode*[256];
+        stream->Seek(terrain->childTableOffset + childListOffset, 0, 1);
+        stream->Read(childOffsets, 0x400, 1);
+        for (i = 0; i < 256; i++) {
+            if (childOffsets[i]) {
+                stream->Seek(terrain->childTableOffset + childOffsets[i], 0, 1);
+                children[i] = CreateChildNode(stream, a1, this, this->level - 1, this->shift - 4,
+                                              (gridX + i % 16) * 16, (gridZ + i / 16) * 16, i,
+                                              boundsMin, boundsMax);
+            } else {
+                children[i] = 0;
+            }
+        }
+    }
+    return this;
+}
+
 // 0x0047ec60
 DrawableGridNode::~DrawableGridNode()
 {
