@@ -1,24 +1,23 @@
-// Near-miss SceneManager.cpp candidates, kept out of src/reconstructed until
-// they match. See docs/SCENEMANAGER.md.
+// SceneManager.cpp candidates, kept out of src/reconstructed until both
+// match. See docs/SCENEMANAGER.md.
 //
-// Scene::ReadStaticModels (0x004ecd60, 4543 bytes; 4534 of 4536 compared
-// positions): the "StaticModels" reader. Everything but one store lines up,
-// including the frame, the jump table and the EH states. The model name's
-// terminator `staticModels->casters[i].fileName[count] = 0` is
-// `add edx,ebx; mov [edx+esi+0x10],0` in retail (element offset first) and
-// `add edx,esi; mov [edx+ebx+0x10],0` here. Pointer and index spellings,
-// the clamp forms, function-scope declarations, inline helpers and an
-// element pointer local do not change it (helpers and locals make it worse).
-// The order follows the spill of the element offset (ebx, stored at
-// [esp+0x4c] around the physics branch and reloaded in the sound section,
-// as in retail): builds without that spill (the physics branch, the
-// collision block or the sound section removed) emit retail's
-// `add edx, ebx`, and a small probe with the same statements does too.
-// Declaration order, `count`/`length`/`i` types (int, long, unsigned,
-// register), `'\0'`, `*(p + count)`, extra uses of `count`, `(p + i)->`,
-// extra parentheses, a count-plus-pointer form, char* arithmetic,
-// `&...[0]` in the strncpy and the /G3-/G6, /GB, /Gy, /Gf, /Zp, /Op, /Ox,
-// /vm* flags leave it.
+// Scene::ReadStaticModels (0x004ecd60, 4536 code bytes): the "StaticModels"
+// reader, strict exact. The last difference was the model name's terminator
+// `staticModels->casters[i].fileName[count] = 0`: retail adds the element
+// offset to the array pointer first (`add edx,ebx; mov [edx+esi+0x10],0`),
+// the candidate added the count first. `count` is a function-scope local
+// that is zeroed with `models` at the top: its leaf is then older than the
+// `i * sizeof` temporary created at the first `casters[i]`, and VC6 adds the
+// older leaf last (docs/VC6_OPERAND_ORDER.md 1.2). A dead initialisation of
+// `length` instead, or `count` declared at function scope without the early
+// store, leaves the candidate order. Forms that never moved it while `count`
+// was first assigned at the strcspn clamp: pointer and index spellings, the
+// clamp forms, inline helpers, an element pointer local, declaration order,
+// `count`/`length`/`i` types, `'\0'`, `*(p + count)`, extra uses of `count`,
+// `(p + i)->`, a count-plus-pointer form, char* arithmetic, `i++` with
+// `i + 1`, a `follow` local for the sound emitter's model (worse), 0..63
+// prepended typedefs, 0-33 dead locals and the /G3-/G6, /GB, /Gy, /Gf, /Zp,
+// /Op, /Ox, /vm* flags.
 // k-scan (s22): compiled behind 0..63 prepended typedefs, 0x004ecd60,
 // 0x004edfe0 have the same code at every count, so their differences are not
 // a declaration-count effect (docs/VC6_OPERAND_ORDER.md section 2).
@@ -213,6 +212,7 @@ int Scene::ReadStaticModels(LightManager* lights, int particleManager, int textu
                                  int interval)
 {
     int models;
+    int count;
     int next;
     int stadium;
     int points;
@@ -245,6 +245,7 @@ int Scene::ReadStaticModels(LightManager* lights, int particleManager, int textu
     char colPath[0x104];
 
     models = 0;
+    count = 0;
     staticModels = 0;
     int found = parameters.SelectSection("StaticModels");
     if (sceneManager->sceneNamed && found) {
@@ -389,7 +390,7 @@ int Scene::ReadStaticModels(LightManager* lights, int particleManager, int textu
             staticModels->casters[i].model = (ShadowCaster*)object;
             AppendChild(object->LoadModel(renderContext, sltPath, (int)lights, modelTextures, 1), -1);
             int length = strcspn(sltPath, ".");
-            int count = length < 0x14 ? length : 0x14;
+            count = length < 0x14 ? length : 0x14;
             strncpy(staticModels->casters[i].fileName, sltPath, count);
             staticModels->casters[i].fileName[count] = 0;
             ((D3DIMSoultreeObject*)staticModels->casters[i].model)->SetPositionVec3(position);

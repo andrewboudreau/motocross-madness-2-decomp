@@ -552,7 +552,7 @@
     {
       "path": "samples/track/SceneManagerNearMisses.cpp",
       "status": "reviewed-nonexact",
-      "reason": "Scene::ReadStaticModels 0x004ecd60 (4534/4536 strict) and ReadAnimations 0x004edfe0 (5113/5335 strict) replace the Group4_SceneRead bring-up copies of the same source. The copies differed only in calling bridge functions; here the bodies make retail's direct constructor and method calls, which link_aliases bind to the providers at the same retail addresses (allocation sizes, pushed argument counts and this pointers checked against the bridges). Not differentially tested.",
+      "reason": "Scene::ReadStaticModels 0x004ecd60 (4536/4536 strict) and ReadAnimations 0x004edfe0 (5113/5335 strict) replace the Group4_SceneRead bring-up copies of the same source. The copies differed only in calling bridge functions; here the bodies make retail's direct constructor and method calls, which link_aliases bind to the providers at the same retail addresses (allocation sizes, pushed argument counts and this pointers checked against the bridges). Not differentially tested.",
       "evidence": "docs/GAME_BUILD.md#near-miss-bodies-replacing-bring-up-copies"
     },
     {

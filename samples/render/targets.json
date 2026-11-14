@@ -43,5 +43,14 @@
     "expect": "partial",
     "bindings": "BitStringRead.bindings.json",
     "status": "Complete nonexact candidate (1/150 strict, linked masked score 0.505, docs/BITSTRING_READ.md). Retail's ebp frame, bswap and store-then-reload local return look like inline assembly (inference), so an exact C++ form is unlikely."
+  },
+  {
+    "source": "CubeDrawNearMisses.cpp",
+    "candidate_symbol_contains": "?BuildFaceGeometry@DrawableCube@@QAEHXZ",
+    "target_va": "0x0043dc60",
+    "target_size": 1104,
+    "expect": "exact",
+    "bindings": "CubeDrawNearMisses.bindings.json",
+    "status": "Strict exact (1104/1104, switch table included): the column coordinate is one local `int x = column * 128 - 256;` and faces 2 and 3 use `-x`, which gives retail's order of the two induction-variable spills. Kept as a sample until it is promoted into src/reconstructed/CubeDraw.cpp with a calibration case."
   }
 ]

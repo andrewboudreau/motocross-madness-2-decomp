@@ -1,6 +1,6 @@
 // CubeDraw.cpp -- reconstruction of D:\aardvark\VC\krusty2\cubedraw.cpp.
 // See CubeDraw.h for the TU extent and the class. The geometry builder
-// 0x0043dc60 is a near miss in samples/render/CubeDrawNearMisses.cpp.
+// 0x0043dc60 is exact in samples/render/CubeDrawNearMisses.cpp (not promoted yet).
 
 #include <string.h>
 

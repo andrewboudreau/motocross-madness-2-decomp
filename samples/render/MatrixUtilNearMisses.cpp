@@ -43,6 +43,11 @@
 //   row is a live local here, not a folded one: m[2][2] 147, srcPoint->z
 //   121, both 115, the x or y operands or the translation 113..142, and
 //   m[2][2] copied at the loop top or before the loop 53 and 39.
+//   Round 9 (2026-11-14), loop and cursor shapes: the parameters themselves
+//   as cursors (43), loop-local cursors read from the parameters (40, 51
+//   with only the source one), an index loop with `i * stride` (171), the
+//   target cursor stepped first (171), `while (count-- > 0)` (24) and
+//   `for (i = count; i > 0; i--)` (122).
 //
 // TriangleNormal 0x004a11e0 and ViewMatrix 0x004a1500 are exact in
 // src/reconstructed/MatrixUtil.cpp (parenthesised products).

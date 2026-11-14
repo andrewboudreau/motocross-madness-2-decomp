@@ -26,7 +26,7 @@
     "samples/render/CubeDrawNearMisses.cpp": {
       "sections": 5,
       "relocations": 41,
-      "sha256": "7486de3d847d1d7faec510eeb7dea912d2bd650f8706e8512bcacf09ebb85dfc"
+      "sha256": "ece8674948da140bb9a1c8e5fef89206140b9d84dd55d8170689ac2f4e40c9d3"
     },
     "samples/camera/FollowCameraNearMisses.cpp": {
       "sections": 66,

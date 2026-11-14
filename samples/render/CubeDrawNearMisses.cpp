@@ -1,12 +1,18 @@
-// Near-miss cubedraw.cpp candidate, kept out of src/reconstructed until it
-// matches. See src/reconstructed/CubeDraw.h.
+// cubedraw.cpp's geometry builder, kept out of src/reconstructed/CubeDraw.cpp
+// until it is promoted with its calibration case. See
+// src/reconstructed/CubeDraw.h.
 //
-// 0x0043dc60 (1078 bytes plus its 26-byte switch table): 1100 of 1104 strict,
-// 259 of 261 instructions aligned. The only difference left is the order of
-// two column-loop spills at +0x228: retail stores the `256 - column * 128`
-// induction value ([esp+0x28]) before `column * 128 - 256` ([esp+0x18])
-// around the last grid store; VC6 here the other way. Swapping case blocks
-// or the tu/tv stores is worse, and `-column * 128 + 256` is the same.
+// 0x0043dc60 (1078 bytes plus its 26-byte switch table): strict exact,
+// 1104 of 1104. The last difference was the order of two column-loop spills
+// at +0x228: retail stores the `256 - column * 128` induction value
+// ([esp+0x28]) before `column * 128 - 256` ([esp+0x18]) around the last grid
+// store. The column coordinate is one named local, `int x = column * 128 -
+// 256;` at the top of the loop body, and faces 2 and 3 use `-x`: VC6 still
+// strength-reduces both `x` and `-x` into their own induction variables, and
+// spills `-x`'s first as retail does. Writing each case's expression out
+// (in any spelling, see the s22 list below), naming `256 - column * 128`
+// with `-x` for the others (1058), naming both values in either order
+// (1100) or naming the row coordinate the same way (1041) does not.
 // What moved VC6 to retail's shape:
 // - a flat 25-point grid written through one running `point` index
 //   (retail's single biased pointer through all 25 points);
@@ -74,9 +80,10 @@ int DrawableCube::BuildFaceGeometry()
         int point = 0;
         for (int row = 0; row < 5; row++) {
             for (int column = 0; column < 5; column++, point++) {
+                int x = column * 128 - 256;
                 switch (face) {
                 case 0:
-                    grid[point].position.x = (float)(column * 128 - 256) * 100.0f;
+                    grid[point].position.x = (float)x * 100.0f;
                     grid[point].position.y = (float)(256 - row * 128) * 100.0f;
                     grid[point].position.z = 25600.0f;
                     s_faceNormals[0].x = s_faceNormals[0].y = 0.0f;
@@ -85,12 +92,12 @@ int DrawableCube::BuildFaceGeometry()
                 case 1:
                     grid[point].position.x = -25600.0f;
                     grid[point].position.y = (float)(256 - row * 128) * 100.0f;
-                    grid[point].position.z = (float)(column * 128 - 256) * 100.0f;
+                    grid[point].position.z = (float)x * 100.0f;
                     s_faceNormals[1].z = s_faceNormals[1].y = 0.0f;
                     s_faceNormals[1].x = 1.0f;
                     break;
                 case 2:
-                    grid[point].position.x = (float)(256 - column * 128) * 100.0f;
+                    grid[point].position.x = (float)(-x) * 100.0f;
                     grid[point].position.y = (float)(256 - row * 128) * 100.0f;
                     grid[point].position.z = -25600.0f;
                     s_faceNormals[2].x = s_faceNormals[2].y = 0.0f;
@@ -99,19 +106,19 @@ int DrawableCube::BuildFaceGeometry()
                 case 3:
                     grid[point].position.x = 25600.0f;
                     grid[point].position.y = (float)(256 - row * 128) * 100.0f;
-                    grid[point].position.z = (float)(256 - column * 128) * 100.0f;
+                    grid[point].position.z = (float)(-x) * 100.0f;
                     s_faceNormals[3].z = s_faceNormals[3].y = 0.0f;
                     s_faceNormals[3].x = -1.0f;
                     break;
                 case 4:
-                    grid[point].position.x = (float)(column * 128 - 256) * 100.0f;
+                    grid[point].position.x = (float)x * 100.0f;
                     grid[point].position.y = 25600.0f;
                     grid[point].position.z = (float)(row * 128 - 256) * 100.0f;
                     s_faceNormals[4].x = s_faceNormals[4].z = 0.0f;
                     s_faceNormals[4].y = -1.0f;
                     break;
                 case 5:
-                    grid[point].position.x = (float)(column * 128 - 256) * 100.0f;
+                    grid[point].position.x = (float)x * 100.0f;
                     grid[point].position.y = -25600.0f;
                     grid[point].position.z = (float)(256 - row * 128) * 100.0f;
                     s_faceNormals[5].x = s_faceNormals[5].z = 0.0f;

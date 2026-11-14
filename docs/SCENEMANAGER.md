@@ -164,29 +164,20 @@ member lookup resolving to the virtual base's protected `field_0x10`.
   a pointer are an inlined `__asm` float-to-int helper. The bring-up body
   (`src/bringup/Group4_SceneTick.cpp`) keeps the frame with a per-function
   pragma (docs/GAME_BUILD.md#frame-pointer-units).
-- `0x004ecd60` (4543 bytes) is a near miss in
-  `samples/track/SceneManagerNearMisses.cpp` (4534 of 4536 compared
-  positions): the "StaticModels" reader, which builds each model's physics
-  object (constructor `0x005037c0`, slots 37/40), collision points
+- `0x004ecd60` (4543 bytes with its padding and jump table) is strict
+  exact in `samples/track/SceneManagerNearMisses.cpp` (4536 of 4536
+  compared positions): the "StaticModels" reader, which builds each model's
+  physics object (constructor `0x005037c0`, slots 37/40), collision points
   (`0x0043a330`), particle emitters (`0x004b8a00`, `0x004b8df0`,
   `0x004b9310`, slot 27), collision object (`0x00431e70`) and sound emitter.
-  Only the address of the name terminator differs (retail adds the element
-  offset to the array base first); the order follows the spill of the
-  element offset around the physics branch, which retail shares (sample
-  header). Every frame slot is at retail's offset; the two bytes are the
-  commutative operand order of one address computation. The views of those classes live in the
-  sample. Shapes that mattered: nested `if`s for the missing-count and
-  no-models messages, `model[0x44]` and `slt[0x108]` (retail's frame), the
-  emitter loop inside `if (points > 0)` and `if (a2)`, inline keyword
-  lookups over local `{name, value}` tables, and 0.033333f. These do not
-  change the store:
-  - other spellings of it (`*(p + n)`, `n[p]`, byte offsets from the
-    element);
-  - other clamp forms;
-  - reusing the function's other ints for the length and count.
-
-  `0x004edfe0` builds the same store from the same source shape, and
-  there VC6 matches retail.
+  The views of those classes live in the sample. Shapes that mattered:
+  nested `if`s for the missing-count and no-models messages, `model[0x44]`
+  and `slt[0x108]` (retail's frame), the emitter loop inside
+  `if (points > 0)` and `if (a2)`, inline keyword lookups over local
+  `{name, value}` tables, 0.033333f, and the name length's clamp `count`
+  declared at function scope and cleared with the other counters at the
+  top (`count = 0;`), which gives the name terminator's address retail's
+  operand order.
 - `0x004edfe0` (5343 bytes) is a near miss in the same sample (4393 of
   5346 compared positions): the "Animations" reader. Each "Animation<n>"
   entry (`SceneAnimation`, 0x44 bytes) is either key-framed (bit 3; a

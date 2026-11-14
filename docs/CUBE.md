@@ -50,10 +50,11 @@ Exact:
   expression or a local cell pointer all compile to strength-reduced
   pointers with immediate zeros.
 
-Near misses:
+Exact, still a sample:
 - `samples/render/CubeDrawNearMisses.cpp`: the geometry builder
-  `0x0043dc60`, 1100 of 1104 bytes; two column-loop spills are stored in
-  the other order.
+  `0x0043dc60`, 1104 of 1104 bytes. The column coordinate is one local
+  (`int x = column * 128 - 256;`) and the mirrored faces use `-x`. It moves
+  into CubeDraw.cpp with its calibration case.
 
 The texture coordinates `0x0043e0b0` match in CubeDraw.cpp. Both functions
 walk the cells with a running index that is not reset per row
