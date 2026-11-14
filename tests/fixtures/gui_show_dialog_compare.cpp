@@ -51,7 +51,7 @@ static void Text(Event& e, int n, const char* text) {
 }
 static void Touch(int operation) {
     if (!scenario.mutate) return;
-    Manager()->field_0x1f8 ^= operation * 0x010101;
+    Manager()->paletteLocked ^= operation * 0x010101;
     Manager()->paletteChanged = operation & 1;
     Manager()->dialogFontSize = (short)(-32768 + operation);
     Manager()->guiBackground = (BackgroundImage*)(pointerTokens + operation);

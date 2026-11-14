@@ -153,7 +153,7 @@ GUIManager::GUIManager(int flags) : GameObject(flags) {
     languageModule = 0;
     windowClipper = 0;
     paletteChanged = 0;
-    field_0x1f8 = 0;
+    paletteLocked = 0;
     redrawBackground = 0;
     field_0x304 = 0;
     cursorImage[0] = 0;
@@ -528,8 +528,8 @@ void GUIManager::SetGuiPalette(Palette8* palette) {
 }
 
 // 0x004864f0
-int GUIManager::UnknownFunction4864f0() {
-    return field_0x1f8;
+int GUIManager::IsPaletteLocked() {
+    return paletteLocked;
 }
 
 // 0x00486500

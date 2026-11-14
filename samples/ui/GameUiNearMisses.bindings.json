@@ -605,7 +605,7 @@
   "??_C@_0L@NDGO@FontHeight?$AA@": "0x0056bba0",
   "??_C@_04DKPP@Bold?$AA@": "0x0056bb98",
   "??_C@_06MPAD@Italic?$AA@": "0x0056bb90",
-  "?UnknownFunction4864f0@GUIManager@@QAEHXZ": "0x004864f0",
+  "?IsPaletteLocked@GUIManager@@QAEHXZ": "0x004864f0",
   "??_C@_0M@BKNP@PaletteFile?$AA@": "0x0056bb84",
   "??0Palette8@@QAE@PAVFileStream@@@Z": "0x004b6c00",
   "?SetGuiPalette@GUIManager@@QAEXPAVPalette8@@@Z": "0x00486150",

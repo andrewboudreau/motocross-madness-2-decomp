@@ -110,7 +110,7 @@ public:
     // 0x00486170: copies the screen (or `rect`) into a new texture, halving
     // its brightness when `dim`.
     PCTextureMap* CopyScreenToTexture(int dim, CameraRect* rect);
-    int UnknownFunction4864f0();              // 0x004864f0
+    int IsPaletteLocked();                    // 0x004864f0
     void RedrawFrame();             // 0x00486500: redraws a frame
     GUIUser* GetUser(int index);              // 0x00486540: user `index` (0 past 3)
     void SetWaitCursorImage(const char* image); // 0x00486560
@@ -147,7 +147,7 @@ public:
     char dialogDirectory[0x100];              // +0xf0: dialog directory
     int paletteChanged;                       // +0x1f0: set by 0x00486150; slot 10 clears it
     int waitFrames;                           // +0x1f4: frames to wait
-    int field_0x1f8;
+    int paletteLocked;                        // +0x1f8: set, 8-bit dialogs keep the GUI palette (no PaletteFile, no restore)
     void* toolTipFont;                        // +0x1fc: tool tip font (HFONT)
     char cursorImage[0x80];                   // +0x200: cursor image
     char waitCursorImage[0x80];               // +0x280: wait cursor image

@@ -145,7 +145,7 @@
   "?SetDialogDirectory@GUIManager@@QAEXPBD@Z": "0x00485d70",
   "?SwapModalDialog@GUIManager@@QAEHH@Z": "0x00485ee0",
   "?SetGuiPalette@GUIManager@@QAEXPAVPalette8@@@Z": "0x00486150",
-  "?UnknownFunction4864f0@GUIManager@@QAEHXZ": "0x004864f0",
+  "?IsPaletteLocked@GUIManager@@QAEHXZ": "0x004864f0",
   "?SetWaitCursorImage@GUIManager@@QAEXPBD@Z": "0x00486560",
   "?CreateCursors@GUIManager@@QAEXPBDH@Z": "0x00486590",
   "?RecreateCursors@GUIManager@@QAEXPBDH@Z": "0x004865e0",

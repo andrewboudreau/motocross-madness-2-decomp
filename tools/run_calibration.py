@@ -8630,7 +8630,7 @@ CASES = [
         'name': 'GUIManager.cpp GUIManager get +0x1f8 0x004864f0',
         'bindings': 'src/reconstructed/GUIManager.bindings.json',
         'source': 'src/reconstructed/GUIManager.cpp',
-        'symbol': '?UnknownFunction4864f0@GUIManager@@QAEHXZ',
+        'symbol': '?IsPaletteLocked@GUIManager@@QAEHXZ',
         'target_va': '0x004864f0',
         'target_size': 7,
         'reason': 'returns +0x1f8',

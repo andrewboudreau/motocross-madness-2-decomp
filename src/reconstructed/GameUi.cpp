@@ -1913,7 +1913,7 @@ UIDialog::~UIDialog() {
         if (isModal)
             guiManager->SwapModalDialog(previousModalDialog);
         if (g_TrackGame->renderTarget->surfacePixelFormat == 8) {
-            if (!guiManager || !guiManager->UnknownFunction4864f0())
+            if (!guiManager || !guiManager->IsPaletteLocked())
                 guiManager->UnknownFunction464e90();
         }
         if (isModal && parentDialog)
@@ -1925,7 +1925,7 @@ UIDialog::~UIDialog() {
         dialogBackground->MarkAllDirty();
     if (parentDialog) {
         if (parentDialog->dialogPalette && parentDialog->dialogPalette != dialogPalette &&
-            parentDialog->guiManager && !parentDialog->guiManager->UnknownFunction4864f0())
+            parentDialog->guiManager && !parentDialog->guiManager->IsPaletteLocked())
             parentDialog->guiManager->SetGuiPalette((Palette8*)parentDialog->dialogPalette);
         if (notifyParentOnClose)
             NotifyParent(dialogResult, 9);

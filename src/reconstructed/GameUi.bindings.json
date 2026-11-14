@@ -326,7 +326,7 @@
   "?ResizeDebugBlock@@YAPAXPAXI@Z": "0x0047b570",
   "?SwapModalDialog@GUIManager@@QAEHH@Z": "0x00485ee0",
   "?SetGuiPalette@GUIManager@@QAEXPAVPalette8@@@Z": "0x00486150",
-  "?UnknownFunction4864f0@GUIManager@@QAEHXZ": "0x004864f0",
+  "?IsPaletteLocked@GUIManager@@QAEHXZ": "0x004864f0",
   "?ShowControlToolTip@ToolTip@@QAEXPAVUnknownGuiControl@@@Z": "0x00486b10",
   "?RequestHover@GUIUser@@QAEHPAVUnknownGuiControl@@PAPAV2@H@Z": "0x00487730",
   "?RequestFocus@GUIUser@@QAEHPAVUnknownGuiControl@@PAPAV2@H@Z": "0x00487790",

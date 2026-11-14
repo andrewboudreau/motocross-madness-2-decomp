@@ -542,7 +542,7 @@ int UIDialog::ReadDialogResource(void* stream, int offset) {
                     if (g_TrackGame->renderTarget->surfacePixelFormat == 8) {
                         int load = 1;
                         if (guiManager) {
-                            if (guiManager->UnknownFunction4864f0())
+                            if (guiManager->IsPaletteLocked())
                                 load = 0;
                             dialogPalette = guiManager->guiPalette;
                         }
