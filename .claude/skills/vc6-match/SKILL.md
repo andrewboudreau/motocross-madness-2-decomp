@@ -72,6 +72,14 @@ near misses; `tools/near_miss_drops.py` lists ones whose gap is a single drop.
   reassigned one survives (FileStream Write/CheckHeader, ShowControlToolTip, LeaveRaceForMenu, HandleReceivedMessage).
 - Struct copy then `+=` (`pos = dev->pointerPosition; pos.y += 16;`) beats component-wise stores (ShowControlToolTip).
 - PoseRotation: the function-local definition count has period 8 there; used named constants count like dead locals.
+- An inline accessor in an argument list is evaluated ahead of the other arguments; reading the member in place restores
+  right-to-left interleaving and can flip a loop value's callee-saved register (CollectRacers `0x0051d730`).
+- Two statements sharing a subexpression: the one written first decides which register accumulates; `int h = f(); a = top + h`
+  and `a = top + f()` accumulate in different operands (UIDropDownList `0x0047a400`, UIListBox `0x00477e90`).
+- The initialised-local count is a weak lever: flat on most rows; when it varies, usually period 8, and it never moves
+  scheduling (push order, `sub esp`, store placement). A named by-value copy into an inline helper is a stronger leaf-age
+  lever (HullVsHull `0x00436720`).
+- sweep_variants templates: an inline choice ending in `{` followed by `@|` parses as nested; keep braces outside choices.
 - In Git Bash, `/` compiler flags in env vars (`MCM2_EXTRA_FLAGS`) need `MSYS_NO_PATHCONV=1`, or they are ignored.
 
 ## 4. Record and ship
