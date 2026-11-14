@@ -7,11 +7,11 @@ object layout is added or changed.
 
 | Existing provider | Retail entry | Complete bytes | Retired receiver views |
 | --- | --- | ---: | --- |
-| SetUseLighting(int) | `0x4444c0` | 23 | BikeA1A0, KrustyUISoultreeObjectView, UnknownSceneLodObject, SoultreeD3DNode |
+| SetUseLighting(int) | `0x4444c0` | 23 | BikeA1A0, KrustyUISoultreeObjectView, SceneSoultreeObjectView, SoultreeD3DNode |
 | ClearScreenRects() | `0x4444e0` | 55 | BikeA1A0, VehSceneNodeView::Method_004444E0 |
 | SetLod(int) | `0x444d00` | 56 | KbXform |
 | SetLowestLod(int) | `0x444d40` | 32 | KbXform |
-| ApplyLodSettings(int) | `0x4451e0` | 81 | RacerD3DIMSoultreeObjectView, UnknownSceneLodObject |
+| ApplyLodSettings(int) | `0x4451e0` | 81 | RacerD3DIMSoultreeObjectView, SceneSoultreeObjectView |
 
 All five complete providers match retail strictly with resolved relocations.
 Their existing dependencies are also supplied: SoultreeObject::SetFlag14c

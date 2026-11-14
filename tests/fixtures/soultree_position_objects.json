@@ -14,7 +14,7 @@
     "samples/track/SceneManagerNearMisses.cpp": {
       "sections": 96,
       "relocations": 484,
-      "sha256": "dc538fc9481f9553298165640d93cd7b9157df4a68bc32e8130b21e29bf463f7"
+      "sha256": "26d0bddc6e68eb7a820e18ce1dc20aa661e9b6f5ea07efe58894a3ea8221a3af"
     },
     "samples/race/BikeRaceNearMisses.cpp": {
       "sections": 206,
@@ -24,7 +24,7 @@
     "src/reconstructed/SceneManager.cpp": {
       "sections": 272,
       "relocations": 1273,
-      "sha256": "3ba831ee951d3c83bbf3939dce521bd87551518e3deba1bdd5525c18d15a45bd"
+      "sha256": "f4f2d6e5e6cadd4c5b051f5a7948b2ed229d64dfe7836c0dce51dc8cfd61888b"
     }
   }
 }

@@ -4,12 +4,12 @@
     "src/reconstructed/SceneManager.cpp": {
       "sections": 272,
       "relocations": 1273,
-      "sha256": "cffb89f0c58c4b584977ff983c23a62a46387785f94317f02758c0d8cc672faa"
+      "sha256": "d71f442dee048a77be74f6939c6e85e7f524eedae263c27a43f306f17e475dfe"
     },
     "samples/track/SceneManagerNearMisses.cpp": {
       "sections": 96,
       "relocations": 484,
-      "sha256": "7e53a949b61b8bea924c6f3fc7b0642118589fcc4e71460b7c33d547105cccc3"
+      "sha256": "17b3b60a914b201196e85c717dae12bdec63baa29c465b21175c44d3397683a8"
     }
   }
 }

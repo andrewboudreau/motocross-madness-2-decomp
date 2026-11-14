@@ -56,7 +56,7 @@
   "?SetDetailLevel@EcoSystem@@QAEXH@Z": "0x004594c0",
   "?RemovePlayer@EventManager@@QAEXH@Z": "0x0045fbd0",
   "?SetDetailLevel@Fog@@QAEXH@Z": "0x00462db0",
-  "?UnknownFunction464e80@StatsOverlay@@QAEXH@Z": "0x00464e80",
+  "?SetCueIndex@StatsOverlay@@QAEXH@Z": "0x00464e80",
   "?DisableByClassName@GameObject@@IAEXPBD@Z": "0x00468dd0",
   "?EnableByClassName@GameObject@@IAEXPBD@Z": "0x00468f10",
   "?AppendChild@GameObject@@QAEHPAV1@H@Z": "0x00469190",

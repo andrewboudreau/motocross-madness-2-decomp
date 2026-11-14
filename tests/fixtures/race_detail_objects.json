@@ -4,7 +4,7 @@
     "src/reconstructed/QuarryStuntEvent.cpp": {
       "sections": 86,
       "relocations": 393,
-      "sha256": "1395805734a309be0dcafe119673aa69a1da6d9909b050d7f1b967fe75a4c32b"
+      "sha256": "6978c516b78e864f8c2f3bc618cabddcca59c1584d3ce87f0a031efb219cf0af"
     },
     "samples/game/QuarryStuntEventNearMisses.cpp": {
       "sections": 23,

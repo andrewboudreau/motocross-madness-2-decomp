@@ -477,14 +477,14 @@ int Scene::ReadVector(Vector3* out, const char* section, const char* key,
     block->SelectSection(section);
     if (!sceneManager->sceneNamed) {
         block->GetString(key, def, value, 0x80);
-        UnknownFunction4de580(section, key, value);
+        LogParameter(section, key, value);
         out->x = (float)atof(strtok(value, ","));
         out->y = (float)atof(strtok(0, ","));
         out->z = (float)atof(strtok(0, "\n"));
         return 1;
     }
     if (block->GetString(key, "", value, 0x80)) {
-        UnknownFunction4de580(section, key, value);
+        LogParameter(section, key, value);
         out->x = (float)atof(strtok(value, ","));
         out->y = (float)atof(strtok(0, ","));
         out->z = (float)atof(strtok(0, "\n"));
@@ -492,7 +492,7 @@ int Scene::ReadVector(Vector3* out, const char* section, const char* key,
     }
     if (useDefault && *def) {
         strcpy(value, def);
-        UnknownFunction4de580(section, key, value);
+        LogParameter(section, key, value);
         out->x = (float)atof(strtok(value, ","));
         out->y = (float)atof(strtok(0, ","));
         out->z = (float)atof(strtok(0, "\n"));
@@ -511,7 +511,7 @@ int Scene::ReadColor(unsigned long* out, const char* section, const char* key,
     block->SelectSection(section);
     if (!sceneManager->sceneNamed) {
         block->GetString(key, def, value, 0x80);
-        UnknownFunction4de580(section, key, value);
+        LogParameter(section, key, value);
         int r = atoi(strtok(value, ","));
         int g = atoi(strtok(0, ","));
         int b = atoi(strtok(0, "\n"));
@@ -519,7 +519,7 @@ int Scene::ReadColor(unsigned long* out, const char* section, const char* key,
         return 1;
     }
     if (block->GetString(key, def, value, 0x80)) {
-        UnknownFunction4de580(section, key, value);
+        LogParameter(section, key, value);
         int r = atoi(strtok(value, ","));
         int g = atoi(strtok(0, ","));
         int b = atoi(strtok(0, "\n"));
@@ -616,20 +616,20 @@ int Scene::ReadLight(int index)
         SceneLight* light = &sceneLights[index];
         parameters.GetString("Type", "BLANK", text, 0x100);
         if (FindKeyword(&light->type, text, s_lightTypes)) {
-            UnknownFunction4de580(section, "Type", text);
+            LogParameter(section, "Type", text);
             if (!ReadColor(&light->color, section, "ColorRGB", "", 1, 0))
                 return 0;
             light->effectivePosition = &light->position;
             if (!ReadVector(&light->position, section, "Position", "", 0, 0)) {
                 light->position = Vector3(-2000.0f, 4000.0f, 1252.0f);
                 if (light->type != 6 && light->type != 7)
-                    UnknownFunction4de580(section, "Position(Default)", light->effectivePosition);
+                    LogParameter(section, "Position(Default)", light->effectivePosition);
                 else
                     light->effectivePosition = 0;
             }
             parameters.GetInt("PlaceLightAtInfinity", 0, &atInfinity);
             light->atInfinity = atInfinity;
-            UnknownFunction4de580(section, "PlaceLightAtInfinity", (int)light->atInfinity);
+            LogParameter(section, "PlaceLightAtInfinity", (int)light->atInfinity);
             if (light->atInfinity) {
                 light->direction = light->position * (80000.0f / Length(light->position));
                 light->effectivePosition = &light->direction;
@@ -648,31 +648,31 @@ int Scene::ReadLight(int index)
             if (range == -1.0) {
                 light->range = 0.0f;
                 if (light->type != 6 && light->type != 7)
-                    UnknownFunction4de580(section, "Range(Default)", 0.0f);
+                    LogParameter(section, "Range(Default)", 0.0f);
             } else {
-                UnknownFunction4de580(section, "Range", range);
+                LogParameter(section, "Range", range);
             }
             parameters.GetInt("ShowDebugSphere", 0, &showDebugSphere);
             light->showDebugSphere = showDebugSphere;
-            UnknownFunction4de580(section, "ShowDebugSphere", (int)light->showDebugSphere);
+            LogParameter(section, "ShowDebugSphere", (int)light->showDebugSphere);
             parameters.GetInt("CastsShadows", 0, &castsShadows);
             light->castsShadows = castsShadows;
-            UnknownFunction4de580(section, "CastsShadows", (int)light->castsShadows);
+            LogParameter(section, "CastsShadows", (int)light->castsShadows);
             parameters.GetInt("EmitsLight", 1, &emitsLight);
             light->emitsLight = emitsLight;
-            UnknownFunction4de580(section, "EmitsLight", (int)light->emitsLight);
+            LogParameter(section, "EmitsLight", (int)light->emitsLight);
             parameters.GetInt("HasLensFlare", 0, &hasLensFlare);
             light->hasLensFlare = hasLensFlare;
-            UnknownFunction4de580(section, "HasLensFlare", (int)light->hasLensFlare);
+            LogParameter(section, "HasLensFlare", (int)light->hasLensFlare);
             if (light->hasLensFlare) {
                 ReadColor(&light->lensFlareColor, section, "LensFlareColorRGB", "", 0, 0);
                 parameters.GetFloat("LensFlareBrightness", -1.0f, &light->lensFlareBrightness);
                 float brightness = light->lensFlareBrightness;
                 if (brightness == -1.0) {
                     light->lensFlareBrightness = 1.0f;
-                    UnknownFunction4de580(section, "LensFlareBrightness(Default)", 1.0f);
+                    LogParameter(section, "LensFlareBrightness(Default)", 1.0f);
                 } else {
-                    UnknownFunction4de580(section, "LensFlareBrightness", brightness);
+                    LogParameter(section, "LensFlareBrightness", brightness);
                 }
                 if (ReadFlags(light->layersVisible, 5, section, "LensFlareLayersVisible",
                                           "T,F,F,F,F", 0, 0)) {
@@ -680,18 +680,18 @@ int Scene::ReadLight(int index)
                             TF(light->layersVisible[0]), TF(light->layersVisible[1]),
                             TF(light->layersVisible[2]), TF(light->layersVisible[3]),
                             TF(light->layersVisible[4]));
-                    UnknownFunction464e80(text);
+                    LogMessage(text);
                 }
                 if (parameters.GetString("LensFlareTextureMapName", "", light->lensFlareTexture,
                                                       0x3f))
-                    UnknownFunction4de580(section, "LensFlareTextureMapName", light->lensFlareTexture);
+                    LogParameter(section, "LensFlareTextureMapName", light->lensFlareTexture);
                 else
                     strncpy(light->lensFlareTexture, "overlay\\lensflare.tga", 0x3f);
             }
-            UnknownFunction464e80("");
+            LogMessage("");
             return 1;
         }
-        UnknownFunction4de580(section, "Type", text);
+        LogParameter(section, "Type", text);
         return 0;
     }
     SceneLight* light = &sceneLights[index];
@@ -722,7 +722,7 @@ int Scene::ReadLight(int index)
         light->castsShadows = 1;
         light->hasLensFlare = 0;
     }
-    UnknownFunction464e80("No Scene File or no light data:  Use DEFAULT Lights (1 Ambient, 1 ObjectPoint "
+    LogMessage("No Scene File or no light data:  Use DEFAULT Lights (1 Ambient, 1 ObjectPoint "
                           "shadowcaster\n");
     return 1;
 }
@@ -740,31 +740,31 @@ int Scene::ReadFog()
     fog->haziness = 0.5f;
     int found = parameters.SelectSection("Fog");
     if (!sceneManager->sceneNamed || !found) {
-        UnknownFunction464e80("No Scene File or no fog data:  Using DEFAULT Fog\n");
+        LogMessage("No Scene File or no fog data:  Using DEFAULT Fog\n");
         return 1;
     }
     visibility = 1.0f;
     if (!parameters.GetFloat("Visibility", 1.0f, &visibility)) {
-        UnknownFunction4de580("Fog", "Visibility", "NOT FOUND using default 1.0");
+        LogParameter("Fog", "Visibility", "NOT FOUND using default 1.0");
     } else if (visibility < 0.0f || visibility > 1.0f) {
-        UnknownFunction4de580("Fog", "Visibility",
+        LogParameter("Fog", "Visibility",
                               "Invalid value, must be between 0.0 and 1.0, using default 1.0");
         visibility = 1.0f;
     }
     fog->visibility = visibility;
-    UnknownFunction4de580("Fog", "Visibility", fog->visibility);
+    LogParameter("Fog", "Visibility", fog->visibility);
     if (!parameters.GetFloat("Haziness", 0.5f, &haziness)) {
-        UnknownFunction4de580("Fog", "Haziness", "NOT FOUND using default 0.5");
+        LogParameter("Fog", "Haziness", "NOT FOUND using default 0.5");
     } else if (visibility < 0.0f || visibility > 1.0f) {
-        UnknownFunction4de580("Fog", "Haziness",
+        LogParameter("Fog", "Haziness",
                               "Invalid value, must be between 0.0 and 1.0, using default 0.5");
         haziness = 0.5f;
     }
     fog->haziness = haziness;
-    UnknownFunction4de580("Fog", "Haziness", fog->haziness);
+    LogParameter("Fog", "Haziness", fog->haziness);
     if (!ReadColor(&fog->color, "Fog", "ColorRGB", "", 1, 0))
         return 0;
-    UnknownFunction464e80("");
+    LogMessage("");
     return 1;
 }
 
@@ -781,7 +781,7 @@ int Scene::ReadEnvironment(const char* directory, const char* cubeDirectory)
     int found = parameters.SelectSection("Environment");
     if (sceneManager->sceneNamed && !found) {
         sprintf(text, "\nCannot find data for [%s] in %s.\n\n", "Environment", scenePath);
-        UnknownFunction464e80(text);
+        LogMessage(text);
         return 0;
     }
     environment = new(__FILE__, 1456) SceneEnvironment;
@@ -800,63 +800,63 @@ int Scene::ReadEnvironment(const char* directory, const char* cubeDirectory)
         strcpy(strrchr(text, '.'), ".est");
         sprintf(environment->ecosystemFile, "%s\\%s", directory, text);
         strncpy(sceneManager->estFile, text, 0x3f);
-        UnknownFunction4de580("Environment", "TerrainFile", environment->terrainFile);
-        UnknownFunction4de580("Environment", "EcosystemFile", environment->terrainFile);
+        LogParameter("Environment", "TerrainFile", environment->terrainFile);
+        LogParameter("Environment", "EcosystemFile", environment->terrainFile);
     } else {
-        UnknownFunction4de580("Environment", "TerrainFile(Default)", environment->terrainFile);
-        UnknownFunction4de580("Environment", "EcosystemFile(Default)", environment->ecosystemFile);
+        LogParameter("Environment", "TerrainFile(Default)", environment->terrainFile);
+        LogParameter("Environment", "EcosystemFile(Default)", environment->ecosystemFile);
         if (sceneManager->sceneNamed)
             return 0;
     }
     if (parameters.GetString("EcosystemFile", "", text, 0x100)) {
         sprintf(environment->ecosystemFile, "%s\\%s", directory, text);
         strncpy(sceneManager->estFile, text, 0x3f);
-        UnknownFunction4de580("Environment", "EcosystemFile", environment->terrainFile);
+        LogParameter("Environment", "EcosystemFile", environment->terrainFile);
     }
     if (parameters.GetString("CubeFile", "", text, 0x104)) {
         sprintf(environment->cubeFile, "%s\\%s", cubeDirectory, text);
         strncpy(sceneManager->cubeFile, text, 0x3f);
-        UnknownFunction4de580("Environment", "CubeFile", environment->cubeFile);
+        LogParameter("Environment", "CubeFile", environment->cubeFile);
     }
     if (parameters.GetString("ParticleTextureMapName", "", text, 0x100)) {
         strncpy(environment->particleTexture, text, 0x3f);
-        UnknownFunction4de580("Environment", "ParticleTextureMapName", environment->particleTexture);
+        LogParameter("Environment", "ParticleTextureMapName", environment->particleTexture);
     } else if (sceneManager->sceneNamed) {
-        UnknownFolded4de580("Environment", "ParticleTextureMapName", "dirtpart.tga");
+        LogDefaultParameter("Environment", "ParticleTextureMapName", "dirtpart.tga");
     }
     if (parameters.GetString("DetailTextureMapName", "", text, 0x100)) {
         strncpy(environment->detailTexture, text, 0x3f);
-        UnknownFunction4de580("Environment", "DetailTextureMapName", environment->particleTexture);
+        LogParameter("Environment", "DetailTextureMapName", environment->particleTexture);
     } else if (sceneManager->sceneNamed) {
-        UnknownFolded4de580("Environment", "DetailTextureMapName", "graynoise.tga");
+        LogDefaultParameter("Environment", "DetailTextureMapName", "graynoise.tga");
     }
     if (!parameters.GetFloat("TerrainWidthScale", 3.0f, &environment->terrainWidthScale))
-        UnknownFunction4de580("Environment", "TerrainWidthScale(Default)", environment->terrainWidthScale);
+        LogParameter("Environment", "TerrainWidthScale(Default)", environment->terrainWidthScale);
     else
-        UnknownFunction4de580("Environment", "TerrainWidthScale", environment->terrainWidthScale);
+        LogParameter("Environment", "TerrainWidthScale", environment->terrainWidthScale);
     if (!parameters.GetFloat("TerrainBreadthScale", 3.0f, &environment->terrainBreadthScale))
-        UnknownFunction4de580("Environment", "TerrainBreadthScale(Default)", environment->terrainBreadthScale);
+        LogParameter("Environment", "TerrainBreadthScale(Default)", environment->terrainBreadthScale);
     else
-        UnknownFunction4de580("Environment", "TerrainBreadthScale", environment->terrainBreadthScale);
+        LogParameter("Environment", "TerrainBreadthScale", environment->terrainBreadthScale);
     if (!parameters.GetFloat("TerrainWidth", 5.0f, &environment->terrainWidth))
-        UnknownFunction4de580("Environment", "TerrainWidth(Default)", environment->terrainWidth);
+        LogParameter("Environment", "TerrainWidth(Default)", environment->terrainWidth);
     else
-        UnknownFunction4de580("Environment", "TerrainWidth", environment->terrainWidth);
+        LogParameter("Environment", "TerrainWidth", environment->terrainWidth);
     if (!parameters.GetFloat("TerrainBreadth", 5.0f, &environment->terrainBreadth))
-        UnknownFunction4de580("Environment", "TerrainBreadth(Default)", environment->terrainBreadth);
+        LogParameter("Environment", "TerrainBreadth(Default)", environment->terrainBreadth);
     else
-        UnknownFunction4de580("Environment", "TerrainBreadth", environment->terrainBreadth);
+        LogParameter("Environment", "TerrainBreadth", environment->terrainBreadth);
     if (!parameters.GetFloat("StartGateScale", 1.0f, &environment->startGateScale))
-        UnknownFunction4de580("Environment", "StartGateScale(Default)", environment->startGateScale);
+        LogParameter("Environment", "StartGateScale(Default)", environment->startGateScale);
     else
-        UnknownFunction4de580("Environment", "StartGateScale", environment->startGateScale);
+        LogParameter("Environment", "StartGateScale", environment->startGateScale);
     found = parameters.SelectSection("TerrainZone1");
     environment->surfaceFriction[0] = 1.0f;
     environment->surfaceDrag[0] = 1.0f;
     environment->surfaceTraction[0] = 1.0f;
     if (!found) {
         sprintf(text, "\nCannot find Dust/Dirt data for [%s] in %s.\n\n", "TerrainZone1", scenePath);
-        UnknownFunction464e80(text);
+        LogMessage(text);
     } else {
         int dust;
         int dirt;
@@ -872,7 +872,7 @@ int Scene::ReadEnvironment(const char* directory, const char* cubeDirectory)
         sprintf(zone, "TerrainZone%d", i);
         if (!parameters.SelectSection(zone)) {
             sprintf(text, "\nCannot find data for [%s] in %s.\n\n", zone, scenePath);
-            UnknownFunction464e80(text);
+            LogMessage(text);
             environment->surfaceFriction[i - 1] = 1.0f;
             environment->surfaceDrag[i - 1] = 1.0f;
             environment->surfaceTraction[i - 1] = 1.0f;
@@ -881,44 +881,44 @@ int Scene::ReadEnvironment(const char* directory, const char* cubeDirectory)
             continue;
         }
         if (!parameters.GetFloat("SurfaceFriction", 1.0f, &environment->surfaceFriction[i - 1])) {
-            UnknownFunction4de580(zone, "SurfaceFriction", "NOT FOUND");
+            LogParameter(zone, "SurfaceFriction", "NOT FOUND");
         } else if (environment->surfaceFriction[i - 1] > 2.0f) {
             environment->surfaceFriction[i - 1] = 2.0f;
         } else if (environment->surfaceFriction[i - 1] < 0.05f) {
             environment->surfaceFriction[i - 1] = 0.05f;
         }
-        UnknownFunction4de580(zone, "SurfaceFriction", environment->surfaceFriction[i - 1]);
+        LogParameter(zone, "SurfaceFriction", environment->surfaceFriction[i - 1]);
         if (!parameters.GetFloat("SurfaceDrag", 1.0f, &environment->surfaceDrag[i - 1])) {
-            UnknownFunction4de580(zone, "SurfaceDrag", "NOT FOUND");
+            LogParameter(zone, "SurfaceDrag", "NOT FOUND");
         } else if (environment->surfaceDrag[i - 1] > 2.0f) {
             environment->surfaceDrag[i - 1] = 2.0f;
         } else if (environment->surfaceDrag[i - 1] < 0.05f) {
             environment->surfaceDrag[i - 1] = 0.05f;
         }
-        UnknownFunction4de580(zone, "SurfaceDrag", environment->surfaceDrag[i - 1]);
+        LogParameter(zone, "SurfaceDrag", environment->surfaceDrag[i - 1]);
         if (!parameters.GetFloat("SurfaceTraction", 1.0f, &environment->surfaceTraction[i - 1])) {
-            UnknownFunction4de580(zone, "SurfaceTraction", "NOT FOUND");
+            LogParameter(zone, "SurfaceTraction", "NOT FOUND");
         } else if (environment->surfaceTraction[i - 1] > 2.0f) {
             environment->surfaceTraction[i - 1] = 2.0f;
         } else if (environment->surfaceTraction[i - 1] < 0.05f) {
             environment->surfaceTraction[i - 1] = 0.05f;
         }
-        UnknownFunction4de580(zone, "SurfaceTraction", environment->surfaceTraction[i - 1]);
+        LogParameter(zone, "SurfaceTraction", environment->surfaceTraction[i - 1]);
         parameters.GetInt("GenerateDust", 1, &dust);
         environment->generateDust[i - 1] = dust;
-        UnknownFunction4de580(zone, "GenerateDust", (int)environment->generateDust[i - 1]);
+        LogParameter(zone, "GenerateDust", (int)environment->generateDust[i - 1]);
         parameters.GetInt("GenerateDirt", 1, &dirt);
         environment->generateDirt[i - 1] = dirt;
-        UnknownFunction4de580(zone, "GenerateDirt", (int)environment->generateDirt[i - 1]);
+        LogParameter(zone, "GenerateDirt", (int)environment->generateDirt[i - 1]);
     }
-    UnknownFunction464e80("");
+    LogMessage("");
     for (i = 0; i < 4; i++)
         environment->enviroID[i] = 0;
     for (i = 0; i < 4; i++) {
         sprintf(zone, "ReverbZone%d", i + 1);
         if (!parameters.SelectSection(zone)) {
             sprintf(text, "\nCannot find ReverbZone data for [%s] in %s.\n\n", zone, scenePath);
-            UnknownFunction464e80(text);
+            LogMessage(text);
         } else {
             parameters.ReadString("EnviroID", 0, environment->enviroID[i]);
         }
@@ -949,7 +949,7 @@ int Scene::OpenResourceFiles()
         return 1;
     }
     sprintf(message, "\nCannot find data for [%s] in %s.\n\n", "ResourceFiles", scenePath);
-    UnknownFunction464e80(message);
+    LogMessage(message);
     return 0;
 }
 
@@ -1009,8 +1009,8 @@ int Scene::ReadSounds()
         return 0;
     parameters.SelectSection("Sounds");
     parameters.GetInt("CrowdPresent", 0, &crowdPresent);
-    UnknownFunction4de580("Sounds", "CrowdPresent", crowdPresent);
-    UnknownFunction464e80("");
+    LogParameter("Sounds", "CrowdPresent", crowdPresent);
+    LogMessage("");
     parameters.GetInt("NumStaticSounds", 0, &count);
     if (count > 0) {
         sprintf(position, "%f %f %f", FLT_MAX, FLT_MAX, FLT_MAX);
@@ -1026,7 +1026,7 @@ int Scene::ReadSounds()
                                               &randomTriggerPercent, &oneShot, &force2D);
                         if (!ReadVector(&params.position, section, "Position", position, 1, 0)) {
                             sprintf(text, "Position not available for StaticSound%d\n", i);
-                            UnknownFunction464e80(text);
+                            LogMessage(text);
                         }
                         SoundEmitter* emitter =
                             (new(__FILE__, 2588)
@@ -1036,7 +1036,7 @@ int Scene::ReadSounds()
                         AppendChild(emitter, -1);
                         if (!emitter) {
                             sprintf(text, "\nScene::SoundEmitter(%s) not created\n", file);
-                            UnknownFunction464e80(text);
+                            LogMessage(text);
                         }
                     } else if (!_stricmp(type, "Sound")) {
                         int volume;
@@ -1050,14 +1050,14 @@ int Scene::ReadSounds()
                 }
             } else {
                 sprintf(text, "\nScene:  No AuralScape, so NO Static Model SOUNDS!\n");
-                UnknownFunction464e80(text);
+                LogMessage(text);
             }
         }
-        UnknownFunction464e80("");
+        LogMessage("");
         return 1;
     }
     sprintf(text, "\nNumber of StaticSounds<1 in %s.\n\n", scenePath);
-    UnknownFunction464e80(text);
+    LogMessage(text);
     return 0;
 }
 
@@ -1141,10 +1141,10 @@ int Scene::Load(void* owner, LightManager* lights, int particleManager, int text
         logFile = 0;
     }
     sceneManager->ReadCurrentSceneName(sceneName, sceneManager->sceneFile, 0);
-    UnknownFunction4de580("SceneInfo", "SceneName", sceneName);
+    LogParameter("SceneInfo", "SceneName", sceneName);
     ReadVector(&defaultStartPosition, "SceneInfo", "DefaultStartPosition", "1152.0,100.0,1152.0", 1, 0);
     ReadVector(&defaultStartDirection, "SceneInfo", "DefaultStartDirection", "0.0,0.0,1.0", 1, 0);
-    UnknownFunction464e80("");
+    LogMessage("");
     renderContext = owner;
     ReadVector(&podiumPosition, "SceneInfo", "PodiumPosition", "0.0,0.0,0.0", 1, 0);
     ReadVector(&podiumDirection, "SceneInfo", "PodiumDirection", "0.0,0.0,0.0", 1, 0);
@@ -1152,8 +1152,8 @@ int Scene::Load(void* owner, LightManager* lights, int particleManager, int text
         return 0;
     parameters.SelectSection("Lights");
     parameters.GetInt("NumberOfLights", -1, &lightCount);
-    UnknownFunction4de580("Lights", "NumberOfLights", lightCount);
-    UnknownFunction464e80("");
+    LogParameter("Lights", "NumberOfLights", lightCount);
+    LogMessage("");
     if (!sceneManager->sceneNamed || lightCount == -1)
         lightCount = 2;
     sceneLights = new(__FILE__, 2784) SceneLight[lightCount];
@@ -1442,18 +1442,18 @@ int Scene::CountObjects(int* count)
     if (!sceneManager->sceneNamed || !found) {
         sprintf(message, "\nNo scene file OR cannot find data for [%s] in %s.\n\n",
                 "StaticModels", scenePath);
-        UnknownFunction464e80(message);
+        LogMessage(message);
     }
     if (!parameters.GetInt("NumberOfStaticModels", 1, count)) {
         sprintf(message, "\nNumberOfStaticModels cannot be found under [%s] in %s.\n\n",
                 "StaticModels", scenePath);
-        UnknownFunction464e80(message);
+        LogMessage(message);
     }
     animations = 0;
     if (!parameters.GetInt("NumberOfAnimations", 0, &animations)) {
         sprintf(message, "\nNumberOfAnimations cannot be found under [%s] in %s.\n\n",
                 "Animations", scenePath);
-        UnknownFunction464e80(message);
+        LogMessage(message);
     }
     *count += animations;
     *count = *count > 1 ? *count : 1;
@@ -1529,14 +1529,14 @@ int Scene::CountTextures(unsigned long* counts, float* width, int* hasCube, char
         if (!parameters.GetInt("NumberOfStaticModels", -1, &models)) {
             sprintf(text, "\nNumberOfStaticModels cannot be found under [%s] in %s.\n\n", "StaticModels",
                     scenePath);
-            UnknownFunction464e80(text);
+            LogMessage(text);
         } else if (models > i) {
             for (i = 0; i < models;) {
                 sprintf(model, "Model%d", ++i);
                 parameters.SelectSection(model);
                 if (!parameters.GetString("SLT", "", file, 0x104)) {
                     sprintf(modelMessage, "\nCannot find %s for [%s] in %s.\n\n", file, model, scenePath);
-                    UnknownFunction464e80(modelMessage);
+                    LogMessage(modelMessage);
                     return 0;
                 }
                 sprintf(modelPath, "%s\\%s", "Res", file);
@@ -1546,7 +1546,7 @@ int Scene::CountTextures(unsigned long* counts, float* width, int* hasCube, char
         }
     } else {
         sprintf(text, "\nCannot find data for [%s] in %s.\n\n", "StaticModels", scenePath);
-        UnknownFunction464e80(text);
+        LogMessage(text);
     }
     i = 0;
     animations = 0;
@@ -1555,7 +1555,7 @@ int Scene::CountTextures(unsigned long* counts, float* width, int* hasCube, char
         if (!parameters.GetInt("NumberOfAnimations", -1, &animations)) {
             sprintf(text, "\nNumberOfAnimations cannot be found under [%s] in %s.\n\n", "Animations",
                     scenePath);
-            UnknownFunction464e80(text);
+            LogMessage(text);
         } else if (animations > i) {
             for (i = 0; i < animations; i = next) {
                 int keyFramed;
@@ -1564,7 +1564,7 @@ int Scene::CountTextures(unsigned long* counts, float* width, int* hasCube, char
                 parameters.SelectSection(animation);
                 if (!parameters.GetString("AnimationType", "", text, 0x40)) {
                     sprintf(message, "\nScene: AnimationType not specified for anim#%d.  Using KeyFramed.\n", i);
-                    UnknownFunction464e80(message);
+                    LogMessage(message);
                     keyFramed = 1;
                 } else if (!_strnicmp(text, "Procedural", 3)) {
                     keyFramed = 0;
@@ -1574,27 +1574,27 @@ int Scene::CountTextures(unsigned long* counts, float* width, int* hasCube, char
                 if (keyFramed) {
                     if (!parameters.GetString("MCF", "", file, 0x104)) {
                         sprintf(message, "\nCannot find %s for [%s] in %s.\n\n", "MCF", animation, scenePath);
-                        UnknownFunction464e80(message);
+                        LogMessage(message);
                         return 0;
                     }
                 } else if (!parameters.GetString("SLT", "", file, 0x104)) {
                     sprintf(message, "\nCannot find %s for [%s] in %s.\n\n", "SLT", animation, scenePath);
-                    UnknownFunction464e80(message);
+                    LogMessage(message);
                     return 0;
                 }
                 sprintf(animationPath, "%s\\%s", "Res", file);
                 if (keyFramed) {
-                    UnknownFunction4de580(animation, "MCF", animationPath);
+                    LogParameter(animation, "MCF", animationPath);
                     ResolveSltPath(animationPath);
                 }
-                UnknownFunction4de580(animation, "SLT", animationPath);
+                LogParameter(animation, "SLT", animationPath);
                 if (!CountModelTextures(animationPath, &resources, counts))
                     return 0;
             }
         }
     } else {
         sprintf(text, "\nCannot find data for [%s] in %s.\n\n", "Animations", scenePath);
-        UnknownFunction464e80(text);
+        LogMessage(text);
     }
     found = parameters.SelectSection("Environment");
     if (sceneManager->sceneNamed && found) {

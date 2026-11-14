@@ -9,19 +9,19 @@ relocations. Existing headers, reader bodies, and binding names are unchanged.
 
 | Existing declaration | Retail entry | Complete behavior | Direct calls |
 | --- | --- | --- | ---: |
-| `UnknownFunction4de580(const char*, const char*, const char*)` | `0x004de580` | `ret 12` | 25 |
-| `UnknownFunction4de580(const char*, const char*, float)` | `0x004de580` | `ret 12` | 12 |
-| `UnknownFunction4de580(const char*, const char*, int)` | `0x004de580` | `ret 12` | 9 |
-| `UnknownFunction4de580(const char*, const char*, const Vector3*)` | `0x004de580` | `ret 12` | 1 |
-| `UnknownFolded4de580(const char*, const char*, const char*)` | `0x004de580` | `ret 12` | 2 |
-| `UnknownFunction464e80(const char*)` | `0x00464e80` | `ret 4` | 25 |
+| `LogParameter(const char*, const char*, const char*)` | `0x004de580` | `ret 12` | 25 |
+| `LogParameter(const char*, const char*, float)` | `0x004de580` | `ret 12` | 12 |
+| `LogParameter(const char*, const char*, int)` | `0x004de580` | `ret 12` | 9 |
+| `LogParameter(const char*, const char*, const Vector3*)` | `0x004de580` | `ret 12` | 1 |
+| `LogDefaultParameter(const char*, const char*, const char*)` | `0x004de580` | `ret 12` | 2 |
+| `LogMessage(const char*)` | `0x00464e80` | `ret 4` | 25 |
 
 Each return is followed by thirteen NOPs before the next entry. There are no
 receiver or argument reads, logging calls, output writes, or returned-value
 assignments. The reconstructed definitions therefore add no such effects.
 They remain separate functions: the shared retail return address does not prove
-that the original methods were identical. Names, overload grouping, the
-`UnknownFolded` distinction, and original translation-unit ownership remain
+that the original methods were identical. Names (tier 3), overload grouping,
+the `LogDefaultParameter` distinction, and original TU ownership remain
 provisional. The new file groups these confirmed call contracts; it does not
 claim an original filename.
 

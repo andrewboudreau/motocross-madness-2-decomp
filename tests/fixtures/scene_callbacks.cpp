@@ -34,17 +34,17 @@ int main()
                 if ((char*)(GameObject*)reinterpret_cast<Scene*>(actual.bytes + 16) !=
                     (char*)actual.bytes + 16) return 2;
                 __try {
-                    scene->UnknownFunction4de580(section, key, text);
+                    scene->LogParameter(section, key, text);
                     if (memcmp(actual.bytes, expected.bytes, sizeof(actual.bytes))) return 3;
-                    scene->UnknownFunction4de580(section, key, number);
+                    scene->LogParameter(section, key, number);
                     if (memcmp(actual.bytes, expected.bytes, sizeof(actual.bytes))) return 4;
-                    scene->UnknownFunction4de580(section, key, (int)bits[value]);
+                    scene->LogParameter(section, key, (int)bits[value]);
                     if (memcmp(actual.bytes, expected.bytes, sizeof(actual.bytes))) return 5;
-                    scene->UnknownFunction4de580(section, key, vector);
+                    scene->LogParameter(section, key, vector);
                     if (memcmp(actual.bytes, expected.bytes, sizeof(actual.bytes))) return 6;
-                    scene->UnknownFolded4de580(section, key, text);
+                    scene->LogDefaultParameter(section, key, text);
                     if (memcmp(actual.bytes, expected.bytes, sizeof(actual.bytes))) return 7;
-                    scene->UnknownFunction464e80(text);
+                    scene->LogMessage(text);
                     if (memcmp(actual.bytes, expected.bytes, sizeof(actual.bytes))) return 8;
                 } __except(EXCEPTION_EXECUTE_HANDLER) {
                     return 9;

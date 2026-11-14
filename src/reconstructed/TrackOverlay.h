@@ -181,7 +181,7 @@ public:
                                         OverlayRect screen);
     // 0x00464e80: the shared empty `ret 4` body (QuarryStuntEvent.cpp
     // 0x004de4a3 passes the visual cue index).
-    void UnknownFunction464e80(int index);
+    void SetCueIndex(int index);
     int SetStatsSource(int source);     // 0x00519880
     int Redraw();                             // 0x005198a0
     int DrawStandings();              // 0x00519a20

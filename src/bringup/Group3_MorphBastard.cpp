@@ -35,7 +35,7 @@ void MorphBastardModifier::ModifyMesh(D3DIMSoultreeObject* object, ModifierSoult
         UpdateChannels(&morphObjects[i]);
         // The shared empty `ret 4` stub 0x00464e80, called with i (retail 0x004a4ce9);
         // link_aliases bind it to the defined copy of that stub.
-        UnknownFunction464e80(i);
+        OnChannelsUpdated(i);
         // As in retail, group is not initialised: a mesh without this object's node
         // leaves it undefined (retail then reads whatever its stack slot holds).
         MorphBastardMeshGroup* group;

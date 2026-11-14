@@ -25,7 +25,7 @@
   "?AxisAngleMatrix@@YAXPAUMatrix4@@MMMM@Z": "0x0042de90",
   "?CollisionMatrixMultiply@@YAXPAUMatrix4@@PBU1@1@Z": "0x00436500",
   "?Open@FileStream@@QAEHPBD0H@Z": "0x00460f50",
-  "?UnknownFunction464e80@MorphBastardModifier@@QAEXH@Z": "0x00464e80",
+  "?OnChannelsUpdated@MorphBastardModifier@@QAEXH@Z": "0x00464e80",
   "?Matrix4Row@@YA?AUVector3@@PBUMatrix4@@H@Z": "0x004a2350",
   "?LoadParameterFile@MorphBastardModifier@@QAEPAV1@PAXPBDPAVSoultreeObject@@@Z": "0x004a33b0",
   "?LoadParameterFile@MorphBastardModifier@@QAEPAV1@PAXPBDPAVSoultreeObject@@@Z$ehhandler": "0x0054c3ee",

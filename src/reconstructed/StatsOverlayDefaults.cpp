@@ -4,5 +4,5 @@
 // the cue index to the primary StatsOverlay pointer produced by CreateOverlays.
 // The method name, semantic purpose and original TU remain provisional;
 // sharing this empty address with other methods does not establish identity.
-void StatsOverlay::UnknownFunction464e80(int) {
+void StatsOverlay::SetCueIndex(int) {
 }

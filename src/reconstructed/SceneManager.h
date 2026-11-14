@@ -18,7 +18,7 @@ struct DS3DBuffer;
 // The Soultree object whose detail level 0x004eff30 sets (0x004451e0, the
 // D3DIMSoultreeObject methods of D3DIMSoulTree.h). A view: the scene reaches
 // it through character +0x1a0, object +0x34 and each shadow caster.
-struct UnknownSceneLodObject {
+struct SceneSoultreeObjectView {
     void SetAxesPtr(const Vector3* look, const Vector3* up, int orthogonalize, int keepZ); // 0x004fbd70
     void SetPosition(const Vector3* position); // 0x004fc660
 };
@@ -47,7 +47,7 @@ public:
     int motionStopped;                        // +0xC  Character +0x0c (D3DIMSoultreeCharacter.h motionStopped): set when a non-looping motion ends, cleared by SetMotion 0x004a8b40; AdvanceMotion returns 0 while set
     int motionTime;  // +0x10  Character +0x10: motion time (slot 7 adds time to it); RestartEntry zeroes it before AdvanceMotion
     unsigned char field_0x014[0x1a0 - 0x14];
-    UnknownSceneLodObject* modelNode;         // +0x1a0
+    SceneSoultreeObjectView* modelNode;         // +0x1a0
     char fileName[0x6c];  // +0x1A4  FindEntryByFileName (0x004eaec0) compares it, up to its '.', with the path's file name
     void* collisionObject;                // +0x210 CollisionCharacter's CollisionObject (QuarryStuntEvent.cpp)
     unsigned char field_0x214[0x268 - 0x214];
@@ -68,7 +68,7 @@ public:
                                float a14, float a15);
 
     unsigned char field_0x2c[0x34 - 0x2c];
-    UnknownSceneLodObject* carModel;  // +0x34  CarProcedural +0x34 carModel; SetDetailLevel/BikeRace use it as the model node
+    SceneSoultreeObjectView* carModel;  // +0x34  CarProcedural +0x34 carModel; SetDetailLevel/BikeRace use it as the model node
     void* sensorCollider;  // +0x38  CarProcedural +0x38 sensorCollider (QuarryStuntEvent sets collision ignore lists)
     void* bodyCollider;  // +0x3C  CarProcedural +0x3c bodyCollider
     unsigned char field_0x40[0x5c - 0x40];
@@ -128,7 +128,7 @@ class ShadowCaster;
 class ProjectedShadow;
 
 // Views declared in samples/track/SceneManagerNearMisses.cpp (0x004ecd60).
-class UnknownScenePhysicsObject;
+class SceneSoultreePhysicsObjectView;
 class SceneCollisionObjectView;
 
 // 0x28-byte element of SceneStaticModels::casters: a static model
@@ -139,7 +139,7 @@ struct SceneStaticModel {
     unsigned char useLighting : 1;        // bit 1: "UseLighting"
     unsigned char field_0x01[3];
     ShadowCaster* model;                      // +0x04 the model (a D3DIMSoultreeObject)
-    UnknownScenePhysicsObject* physicsObject; // +0x08
+    SceneSoultreePhysicsObjectView* physicsObject; // +0x08
     SceneCollisionObjectView* collisionObject; // +0x0c
     char fileName[0x18];                      // +0x10 the model's file name, at most 0x14 characters
 };
@@ -274,15 +274,15 @@ public:
                                int* oneShot, int* force2D);
     // 0x004de580 is a shared empty `ret 0xc` body (also BaseQuarryEvent and
     // NationalRace slot 34) that the readers call directly with the value
-    // they read: a string or, in 0x004ebdb0, a float. The two overloads
-    // here are provisional.
-    void UnknownFunction4de580(const char* section, const char* key, const char* value);
-    void UnknownFunction4de580(const char* section, const char* key, float value);
-    void UnknownFunction4de580(const char* section, const char* key, int value);
-    void UnknownFunction4de580(const char* section, const char* key, const Vector3* value);
+    // they read: a string or, in 0x004ebdb0, a float. The overloads are
+    // provisional; the Log names (tier 3) follow Load's "LogProgress" key.
+    void LogParameter(const char* section, const char* key, const char* value);
+    void LogParameter(const char* section, const char* key, float value);
+    void LogParameter(const char* section, const char* key, int value);
+    void LogParameter(const char* section, const char* key, const Vector3* value);
     // A second function folded into the same empty body: VC6 does not
     // cross-jump its calls with the ones above (0x004ebfc0).
-    void UnknownFolded4de580(const char* section, const char* key, const char* value);
+    void LogDefaultParameter(const char* section, const char* key, const char* value);
     // 0x004efb20: loads the scene: its file, the start and podium positions,
     // the environment, lights, fog, resources, stadium and the rest.
     int Load(void* owner, LightManager* lights, int particleManager, int textureManager, int modelTextures,
@@ -302,8 +302,8 @@ public:
     int ReadEnvironment(const char* directory, const char* cubeDirectory); // 0x004ebfc0: "Environment"
     int ReadLight(int index);             // 0x004eb570: reads "Light<index + 1>"
     // 0x00464e80 is likewise a shared empty `ret 4` body (FollowCamera slot 52
-    // among others), called directly with the formatted "Cannot find data" text.
-    void UnknownFunction464e80(const char* message);
+    // among others), called with the formatted error text or "" (tier 3 name).
+    void LogMessage(const char* message);
     int CountObjects(int* count);         // 0x004f0d20: loads the scene file, counts its objects
     int ResolveSltPath(char* path);           // model path -> its SLT file
     // 0x004f1130: counts the textures of the scene's models and animations

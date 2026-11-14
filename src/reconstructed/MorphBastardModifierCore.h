@@ -25,7 +25,7 @@ public:
     // 0x004a4bb0 (ret 4): updates every channel of `object`.
     void UpdateChannels(MorphBastardObject* object);
     // 0x00464e80 (ret 4): the shared empty stub, called with the object index.
-    void UnknownFunction464e80(int index);
+    void OnChannelsUpdated(int index);
     // 0x004a5290 (ret 4): makes meshCopy a copy of `mesh`.
     void CopyMesh(ModifierSoultreeSurfaceView* mesh);
 

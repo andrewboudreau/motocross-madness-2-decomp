@@ -1,6 +1,6 @@
 # StatsOverlay cue default method
 
-`StatsOverlay::UnknownFunction464e80(int)` supplies the missing default method
+`StatsOverlay::SetCueIndex(int)` supplies the missing default method
 called by `BaseQuarryEvent::Tick`. Its ordinary empty C++ emits retail's complete
 three-byte `RET 4` at `0x00464e80`, followed by thirteen alignment NOPs. The
 neighboring one-byte collision return at `0x00464e90` has a different calling

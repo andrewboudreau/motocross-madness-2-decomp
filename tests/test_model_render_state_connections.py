@@ -38,14 +38,14 @@ PROVIDERS = (
 )
 RENAMES = {
     '?SetUseLighting@' + view + '@@QAEXH@Z': '?SetUseLighting@D3DIMSoultreeObject@@QAEXH@Z'
-    for view in ('BikeA1A0', 'KrustyUISoultreeObjectView', 'UnknownSceneLodObject', 'SoultreeD3DNode')}
+    for view in ('BikeA1A0', 'KrustyUISoultreeObjectView', 'SceneSoultreeObjectView', 'SoultreeD3DNode')}
 RENAMES.update({
     '?ClearScreenRects@BikeA1A0@@QAEXXZ': '?ClearScreenRects@D3DIMSoultreeObject@@QAEXXZ',
     '?Method_004444E0@VehSceneNodeView@@QAEXXZ': '?ClearScreenRects@D3DIMSoultreeObject@@QAEXXZ',
     '?SetLod@KbXform@@QAEXH@Z': '?SetLod@D3DIMSoultreeObject@@QAEXH@Z',
     '?SetLowestLod@KbXform@@QAEXH@Z': '?SetLowestLod@D3DIMSoultreeObject@@QAEXH@Z',
     '?ApplyLodSettings@RacerD3DIMSoultreeObjectView@@QAEXH@Z': '?ApplyLodSettings@D3DIMSoultreeObject@@QAEXH@Z',
-    '?ApplyLodSettings@UnknownSceneLodObject@@QAEXH@Z': '?ApplyLodSettings@D3DIMSoultreeObject@@QAEXH@Z',
+    '?ApplyLodSettings@SceneSoultreeObjectView@@QAEXH@Z': '?ApplyLodSettings@D3DIMSoultreeObject@@QAEXH@Z',
 })
 
 

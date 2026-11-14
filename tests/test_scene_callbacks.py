@@ -19,12 +19,12 @@ ROOT = Path(__file__).resolve().parents[1]
 SOURCE = 'src/reconstructed/SceneCallbacks.cpp'
 CALLER = 'src/reconstructed/SceneManager.cpp'
 METHODS = {
-    '?UnknownFunction4de580@Scene@@QAEXPBD00@Z': (0x4de580, 25),
-    '?UnknownFunction4de580@Scene@@QAEXPBD0M@Z': (0x4de580, 12),
-    '?UnknownFunction4de580@Scene@@QAEXPBD0H@Z': (0x4de580, 9),
-    '?UnknownFunction4de580@Scene@@QAEXPBD0PBUVector3@@@Z': (0x4de580, 1),
-    '?UnknownFolded4de580@Scene@@QAEXPBD00@Z': (0x4de580, 2),
-    '?UnknownFunction464e80@Scene@@QAEXPBD@Z': (0x464e80, 25),
+    '?LogParameter@Scene@@QAEXPBD00@Z': (0x4de580, 25),
+    '?LogParameter@Scene@@QAEXPBD0M@Z': (0x4de580, 12),
+    '?LogParameter@Scene@@QAEXPBD0H@Z': (0x4de580, 9),
+    '?LogParameter@Scene@@QAEXPBD0PBUVector3@@@Z': (0x4de580, 1),
+    '?LogDefaultParameter@Scene@@QAEXPBD00@Z': (0x4de580, 2),
+    '?LogMessage@Scene@@QAEXPBD@Z': (0x464e80, 25),
 }
 
 

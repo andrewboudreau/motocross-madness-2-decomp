@@ -82,14 +82,14 @@ type, member and function names are provisional.
 - `SceneCarProceduralView` is the procedural entry's CarProcedural: a
   GameObject with +0x34, +0x38/+0x3c, +0x5c and +0x194, plus slot 27.
   Naming +0x20c as well changes VC6's code for `0x004eb570`.
-- `UnknownSceneLodObject` has `0x004444c0`, `0x004451e0`, `0x004fbd70` and
+- `SceneSoultreeObjectView` has `0x004444c0`, `0x004451e0`, `0x004fbd70` and
   `0x004fc660`.
 
   Together they are what the entry functions touch of the Soultree classes.
 - `SceneAnimation` types +0x08 (the procedural object), +0x0c (a
   `Vector3`) and +0x2c (the file name) and adds bit 5.
   `SceneRandomSet` types its index arrays as `signed char*`.
-- `UnknownFolded4de580`: a second declaration bound to the empty body
+- `LogDefaultParameter`: a second declaration bound to the empty body
   `0x004de580`. In `0x004ebfc0` VC6 cross-jumps the "found" and "default"
   report calls when both call the same function; retail keeps them apart,
   as calls to two folded functions would.

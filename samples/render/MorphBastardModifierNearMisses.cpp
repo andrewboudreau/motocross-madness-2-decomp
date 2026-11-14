@@ -306,7 +306,7 @@ void MorphBastardModifier::ModifyMesh(D3DIMSoultreeObject* object, ModifierSoult
     float value;
     for (int i = 0; i < objectCount; i++) {
         UpdateChannels(&morphObjects[i]);
-        UnknownFunction464e80(i);
+        OnChannelsUpdated(i);
         MorphBastardMeshGroup* group;
         for (int g = 0; g < mesh->groupCount; g++) {
             if (mesh->groups[g].node == morphObjects[i].node)

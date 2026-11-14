@@ -66,25 +66,25 @@
 // The particle emitters a physics model may carry (0x004ecd60). Views of
 // classes reconstructed in src/reconstructed/*ParticleEmitter.cpp: GameObjects whose own
 // slot 27 attaches them and returns the GameObject to add as a child.
-class UnknownSceneParticleEmitter : public GameObject {
+class SceneParticleEmitterView : public GameObject {
 public:
     virtual GameObject* Create(void* owner, int a);
 };
-class UnknownSceneDustEmitter : public UnknownSceneParticleEmitter {
+class SceneDustParticleEmitterView : public SceneParticleEmitterView {
 public:
-    explicit UnknownSceneDustEmitter(int flags);       // 0x004b8a00
+    explicit SceneDustParticleEmitterView(int flags);       // 0x004b8a00
 
     unsigned char field_0x2c[0x80 - 0x2c];
 };
-class UnknownSceneChunkEmitter : public UnknownSceneParticleEmitter {
+class SceneDirtChunkParticleEmitterView : public SceneParticleEmitterView {
 public:
-    explicit UnknownSceneChunkEmitter(int flags);      // 0x004b8df0
+    explicit SceneDirtChunkParticleEmitterView(int flags);      // 0x004b8df0
 
     unsigned char field_0x2c[0x608 - 0x2c];
 };
-class UnknownSceneSprayEmitter : public UnknownSceneParticleEmitter {
+class SceneDirtSprayParticleEmitterView : public SceneParticleEmitterView {
 public:
-    explicit UnknownSceneSprayEmitter(int flags);      // 0x004b9310
+    explicit SceneDirtSprayParticleEmitterView(int flags);      // 0x004b9310
 
     unsigned char field_0x2c[0x608 - 0x2c];
 };
@@ -93,7 +93,7 @@ public:
 // 0x005037c0; src/krusty2/soultree's SoultreePhysicsObject family). Only the
 // slots and fields 0x004ecd60 uses are declared: slot 37 attaches a particle
 // emitter, slot 40 loads the model and returns the GameObject to add.
-class UnknownScenePhysicsBody {
+class SceneSoultreePhysicsBaseObjectView {
 public:
     virtual void UpdateMass();
     virtual void ResetDynamicState();
@@ -148,9 +148,9 @@ public:
     int collisionPointCount;              // +0x130
     unsigned char field_0x134[0x21c - 0x134];
 };
-class UnknownScenePhysicsObject : public UnknownScenePhysicsBody, public D3DIMSoultreeObject {
+class SceneSoultreePhysicsObjectView : public SceneSoultreePhysicsBaseObjectView, public D3DIMSoultreeObject {
 public:
-    UnknownScenePhysicsObject(int a, int b);         // 0x005037c0
+    SceneSoultreePhysicsObjectView(int a, int b);         // 0x005037c0
 
     unsigned char field_0x4f4[0x524 - 0x4f4];
 };
@@ -178,17 +178,17 @@ void* AddCollisionPoint(int capacity, void** points, const Vector3* position, vo
 void OrientationAxesFromAngles(Vector3* look, Vector3* up, float heading, float pitch, int a);
 
 // An "ObjectShape" (0x24 bytes) or "EmitterType<n>" (0x1c bytes) keyword.
-struct UnknownSceneShapeKeyword {
+struct SceneObjectShapeKeyword {
     char name[0x20];
     int value;
 };
-struct UnknownSceneEmitterKeyword {
+struct SceneEmitterTypeKeyword {
     char name[0x18];
     int value;
 };
 
 // The value of keyword `name` (0 when not listed).
-static inline int FindShape(const char* name, const UnknownSceneShapeKeyword* table)
+static inline int FindShape(const char* name, const SceneObjectShapeKeyword* table)
 {
     for (int i = 0; i < 2; i++) {
         if (!_stricmp(name, table[i].name))
@@ -196,7 +196,7 @@ static inline int FindShape(const char* name, const UnknownSceneShapeKeyword* ta
     }
     return 0;
 }
-static inline int FindEmitter(const char* name, const UnknownSceneEmitterKeyword* table)
+static inline int FindEmitter(const char* name, const SceneEmitterTypeKeyword* table)
 {
     for (int i = 0; i < 4; i++) {
         if (!_stricmp(name, table[i].name))
@@ -252,7 +252,7 @@ int Scene::ReadStaticModels(LightManager* lights, int particleManager, int textu
         if (!parameters.GetInt("NumberOfStaticModels", -1, &models)) {
             sprintf(text, "\nNumberOfStaticModels cannot be found under [%s] in %s.\n\n", "StaticModels",
                     scenePath);
-            UnknownFunction464e80(text);
+            LogMessage(text);
             return 0;
         }
         if (models > 0) {
@@ -269,7 +269,7 @@ int Scene::ReadStaticModels(LightManager* lights, int particleManager, int textu
         parameters.SelectSection(model);
         if (!parameters.GetString("SLT", "", slt, 0x104)) {
             sprintf(message, "\nCannot find %s for [%s] in %s.\n\n", slt, model, scenePath);
-            UnknownFunction464e80(message);
+            LogMessage(message);
             return 0;
         }
         strcpy(path, slt);
@@ -300,11 +300,11 @@ int Scene::ReadStaticModels(LightManager* lights, int particleManager, int textu
             parameters.GetInt("MinCollisionPointsToRestOn", 1, &minPoints);
             parameters.GetFloat("Radius", 1.0f, &radius);
             parameters.GetString("ObjectShape", "", text, 0x80);
-            UnknownSceneShapeKeyword shapes[2] = {{"Box", 0}, {"Sphere", 1}};
+            SceneObjectShapeKeyword shapes[2] = {{"Box", 0}, {"Sphere", 1}};
             int shape = FindShape(text, shapes);
             if (minPoints >= points - 1)
                 minPoints = points - 1;
-            UnknownScenePhysicsObject* object = new(__FILE__, 1845) UnknownScenePhysicsObject(1, 1);
+            SceneSoultreePhysicsObjectView* object = new(__FILE__, 1845) SceneSoultreePhysicsObjectView(1, 1);
             AppendChild(object->LoadPhysicsModel(renderContext, sltPath, lights, modelTextures, position, look, up,
                                                                0, particleManager, 5.0f, points, emitters, this,
                                                                0.033333f, 10, 0.025f, 0.05f, radius, shape,
@@ -320,7 +320,7 @@ int Scene::ReadStaticModels(LightManager* lights, int particleManager, int textu
                     sprintf(key, "FrictionCoefficient%d", p + 1);
                     parameters.GetFloat(key, 0.6f, &friction);
                     AddCollisionPoint(points, object->collisionPoints, &position,
-                                      object->UnknownScenePhysicsBody::followedNode, 0,
+                                      object->SceneSoultreePhysicsBaseObjectView::followedNode, 0,
                                       &object->collisionPointCount,
                                       friction, (int)this);
                 }
@@ -333,7 +333,7 @@ int Scene::ReadStaticModels(LightManager* lights, int particleManager, int textu
                     nextEmitter = e + 1;
                     sprintf(key, "EmitterType%d", nextEmitter);
                     parameters.GetString(key, "", text, 0x17);
-                    UnknownSceneEmitterKeyword types[4] = {
+                    SceneEmitterTypeKeyword types[4] = {
                         {"DustEmitter", 1}, {"DirtChunkEmitter", 2}, {"DirtSprayEmitter", 3},
                         {"ExhaustEmitter", 4},
                     };
@@ -341,9 +341,9 @@ int Scene::ReadStaticModels(LightManager* lights, int particleManager, int textu
                     case 1:
                         if (dust) {
                             sprintf(message, "\nOnly ONE %s for [%s] allowed.\n\n", text, model);
-                            UnknownFunction464e80(message);
+                            LogMessage(message);
                         } else {
-                            UnknownSceneDustEmitter* emitter = new(__FILE__, 1917) UnknownSceneDustEmitter(1);
+                            SceneDustParticleEmitterView* emitter = new(__FILE__, 1917) SceneDustParticleEmitterView(1);
                             D3DIMSoultreeObject* node = object;
                             node->AppendChild(emitter->Create(renderContext, particleManager), -1);
                             object->AddAttachment(1, emitter, *object->collisionPoints, 0);
@@ -353,9 +353,9 @@ int Scene::ReadStaticModels(LightManager* lights, int particleManager, int textu
                     case 2:
                         if (chunk) {
                             sprintf(message, "\nOnly ONE %s for [%s] allowed.\n\n", text, model);
-                            UnknownFunction464e80(message);
+                            LogMessage(message);
                         } else {
-                            UnknownSceneChunkEmitter* emitter = new(__FILE__, 1927) UnknownSceneChunkEmitter(1);
+                            SceneDirtChunkParticleEmitterView* emitter = new(__FILE__, 1927) SceneDirtChunkParticleEmitterView(1);
                             D3DIMSoultreeObject* node = object;
                             node->AppendChild(emitter->Create(renderContext, particleManager), -1);
                             object->AddAttachment(2, emitter, *object->collisionPoints, 0);
@@ -365,9 +365,9 @@ int Scene::ReadStaticModels(LightManager* lights, int particleManager, int textu
                     case 3:
                         if (spray) {
                             sprintf(message, "\nOnly ONE %s for [%s] allowed.\n\n", text, model);
-                            UnknownFunction464e80(message);
+                            LogMessage(message);
                         } else {
-                            UnknownSceneSprayEmitter* emitter = new(__FILE__, 1937) UnknownSceneSprayEmitter(1);
+                            SceneDirtSprayParticleEmitterView* emitter = new(__FILE__, 1937) SceneDirtSprayParticleEmitterView(1);
                             D3DIMSoultreeObject* node = object;
                             node->AppendChild(emitter->Create(renderContext, particleManager), -1);
                             object->AddAttachment(3, emitter, *object->collisionPoints, 0);
@@ -378,7 +378,7 @@ int Scene::ReadStaticModels(LightManager* lights, int particleManager, int textu
                         break;
                     default:
                         sprintf(message, "\nUnknown EmitterType (%s) for [%s].\n\n", text, model);
-                        UnknownFunction464e80(message);
+                        LogMessage(message);
                         break;
                     }
                 }
@@ -436,24 +436,24 @@ int Scene::ReadStaticModels(LightManager* lights, int particleManager, int textu
                 AppendChild(emitter, -1);
                 if (!emitter) {
                     sprintf(text, "\nScene::SoundEmitter(%s) not created\n", sound);
-                    UnknownFunction464e80(text);
+                    LogMessage(text);
                 }
             }
         } else {
             sprintf(text, "\nScene:  No AuralScape, so NO Static Model SOUNDS!\n");
-            UnknownFunction464e80(text);
+            LogMessage(text);
         }
     }
     delete stream;
-    UnknownFunction464e80("");
+    LogMessage("");
     return 1;
         }
         sprintf(text, "\nNumber of models<1 in %s.\n\n", "StaticModels", scenePath);
-        UnknownFunction464e80(text);
+        LogMessage(text);
         return 0;
     }
     sprintf(text, "\nCannot find data for [%s] in %s.\n\n", "StaticModels", scenePath);
-    UnknownFunction464e80(text);
+    LogMessage(text);
     return 0;
 }
 
@@ -506,13 +506,13 @@ int Scene::ReadAnimations(LightManager* lights, int textureManager, int modelTex
         if (!parameters.GetInt("NumberOfAnimations", -1, &animations)) {
             sprintf(text, "\nNumberOfAnimations cannot be found under [%s] in %s.\n\n", "Animations",
                     scenePath);
-            UnknownFunction464e80(text);
+            LogMessage(text);
             return 0;
         }
         if (animations > 0) {
     animationTable = new(__FILE__, 2178) SceneAnimationTable;
     animationTable->entryCount = animations;
-    UnknownFunction4de580("Animations", "NumberOfAnimations", animations);
+    LogParameter("Animations", "NumberOfAnimations", animations);
     animationTable->entries = new(__FILE__, 2181) SceneAnimation[animations];
     for (i = 0; i < animationTable->entryCount; i = next) {
         if (i % interval == interval - 1 && progress)
@@ -523,13 +523,13 @@ int Scene::ReadAnimations(LightManager* lights, int textureManager, int modelTex
         parameters.SelectSection(name);
         if (!parameters.GetString("AnimationType", "", text, 0x40)) {
             sprintf(message, "\nScene: AnimationType not specified for anim#%d.  Using KeyFramed.\n", i);
-            UnknownFunction464e80(message);
+            LogMessage(message);
             animationTable->entries[i].keyFramed = 1;
         } else if (!_strnicmp(text, "Procedural", 3)) {
             animationTable->entries[i].keyFramed = 0;
             if (!parameters.GetString("VUE", "", vue, 0x40)) {
                 sprintf(message, "\nCannot find %s for [%s] in %s.\n\n", "VUE", name, scenePath);
-                UnknownFunction464e80(message);
+                LogMessage(message);
                 return 0;
             }
             sprintf(text, "%s\\%s", "Res", vue);
@@ -541,40 +541,40 @@ int Scene::ReadAnimations(LightManager* lights, int textureManager, int modelTex
                 return 0;
             }
             delete stream;
-            UnknownFunction4de580(name, "VUE", vuePath);
+            LogParameter(name, "VUE", vuePath);
             if (!parameters.GetFloat("FPS", 30.0f, &fps))
-                UnknownFunction4de580(name, "FPS(Default)", fps);
+                LogParameter(name, "FPS(Default)", fps);
             else
-                UnknownFunction4de580(name, "FPS", fps);
+                LogParameter(name, "FPS", fps);
             if (!parameters.GetFloat("LagDistance", 0, &lagDistance))
-                UnknownFunction4de580(name, "LagDistance(Default)", lagDistance);
+                LogParameter(name, "LagDistance(Default)", lagDistance);
             else
-                UnknownFunction4de580(name, "LagDistance", lagDistance);
+                LogParameter(name, "LagDistance", lagDistance);
             if (!parameters.GetInt("FrontWheelsTurn", 1, &frontWheelsTurn)) {
-                UnknownFunction4de580(name, "FrontWheelsTurn(Default)", frontWheelsTurn);
+                LogParameter(name, "FrontWheelsTurn(Default)", frontWheelsTurn);
                 if (lagDistance == 0)
                     frontWheelsTurn = 1;
                 else
                     frontWheelsTurn = 0;
             } else {
-                UnknownFunction4de580(name, "FrontWheelsTurn", frontWheelsTurn);
+                LogParameter(name, "FrontWheelsTurn", frontWheelsTurn);
             }
             if (!parameters.GetInt("NumberOfTires", 4, &tires))
-                UnknownFunction4de580(name, "NumberOfTires(Default)", tires);
+                LogParameter(name, "NumberOfTires(Default)", tires);
             else
-                UnknownFunction4de580(name, "NumberOfTires", tires);
+                LogParameter(name, "NumberOfTires", tires);
         } else {
             animationTable->entries[i].keyFramed = 1;
         }
         animationTable->entries[i].animatesWhileHeld = 0;
         if (animationTable->entries[i].keyFramed && !parameters.GetString("MCF", "", file, 0x104)) {
             sprintf(message, "\nCannot find %s for [%s] in %s.\n\n", "MCF", name, scenePath);
-            UnknownFunction464e80(message);
+            LogMessage(message);
             return 0;
         }
         if (!animationTable->entries[i].keyFramed && !parameters.GetString("SLT", "", file, 0x104)) {
             sprintf(message, "\nCannot find %s for [%s] in %s.\n\n", "SLT", name, scenePath);
-            UnknownFunction464e80(message);
+            LogMessage(message);
             return 0;
         }
         sprintf(sltPath, "%s\\%s", "Res", file);
@@ -603,7 +603,7 @@ int Scene::ReadAnimations(LightManager* lights, int textureManager, int modelTex
             if (!AppendChild(character->Load(renderContext, sltPath, colPath, lights, modelTextures, 1, 1),
                                        -1)) {
                 sprintf(message, "\nScene: Cannot create character from %s.\n\n", file);
-                UnknownFunction464e80(message);
+                LogMessage(message);
                 return 0;
             }
         }
@@ -615,7 +615,7 @@ int Scene::ReadAnimations(LightManager* lights, int textureManager, int modelTex
                                                                  frontWheelsTurn, lagDistance, 1.0f, tires, 0, 0, 0),
                                        -1)) {
                 sprintf(message, "\nScene: Cannot create procedural model from %s.\n\n", file);
-                UnknownFunction464e80(message);
+                LogMessage(message);
                 return 0;
             }
         }
@@ -633,7 +633,7 @@ int Scene::ReadAnimations(LightManager* lights, int textureManager, int modelTex
         parameters.GetInt("ExcludeFromCameraIteration", 0, &exclude);
         animationTable->entries[i].excludeFromCameraIteration = exclude;
         if (animationTable->entries[i].keyFramed) {
-            UnknownFunction4de580(name, "MCF", file);
+            LogParameter(name, "MCF", file);
             animationTable->entries[i].character->modelNode->SetPosition(&animationTable->entries[i].position);
             if (axes)
                 animationTable->entries[i].character->modelNode->SetAxesPtr(&look, &up, 1, 0);
@@ -650,10 +650,10 @@ int Scene::ReadAnimations(LightManager* lights, int textureManager, int modelTex
                     sprintf(key, "MotionToPlay%d", m + 1);
                     if (!parameters.GetString(key, "", motion, 0x10)) {
                         sprintf(message, "\nCannot find %s for [%s] in %s.\n\n", key, name, scenePath);
-                        UnknownFunction464e80(message);
+                        LogMessage(message);
                         return 0;
                     }
-                    UnknownFunction4de580(name, key, motion);
+                    LogParameter(name, key, motion);
                     animationTable->entries[i].motions[m] =
                         animationTable->entries[i].character->FindMotion(motion, 1);
                 }
@@ -679,19 +679,19 @@ int Scene::ReadAnimations(LightManager* lights, int textureManager, int modelTex
                     } else {
                         animationTable->entries[i].sequenceIndex = 0;
                         sprintf(message, "\n%s for [%s] in %s is ZERO!\n\n", "NumberInSequence", name, scenePath);
-                        UnknownFunction464e80(message);
+                        LogMessage(message);
                         return 0;
                     }
                 } else {
                     animationTable->entries[i].currentMotion = 0;
                     animationTable->entries[i].sequenceLength = 0;
                     sprintf(message, "\n%s for [%s] in %s is ZERO!\n\n", "MotionSequence", name, scenePath);
-                    UnknownFunction464e80(message);
+                    LogMessage(message);
                     return 0;
                 }
             }
         } else {
-            UnknownFunction4de580(name, "SLT", sltPath);
+            LogParameter(name, "SLT", sltPath);
             animationTable->entries[i].motionCount = 1;
             reinterpret_cast<D3DIMSoultreeObject*>(animationTable->entries[i].proceduralObject->carModel)->SetUseLighting(useLighting);
             if (axes)
@@ -704,7 +704,7 @@ int Scene::ReadAnimations(LightManager* lights, int textureManager, int modelTex
                     ReadSoundSettings(name, sound, 0, &params, &flags, &oneShotDistance, &randomTriggerPercent,
                                           &oneShot, &force2D);
                     parameters.GetString("SoundAttachToObject", "", attach, 0x40);
-                    UnknownSceneLodObject* node;
+                    SceneSoultreeObjectView* node;
                     if (animationTable->entries[i].keyFramed)
                         node = animationTable->entries[i].character->modelNode;
                     else
@@ -716,14 +716,14 @@ int Scene::ReadAnimations(LightManager* lights, int textureManager, int modelTex
                                                     flags, oneShotDistance, randomTriggerPercent, 0, force2D);
                     if (!emitter) {
                         sprintf(text, "\nScene::SoundEmitter(%s) not created\n", sound);
-                        UnknownFunction464e80(text);
+                        LogMessage(text);
                     } else {
                         AppendChild(emitter, -1);
                     }
                 }
             } else {
                 sprintf(text, "\nScene:  No AuralScape, so NO Animation SOUNDS!\n");
-                UnknownFunction464e80(text);
+                LogMessage(text);
             }
         }
     }
@@ -737,12 +737,12 @@ int Scene::ReadAnimations(LightManager* lights, int textureManager, int modelTex
             sprintf(setName, "RandomSet%d", i + 1);
             if (!parameters.SelectSection(setName)) {
                 sprintf(message, "\nCannot find [%s] in %s.\n\n", setName, scenePath);
-                UnknownFunction464e80(message);
+                LogMessage(message);
                 return 0;
             }
             if (!parameters.GetString("RandomSet", "", list, 0x80)) {
                 sprintf(message, "\nCannot find %s for [%s] in %s.\n\n", "RandomSet", setName, scenePath);
-                UnknownFunction464e80(message);
+                LogMessage(message);
                 return 0;
             }
             char* token = strtok(list, ",");
@@ -757,7 +757,7 @@ int Scene::ReadAnimations(LightManager* lights, int textureManager, int modelTex
                     if (!dot || dot == (int)strlen(token)) {
                         sprintf(message, "\nInvalid Animation or Motion #%d in [%s] in %s.\n\n", j, setName,
                                 scenePath);
-                        UnknownFunction464e80(message);
+                        LogMessage(message);
                         return 0;
                     }
                     token[dot] = 0;
@@ -776,14 +776,14 @@ int Scene::ReadAnimations(LightManager* lights, int textureManager, int modelTex
     } else {
         animationTable->randomSets = 0;
     }
-    UnknownFunction464e80("");
+    LogMessage("");
     return 1;
         }
         sprintf(text, "\nNumber of animations<1 in %s.\n\n", "Animations", scenePath);
-        UnknownFunction464e80(text);
+        LogMessage(text);
         return 0;
     }
     sprintf(text, "\nCannot find data for [%s] in %s.\n\n", "Animations", scenePath);
-    UnknownFunction464e80(text);
+    LogMessage(text);
     return 0;
 }

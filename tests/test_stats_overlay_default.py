@@ -13,7 +13,7 @@ from mcm2tool.rtti import parse_rtti
 from tools.match import compare
 
 ROOT = Path(__file__).resolve().parents[1]
-SYMBOL = '?UnknownFunction464e80@StatsOverlay@@QAEXH@Z'
+SYMBOL = '?SetCueIndex@StatsOverlay@@QAEXH@Z'
 
 
 @unittest.skipUnless(os.name == 'nt' and os.environ.get('VC6_ROOT') and os.environ.get('MCM2_EXE'),

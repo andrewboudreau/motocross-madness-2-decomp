@@ -98,7 +98,7 @@ int BaseQuarryEvent::Tick(float frameTime) {
         int index = visualCue->NextCueIndex();
         if (index != -1) {
             radarOverlay->cueIndex = index;
-            statsOverlay->UnknownFunction464e80(index);
+            statsOverlay->SetCueIndex(index);
         }
         radarOverlay->cueShown = visualCue->CanCycleCues();
         chatOverlay->ShowCueTag(visualCue->CanCycleCues());

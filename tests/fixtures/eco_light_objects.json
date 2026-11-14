@@ -17,7 +17,7 @@
     "src/reconstructed/SceneManager.cpp": {
       "sections": 272,
       "relocations": 1273,
-      "sha256": "b3cd7b3bcecbe07e6e90710388572181b427934b58292e63246928d91641c113"
+      "sha256": "07aefc3588507c06c1ab6390ac096ff4ad145a267dca856906797bcd14abcf1e"
     },
     "src/reconstructed/KrustyUI.cpp": {
       "sections": 317,
@@ -27,7 +27,7 @@
     "src/reconstructed/QuarryStuntEvent.cpp": {
       "sections": 86,
       "relocations": 393,
-      "sha256": "1395805734a309be0dcafe119673aa69a1da6d9909b050d7f1b967fe75a4c32b"
+      "sha256": "6978c516b78e864f8c2f3bc618cabddcca59c1584d3ce87f0a031efb219cf0af"
     },
     "src/reconstructed/ArcadeObject.cpp": {
       "sections": 32,
@@ -52,7 +52,7 @@
     "samples/track/SceneManagerNearMisses.cpp": {
       "sections": 96,
       "relocations": 484,
-      "sha256": "93b93afe7d7a3a9986bac0a23304a3ba58ae42f2184de508838f6cede2cd11dc"
+      "sha256": "52b885be73784556f3cf529abd1f09f6669ac5e2aa6f5038d98bf20025c8eb5f"
     },
     "samples/render/D3DIMSoulTreeNearMisses.cpp": {
       "sections": 29,
