@@ -18,6 +18,13 @@
 // Session 25: 0..5 dead initialised locals and `down`/`up` declared at
 // the top (either order) and assigned later are unchanged; 6 or more dead
 // locals grow the frame.
+// Big-gap pass (166 of 1760 strict, 507 of 531 aligned, first divergence
+// the register choice at offset 0x29, everything after it is shifted by
+// that one reload): NewPage as an inline taking the overlay or the game,
+// with or without a page local, and no-argument overlay/game accessors
+// are unchanged; `nextPage++; return nextPage - 1` aligns 500, the
+// increment stored to s_DebugPage directly or store-then-increment 510
+// (1768 bytes).
 #include <stdio.h>
 #include <string.h>
 
