@@ -23,6 +23,16 @@
 // head copy and the entry index (1685), and `Scene& scene = *raceScene` for
 // the table reads (1492) are worse than the form above, which keeps the
 // edx/ecx swap.
+// Cycle 4 (688 renderings, all 1699 or below): the caster arm's model, entry
+// address, camera view or index in a local, `casters + targetCaster`, either
+// order of the kind and index stores in either arm, the entry address as
+// `entries + targetEntry`, `entry += targetEntry` or with a table or index
+// local, the table tests negated with the arms swapped or nested, `> 0`,
+// `>= 1` and implicit tests, `followingRacer = true` or through a view local
+// in either else arm, and the same caster-arm forms under the split stores
+// (1676). Read as register turns, retail is one turn ahead of the candidate
+// at the entry arm's head (index edx, scene ecx with eax held by the camera
+// view) and none of these forms spends or saves a turn before it.
 //
 // 0x0041f1d0 (881 bytes; next/previous camera target): control flow, the
 // three branches and the shared tail call 0x0041eb20(caster) (the caster
