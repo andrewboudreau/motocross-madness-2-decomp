@@ -2,14 +2,21 @@
 // kept out of src/reconstructed until they match. The exact functions of the
 // file are in src/reconstructed/NetThread.cpp.
 //
-// ReceiveMessages (0x004af8e0, 338 bytes): same instructions and frame
-// except register colouring in the receive loop. Retail loads the buffer
-// pointer at the loop head (the realloc back edge enters after that load),
-// keeps &size in ebx and calls Receive through ecx; VC6 here loads the
-// buffer later and uses eax/ecx, saving the ebx push. Moving the from/to
-// declarations, a local buffer copy, a local interface pointer and do/while
-// or continue forms all compile identically, as do a function-pointer local
-// for Receive and inline accessors for the buffer and the size.
+// ReceiveMessages (0x004af8e0, 338 bytes): 274 of 339 bytes, every instruction
+// retail's but one. The buffer pointer is a local that the reallocation
+// assigns, which gives retail's registers (buffer in eax, &size in ebx,
+// Receive through ecx; 234 before, with the buffer read from the global in
+// the argument list). Retail reloads the local once at the loop head and the
+// reallocation jumps past that load; VC6 here keeps one load before the loop
+// and one after the dispatch.
+// Tried for the last instruction: the reload at the loop head with a `goto`
+// or a nested retry loop past it (VC6 clones the Receive call for the inner
+// back edge, 385 bytes), `for (init;;)`, `while (1)`, a `continue` after the
+// reallocation and the reload after the if/else (all 274). Tried before the
+// local: a buffer or &size local that is only read (propagated away, 234),
+// the buffer passed to the dispatch (106), inline Receive wrappers taking the
+// buffer, the size or the interface (234, 194), a local interface pointer, a
+// function-pointer local and inline accessors for the buffer and the size.
 //
 // HandleReceivedMessage (0x004afa90) is exact in src/reconstructed/NetThread.cpp:
 // the acknowledgement reads the local player into a local before SendRaw and
@@ -52,17 +59,19 @@ long ReceiveMessages(unsigned int time)
         return NET_E_INVALIDARG;
     }
     unsigned long size = g_UnknownGlobal6886dc;
+    unsigned char* buffer = s_ReceiveBuffer;
     for (;;) {
         unsigned long from = 0;
         unsigned long to = 0;
         long result = g_TrackGame->network->directPlay->Receive(
-            &from, &to, 1 /* DPRECEIVE_ALL */, s_ReceiveBuffer, &size);
+            &from, &to, 1 /* DPRECEIVE_ALL */, buffer, &size);
         if (result == NET_DPERR_BUFFERTOOSMALL) {
             if (s_ReceiveBuffer)
                 DebugFree(s_ReceiveBuffer, __FILE__, 221);
             g_UnknownGlobal6886dc = 0;
-            s_ReceiveBuffer = (unsigned char*)DebugMalloc(size, __FILE__, 223);
-            if (!s_ReceiveBuffer)
+            buffer = (unsigned char*)DebugMalloc(size, __FILE__, 223);
+            s_ReceiveBuffer = buffer;
+            if (!buffer)
                 break;
             g_UnknownGlobal6886dc = size;
         } else {
@@ -70,6 +79,7 @@ long ReceiveMessages(unsigned int time)
                 break;
             if (size >= 4)
                 HandleReceivedMessage(s_ReceiveBuffer, size, from, to, time);
+            buffer = s_ReceiveBuffer;
         }
     }
     LeaveCriticalSection(NET_LOCK(g_TrackGame->network->lock));

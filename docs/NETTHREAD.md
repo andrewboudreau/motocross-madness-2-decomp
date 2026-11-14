@@ -30,7 +30,10 @@ across `EnterCriticalSection`. With only the second, every later block was
 one register off.
 
 Near miss (`samples/net/NetThreadNearMisses.cpp`): the receive loop
-`0x004af8e0`, which differs only in register assignment.
+`0x004af8e0`, 274 of 339 bytes: the buffer pointer is a local the
+reallocation assigns, and only the place of its reload differs (retail has
+one load at the loop head, VC6 here one before the loop and one after the
+dispatch).
 
 Open question: `0x004af6a0` passes a float (`fstp [esp]`) to
 NetworkInterface `0x004acc50`, but Net.cpp's body uses that argument as an
