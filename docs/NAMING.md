@@ -2064,3 +2064,159 @@ Left as placeholders:
   - The `a9` of the LoadPhysicsModel view (see above).
   - GearRatios' `arg6`, which is stored at +0x1d8 and never read.
   - The D3DIMSoulTreeNearMisses.cpp `a7`.
+
+## Wave 22: krusty2 slots, the vehicle helpers and the motion parameters
+
+Wave 22 takes up Wave 21's list of names it could not touch in src/krusty2
+and samples/physics. It names the slots and helpers whose bodies, overrides
+or callers fix a role, and renames the generic parameters whose use decides
+one. Names only: no declaration, typedef, forward declaration or member was
+added or removed, and no static or type of a static was renamed. No line
+count changed, so the `__LINE__` values that DebugAlloc.h's macros take did
+not move.
+`git grep -ohE 'UnknownVirtualSlot[0-9]+|UnknownMethod[0-9]+|Method_[0-9A-Fa-f]+|\bFn_[0-9A-Fa-f]+' -- src samples`
+fell from 270 uses to 146. In src/krusty2 and samples/physics alone it fell
+from 112 to 45. No `Method_` name is left, and the only `Fn_` name left is
+the historical one in samples/physics/hierarchy/MIGRATION.md.
+work/naming/w21/generic.py counts `aN` falling from 18 to 8 and `argN` from
+6 to 3; `valueN` and `temp` stay at 0.
+
+Method:
+
+- work/naming/w16_overrides.py resolves each slot's overrides.
+  work/naming/w22_callers.py is w16_callers.py with any base register, and
+  small displacements (`+ 8]`) were grepped in work/naming/retail.asm.
+- The unique identifiers (`UnknownVirtualSlot19`, `12`, `26`, `43`,
+  `CollisionPointVirtualSlot1` and the `Method_` names) were renamed across
+  the tracked tree with work/naming/rename.py and work/naming/w22/renameA.json.
+  The name of a slot that other views share (`UnknownVirtualSlot0` and `1`)
+  was changed only at its own declaration and call sites, with
+  work/naming/w22/editB.py and work/naming/sub.py. The stale
+  "UnknownVirtualSlot12" comment in D3DIMSoulTreeNearMisses.cpp, which
+  describes PrepareGeometry, was corrected first (work/naming/w22/pre.py).
+- The parameter renames are work/naming/w22/specB.py, applied with
+  work/naming/w21/pren.py.
+
+Result: one proof over every unit whose closure reaches a changed source
+(461 units, run in two halves), from 1a8c08c9 to the renamed tree, with
+work/naming/w22/map.json (14 entries: the renamed slots and methods of
+GameObject, Game, ShadowCamera, Terrain, SoultreePhysicsBaseObject,
+BikeBodyObj, CollisionPoint, Tire, SoultreeContact, VehicleContactPoint,
+VehicleTicker, KbSink and Vehicle). Parameter names are not mangled, so the
+map needs no entry for them.
+
+- 351 IDENTICAL, 104 NAME-ONLY and 5 NAME-ONLY+COMDAT-ORDER.
+  - The COMDAT-ORDER units are DlgProcsNearMisses.cpp, Group4_DlgMain.cpp,
+    KrustyUI.cpp and ProCircuitProcs.cpp, where VC6 emits the dialog RTTI
+    COMDATs in another order once TrackRecordDlg's view slot is renamed, and
+    SoulTreePhysics.cpp, where the vtordisp thunks of SoultreePhysicsObject
+    and SoultreePhysicsBaseObject change places. Every section, relocation
+    and symbol is equal after the map; only the COMDAT order differs, as in
+    Waves 4 and 14.
+- tests/fixtures/bvh_vector_compare.cpp fails to compile in the old tree as
+  well: it includes the header its test generates (Wave 14).
+
+There was no DIFF, no other compile failure, and no .bss or .data offset
+moved. Every edited file keeps its line count.
+
+Negative controls:
+
+- Without the map, GameObject.obj, Tire.obj and Vehicle.obj give DIFF: the
+  vtable `.rdata` of GameObject and CollisionPoint, and SimulateFrame's
+  `.text`, differ in their relocations.
+- A live change gives DIFF in the changed function's `.text` bytes. In the
+  new tree's ApplyShockDamping, `lastStepTime` became `stepTime`
+  (work/naming/w22/live.py). This gives DIFF in
+  `?ApplyShockDamping@Vehicle@@QAEXPAM@Z`. After the change is reverted,
+  Vehicle.cpp is NAME-ONLY again and the new tree matches the work tree.
+
+Fixture pins: only whole-object digests of NAME-ONLY units were repinned,
+and every pinned section and relocation count still held.
+
+- work/naming/w22/repin_all.py ran work/naming/repin.py, repin2.py and
+  w16_repin3.py on the 41 failing modules (log: work/naming/w22/repin.log).
+  37 passed. w16_repin3.py does not check the verdict, so its units were
+  checked against the proof by hand: FollowCameraNearMisses.cpp,
+  FollowCameraConstructor.cpp, Terrain.cpp and VisibilityQuadTree.cpp are
+  all NAME-ONLY. The "FollowCameraControls.cpp" keys in
+  follow_camera_constructor_objects.json and the "?" key in
+  follow_camera_load_file_objects.json name the FollowCameraNearMisses.cpp
+  aggregate (66, 337) and the FollowCameraConstructor.cpp candidate
+  (31, 139).
+- The other four modules were repinned by hand:
+  - test_collision_point_storage (CollisionPoint.cpp, 32, 128) and
+    test_race_sound_refill (the RaceSoundNearMisses.cpp aggregate, 107, 580):
+    work/naming/w22/repin_manual.py.
+  - test_rider_motion_start_connections pins Bike.cpp (243, 1105),
+    KrustyBike.cpp (248, 1082) and KrustyBikeNearMisses.cpp (271, 1443) in
+    the test itself. test_chat_name_tag_draw's "canonical" digest is
+    TrackOverlay.cpp (215, 920), pinned in both chat_name_tag_objects.json
+    and stats_standings_objects.json: work/naming/w22/repin_bike.py.
+- test_soultree_physics_methods lists the slots renamed away from
+  `UnknownVirtualSlotN`. `'OnPhysicsStep': 26` was added to it
+  (work/naming/w22/testfix.py).
+- The renamed mangled names were also updated in tools/run_calibration.py
+  (the ShadowCamera, Game and GameObject OnInputEvent rows),
+  tools/emu_cases/vehicle_wheel_impulse.py, test_vector_add_assign.py,
+  test_vector_constructors.py, the bindings, the targets.json files and
+  docs/PHYSICS_VALIDATION.md, VC6_OPERAND_ORDER.md and VECTOR_ADD_ASSIGN.md.
+
+### Methods
+
+| Old name | New name | Tier | Evidence |
+| --- | --- | --- | --- |
+| `GameObject::UnknownVirtualSlot19` (with the ShadowCamera and Terrain overrides and the Bike, Vehicle, EcoSystem, TrackGame and TrackRecordDlg views) | `OnInputEvent` | 3 | The base body (`0x00469530`) runs only when childFlags has bit 0x100. It passes its int to each enabled child that is not pending release, and returns 1 at the first child that returns nonzero, like OnChar and OnKeyDown, which follow it. ShadowCamera (`0x004da550`) and Terrain (`0x00507920`) override it with `return 0`, as they do OnControlRelease. Its only caller is Game slot 12. |
+| `Game::UnknownVirtualSlot12` (with the UnknownEcoTrackGame and KbGame views) | `OnInputEvent` | 3 | `0x004688e0` returns `rootObject->OnInputEvent(value) != 0`. It sits before Game's OnControlRelease and OnControlPress. Nothing in retail calls it. The `call [eax+0x4c]` sites in LeaveMenusForRace and KrustyUI::OpenMenu are g_TrackGame's slot 19, not this one. |
+| `SoultreePhysicsBaseObject::UnknownVirtualSlot26` (with the Tire, FollowRacer and SceneManager views) | `OnPhysicsStep` | 3 | The entry is the shared empty stub (`0x00464e90`) and nothing overrides it. It is called once in each step of the three step loops: RunSteps (after IntegrateMotion, before the position update), Vehicle::SimulateFrame (before AdvancePosition) and KrustyBike::SimulateAIFrame. |
+| `CollisionPoint::CollisionPointVirtualSlot1` (and `Tire`) | `ComputeFrictionForce` | 2 | The base (`0x0043b240`) computes frictionForce (+0x78) from the normal load. The Tire override (`0x00515b50`) computes an anisotropic friction. Both retail callers add frictionForce right after the call. |
+| `SoultreeContact::UnknownVirtualSlot1`, `VehicleContactPoint::UnknownVirtualSlot1` | `ComputeFrictionForce` | 2 | Both are views of CollisionPoint. RunSteps' contact loop and ApplyWheelDriveAndFriction call slot 1 and then read frictionForce. |
+| `BikeBodyObj::UnknownVirtualSlot43` (Bike.cpp view) | `GetWorldAngularVelocity` | 2 | The view's fields match PhysicsBody (angularVelocity at +0x16c, invMass at +0x17c, invInertia at +0x1d0), and PhysicsBody slot 43 (`0x004cbed0`) is GetWorldAngularVelocity. The call fills a Vec3 out-parameter, which the collision response uses as the other body's angular velocity. |
+| `KbSink::UnknownVirtualSlot0`, `UnknownVirtualSlot1` | `Reset`, `ClearForces` | 2 | KrustyBike::InterpolateNetworkState (`0x00493660`) calls slot 0 of frontWheel+0x2b0 and rearWheel+0x2ac (`0x00494890`-`0x004948a8`), which hold the InlineShock and the RotatingShock. Shock's vtable has two entries: Reset (`0x004f9ba0`) and ClearForces (`0x004f9c70`). |
+| `VehicleTicker::UnknownVirtualSlot0` | `Reset` | 2 | Bike's loader passes the RotatingShock (constructor `0x004fa700`) to AddLateTicker and the InlineShock (`0x004f9ee0`) to AddEarlyTicker, so RunTickers calls Shock::Reset. |
+| `Vehicle::Method_00478FE0` | `DetectCrash` | 3 | The shared `xor eax,eax; ret` stub. CheckCrash (`0x00526830`) calls it directly and stores the result as its crash state. |
+| `Vehicle::Method_00527A20` | `ApplyWheelDriveAndFriction` | 2 | It applies each wheel's drive share (Tire's per-wheel drive step `0x00514170`), then the contact friction impulses limited by frictionMagnitude. |
+| `Vehicle::Method_005293E0` | `ApplyShockDamping` | 2 | It calls Shock::ApplyDamping for each wheel whose shock is engaged. |
+| `Vehicle::Method_00529450` | `ApplyShockForces` | 2 | It projects each engaged wheel's spring force on the ground normal and adds the force, the torque and the displacement impulse. |
+
+The `Fn_` and `Method_00528EB0` names in the targets.json notes became the
+bound names of the same addresses: FindObjectPlacement (`0x004b0df0`),
+CastSegment (`0x00506e90`), RemoveNodesFromQuadtree (`0x005047f0`),
+ResolveContactImpulse (`0x00500220`) and PlaceWheels (`0x00528eb0`).
+
+### Parameters
+
+| Function | Old | New | Tier | Evidence |
+| --- | --- | --- | --- | --- |
+| `Vehicle::LoadVehicle` | `arg18` | `suspensionScale` | 2 | It is stored in suspensionWeightScale, which slot 0 multiplies into the suspension mass. Bike passes 0.9f. |
+| `D3DIMSoultreeCharacter::LoadCharacter` | `a5` | `useOptions` | 2 | It is stored at character +0x20c (d3d_field_0x1a4+0x68). BuildModel (`0x00445c17`) passes it to LoadModel as useOptions. Every caller passes 1. |
+| `CollisionCharacter::Load`, SceneManager.h's character Load view | `a6`, `a5` | `useOptions` | 2 | Both forward it to LoadCharacter unchanged. |
+| `D3DIMSoultreeObject::GetPart` | `a6` | `unused` | 2 | The body ignores it, and the callers pass 0. |
+| The GetPart views in Group5_ShadowBridges.cpp and ProjectedShadow.h | `c`, `d` | `unused`, `lod` | 2 | D3DIMSoultreeObject::GetPart's names. |
+| D3DIMSoulTreeNearMisses.cpp's TestBox view | `a7` | `unused` | 2 | VisibilityClipper.h's name. |
+
+Left as placeholders:
+
+- PhysicsBody slots 31 and 32: they set +0x180 (an int) and +0x184 (a Vec3),
+  which nothing reads. No call site uses vtable offset 0x7c or 0x80, and
+  nothing overrides them.
+- Vehicle slots 78 and 79 (`0x00492220`, `0x00492270`): nothing calls or
+  overrides them. 78 reads joystick button index 3 or DIK_S, and 79 reads
+  button index 4 or DIK_X. The booklet's control list does not pair these
+  keys and buttons with one action, so no name is defensible.
+- ConstraintMethodCollisionModel slot 2: the shared bare `ret`
+  (`0x0044d710`), added on the QuadTreeObject primary vtable. No caller was
+  found.
+- KbSink slots 2-5: they lie past the end of Shock's two-entry vtable, and
+  nothing calls them.
+- GameObject slot 9 (see Wave 21).
+- Destructor slots keep their placeholders: slot 0 in the views
+  (VisibilityQuadTree.h, CollisionObject.cpp, VehicleInputMap,
+  VehicleContactPoint, the Bike and Vehicle GameObject views, KbGame) and
+  slot 1 in the KbPad and Vehicle.h InputDevice views (`~InputDevice`).
+- Generic parameters with no use that decides a role:
+  - GearRatios' `arg6` (and LoadVehicle's `gearArg`): stored at gearbox
+    +0x1d8 and never read. Bike passes 0.18f.
+  - LightEmitter::Create's `a8` to `a10`, TrackOverlay CastSegment's `a4`
+    to `a6` and the LoadPhysicsModel view's `a9` (see Wave 21).
+- RunTickers could be renamed after Shock::Reset; it was left for a later
+  wave.
