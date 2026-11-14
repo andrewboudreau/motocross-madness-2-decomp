@@ -20,6 +20,14 @@
 // a `starting` bool local, and dead statements (a discarded load, an unused
 // int, a scoped pointer) ahead of the second call. The rotation also
 // reaches the restore tail in the other branch.
+// Session 25 (all 337): pointer, reference and up-axis locals for the
+// vector arguments, event/view/game locals, float and reference locals in
+// the tail, a comma return, `BikeCamera::` on the three direct calls,
+// inline wrappers for them and a local for the static flag. Clue: with the
+// 0x004210f0 call made virtual (380 bytes, so not retail's direct call)
+// every later register matches and only that call and the last Tick's
+// `mov ecx, [frameTime] ; push ecx ; mov ecx, esi` differ, so retail has
+// exactly one more live temporary at that direct call.
 // The vector passed to slot 46 (0x0067c3e8) is the unit's kVec3YAxis
 // (src/reconstructed/KrustyBikeCamera.cpp); it is file-static there, so this
 // sample keeps its own static.

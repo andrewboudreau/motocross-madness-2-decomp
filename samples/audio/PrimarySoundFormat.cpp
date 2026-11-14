@@ -2,7 +2,11 @@
 #include <string.h>
 #include "../../src/reconstructed/SoundInterface.h"
 
-// 0x004be910: sets the primary buffer's PCM format.
+// 0x004be910: sets the primary buffer's PCM format (108/158). Retail keeps
+// `rate` in esi from the entry and loads `stereo` late into edx; VC6 here
+// does the reverse. Unchanged or worse: all 24 orders of the four computed
+// stores, 0..7 dead initialised locals, `samples`/`channels` locals and the
+// byte rate from `(unsigned long)rate` (1536 forms).
 int PCSoundInterface::SetPrimaryFormat(int rate, int stereo, int bits) {
     if (!audioStarted)
         return 0;

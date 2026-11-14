@@ -19,7 +19,8 @@ extern unsigned int g_WordHighBitMasks[33];
 // the first word in its own local or block, `src = dst; *src++ = ...`, the
 // src step in the for header, swap-macro spellings (operands and `+`), a
 // `fill` local or swapped fill arms (worse), and `32 - count` written out
-// for any subset of the carryShift uses (worse).
+// for any subset of the carryShift uses (worse), and 0..8 dead initialised
+// locals.
 void GR_BitString::ShiftBitsTowardFront(int count) {
     unsigned int* dst = (unsigned int*)data;
     unsigned int* src;
@@ -69,6 +70,10 @@ void GR_BitString::ShiftBitsTowardFront(int count) {
 // a mask local in the 0xffffffff arm (204), a count-up loop (155),
 // `32 - count` in place of carryShift (15) and `src` re-derived from
 // `data` (17); `&data[words - 1]` and a separate `>>= count` stay 387.
+// Also 387: 0..8 dead initialised locals, `i != 0`/`--i` and `for (i =
+// words; --i;)` loops, `--src`, `!*src`, a split `dst--` in the 0xffffffff
+// arm and the head's `dst++`/`src++` in either order. `i > 0` is 386, `dst--`
+// hoisted ahead of the value test 155 and ahead of the fill arms 343.
 void GR_BitString::ShiftBitsTowardBack(int count) {
     int words = (bitCount + 31) / 32;
     unsigned int* dst = (unsigned int*)data + words - 1;
