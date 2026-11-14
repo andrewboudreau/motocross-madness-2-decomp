@@ -61,9 +61,10 @@ Source forms needed:
   first) with the new picker in a local.
 
 Near misses (`samples/race/BikeRaceNearMisses.cpp`):
-- `0x0041eb20` (camera target), 1699 of 1710 bytes: register swap in the
-  scene-object branch (retail loads the index before the table; no
-  index/entry spelling or flag changes it).
+- `0x0041eb20` (camera target): exact, 1710 of 1710 bytes (registered in
+  `samples/race/targets.json`). The view's inline `UnknownFunctionTargetCaster`
+  stores `shadowCaster` before `isSettled`; with the other order the
+  scene-object branch's scratch registers were one rotation step off.
 - `0x0041f1d0`, 313 of 881 bytes (887-byte candidate, masked 0.829):
   retail keeps 0 in edx from the first instruction (re-zeroed after
   calls); the candidate does not. Retail repeats the `0x0041eb20(caster)`

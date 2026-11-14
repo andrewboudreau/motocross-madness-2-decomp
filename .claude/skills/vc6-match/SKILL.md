@@ -74,6 +74,10 @@ near misses; `tools/near_miss_drops.py` lists ones whose gap is a single drop.
   the arms themselves match, give the earlier arm its own copy of the function's tail and a `return`, with the other
   arm's statements after the `if`: VC6 tail-merges the copy (same bytes) but the arm order in the IL changes
   (ChatOverlay::DrawNameTag `0x0051e3f0`, 966 -> exact). A value loaded only to be tested takes no turn.
+  The state also depends on statement order inside an inline expanded in the earlier arm: VC6 may schedule two
+  member stores the same way for both orders, so that arm matches either way and only the next arm shows it
+  (BikeRace::AimCamera `0x0041eb20`: `shadowCaster = caster;` before `isSettled = 0;`, 1699 -> exact).
+  Probe by adding a throwaway `a = b;` copy at block ends to find which block the wrong arm inherits from.
 - A `c ? &a : &b` call argument is evaluated whole, ahead of the pushes. Retail testing first, pushing the shared
   arguments and choosing with `lea/jne/lea` in place means the call was written once per if/else arm; VC6 merges the
   shared pushes on both sides (Vehicle::ApplyBodyContactImpulse `0x005265d0`, 405 -> exact; arm order matters).

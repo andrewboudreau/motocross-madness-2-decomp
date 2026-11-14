@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 2, b 106, c 71, total 179. The three class (a) functions of the
+Counts: a 2, b 106, c 70, total 178. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -198,6 +198,14 @@ the last block in source order before the next branch, and the scratch-register 
 (eax, ecx, edx in turn per temporary) enters that branch one register later. The
 positions block also reads `racers[index]->position` without a block-local pointer. When
 every register after an if/else is one rotation step off, change which arm comes last.
+BikeRace::AimCamera `0x0041eb20` (class c, 1699/1710) is exact too: the camera view's inline
+`UnknownFunctionTargetCaster` (BikeRace.h) stores `shadowCaster = caster` before
+`isSettled = 0`, as its two siblings store their target first. VC6 emits the 0x274 store
+ahead of the 0x38c one for both orders, so the arm that calls the inline matched either
+way; the difference showed only in the next arm, whose temporaries start one rotation step
+later when the argument's store is the inline's first statement. When an arm is one step
+off and nothing in it moves, look at the statement order of an inline expanded in the arm
+before it, even if that arm already matches.
 
 | TU | VA | score | class | what differs |
 |---|---|---|---|---|
@@ -228,7 +236,7 @@ every register after an if/else is one rotation step off, change which arm comes
 | inputdevice/PCJoystickDevice | `0x004c3790` | 453/454 | b | one instruction: retail pushes the zero register (`push ebp`) for the release arm's QueueEvent argument, the candidate pushes eax; `int pressed = buttonStates[i].state = state.buttons[i] >> 7;` took it from 373 (samples/inputdevice/PCJoystickDeviceNearMisses.cpp) |
 | io/FileStream | `0x00461340` | 644/702 | c | inline `FileOf(FileStream*)` accessor at the three ReadXorDecoded calls and the tail as a nested `if`; left: origin/offset in ebx/ebp swapped, plus the scratch rotation of the fseek/fclose arguments |
 | io/FileStream | `0x00461640` | 545/663 | c | `FileOf` at the four fread calls and `if (!...) return count - 1; return count;` for the empty-buffer decoded read: every instruction is retail's, but one cross-jump keeps the other copy (36 return spellings and all 127 `FileOf` subsets tried) |
-| io/FileStream | `0x00461b90` | 257/282 | c | 3 code diffs: retail stores the 0xfa seed inside the inlined strcat and sets up the name pointer right after strlen |
+| io/FileStream | `0x00461b90` | 255/282 | c | 3 code diffs: retail stores the 0xfa seed inside the inlined strcat and sets up the name pointer right after strlen |
 | krusty2/broadphase/Quadtree | `0x004dcac0` | 620/627 | a | x and z spill slots swapped (0x2c/0x30) |
 | krusty2/broadphase/Quadtree | `0x004dcf20` | 182/331 | b | i and cell cached in edi/edx where retail reads their slots; z in esi; slot order differs |
 | krusty2/broadphase/Terrain | `0x00507c10` | linked 0.899 (was 0.864) | b | differential emulation fixed two behaviour bugs (the smooth (0,1,3) normal blends corners 0, 1, 2; heights add `(base + slope_x) + slope_z`), bit-identical in 6000 cases; retail's dead smooth-normal store in the even (0,1,3) flat-shaded branch is reproduced; the rest is out of reach under the rules: retail inlines an `__asm` float-to-int helper (`fld [ebp-0x30] ; mov eax, [ebp-0x2c] ; fistp dword ptr [eax]`), which forces the EBP frame; candidate 3544 B (995 insns) vs 2963 B (970) |
@@ -298,7 +306,6 @@ every register after an if/else is one rotation step off, change which arm comes
 | physics/visibility/VisibilityQuadTreeTraversal | `0x0052d610` | 2265/3027 | c | 23 differing instructions (3022 B): VC6 cross-jumps two recursive-call tails that retail keeps apart (retail merges two slot-2 call tails instead); argument-expression, helper and arm-shape forms do not move the choice |
 | race/BikeRace | `0x00417ed0` | 2828/6768 | c | retail stores `z*z` of each vector length to a stack temporary (`fstp [t]; faddp; fadd [t]`); the girl block's temporaries sit 4 to 12 bytes apart |
 | race/BikeRace | `0x00419970` | 13396/13428 | b | every scalar slot is retail's (13396 with one more inline-bearing class declared, BIKE_RACE_STATE_CONNECTIONS.md); left are three early register choices, two prologue stores, one SIB order and two 0x40-byte pairs swapped (own textures, replay recorded bike/rider) |
-| race/BikeRace | `0x0041eb20` | 1697/1710 | c | retail loads the scene-table index (+0x150) before the table pointer in the scene-object branch (edx/ecx swapped at the branch head) and again after the 0x4dab90 call; 162 parenthesisations of the index copy, table test and entry address give identical bytes |
 | race/BikeRace | `0x0041f1d0` | 313/881 | c | retail keeps 0 in edx from the first instruction (`cmp [edi + 0x3430], edx`, `xor edx, edx` after calls) and has three 0x0041eb20 call copies; the objects scan's found path calls and returns (second copy) and the racer-slot helper re-reads the player count (887 bytes, masked 0.829) |
 | race/BikeRace | `0x004210f0` | 465/2996 | b | inline budget: in the mode 2/3 case retail calls dot, FastInvSqrt, Scale, 0x518130 twice and the Vector3 constructor twice; the candidate calls dot, FastInvSqrt, the constructor and 0x518130 twice. The slot step scaled in place through a `Vector3&` gives retail's calls in the other cases (masked 0.936 -> 0.958; `= Scale(...)` kept 1018 strict but misaligned); registers follow |
 | race/CarProcedural | `0x0042fd80` | 580/2909 | b | slot 10, linked by the game: axisA at function scope gives retail's 0xdc frame (221 -> 580; the slot groups still differ in places), the hull correction through one `body` pointer (aligned 713 -> 719 of 782, candidate 2880 B); left: the steering clamp's memory local, component/scalar load order in the `back` normalisation and blend, argument-push scheduling |

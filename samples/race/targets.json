@@ -1,0 +1,11 @@
+[
+  {
+    "source": "BikeRaceNearMisses.cpp",
+    "candidate_symbol_contains": "?AimCamera@BikeRace@@QAEHH@Z",
+    "target_va": "0x0041eb20",
+    "target_size": 1710,
+    "expect": "exact",
+    "bindings": "BikeRaceNearMisses.bindings.json",
+    "status": "Exact (1710/1710 strict). Kept in the BikeRace aggregate sample; moving it into BikeRace.cpp changes that unit's pinned object."
+  }
+]

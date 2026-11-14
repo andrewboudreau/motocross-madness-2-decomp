@@ -662,9 +662,11 @@ struct BikeRaceKrustyBikeCameraView {
     }
 
     // Inline (0x0041eb20): the camera targets one scene object instead.
+    // Each of the three stores its own target first (the store order is
+    // what makes AimCamera 0x0041eb20 exact).
     void TargetShadowCaster(void* caster) {
-        isSettled = 0;
         shadowCaster = caster;
+        isSettled = 0;
         targetPointCached = 0;
         targetHeadingCached = 0;
         followingRacer = false;

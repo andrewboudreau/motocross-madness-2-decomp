@@ -200,12 +200,18 @@
 #include "../../src/reconstructed/SelectGamePicProcs.h"
 #include "../../src/reconstructed/TextureMap.h"
 
-// 0x0041eb20. Left: the caster arm loads targetCaster then raceScene as
-// retail does, the entry arm loads targetEntry and raceScene in the other
-// order. Splitting the two arms' targetKind/targetIndex stores into their
-// own `if (caster) ... else ...` ahead of the bodies flips both arms (the
-// entry arm then matches, the caster arm does not); splitting one arm,
-// `!caster` tests, ternary stores or one store per split leave it or worse.
+// 0x0041eb20: exact (1710/1710). The lever was not in this function: the
+// camera view's inline UnknownFunctionTargetCaster stores shadowCaster first,
+// like its two siblings store their target first. VC6 schedules the 0x274
+// store ahead of the 0x38c one either way, so the caster arm's bytes did not
+// tell the two orders apart; what moved is the scratch-register rotation the
+// following (scene-object) arm starts from, which was one step off. Forms
+// that did not move it: the two arms' targetKind/targetIndex stores in their
+// own `if (caster) ... else ...` (flips both arms), `!caster` and negated
+// inner tests, early returns with a copied tail, a `found` flag for the
+// shared followingRacer store, a view local (declared anywhere, reassigned
+// or not), table/models/index locals, and a helper inline taking the view
+// and the model in either order.
 int BikeRace::AimCamera(int caster) {
     if (RaceCameraView()->followingRacer) {
         targetKind = 0xff;
