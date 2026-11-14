@@ -36,7 +36,7 @@
     "target_va": "0x00425900",
     "target_size": 4314,
     "expect": "partial",
-    "notes": "2450/4314 (4321 B, aligned 1283/1300): one componentwise axis normalised in place, named dist/ra sums with QueryDot projections, named box-test extents and an if/return QuerySigned; left: the seventh normalisation's DotProduct stays inline, two fxch, c1z's slot and a permuted frame (see the file header).",
+    "notes": "2450/4314 (4321 B, aligned 1283/1300): one componentwise axis normalised in place, named dist/ra sums with QueryDot projections, named box-test extents and an if/return QuerySigned; left: the seventh normalisation's DotProduct stays inline, two fxch, c1z's slot and a permuted frame (see the file header). Local-count scan (session 25, k extra initialised int locals, dead, scratch only): not periodic, k = 0..15: 2450 2441 2435 2435 2494 2476 2477 2478 2478 2479 2474 2474 2476 2486 2485 2476, then 2467 falling to 2444 at 31; best 2494 at k = 4, far from exact",
     "bindings": "BoundingBoxTreeQueryNearMisses.bindings.json"
   },
   {
