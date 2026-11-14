@@ -1,0 +1,11 @@
+[
+  {
+    "source": "TrackOverlayNearMisses.cpp",
+    "candidate_symbol_contains": "?CollectRacers@ChatOverlay@@QAEHPAUUnknownChatView@@@Z",
+    "target_va": "0x0051d730",
+    "target_size": 586,
+    "expect": "exact",
+    "bindings": "TrackOverlayNearMisses.bindings.json",
+    "status": "Strict exact (586/586): both NameOverlay::Create calls read the render context in place instead of through the inline Target() accessor."
+  }
+]
