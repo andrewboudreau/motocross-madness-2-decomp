@@ -88,6 +88,17 @@
 //   `if (!previewDragged)` test on the member is reloaded (801).
 //   The reference, named-copy and threaded-ternary forms also leave
 //   0x004f8820 (1214) and 0x004d72c0 (1233) unchanged.
+//   2026-11: the scheduler works on blocks of a bounded tuple count, and
+//   both Tick branches sit exactly at the bound; retail behaves as if each
+//   held one more tuple (one extra store ahead of the slot-29 call gives
+//   retail's order too, and is as matching-only as the label). Looked for
+//   that tuple in the inline maths the branches expand, all 1181 unless
+//   noted: VectorDifference/VectorSum taking pointers, returning const,
+//   building `Vector3 r(...)`, through float locals or operator[]
+//   (by-value parameters 267-397, a named result filled member by member
+//   490-514); the `turned *= viewDistance` scale as an inline helper taking
+//   a value or pointer (a `const float&` parameter 376) or through a
+//   `float distance` local. None changes the slot-29 schedule.
 // SPRaceInfoDlg::HandleEvent (0x004507a0, 1652 bytes) and
 // MPRaceInfoDlg::HandleEvent (0x004513a0, 2004 bytes): the same
 //   calls, strings and list columns; inside the per-racer loops retail

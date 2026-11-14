@@ -72,6 +72,27 @@
 // Worse: the fee stored first, and game/kind/circuit declaration orders
 // with an int, unsigned or const kind (836, or 91/883 with the kind in eax
 // and TrackGame reloaded).
+// 2026-11, second pass. Retail scan: of the dialogs' HandleEvent methods
+// only 0x004d8fc0, 0x004d9860 and exact PCCompleteDlg 0x004da1b0 load the
+// kind into ecx, and in 0x004da1b0 that is because the g_TrackGame
+// temporary (eax) is still live when the kind is loaded (its init case
+// calls g_TrackGame->proCircuit->Save first); exact PCNewEventDlg
+// 0x004d9fd0 has the kind in eax as the candidates here do. So retail keeps
+// a g_TrackGame-derived value live across the kind load in these two as
+// well, and the fee/cash rotation (series eax, fee ecx stored first, cash
+// eax, shortfall in edx) follows from it. No source form found that does
+// it, all 836 unless noted: the cases in command-first order, a default
+// arm, if/else chains for the switch (72-86), `switch (event->kind - 1)`
+// (68), an unsigned or cast kind; the circuit through `CircuitOf(game)`,
+// a `TrackGame*&` or a parameterless inline getter, the kind through an
+// inline accessor, each against six init-store forms (72 combinations:
+// 836, 750 for the member-first stores `entryFee = ...; playerCash = ...;
+// cashShortfall = entryFee - playerCash;`, 99-101 for the others);
+// g_TrackGame->proCircuit written out at any one of the three init reads
+// (836; 750 or 86 with member-first stores); a `game` local kept live into
+// the init case (89: TrackGame in ecx, kind in eax); the kind read before
+// the circuit (91/883). A throwaway extra store or test in the first block
+// never moved the kind to ecx either.
 #include "../../src/reconstructed/ProCircuitProcs.cpp"
 
 // 0x004d8c40
