@@ -2220,3 +2220,137 @@ Left as placeholders:
     to `a6` and the LoadPhysicsModel view's `a9` (see Wave 21).
 - RunTickers could be renamed after Shock::Reset; it was left for a later
   wave.
+
+## Wave 23: GameObject slot 9, the render target's display view and message fields
+
+Wave 23 takes up the slots and fields that Waves 21 and 22 left as
+placeholders, and names those whose body, caller or the class they view
+fixes a role. Names only: no declaration, typedef, forward declaration or
+member was added or removed, and no static or type of a static was renamed.
+Every edited file keeps its line count, so the `__LINE__` values that
+DebugAlloc.h's macros take did not move.
+`git grep -ohE 'UnknownVirtualSlot[0-9]+|UnknownMethod[0-9]+|Method_[0-9A-Fa-f]+|\bFn_[0-9A-Fa-f]+' -- src samples`
+fell from 146 uses to 85. `\bfield_0x[0-9a-fA-F]+` fell from 1920 uses to
+1899, and `\bUnknown[A-Za-z0-9_]*` from 2768 uses (370 names) to 2704 (366
+names). The `flagN` bit-fields of the Kb bike messages are all named.
+
+Method:
+
+- work/naming/w16_overrides.py and work/naming/w22_callers.py resolved the
+  overrides and callers, as in Wave 22.
+- The unique identifiers (`UnknownVirtualSlot9`, `UnknownVirtualSlot27` and
+  `UnknownGameObjectOwnerPart`) were renamed across the tracked tree with
+  work/naming/rename.py and work/naming/w23/renameA.json, and the message
+  bits with work/naming/w23/renameB.json. Shared names (DrawableGridNode
+  slot 5, the display view's slots, the `field_0xNN` names and the
+  UIEditBox parameters) were changed only at their own declaration and uses,
+  with work/naming/w23/editB.py and work/naming/sub.py.
+  work/naming/w23/align.py realigned the bit-field comments (whitespace).
+
+Result: one proof over every unit whose closure reaches a changed source
+(463 units), from ae01415a to the renamed tree, with work/naming/w23/map.json
+(8 entries: GameObject slot 9, BackgroundImage slot 27, DrawableGridNode
+slot 5, and the display view's type and slots 1-4). Field and parameter names
+are not mangled into these objects, so the map needs no entry for them.
+
+- 357 IDENTICAL, 95 NAME-ONLY and 10 NAME-ONLY+COMDAT-ORDER.
+  - The COMDAT-ORDER units are DlgProcs.cpp, DlgProcsNearMisses.cpp,
+    Group4_DlgMain.cpp, KrustyUI.cpp, OptionProcs.cpp, ProCircuitProcs.cpp,
+    ProCircuitProcsNearMisses.cpp, SelectGamePicProcs.cpp,
+    SelectGamePicProcsNearMisses.cpp and VisibilityQuadTree.cpp. VC6 emits
+    their RTTI and vtable COMDATs in another order once the GameObject views'
+    slot 9 is renamed. Every section, relocation and symbol is equal after
+    the map; only the COMDAT order differs, as in Waves 4, 14 and 22.
+- tests/fixtures/bvh_vector_compare.cpp fails to compile in the old tree as
+  well: it includes the header its test generates (Wave 14).
+
+There was no DIFF, no other compile failure, and no .bss or .data offset
+moved.
+
+Negative controls:
+
+- Without the map, GameObject.obj and Griddraw.obj give DIFF in the
+  relocations of the GameObject and DrawableGridNode vtables, and
+  BackgroundImageHooks.obj gives DIFF because the old object's slot 27
+  `.text` has no counterpart.
+- A live change gives DIFF in the changed function's `.text` bytes. In the
+  new tree's Tire::HandleContact, the car branch read `physicsVelocity`
+  instead of `carPathVelocity` (work/naming/w23/live.py). This gives DIFF
+  in `?HandleContact@Tire@@QAEXHHPAVCollisionObject@@@Z`. After the new
+  tree's Tire.cpp is restored, Tire.cpp is NAME-ONLY again and the new tree
+  matches the work tree.
+
+Fixture pins: only whole-object digests of NAME-ONLY units were repinned,
+and every pinned section and relocation count still held.
+
+- 149 test modules reach a changed file, a renamed name or a NAME-ONLY unit
+  (work/naming/w23/pick_tests.py). 31 failed on digests only.
+- work/naming/w22/repin_all.py ran work/naming/repin.py, repin2.py and
+  w16_repin3.py on them (logs: work/naming/w23/repin1.log and repin2.log).
+  29 passed: 22 through repin.py, 3 through repin2.py and 4 through
+  w16_repin3.py. w16_repin3.py does not check the verdict, so its units were
+  checked against the proof by hand: VisibilityQuadTree.cpp,
+  FollowCameraNearMisses.cpp, Terrain.cpp and FollowCameraConstructor.cpp
+  are all NAME-ONLY (or NAME-ONLY+COMDAT-ORDER). As in Wave 22, the
+  "FollowCameraControls.cpp" keys of follow_camera_constructor_objects.json
+  and the "?" key of follow_camera_load_file_objects.json name the
+  FollowCameraNearMisses.cpp aggregate and the FollowCameraConstructor.cpp
+  candidate.
+- The other two were repinned by hand with work/naming/w23/repin_manual.py:
+  - test_chat_name_tag_draw's "canonical" digest, TrackOverlay.cpp
+    (215, 920), pinned in both chat_name_tag_objects.json and
+    stats_standings_objects.json; and test_race_sound_refill's
+    RaceSoundNearMisses.cpp aggregate (107, 580).
+  - test_rider_motion_start_connections pins Bike.cpp (243, 1105),
+    KrustyBike.cpp (248, 1082) and KrustyBikeNearMisses.cpp (271, 1443) in
+    the test itself.
+- The 31 modules pass after the repins. So do the seven modules whose
+  fixtures share a repinned digest (test_multi_state_draw,
+  test_race_detail_connections, test_stats_standings_draw,
+  test_vegetation_collision_object, test_vegetation_connections,
+  test_vehicle_input_subtype and test_visibility_connections).
+
+### Methods and types
+
+| Old name | New name | Tier | Evidence |
+| --- | --- | --- | --- |
+| `GameObject::UnknownVirtualSlot9` (with the Bike, Vehicle, EcoSystem, TrackGame and TrackRecordDlg views) | `PreTick` | 3 | The body (`0x00469430`) is Tick's (`0x004693d0`) child walk without the display hook: it runs only when childFlags has bit 0x01, the bit below Tick's 0x02, and passes its argument to each enabled child that is not paused or pending release. It is the slot just before Tick. Nothing overrides or calls it, so the name rests on the shape alone. |
+| `UnknownGameObjectOwnerPart` (GameObject.cpp) | `RenderTargetDisplayView` | 2 | Tick reads it from renderContext +0x04, which is RenderTarget's targetDisplay, a VideoCard. It tests +0x70 bit 2, VideoCard's lastFlipFailed. |
+| Its `UnknownVirtualSlot1` to `UnknownVirtualSlot4` | `ReleaseResources`, `SetDisplayMode`, `Present`, `RetryFlip` | 2 | VideoCard's slots 1-4. Tick calls RetryFlip(0) when lastFlipFailed is set. |
+| `BackgroundImage::UnknownVirtualSlot27` | `DrawBackground` | 3 | The shared `return 1` body (`0x004627f0`), slot 27 of the primary vtable `0x005506d8`, with no override. RenderPre3D (`0x00403dc0`) calls it with the off-screen copy and then sets copyValid, or with the render surface for a full restore, so it is where a background is drawn into a surface. |
+| `DrawableGridNode::UnknownVirtualSlot5` | `ReadExtraData` | 3 | The shared empty body (`0x004806f0`), empty in the override too. The node reader calls it last, with the stream it read the node from. |
+
+### Fields and parameters
+
+| Owner | Old | New | Tier | Evidence |
+| --- | --- | --- | --- | --- |
+| `KbBikeMessage`, `KbBikeDeltaMessage` | `flag4` to `flag9` | `spawnProtected`, `finished`, `onTrack`, `throttleOn`, `driveDisengaged`, `trickPoseHeld` | 2 | The message builder copies them from IsSpawnProtected() (slot 51), hasFinished (+0x7a4) and the KrustyBike members onTrack (+0x78c), throttleOn (+0x478), driveDisengaged (+0x479) and trickPoseHeld (+0x153c). |
+| `KbBikeDeltaMessage` | `field_0x11`, `field_0x16` | `lapGate`, `loaderKind` | 2 | KbBikeMessage's names for the same values: the delta builder stores lapGate (lapCount in event types 2 and 3) and loaderKind (KrustyBike +0x11c0). |
+| `LobbySettingsMessage` | `field_0x2d78` (3 bits) | `series` | 2 | The sender stores `mode.raceSettings.series` in it, and the receiver stores it back there. |
+| `TireContactOwner` (Tire.cpp) | `field_0x40`, `field_0x64`, `field_0x224` | `carPathVelocity`, `physicsVelocity`, `characterVelocity` | 2 | HandleContact picks one by the owner's tag: 0x69 (CarProcedural, whose +0x40 is pathVelocity), 0x64/0x68 (physics bodies, velocity at +0x64) and 0x2711 (CollisionCharacter, nodeVelocity at +0x224). |
+| `UIEditBox::UIEditBox` | `a`, `b` | `keyClickSound`, `fullTextSound` | 2 | They are stored at +0x204 and +0x208, whose union members are clickSound (the key click) and fullSound (the "full" sound). |
+
+DlgProcsNearMisses.cpp's comment now calls the podium camera slot by its
+Wave 21 name, `LookAt(podiumFocus)`. docs/STARTUP_DEFAULT_METHODS.md,
+tools/run_calibration.py, test_startup_default_methods.py and the
+particle_emitter_objects.json symbols use the new mangled names.
+
+Left as placeholders:
+
+- PhysicsBody slots 31 and 32: still no caller and no reader of +0x180 or
+  +0x184 (see Wave 22).
+- Vehicle slots 78 and 79 (`0x00492220`, `0x00492270`): no caller or
+  override, and the booklet does not pair joystick button 3 with DIK_S or
+  button 4 with DIK_X (see Wave 22).
+- UIDialog slot 30: the callback at +0xd4 it uses is set only by the
+  constructor (to 0), and no caller was found.
+- BaseQuarryEvent slots 28 and 34, ConstraintMethodCollisionModel slot 2,
+  KbSink slots 2-5, ConnectionInfoType slot 1 and the score interface's
+  `UnknownMethod5` and `UnknownMethod7` to `UnknownMethod14`: shared stubs
+  or no caller.
+- RenderTargetDisplayView slot 0 and the other destructor slots (see Wave 22).
+- Fields whose uses do not decide a role: RaceSound `field_0x40`,
+  TrackGame `field_0xac` and `field_0x25e8`, VideoCard `field_0x14[16]`
+  (read, but no writer found), PCTextureMap `field_0x38`, and
+  KrustyBikeCore's write-only fields.
+- The generic parameters listed in Wave 22.
