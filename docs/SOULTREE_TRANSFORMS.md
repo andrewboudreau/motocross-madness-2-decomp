@@ -2,14 +2,14 @@
 
 SetMatrixIn and SetAxesIn remain in `samples/physics/helpers/` and are
 explicitly included in the functional build through `config/game_build.json`.
-They are reviewed nonexact candidates, not additions to the strict-exact census.
+SetMatrixIn is a reviewed nonexact candidate; SetAxesIn is strict exact in the sample.
 WorldToLocalDirection is strict exact in `src/krusty2/soultree/soultree.cpp`.
 
 | Method | Retail VA | Retail / VC6 bytes | Remaining difference |
 | --- | --- | ---: | --- |
 | WorldToLocalDirection | `0x004fd710` | 209 / 209 | Strict exact in `soultree.cpp` |
 | SetMatrixIn | `0x004fb8c0` | 1096 / 1134 | Transpose inlining and stack-slot assignment |
-| SetAxesIn | `0x004fc050` | 1171 / 1171 | Stack-slot assignment |
+| SetAxesIn | `0x004fc050` | 1171 / 1171 | Strict exact in the sample (one `x` local for both cross products) |
 | TransposeRotation3x3 | `0x004fefb0` | 41 / 41 | Strict exact helper, unchanged |
 
 The class is confirmed by SoultreeObject RTTI, its two vtable writes and the

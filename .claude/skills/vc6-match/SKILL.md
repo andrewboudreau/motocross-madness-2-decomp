@@ -101,6 +101,10 @@ near misses; `tools/near_miss_drops.py` lists ones whose gap is a single drop.
 - Two strength-reduced induction variables of mirrored expressions (`column * 128 - 256` and `256 - column * 128`)
   spilled in the wrong order: name one (`int x = column * 128 - 256;`) and write the other as `-x`. Every spelling
   of the two written out is canonicalised to the same code (BuildFaceGeometry `0x0043dc60`, 1100 -> exact).
+- Two named struct locals with disjoint lives that retail keeps in one slot (while the call-result temporaries
+  share another) can be one reused variable: `Vec3 x; if (c) { x = Cross(z, y); ... } ... x = Cross(y, z);`.
+  Sibling blocks, inline helpers and scope moves do not reproduce that colouring (SetAxesIn `0x004fc050`,
+  1137 -> exact with unchanged instructions).
 - sweep_variants templates: an inline choice ending in `{` followed by `@|` parses as nested; keep braces outside choices.
 - In Git Bash, `/` compiler flags in env vars (`MCM2_EXTRA_FLAGS`) need `MSYS_NO_PATHCONV=1`, or they are ignored.
 - A test the optimiser folds late flips `[base + index]` operand order. When a loop's

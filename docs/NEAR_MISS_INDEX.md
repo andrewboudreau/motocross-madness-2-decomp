@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 2, b 106, c 68, total 176. The three class (a) functions of the
+Counts: a 2, b 105, c 68, total 175. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -56,6 +56,12 @@ Vehicle slot 74 `0x005281b0` (class c, 528/539) is exact too, in Vehicle.cpp: th
 stored straight into `field_0x4e8` and the abs test reads the member (`k` is copied from it
 inside the branch), so VC6 stores the member before the `fcom` as retail does. A local `k`
 stored to the member, or copied from it before the test, leaves the compare ahead of the store.
+SoultreeObject::SetAxesIn `0x004fc050` (class b, 1137/1171, same instructions) is exact too:
+one `Vec3 x` at the block's scope holds the orthogonalising cross product and later row 0,
+where the candidate had a separate `normal` in the orthogonalize block. Retail kept the two in
+one 12-byte slot and every call result in another; blocks, inline helpers and scope changes
+cannot make VC6 colour two locals that way, a reused variable does. When /FAs shows two named
+vectors with disjoint lives in one slot and the temporaries apart, try one variable.
 SoultreeRefreshContacts `0x0043ad80` (class c, 604/615) is exact too, in CollisionPoint.cpp:
 the single contact's `offset - k * normal` is summed through InlineSum (returned through the
 three-float constructor), which stores the copy's y after the `fstp` of z as retail does; the
@@ -307,7 +313,6 @@ before it, even if that arm already matches.
 | physics/helpers/GraphicsTest | `0x0047bd10` | 818/917 | b | DrawCircle: frame 0xb84 vs 0xb78, the `[eax - 4]` store and the centre-sum operand order; a `Vec3* p = &points[i]` local gave +4 |
 | physics/helpers/SoultreeBounds | `0x004fd340` | 618/630 | c | rows _11.._13 written k = 1,3,2,4 and _14 k = 3,1,2,4; the s13 product of _11.._14 loads its operands the other way (retail m3j first) and two _44 products differ (samples/physics/helpers/SoultreeBounds.cpp) |
 | physics/helpers/SoultreeMatrix | `0x004fb8c0` | 262/1096 | b | 13 code diffs: `mov ecx, [esp + N] ; mov edx, [esp + N]~` vs `lea ecx, [esp + N] ; push ecx`; `fld [esp + N] ; mov [esp + N], ecx ; le~` vs `call A`; slot order differs |
-| physics/helpers/SoultreeMatrix | `0x004fc050` | 1137/1171 | b | same instructions, order and length (bracketed products in the inline cross); three 12-byte slots ordered temporaries, pos, r where retail has r (shared with the delta copy), temporaries, pos; dropping the z/y/x block gives the r/d sharing but demotes z (1093) |
 | physics/krustybike/KrustyBike | `0x0048eea0` | 608/2952 | c | slot 102, frame 0x50 exact; VC6 cross-jumps the head-turn arms differently (retail keeps the + side hold block and the - side retarget tail), `jne call ; jmp skip` vs retail `je skip ; jmp call` in the trick-chain switch, the `+0x153c = 0` else block before the shared advance, and the crash clamp keeps t on the x87 stack where retail spills it to the dt slot |
 | physics/krustybike/KrustyBike | `0x004919a0` | 151/230 | c | 8 code diffs: retail adds `mov edx, [edx + 0x60c] ; fsub [ecx + 0x~`; retail lacks `fsub [ecx + 0xb8]` |
 | physics/krustybike/KrustyBike | `0x00491d10` | 526/1296 | b | every game read through g_TrackGame (retail reloads it after case 4's `*a3` store; aligned 275 -> 309); prologue, frame 0x20 and lim in ebp match (if/else flag/lim, mode 2/3 copy path breaks); the 2/3 normalise join sits after the invsqrt arm (retail after the zero arm), its query call is not cross-jumped into the shared call, and retail homes the case 0/4 call in case 4 (candidate in case 0); candidate 1288 bytes |

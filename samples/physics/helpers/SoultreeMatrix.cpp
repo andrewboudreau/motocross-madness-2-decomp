@@ -1,4 +1,4 @@
-// SoultreeMatrix.cpp -- near misses of SoultreeObject (soultree.cpp) frame-relative matrix
+// SoultreeMatrix.cpp -- SetAxesIn (exact) and the SetMatrixIn near miss of SoultreeObject (soultree.cpp) frame-relative matrix
 // accessors (declared in core/SoultreeObject.h). The exact members of the unit, GetMatrixIn
 // 0x004fca80 among them, are in src/krusty2/soultree/soultree.cpp. Class attribution tier 2; names tier 3.
 #include <string.h>
@@ -82,14 +82,19 @@ static inline void RotateByRowsTo(Vec3* r, Vec3 v, const Matrix4& m)
 // 0x004fc050. Inverse of GetAxesIn: builds a rotation whose row 2 is *axisZ and row 1 is
 // *axisY (both given in 'frame' space), row 0 = cross(row1, row2), and stores it into
 // localMatrix, keeping the old local translation. See SoultreeObject.h for the data flow.
-// PARTIAL 1089/1171 (was 392): same instructions, order and length as retail once the row-0 cross
-// product goes through a named Vec3, the frame == this product passes localMatrix as a and axes
-// as b (retail copies axes into the last argument first), localMatrix is reached through a
-// pointer held across the parent branch and the delta is rotated into itself (GetMatrixIn's
-// form). Left: three 12-byte slots. Retail puts normal (shared with the delta copy) nearest esp,
-// then the cross temporaries, then pos; VC6 here orders the temporaries, pos, normal. Dropping the
-// z/y block, bracing x, normal at block scope or no named normal, constructor-form CrossOfYAndZ (by
-// reference or value) and pos/axes/end stores as Vec3 copies did not reorder them.
+// EXACT 1171/1171. One Vec3 `x` at the block's scope holds the orthogonalising cross product and
+// then row 0: retail keeps both in one 12-byte slot (nearest esp after z and y), all five call
+// results and the inline cross's result in the next, then pos. With a separate `normal` in the
+// orthogonalize block VC6 colours it with the later call results instead and the three slots come
+// out as temporaries, pos, normal (1137, same instructions). Also needed: the row-0 cross product
+// through a named Vec3, the frame == this product passing localMatrix as a and axes as b (retail
+// copies axes into the last argument first), localMatrix reached through a pointer held across
+// the parent branch, the delta rotated into itself (GetMatrixIn's form) and bracketed products
+// in CrossOfYAndZ. Forms that did not regroup the slots while `normal` was a second local:
+// dropping the z/y block, bracing x, normal at block scope or no named normal, constructor-form
+// CrossOfYAndZ, inline helpers for the orthogonalise step and the row stores (1129), pos/axes/end
+// stores as Vec3 copies. `x` initialised from the cross ahead of the orthogonalize test (177) and
+// z/y/x at function scope (475) are worse.
 void SoultreeObject::SetAxesIn(SoultreeObject* frame, const Vec3* axisZ, const Vec3* axisY,
                                int orthogonalize, int keepZ)
 {
@@ -101,16 +106,17 @@ void SoultreeObject::SetAxesIn(SoultreeObject* frame, const Vec3* axisZ, const V
     {
         Vec3 z = *axisZ;
         Vec3 y = *axisY;
+        Vec3 x;
         if (orthogonalize) {
-            Vec3 normal = CrossOfYAndZ(z, y);
+            x = CrossOfYAndZ(z, y);
             if (keepZ)
-                y = CrossProductCall(z, normal);
+                y = CrossProductCall(z, x);
             else
-                z = CrossProductCall(normal, y);
+                z = CrossProductCall(x, y);
         }
         y = Vec3Normalize(y);
         z = Vec3Normalize(z);
-        Vec3 x = CrossProductCall(y, z);
+        x = CrossProductCall(y, z);
         axes._11 = x.x; axes._12 = x.y; axes._13 = x.z; axes._14 = 0.0f;
         axes._21 = y.x; axes._22 = y.y; axes._23 = y.z; axes._24 = 0.0f;
         axes._31 = z.x; axes._32 = z.y; axes._33 = z.z; axes._34 = 0.0f;
