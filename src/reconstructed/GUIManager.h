@@ -143,7 +143,9 @@ struct CursorUIAnimView {
     int currentFrame;                         // +0x08 UIAnim::currentFrame
     int playForwards;                         // +0x0c UIAnim::playForwards
     int frameCount;                           // +0x10 UIAnim::frameCount
-    unsigned char field_0x14[0x20 - 0x14];
+    int passesLeft;                           // +0x14 UIAnim::passesLeft
+    int passCountdown;                        // +0x18 UIAnim::passCountdown
+    int frameDelay;                           // +0x1c UIAnim::frameDelay
     int lastStepTime;                         // +0x20 UIAnim::lastStepTime
 };
 
@@ -177,9 +179,22 @@ public:
     unsigned char field_0x60[0xb8 - 0x60];
     UIDialog* ownerDialog;            // +0xb8
     GUIManager* ownerGui;                     // +0xbc
-    unsigned char field_0xc0[0xf0 - 0xc0];
+    char* controlText;                        // +0xc0 UIControl controlText ("Text")
+    unsigned int textColor;                   // +0xc4 UIControl textColor
+    int dropColor;                            // +0xc8 UIControl dropColor
+    unsigned int currentTextColor;            // +0xcc UIControl currentTextColor
+    int controlTextLength;                    // +0xd0 UIControl controlTextLength
+    int textDrop;                             // +0xd4 UIControl textDrop
+    int textAlign;                            // +0xd8 UIControl textAlign
+    int textExtent[2];                        // +0xdc UIControl textExtent
+    char* textLines;                          // +0xe4 UIControl textLines
+    int textLeftMargin;                       // +0xe8 UIControl textLeftMargin
+    int textTopMargin;                        // +0xec UIControl textTopMargin
     char* toolTipText;                        // +0xf0: tool tip text
-    unsigned char field_0xf4[0x130 - 0xf4];
+    char controlName[0x32];                   // +0xf4 UIControl controlName (the .dtm section name)
+    unsigned char field_0x126[0x128 - 0x126];
+    int fontHandle;                           // +0x128 UIControl fontHandle
+    int ownsFont;                             // +0x12c UIControl ownsFont
     char fontFace[0x158 - 0x130];             // +0x130
     int bold;                                 // +0x158: bold
     unsigned char italic[0x160 - 0x15c];     // +0x15c: UIControl::italic (bytes kept)
