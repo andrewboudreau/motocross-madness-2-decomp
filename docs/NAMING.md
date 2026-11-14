@@ -2722,3 +2722,124 @@ Left for later:
 | `UnknownKrustyUICharacter` | `KrustyUID3DIMSoultreeCharacterView` | 2 | 13 | RTTI D3DIMSoultreeCharacter |
 | `UnknownWreckerParticles` | `WreckerParticleManagerView` | 2 | 7 | RTTI ParticleManager |
 | `UnknownCubeVertex` | `CubeLitVertex` | 2 | 7 | D3DLVERTEX layout |
+
+## Wave 26: fields named by the layout they share, and stale comment references
+
+Wave 26 names `field_0xNN` members whose struct is a second view of a layout
+that already has names (the soultree surface and vertex group, the BVH box
+node, the grid block record, the quadtree object), whose value is copied
+from a named record, or whose one reader fixes the role. It also rewrites
+the comments and notes that still spell a member by the placeholder it had
+before an earlier wave named it. Names only: no declaration, typedef or
+member was added, removed or reordered, no array was split, and no static or
+type of a static was renamed. Every edited file keeps its line count.
+`git grep -ohE '\bfield_0x[0-9a-fA-F]+' -- src samples` fell from 1786 uses
+(377 distinct spellings) to 1499 (345): 69 uses went with the 28 renamed
+member declarations and the parameter, 218 with the comment edits. `\bUnknown[A-Za-z0-9_]*`
+stays at 1317 uses: no type or method was renamed.
+
+Method:
+
+- work/naming/w26/viewmatch.py and pairmatch.py read the compiled layouts
+  (work/naming/cv/layouts.json) and list each placeholder whose offset and
+  size match a named member of another class that agrees with it on other
+  named offsets. Most leads are padding blocks of the Wave 25 views; the
+  scalar leads were checked against their uses and retail by hand.
+  work/naming/classreads.py lists the retail accesses (work/naming/w26/reads.txt).
+- The renames were applied with work/naming/w26/editA.py, editB.py and
+  editC.py (work/naming/sub.py, count-checked, line endings kept).
+- work/naming/w26/comments.py lists every comment occurrence of a placeholder
+  spelling. Each was resolved to the class it names (from its `Class::`
+  qualifier, the `->` operand, the enclosing method or the surrounding text)
+  and the member now declared at that offset in the canonical header
+  (work/naming/w26/comment_edits.json, 192 proposed line edits, 118 left with
+  a reason). work/naming/w26/editD.py replaces whole lines at their line
+  numbers. It skips Quadtree.cpp, CollisionObject.cpp, FollowCamera.cpp,
+  TrackOverlayNearMisses.cpp and BikeRaceNearMisses.cpp (21 edits), whose near
+  misses are being matched at the same time, and applies 171 edits in 60 files.
+
+Result: one proof over every unit whose closure reaches a changed file
+(472 units), from 9fe68b72 to the renamed tree, with an empty map
+(work/naming/w26/map.json): no mangled name changed.
+
+| Verdict | Units |
+| --- | --- |
+| IDENTICAL | 465 |
+| IDENTICAL-COMDAT-ORDER | 7 (DlgProcsNearMisses.cpp, SelectGamePicProcsNearMisses.cpp, Group4_DlgMain.cpp, DlgProcs.cpp, KrustyUI.cpp, OptionProcs.cpp, SelectGamePicProcs.cpp) |
+| NAME-ONLY, DIFF, compile failure | 0 |
+
+tests/fixtures/bvh_vector_compare.cpp was compiled in both trees with the
+stub `bvh_vector_patches.h` (`static void InstallPatches() {}`), as in
+earlier waves; it is IDENTICAL. No .bss or .data offset moved.
+
+Negative control: in the new tree only, the GameObject bit was given the
+name `flags`, which the constructor's argument already has. The constructor's
+store became `flags = flags;`, a self-assignment of the argument, and the
+proof gave DIFF in the `.text` of `??0GameObject@@QAE@H@Z`
+(work/naming/w26/negcontrol.txt). The tree was then restored.
+
+Fixture pins: no digest changed, so nothing was repinned.
+138 test modules reach a changed file or a renamed name
+(work/naming/w26/pick_tests.py); their 233 tests pass except test_emu_diff's vehicle_simulate_frame case (retail_faults 50 != 0), which fails the same way on the base tree 9fe68b72; 1 is skipped. tools/static_check.py
+passes.
+
+### Fields and parameters
+
+| Owner | Old | New | Tier | Evidence |
+| --- | --- | --- | --- | --- |
+| `GameObject` | `field_0x25_bit1` | `receivesNetworkMessages` | 2 | Set and cleared with `isEnabled` (constructor, Enable `0x004690b0`, Disable `0x004690a0`), and the only test of it is OnNetworkMessage (`0x00469620`), which forwards the message to a child only when the bit is set. |
+| `MorphBastardMeshGroup` (MorphBastardModifier.h) | `field_0x08`, `field_0x0c`, `field_0x10` | `sourceVertices`, `transformedVertices`, `normals` | 2 | The 0x14-byte group is D3DIMSoulTree.h's SoultreeVertexGroup (node, vertexCount, sourceVertices, transformedVertices, normals). CopyMesh (`0x004a5290`) points them into the copy's `vertices`, `drawnVertices` and `normals`, and ModifyMesh indexes the group by `sourceVertices - mesh->vertices`. |
+| `MorphBastardMeshPair` (MorphBastardModifier.h) | `field_0x00`, `field_0x04` | `materialCount`, `materialIndices` | 2 | The 8-byte value at UnknownSoultreeMesh+0x20, which is SoultreeSurface's `materialCount` and `materialIndices` (+0x20, +0x24). The int type is kept. |
+| `UnknownSoultreeMesh` (MorphBastardModifier.h) | `field_0x20` | `materials` | 2 | The pair above; CopyMesh copies it as one value. |
+| `UnknownSoultreeMesh` (MorphBastardModifier.h) | `field_0x2c`, `field_0x30`, `field_0x34` | `mappingScale`, `mappingOffsetU`, `mappingOffsetV` | 2 | The 0x38-byte mesh is the SoultreeSurface that slot 27 receives (the draw casts the surface to it), and Wave 24 named SoultreeSurface's +0x2c..+0x34 so. The int types are kept. Nothing reads them through this view. |
+| `MorphBastardChannel` (MorphBastardModifier.h) | `field_0x64`, `field_0x68` | `currentValue1`, `currentValue2` | 2 | ModifyMesh (`0x004a4c60`) reads `currentValue` for axis 0 and these two for axes 1 and 2; the controller update stores `-angleX`, `-angleZ` and `-angleY` into the three. |
+| `UnknownSoultreeQuadTreeObject` (D3DIMSoulTree.h) | `field_0x04`, `field_0x06`, `field_0x08` | `queryStamp`, `sortKey`, `objectTypeId` | 2 | The RTTI QuadTreeObject base (vtable `0x005511c4`), whose CollisionObject.h declaration names the same offsets and sizes. The type keeps its name (Wave 25: its type descriptor is emitted). |
+| `RaceGate` (BikeRaceNode.h) | `field_0x28` | `height` | 2 | The crossing test (GameUiHelpers.cpp) compares the crossing point's height above the gate centre with it, read as a float; AppendNode (`0x0041d0d0`) stores its int argument there. |
+| `RaceGateObject` (BikeRace.h) | `field_0x54` | `height` | 2 | BuildNodeList (`0x0041d170`) passes it to AppendNode as the value stored at RaceGate+0x28. |
+| `BikeRace::AppendNode` (BikeRace.cpp, BikeRaceCore.h) | `value` | `height` | 2 | The argument stored in RaceGate's `height`. |
+| `LightManager` (LightEmitter.h) | `field_0x114` | `storeVertexColors` | 2 | LightVertices sets it when a colour array is passed and clears it otherwise, and the lighting loops keep the clamped per-vertex RGB in `vertexRed`/`vertexGreen`/`vertexBlue` only while it is set. |
+| `Tire`, `VehicleWheel`, `BikeWheel`, `ShockCarrier` | `field_0x2a4` (`w_0x2a4` in BikeWheel) | `leanCos` | 2 | 1.0 after construction and ResetWheelContacts; Bike::UpdateLeanFromNormal stores the bike's `leanCos` in both wheels, and InlineShock::Retract (`0x004fa310`, called at `0x00528f1c` with `wheelList[i]` as the carrier) divides the retraction by it. |
+| `CollisionBoxBounds` (CollisionShapeTests.h) | `field_0x00` | `volume` | 2 | The root is the 0x24-byte BVH node (center +0x04, halfExtents +0x10, children +0x1c/+0x20), BoundingBoxTreeBuild.h's BoxTreeNode, whose +0x00 is `volume`. The int type is kept. |
+| `GridBlockRecord` (Griddraw.h) | `field_0x04` | `texture` | 2 | The record is Grid1.h's Grid1BlockTexture (same 0x2c bytes, same mapping fields), whose +0x04 is the texture used when the own bit is set; the allocation clears it. The int type is kept. |
+| `CollisionCharacter` | `field_0x248`, `field_0x254` | `contactPoint`, `contactNormal` | 2 | Tick copies the contact record's +0x18 (the contact position CollisionObject copies into `hitPoint`) and +0x0c (`contactNormal`, CollisionSweepQuery) after QueryCollisions. |
+| `SoultreeObject` (core/SoultreeObject.h, D3DIMSoulTree.h) | `field_0x170` | `subtreeBoundsValid` | 3 | It sits before the subtree bounds as `localBoundsValid` sits before the local bounds; the node record load reads it in that place, and BonusObjectManager::CreateFrameNode (`0x0048c8a0`) sets it to 1 with the subtree bounds as it sets `localBoundsValid` with the local bounds. No reader decoded. |
+
+### Stale comment references
+
+171 comment and note lines in 60 files spelled a member by the placeholder of
+an earlier wave. They now use the member's name, resolved per mention (the
+same offset can belong to different classes in one file: Tire.cpp mixes
+CollisionPoint offsets of the +0xb8 base with Tire's own). Examples:
+Tire.cpp's friction derivation (`frictionMagnitude = -friction(normalForce) *
+surfaceGrip * frictionCoefficient`, `frictionDirection . rollDirection`),
+the SoultreePhysicsBaseObject offsets in the physics headers (`sceneNode`,
+`collisionPoints`, `terrainScale`, `asleep`), Terrain.h's `surfaceRegistry`,
+`qualityIndex` and `drawDistance`, CollisionShapeTests.h's `swept`, Quantize.h's
+ColorMapper tables, and samples/ui/DlgProcsNearMisses.cpp's `(results + i)->`.
+
+Left as written: mentions of members that are still placeholders
+(Vehicle `field_0x4e8`, FollowCamera `field_0x33c`, VisibilityCamera
+`field_0x17c`, VCRFileEntry `field_0x00`), ranges and compound mentions
+(`field_0x40..0x4c`), a Vec3 component (`field_0x504` is `controlInput.x`),
+the bitfield byte `GameObject::field_0x25`, JSON files, the historical record
+in samples/physics/hierarchy/MIGRATION.md (4 of its 44 mentions changed), and
+the 21 edits in the files skipped above.
+
+Left for later:
+
+- The 21 comment edits in Quadtree.cpp, CollisionObject.cpp, FollowCamera.cpp,
+  TrackOverlayNearMisses.cpp and BikeRaceNearMisses.cpp
+  (work/naming/w26/comment_applied.json, `skipped_concurrent`), once their
+  near-miss work has merged.
+- The tag ball's byte +0x10a (TrackGame.h UnknownTrackGameViewOwnerDc), which
+  0x004a9e80 clears when the followed racer changes: it would be
+  SoultreePhysicsBaseObject's `asleep` if the ball is a physics object, which
+  no constructor or RTTI shows yet.
+- Members with only lifecycle or constructor stores: TrackGame
+  `field_0x25e8` (a CombinedDirectoryList created and freed, never read),
+  KrustyBike `field_0x810` (set with `aiTricksEnabled`), SoultreeObject's
+  second screen rectangle `field_0x2a8`, the Terrain cell's `field_0x40`
+  (TerrainShadow slot 30's gate, role not decided), Vehicle `field_0x4e8`,
+  and the fields listed at the end of Waves 23 and 24.
+- The padding arrays of the Wave 25 views that cover named members of their
+  class (viewmatch.txt): naming them needs a split.
