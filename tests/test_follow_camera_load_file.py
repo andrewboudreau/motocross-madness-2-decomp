@@ -180,7 +180,7 @@ class FollowCameraLoadFileTests(unittest.TestCase):
                 'finditem':'#include <string.h>\n#include "TextureMap.h"\n#include "ResourceManager.h"\n'+extract((ROOT/'src/reconstructed/ResourceManager.cpp').read_text(),'ResourceItem* ResourceManager::FindItem('),
                 'readxor':'#include <stdio.h>\n'+extract((ROOT/'src/reconstructed/EcoSystem.cpp').read_text(),'int ReadXorDecoded(')}
             sample=(TOOL_ROOT/'samples/io/FileStream.cpp').read_text()
-            helper_sources['stream_candidates']='#include <stdio.h>\n#include "FileStream.h"\nint ReadXorDecoded(unsigned char*,int,int,FILE*,unsigned char*);\n'+'\n'.join(extract(sample,p)for p in ['int FileStream::Seek('])
+            helper_sources['stream_candidates']='#include <stdio.h>\n#include "FileStream.h"\nint ReadXorDecoded(unsigned char*,int,int,FILE*,unsigned char*);\n'+'\n'.join(extract(sample,p)for p in ['static inline FILE* FileOf(','int FileStream::Seek('])
             helpers={};helper_paths=[]
             for name,text in helper_sources.items():
                 path=out/(name+'.cpp');path.write_text(text+'\n');obj,o=compile_source(path,name);helpers[name]=o;helper_paths.append(obj)

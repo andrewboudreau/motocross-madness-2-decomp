@@ -46,8 +46,8 @@
 //   locals shift every later scratch register by one step, which was the
 //   whole 136/152 gap. Source shapes, statement order, helpers, types and a
 //   0..63 declaration prefix never moved it.
-// - 0x00461340: retail loads the decoded position (+0x0c) once and keeps the next
-//   pointer in a different register (see the function's note).
+// - 0x00461340 and 0x00461640: the file handle read through an inline accessor
+//   (FileOf) at some call sites; see the two functions' notes.
 // - /G6 makes every one of these worse.
 
 #include <io.h>
@@ -89,8 +89,21 @@ static inline FileStream* InnermostStream(FileStream* stream)
 // return 0; return 1;` (also as if/else-if/else) gives retail's `not al;
 // movsx eax, al; and 0x10; shr 4`; `!feof`, `feof == 0`, `?:`, `!=
 // _IOEOF`, char casts of the flag or of feof, and a `flags` local do not.
-// Still left: retail gives the fseek result edi and the position ebx (offset
-// reloaded from its home), VC6 here the reverse; the declaration order of
+// The three decoded reads take the handle through FileOf (343 -> 644 of 702,
+// 702 bytes): the fseek result then lives in edi and the position in the
+// register `offset` had, with `offset` reloaded from its home, as in retail.
+// A FILE* local at the two skip reads does the same (638); either skip read
+// without it falls back to 341/332. Left: `origin` and `offset` are in each
+// other's registers (ebx/ebp) and the scratch registers of the fseek, fclose
+// and decoded-read arguments are rotated. FileOf at any subset of the two
+// fseek, two fclose, ferror and feof calls stays at 644 or drops to 342; a
+// FILE* local or a `start` local at either fseek drops to 313-332; the
+// declaration order of stream/buffer/result, `offset -= position`, the
+// tail/blocks order, `while (blocks--)` and counted loops, a function-scope
+// position, swapped `==` operands, `!origin` and a for-loop chain walk keep
+// the swap (638 on the local form) or are worse; a key accessor alone is 343.
+// Before the accessor: retail gave the fseek result edi and the position ebx
+// (offset reloaded from its home), VC6 here the reverse; the declaration order of
 // stream/buffer/result, `if ((result = fseek(..)) != 0)`, `offset -=
 // position` or `position = offset - position` for the skip, a
 // function-scope position, a tail-recursive Seek (not turned into a loop:
@@ -111,6 +124,13 @@ static inline FileStream* InnermostStream(FileStream* stream)
 // ternary (201), an if/else on the position, a `decoded` local (194), a
 // `next` pointer for the chain walk (194), if/else-if origin checks (196 to
 // 208) and a goto past the decoded read (206) are worse.
+// The file handle through an inline accessor: its result is a named value, so
+// it takes no turn in VC6's eax/ecx/edx rotation of expression temporaries
+// and can reuse the stream's own register when the stream is dead after it
+// (`mov ebx, [ebx + 0x14]` in 0x00461640). Provisional name; retail has no
+// out-of-line copy.
+static inline FILE* FileOf(FileStream* stream) { return stream->fileHandle; }
+
 int FileStream::Seek(int offset, int origin, int flag)
 {
     FileStream* stream = this;
@@ -150,14 +170,16 @@ int FileStream::Seek(int offset, int origin, int flag)
                 int blocks = skip / 0x400;
                 int tail = skip % 0x400;
                 for (; blocks; blocks--) {
-                    if (!ReadXorDecoded(buffer, 0x400, 1, stream->fileHandle, (unsigned char*)&stream->textMode))
+                    if (!ReadXorDecoded(buffer, 0x400, 1, FileOf(stream), (unsigned char*)&stream->textMode))
                         return -1;
                 }
-                if (tail && !ReadXorDecoded(buffer, tail, 1, stream->fileHandle, (unsigned char*)&stream->textMode))
-                    return -1;
+                if (tail) {
+                    if (!ReadXorDecoded(buffer, tail, 1, FileOf(stream), (unsigned char*)&stream->textMode))
+                        return -1;
+                }
             }
         } else if (origin == SEEK_END) {
-            while (ReadXorDecoded(buffer, 0x400, 1, stream->fileHandle, (unsigned char*)&stream->textMode))
+            while (ReadXorDecoded(buffer, 0x400, 1, FileOf(stream), (unsigned char*)&stream->textMode))
                 ;
             if (ferror(stream->fileHandle))
                 return -1;
@@ -193,7 +215,21 @@ static inline void DecodeBytes(FileStream* stream, char* p, int count)
 }
 
 // 0x00461640: reads `count` items of `size` bytes, from the buffer first, and
-// returns how many it read. Near miss (467 of 670): a separate `out` pointer
+// returns how many it read. Near miss (545 of 663, 663 bytes; every
+// instruction is retail's): the four fread calls take the handle through
+// FileOf, which gives retail's eax/ebx for it (edx before, 467) and keeps the
+// two `(done + read) / size` failure returns apart; the two decoded reads
+// read the member. Both decoded reads are `if (!...) return count - 1; return
+// count;`, so VC6 cross-jumps them as retail does, but here the buffered read
+// jumps forward into the empty-buffer one and retail's empty-buffer read
+// jumps back. All 36 pairs of six spellings of the two returns (if/return
+// either way round, `?:` either way round, if/else, an `ok` local), an
+// inline encoded-read helper, a key accessor, an `items` local, the encoded
+// read sharing the final `return count`, an if/else of the two arms and the
+// empty-buffer arm first in the source do not turn the jump round; FileOf at
+// either decoded read stops the merge. All 127 subsets of FileOf over the
+// seven handle reads were compiled.
+// Earlier notes: a separate `out` pointer
 // for the advanced buffer (202 when `buffer` itself is advanced) gives
 // retail's ecx copy homed in the dead `buffer` slot. The empty-buffer
 // encoded read returns a `?:` (389 as `if (!...) return count - 1; return
@@ -233,7 +269,7 @@ int FileStream::Read(void* buffer, int size, int count)
                 if (!ReadXorDecoded((unsigned char*)out, part, 1, stream->fileHandle, (unsigned char*)&stream->textMode)) {
                     return 0;
                 }
-            } else if (!fread(out, part, 1, stream->fileHandle)) {
+            } else if (!fread(out, part, 1, FileOf(stream))) {
                 return (unsigned)available / (unsigned)size;
             }
             if (part == total - available) {
@@ -248,14 +284,17 @@ int FileStream::Read(void* buffer, int size, int count)
             return count;
         }
         int left = count - (unsigned)(part + available) / (unsigned)size;
-        int read = fread(out, size, left, stream->fileHandle);
+        int read = fread(out, size, left, FileOf(stream));
         if (read == left) {
             return count;
         }
         return count - read;
     }
     if (stream->fileEncoded) {
-        return ReadXorDecoded((unsigned char*)buffer, size, count, stream->fileHandle, (unsigned char*)&stream->textMode) ? count : count - 1;
+        if (!ReadXorDecoded((unsigned char*)buffer, size, count, stream->fileHandle, (unsigned char*)&stream->textMode)) {
+            return count - 1;
+        }
+        return count;
     }
     int total = size * count;
     int done = 0;
@@ -263,7 +302,7 @@ int FileStream::Read(void* buffer, int size, int count)
     int tail = total % 0x400;
     char* out = (char*)buffer;
     while (blocks) {
-        int read = fread(out, 1, 0x400, stream->fileHandle);
+        int read = fread(out, 1, 0x400, FileOf(stream));
         if (read != 0x400) {
             return (unsigned)(done + read) / (unsigned)size;
         }
@@ -272,7 +311,7 @@ int FileStream::Read(void* buffer, int size, int count)
         done += read;
     }
     if (tail) {
-        int read = fread(out, 1, tail, stream->fileHandle);
+        int read = fread(out, 1, tail, FileOf(stream));
         if (read != tail) {
             return (unsigned)(done + read) / (unsigned)size;
         }

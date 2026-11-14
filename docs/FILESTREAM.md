@@ -91,9 +91,15 @@ The notes are in the source header.
 
 | VA | Retail bytes | Candidate bytes | Masked match | Function |
 |---|---|---|---|---|
-| `0x00461340` | 702 | 695 | 49% (strict 343) | seek |
-| `0x00461640` | 663 | 670 | 71% | read |
+| `0x00461340` | 702 | 702 | strict 644 | seek |
+| `0x00461640` | 663 | 663 | strict 545 | read |
 | `0x00461b90` | 282 | 282 | 90% | write the header |
+
+Seek and Read read the file handle through an inline accessor (`FileOf`,
+provisional) at the decoded reads of Seek and the four `fread` calls of Read:
+that gave Seek retail's frame and callee-saved registers but for `origin` and
+`offset` swapped, and Read retail's instructions with one cross-jump the
+other way round.
 
 Each miss comes down to one of:
 - register assignment, or
