@@ -54,7 +54,7 @@ fingerprints remain identical before/after relocation resolution:
 
 | Sample | Retail extent | Candidate extent | Matching positions |
 | --- | --- | --- | --- |
-| Slot 29, `0x00446c30` | 771 | 771 | 721 |
+| Slot 29, `0x00446c30` | 771 | 771 | 739 |
 | Slot 30, `0x00446f40` | 1,524 | 1,485 | 180 |
 
 Neither sample is promoted or repaired. In particular, slot 30's conversion

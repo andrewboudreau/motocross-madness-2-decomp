@@ -77,7 +77,7 @@
     "samples/physics/shadow/D3DIMSoultreeShadowNearMisses.cpp": {
       "sections": 7,
       "relocations": 53,
-      "sha256": "c5516906f60954f4c65ad9364b677f612bf7dc1c8cf081b0d59409280b27c7b5"
+      "sha256": "c143b44b9d65d7683068c88d00cae8c83d5c492250bc9f8dc7baf267e770a4f2"
     },
     "samples/physics/visibility/VisibilityQuadTreeTraversal.cpp": {
       "sections": 2,
