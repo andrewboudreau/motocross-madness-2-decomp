@@ -37,7 +37,7 @@ public:
     virtual void SetPaused();
     virtual void OnDeactivate();
     virtual void OnActivate();
-    virtual void UnknownVirtualSlot19();
+    virtual void OnInputEvent();
     virtual void OnChar();
     virtual void OnKeyDown();
     virtual void OnControlRelease();

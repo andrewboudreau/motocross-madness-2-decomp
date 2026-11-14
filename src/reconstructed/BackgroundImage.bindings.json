@@ -37,7 +37,7 @@
   "?SetPaused@GameObject@@UAEHH@Z": "0x00469480",
   "?OnDeactivate@GameObject@@UAEHXZ": "0x00469500",
   "?OnActivate@BackgroundImage@@UAEHXZ": "0x00404de0",
-  "?UnknownVirtualSlot19@GameObject@@UAEHH@Z": "0x00469530",
+  "?OnInputEvent@GameObject@@UAEHH@Z": "0x00469530",
   "?OnChar@GameObject@@UAEHH@Z": "0x00469c00",
   "?OnKeyDown@GameObject@@UAEHH@Z": "0x00469c40",
   "?OnControlRelease@GameObject@@UAEHPAUControlEvent@@PAUInputButtonState@@@Z": "0x00469580",

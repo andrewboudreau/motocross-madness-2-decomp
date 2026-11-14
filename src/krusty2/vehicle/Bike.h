@@ -56,7 +56,7 @@ struct BikeParticleEmitterView {
     virtual void UnknownVirtualSlot9(); virtual void Tick(); virtual void Step();
     virtual void PrepareGeometry(); virtual void RenderPre3D(); virtual void Render3D();
     virtual void RenderPost3D(); virtual void SetPaused(); virtual void OnDeactivate();
-    virtual void OnActivate(); virtual void UnknownVirtualSlot19(); virtual void OnChar();
+    virtual void OnActivate(); virtual void OnInputEvent(); virtual void OnChar();
     virtual void OnKeyDown(); virtual void OnControlRelease(); virtual void OnControlPress();
     virtual void OnNetworkMessage(); virtual void AttachRenderContext(); virtual void MarkPendingRelease();
     virtual void* Create(void* a, GameObject* manager);

@@ -197,7 +197,7 @@ struct KbGame {
     virtual void PresentFrame();
     virtual void Tick();
     virtual void SetInputSuspended();
-    virtual void UnknownVirtualSlot12();
+    virtual void OnInputEvent();
     virtual void OnControlRelease();
     virtual void OnControlPress();
     virtual void Shutdown();

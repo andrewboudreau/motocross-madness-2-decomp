@@ -204,11 +204,11 @@ int GameObject::OnDeactivate() {
 }
 
 // 0x00469530: returns 1 at the first child that returns nonzero.
-int GameObject::UnknownVirtualSlot19(int value) {
+int GameObject::OnInputEvent(int value) {
     if (childFlags & 0x100) {
         for (GameObject* child = firstChild; child; child = child->nextSibling) {
             if (child->isEnabled && !child->pendingRelease) {
-                if (child->UnknownVirtualSlot19(value))
+                if (child->OnInputEvent(value))
                     return 1;
             }
         }

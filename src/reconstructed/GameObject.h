@@ -46,7 +46,7 @@ public:
     // Slot 11 is Step: Wrecker slot 10 calls slot 11 of its gravity model, rigid
     // body and collision model with the sub-step length, and the physics models'
     // Tick overrides call their own slot 11 with the frame time.
-    // Slots 9 and 19 keep placeholder names.
+    // Slot 9 keeps a placeholder name; slot 19 is named after Game slot 12, its only caller (tier 3).
     virtual void Disable();
     virtual void Enable();
     virtual void OnDisable();
@@ -64,7 +64,7 @@ public:
     virtual int SetPaused(int value);
     virtual int OnDeactivate();
     virtual int OnActivate();
-    virtual int UnknownVirtualSlot19(int value);
+    virtual int OnInputEvent(int value);
     virtual int OnChar(int value);
     virtual int OnKeyDown(int value);
     // Input events from Game slots 13 and 14, passed down the children.

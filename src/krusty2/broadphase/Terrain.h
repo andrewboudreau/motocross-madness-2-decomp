@@ -292,7 +292,7 @@ public:
     // src/bringup/Group3_TerrainPrepareGeometry.cpp (not byte-matched).
     virtual int PrepareGeometry();
     virtual int Render3D();
-    virtual int UnknownVirtualSlot19(int a);                 // 0x00507920 returns 0
+    virtual int OnInputEvent(int a);                 // 0x00507920 returns 0
     void GetHeightRange(float* outMin, float* outMax);          // 0x00508970
     virtual int OnControlRelease(ControlEvent* a, InputButtonState* b);                 // 0x004dc4c0 returns 0 (shared stub)
     // Slot 23 (0x00508850, ret 8): debug key handler; tier 3 name kept in the comment only

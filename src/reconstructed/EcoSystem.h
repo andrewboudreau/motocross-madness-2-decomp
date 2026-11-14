@@ -135,7 +135,7 @@ public:
     virtual void SetPaused();
     virtual void OnDeactivate();
     virtual void OnActivate();
-    virtual void UnknownVirtualSlot19();
+    virtual void OnInputEvent();
     virtual void OnChar();
     virtual void OnKeyDown();
     virtual void OnControlRelease();
@@ -372,7 +372,7 @@ public:
     virtual void PresentFrame();
     virtual void Tick();
     virtual void SetInputSuspended();
-    virtual void UnknownVirtualSlot12();
+    virtual void OnInputEvent();
     virtual void OnControlRelease();
     virtual void OnControlPress();
     virtual void Shutdown();

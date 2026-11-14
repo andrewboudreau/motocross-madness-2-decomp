@@ -57,7 +57,7 @@ public:
     virtual int PresentFrame();               // 0x004685c0
     virtual int Tick();                       // 0x004685d0; functional QPC candidate in samples/game
     virtual int SetInputSuspended(int value);                                             // 0x004688a0
-    virtual int UnknownVirtualSlot12(int value);                                          // 0x004688e0
+    virtual int OnInputEvent(int value);                                          // 0x004688e0
     virtual int OnControlRelease(ControlEvent* event, InputButtonState* entry);     // 0x00468900
     virtual int OnControlPress(ControlEvent* event, InputButtonState* entry);       // 0x00468930
     virtual int Shutdown();                   // 0x00468a30: shutdown

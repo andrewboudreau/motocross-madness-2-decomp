@@ -312,7 +312,7 @@
   {
     "class": "Terrain",
     "source": "Terrain.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot19@Terrain",
+    "candidate_symbol_contains": "OnInputEvent@Terrain",
     "target_va": "0x00507920",
     "target_size": 5,
     "expect": "exact",

@@ -352,8 +352,8 @@ int Game::SetInputSuspended(int value) {
 }
 
 // 0x004688e0
-int Game::UnknownVirtualSlot12(int value) {
-    return rootObject->UnknownVirtualSlot19(value) != 0;
+int Game::OnInputEvent(int value) {
+    return rootObject->OnInputEvent(value) != 0;
 }
 
 // 0x00468900: releases go to the interface unless inputSuspended is set.

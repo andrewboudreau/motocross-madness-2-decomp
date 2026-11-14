@@ -9,7 +9,7 @@ int ShadowCamera::Tick(float) {
 }
 
 // 0x004da550: no child search.
-int ShadowCamera::UnknownVirtualSlot19(int) {
+int ShadowCamera::OnInputEvent(int) {
     return 0;
 }
 

@@ -3,7 +3,7 @@
 // evidence and the exact functions are in src/reconstructed/D3DIMSoulTree.h
 // and .cpp. Bindings: D3DIMSoulTreeNearMisses.bindings.json.
 //
-// UnknownVirtualSlot12 (0x00443aa0, 832 bytes): 799/832. The inline view
+// PrepareGeometry (0x00443aa0, 832 bytes): 799/832. The inline view
 // matrix product only gets retail's `add eax, 0xec` base when the camera
 // is not held in a local; named result fields (_11.._44) fix the term
 // order of rows 0, 2 and 3. Row 1 still adds its four products in a

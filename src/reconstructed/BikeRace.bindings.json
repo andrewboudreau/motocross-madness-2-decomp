@@ -160,7 +160,7 @@
   "?SetPaused@GameObject@@UAEHH@Z": "0x00469480",
   "?OnDeactivate@GameObject@@UAEHXZ": "0x00469500",
   "?OnActivate@GameObject@@UAEHXZ": "0x004694d0",
-  "?UnknownVirtualSlot19@GameObject@@UAEHH@Z": "0x00469530",
+  "?OnInputEvent@GameObject@@UAEHH@Z": "0x00469530",
   "?OnChar@BikeRace@@UAEHH@Z": "0x0041f590",
   "?OnChar@GameObject@@UAEHH@Z": "0x00469c00",
   "?OnKeyDown@GameObject@@UAEHH@Z": "0x00469c40",
