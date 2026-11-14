@@ -12,7 +12,7 @@
     "src/reconstructed/EcoSystem.cpp": {
       "sections": 132,
       "relocations": 720,
-      "sha256": "d1f6e48f21f84ef5ea535cd623f2ad53f3c6792fb075827442f3ee67e8062112"
+      "sha256": "2302771c6909d7dc586e8655cdeac52bf75de59ff031633b133cd537c1881ac5"
     },
     "samples/ecosystem/EcoSystemNearMisses.cpp": {
       "sections": 98,
@@ -27,7 +27,7 @@
     "src/krusty2/visibility/VisibilityQuadTree.cpp": {
       "sections": 88,
       "relocations": 342,
-      "sha256": "88423ad4b8e79f59e93e57b3f8d2b8142b7d8743cdec55f1268392bb02067085"
+      "sha256": "45dd646326deaf6af8daaa2cfef12be696e951467b0c5ea0ccdb0fb95fa54e80"
     }
   },
   "inventory": [

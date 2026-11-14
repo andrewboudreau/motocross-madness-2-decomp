@@ -11,17 +11,17 @@
     "src/reconstructed/CubeDraw.cpp": {
       "sections": 49,
       "relocations": 183,
-      "sha256": "617ed18edd50a6c31eac570c4617242f9d779bd94da5e29aaac34cb5f1579fab"
+      "sha256": "c5d508ef86b59da887e954c1242e8c5ab01f38e0b04691a40dcc791b5540cd06"
     },
     "src/reconstructed/FollowCamera.cpp": {
       "sections": 98,
       "relocations": 250,
-      "sha256": "516d75b02aec9956bf297c5efd62d79d6184376ae9b4ca3d703cb84b854a6bd7"
+      "sha256": "f2226a58e2fb9be2e0c546586cbc552a45bd06d58e532d1e926779e67d5d673e"
     },
     "src/reconstructed/TrackOverlay.cpp": {
       "sections": 215,
       "relocations": 920,
-      "sha256": "7b818c058b81c50772148b88892a515b39ad5e31edca49e948fdee647591795d"
+      "sha256": "87fcf4da257387aa8c022b0d4eaf9c0bf078a29073c0898c8dbd8ab4ebde0e61"
     },
     "samples/render/CubeDrawNearMisses.cpp": {
       "sections": 5,
@@ -31,7 +31,7 @@
     "samples/camera/FollowCameraNearMisses.cpp": {
       "sections": 66,
       "relocations": 337,
-      "sha256": "f3a01832801fbc1c642a9839aab778b6ef928707f7bc2aacaafbff1f28111187"
+      "sha256": "0d14d573f3c22fb9a182e848f8aab64112657905279638a925df99e5a94ad080"
     },
     "samples/track/TrackOverlayNearMisses.cpp": {
       "sections": 27,
@@ -41,7 +41,7 @@
     "src/krusty2/visibility/VisibilityQuadTree.cpp": {
       "sections": 88,
       "relocations": 342,
-      "sha256": "52e84b8f4c86ec1b121691f1cc8611c035b0bf6004ab0cd0fd57bf7756e24f11"
+      "sha256": "a84bff3969959088c48dc8ed51142a679bf108363f2819c82e15cdd1fb9722bb"
     }
   }
 }

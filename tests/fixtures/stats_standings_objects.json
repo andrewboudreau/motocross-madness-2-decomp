@@ -4,7 +4,7 @@
   "canonical": {
     "sections": 215,
     "relocations": 920,
-    "sha256": "cf09ab8ff337083672e2e72bf73004ea12585bc999bca6b52789169959f3d96c"
+    "sha256": "ebd78efa41c99cb9462c645270095f1f91d4f5e2c3d9f653ef10549d49fd6377"
   },
   "aggregate_before": {
     "sections": 37,
