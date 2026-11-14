@@ -3,12 +3,12 @@
     "src/reconstructed/ManagedTextureGroup.cpp": {
       "sections": 50,
       "relocations": 239,
-      "sha256": "1de0ce3ced032d7cadb9d7c51f3f1cdef335d66b8cf184e80e93f76d1b28cfd5"
+      "sha256": "3c3295000e21e67e660fcc65079b8376f9bc9a37b9b1f0bac10a2ee1edbd53c7"
     },
     "samples/render/ManagedTextureGroupNearMisses.cpp": {
       "sections": 36,
       "relocations": 275,
-      "sha256": "88cd230d471ec83af52e5d85541de4cd4d16ba67d94678e33fb2d1930d46eac9"
+      "sha256": "ae1aaa24c0739516215a0f4faff45b683b74c3f2e35a24dd4dcf35789a45c1bd"
     },
     "src/reconstructed/SceneManager.cpp": {
       "sections": 272,
