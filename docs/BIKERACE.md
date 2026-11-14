@@ -62,7 +62,7 @@ Source forms needed:
 
 Near misses (`samples/race/BikeRaceNearMisses.cpp`):
 - `0x0041eb20` (camera target): exact, 1710 of 1710 bytes (registered in
-  `samples/race/targets.json`). The view's inline `UnknownFunctionTargetCaster`
+  `samples/race/targets.json`). The view's inline `TargetShadowCaster`
   stores `shadowCaster` before `isSettled`; with the other order the
   scene-object branch's scratch registers were one rotation step off.
 - `0x0041f1d0`, 313 of 881 bytes (887-byte candidate, masked 0.829):

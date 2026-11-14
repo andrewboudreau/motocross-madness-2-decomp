@@ -199,7 +199,7 @@ the last block in source order before the next branch, and the scratch-register 
 positions block also reads `racers[index]->position` without a block-local pointer. When
 every register after an if/else is one rotation step off, change which arm comes last.
 BikeRace::AimCamera `0x0041eb20` (class c, 1699/1710) is exact too: the camera view's inline
-`UnknownFunctionTargetCaster` (BikeRace.h) stores `shadowCaster = caster` before
+`TargetShadowCaster` (BikeRace.h) stores `shadowCaster = caster` before
 `isSettled = 0`, as its two siblings store their target first. VC6 emits the 0x274 store
 ahead of the 0x38c one for both orders, so the arm that calls the inline matched either
 way; the difference showed only in the next arm, whose temporaries start one rotation step

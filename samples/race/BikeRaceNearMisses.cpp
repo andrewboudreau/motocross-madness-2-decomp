@@ -201,7 +201,7 @@
 #include "../../src/reconstructed/TextureMap.h"
 
 // 0x0041eb20: exact (1710/1710). The lever was not in this function: the
-// camera view's inline UnknownFunctionTargetCaster stores shadowCaster first,
+// camera view's inline TargetShadowCaster stores shadowCaster first,
 // like its two siblings store their target first. VC6 schedules the 0x274
 // store ahead of the 0x38c one either way, so the caster arm's bytes did not
 // tell the two orders apart; what moved is the scratch-register rotation the
