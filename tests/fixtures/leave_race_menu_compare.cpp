@@ -44,7 +44,7 @@ static void EventAt(int kind,int who=0,int a=0,int b=0,int c=0,int d=0,const cha
     if(text){if(strlen(text)>31)Fail(83);strcpy(e.text,text);}Snapshot(e.state);
     if(scenario.mutateAt==observed.count){switch(scenario.mutation){
     case 0:g_TrackGame=GameAt(1-GameIndex());*(TrackGame**)0x56e26c=g_TrackGame;break;
-    case 1:g_TrackGame->mode.toolTips^=0x1234;g_TrackGame->mode.field_0xa20=!g_TrackGame->mode.field_0xa20;g_TrackGame->playingReplay=!g_TrackGame->playingReplay;g_TrackGame->ui->playingDemo=!g_TrackGame->ui->playingDemo;g_TrackGame->mode.raceSettings.raceMode=(g_TrackGame->mode.raceSettings.raceMode+1)%6;g_TrackGame->ui->allowIme=!g_TrackGame->ui->allowIme;break;
+    case 1:g_TrackGame->mode.toolTips^=0x1234;g_TrackGame->mode.cdAudioOn=!g_TrackGame->mode.cdAudioOn;g_TrackGame->playingReplay=!g_TrackGame->playingReplay;g_TrackGame->ui->playingDemo=!g_TrackGame->ui->playingDemo;g_TrackGame->mode.raceSettings.raceMode=(g_TrackGame->mode.raceSettings.raceMode+1)%6;g_TrackGame->ui->allowIme=!g_TrackGame->ui->allowIme;break;
     case 2:g_TrackGame->ui=UI(1);g_TrackGame->display=(PCVideoCard*)world.displays[1];g_TrackGame->soundInterface=(SoundInterface*)world.sounds[1];break;
     case 3:g_TrackGame->ui->gui=Gui(1);User(0)->userToolTip=(ToolTip*)world.tips[1];g_TrackGame->ui->savedInputContext=(void*)0x23456789;g_TrackGame->windowHandle=(void*)0x34567891;break;
     }}
@@ -156,7 +156,7 @@ static void Invoke(){union{void(EventManager::*method)(int);DWORD address;}call;
 }
 static void Run(int retail){retailActive=retail;memset(&observed,0,sizeof(observed));memset(&world,0x53+scenario.seed%19,sizeof(world));g_TrackGame=GameAt(0);*(TrackGame**)0x56e26c=g_TrackGame;
     for(int n=0;n<2;++n){TrackGame* g=GameAt(n);*(DWORD*)g=(DWORD)gameTables[n];g->ui=scenario.mask&1?UI(n):0;g->display=(PCVideoCard*)world.displays[n];g->soundInterface=(SoundInterface*)world.sounds[n];g->windowHandle=(void*)(0x12345670+n*4);
-        g->display->displayModes=world.modes[n];g->mode.displayModeIndex=scenario.index;g->mode.field_0xa20=scenario.mask&16;g->mode.toolTips=(scenario.seed&1)?-7:0;g->mode.raceSettings.raceMode=scenario.mode;g->playingReplay=scenario.mask&32;
+        g->display->displayModes=world.modes[n];g->mode.displayModeIndex=scenario.index;g->mode.cdAudioOn=scenario.mask&16;g->mode.toolTips=(scenario.seed&1)?-7:0;g->mode.raceSettings.raceMode=scenario.mode;g->playingReplay=scenario.mask&32;
         UI(n)->gui=Gui(n);UI(n)->savedInputContext=scenario.mask&4?(void*)(0x23456780+n*4):0;UI(n)->allowIme=scenario.mask&8;UI(n)->playingDemo=scenario.mask&64;User(n)->userToolTip=scenario.invalid==2?0:(ToolTip*)world.tips[n];
         for(int k=0;k<3;++k){world.modes[n][k].width=scenario.mask&128?800:640;world.modes[n][k].height=scenario.mask&256?600:480;world.modes[n][k].bitDepth=scenario.mask&512?32:16;}
     }

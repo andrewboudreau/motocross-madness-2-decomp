@@ -188,7 +188,7 @@ void TrackGameMode::ResetInterfaceOptions(UnknownTrackGameModeOptions6ac* option
 // 0x00522780: the defaults of +0xa20..+0xa4b, mostly sound settings (sound
 // on at +0xa28, volume 100 at +0xa40, 8-bit at +0xa48); the name is inference.
 void TrackGameMode::ResetSoundOptions(UnknownTrackGameModeOptionsA20* options) {
-    options->field_0x00 = 0;
+    options->cdAudioOn = 0;
     options->soundOn = 1;
     options->uiSounds = 1;
     options->field_0x0c = 1;
@@ -428,7 +428,7 @@ int TrackGameMode::LoadProfile() {
     fread(profileName, 0x10, 1, file);
     fread(&showNewbieDialog, 4, 1, file);
     fread(&instrumentOverlayOn, 0x374, 1, file);
-    fread(&field_0xa20, 0x2c, 1, file);
+    fread(&cdAudioOn, 0x2c, 1, file);
     fread(&displayModeIndex, 0x1c, 1, file);
     fread(responseSliders, 0x30, 1, file);
     fread(resourceStrings, 0x500, 1, file);
@@ -482,7 +482,7 @@ void TrackGameMode::SaveProfile() {
     fwrite(profileName, 0x10, 1, file);
     fwrite(&showNewbieDialog, 4, 1, file);
     fwrite(&instrumentOverlayOn, 0x374, 1, file);
-    fwrite(&field_0xa20, 0x2c, 1, file);
+    fwrite(&cdAudioOn, 0x2c, 1, file);
     fwrite(&displayModeIndex, 0x1c, 1, file);
     fwrite(responseSliders, 0x30, 1, file);
     fwrite(resourceStrings, 0x500, 1, file);

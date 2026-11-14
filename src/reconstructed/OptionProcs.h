@@ -32,7 +32,7 @@ struct UnknownOptGameSettings {               // 0x374 bytes (TrackGame+0xc24)
 };
 
 struct UnknownOptSoundSettings {              // 0x2c bytes (TrackGame+0xf98)
-    int field_0x00;
+    int cdAudioOn;                            // +0x00: TrackGameMode::cdAudioOn (no control edits it)
     int uiSounds;                             // +0x04: UserInterfaceSoundsCheckBox
     int inGameSoundEffects;                   // +0x08: InGameSoundEffectsCheck
     int field_0x0c;

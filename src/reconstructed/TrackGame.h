@@ -157,7 +157,7 @@ struct UnknownTrackGameModeOptions6ac {       // TrackGameMode+0x6ac, 0x374 byte
 };
 
 struct UnknownTrackGameModeOptionsA20 {       // TrackGameMode+0xa20, 0x2c bytes
-    int field_0x00;
+    int cdAudioOn;                            // +0x00 (TrackGameMode+0xa20): CD audio on, reset to 0
     int uiSounds;                             // +0x04 UserInterfaceSoundsCheckBox (OptionProcs.h)
     int soundOn;                              // +0x08 (TrackGameMode+0xa28): sound on
     int field_0x0c;
@@ -371,7 +371,7 @@ public:
     char trackNames[6][0x80];             // +0x6f4: a track name per game type (SelectGamePicProcs.cpp)
     int trackIndices[6];                  // +0x9f4: a track index per game type (SelectGamePicProcs.cpp)
     int garageCurveChoice[5];             // +0xa0c: the garage curve chosen per bike class (OptionProcs.cpp's +0x360)
-    int field_0xa20;                          // EventManager 0x0045e710 calls TrackGame 0x00521a40 when clear
+    int cdAudioOn;                            // +0xa20 first of the 0x2c-byte sound block; LeaveRaceForMenu 0x0045e710 calls StopCDAudio 0x00521a40 when clear
     int uiSounds;                             // +0xa24 UserInterfaceSoundsCheckBox (OptionProcs.h's TrackGame+0xf98 block); selects uiVolume for the GUI's +0x34c (KrustyUI 0x004988a0)
     int soundOn;                              // +0xa28 sound on (racesnd.cpp)
     int field_0xa2c;

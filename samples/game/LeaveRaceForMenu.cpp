@@ -32,7 +32,7 @@ void EventManager::LeaveRaceForMenu(int menu) {
     g_TrackGame->uiInteractionBlocked = 0;
     g_TrackGame->podiumFinished = 0;
     g_TrackGame->uiBlockedSeconds = 0;
-    if (!g_TrackGame->mode.field_0xa20)
+    if (!g_TrackGame->mode.cdAudioOn)
         g_TrackGame->StopCDAudio();
     DisplayMode* current = &g_TrackGame->display->displayModes[g_TrackGame->mode.displayModeIndex];
     if (current->width != 640 || current->height != 480 || current->bitDepth != 16)
