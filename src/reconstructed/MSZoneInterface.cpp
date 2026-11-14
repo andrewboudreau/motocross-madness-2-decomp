@@ -49,17 +49,17 @@ struct DPLMsgGetPropertyResponse {
     char data[1];
 };
 
-// The COM object 0x004aa670 creates; only the slots it calls are named.
+// The COM object 0x004aa670 creates; the called slots are named after their arguments (tier 3).
 struct UnknownZoneScore {
     virtual long __stdcall QueryInterface(const GUID& iid, void** result);
     virtual unsigned long __stdcall AddRef();
     virtual unsigned long __stdcall Release();
-    virtual long __stdcall UnknownMethod3(const GUID* application, unsigned long count, int a, int b,
-                                          int c);
-    virtual long __stdcall UnknownMethod4(unsigned long index, const char* name, double score,
-                                          int a, int flags);
+    virtual long __stdcall Initialize(const GUID* application, unsigned long count, int a, int b,
+                                      int c);
+    virtual long __stdcall SetPlayerResult(unsigned long index, const char* name, double score,
+                                           int a, int flags);
     virtual long __stdcall UnknownMethod5();
-    virtual long __stdcall UnknownMethod6(void* a, void* b);
+    virtual long __stdcall SetResultData(void* a, void* b);
     virtual long __stdcall UnknownMethod7();
     virtual long __stdcall UnknownMethod8();
     virtual long __stdcall UnknownMethod9();
@@ -68,7 +68,7 @@ struct UnknownZoneScore {
     virtual long __stdcall UnknownMethod12();
     virtual long __stdcall UnknownMethod13();
     virtual long __stdcall UnknownMethod14();
-    virtual long __stdcall UnknownMethod15(DirectPlayLobby3A* lobby);
+    virtual long __stdcall SendThroughLobby(DirectPlayLobby3A* lobby);
 };
 
 // 0x004aa350
@@ -178,7 +178,7 @@ int MSZoneInterface::SubmitScores(unsigned int count, void* a, void* b) {
 
     if (CoCreateInstance(g_ZoneScoreClassGuid, 0, CLSCTX_INPROC_SERVER, g_ZoneScoreInterfaceGuid, (void**)&score) < 0)
         return 0;
-    if (score->UnknownMethod3(&g_NetApplicationGuid, count, 0, 0, 0x1000) < 0)
+    if (score->Initialize(&g_NetApplicationGuid, count, 0, 0, 0x1000) < 0)
         goto failed;
     SendDebugMessage("\nSending The RaceStatus to the Zone\n");
     for (i = 0; i < count; i++) {
@@ -186,14 +186,14 @@ int MSZoneInterface::SubmitScores(unsigned int count, void* a, void* b) {
             flags = 2;
         else
             flags = players[i].position ? 4 : 16;
-        if (score->UnknownMethod4(i, players[i].name, players[i].score, 0, flags) < 0)
+        if (score->SetPlayerResult(i, players[i].name, players[i].score, 0, flags) < 0)
             goto failed;
         SendDebugMessage("\nPlayer %s:%d,%d\n", players[i].name, players[i].position,
                               players[i].score);
     }
-    if (score->UnknownMethod6(a, b) < 0)
+    if (score->SetResultData(a, b) < 0)
         goto failed;
-    if (score->UnknownMethod15(lobby) < 0)
+    if (score->SendThroughLobby(lobby) < 0)
         goto failed;
     SendDebugMessage("Sent The Final Score to the Zone successfully\n");
     score->Release();
