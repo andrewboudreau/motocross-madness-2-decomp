@@ -26,6 +26,15 @@ the second rotation argument setup and the state-5 square-root argument setup.
 The candidate's arithmetic and control flow were not rewritten to improve the
 score. The test checks the full extent and the exact set of differing offsets.
 
+Forms that leave the 13 bytes in place (3659) or are worse: a pointer local for
+either argument of the second `D3DRMVectorRotate` (3659), the first rotation's
+result passed as the second one's argument (677), scaling through the returned
+pointer (3553), a `yaw` local (497), a `float sum` local for the whole
+square-root argument (966), and partial-sum locals, regrouped or reordered
+terms in that argument (3659). Retail's two differences are both argument
+scheduling: `lea ecx, [esp + N]` ahead of `push eax` in the second rotation,
+and the square-root argument's `push ecx` after the two squares.
+
 The persistent regression compares complete standalone and aggregate Tick
 bytes and named relocations, including addends. A private before/after proof
 against `364d4e27` additionally preserves all five aggregate function extents

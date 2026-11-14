@@ -350,6 +350,10 @@ static inline int PutHeader(FileStream* stream)
 // xor reading `*p++` directly, and an inline SeedKey(stream, name) helper with
 // the seed in three positions (with or without the strcat or the nameKey
 // store inside it). A scan over 0..63 leading typedefs is flat at 255.
+// Round 5, also no closer: the seed through a `char key` local (257), the
+// length taken in the for-init or as the loop bound `i < (int)strlen(name)`
+// (257, 217), an unsigned length and counter (208), and loops counting the
+// length down (257).
 int FileStream::WriteHeader(const char* path)
 {
     char drive[_MAX_DRIVE];

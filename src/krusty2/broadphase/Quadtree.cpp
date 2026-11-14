@@ -227,6 +227,13 @@ inline void QuadTree::ExtendRootY(float y0, float y1)
 // them).  The children-present branch first, `child = 0` after Grow with one shared
 // factory block, cell after x/z, `node = child` before `parentIndex = index`, i before
 // bit in the for-init and a `kids` local each move it closer.
+// Round 5, flat at 620 (same two slots): unsigned x/z, one declaration for both,
+// `cell` first, the ternary as the left addend, `child`/`parentIndex`, `i`/`bit` and
+// `node`/`parent` declarations swapped, `level` declared outside the for, the index
+// sum reversed.  Worse: cz before cx (607) or z before x (609; both together 614:
+// they swap the shifts or the flag tests, never the homes), `fresh` folded into
+// `child` (619), `?: 2 : 0` in the index (461), `if (i & 2) cx += cell` forms (43),
+// `(i & 2) ? x + cell : x` (23), mask before cx/cz (304).
 void QuadTree::Insert(QuadTreeObject* obj, unsigned int code, float y0, float y1)
 {
     if (code == 0xf)
