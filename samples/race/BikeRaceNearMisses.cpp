@@ -161,10 +161,17 @@
 // network, ghost and AI racer is held in a local from its new until Load
 // (retail calls Load with mov ecx, eax or edi instead of reloading the slot),
 // and the remote player's setup.weight is stored before its path sprintf.
-// The two network player loops share one block-level `k` for their preset
-// curve copies; with a `for (int k` in each, VC6 allocates the later event
-// AI copy differently (retail [base + n*0xcc], ours was [n*0xcc + base], and
-// its UI else branch loaded bikes[n] before ui->bikes). Two retail facts
+// The replay player block and the replay AI block read the tape into one
+// function-scope recordedBike/recordedRider pair (retail keeps both blocks'
+// buffers in the same two slots, rider at 0x480 and bike at 0x4c0 from esp;
+// with a pair declared in each block VC6 crossed them, the second block's
+// bike sharing the first block's rider), and each network player loop
+// declares its own `for (int k` like the circuit and AI loops. The two go
+// together: with block-scope recorded pairs the `for (int k` form allocates
+// the later event AI copy differently (retail [base + n*0xcc], ours was
+// [n*0xcc + base], and its UI else branch loaded bikes[n] before ui->bikes),
+// and with the function-scope pair one block-level `k` shared by the two
+// loops does the same (13369). Two retail facts
 // fix the scalars below 0x6c: the network block's `i` is a function-scope
 // local that the network AI loop reuses (retail homes both loops' index in
 // one slot at 0), and RandomSkill writes the skill through a
@@ -172,18 +179,30 @@
 // the second rand() and adds base to it; with a returned value VC6 homes the
 // pro circuit's offset in the riders/circuit slot, which then ranks too
 // high). That puts every scalar and bikeTexture/riderTexture at retail's
-// offset, so 13390 of 13428 bytes match (13396 with one more inline-bearing
-// class declared in the TU: XOR EDI/MOV EBX at +538 swap; see
+// offset, so 13400 of 13428 bytes match (six fewer without one more
+// inline-bearing class declared in the TU: XOR EDI/MOV EBX at +538 swap; see
 // BIKE_RACE_STATE_CONNECTIONS.md). Left: the three register choices
 // near the start (0x419b0d, 0x419b39, 0x419bf0), the first two stores of
 // the prologue in the other order (0x4199ad), the SIB order of one curve
-// copy (0x41b124), and two 0x40-byte pairs swapped in the frame:
-// ownBikeTexture/ownRiderTexture and the two replay blocks' recorded
-// bike/rider pair (each block's bike shares with the other's rider).
+// copy (0x41b124), and one 0x40-byte pair swapped in the frame:
+// retail has ownRiderTexture at 0x400 and ownBikeTexture at 0x440.
 // Measured but not kept: the shared `i` alone gives 12792 (the offset
 // temporary then pushes riders up), the `float&` helper alone 2617 (the
 // second loop's index takes fromEvent's slot), and a char[2][0x40] for the
 // own textures fixed bike/riderTexture but swapped the recorded pair.
+// Tried on the own pair without effect (the two buffers have five uses each
+// and VC6 breaks the tie the other way): either declaration order of the
+// own, recorded and bike/riderTexture pairs (16 combinations, identical
+// code, as are both orders of the function-scope recorded pair and the
+// pairs declared before bike/riderTexture), other local names, and the
+// network block resolving the rider file first (reorders the calls, 13396).
+// Worse: own pairs scoped to the circuit and network blocks (13383), a
+// separate pair for the circuit block (13154), char[2][0x40] own or recorded
+// pairs with either index order (2617..2631, the frame grows by 3 bytes of
+// code), one char[4][0x40] (13206), and with the function-scope recorded
+// pair the replay `text` (13363) or `aiName` (13064) at function scope.
+// One more use of either own buffer moves it to 0x1b8, so the two are
+// ordered by use count first; what orders a tie is not established.
 
 #include "../../src/reconstructed/BikeRace.cpp"
 
@@ -1049,6 +1068,8 @@ static inline BikeRaceManufacturerRecord& UiRider(int i) {
 // spells nine times) is one such local and gives 13396; a named 0x7fffffff does the same.
 // The bytes support the count of initialised locals, not this particular constant, and the
 // other 32 bytes (register ties in integer code) do not move with it.
+// (Those scores predate the function-scope recorded texture pair, which brought the best
+// case from 13396 to 13400; the scans were not repeated with it.)
 int BikeRace::CreateRacers(void* owner, LightManager* lights, TextureContext* textures,
                                     BikeRaceTerrainView* terrain, RaceGateEvent* event) {
     const char* const resources = "Res";
@@ -1061,6 +1082,8 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, TextureContext* te
     char name[0x10];
     char ownBikeTexture[0x40];
     char ownRiderTexture[0x40];
+    char recordedBike[0x40];
+    char recordedRider[0x40];
     char empty[0x104];
     int order[11];
     int ranking[11];
@@ -1227,8 +1250,6 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, TextureContext* te
     int fourStroke;
     if (g_TrackGame->playingReplay) {
         // A replay: the recorded player.
-        char recordedBike[0x40];
-        char recordedRider[0x40];
         recordIndex = 1;
         replayVcr->GetRacer(&id, &ai, 0, name, bikeFile, riderFile, recordedBike, recordedRider,
                                            &engineSize, &fourStroke, &plate);
@@ -1297,7 +1318,6 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, TextureContext* te
         // A network race: this player's racer, the other players' and the
         // AI racers of other hosts.
         playerId = g_TrackGame->network->localPlayer;
-        int k;
         for (i = 0; i < racerCount; i++) {
             if (GridPlayer(i).networkPlayerId == playerId && !GridPlayer(i).isAi) {
                 int j;
@@ -1369,7 +1389,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, TextureContext* te
             int bikeClass = BikeClassOf(setup.engineSize);
             setup.rpmLowerLimit = g_TrackGame->ui->rpmLowerLimit[bikeClass];
             setup.rpmUpperLimit = g_TrackGame->ui->rpmUpperLimit[bikeClass];
-            for (k = 0; k < 11; k++)
+            for (int k = 0; k < 11; k++)
                 setup.presetCurve[k] = g_TrackGame->ui->standardCurves[bikeClass][0][k];
             setup.rpmStep = (setup.rpmUpperLimit - setup.rpmLowerLimit) / 10;
             setup.weight = g_TrackGame->ui->weight[bikeClass];
@@ -1422,7 +1442,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, TextureContext* te
             int bikeClass = BikeClassOf(setup.engineSize);
             setup.rpmLowerLimit = g_TrackGame->ui->rpmLowerLimit[bikeClass];
             setup.rpmUpperLimit = g_TrackGame->ui->rpmUpperLimit[bikeClass];
-            for (k = 0; k < 11; k++)
+            for (int k = 0; k < 11; k++)
                 setup.presetCurve[k] = g_TrackGame->ui->standardCurves[bikeClass][0][k];
             setup.rpmStep = (setup.rpmUpperLimit - setup.rpmLowerLimit) / 10;
             setup.weight = g_TrackGame->ui->weight[bikeClass];
@@ -1492,8 +1512,6 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, TextureContext* te
             for (int n = 0; n < g_TrackGame->mode.raceSettings.aiRacerCount; n++) {
                 char aiName[0x10];
                 if (g_TrackGame->playingReplay) {
-                    char recordedBike[0x40];
-                    char recordedRider[0x40];
                     replayVcr->GetRacer(&id, &ai, recordIndex, aiName, bikeFile, riderFile,
                                                        recordedBike, recordedRider, &engineSize, &fourStroke,
                                                        &plate);

@@ -59,16 +59,16 @@ PARTIAL = [['samples/race/BikeRaceNearMisses.cpp',
   6760,
   2821,
   '59d5d6fed62ff5b907d3df81802c39f84c8feeede5d33f5cde930089545f8c90'],
- # Nonexact score 13396 with the named "Res" constant in CreateRacers; without it (one
+ # Nonexact score 13400 with the named "Res" constant in CreateRacers; without it (one
  # initialised local fewer) XOR EDI/MOV EBX at +538..545 are exchanged and the score is
- # 13390 (same state/flags, no interior entry); BIKE_RACE_STATE_CONNECTIONS.md.
+ # six lower (same state/flags, no interior entry); BIKE_RACE_STATE_CONNECTIONS.md.
  ['samples/race/BikeRaceNearMisses.cpp',
   '?CreateRacers@BikeRace@@',
   4299120,
   13428,
   13428,
-  13396,
-  'a6159f61caafc2347d11f9ef24dfc6956a1da5b180cd6749c63609a4716f8482']]
+  13400,
+  '2da850db52316df8731a83fbd44bed12c4aed598cba48e96e19bc22ce3f63d08']]
 
 
 @unittest.skipUnless(os.name == 'nt' and os.environ.get('VC6_ROOT') and os.environ.get('MCM2_EXE'),

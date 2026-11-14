@@ -83,6 +83,13 @@ and 10..14 extra locals, 13,390 otherwise). The sample now names the "Res" direc
 times (`resources`), which is one such local and gives the 13,396 order; the bytes support the
 count, not that constant, and a later change of the unit's declaration count can move the window again.
 
+A later source change raised the sample's count to 13,400 (the fingerprints below predate it): the
+replay player block and the replay AI block read the tape into one function-scope
+`recordedBike`/`recordedRider` pair, and each network player loop declares its own `for (int k`.
+Retail keeps both replay blocks' buffers in the same two frame slots; block-scope pairs came out
+crossed. The six count-dependent bytes above are unchanged by it, and the count scans were not
+repeated with the new form.
+
 | Complete CreateRacers fingerprint | Before | After |
 |---|---|---|
 | Raw body SHA-256 | `1a2b16687fa89e9a0ed33dba31a1e46452caaaefa3ad73ce630b317a32bf07c4` | `9c7483a4d5ff8514f8a350f528dbe11d8d82d4d694439f87d069fd6fbf9e748b` |

@@ -95,7 +95,7 @@
       "samples/race/BikeRaceNearMisses.cpp",
       "?CreateRacers@BikeRace@@QAEHPAXPAVLightManager@@PAUTextureContext@@PAVBikeRaceTerrainView@@PAURaceGateEvent@@@Z",
       13428,
-      "9cf6a3fb1c8fccb8e1f3c006258d9c7f18b07e7f8aa0c4bcee93bc34c7f6a772"
+      "4e63b7555c884f4141c2974028e21a80685e95d8c90c798789d691603915e038"
     ],
     [
       "samples/ui/DlgProcsNearMisses.cpp",
