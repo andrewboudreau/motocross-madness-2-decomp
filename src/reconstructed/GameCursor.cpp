@@ -96,7 +96,7 @@ int GameCursor::LoadCursorTexture(const char* image, TextureMapManager* textures
                                              file->bitsPerPixel == 16 ? 0x22b : 0x378,
                                              ((PCRenderTarget*)renderContext)->surfacePixelFormat,
                                              (UnknownTexturePalette*)palette, 4,
-                                             ((PCRenderTarget*)renderContext)->targetDisplay->field_0x198, 0, 0, 2, 1, 0,
+                                             ((PCRenderTarget*)renderContext)->targetDisplay->surfacePalette, 0, 0, 2, 1, 0,
                                              0x80, 0xff00ff))
             goto failed;
         cursorTexture->ApplyColorKey(0xff00ff);

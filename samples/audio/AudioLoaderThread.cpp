@@ -42,7 +42,7 @@ unsigned __stdcall SoundMemoryManager::LoaderThreadProc(void* context) {
                 int loaded = 0;
                 if (sound->CreatePendingBuffer()) {
                     sound->FillBufferFromFile(&sound->pendingBuffer);
-                    sound->field_0x1f4_bit7 = 0;
+                    sound->loadQueued = 0;
                     sound->bufferReady = 1;
                     sound->dsBuffer = sound->pendingBuffer;
                     sound->dsBuffer3D = sound->pendingBuffer3D;

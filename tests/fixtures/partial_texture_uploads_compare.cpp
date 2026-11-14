@@ -208,7 +208,7 @@ static void Run(int retail){
     blocks=allocations=constructors=modeIndex=textureCalls=passes=0;
     g_TrackGame=(TrackGame*)gameStorage;*(TrackGame**)0x56e26c=g_TrackGame;
     g_TrackGame->display=(PCVideoCard*)0x12345678;g_TrackGame->renderTarget=(RenderTarget*)0x23456789;
-    Display()->displayModeCount=scenario.modeCount;Display()->displayModes=modes;Display()->field_0x198=(void*)0x89abcdef;
+    Display()->displayModeCount=scenario.modeCount;Display()->displayModes=modes;Display()->surfacePalette=(void*)0x89abcdef;
     Display()->backBuffer=(DirectDrawSurface*)0x13572468;Display()->frameBufferCount=3;
     for(int i=0;i<4;++i){modes[i].width=(scenario.matchMask&(1<<i))?640:800;modes[i].height=480;modes[i].bitDepth=16;}
     // Existing target is not constructed or owned by this method. Give it the

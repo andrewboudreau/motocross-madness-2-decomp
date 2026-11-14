@@ -100,7 +100,7 @@ PCVideoCard::PCVideoCard() {
     gammaControl = 0;
     renderSurface = 0;
     clipper = 0;
-    field_0x198 = 0;
+    surfacePalette = 0;
     partialTextureUploadResult = 0;
     cooperativeLevel = DDSCL_NORMAL;
     waitForFlip = 0;

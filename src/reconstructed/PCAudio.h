@@ -133,7 +133,7 @@ public:
     void ReleaseMembers();             // 0x00401c30: releases every member
     void SetMemberVolume(long volume);  // 0x00401dd0 (racesnd.cpp music volume)
 
-    unsigned char field_0x2c_bit0 : 1; // members may play
+    unsigned char playEnabled : 1; // members may play
     long memberVolume; // +0x30: volume applied to members
     ContainerList<Sound*> members; // +0x34
 };
@@ -249,8 +249,8 @@ public:
     unsigned char isLooping : 1;             // +0x1f4 bit 3
     unsigned char pausedWhilePlaying : 1;    // +0x1f4 bit 4
     unsigned char isFading : 1;              // +0x1f4 bit 5
-    unsigned char field_0x1f4_bit6 : 1;
-    unsigned char field_0x1f4_bit7 : 1;
+    unsigned char hardwarePreferred : 1;
+    unsigned char loadQueued : 1;
     unsigned char bufferReady : 1;           // +0x1f5 bit 0
     unsigned char isStopped : 1;             // +0x1f5 bit 1
     unsigned char isFilling : 1;             // +0x1f5 bit 2: FillBufferFromStream running

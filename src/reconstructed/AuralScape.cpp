@@ -34,7 +34,7 @@ static const Vector3 kVec3ZAxis = Vector3(0.0f, 0.0f, 1.0f);
 
 // 0x00401a30
 SoundGroup::SoundGroup(int flags) : GameObject(flags) {
-    field_0x2c_bit0 = 1;
+    playEnabled = 1;
     memberVolume = 0;
     members.Init(8, 16);
 }

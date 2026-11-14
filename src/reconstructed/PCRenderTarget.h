@@ -8,7 +8,7 @@
 // +0x70.
 struct UnknownBlitSource {
     unsigned char field_0x00[0x70];
-    DirectDrawSurface* field_0x70;
+    DirectDrawSurface* systemSurface;
 };
 
 // One cached render state (PCRenderTarget+0x264, 300 entries).

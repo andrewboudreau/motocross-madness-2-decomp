@@ -155,7 +155,7 @@ struct DDSurfaceDesc2 {
     unsigned long width;
     long pitch;
     union {
-        unsigned long field_0x14;
+        unsigned long depth;
         unsigned long backBufferCount;
     };
     union {

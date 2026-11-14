@@ -69,7 +69,7 @@ int PCJoystickDevice::OpenDevice(const DIDeviceInstance* instance) {
     range.size = sizeof(range);
     range.headerSize = 0x10;
     range.how = DIPH_BYOFFSET;
-    if (field_0x14_axis0) {
+    if (hasXAxis) {
         range.object = 0;
         if (device->GetProperty(DIPROP_RANGE, &range) < 0)
             goto failed;
@@ -77,7 +77,7 @@ int PCJoystickDevice::OpenDevice(const DIDeviceInstance* instance) {
         half = (range.maximum + 1) / 2;
         deadZoneScales[0] = half / (half - half * 0.05f);
     }
-    if (field_0x14_axis1) {
+    if (hasYAxis) {
         range.object = 4;
         if (device->GetProperty(DIPROP_RANGE, &range) < 0)
             goto failed;
@@ -85,7 +85,7 @@ int PCJoystickDevice::OpenDevice(const DIDeviceInstance* instance) {
         half = (range.maximum + 1) / 2;
         deadZoneScales[1] = half / (half - half * 0.05f);
     }
-    if (field_0x14_axis2) {
+    if (hasZAxis) {
         range.object = 8;
         if (device->GetProperty(DIPROP_RANGE, &range) < 0)
             goto failed;
@@ -93,7 +93,7 @@ int PCJoystickDevice::OpenDevice(const DIDeviceInstance* instance) {
         half = (range.maximum + 1) / 2;
         deadZoneScales[2] = half / (half - half * 0.05f);
     }
-    if (field_0x14_axis3) {
+    if (hasRxAxis) {
         range.object = 12;
         if (device->GetProperty(DIPROP_RANGE, &range) < 0)
             goto failed;
@@ -101,7 +101,7 @@ int PCJoystickDevice::OpenDevice(const DIDeviceInstance* instance) {
         half = (range.maximum + 1) / 2;
         deadZoneScales[3] = half / (half - half * 0.05f);
     }
-    if (field_0x14_axis4) {
+    if (hasRyAxis) {
         range.object = 16;
         if (device->GetProperty(DIPROP_RANGE, &range) < 0)
             goto failed;
@@ -109,7 +109,7 @@ int PCJoystickDevice::OpenDevice(const DIDeviceInstance* instance) {
         half = (range.maximum + 1) / 2;
         deadZoneScales[4] = half / (half - half * 0.05f);
     }
-    if (field_0x14_axis5) {
+    if (hasRzAxis) {
         range.object = 20;
         if (device->GetProperty(DIPROP_RANGE, &range) < 0)
             goto failed;
@@ -137,17 +137,17 @@ int __stdcall PCJoystickDevice::EnumAxisObjectsCallback(const DIDeviceObjectInst
     info.size = sizeof(info);
     if (device->device->GetObjectInfo(&info, object->type, DIPH_BYID) >= 0) {
         if (!memcmp(&object->guidType, &GUID_XAxis, sizeof(Guid)))
-            device->field_0x14_axis0 = 1;
+            device->hasXAxis = 1;
         if (!memcmp(&object->guidType, &GUID_YAxis, sizeof(Guid)))
-            device->field_0x14_axis1 = 1;
+            device->hasYAxis = 1;
         if (!memcmp(&object->guidType, &GUID_ZAxis, sizeof(Guid)))
-            device->field_0x14_axis2 = 1;
+            device->hasZAxis = 1;
         if (!memcmp(&object->guidType, &GUID_RxAxis, sizeof(Guid)))
-            device->field_0x14_axis3 = 1;
+            device->hasRxAxis = 1;
         if (!memcmp(&object->guidType, &GUID_RyAxis, sizeof(Guid)))
-            device->field_0x14_axis4 = 1;
+            device->hasRyAxis = 1;
         if (!memcmp(&object->guidType, &GUID_RzAxis, sizeof(Guid)))
-            device->field_0x14_axis5 = 1;
+            device->hasRzAxis = 1;
     }
     return 1;
 }

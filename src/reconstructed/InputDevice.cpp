@@ -2,12 +2,12 @@
 
 // 0x00489780
 InputDevice::InputDevice(int id) {
-    field_0x14_axis0 = 0;
-    field_0x14_axis1 = 0;
-    field_0x14_axis2 = 0;
-    field_0x14_axis3 = 0;
-    field_0x14_axis4 = 0;
-    field_0x14_axis5 = 0;
+    hasXAxis = 0;
+    hasYAxis = 0;
+    hasZAxis = 0;
+    hasRxAxis = 0;
+    hasRyAxis = 0;
+    hasRzAxis = 0;
     deviceSubtype = -1;
     axisCount = 0;
     buttonCount = 0;

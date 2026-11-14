@@ -239,7 +239,7 @@ int main(int argc,char** argv){
         if(Audio()->queuedSounds.m_count || observed.waits!=2 || observed.ended!=1)ExitProcess(98);
         for(int n=0;n<3;++n){
             if(observed.creates[n]!=1 || observed.fills[n]!=!fail || observed.plays[n]!=!fail || observed.recorded[n]!=!fail)ExitProcess(99);
-            if(!fail && (!Item(n)->bufferReady || Item(n)->field_0x1f4_bit7 || Item(n)->pendingBuffer || Item(n)->pendingBuffer3D ||
+            if(!fail && (!Item(n)->bufferReady || Item(n)->loadQueued || Item(n)->pendingBuffer || Item(n)->pendingBuffer3D ||
                 (DWORD)Item(n)->dsBuffer!=0x56780000+n*16 || (DWORD)Item(n)->dsBuffer3D!=0x67890000+n*16))ExitProcess(100);
             if(fail && (Item(n)->bufferReady || (DWORD)Item(n)->pendingBuffer!=0x34560000+n*16))ExitProcess(101);
         }

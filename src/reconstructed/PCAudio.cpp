@@ -219,8 +219,8 @@ Sound::Sound(SoundGroup* group, int type) {
     isLooping = 0;
     pausedWhilePlaying = 0;
     isFading = 0;
-    field_0x1f4_bit6 = 0;
-    field_0x1f4_bit7 = 0;
+    hardwarePreferred = 0;
+    loadQueued = 0;
 }
 
 // 0x004bbb60: unloads the sound and unregisters it everywhere.
@@ -483,16 +483,16 @@ int Sound::SetProperty(const Guid* set, unsigned long id, void* instance,
 // queued for the loader. Failures after the lock leave the critical section
 // held (retail behaviour).
 int Sound::PlayWithOptions(int restart, unsigned long playFlags, int preferHardware) {
-    if (!SoundSystem()->audioStarted || !soundGroup || !soundGroup->field_0x2c_bit0 ||
+    if (!SoundSystem()->audioStarted || !soundGroup || !soundGroup->playEnabled ||
         soundGroup->isPaused)
         return 1;
     int looping = playFlags & 1;
     lastPlayFlags = playFlags;
-    field_0x1f4_bit6 = preferHardware;
+    hardwarePreferred = preferHardware;
     if (soundFlags & 2) {
         lastPlayFlags = 1;
     } else if (!(soundFlags & 0x20)) {
-        if (field_0x1f4_bit6 && SoundSystem()->allowSoundHardware &&
+        if (hardwarePreferred && SoundSystem()->allowSoundHardware &&
             (long)SoundSystem()->soundCaps.freeHw3DAllBuffers > 0)
             lastPlayFlags = playFlags | 2;
         else
@@ -545,8 +545,8 @@ done:
     if (soundFlags & 4) {
         EnterCriticalSection(&bufferLock);
         int queue = 0;
-        if (!bufferReady && !field_0x1f4_bit7) {
-            field_0x1f4_bit7 = 1;
+        if (!bufferReady && !loadQueued) {
+            loadQueued = 1;
             queue = 1;
         }
         LeaveCriticalSection(&bufferLock);
@@ -604,7 +604,7 @@ int Sound::IsPlaying() {
         return 0;
     if (soundFlags & 4) {
         EnterCriticalSection(&bufferLock);
-        if (!bufferReady && field_0x1f4_bit7) {
+        if (!bufferReady && loadQueued) {
             LeaveCriticalSection(&bufferLock);
             return 1;
         }
@@ -803,7 +803,7 @@ void Sound::ReleaseBuffers() {
     }
     g_MemTagStack->SubtractDirectXBytes(bufferBytes);
     bufferReady = 0;
-    field_0x1f4_bit6 = 0;
+    hardwarePreferred = 0;
     LeaveCriticalSection(&bufferLock);
 }
 

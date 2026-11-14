@@ -612,9 +612,9 @@ void GUIManager::SetToolTipFont(const char* font) {
 
 // A pixel of 0x00486740's 24-bit fill.
 struct UnknownGuiRgb {
-    unsigned char field_0x00;
-    unsigned char field_0x01;
-    unsigned char field_0x02;
+    unsigned char red;
+    unsigned char green;
+    unsigned char blue;
 };
 
 // 0x00486740
@@ -626,9 +626,9 @@ PCTextureMap* GUIManager::CreateFilledTexture(int width, int height, unsigned lo
 
     if (texture) {
         bits = new(__FILE__, 1144) UnknownGuiRgb[width * height];
-        fill.field_0x00 = (unsigned char)(color >> 16);
-        fill.field_0x01 = (unsigned char)(color >> 8);
-        fill.field_0x02 = (unsigned char)color;
+        fill.red = (unsigned char)(color >> 16);
+        fill.green = (unsigned char)(color >> 8);
+        fill.blue = (unsigned char)color;
         for (pixel = bits; pixel < bits + width * height; pixel++)
             *pixel = fill;
         if (texture->CreateSurface(bits, width, height, width, width, 0x378,

@@ -83,18 +83,18 @@ int PCVideoCard::ProbePartialTextureUploads(RenderTarget* target) {
             image = new (__FILE__, 2078) PCTextureMap(0, 0);
             if (!image->CreateSurface(file->bits, file->width, file->height, file->width, file->width,
                                       file->bitsPerPixel == 16 ? 0x22b : 0x378, render->surfacePixelFormat, 0, 0,
-                                      render->targetDisplay->field_0x198, 0, 0, 2, 1, 0, 0x80, 0xff00ff)) {
+                                      render->targetDisplay->surfacePalette, 0, 0, 2, 1, 0, 0x80, 0xff00ff)) {
                 FreeFile(file);
                 result = -2;
             } else {
                 expected = new (__FILE__, 2097) PCTextureMap(0, 0);
                 expected->CreateSurface(0, file->width, file->height, file->width, file->width,
                                         render->surfacePixelFormat, render->surfacePixelFormat, 0, 0,
-                                        render->targetDisplay->field_0x198, 0, 0, 2, 1, 0, 0x80, 0xff00ff);
+                                        render->targetDisplay->surfacePalette, 0, 0, 2, 1, 0, 0x80, 0xff00ff);
                 rendered = new (__FILE__, 2110) PCTextureMap(0, 0);
                 rendered->CreateSurface(0, file->width, file->height, file->width, file->width,
                                         render->surfacePixelFormat, render->surfacePixelFormat, 0, 0,
-                                        render->targetDisplay->field_0x198, 0, 0, 2, 1, 0, 0x80, 0xff00ff);
+                                        render->targetDisplay->surfacePalette, 0, 0, 2, 1, 0, 0x80, 0xff00ff);
                 if (!rendered->CreateTextureSurface(1, 0, 1)) {
                     FreeFile(file);
                     result = -4;

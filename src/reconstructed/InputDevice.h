@@ -25,10 +25,10 @@ protected:
     int buttonCount;                // +0x08
     int deviceKind;                 // +0x0c; id passed to the constructor
     int deviceSubtype;              // +0x10; -1 initially
-    unsigned char field_0x14_axis0 : 1;  // axis enable bits; JoystickDevice
-    unsigned char field_0x14_axis1 : 1;  // 0x00489c60 tests one per axis
-    unsigned char field_0x14_axis2 : 1;
-    unsigned char field_0x14_axis3 : 1;
-    unsigned char field_0x14_axis4 : 1;
-    unsigned char field_0x14_axis5 : 1;
+    unsigned char hasXAxis : 1;  // axis present bits (EnumAxisObjectsCallback); JoystickDevice
+    unsigned char hasYAxis : 1;  // 0x00489c60 tests one per axis
+    unsigned char hasZAxis : 1;
+    unsigned char hasRxAxis : 1;
+    unsigned char hasRyAxis : 1;
+    unsigned char hasRzAxis : 1;
 };

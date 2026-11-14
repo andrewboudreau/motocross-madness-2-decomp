@@ -67,7 +67,7 @@ public:
 
     DirectDraw* directDraw;    // +0x190: IDirectDraw7 (DirectDrawCreateEx)
     Direct3D* direct3D;        // +0x194: IDirect3D7 (QueryInterface)
-    void* field_0x198;
+    void* surfacePalette;
     DirectDrawSurface* primarySurface;   // +0x19c: primary; PCGame slot 5: IsLost/Restore
     DirectDrawSurface* backBuffer;       // +0x1a0: back buffer; PCGame slot 31's surface without +0x1a8
     DirectDrawGammaControl* gammaControl; // +0x1a4

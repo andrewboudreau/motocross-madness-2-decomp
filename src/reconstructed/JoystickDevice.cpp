@@ -94,51 +94,51 @@ int JoystickDevice::GetControlState(int control, int modifier, InputButtonState*
     if (control < 0) {
         switch (control) {
         case -2:
-            if (field_0x14_axis0 && axisValues[0] < 16384.0f)
+            if (hasXAxis && axisValues[0] < 16384.0f)
                 return 1;
             break;
         case -3:
-            if (field_0x14_axis0 && axisValues[0] > 49152.0f)
+            if (hasXAxis && axisValues[0] > 49152.0f)
                 return 1;
             break;
         case -4:
-            if (field_0x14_axis1 && axisValues[1] < 16384.0f)
+            if (hasYAxis && axisValues[1] < 16384.0f)
                 return 1;
             break;
         case -5:
-            if (field_0x14_axis1 && axisValues[1] > 49152.0f)
+            if (hasYAxis && axisValues[1] > 49152.0f)
                 return 1;
             break;
         case -6:
-            if (field_0x14_axis2 && axisValues[2] < 16384.0f)
+            if (hasZAxis && axisValues[2] < 16384.0f)
                 return 1;
             break;
         case -7:
-            if (field_0x14_axis2 && axisValues[2] > 49152.0f)
+            if (hasZAxis && axisValues[2] > 49152.0f)
                 return 1;
             break;
         case -8:
-            if (field_0x14_axis3 && axisValues[3] < 16384.0f)
+            if (hasRxAxis && axisValues[3] < 16384.0f)
                 return 1;
             break;
         case -9:
-            if (field_0x14_axis3 && axisValues[3] > 49152.0f)
+            if (hasRxAxis && axisValues[3] > 49152.0f)
                 return 1;
             break;
         case -10:
-            if (field_0x14_axis4 && axisValues[4] < 16384.0f)
+            if (hasRyAxis && axisValues[4] < 16384.0f)
                 return 1;
             break;
         case -11:
-            if (field_0x14_axis4 && axisValues[4] > 49152.0f)
+            if (hasRyAxis && axisValues[4] > 49152.0f)
                 return 1;
             break;
         case -12:
-            if (field_0x14_axis5 && axisValues[5] < 16384.0f)
+            if (hasRzAxis && axisValues[5] < 16384.0f)
                 return 1;
             break;
         case -13:
-            if (field_0x14_axis5 && axisValues[5] > 49152.0f)
+            if (hasRzAxis && axisValues[5] > 49152.0f)
                 return 1;
             break;
         }
