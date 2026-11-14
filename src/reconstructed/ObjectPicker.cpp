@@ -81,7 +81,7 @@ int ObjectPicker::PickAt(int x, int y) {
     pickRay->SetMeshShape(1, segment);
     pickRay->UpdatePlacement();
     if (pickRay->QueryCollisions())
-        return field_0x2c;
+        return pickedObject;
     return 0;
 }
 

@@ -26,7 +26,7 @@ GameCursor::GameCursor(int flags) : GameObject(flags) {
     backgroundImage = 0;
     backgroundRegion = -1;
     field_0x4c = 0;
-    field_0x50 = 1.0f;
+    drawScale = 1.0f;
 }
 
 // 0x0043ea70
@@ -186,8 +186,8 @@ int GameCursor::RenderPost3D() {
 
     s_destination.left = cursorX;
     s_destination.top = cursorY;
-    s_destination.right = (int)(s_right * field_0x50);
-    s_destination.bottom = (int)(s_bottom * field_0x50);
+    s_destination.right = (int)(s_right * drawScale);
+    s_destination.bottom = (int)(s_bottom * drawScale);
     s_source.top = 0;
     s_source.left = 0;
     s_source.right = s_right - cursorX;

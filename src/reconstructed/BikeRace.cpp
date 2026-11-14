@@ -48,7 +48,7 @@ static inline Vector3 operator-(const Vector3& a, const Vector3& b) {
 void PickerHitCallback(CollisionObject* self, CollisionObject* other) {
     BikeRace* race = (BikeRace*)g_TrackGame->eventManager->FindRaceView();
     if (race != 0 && race->objectPicker != 0) {
-        race->objectPicker->field_0x2c = (int)other;
+        race->objectPicker->pickedObject = (int)other;
     }
 }
 

@@ -55,7 +55,7 @@ public:
     ObjectPicker* Create(void* target, TextureMapManager* textures, UnknownPickCallback callback,
                                         GameCursor* cursor);
 
-    int field_0x2c;
+    int pickedObject;                         // +0x2c the CollisionObject PickerHitCallback stores; PickAt returns it on a hit
     CollisionObject* pickRay;                 // +0x30 pick ray
     GameCursor* pickCursor;                   // +0x34  the caller's cursor or the bound cursor.tga GameCursor; PickAtCursor reads its CursorPosition
     int lastPickX;                            // +0x38 last picked x
