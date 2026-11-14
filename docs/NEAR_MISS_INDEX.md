@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 2, b 108, c 71, total 181. The three class (a) functions of the
+Counts: a 2, b 107, c 71, total 180. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -161,6 +161,12 @@ of the other arguments; the member read gives the natural right-to-left interlea
 The same session took UIDropDownList::LayoutParts `0x0047a400` to 887/962 (use the shared
 value first, then `scroll.bottom = list.bottom - 2`) and UIListBox::ButtonDown
 `0x00477e90` to 320/342 (`rect.bottom = rect.top + GetRowHeight(row)` with no height local).
+Vehicle::ApplyBodyContactImpulse `0x005265d0` (class b, 405/555) is exact in
+src/krusty2/vehicle/Vehicle.cpp: the solver call is written once per `crashState` arm, as in
+the sibling ApplyStaticContactImpulse. A `c ? &a : &b` argument is evaluated whole ahead of the
+pushes; retail tests first and picks the address with `lea/jne/lea` in place. A
+`ProCircuit* circuit` local inside the pro-circuit block takes CreatePodiumScene `0x0045d480`
+to 4167/4247.
 Compiler flags (s21, `MCM2_EXTRA_FLAGS` of `tools/rank_near_misses.py`): EcoSystem `0x00456890` and `0x00457ed0`,
 Griddraw `0x0047e600`, CacheTexture `0x005102d0`, ResourceManager `0x004e9030`,
 TextService `0x0050ba00` and the FollowCamera constructor `0x00462ee0` are unchanged
@@ -203,7 +209,7 @@ BuildFaceGeometry `0x0043dc60` from 121/1064 to 1100/1104.
 | ecosystem/EcoSystem | `0x00459ce0` | 323/3300 | b | 112 code diffs: retail adds `xor edi, edi`; retail adds `mov [esp + N], edi`; slot order differs |
 | ecosystem/EcoSystem | `0x0045b060` | 3714/3967 | c | same size and frame (1024/1045 aligned): the first loop guard compares `remaining` with the zero register before the offset stores, x87 scheduling in the lit-face block (+0x8d4..+0x931) and the alpha/leftColor load order at +0xc1c; the uScale quotient was inverted (logic fix) |
 | game/DeviceSetup | `0x00448560` | 148/1006 | b | 35 code diffs: retail adds `push edi`; `push edi ; xor ebp, ebp` vs `xor edi, edi`; frame 0x11c vs 0x118 |
-| game/EventManager | `0x0045d480` | 4139/4247 | b | frame size 0x460 and extent match; the squared lengths square each component as retail with `xx`/`yy` locals, but retail spills the z square to [esp+0x1c] (so the +0x1c/+0x20 homes swap); the Winner branch registers run one step behind retail |
+| game/EventManager | `0x0045d480` | 4167/4247 | b | frame size 0x460 and extent match; the squared lengths square each component as retail with `xx`/`yy` locals, but retail spills the z square to [esp+0x1c] (so the +0x1c/+0x20 homes swap); the Winner branch registers run one step behind retail |
 | game/PCGame | `0x004c0d10` | 1776/1790 | c | retail stores the surface description's size right after the memset, VC6 after pushing the 0x005119c0 arguments ; helpers, a derived-struct constructor, pointer/format locals and sizeof spellings do not move it (retail stores it after the pushes in the matched 0x004c5950) |
 | game/QuarryStuntEvent | `0x004e14a0` | 166/1760 | b | 9 code diffs: `mov edx, [A] ; test edx, edx` vs `mov ecx, [A] ; test ecx, ecx`; `mov eax, [ecx + 0x26c0] ; lea edx, [eax~` vs `mov eax, [eax + 0x38] ; mov ecx, [eax +~`; slots differ |
 | game/QuarryStuntEventLoader | `0x004de590` | 3137/7952 | b | decision tree fixed (two textureBytes / 4 terms, last AGP test its own else-if), car ignore list an if/else of calls, block-local `step` (frame 0x650): 2207/2208 insns, sdiff 107 hunks, 2034 aligned (was 161, 1896); slots below 0x1c, register choices and the animation loop head left; the linked bring-up (src/bringup/Group3_QuarryLoad.cpp, inline canonical allocations) scores 0.985 at 2208/2208 |
@@ -240,7 +246,6 @@ BuildFaceGeometry `0x0043dc60` from 121/1064 to 1100/1104.
 | krusty2/vehicle/Bike | `0x0040a520` | 2084/2272 | b | the left-bar arms store `offset` and dot `base` as retail (a behaviour fix found by `tools/emu_cases/bike_steer_torque.py`; it cost 28 positions from 2112); axis references and zero-first `if (d >= 0)` arms, the steerTorque update (gain float locals, named delta) and the angle product match; left: the operator return temporary and base swap slots, cross products load the first-stored multiplicand (spin.x, push.x) first where retail loads it second (operand order inert), the airborne `test al, al` is scheduled earlier |
 | krusty2/vehicle/Bike | `0x0040c000` | 162/1015 | b | retail has a bare `fistp` (inline `__asm`, docs/REBUILD_GAPS.md), hence its ebp frame; 60 code diffs: retail adds `push ebp ; mov ebp, esp`; retail lacks `fld [A]`; slot order differs |
 | krusty2/vehicle/Vehicle | `0x005257a0` | 734/745 | b | leanCos/wheelForwardAlignment written where VC6 picks the hoisted pair (after throttleAxis), so 0x4b0/0x4b4 go into the weightForce copy as in retail; left: the `mov eax, 0x3ccccccd` (0.025f) load is one store early (before leanAxis' 0x4fc store). The load rises at most 13 original-order units above its first use; retail behaves as if one more unit sat between leanAxis and stepTime |
-| krusty2/vehicle/Vehicle | `0x005265d0` | 405/555 | b | same size; parenthesised Vec3-constructor crosses give retail's product loads; the crashState ?: argument is hoisted above the pushes, A-offset temporaries 0xc lower |
 | krusty2/vehicle/Vehicle | `0x00527a20` | 840/870 | c | `normalLoad = 0` scheduled after the dword-wise zero copy (retail: between its second and third temporary loads) |
 | krusty2/vehicle/Vehicle | `0x005286a0` | 762/784 | c | slot 56: two side-cross products load their multiplicands in the other order (retail side.y*a.z, a.x*side.z); source operand order has no effect; four named intermediates (facing, root, sine, cosine) give 762 |
 | krusty2/vehicle/Vehicle | `0x0052a940` | 2339/3254 | b | 40 differing instructions (3257 B; backingUp and DriveForce's reversing are char). The lift tilt-axis arm is laid out after the Rotate(k) arm (30 control-flow forms, dead end); prevSpeed is loaded before the wheel-count store; some local slots differ |
