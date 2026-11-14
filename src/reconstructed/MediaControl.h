@@ -33,7 +33,13 @@ struct DDSurfaceDesc {
     unsigned long flags;
     unsigned long height;
     unsigned long width;
-    unsigned char field_0x10[0x6c - 0x10];
+    long pitch;                               // +0x10 lPitch (a union with dwLinearSize)
+    unsigned long backBufferCount;            // +0x14 dwBackBufferCount
+    unsigned long mipMapCount;                // +0x18 dwMipMapCount (a union with the z-buffer depth and refresh rate)
+    unsigned long alphaBitDepth;              // +0x1c dwAlphaBitDepth
+    unsigned long reserved;                   // +0x20 dwReserved
+    void* surface;                            // +0x24 lpSurface
+    unsigned char field_0x28[0x6c - 0x28];    // the four DDCOLORKEYs, ddpfPixelFormat (+0x48), ddsCaps (+0x68)
 };
 
 // IStreamSample / IDirectDrawStreamSample.

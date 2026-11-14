@@ -139,7 +139,8 @@ struct GroundFogCacheOwner {
 // "MouseAnim" UIAnim to it, so the members follow GameUi.h's UIAnim.
 struct CursorUIAnimView {
     int AdvancePastSounds();              // 0x004730b0: current frame
-    unsigned char field_0x00[0x08];
+    unsigned char field_0x00[0x04];           // +0x00 vfptr (BaseObject)
+    int refCount;                             // +0x04 BaseObject refCount
     int currentFrame;                         // +0x08 UIAnim::currentFrame
     int playForwards;                         // +0x0c UIAnim::playForwards
     int frameCount;                           // +0x10 UIAnim::frameCount
@@ -176,7 +177,28 @@ public:
     CameraRect area;                          // +0x3c: area
     unsigned char visibleArea[0x5c - 0x4c];  // +0x4c UIControl visibleArea (bytes kept)
     int controlType;                          // +0x5c: control type (11: edit field)
-    unsigned char field_0x60[0xb8 - 0x60];
+    int currentState;                         // +0x60 UIControl currentState
+    int savedState;                           // +0x64 UIControl savedState
+    int transitionState;                      // +0x68 UIControl transitionState
+    int enabled;                              // +0x6c UIControl enabled
+    int shown;                                // +0x70 UIControl shown
+    int eventCode;                            // +0x74 UIControl eventCode
+    int groupId;                              // +0x78 UIControl groupId
+    int attachId;                             // +0x7c UIControl attachId
+    float slideX;                             // +0x80 UIControl slideX
+    float slideY;                             // +0x84 UIControl slideY
+    float zoomWidth;                          // +0x88 UIControl zoomWidth
+    float zoomHeight;                         // +0x8c UIControl zoomHeight
+    float slideStepX;                         // +0x90 UIControl slideStepX
+    float slideStepY;                         // +0x94 UIControl slideStepY
+    float zoomStepWidth;                      // +0x98 UIControl zoomStepWidth
+    float zoomStepHeight;                     // +0x9c UIControl zoomStepHeight
+    int shapeBounds;                          // +0xa0 UIControl shapeBounds
+    int sourceBlit;                           // +0xa4 UIControl sourceBlit
+    unsigned int transitionTime;              // +0xa8 UIControl transitionTime
+    unsigned int transitionDelay;             // +0xac UIControl transitionDelay
+    int transitionFrameCount;                 // +0xb0 UIControl transitionFrameCount
+    int transitionType;                       // +0xb4 UIControl transitionType
     UIDialog* ownerDialog;            // +0xb8
     GUIManager* ownerGui;                     // +0xbc
     char* controlText;                        // +0xc0 UIControl controlText ("Text")
@@ -199,7 +221,38 @@ public:
     int bold;                                 // +0x158: bold
     unsigned char italic[0x160 - 0x15c];     // +0x15c: UIControl::italic (bytes kept)
     int fontHeight;                           // +0x160
-    unsigned char field_0x164[0x210 - 0x164];
+    int transitionFrame;                      // +0x164 UIControl transitionFrame
+    int moveable;                             // +0x168 UIControl moveable
+    void* stateImages[5];                     // +0x16c UIControl stateImages
+    int mouseAnim;                            // +0x180 UIControl mouseAnim
+    void* fxAnimIn;                           // +0x184 UIControl fxAnimIn
+    void* fxAnimOut;                          // +0x188 UIControl fxAnimOut
+    void* anchorControl;                      // +0x18c UIControl anchorControl
+    int relAnchor;                            // +0x190 UIControl relAnchor
+    void* sounds[5];                          // +0x194 UIControl sounds
+    void* slideSound;                         // +0x1a8 UIControl slideSound
+    void* fxSoundIn;                          // +0x1ac UIControl fxSoundIn
+    void* fxSoundOut;                         // +0x1b0 UIControl fxSoundOut
+    int* boundValue;                          // +0x1b4 UIControl boundValue
+    int backgroundRegion;                     // +0x1b8 UIControl backgroundRegion
+    int redrawFrames;                         // +0x1bc UIControl redrawFrames
+    int needsRedraw;                          // +0x1c0 UIControl needsRedraw
+    void* tabStops;                           // +0x1c4 UIControl tabStops
+    unsigned char field_0x1c8[0x1cc - 0x1c8];
+    void* drawnTexture;                       // +0x1cc UIControl drawnTexture
+    unsigned char transitionStep[0x1d4 - 0x1d0];  // +0x1d0 UIControl transitionStep (a member-function pointer; bytes kept)
+    int heldButton;                           // +0x1d4 UIControl heldButton
+    int keyBind;                              // +0x1d8 UIControl keyBind
+    int post3D;                               // +0x1dc UIControl post3D
+    int permanent;                            // +0x1e0 UIControl permanent
+    unsigned char field_0x1e4[0x1e8 - 0x1e4];
+    int wordWrap;                             // +0x1e8 UIControl wordWrap
+    int textLength;                           // +0x1ec UIEditBox textLength
+    int textCapacity;                         // +0x1f0 UIEditBox textCapacity
+    unsigned char field_0x1f4[0x1fc - 0x1f4];
+    int textWidth;                            // +0x1fc UIEditBox textWidth
+    int textScrollX;                          // +0x200 UIEditBox textScrollX
+    unsigned char field_0x204[0x210 - 0x204];  // UIEditBox clickSound/fullSound unions; backgroundBrush (+0x20c), not split: declaration counter
     char* acceptedCharacters;                 // +0x210: accepted characters
     RECT caretRect;                           // +0x214  UIEditBox +0x214 caretRect (GameUi.h); EnableImeInput places the IME composition window at its top left
 };
