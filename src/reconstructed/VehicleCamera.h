@@ -16,7 +16,11 @@ struct VehicleCameraVehicleView {
     unsigned char field_0x000[0x48];
     float savedRoll;                          // +0x48 VehicleCamera slot 51; krusty2 SoultreePhysicsBaseObject
     float savedPitch;                         // +0x4c VehicleCamera slot 35 pitch angle
-    unsigned char field_0x050[0x64 - 0x50];
+    float savedYaw;                           // +0x050 Vehicle savedYaw (SoultreePhysicsBaseObject)
+    float savedSinRoll;                       // +0x054 Vehicle savedSinRoll (SoultreePhysicsBaseObject)
+    float savedCosRoll;                       // +0x058 Vehicle savedCosRoll (SoultreePhysicsBaseObject)
+    float savedSinPitch;                      // +0x05c Vehicle savedSinPitch (SoultreePhysicsBaseObject)
+    float savedCosPitch;                      // +0x060 Vehicle savedCosPitch (SoultreePhysicsBaseObject)
     Vector3 velocity;                         // +0x64 VehicleCamera slot 33
     Vector3 acceleration;                     // +0x070 Vehicle acceleration (SoultreePhysicsBaseObject)
     Vector3 prevVelocity;                     // +0x07c Vehicle prevVelocity (SoultreePhysicsBaseObject)
@@ -26,7 +30,16 @@ struct VehicleCameraVehicleView {
     Vector3 savedUp;                          // +0x0ac Vehicle savedUp (SoultreePhysicsBaseObject)
     float prevSpeed;                          // +0x0b8 Vehicle prevSpeed (SoultreePhysicsBaseObject)
     float linearSpeed;                        // +0xbc |velocity|; VehicleCamera slot 41 (at least 0.01)
-    unsigned char field_0x0c0[0x3bc - 0xc0];
+    Vector3 angularAcceleration;              // +0x0c0 Vehicle angularAcceleration (SoultreePhysicsBaseObject)
+    Vector3 worldAngularVelocity;             // +0x0cc Vehicle worldAngularVelocity (SoultreePhysicsBaseObject)
+    Vector3 angularVelocity;                  // +0x0d8 Vehicle angularVelocity (SoultreePhysicsBaseObject)
+    Vector3 invInertia;                       // +0x0e4 Vehicle invInertia (SoultreePhysicsBaseObject)
+    Vector3 shapeInvInertia;                  // +0x0f0 Vehicle shapeInvInertia (SoultreePhysicsBaseObject)
+    unsigned char field_0x0fc[0x108 - 0xfc];
+    char airborne;                            // +0x108 Vehicle airborne (SoultreePhysicsBaseObject)
+    char respawnPending;                      // +0x109 Vehicle respawnPending (SoultreePhysicsBaseObject)
+    char asleep;                              // +0x10a Vehicle asleep (SoultreePhysicsBaseObject)
+    unsigned char field_0x10b[0x3bc - 0x10b];
     SoultreeObject* modelNode;            // +0x3bc VehicleCamera slot 50
     unsigned char field_0x3c0[0x434 - 0x3c0];
     float forwardSpeed;  // +0x434  Vehicle +0x434 = dot(velocity, bodyForward) (BikeAI); KrustyBike compares it with 60 mph in ft/s

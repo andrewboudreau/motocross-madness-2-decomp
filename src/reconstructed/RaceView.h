@@ -114,7 +114,10 @@ struct EventKrustyBikeView : virtual public GameObject {
     float savedRoll;                          // +0x048 KrustyBike savedRoll (SoultreePhysicsBaseObject)
     float savedPitch;                         // +0x04c KrustyBike savedPitch (SoultreePhysicsBaseObject)
     float heading;                            // +0x050 heading; RadarOverlay 0x0051bed0 negates it for the map
-    unsigned char field_0x054[0x64 - 0x54];
+    float savedSinRoll;                       // +0x054 KrustyBike savedSinRoll (SoultreePhysicsBaseObject)
+    float savedCosRoll;                       // +0x058 KrustyBike savedCosRoll (SoultreePhysicsBaseObject)
+    float savedSinPitch;                      // +0x05c KrustyBike savedSinPitch (SoultreePhysicsBaseObject)
+    float savedCosPitch;                      // +0x060 KrustyBike savedCosPitch (SoultreePhysicsBaseObject)
     Vector3 velocity;                         // +0x064 velocity (racesnd.cpp 0x004e3730)
     Vector3 acceleration;                     // +0x070 KrustyBike acceleration (SoultreePhysicsBaseObject)
     Vector3 prevVelocity;                     // +0x07c KrustyBike prevVelocity (SoultreePhysicsBaseObject)

@@ -405,7 +405,16 @@ public:
     unsigned char sceneNode[0x0c - 0x08];     // +0x008 KrustyBike sceneNode (SoultreePhysicsBaseObject) (bytes kept)
     Vector3 position;                         // +0x00c KrustyBike position (SoultreePhysicsBaseObject)
     Vector3 centerOfMass;                     // +0x018 KrustyBike centerOfMass (SoultreePhysicsBaseObject); the "you" indicator sits 4.25 above it
-    unsigned char field_0x024[0x64 - 0x24];
+    float invMass;                            // +0x024 KrustyBike invMass (SoultreePhysicsBaseObject)
+    float inverseLoadMass;                    // +0x028 KrustyBike inverseLoadMass (SoultreePhysicsBaseObject)
+    float bodyRoll;                           // +0x02c KrustyBike bodyRoll (SoultreePhysicsBaseObject)
+    float bodyPitch;                          // +0x030 KrustyBike bodyPitch (SoultreePhysicsBaseObject)
+    float bodyYaw;                            // +0x034 KrustyBike bodyYaw (SoultreePhysicsBaseObject)
+    float bodySinRoll;                        // +0x038 KrustyBike bodySinRoll (SoultreePhysicsBaseObject)
+    float bodyCosRoll;                        // +0x03c KrustyBike bodyCosRoll (SoultreePhysicsBaseObject)
+    float bodySinPitch;                       // +0x040 KrustyBike bodySinPitch (SoultreePhysicsBaseObject)
+    float bodyCosPitch;                       // +0x044 KrustyBike bodyCosPitch (SoultreePhysicsBaseObject)
+    unsigned char field_0x048[0x64 - 0x48];   // +0x048 savedRoll..savedCosPitch (SoultreePhysicsBaseObject), not split: declaration counter
     Vector3 velocity;                         // +0x064 velocity (cleared for a remote player's racer)
     Vector3 acceleration;                     // +0x070 KrustyBike acceleration (SoultreePhysicsBaseObject)
     Vector3 prevVelocity;                     // +0x07c KrustyBike prevVelocity (SoultreePhysicsBaseObject)
@@ -440,7 +449,9 @@ public:
     char riderName[0x10];                     // +0x5e0 KrustyBike riderName (Bike); EventKrustyBikeView racerName
     CollisionObject* frontWheel;       // +0x5f0 paired with the other racers' (the loader)
     CollisionObject* rearWheel;        // +0x5f4
-    unsigned char field_0x5f8[0x604 - 0x5f8];
+    void* leftBarContact;                     // +0x5f8 KrustyBike leftBarContact (Bike)
+    void* rightBarContact;                    // +0x5fc KrustyBike rightBarContact (Bike)
+    int tailContact;                          // +0x600 KrustyBike tailContact (Bike)
     BikeRaceWreckerView* wrecker;  // +0x604  Bike+0x604 object (SetupWrecker with rider.col, StartAnimatedWreck: Wrecker); its collision model is paired
     unsigned char field_0x608[0x734 - 0x608];
     unsigned char netIndex;                   // +0x734 racer index in network messages
@@ -493,13 +504,15 @@ public:
 struct RacerStateMessage {
     char type;                                // +0x00 SendRaw (0x004ad280) writes the type byte here
     char finishPosition;  // +0x1  KbBikeMessage+0x01 finishPosition (the sender's message 1 layout)
-    unsigned char field_0x02[0x04 - 0x02];
-    int field_0x04;
+    short elapsedMs;                          // +0x02 KbBikeMessage+0x02 elapsedMs
+    short lapCount;                           // +0x04 KbBikeMessage+0x04 lapCount
+    short gatesPassed;                        // +0x06 KbBikeMessage+0x06 gatesPassed
     Vector3 position;  // +0x8  KbBikeMessage+0x08 position; copied to racer deltaBasePosition (+0x1364)
     int roll;  // +0x14  KbBikeMessage+0x14 roll; copied raw to racer +0x137c
     int pitch;  // +0x18  KbBikeMessage+0x18 pitch; copied raw to racer +0x1380
     int yaw;  // +0x1C  KbBikeMessage+0x1c yaw; copied raw to racer +0x1384
-    unsigned char field_0x20[0x28 - 0x20];
+    float lastLapTime;                        // +0x20 KbBikeMessage+0x20 lastLapTime
+    unsigned char field_0x24[0x28 - 0x24];
     float fastestLap;  // +0x28  RecordFrame copies it to racer fastestLap (+0x750, as KbBikeMessage+0x28)
     int timeBehindLeader;  // +0x2C  KbBikeMessage+0x2c timeBehindLeader; replayed into racer timeBehindLeader (+0x770)
     Vector3 angularVelocity;  // +0x30  KbBikeMessage+0x30 angularVelocity; copied to racer +0x1370

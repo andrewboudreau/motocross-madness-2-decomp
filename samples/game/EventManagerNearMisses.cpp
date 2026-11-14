@@ -107,7 +107,38 @@ struct PodiumRiderView {                    // racer +0x5c4
 struct PodiumKrustyBikeView {
     unsigned char field_0x000[0x5c4];
     PodiumRiderView* riderCharacter;      // +0x5c4
-    unsigned char field_0x5c8[0x784 - 0x5c8];
+    unsigned char loadInfo[0x5e0 - 0x5c8];    // +0x5c8 Bike loadInfo (a BikeA5C8; bytes kept)
+    char riderName[16];                       // +0x5e0 Bike riderName
+    void* frontWheel;                         // +0x5f0 Bike frontWheel
+    void* rearWheel;                          // +0x5f4 Bike rearWheel
+    void* leftBarContact;                     // +0x5f8 Bike leftBarContact
+    void* rightBarContact;                    // +0x5fc Bike rightBarContact
+    int tailContact;                          // +0x600 Bike tailContact
+    void* wrecker;                            // +0x604 Bike wrecker
+    unsigned char field_0x608[0x734 - 0x608];
+    char aiKind;                              // +0x734 KrustyBike aiKind
+    char isRemote;                            // +0x735 KrustyBike isRemote
+    char isGhost;                             // +0x736 KrustyBike isGhost
+    char fourStroke;                          // +0x737 KrustyBike fourStroke
+    int engineSize;                           // +0x738 KrustyBike engineSize
+    int plateNumber;                          // +0x73c KrustyBike plateNumber
+    void* race;                               // +0x740 KrustyBike race
+    void* statusNode;                         // +0x744 KrustyBike statusNode
+    int finishTimeStamp;                      // +0x748 KrustyBike finishTimeStamp
+    float lastLapTime;                        // +0x74c KrustyBike lastLapTime
+    float fastestLap;                         // +0x750 KrustyBike fastestLap
+    float totalRunningTime;                   // +0x754 KrustyBike totalRunningTime
+    float totalTrickTime;                     // +0x758 KrustyBike totalTrickTime
+    float tagRun;                             // +0x75c KrustyBike tagRun
+    float bestTagRun;                         // +0x760 KrustyBike bestTagRun
+    float totalTagRun;                        // +0x764 KrustyBike totalTagRun
+    float score;                              // +0x768 KrustyBike score
+    float offTrackTime;                       // +0x76c KrustyBike offTrackTime
+    float timeBehindLeader;                   // +0x770 KrustyBike timeBehindLeader
+    float lapStartTime;                       // +0x774 KrustyBike lapStartTime
+    float aiCrashImpactLimit;                 // +0x778 KrustyBike aiCrashImpactLimit
+    void* heapBufferA;                        // +0x77c KrustyBike heapBufferA
+    void* heapBufferB;                        // +0x780 KrustyBike heapBufferB
     int place;                                      // +0x784
 };
 // Game+0x1c's resource context, as the podium characters' slot 11 takes it

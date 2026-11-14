@@ -155,9 +155,99 @@ public:
                                                    int f, int count, int* presets);
     void SetSubject(OverlayTerrainView* terrain);       // 0x00463600
 
-    unsigned char field_0x02c[0x274 - 0x2c];
+    Matrix4 worldMatrix;                      // +0x02c Camera worldMatrix
+    Matrix4 projectionMatrix;                 // +0x06c Camera projectionMatrix
+    Matrix4 viewMatrix;                       // +0x0ac Camera viewMatrix
+    Matrix4 screenMatrix[2];                  // +0x0ec Camera screenMatrix
+    float fieldOfView;                        // +0x16c Camera fieldOfView
+    Vector3 eyePosition;                      // +0x170 Camera eyePosition
+    Vector3 viewDirection;                    // +0x17c Camera viewDirection
+    Vector3 upDirection;                      // +0x188 Camera upDirection
+    float roll;                               // +0x194 Camera roll
+    float focalLength;                        // +0x198 Camera focalLength
+    float displayAspect;                      // +0x19c Camera displayAspect
+    int viewport[6];                          // +0x1a0 Camera viewport
+    float heightWidthRatio;                   // +0x1b8 Camera heightWidthRatio
+    float nearPlane;                          // +0x1bc Camera nearPlane
+    float farPlane;                           // +0x1c0 Camera farPlane
+    int targetWidth;                          // +0x1c4 Camera targetWidth
+    int targetHeight;                         // +0x1c8 Camera targetHeight
+    int viewportClearFrames;                  // +0x1cc Camera viewportClearFrames
+    int projectionChangeFrames;               // +0x1d0 Camera projectionChangeFrames
+    int fovKeysEnabled;                       // +0x1d4 Camera fovKeysEnabled
+    int widthKeysEnabled;                     // +0x1d8 Camera widthKeysEnabled
+    float maxFieldOfView;                     // +0x1dc Camera maxFieldOfView
+    float minFieldOfView;                     // +0x1e0 Camera minFieldOfView
+    void* file;                               // +0x1e4 Camera file
+    unsigned char field_0x1e8[0x200 - 0x1e8];
+    float lastMoveDistance;                   // +0x200 Camera lastMoveDistance
+    float lastTurnAngle;                      // +0x204 Camera lastTurnAngle
+    Vector3 previousEyePosition;              // +0x208 Camera previousEyePosition
+    Vector3 previousViewDirection;            // +0x214 Camera previousViewDirection
+    float followDistance;                     // +0x220 FollowCamera followDistance
+    float initialDistance;                    // +0x224 FollowCamera initialDistance
+    float lookAheadDistance;                  // +0x228 FollowCamera lookAheadDistance
+    float followPitch;                        // +0x22c FollowCamera followPitch
+    float initialPitch;                       // +0x230 FollowCamera initialPitch
+    float followYaw;                          // +0x234 FollowCamera followYaw
+    float initialYaw;                         // +0x238 FollowCamera initialYaw
+    float worldYaw;                           // +0x23c FollowCamera worldYaw
+    void* subject;                            // +0x240 FollowCamera subject
+    int cameraState;                          // +0x244 FollowCamera cameraState
+    int savedCameraState;                     // +0x248 FollowCamera savedCameraState
+    float savedFieldOfView;                   // +0x24c FollowCamera savedFieldOfView
+    int resumeState;                          // +0x250 FollowCamera resumeState
+    float resumeFieldOfView;                  // +0x254 FollowCamera resumeFieldOfView
+    float targetFieldOfView;                  // +0x258 FollowCamera targetFieldOfView
+    Vector3 resumeEyePosition;                // +0x25c FollowCamera resumeEyePosition
+    int overrideActive;                       // +0x268 FollowCamera overrideActive
+    int isMovingTarget;                       // +0x26c FollowCamera isMovingTarget
+    float recordsPerSecond;                   // +0x270 FollowCamera recordsPerSecond
     unsigned char isSettled;  // +0x274 FollowCamera isSettled
-    unsigned char field_0x275[0x384 - 0x275];
+    unsigned char isPlaced;                   // +0x275 FollowCamera isPlaced
+    unsigned char isCrashView;                // +0x276 FollowCamera isCrashView
+    bool settleChecked;                       // +0x277 FollowCamera settleChecked
+    unsigned char wasWide;                    // +0x278 FollowCamera wasWide
+    unsigned char isBlending;                 // +0x279 FollowCamera isBlending
+    unsigned char field_0x27a[0x27c - 0x27a];
+    void* targetEaseX;                        // +0x27c FollowCamera targetEaseX
+    void* targetEaseY;                        // +0x280 FollowCamera targetEaseY
+    void* targetEaseZ;                        // +0x284 FollowCamera targetEaseZ
+    void* positionEaseX;                      // +0x288 FollowCamera positionEaseX
+    void* positionEaseY;                      // +0x28c FollowCamera positionEaseY
+    void* positionEaseZ;                      // +0x290 FollowCamera positionEaseZ
+    void* fieldOfViewEase;                    // +0x294 FollowCamera fieldOfViewEase
+    void* distanceEase;                       // +0x298 FollowCamera distanceEase
+    Vector3 followHeading;                    // +0x29c FollowCamera followHeading
+    Vector3 cachedTarget;                     // +0x2a8 FollowCamera cachedTarget
+    Vector3 targetPoint;                      // +0x2b4 FollowCamera targetPoint
+    float targetDistance;                     // +0x2c0 FollowCamera targetDistance
+    float savedDistance;                      // +0x2c4 FollowCamera savedDistance
+    float savedPitch;                         // +0x2c8 FollowCamera savedPitch
+    float savedYaw;                           // +0x2cc FollowCamera savedYaw
+    float defaultFollowHeight;                // +0x2d0 FollowCamera defaultFollowHeight
+    float followHeight;                       // +0x2d4 FollowCamera followHeight
+    float lift;                               // +0x2d8 FollowCamera lift
+    int pointCapacity;                        // +0x2dc FollowCamera pointCapacity
+    int pointCount;                           // +0x2e0 FollowCamera pointCount
+    void* points;                             // +0x2e4 FollowCamera points
+    float yawOffset;                          // +0x2e8 FollowCamera yawOffset
+    float subjectCellSize;                    // +0x2ec FollowCamera subjectCellSize
+    float state4FieldOfView;                  // +0x2f0 FollowCamera state4FieldOfView
+    float distanceFovMinimum;                 // +0x2f4 FollowCamera distanceFovMinimum
+    float distanceForMinimumFov;              // +0x2f8 FollowCamera distanceForMinimumFov
+    float distanceFovMaximum;                 // +0x2fc FollowCamera distanceFovMaximum
+    float distanceForMaximumFov;              // +0x300 FollowCamera distanceForMaximumFov
+    float blendClock;                         // +0x304 FollowCamera blendClock
+    float turnYaw;                            // +0x308 FollowCamera turnYaw
+    int stateIndex;                           // +0x30c FollowCamera stateIndex
+    int stateCount;                           // +0x310 FollowCamera stateCount
+    int states[8];                            // +0x314 FollowCamera states
+    unsigned int frameCount;                  // +0x334 FollowCamera frameCount
+    void* frames;                             // +0x338 FollowCamera frames
+    unsigned char field_0x33c[0x340 - 0x33c];
+    float frameTime;                          // +0x340 FollowCamera frameTime
+    Matrix4 orientation;                      // +0x344 FollowCamera orientation
     int targetCharacter;  // +0x384 VehicleCamera targetCharacter
     int targetCar;  // +0x388 VehicleCamera targetCar
     int targetCaster;  // +0x38C VehicleCamera targetCaster
