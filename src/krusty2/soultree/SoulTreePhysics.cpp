@@ -502,7 +502,7 @@ void SoultreePhysicsBaseObject::AccumulateContactForces(Vec3* force, Vec3* local
             Vec3 scaled;
             SoultreeCopyBits(contact->normalForce, *Vec3ScaleCall(&scaled, &contact->contactNormal, -normalComponent));
         }
-        contact->UnknownVirtualSlot1();
+        contact->ComputeFrictionForce();
         *force += contact->frictionForce;
         *localTorque += sceneNode->WorldToLocalDirection(
             CrossProduct(contact->leverArm, contact->frictionForce));
@@ -1442,7 +1442,7 @@ void SoultreePhysicsBaseObject::RunSteps(int steps, int respawn, int refreshed)
         AccumulateContactForces(&force, &localTorque, 1.0f);
         UpdateRestState();
         IntegrateMotion(&force, &localTorque, &worldTorque);
-        UnknownVirtualSlot26();
+        OnPhysicsStep();
         position += (velocity * 3.0f - prevVelocity) * 0.5f * stepTime;
         sceneNode->SetPosition(position);
         float mag = VecLengthRsq(angularVelocity) * stepTime;

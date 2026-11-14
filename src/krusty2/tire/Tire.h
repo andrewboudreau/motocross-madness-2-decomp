@@ -112,7 +112,7 @@ public:
     virtual void ShouldEmitMovingEffects();
     virtual void ShouldRestartSteamEffect();
     virtual void ShouldBurstSteamEffect();
-    virtual void UnknownVirtualSlot26();
+    virtual void OnPhysicsStep();
     virtual void StartWreck();
     virtual void ResolveSubstepCollisions();
     virtual void SaveBodyOrientation();
@@ -164,7 +164,7 @@ public:
          float blendWeight_, int track);
     virtual ~Tire();                            // slot 0 @12 (0x005133a0), core 0x005133d0
     virtual GameObject* SetRenderContext(void* context);        // 0x00513490
-    virtual void CollisionPointVirtualSlot1();  // CollisionPoint slot 1 @184, 0x00515b50
+    virtual void ComputeFrictionForce();  // CollisionPoint slot 1 @184, 0x00515b50
 
     // Non-virtual members (this == complete object).
     void HandleContact(int unused, int tag, CollisionObject* other);   // 0x00512e80 (ret 0xc)

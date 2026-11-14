@@ -965,7 +965,7 @@ try on similar code. None is a rule.
   *speed -= amount; push = scaled;` gives retail's order (x and z still copied
   early, y in the freed `edx`).
 - **Store a result through a local, then read the member back.** Tire
-  CollisionPointVirtualSlot1 (`0x00515b50`): with `tangentSin = sqrt(...)`, or with a
+  ComputeFrictionForce (`0x00515b50`): with `tangentSin = sqrt(...)`, or with a
   local `s` used in the later product, VC6 multiplies the memory operands of
   `(-side) * scale * tangentSin * mu` first and the stacked sqrt last. With
   `float s = sqrt(...); tangentSin = s;` and the product still reading `tangentSin`,

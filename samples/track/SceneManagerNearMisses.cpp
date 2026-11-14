@@ -122,7 +122,7 @@ public:
     virtual void ShouldEmitMovingEffects();
     virtual void ShouldRestartSteamEffect();
     virtual void ShouldBurstSteamEffect();
-    virtual void UnknownVirtualSlot26();
+    virtual void OnPhysicsStep();
     virtual void StartWreck();
     virtual void ResolveSubstepCollisions();
     virtual void SaveBodyOrientation();

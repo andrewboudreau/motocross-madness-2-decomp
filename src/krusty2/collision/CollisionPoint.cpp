@@ -428,7 +428,7 @@ CollisionVec3* CollisionRejectFrom(CollisionVec3* out, const CollisionVec3* a, c
 // rotational slip (both <= 0.001) it is zero; otherwise its magnitude is
 // -normalForce * surfaceGrip * frictionCoefficient along frictionDirection, and the
 // stored magnitude is made non-negative.
-void CollisionPoint::CollisionPointVirtualSlot1() {
+void CollisionPoint::ComputeFrictionForce() {
     if (!(tangentSpeed > 0.001f) && !(spinSpeed > 0.001f)) {
         frictionMagnitude = 0.0f;
         frictionForce = (*reinterpret_cast<const CollisionVec3*>(&kCollisionPointZero));

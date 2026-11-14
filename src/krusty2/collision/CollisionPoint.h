@@ -22,7 +22,7 @@ public:
     virtual ~CollisionPoint() {}               // slot 0 (deleting destructor 0x0043b300; core inlined)
     // slot 1 (0x0043b240).  Named apart from QuadTreeObject::ComputeQuadTreeCode so that
     // Tire, which derives from both, can override this one alone.
-    virtual void CollisionPointVirtualSlot1();
+    virtual void ComputeFrictionForce();
 
     // Not vtable slots: table-management helpers in CollisionPoint.cpp.
     // 0x0043a640 (thiscall, ret 0x14).  Recomputes the relative position (relativePosition) and the

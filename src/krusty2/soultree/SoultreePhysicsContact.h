@@ -14,7 +14,7 @@
 class SoultreeContact {
 public:
     virtual ~SoultreeContact();
-    virtual void UnknownVirtualSlot1();
+    virtual void ComputeFrictionForce();
     void* ownerNode;  // +0x04 slot 31 skips points whose ownerNode is null (contactState = 0); the destructor 0x00501260 deletes only points with a non-null ownerNode
     char field_0x08[0x0c];
     Vec3 worldPosition;  // +0x14 slot 7 weights each touching point by |centerOfMass - worldPosition|; 0x0043a640 recomputes the lever arm from it

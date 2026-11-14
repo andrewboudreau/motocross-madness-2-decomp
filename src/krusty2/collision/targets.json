@@ -932,7 +932,7 @@
   {
     "class": "CollisionPoint",
     "source": "CollisionPoint.cpp",
-    "candidate_symbol_contains": "CollisionPointVirtualSlot1@CollisionPoint",
+    "candidate_symbol_contains": "ComputeFrictionForce@CollisionPoint",
     "target_va": "0x0043b240",
     "target_size": 186,
     "expect": "exact",

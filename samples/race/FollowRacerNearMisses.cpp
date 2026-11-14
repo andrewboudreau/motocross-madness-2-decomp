@@ -47,7 +47,7 @@ struct UnknownFollowedRacerSlots {
     virtual void LocalTorqueToAngularAcceleration(); virtual void AverageAttachmentPosition(); virtual void UpdateContactEffect();
     virtual void UpdateSlideEffect(); virtual void UpdateScrapeEffect(); virtual void UpdateAttachmentEffects();
     virtual void ShouldUpdateShadowLight(); virtual void ShouldEmitMovingEffects(); virtual void ShouldRestartSteamEffect();
-    virtual void ShouldBurstSteamEffect(); virtual void UnknownVirtualSlot26(); virtual void StartWreck();
+    virtual void ShouldBurstSteamEffect(); virtual void OnPhysicsStep(); virtual void StartWreck();
     virtual void ResolveSubstepCollisions(); virtual void SaveBodyOrientation(); virtual void ClearContactEffectFlags();
     virtual void UpdateContactStates(); virtual void EffectiveLoadWeight(); virtual void ResetToPlacement();
     virtual void LoadBodyAxes(); virtual void StoreBodyAxes(); virtual void ResetBodyOrientation();

@@ -42,7 +42,7 @@
   {
     "class": "Tire",
     "source": "Tire.cpp",
-    "candidate_symbol_contains": "CollisionPointVirtualSlot1@Tire",
+    "candidate_symbol_contains": "ComputeFrictionForce@Tire",
     "target_va": "0x00515b50",
     "target_size": 316,
     "expect": "exact",

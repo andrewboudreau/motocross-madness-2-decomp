@@ -221,8 +221,8 @@ struct VehicleTrackView {
     char pad_0x00[0x88];
     unsigned char field_0x88;
 };
-struct VehicleTicker {               // elements of Vehicle+0x554/+0x560 (provisional): only virtual slot 0 is called
-    virtual void UnknownVirtualSlot0();
+struct VehicleTicker {               // elements of Vehicle+0x554/+0x560: the bike adds its two Shock objects
+    virtual void Reset();            // Shock slot 0 (0x004f9ba0); only this slot is called
 };
 class SoultreeContact;
 // 0x0043a570: appends a contact to the owner's contact array.  The same function as
@@ -287,7 +287,7 @@ struct VehicleWheelAux {             // object at VehicleWheel+0x2a8 (provisiona
 // virtual slot 1 (friction update) is called here, by ApplyWheelDriveAndFriction.  Provisional view.
 struct VehicleContactPoint {
     virtual void UnknownVirtualSlot0();
-    virtual void UnknownVirtualSlot1();
+    virtual void ComputeFrictionForce();
 };
 // Elements of Vehicle+0x53c (provisional: only touched offsets are named).
 struct VehicleWheel {

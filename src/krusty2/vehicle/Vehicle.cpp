@@ -1126,7 +1126,7 @@ void Vehicle::SimulateFrame(float frame)
         Vec3 aimOut;
         Vec3 aim = *ComputeRotationPivot(&aimOut, slideAngle);
         int mode = ClassifyGroundContact(slideAngle);
-        UnknownVirtualSlot26();
+        OnPhysicsStep();
         AdvancePosition();
         UpdateWheelRolls();
         modelNode->SetPosition(position);
@@ -1724,13 +1724,13 @@ int Vehicle::CheckCrash()
     return crashed;
 }
 
-// 0x00525c60: runs virtual slot 0 of every object in the two owned arrays.
+// 0x00525c60: runs virtual slot 0 (Shock::Reset) of every object in the two owned arrays.
 void Vehicle::RunTickers()
 {
     for (int i = 0; i < earlyTickerCount; i++)
-        earlyTickers[i]->UnknownVirtualSlot0();
+        earlyTickers[i]->Reset();
     for (int j = 0; j < lateTickerCount; j++)
-        lateTickers[j]->UnknownVirtualSlot0();
+        lateTickers[j]->Reset();
 }
 
 int Vehicle::AddEarlyTicker(VehicleTicker* t)
@@ -2371,7 +2371,7 @@ void Vehicle::ApplyWheelDriveAndFriction(float* speed, Vec3* worldTorque, Vec3* 
             wheel->normalLoad = load;
             VehSetV(wheel->normalLoadVector, *Vec3ScaleCall(&scaled, &wheel->groundNormal, load));
         }
-        wheel->contactPoint.UnknownVirtualSlot1();
+        wheel->contactPoint.ComputeFrictionForce();
         float budget = wheel->spinSpeed + wheel->tangentSpeed;
         float timeScale = wheel->frictionMagnitude;
         if (timeScale > 0.0f && budget != 0.0f) {

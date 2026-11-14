@@ -241,7 +241,7 @@ static inline CollisionVec3 TireScaled(const CollisionVec3& v, float s)
 //                                                               mu_b = field_0x1cc*field_0x1d4
 // The force vector field_0x78 = field_0x50 * force and field_0x84 is stored as |force|.
 // The cos/sin pair is kept in field_0x28c / field_0x288.
-void Tire::CollisionPointVirtualSlot1()
+void Tire::ComputeFrictionForce()
 {
     if (!(CollisionPoint::tangentSpeed > 0.001f) && !(CollisionPoint::spinSpeed > 0.001f)) {
         CollisionPoint::frictionMagnitude = 0.0f;

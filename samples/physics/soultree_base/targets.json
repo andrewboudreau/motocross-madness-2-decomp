@@ -82,7 +82,7 @@
  {
   "class": "SoultreePhysicsBaseObject",
   "source": "../../../src/reconstructed/SoultreePhysicsMethods.cpp",
-  "candidate_symbol_contains": "UnknownVirtualSlot26@SoultreePhysicsBaseObject",
+  "candidate_symbol_contains": "OnPhysicsStep@SoultreePhysicsBaseObject",
   "target_va": "0x00464e90",
   "target_size": 1,
   "expect": "exact",

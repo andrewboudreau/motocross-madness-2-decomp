@@ -136,7 +136,7 @@ public:
     virtual int ShouldEmitMovingEffects();
     virtual int ShouldRestartSteamEffect();
     virtual int ShouldBurstSteamEffect();
-    virtual void UnknownVirtualSlot26();
+    virtual void OnPhysicsStep();
     virtual void StartWreck();
     virtual int ResolveSubstepCollisions(int steps);
     virtual void SaveBodyOrientation(int lastStep);

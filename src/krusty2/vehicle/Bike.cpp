@@ -1899,7 +1899,7 @@ struct BikeBodyObj {
     virtual void S32(); virtual void S33(); virtual void S34(); virtual void S35();
     virtual void S36(); virtual void S37(); virtual void S38(); virtual void S39();
     virtual void S40(); virtual void S41(); virtual void S42();
-    virtual Vec3* UnknownVirtualSlot43(Vec3* out);
+    virtual Vec3* GetWorldAngularVelocity(Vec3* out);
     char pad_0x004[0x150];
     Vec3 currentPoint;          // +0x154
     char pad_0x160[0x0c];
@@ -2039,7 +2039,7 @@ void Bike::ApplyCollisionEvent(int notify, int eventKind, void* event)
     case 0x3ea: {
         BikeKindParty* other = (BikeKindParty*)((BikeCollisionEvent*)event)->otherBody;
         BikeKindInfo* kind = other->kind;
-        otherWorldAngVel = *other->body->UnknownVirtualSlot43(&tmp);
+        otherWorldAngVel = *other->body->GetWorldAngularVelocity(&tmp);
         otherVel = &blend;
         otherAngVel = &other->body->angularVelocity;
         // other point: interpolate body->previousPoint toward body->currentPoint by kind->field_0x24; retail

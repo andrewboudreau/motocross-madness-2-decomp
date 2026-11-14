@@ -1450,7 +1450,7 @@ int KrustyBike::SimulateAIFrame(float dt)
                 SetSpawnProtection(0, 0, 0);
         }
     }
-    UnknownVirtualSlot26();
+    OnPhysicsStep();
 
     Vec3 steer;
     float lean;

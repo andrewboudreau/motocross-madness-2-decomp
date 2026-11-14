@@ -726,8 +726,8 @@ void KrustyBike::InterpolateNetworkState(float dt, int copyRaceProgress)
         ((SoultreeObject*)riderCharacter->c_0x1a0)->SetAxesPtr(&bodyForward, &bodyUp, 1, 1);
         centerNode->GetPositionIn(0, &centerOfMass);
         worldAngularVelocity = modelNode->LocalToWorldDirection(angularVelocity);
-        ((KbSink*)frontWheel->primaryAux)->UnknownVirtualSlot0();
-        ((KbSink*)rearWheel->secondaryAux)->UnknownVirtualSlot0();
+        ((KbSink*)frontWheel->primaryAux)->Reset();
+        ((KbSink*)rearWheel->secondaryAux)->Reset();
         PlaceWheels();
         allWheelsInContact = wheelsInContact == wheelCount;
         anyWheelInContact = wheelsInContact != 0;

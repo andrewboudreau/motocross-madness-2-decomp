@@ -425,9 +425,9 @@ struct KbGhost {
     KbRaw3 progressPos;      // +0x44 seeded from the start probe by the loader reset
 };
 
-struct KbSink {
-    virtual void UnknownVirtualSlot0();
-    virtual void UnknownVirtualSlot1();
+struct KbSink {                    // view of the wheel Shock (vtable: 0 Reset, 1 ClearForces)
+    virtual void Reset();          // 0x004f9ba0
+    virtual void ClearForces();    // 0x004f9c70; slots 2-5 lie past the retail vtable
     virtual int UnknownVirtualSlot2(int a, int b);
     virtual void UnknownVirtualSlot3();
     virtual void UnknownVirtualSlot4();
