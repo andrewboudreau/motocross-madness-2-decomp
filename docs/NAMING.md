@@ -1910,3 +1910,157 @@ Left as placeholders:
     argument is not decoded.
   - `UIDialog::field_0x180`.
   - The union arms.
+
+## Wave 21: score interface slots, the race view hook and generic parameters
+
+Wave 21 names the placeholder methods that the retail call sites can name.
+It also renames generic parameter and local names (`aN`, `valueN`) whose
+role is clear from the body or from the decoded callers. Names only: no
+declaration, typedef, forward declaration or member was added or removed,
+and no static or type of a static was renamed. No line count changed, so the
+`__LINE__` values that DebugAlloc.h's macros take did not move.
+`git grep -ohE 'UnknownVirtualSlot[0-9]+|UnknownMethod[0-9]+|Method_[0-9A-Fa-f]+|\bFn_[0-9A-Fa-f]+' -- src samples`
+fell from 283 uses to 270. Of those, `UnknownMethodN` fell from 17 to 9.
+work/naming/w21/generic.py strips comments and strings, then counts the
+generic names in tracked src, samples and fixture sources:
+
+- `aN` fell from 110 to 18 (from 104 to 12 outside the files this wave
+  could not touch);
+- `valueN` fell from 22 to 0;
+- `argN` stayed at 6;
+- `temp` stayed at 0.
+
+Method:
+
+- work/naming/w16_overrides.py and w16_callers.py resolve each slot's
+  overrides and retail call sites.
+- The method renames are work/naming/w21/editA.py, applied with
+  work/naming/sub.py.
+- The parameter and local renames are work/naming/w21/specB.py, applied with
+  work/naming/w21/pren.py. pren.py renames whole words within a line range
+  and skips member accesses. It stops if an old name is missing from the
+  range or if the new name is already used there, so a parameter cannot
+  capture a member or global that the body reads. The one allowed existing
+  use is `g_TrackGame->textureManager` in Scene::Load, which is a member
+  access.
+
+Result: two proofs, each run over every unit whose closure reaches a changed
+file.
+
+- Batch A runs from d39d250a to 70698a05 with map-A (1 entry,
+  `?UnknownVirtualSlot32@BaseQuarryEvent@@` to
+  `?OnRaceViewAttached@BaseQuarryEvent@@`). It has 21 units: 19 IDENTICAL
+  and 2 NAME-ONLY.
+  - The NAME-ONLY units are QuarryStuntEvent.cpp and NationalRace.cpp. These
+    are the units that emit BaseQuarryEvent's vtable or NationalRace's
+    vtable, which holds the slot.
+  - MSZoneInterface.cpp is IDENTICAL: the score interface is never defined,
+    and its calls go through the vtable.
+- Batch B runs from 70698a05 to 3c92fa73 with an empty map. It has 86 units:
+  85 IDENTICAL and 1 IDENTICAL-COMDAT-ORDER (Group6_BikeRaceCreate.cpp, as in
+  Wave 20; a rerun gives the same verdict). No mangled name changed.
+
+There was no DIFF and no compile failure, and no .bss or .data offset moved.
+
+Negative controls:
+
+- Without the map, QuarryStuntEvent.obj and NationalRace.obj give DIFF. Their
+  vtable `.rdata` (`??_7BaseQuarryEvent@@6B@`, `??_7NationalRace@@6B@`)
+  differs in its relocations.
+- Live changes give DIFF in the changed function's `.text` bytes. After each
+  change is reverted, the new tree matches the work tree again.
+  - In the new tree's SubmitScores, `? 4 : 16` became `? 4 : 17`
+    (work/naming/w21/live.py). This gives DIFF in
+    `?SubmitScores@MSZoneInterface@@QAEHIPAX0@Z`.
+  - In DistanceToStripEdge, `mode == 17` became `mode == 18` before the
+    second edge (work/naming/w21/liveB.py). This gives DIFF in
+    `?DistanceToStripEdge@Track@@QAEHUTrackVec3@@PAUTrackSegment@@PAMH@Z`.
+
+Fixture pins:
+
+- QuarryStuntEvent.cpp's whole-object digest is pinned in two fixtures,
+  eco_light_objects.json and race_detail_objects.json. Because it occurs
+  twice, repin.py's one-occurrence check does not apply, so the digest was
+  replaced by hand in both. The pinned section and relocation counts
+  (86, 393) still held.
+- NationalRace.cpp has no whole-object pin. Batch B needed no repin.
+- The renamed mangled name was also updated in
+  QuarryStuntEvent.bindings.json and race_event_partials.json.
+- tools/run_calibration.py does not spell any renamed name.
+
+### Methods
+
+| Old name | New name | Tier | Evidence |
+| --- | --- | --- | --- |
+| `UnknownZoneScore::UnknownMethod3` | `Initialize` | 3 | SubmitScores (`0x004aa670`) calls it first, with the application GUID, the player count, 0, 0 and 0x1000. The interface's IID (3FAF0AFD-B48B-11D2-8A51-00C04F8EF4E9) is not public, so the name comes from the arguments. |
+| `UnknownZoneScore::UnknownMethod4` | `SetPlayerResult` | 3 | It is called once per player with the index, name and score, 0, and the place flags (2 first, 4 placed, 16 no position). |
+| `UnknownZoneScore::UnknownMethod6` | `SetResultData` | 3 | Its arguments are a block and its size: ZoneReport passes `&raceStatus, sizeof(raceStatus)`. |
+| `UnknownZoneScore::UnknownMethod15` | `SendThroughLobby` | 3 | It is called last, with the DirectPlayLobby3A. |
+| `BaseQuarryEvent::UnknownVirtualSlot32` | `OnRaceViewAttached` | 3 | The quarry loader calls slot 32 (`call [edx+0x80]`, `0x004dff03`) with the race view right after AppendChild of the view at +0x34. The base body is the shared empty stub (`0x00464e80`), and no class overrides it. |
+
+### Parameters and locals
+
+| Function | Old | New | Tier | Evidence |
+| --- | --- | --- | --- | --- |
+| `Scene::Load` (and the ReadStaticModels/ReadAnimations declarations and the sample bodies) | `a3`, `a4`, `a5` (`a2`-`a4`, `a3`-`a4`) | `particleManager`, `textureManager`, `modelTextures` | 2 | Group3_QuarryLoad passes `(int)particleManager`, the TrackGame texture manager and `&modelTextures`. ReadStaticModels hands the first to the particle emitters and the last to the model loads. |
+| `Scene::Load` | local `camera` | `flareTextureManager` | 2 | It is the texture manager when the light has a lens flare, and 0 otherwise. It is LightEmitter::Create's ninth argument. |
+| SceneManagerNearMisses.cpp's LoadPhysicsModel view | `a4`, `a8`, `a10`, `a14`-`a17`, `a21`, `a22` | `options`, `terrainProbe`, `weight`, `fixedStep`, `maxSteps`, `drag`, `elasticity`, `probeMask`, `createCollision` | 3 | The names SoultreePhysicsObject.h gives the same parameters. `a9` stays: the scene passes the particle manager there, which does not fit the canonical `linkedObject`. |
+| SceneManagerNearMisses.cpp's AddCollisionPoint view | `a4`, `a7` | `threshold`, `surfaceOwner` | 3 | CollisionPoint.h's names. |
+| SceneManager.h's character Load and CarProcedural Create views | `a4`, `a6` / `a4`, `a5` | `loadInfo`, `unused` / `options`, `ground` | 3 | CollisionCharacter.h's and CarProcedural.h's names. |
+| `FollowCamera::SetupFollowCamera` and the Vehicle, Bike and KrustyBike camera setups | `value`, `rate294`, `rate298`, `value228`, `value2d0`, `value2e8` | `context`, `fieldOfViewEaseRate`, `distanceEaseRate`, `initialLookAhead`, `initialFollowHeight`, `initialYawOffset` | 2 | `0x00463140` passes the context to SetRenderContext. It builds the field-of-view and distance eases from the two rates, then stores the look-ahead distance, the default and current follow height, and the yaw offset. The wrappers forward the arguments unchanged. |
+| `BikeCamera::SteerToKeepTargetOnScreen` | locals `value10`, `value14` | `raiseRate`, `lowerRate` | 2 | SetTableEntry's raise-rate and lower-rate arguments. |
+| `DrawableGridNode` constructor, `ReadNode`, `CreateChildNode`, `DrawableGridNodeSharedTextures` | `a1` | `loadChildren` | 2 | ReadNode creates the children only when it is set, and passes it down. |
+| `TestVisibility`, `WalkVisibilityQuadrants` (also its sample), `UpdateLevelOfDetail` | `a1` | `screenMatrix` | 2 | It is TestBox's matrix. Terrain passes `visibilityCamera->screenMatrix`. |
+| `GridVisibilityClipper::TestBox` | `a6` | `unused` | 2 | The body ignores it. This is VisibilityClipper.h's name. |
+| `RadarOverlay::LoadMap` | `a3` | `camera` | 2 | It is stored as `radarCamera`. QuarryStuntEvent passes `raceCamera`. |
+| `RadarOverlay::TakeRacers` | `a2` | `chat` | 3 | It is unused, and the callers pass the chat overlay. |
+| QuarryEvent.h's `VisualCue::LoadVisualCue` view | `value`, `a9`, `a10`, `a11` | `options`, `size`, `screenXFraction`, `screenYFraction` | 3 | Krusty3DObjects.h's names. |
+| `FontTexture::Load` | `a5` | `textureContext` | 2 | It is cast to TextureContext* for TerrainLoadTexture. |
+| `Track::DistanceToStripEdge` | locals `a`, `d`, `a2`, `d2` | `startA`, `directionA`, `startB`, `directionB` | 2 | The chosen edge's start and direction, and the second edge's start and direction (mode 17). |
+
+Left as placeholders:
+
+- Not touched because another agent owns the file:
+  - Out of bounds for this wave: src/krusty2/ and samples/physics/.
+  - GameObject slot 19: the only override is Terrain (src/krusty2), and the
+    only caller is Game slot 12, which nothing calls. Game slot 12 itself
+    stays a placeholder too.
+  - PhysicsBody slots 31 and 32, Vehicle slots 78 and 79,
+    SoultreePhysicsBaseObject slot 26 and its views, KrustyBikeTypes slots
+    1-5 and 12, Bike slot 43, ConstraintMethodCollisionModel slot 2,
+    CollisionPoint/SoultreeContact slot 1 and VehicleContactPoint slot 1.
+  - `Method_00478FE0` (declared in VehicleCore.h) and `Method_00528EB0`.
+  - The `Fn_*` names, which appear only in krusty2 targets.json notes and
+    samples/physics.
+  - `Method_00527A20`, `Method_00529450` and `Method_005293E0`, which another
+    agent is matching.
+  - The generic names left in src/krusty2 (CollisionCharacter,
+    D3DIMSoultreeMotnctrl, Vehicle, VehicleCore).
+  - `D3DIMSoultreeObject::GetPart`'s `a6`, which sits next to the SoulTree
+    work (D3DIMSoulTreeNearMisses.cpp).
+- Not enough evidence for a name:
+  - GameObject slot 9: nothing overrides it, and its only caller is its own
+    child walk.
+  - BaseQuarryEvent slots 28 and 34: shared stubs, and no caller passes
+    three arguments to 34.
+  - UIDialog slot 30.
+  - BackgroundImage slot 27: a shared `return 1` stub with no override.
+  - DrawableGridNode slot 5: empty in the base and the override. ReadNode
+    calls it with the stream.
+  - ConnectionInfoType slot 1: a `ret` stub.
+  - UnknownGameObjectOwnerPart slots 1-4: the object is not identified.
+  - The score interface's `UnknownMethod5` and `UnknownMethod7` to
+    `UnknownMethod14`: nothing calls them.
+- Destructor slots keep their placeholders:
+  - slot 0 in the views;
+  - slot 1 in the keyboard and joystick InputDevice views (InputDevice slot 1
+    is `~InputDevice`);
+  - UnknownEcoTrackGame slot 12, which is Game's placeholder.
+- Generic parameters with no use that decides a role:
+  - LightEmitter::Create's `a8` to `a10`: the body ignores them. The scene
+    passes 0, the flare texture manager and the flare texture name.
+  - TrackOverlay CastSegment's `a4` to `a6`: the canonical names are tier 3.
+  - The `a5` of SceneManager.h's character Load view.
+  - The `a9` of the LoadPhysicsModel view (see above).
+  - GearRatios' `arg6`, which is stored at +0x1d8 and never read.
+  - The D3DIMSoulTreeNearMisses.cpp `a7`.
