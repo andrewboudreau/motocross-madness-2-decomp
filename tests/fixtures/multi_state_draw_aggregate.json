@@ -3,6 +3,6 @@
   "baseline": "52cb3235bf1da9693869baa528340ac6a1743558",
   "sections": 734,
   "relocations": 3914,
-  "sha256": "5494d26aa58d63fa4e668e7a32275197e72c14bf769dfcfa3a966d4277c0890b",
+  "sha256": "21b8e62c0b3936d9462efa7d20c0453e190be6f184503ef8f06045494417a2ec",
   "scope": "Full nondebug contents; portable pin normalizes only enumerated source filenames as test_edit_box_draw.complete_object. Same-path before/after proof has no exclusions."
 }

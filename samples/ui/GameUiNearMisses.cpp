@@ -128,18 +128,23 @@
 // 0x00478570 UIMultiState slot 40: complete retail 672 / candidate 682, 139
 //   resolved matching positions; included from MultiStateDraw.cpp. See
 //   docs/MULTI_STATE_DRAW.md for the finite actual-helper validation.
-// 0x0047a400 drop-down layout (702/962): the open area's bottom written from
-//   the list (`top + (list.bottom - 2)`) gives retail's left, top, right
-//   store order and the late scroll-bottom stores; with `top +
-//   scroll.bottom` (any spelling, store order or read-back of area->top)
-//   VC6 stores area->top last and adds into the scroll register (320).
-//   Left: VC6 forms the bottom as `lea edx, [list.bottom + top - 2]` where
-//   retail adds the scroll bottom's `sub eax, 2` value into top, and swaps
-//   ebx/edi (zero and list top), which shifts the scratch registers of the
-//   later sprintf/SetName blocks. The scroll.bottom adjustment's position,
-//   the list rect's spellings, scroll declaration forms and a 0..47
-//   typedef prefix leave 702; `+=` on the area members and the scroll
-//   rect's sides set before its top/bottom were worse.
+// 0x0047a400 drop-down layout (887/962): the open area is written before
+//   the scroll rect's bottom, both from `list.bottom - 2`. That gives
+//   retail's left, top, right store order, the late scroll-bottom stores and
+//   the scratch registers of every later sprintf/SetName block (28
+//   differing instructions, all before the first GetName). Left: retail
+//   forms the value once (`mov eax, ebx ; sub eax, 2`) and adds it into
+//   top; VC6 here forms it twice with lea, and swaps ebx/edi (zero and the
+//   list top). With `scroll.bottom -= 2` ahead of the area and `top +
+//   scroll.bottom` (any spelling, operand order, `top +=`, an inline setter,
+//   `top + (scroll.bottom -= 2)`, 400 random statement orders) ebx/edi and
+//   the `sub eax, 2` match but VC6 stores scroll.bottom before the add,
+//   sums into eax and rotates every later scratch register (329, 43
+//   instructions). `top + (scroll.bottom - 2)` then `scroll.bottom -= 2`
+//   folds the sum into one lea (725); a `bottom` local read from
+//   scroll.bottom grows the frame to 0x78 (9 instructions); the area bottom
+//   from the list with `scroll.bottom -= 2` kept first gives 702. 0..8 dead
+//   initialised locals and a 0..47 typedef prefix change neither family.
 // 0x0046a920 UIDialog's resource parser (16 KB; 92% of instructions equal
 //   with stack offsets and relocations ignored, 74% raw): the control flow,
 //   calls and constants follow retail. Retail keeps the current control in
@@ -229,7 +234,6 @@ void UIDropDownList::LayoutParts() {
     list.bottom = rowHeight + list.top;
     CameraRect scroll = list;
     scroll.top += 2;
-    scroll.bottom -= 2;
     scroll.left = button.left;
     scroll.right = button.right;
     CameraRect* area = (CameraRect*)openArea;
@@ -238,6 +242,7 @@ void UIDropDownList::LayoutParts() {
     area->top = top;
     area->right = left + scroll.right;
     area->bottom = top + (list.bottom - 2);
+    scroll.bottom = list.bottom - 2;
     sprintf(name, "%s_BUT", GetName());
     buttonPart->SetName(name);
     *(CameraRect*)buttonPart->screenArea = button;
