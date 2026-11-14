@@ -30,10 +30,10 @@ BikeCamera::BikeCamera(int flags) : VehicleCamera(flags) {
 BikeCamera::~BikeCamera() {}
 
 // 0x00416e80
-BikeCamera* BikeCamera::SetupBikeCamera(void* value, float rate294, float rate298, float value228,
-                                              float value2d0, float value2e8, int capacity, int count,
+BikeCamera* BikeCamera::SetupBikeCamera(void* context, float fieldOfViewEaseRate, float distanceEaseRate, float initialLookAhead,
+                                              float initialFollowHeight, float initialYawOffset, int capacity, int count,
                                               const int* list) {
-    if (!SetupVehicleCamera(value, rate294, rate298, value228, value2d0, value2e8, capacity, count, list))
+    if (!SetupVehicleCamera(context, fieldOfViewEaseRate, distanceEaseRate, initialLookAhead, initialFollowHeight, initialYawOffset, capacity, count, list))
         return 0;
     return this;
 }
@@ -42,20 +42,20 @@ BikeCamera* BikeCamera::SetupBikeCamera(void* value, float rate294, float rate29
 // values that depend on bike state 6, then slot 38.
 void BikeCamera::SteerToKeepTargetOnScreen(float dt) {
     bool special = bike->crashReason == 6;
-    float value10;
-    float value14;
+    float raiseRate;
+    float lowerRate;
     if (special) {
-        value10 = 2.5f;
-        value14 = 4.0f;
+        raiseRate = 2.5f;
+        lowerRate = 4.0f;
     } else {
-        value10 = 5.0f;
-        value14 = 5.0f;
+        raiseRate = 5.0f;
+        lowerRate = 5.0f;
     }
     SoultreeObject* headPart = bike->riderCharacter->modelNode->FindByName("Head");
     Vector3 head;
     headPart->GetPositionIn(0, reinterpret_cast<Vec3*>(&head));
-    SetTableEntry(0, &head, 0, &value10, &value14, 0, 0);
-    SetTableEntry(1, &targetPoint, 0, &value10, &value14, 0, 0);
+    SetTableEntry(0, &head, 0, &raiseRate, &lowerRate, 0, 0);
+    SetTableEntry(1, &targetPoint, 0, &raiseRate, &lowerRate, 0, 0);
     SteerToKeepPointsOnScreen(dt, bike->wrecker->wreckState != 1, special);
 }
 

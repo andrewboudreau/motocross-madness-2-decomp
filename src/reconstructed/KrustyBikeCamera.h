@@ -37,8 +37,8 @@ public:
 
     // 0x00497d90: BikeCamera's setup (0x00416e80), then the "FlybyCam.vue"
     // frames; this or 0.
-    KrustyBikeCamera* SetupFlyby(void* value, float rate294, float rate298, float value228,
-                                            float value2d0, float value2e8, int capacity, int count,
+    KrustyBikeCamera* SetupFlyby(void* context, float fieldOfViewEaseRate, float distanceEaseRate, float initialLookAhead,
+                                            float initialFollowHeight, float initialYawOffset, int capacity, int count,
                                             const int* list);
 
     virtual int Tick(float frameTime);                 // 0x00497e20 (near miss: samples/camera)

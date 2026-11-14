@@ -105,16 +105,16 @@ bool FollowCamera::AppendTableEntry(const Vector3& position, float distanceRate,
 // 0x00463140: Camera slot 8, then the +0x294/+0x298 values, presets, the
 // point table and the state list (states 5-7 and values outside 0..7 are
 // dropped); releases itself when no state is left.
-FollowCamera* FollowCamera::SetupFollowCamera(void* context, float rate294, float rate298,
-                                                  float value228, float value2d0, float value2e8,
+FollowCamera* FollowCamera::SetupFollowCamera(void* context, float fieldOfViewEaseRate, float distanceEaseRate,
+                                                  float initialLookAhead, float initialFollowHeight, float initialYawOffset,
                                                   int capacity, int count, const int* list) {
     if (!Camera::SetRenderContext(context))
         return 0;
-    fieldOfViewEase = new(__FILE__, 0x78) FollowCameraEase(fieldOfView, rate294);
-    distanceEase = new(__FILE__, 0x79) FollowCameraEase(followDistance, rate298);
-    lookAheadDistance = value228;
-    defaultFollowHeight = value2d0;
-    followHeight = value2d0;
+    fieldOfViewEase = new(__FILE__, 0x78) FollowCameraEase(fieldOfView, fieldOfViewEaseRate);
+    distanceEase = new(__FILE__, 0x79) FollowCameraEase(followDistance, distanceEaseRate);
+    lookAheadDistance = initialLookAhead;
+    defaultFollowHeight = initialFollowHeight;
+    followHeight = initialFollowHeight;
     pointCapacity = capacity;
     if (capacity > 0) {
         points = new(__FILE__, 0x88) UnknownFollowCameraPoint[capacity];
@@ -128,7 +128,7 @@ FollowCamera* FollowCamera::SetupFollowCamera(void* context, float rate294, floa
             points[i].screenPoint = kVec3Zero;
         }
     }
-    yawOffset = value2e8;
+    yawOffset = initialYawOffset;
     stateCount = count;
     int kept = 0;
     for (int j = 0; j < count; j++) {

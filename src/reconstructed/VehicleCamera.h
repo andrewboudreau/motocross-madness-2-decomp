@@ -82,8 +82,8 @@ public:
 
     // 0x0052b9e0: FollowCamera's setup (0x00463140); returns this, or 0
     // when it failed.
-    VehicleCamera* SetupVehicleCamera(void* value, float rate294, float rate298, float value228,
-                                         float value2d0, float value2e8, int capacity, int count,
+    VehicleCamera* SetupVehicleCamera(void* context, float fieldOfViewEaseRate, float distanceEaseRate, float initialLookAhead,
+                                         float initialFollowHeight, float initialYawOffset, int capacity, int count,
                                          const int* list);
 
     // 0x0052bac0 / 0x0052bc50: the vehicle's +0x494 / +0x488 in vehicle

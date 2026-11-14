@@ -40,10 +40,10 @@ KrustyBikeCamera::KrustyBikeCamera(int flags) : BikeCamera(flags) {
 KrustyBikeCamera::~KrustyBikeCamera() {}
 
 // 0x00497d90
-KrustyBikeCamera* KrustyBikeCamera::SetupFlyby(void* value, float rate294, float rate298,
-                                                          float value228, float value2d0, float value2e8,
+KrustyBikeCamera* KrustyBikeCamera::SetupFlyby(void* context, float fieldOfViewEaseRate, float distanceEaseRate,
+                                                          float initialLookAhead, float initialFollowHeight, float initialYawOffset,
                                                           int capacity, int count, const int* list) {
-    if (!SetupBikeCamera(value, rate294, rate298, value228, value2d0, value2e8, capacity, count, list))
+    if (!SetupBikeCamera(context, fieldOfViewEaseRate, distanceEaseRate, initialLookAhead, initialFollowHeight, initialYawOffset, capacity, count, list))
         return 0;
     LoadCameraFile("FlybyCam.vue");
     return this;

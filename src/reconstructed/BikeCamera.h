@@ -54,8 +54,8 @@ public:
     virtual ~BikeCamera();          // 0x00416e70 (deleting wrapper 0x00416e50)
 
     // 0x00416e80: VehicleCamera's setup (0x0052b9e0); this or 0.
-    BikeCamera* SetupBikeCamera(void* value, float rate294, float rate298, float value228,
-                                      float value2d0, float value2e8, int capacity, int count,
+    BikeCamera* SetupBikeCamera(void* context, float fieldOfViewEaseRate, float distanceEaseRate, float initialLookAhead,
+                                      float initialFollowHeight, float initialYawOffset, int capacity, int count,
                                       const int* list);
 
     virtual Vector3 GetStateFiveFollowPoint(float dt);

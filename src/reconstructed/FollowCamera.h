@@ -219,8 +219,8 @@ public:
     // the point table (line 0x88) and the state list; states 5-7 and values
     // outside 0..7 are dropped. Releases itself and returns 0 when no state
     // is left.
-    FollowCamera* SetupFollowCamera(void* context, float rate294, float rate298,
-                                        float value228, float value2d0, float value2e8,
+    FollowCamera* SetupFollowCamera(void* context, float fieldOfViewEaseRate, float distanceEaseRate,
+                                        float initialLookAhead, float initialFollowHeight, float initialYawOffset,
                                         int capacity, int count, const int* list);
     // 0x004650e0 (KrustyBikeCamera's constructor): loads the "CAMERA" records
     // of the text file `path` into frames/field_0x33c (FollowCam.cpp lines
