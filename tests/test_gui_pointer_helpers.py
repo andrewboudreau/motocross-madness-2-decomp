@@ -10,9 +10,13 @@ from mcm2tool.coff import CoffObject
 from mcm2tool.pe import PEImage
 from mcm2tool.toolchain import find_child_ci, find_vc6_bin, infer_vc98_root, sha256_file
 from tools.match import compare
+from test_edit_box_on_char import extract
 
 ROOT = Path(__file__).resolve().parents[1]
-CASES = (('?ShowControlToolTip@ToolTip@@QAEXPAVUnknownGuiControl@@@Z', 0x486b10, 106, 89),
+# ShowControlToolTip is exact now: its body is taken from the canonical unit and
+# compiled with the remaining candidate.
+PROMOTED = 'void ToolTip::ShowControlToolTip('
+CASES = (('?ShowControlToolTip@ToolTip@@QAEXPAVUnknownGuiControl@@@Z', 0x486b10, 106, 106),
          ('?SetPointerDevice@GUIUser@@QAEHPAVGUIInputDevice@@@Z', 0x488120, 52, 46))
 
 
@@ -45,15 +49,19 @@ class GuiPointerHelpersTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix='mcm2-gui-pointer-') as directory:
             output = Path(directory)
             objects = []
-            for source in ('samples/ui/GuiPointerHelpers.cpp', 'tests/fixtures/gui_pointer_compare.cpp'):
+            candidates = output / 'GuiPointerCandidates.cpp'
+            candidates.write_text(
+                '#include "%s"\n' % (ROOT / 'samples/ui/GuiPointerHelpers.cpp').as_posix()
+                + extract((ROOT / 'src/reconstructed/GUIManager.cpp').read_text(), PROMOTED) + '\n')
+            for source in (candidates, ROOT / 'tests/fixtures/gui_pointer_compare.cpp'):
                 obj = output / (Path(source).stem + '.obj')
-                result = subprocess.run([sys.executable, str(ROOT / 'tools/compile.py'), str(ROOT / source),
+                result = subprocess.run([sys.executable, str(ROOT / 'tools/compile.py'), str(source),
                     '-o', str(obj), '--vc6-root', str(compiler), '--profile', 'vc6_o2_mt'],
                     cwd=ROOT, capture_output=True, text=True, encoding='latin-1',
                     env={**os.environ, 'PYTHONPATH': str(ROOT)})
                 self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
                 objects.append(str(obj))
-                if source.startswith('samples/'):
+                if source == candidates:
                     candidate = CoffObject(obj)
                     self.assertEqual({s.name for s in candidate.symbols
                                       if s.storage_class == 2 and s.section_number > 0}, {c[0] for c in CASES})
@@ -65,9 +73,9 @@ class GuiPointerHelpersTests(unittest.TestCase):
                         self.assertEqual(entry.extent_source, 'coff_function_aux')
                         self.assertEqual(entry.function_size, size)
                         report = compare(retail, candidate, symbol, va, size,
-                                         ROOT / 'samples/ui/GuiPointerHelpers.bindings.json')
+                                         ROOT / 'src/reconstructed/GUIManager.bindings.json')
                         self.assertEqual(report['strict_match']['matching_positions'], matching)
-            # The historical aggregate includes the same bodies; compare every
+            # The aggregate (canonical unit plus candidate) holds the same bodies; compare every
             # byte and relocation operand against the separately compiled candidate.
             aggregate = output / 'aggregate.obj'
             result = subprocess.run([sys.executable, str(ROOT / 'tools/compile.py'),

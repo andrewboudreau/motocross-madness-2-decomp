@@ -712,6 +712,28 @@ int ToolTip::Tick(float frameTime) {
     return 1;
 }
 
+// 0x00486b10: shows the control's tool tip 16 pixels below the pointer, or
+// centred under the control when its user has no pointer device.
+// The pointer branch copies the device's POINT and then moves it down. VC6
+// expands the copy into two loads and folds the `+= 16` into the second, and
+// the copy takes no turn in its scratch-register rotation: the control's
+// bottom then loads into eax after the x store and the call gets the text in
+// eax and &position in edx, as in retail. Component assignments (ternaries or
+// if/else) hoist the bottom load into edx and swap the two (89/106).
+void ToolTip::ShowControlToolTip(UnknownGuiControl* control) {
+    POINT position;
+    GUIInputDevice* device = control->ownerDialog->guiUser->pointerDevice;
+
+    if (device) {
+        position = device->pointerPosition;
+        position.y += 16;
+    } else {
+        position.x = control->area.left + (control->area.right - control->area.left) / 2;
+        position.y = control->area.bottom;
+    }
+    ShowText(control->toolTipText, (int*)&position, 1.0f);
+}
+
 // 0x00486b80: shows `text` at `position` for `time` seconds. The padded
 // width (clamped two pixels inside the target) and height are written back
 // into `size`; retail keeps those two dead stores, and the named limit gives

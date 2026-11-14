@@ -27085,6 +27085,15 @@ CASES = [
         'reason': 'DirectPlay address: the port element points at a WORD atoi local, so `port` stays unaliased and in ebx across lstrlenA',
     },
     {
+        'name': 'GUIManager.cpp tool-tip for a control 0x486b10',
+        'bindings': 'src/reconstructed/GUIManager.bindings.json',
+        'source': 'src/reconstructed/GUIManager.cpp',
+        'symbol': '?ShowControlToolTip@ToolTip@@QAEXPAVUnknownGuiControl@@@Z',
+        'target_va': '0x00486b10',
+        'target_size': 106,
+        'reason': 'tool-tip placement: the pointer branch copies the device POINT and adds 16 to y, which gives retail load order and call registers',
+    },
+    {
         'name': 'GUIManager.cpp tool-tip show text 0x486b80',
         'bindings': 'src/reconstructed/GUIManager.bindings.json',
         'source': 'src/reconstructed/GUIManager.cpp',

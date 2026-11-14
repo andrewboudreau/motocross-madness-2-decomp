@@ -184,7 +184,7 @@ class UIAnimConnectionsTests(unittest.TestCase):
                 self.assertEqual([(r.virtual_address-entry.value, r.type) for r in calls
                                   if obj.symbol_by_index[r.symbol_index].name == wanted],
                                  [(11 if n in (0, 2) else 416, 20)])
-            self.assertEqual((strict, sections, relocations), (193, 1389, 8902))
+            self.assertEqual((strict, sections, relocations), (194, 1390, 8903))
             _, provider = compile_source(ROOT/'src/reconstructed/GameUi.cpp', 'provider')
             for symbol, address, size in (
                 ('??0UIAnim@@QAE@PAX0@Z', 0x472e30, 82),
@@ -219,8 +219,8 @@ class UIAnimConnectionsTests(unittest.TestCase):
             self.assertEqual(result.returncode, 0, result.stdout+result.stderr)
             self.assertEqual(result.stdout.strip(),
                 'UIAnim GetCurrentTexture: 3067 cases, 41 independently checked AV; no storage writes')
-            self.assertEqual(strict, 199)
-        print('199 strict checks; four whole objects; two retail calls; '+result.stdout.strip())
+            self.assertEqual(strict, 200)
+        print('200 strict checks; four whole objects; two retail calls; '+result.stdout.strip())
 
 
 if __name__ == '__main__':

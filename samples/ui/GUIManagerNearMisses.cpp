@@ -27,24 +27,10 @@
 //   edi, which it zeroes before the new-result test and shares with the EH
 //   state store; here ebx holds the texture and the null arm is
 //   `xor ebx, ebx` after the branch.
-// 0x00486b10 (106 bytes, 89/106): one ternary per component (below; two
-//   separate if/else statements compile the same) gives retail's block
-//   order and `pop edi` placement (one if/else block: 86/106). Retail still
-//   stores the centred x before loading the control's bottom into eax and
-//   passes the text in eax and &position in edx; VC6 here hoists the bottom
-//   load into edx beside the cdq and swaps the call registers. Tried: y
-//   before x (81), `!device` ternaries/ifs, a POINT, a pointer to the array
-//   or `*p++` stores, `&position[0]`, x/y/bottom/text locals, casts or
-//   parentheses on the text, a centre helper, a ShowText call in each
-//   branch, and the centre written as `width / 2 + left`, a `width` or
-//   `left` local, or `left` then `+=`; parentheses around either whole
-//   ternary, around its arms or around the centre leave it unchanged.
-//   Swept (tools/sweep_variants.py): a `CameraRect& area` alias on every
-//   subset of the four area reads x a text local x x/y order; best 89.
-//   Also <= 89 (48 forms): a `GUIUser* user` local, x and y as if/else
-//   assignments of locals (with a `half` local), a text local, a `tip = this`
-//   alias and an `int* p = position` local.
-//   Session 21: /ML, /Oa, /Ow, /Op, /GB and /G5 keep 89; /G6 gives 81.
+// 0x00486b10 is exact in src/reconstructed/GUIManager.cpp: the pointer branch
+//   is a POINT copy followed by `position.y += 16`. Every component-wise form
+//   (ternaries, if/else, locals, helpers, inline setters and constructors,
+//   256 combinations of eight value locals) had stayed at 89/106 or below.
 // 0x00488120 (52 bytes, 46/52): retail keeps the `device ? owner : 0` branch
 //   (jmp + xor) and tests the owner for zero before comparing it with
 //   `this`. VC6 threads the xor arm into the next test whenever that test is
@@ -78,6 +64,13 @@
 //   stored to a member, as CollisionPoint's `inContact = cond ? 1 : 0`, or
 //   an inlined `new`'s EH state), where this function merges into a bare
 //   test, so no matched idiom carries over.
+//   Session 24, threaded (13-18/52) or unchanged: inline OwnerOf helpers with
+//   a by-reference or by-pointer out parameter, `(unsigned)owner > 0`,
+//   `owner != 0 && owner != this` followed by `== this`, a bool HasOwner
+//   helper, a `bool owned` local, `!owner || owner == this` nesting,
+//   `device ? owner : (GUIUser*)device`, `owner = (GUIUser*)device; if
+//   (device) ...`, `owner && owner == this`, `return owner == this` and the
+//   store block first.
 
 #include "../../src/reconstructed/GUIManager.cpp"
 

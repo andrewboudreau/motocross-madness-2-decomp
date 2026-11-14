@@ -357,7 +357,7 @@
     {
       "path": "samples/ui/GuiPointerHelpers.cpp",
       "status": "reviewed-nonexact",
-      "reason": "Complete tooltip placement and pointer ownership helpers pass 19606 native state, coordinate, callback, exception and fault comparisons. VC6 emits the full 106/52-byte extents with 89/46 matching positions; ShowText and real input devices remain outside this scripted boundary test.",
+      "reason": "Complete pointer ownership helper passes, with the exact tooltip placement, 19606 native state, coordinate, callback, exception and fault comparisons. VC6 emits the full 52-byte extent with 46 matching positions; ShowText and real input devices remain outside this scripted boundary test.",
       "evidence": "docs/GUI_POINTER_HELPERS.md#functional-build-review"
     },
     {

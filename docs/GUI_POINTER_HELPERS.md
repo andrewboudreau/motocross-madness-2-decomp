@@ -1,10 +1,10 @@
 # GUI pointer helpers
 
-The complete nonexact candidates in `samples/ui/GuiPointerHelpers.cpp` supply
-`ToolTip::ShowControlToolTip` and `GUIUser::SetPointerDevice`, two names missing
-from the source-built game's linker report. They are extracted unchanged from
-`GUIManagerNearMisses.cpp`, which includes the standalone source at the original
-position. This grouping does not establish an original translation unit.
+`ToolTip::ShowControlToolTip` is exact in `src/reconstructed/GUIManager.cpp`;
+the complete nonexact candidate in `samples/ui/GuiPointerHelpers.cpp` supplies
+`GUIUser::SetPointerDevice`. `GUIManagerNearMisses.cpp` includes the standalone
+source after the canonical unit. This grouping does not establish an original
+translation unit.
 
 ## Retail and source evidence
 
@@ -17,11 +17,14 @@ is `0x488120..0x488153` (52 bytes), with returns at `0x48813c` and `0x488151`,
 followed by twelve NOPs before the next function at `0x488160`. Every branch
 target is inside these complete extents; neither body has an EH frame.
 
-Authentic VC6 SP3 `/O2 /GR /GX /MT /Z7` emits 106 and 52 bytes, with 89 and 46
-relocation-resolved matching positions respectively. Tooltip differences are
-load scheduling and register allocation; ownership differences reorder the
-owner-null and owner-this checks. These remain nonexact candidates in samples.
-The separately compiled object defines only those two public methods and imports
+Authentic VC6 SP3 `/O2 /GR /GX /MT /Z7` emits 106 and 52 bytes, with 106 and 46
+relocation-resolved matching positions respectively. The tooltip is exact with
+the pointer branch written as a `POINT` copy followed by `position.y += 16`;
+component-wise stores scheduled the bottom load early and swapped the call
+registers (89). Ownership differences reorder the owner-null and owner-this
+checks; that method remains a nonexact candidate in samples.
+The object the test compiles (the candidate plus the canonical tooltip body)
+defines only those two public methods and imports
 only canonical `ToolTip::ShowText` plus CRT `__fltused`. No new game dependency
 is introduced. Existing `GUIManager.h` declarations preserve the field offsets;
 these direct methods do not require a new vtable or class-layout claim.
@@ -42,7 +45,7 @@ $env:MCM2_EXE = (Resolve-Path work/game/mcm2.exe).Path
 python -m unittest discover -s tests -p test_gui_pointer_helpers.py -v
 ```
 
-The test compiles the actual candidate and fixture as separate objects and
+The test compiles the actual candidate (with the canonical tooltip body) and fixture as separate objects and
 compares 19,606 native scenarios against the hash-pinned retail functions.
 It compares complete user, device, tooltip, control and dialog storage, return
 values, text-pointer identity, callback arguments, state at the call boundary,

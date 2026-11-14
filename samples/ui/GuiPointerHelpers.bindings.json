@@ -1,5 +1,3 @@
 {
-  "?ShowControlToolTip@ToolTip@@QAEXPAVUnknownGuiControl@@@Z": "0x00486b10",
-  "?SetPointerDevice@GUIUser@@QAEHPAVGUIInputDevice@@@Z": "0x00488120",
-  "?ShowText@ToolTip@@QAEXPBDPAHM@Z": "0x00486b80"
+  "?SetPointerDevice@GUIUser@@QAEHPAVGUIInputDevice@@@Z": "0x00488120"
 }

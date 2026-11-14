@@ -796,8 +796,10 @@ without effect, as noted.
 - **Bool joins.** `field = false; return false;` stores the immediate; a `bool result`
   assigned on every path with one `return result` gives `xor al, al; mov [m], al` and
   stops VC6 cross-jumping the final `return false` into another tail (FollowCamera
-  `0x00465000`, VehicleCamera `0x0052cc80`). One ternary per component instead of one
-  if/else block moves the `pop edi` placement (ToolTip `0x00486b10`, +3).
+  `0x00465000`, VehicleCamera `0x0052cc80`). A struct copy followed by
+  `+=` on one field (`position = device->pointerPosition; position.y += 16;`) expands
+  into per-field loads with the add folded in and, unlike component-wise stores, takes
+  no turn in the scratch-register rotation (ToolTip `0x00486b10`, 89 to exact).
 - **Not moved by any of these:** byte-store parity in EcoSystem `0x00458da0` (each
   variable-index byte store toggles the later SIB order), the `memset` + `.size`
   store placement in PCGame `0x004c0d10`
