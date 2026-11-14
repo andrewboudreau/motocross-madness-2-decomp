@@ -190,7 +190,7 @@ class CollisionQueryConnectionsTests(unittest.TestCase):
                         resolved = match_object(objects[source], symbol, va, b'',
                             {k: int(v, 0) for k, v in json.loads(binding.read_text()).items()})
                     self.assertEqual(resolved['digest'], digest, key); preserved += 1
-            self.assertEqual(preserved, 17)
+            self.assertEqual(preserved, 16)
             self.assertEqual(len(checked_callers), 18)
             compiler = Path(os.environ['VC6_ROOT'])
             linker = find_child_ci(find_vc6_bin(compiler), 'link.exe')
@@ -203,7 +203,7 @@ class CollisionQueryConnectionsTests(unittest.TestCase):
             result = subprocess.run([str(executable)], capture_output=True, text=True, timeout=30)
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             self.assertIn('Collision query boundaries: 10535 native cases passed', result.stdout)
-            print('%d strict cases, 17 complete partial fingerprints, 11 supplied providers, 38 call sites; %s' %
+            print('%d strict cases, 16 complete partial fingerprints, 11 supplied providers, 38 call sites; %s' %
                   (strict, result.stdout.strip()))
 
 

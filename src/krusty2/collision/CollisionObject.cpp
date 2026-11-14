@@ -1948,15 +1948,6 @@ inline void CollisionTransformPointTo(CollisionVec3* out, CollisionVec3 v, const
     out->z = v.x * m->m[0][2] + v.y * m->m[1][2] + v.z * m->m[2][2] + m->m[3][2];
 }
 
-// The scratch loop's form of CollisionRotateRowsTo: its y and z rows add the x and z terms
-// first, which keeps retail's x, z, y product order in the loop (HullVsHull 0x00436720).
-inline void CollisionRotateRowsGrouped(CollisionVec3* out, CollisionVec3 v, const Matrix4* m)
-{
-    out->x = v.x * m->m[0][0] + v.y * m->m[0][1] + v.z * m->m[0][2];
-    out->y = v.y * m->m[1][1] + (v.z * m->m[1][2] + v.x * m->m[1][0]);
-    out->z = v.y * m->m[2][1] + (v.z * m->m[2][2] + v.x * m->m[2][0]);
-}
-
 // Negation and scaling through the out-of-line constructor 0x00404e60, as retail calls it.
 inline CollisionVec3 operator-(const CollisionVec3& v)
 {
@@ -1997,28 +1988,22 @@ inline CollisionVec3 CollisionScaledProducts(const CollisionVec3& v, float s)
 // set.  The query vectors and the scratch points are first rotated into B's frame, the
 // box test runs with mode 2, and on a hit the contact point is averaged over contactCount
 // and transformed back; the vectors/points are always rotated back afterwards.
-// Near miss (936/962, same size, frame and registers as retail).  The product order of each
-// inlined rotation follows the leaf age of its matrix operand: the first rotation reads
-// &b->worldTransform directly (retail z, y, x), the scratch loop reads it through xf after
-// xf's first use (retail x, z, y, with its y and z rows grouped x + z first).  The second
-// forward rotation is written out with each row grouped (y + z) + x: retail sums z, y, then
-// x, and through CollisionRotateRowsTo VC6 summed the x row x, z, y, which rounds
-// differently at 24-bit precision (tools/emu_cases/collision_hull_vs_hull.py).  Explicit
-// parentheses in an inline helper cost the inline budget (the last rotation goes out of
-// line); written in place they keep the byte score.  Left: VC6 stores that rotation
-// through edi instead of retail's ebx and swaps the loop's x and z products of the y and z
-// rows (the same sums).
+// Strict exact (962/962).  All three forward rotations are the one inline helper reading
+// &b->worldTransform directly; what decides the product orders (retail z, y, x for the two
+// query vectors and x, z, y in the scratch loop) is the named copy of the contact normal:
+// passing `q->contactNormal` straight to the by-value parameter sums the x row x, z, y
+// (436/962), and a written-out rotation through an `xf` pointer with a grouped loop helper
+// stopped at 936 (stores through edi instead of retail's ebx, loop x and z products
+// swapped).  With the copy named, VC6 keeps &q->contactNormal in ebx and starts the copy
+// before the first rotation's stores, as retail does.
 int CollisionObject::HullVsHull(CollisionHullBody* a, CollisionHullBody* b, CollisionSweepQuery* q)
 {
     if (a->swept)
         return HullVsHullSwept(a, b, q);
 
     CollisionRotateRowsTo(&q->contactOffset, q->contactOffset, &b->worldTransform);
-    const Matrix4* xf = &b->worldTransform;
-    CollisionVec3 n = q->contactNormal;
-    q->contactNormal.x = (n.y * xf->m[0][1] + n.z * xf->m[0][2]) + n.x * xf->m[0][0];
-    q->contactNormal.y = (n.y * xf->m[1][1] + n.z * xf->m[1][2]) + n.x * xf->m[1][0];
-    q->contactNormal.z = (n.y * xf->m[2][1] + n.z * xf->m[2][2]) + n.x * xf->m[2][0];
+    CollisionVec3 normal = q->contactNormal;
+    CollisionRotateRowsTo(&q->contactNormal, normal, &b->worldTransform);
     CollisionVec3 zero;
     zero.x = 0.0f;
     zero.y = 0.0f;
@@ -2026,7 +2011,7 @@ int CollisionObject::HullVsHull(CollisionHullBody* a, CollisionHullBody* b, Coll
     q->contact = zero;
     q->contactCount = 0;
     for (int i = 0; i < g_CollisionScratchCount; i++)
-        CollisionRotateRowsGrouped(&g_CollisionScratchPoints[i], g_CollisionScratchPoints[i], xf);
+        CollisionRotateRowsTo(&g_CollisionScratchPoints[i], g_CollisionScratchPoints[i], &b->worldTransform);
 
     int hit = TreeTreeQuery(reinterpret_cast<QueryTreeNode*>(a->pointTree),
         reinterpret_cast<QueryTreeNode*>(b->triangleTree), &a->worldTransform, &b->worldTransform, 2,
