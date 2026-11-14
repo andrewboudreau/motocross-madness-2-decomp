@@ -1,6 +1,11 @@
 // Complete retail 0x00519a20..0x00519e09 (1002 bytes).
 // Reviewed candidate remains nonexact; original TU ownership is unproven.
 // See docs/STATS_STANDINGS_DRAW.md for finite native evidence.
+// Retail keeps `this` in edi and the view in ebp; the candidate has them
+// swapped. Unchanged (605 of 1004, 42 renderings): the view declared before
+// or after `count`, declared first and assigned in either order, read
+// through a TrackGame local, the own-racer comparison reversed, and the
+// early return tested as `i > row` or `!(i <= row)`.
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
