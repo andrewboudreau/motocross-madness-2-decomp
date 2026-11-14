@@ -346,7 +346,7 @@ struct UnknownEcoDisplay {
     unsigned char field_0x000[0x28];
     int colorKeyFormat;                       // +0x28: colour-key texture format
     unsigned char field_0x02c[0x1c0 - 0x2c];
-    int capabilityBits;                       // +0x1c0
+    int driverColorKeyCaps;                   // +0x1c0: DDCAPS dwCKeyCaps (PCVideoCard::driverColorKeyCaps)
 };
 // DebugOverlay.h: the overlay the draw prints its statistics on.
 class UnknownEcoDebugOverlay {

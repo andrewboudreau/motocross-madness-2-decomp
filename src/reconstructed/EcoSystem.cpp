@@ -173,7 +173,7 @@ int VegetationDefinition::LoadModel(TextureMapManager* textures, int modelFlags)
             block->SelectSection("Material - 0");
             block->ReadString("TextureMap", path, -1);
             int format = 1555;
-            if (!reinterpret_cast<UnknownEcoTrackGame*>(g_TrackGame)->bladeRenderer && (reinterpret_cast<UnknownEcoTrackGame*>(g_TrackGame)->display->capabilityBits & 8)
+            if (!reinterpret_cast<UnknownEcoTrackGame*>(g_TrackGame)->bladeRenderer && (reinterpret_cast<UnknownEcoTrackGame*>(g_TrackGame)->display->driverColorKeyCaps & 8)
                 && reinterpret_cast<UnknownEcoTrackGame*>(g_TrackGame)->GetRegistryFlag("KeyColorTrees", 0))
                 format = reinterpret_cast<UnknownEcoTrackGame*>(g_TrackGame)->display->colorKeyFormat;
             modelTexture = reinterpret_cast<UnknownEcoTexture*>(TerrainLoadTexture(textures, path, format, 0, 2, 5, 6, 0, 0x80, 0xff00ff, 1, 1));
@@ -1229,7 +1229,7 @@ int PreloadEcosystem(TextureMapManager* textures, char* path, FileStream* stream
                     block->SelectSection("Material - 0");
                     block->ReadString("TextureMap", sltName, -1);
                     int format = 1555;
-                    if (!reinterpret_cast<UnknownEcoTrackGame*>(g_TrackGame)->bladeRenderer && (reinterpret_cast<UnknownEcoTrackGame*>(g_TrackGame)->display->capabilityBits & 8)
+                    if (!reinterpret_cast<UnknownEcoTrackGame*>(g_TrackGame)->bladeRenderer && (reinterpret_cast<UnknownEcoTrackGame*>(g_TrackGame)->display->driverColorKeyCaps & 8)
                         && reinterpret_cast<UnknownEcoTrackGame*>(g_TrackGame)->GetRegistryFlag("KeyColorTrees", 0))
                         format = reinterpret_cast<UnknownEcoTrackGame*>(g_TrackGame)->display->colorKeyFormat;
                     UnknownEcoTexture* texture = reinterpret_cast<UnknownEcoTexture*>(TerrainLoadTexture(textures, sltName, format, 0, 2, 5, 6, 0, 0x80, 0xff00ff, 1, 1));
