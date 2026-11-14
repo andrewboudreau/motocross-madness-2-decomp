@@ -59,16 +59,16 @@ PARTIAL = [['samples/race/BikeRaceNearMisses.cpp',
   6760,
   2821,
   '59d5d6fed62ff5b907d3df81802c39f84c8feeede5d33f5cde930089545f8c90'],
- # Shared canonical racer declarations exchange XOR EDI/MOV EBX at +538..545.
- # Same state/flags; no interior entry; all other 13,428 bytes and targets
- # are unchanged. Nonexact score 13390 (13396 while the sample declared its own DemoDlg stand-in class); BIKE_RACE_STATE_CONNECTIONS.md.
+ # Nonexact score 13396 with the named "Res" constant in CreateRacers; without it (one
+ # initialised local fewer) XOR EDI/MOV EBX at +538..545 are exchanged and the score is
+ # 13390 (same state/flags, no interior entry); BIKE_RACE_STATE_CONNECTIONS.md.
  ['samples/race/BikeRaceNearMisses.cpp',
   '?CreateRacers@BikeRace@@',
   4299120,
   13428,
   13428,
-  13390,
-  'dfc0ee81775e2529319f4644466baacd436755506630b8d402b6621e29cea48c']]
+  13396,
+  'a6159f61caafc2347d11f9ef24dfc6956a1da5b180cd6749c63609a4716f8482']]
 
 
 @unittest.skipUnless(os.name == 'nt' and os.environ.get('VC6_ROOT') and os.environ.get('MCM2_EXE'),

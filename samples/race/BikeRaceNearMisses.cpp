@@ -1026,9 +1026,16 @@ static inline UnknownBikeRaceUiModel& UiRider(int i) {
 // alone therefore cannot make the function exact: the other 32 bytes are independent of it.
 // With CreateRacers compiled in retail address order (src/reconstructed/BikeRace.cpp through
 // the destructor, then Create, the helpers and this function) k = 0 is still 13390 and 13396
-// needs k = 6..11 or 16 (scanned 0..16).  No evidence-backed declaration was found to add.
+// needs k = 6..11 or 16 (scanned 0..16).
+// Function-local count (dead-local scan, 0..15 initialised locals at the top): 13396 at 1..4,
+// 6, 7 and 10..14, 13390 otherwise; the six bytes are the order of `xor edi, edi` and
+// `mov ebx, 1` after the ranking loop.  `resources` below (the "Res" directory this function
+// spells nine times) is one such local and gives 13396; a named 0x7fffffff does the same.
+// The bytes support the count of initialised locals, not this particular constant, and the
+// other 32 bytes (register ties in integer code) do not move with it.
 int BikeRace::CreateRacers(void* owner, LightManager* lights, TextureContext* textures,
                                     UnknownBikeRaceProjector* terrain, RaceGateEvent* event) {
+    const char* const resources = "Res";
     char path[0x104];
     char message[0x184];
     char bikeFile[0x104];
@@ -1053,7 +1060,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, TextureContext* te
     empty[0] = 0;
 
     FileStream* stream = new(__FILE__, 0x3b6) FileStream(g_ResourceManager);
-    sprintf(path, "%s\\rider.mcf", "Res");
+    sprintf(path, "%s\\rider.mcf", resources);
     if (!g_TrackGame->sceneObject->OpenArchiveFile(stream, path, "rb", (int)riderFile)) {
         sprintf(message, "No Rider MCF found in resources.  Aborting.\n");
         delete stream;
@@ -1110,7 +1117,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, TextureContext* te
         setup.rpmStep = (setup.rpmUpperLimit - setup.rpmLowerLimit) / 10;
         setup.weight = game->ui->weight[bikeClass];
         WriteRelativePositions(&position, &direction, event, order[0]);
-        sprintf(path, "%s\\%s", "Res", circuit->racers[0].bikeModel);
+        sprintf(path, "%s\\%s", resources, circuit->racers[0].bikeModel);
         if (!g_TrackGame->sceneObject->OpenArchiveFile(stream, path, "rb", (int)bikeFile)) {
             sprintf(message, "No PC Rider MCF found in resources.  Aborting.\n");
             delete stream;
@@ -1120,7 +1127,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, TextureContext* te
         char riderPath[0x104];
         char circuitRiderFile[0x104];
         if (circuit->careerFlags & 2) {
-            sprintf(riderPath, "%s\\%s", "Res", "riderd.mcf");
+            sprintf(riderPath, "%s\\%s", resources, "riderd.mcf");
         } else {
             COPY_TEXT(riderPath, riderFile, 0x104);
         }
@@ -1156,7 +1163,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, TextureContext* te
             for (int n = 1; n < g_TrackGame->proCircuit->racerCount; n++) {
                 ProCircuitRacer* racer = &circuit->racers[n];
                 WriteRelativePositions(&position, &direction, event, order[n]);
-                sprintf(path, "%s\\%s", "Res", racer->bikeModel);
+                sprintf(path, "%s\\%s", resources, racer->bikeModel);
                 if (!g_TrackGame->sceneObject->OpenArchiveFile(stream, path, "rb", (int)bikeFile)) {
                     sprintf(message, "No PC Rider MCF found in resources.  Aborting.\n");
                     delete stream;
@@ -1212,7 +1219,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, TextureContext* te
         g_TrackGame->ui->ResolveBikeFile(recordedBike, bikeTexture, 0x3f);
         g_TrackGame->ui->ResolveRiderFile(recordedRider, riderTexture, 0x3f);
     } else {
-        sprintf(path, "%s\\%s", "Res", g_TrackGame->mode.racerChoice.bikeModel);
+        sprintf(path, "%s\\%s", resources, g_TrackGame->mode.racerChoice.bikeModel);
         if (!g_TrackGame->sceneObject->OpenArchiveFile(stream, path, "rb", (int)bikeFile)) {
             sprintf(message, "No Rider MCF found in resources.  Aborting.\n");
             delete stream;
@@ -1350,7 +1357,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, TextureContext* te
                 setup.presetCurve[k] = g_TrackGame->ui->standardCurves[bikeClass][0][k];
             setup.rpmStep = (setup.rpmUpperLimit - setup.rpmLowerLimit) / 10;
             setup.weight = g_TrackGame->ui->weight[bikeClass];
-            sprintf(path, "%s\\%s", "Res", g_TrackGame->mode.racers[j].bikeModelName);
+            sprintf(path, "%s\\%s", resources, g_TrackGame->mode.racers[j].bikeModelName);
             UnknownBikeRaceRacer* racer = new(__FILE__, 0x5a3) UnknownBikeRaceRacer(1);
             racerSlots[j] = racer;
             if (!AppendChild(racer->Load(
@@ -1441,8 +1448,8 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, TextureContext* te
             // The ghost.
             aiRacers = new(__FILE__, 0x674) UnknownBikeRaceRacer*[1];
             WriteRelativePositions(&position, &direction, event, order[0]);
-            sprintf(bikeFile, "%s\\%s", "Res", "Ghost.mcf");
-            sprintf(riderFile, "%s\\GhostRider.mcf", "Res");
+            sprintf(bikeFile, "%s\\%s", resources, "Ghost.mcf");
+            sprintf(riderFile, "%s\\GhostRider.mcf", resources);
             UnknownBikeRaceRacer* racer = new(__FILE__, 0x67c) UnknownBikeRaceRacer(1);
             aiRacers[0] = racer;
             if (!AppendChild(
@@ -1485,7 +1492,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, TextureContext* te
                         COPY_TEXT(bikeFile, EventAi(n).bikeModelPath, 0x104);
                     } else {
                         COPY_TEXT(aiName, names[n], 0x10);
-                        sprintf(bikeFile, "%s\\%s", "Res", UiManufacturer(UiBike(bikes[n]).manufacturer).modelFile);
+                        sprintf(bikeFile, "%s\\%s", resources, UiManufacturer(UiBike(bikes[n]).manufacturer).modelFile);
                     }
                     ai = 1;
                     if (!g_TrackGame->sceneObject->OpenArchiveFile(stream, bikeFile, "rb",
