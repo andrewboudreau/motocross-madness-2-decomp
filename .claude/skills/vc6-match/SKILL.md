@@ -70,6 +70,12 @@ near misses; `tools/near_miss_drops.py` lists ones whose gap is a single drop.
   one call and persists usually means retail had (or lacked) a named value there. A local declared before an argument
   list shifts the whole list; a pointer local held across a call goes to esi; a read-only local is propagated away, a
   reassigned one survives (FileStream Write/CheckHeader, ShowControlToolTip, LeaveRaceForMenu, HandleReceivedMessage).
+- A `c ? &a : &b` call argument is evaluated whole, ahead of the pushes. Retail testing first, pushing the shared
+  arguments and choosing with `lea/jne/lea` in place means the call was written once per if/else arm; VC6 merges the
+  shared pushes on both sides (Vehicle::ApplyBodyContactImpulse `0x005265d0`, 405 -> exact; arm order matters).
+- A chained read that runs one register behind (`g->a->flags` in a condition, with later argument lists rotated too)
+  can be a pointer local declared inside the block (`ProCircuit* circuit = g->proCircuit;`, CreatePodiumScene
+  `0x0045d480`). Folded trivial accessors and typing do not move a float-slot `push ecx` that retail delays.
 - Struct copy then `+=` (`pos = dev->pointerPosition; pos.y += 16;`) beats component-wise stores (ShowControlToolTip).
 - PoseRotation: the function-local definition count has period 8 there; used named constants count like dead locals.
 - An inline accessor in an argument list is evaluated ahead of the other arguments; reading the member in place restores

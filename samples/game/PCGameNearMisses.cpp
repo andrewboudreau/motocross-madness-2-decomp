@@ -32,6 +32,11 @@
 // Session 24, unchanged (1776): the format read through an `unsigned long`
 // view or an `unsigned long` local, the size stored through an `int` view or
 // a `DDSurfaceDesc2*` local, and a PCRenderTarget cast.
+// ProfileDisplays, unchanged at 1776 (2026-11): template inline accessors
+// for the format (with and without a temporary) and for the pixel-format
+// address (reference or pointer), inline clear helpers for the descriptor,
+// an init helper returning the descriptor for the size store, and the
+// memset result cast and used.
 #include <stdio.h>
 #include <string.h>
 

@@ -345,6 +345,13 @@ void RadarOverlay::DrawTrackOutline(int mode)
     }
 }
 
+// DrawRacers, unchanged at 1129 (2026-11) unless noted: the distance through
+// inline helpers (flat-distance helper with and without a temporary, a
+// squared-sum helper over dx/dz, a template pointer form: 354-355 or 1129),
+// an inline wrapper for SetCueRacer, the name in a local, float/double
+// typing of dx, dz and the distance, const or volatile distance, casts and
+// the sum orders. Retail delays the float slot's `push ecx` past a pending
+// load; none of these moves it.
 // 0x0051bed0: places the name tags and draws the map dots (see the note at
 // the top).
 void RadarOverlay::DrawRacers(int mode)

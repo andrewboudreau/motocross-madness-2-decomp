@@ -56,6 +56,13 @@
 // `along`, by-value or derived-type returning helpers, `from + along`;
 // prepending 0..63 typedefs (tools/decl_shift_scan.py) never changes it.
 
+// Also (2026-11): the next-particle macro as inline accessors (pointer,
+// reference, index or count forms) exhausts the inline budget (303-318);
+// nested Add(Scale()) 441; the position through a named Vector3 917; a
+// `Vector3* at` 1535; the age store after `along` 943; the constructor
+// written out for `along` 1533 or for the position 1572; assign after
+// declare 917; a comma-expression age store and a float index local 1606.
+
 // Compiled inside Wrecker.cpp, whose vector operators, WreckerCross and the
 // mean push's inline `operator/` (`v * (1.0f / s)`) these candidates use.
 #include <math.h>

@@ -22,6 +22,11 @@ extern "C" __declspec(dllimport) int __stdcall DrawTextA(void*,const char*,int,O
 extern "C" __declspec(dllimport) int __stdcall GetTextExtentPoint32A(void*,const char*,int,Win32Size*);
 
 // 0x0051e3f0: draw one racer/cue name and update the tag rectangle.
+// Unchanged at 966/974 (2026-11): inline accessors for s_UnknownGlobal68a444
+// (int or bool, `!= 0`), racers[index], the racer scale, nameTagFont,
+// racerCount and the showRiderPositions/showRiderNames tests, and the game
+// through an inline `Game()`. Folded accessors do not move the register
+// naming that is left.
 void ChatOverlay::DrawNameTag(void* dc, int index)
 {
     char text[0x80];

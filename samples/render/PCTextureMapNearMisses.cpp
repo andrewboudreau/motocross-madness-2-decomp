@@ -22,6 +22,14 @@
 // unsigned/long/ternary/!! forms, separate copy locals, a single return,
 // 1..33 dead locals and moving Clone within the TU leave it unchanged.
 //
+// The 8-bit colour key (2026-11, all 333/600 strict): the key in an
+// unsigned int, int, unsigned long or const local (initialised or
+// assigned), built in two or three statements, through template inline
+// helpers returning unsigned or int (one expression, two steps, a named
+// result), a by-value three-byte helper, and the index in a local. VC6
+// canonicalises all of them; retail's `mov eax, edx` before the push and
+// the late vtable load do not appear.
+//
 // PCTextureMap::CreateSurface (0x004c69c0, 2033 bytes): the setup.
 // Everything but the non-mip format fallback chain lines up, including
 // the mip chain (same source shape). VC6 cross-jumps the identical

@@ -64,6 +64,14 @@
 //   around a statement, a zero-trip for, `while (0)`, `switch (0)`, a switch
 //   on a member) all stay 1237.
 
+// 0x004d8fc0 prologue, unchanged at 836 (2026-11; 0x004d9860 shares it):
+// the circuit as `ProCircuit*&`, `ProCircuit* const&`, a `ProCircuit**` slot
+// or `*&`, assigned after its declaration, a TrackGame local or
+// `TrackGame*&`, the event kind through an inline accessor or
+// `(*event).kind`, and a comma `kind = (circuit = ..., event->kind)`.
+// Worse: the fee stored first, and game/kind/circuit declaration orders
+// with an int, unsigned or const kind (836, or 91/883 with the kind in eax
+// and TrackGame reloaded).
 #include "../../src/reconstructed/ProCircuitProcs.cpp"
 
 // 0x004d8c40

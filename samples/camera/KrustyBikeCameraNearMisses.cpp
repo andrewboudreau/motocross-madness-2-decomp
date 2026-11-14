@@ -31,6 +31,16 @@
 // The vector passed to slot 46 (0x0067c3e8) is the unit's kVec3YAxis
 // (src/reconstructed/KrustyBikeCamera.cpp); it is file-static there, so this
 // sample keeps its own static.
+// Tick, argument-order sweep of 2026-11 (all 337): the event, racer,
+// position, height and pending-view reads through inline accessors (by
+// reference and by value), inline wrappers around WriteRelativePositions,
+// an int-returning view of 0x004210f0 with the result in a dead local or
+// tested in an empty if, every order of the flag store, the first call and
+// BuildOrientationBasis, the PlayRecordedFrame result in a bool local,
+// through this->, as a comma return or tested, and an `int result = 1`
+// local. Probe only: a virtual view of the FIRST 0x004210f0 call fixes
+// every later register (14 instruction diffs, sizes shift); virtual at the
+// second call does not (19).
 #include "../../src/reconstructed/KrustyBikeCamera.h"
 
 // .bss state used by slot 10. There is no initialisation guard, so these are
