@@ -55,6 +55,27 @@
 //   pointer (256, same code: the Lock-failure return still folds to 0).
 //   A further 28 tail forms (result copies, every if-Unlock variant, an
 //   else-if body) all compile to the same 256-position object.
+//   Session 22 (measured on 0x00478e10, 231 before): what keeps the copy in
+//   edi is a conversion between `opaque` and the returned value, which VC6
+//   does not copy-propagate. `unsigned char result = opaque;` before
+//   `if (Unlock(0)) return result; return result;` gives retail's whole
+//   body: `mov edi, 1; jmp` for the 8-bit hit, the memory store and
+//   `mov edi, [esp + 0x10]` for the 16-bit one and the dead `test eax, eax`
+//   (288/329, 7 instruction diffs), leaving an `and eax, 0xff` at the return
+//   and the Lock-failure return folded into `xor eax, eax`. `short opaque`
+//   with `int result = opaque; if (Unlock(0)) return opaque; return result;`
+//   gives the same body with `movsx eax, di` (284). No 4-byte pair blocks
+//   the propagation: unsigned, long, unsigned long, an enum, void*/char*
+//   with casts, `(short)opaque` and `bool result = opaque != 0` stay at
+//   231-235. Not kept: the type is unproven and the match is partial.
+//   An inline pixel test taking `int& opaque` that returns 1 for the 8-bit
+//   hit and sets `opaque` for the 16-bit one gives `mov edi, 1; jmp` too
+//   (241); with `if (!Unlock(0)) return result;` falling into the outer
+//   `return opaque` it keeps the memory store, the test and the separate
+//   Lock-failure return (286/331), but branches on the test and returns the
+//   memory copy when Unlock fails, which retail does not (edi). By value
+//   the helper loses the 0x84 frame (54-59). Early returns for PtInRect or
+//   Lock (72-96) and a single `return opaque` exit (241-250) are worse.
 // 0x004738a0 UIEditBox slot 40 (76/968): retail keeps the width and the
 //   redraw count in memory. Retail reloads width into edi at the loop top
 //   (0x47396d) and consumes that copy in the scroll arms (`sub edi, ebx`),

@@ -115,6 +115,14 @@ static inline int HeaderMatches(FileStream* stream)
 // first seek as `if (fseek(...) == 0) {} else { fclose ... }` keeps the two
 // fclose blocks apart and gives retail's registers from bufferEnd through the
 // four header compares, but places the first block after the function (26/204).
+// Session 22: a second test of the first seek's result (`if (failed)
+// fclose(...); if (failed) { fileHandle = 0; return 0; }`, or the close block
+// followed by `if (failed) return 0;`) is threaded back to the same code
+// (27/186); `if (!fileHandle) return 0;` after the close block keeps the test
+// (29/211). The fseek zero stored for fileEncoded follows from the layout:
+// with the first failure block out of line the success path is the
+// fall-through of `jne`, where VC6 knows eax is 0; retail's inline block makes
+// it a jump target, hence the immediate.
 int FileStream::CheckHeader()
 {
     if (fseek(fileHandle, 0, SEEK_SET)) {
