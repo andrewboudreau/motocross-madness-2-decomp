@@ -3494,3 +3494,202 @@ is left is blocked by one of four things:
   on each would clear them mechanically.
 
 The rest has no new evidence and should wait for matching work to produce it.
+
+## Wave 29: the Scene loader names
+
+Wave 29 is the Scene loader follow-up that Wave 28 deferred while
+Scene::ReadStaticModels `0x004ecd60` was being matched. That function is now
+strict exact, so the names used in it and in the rest of the Scene readers
+could be taken. Names only: no declaration, typedef or member was added,
+removed or reordered, and every edited file keeps its line count and line
+endings. No static, global or type of a static was renamed, and no type whose
+RTTI descriptor is emitted.
+
+Counts over `src` and `samples` (`git grep -ohE`, work/naming/w28/counts.py):
+
+| Placeholder | Before (78e01ae0) | After |
+| --- | --- | --- |
+| `\bUnknownVirtualSlot[0-9]+` | 74 uses, 17 names | 74 uses, 17 names |
+| placeholder methods (`UnknownVirtualSlotN`, `UnknownMethodN`, `Method_`, `Fn_`) | 85 uses | 85 uses |
+| `\bUnknown[A-Za-z0-9_]*` | 573 uses, 86 names | 376 uses, 74 names |
+| `\bfield_0x[0-9a-fA-F]+` | 1274 uses, 326 spellings | 1274 uses, 326 spellings |
+| `field_0x` in samples/ only | 113 uses | 113 uses |
+
+The 197 cleared uses are the whole Wave 28 "Scene loader" group
+(work/naming/w28/remain.py now reports 0 for it). That group also counted the
+two `int` forms of `UnknownFunction464e80` (StatsOverlay and
+MorphBastardModifier), so they were named here too.
+
+| Tier | Renames |
+| --- | --- |
+| 1 | 2 types: the two keyword records, named by the retail keys they hold |
+| 2 | 7 types: the view of SoultreeObject and the emitter and physics views |
+| 3 | 5 methods: the Scene report hooks on the shared empty bodies `0x004de580` and `0x00464e80`, and the two other per-class names of `0x00464e80` |
+
+Method:
+
+- The type renames and the `0x004de580` names (11 names,
+  work/naming/w29/map.json) were applied tree-wide with work/naming/rename.py.
+  The run skipped docs/NAMING.md, docs/NEAR_MISS_INDEX.md,
+  docs/REBUILD_GAPS.md, docs/DECOMPILATION_PROGRESS.md and
+  config/decompilation_progress.json. It updated the `.bindings.json`
+  mangled keys, the config/game_build.json link aliases (the four view
+  constructors and the two `SceneSoultreeObjectView` methods),
+  tools/run_calibration.py, the view tuple and alias keys of
+  tests/test_model_render_state_connections.py, tests/test_scene_callbacks.py
+  and the scene_callbacks.cpp fixture.
+- `UnknownFunction464e80` names three different methods, so each class was
+  edited separately with count-checked substitutions (work/naming/sub.py,
+  work/naming/w29/sub464.py and sub464b.py): Scene's `const char*` form in
+  the Scene units and `?...@Scene@@` keys, then the StatsOverlay and
+  MorphBastardModifier `int` forms.
+- Two comments in SceneManager.h and one sentence in docs/SCENE_CALLBACKS.md
+  were reworded to the new names without changing their line counts.
+- None of the renamed names is used in the bodies the concurrent matching
+  work edits (BikeRace `0x00419970`, BikeAI `0x0040e510`/`0x00415640`,
+  EventManager `0x0045d480`, Tire `0x005135f0`, SoultreeMatrix `0x004fc050`,
+  TextService `0x0050ba00`).
+
+The four Scene report hooks are tier 3. `0x004de580` (`ret 0xc`) and
+`0x00464e80` (`ret 4`) are shared empty bodies, so the name comes from the
+Scene call sites alone: every reader passes (section, key, value read) to
+`0x004de580`, with a "(Default)" key or a "NOT FOUND" value when the key is
+missing, and passes the formatted error text, or "" between sections, to
+`0x00464e80`. Scene::Load `0x004efb20` reads the "LogProgress" key
+(`0x00573b3c`) and opens "scnmgr.log" (`0x00573b30`) into `logFile` when it
+is set; these calls are what such a log would print. The retail bodies write
+nothing, so the names say what the calls report, not what they do.
+
+The `field_0x` pads of SceneManagerNearMisses.cpp stay. Each one spans
+several members of the class it views, so naming it would split an array:
+
+- the emitter views' `field_0x2c` (DustParticleEmitter +0x2c firstUpdate,
+  +0x30 manager and the rest, ParticleEmitters.h);
+- SceneSoultreePhysicsBaseObjectView `field_0x0c` and `field_0x134`;
+- SceneSoultreePhysicsObjectView `field_0x4f4` (the vtordisp and the
+  virtual GameObject);
+- SceneCollisionObjectView `field_0x38` and `field_0x64` (CollisionObject.h
+  members +0x38..+0x5c, and +0x64 ownerType..+0xb4).
+
+A check of every old object (work/naming/w29/datasyms.py, rttisyms.py) found
+that no data, RTTI, vtable or guard symbol name contains a renamed name.
+
+Result: one proof from 78e01ae0 to the renamed tree covered every unit whose
+closure reaches a changed file: 56 units. The map was the old→new decorated
+spellings (`Old@` → `New@`, plus `UnknownFunction464e80@Scene@`,
+`@StatsOverlay@` and `@MorphBastardModifier@`; 14 entries,
+work/naming/w29/proofmap.json). The verdicts are in
+work/naming/w29/report-final.txt:
+
+| Verdict | Units |
+| --- | --- |
+| IDENTICAL | 47 |
+| IDENTICAL-COMDAT-ORDER | 1 (Group6_BikeRaceCreate.cpp) |
+| NAME-ONLY | 8 (SceneManagerNearMisses.cpp, SceneManager.cpp, SceneCallbacks.cpp, scene_callbacks.cpp, QuarryStuntEvent.cpp, StatsOverlayDefaults.cpp, MorphBastardModifierNearMisses.cpp, Group3_MorphBastard.cpp) |
+| DIFF, compile failure | 0 |
+
+SceneManagerNearMisses.cpp is NAME-ONLY, so Scene::ReadStaticModels keeps the
+bytes that made it strict exact.
+
+Negative controls (work/naming/w29/negcontrol.txt):
+
+1. Three NAME-ONLY units were compared again without the map, and each gave
+   DIFF:
+   - SceneManagerNearMisses.cpp: the relocations of
+     `?ReadStaticModels@Scene@@QAEHPAVLightManager@@HHHP6AXH@ZH@Z` differ.
+   - SceneManager.cpp: the relocations of
+     `?ReadVector@Scene@@QAEHPAUVector3@@PBD11HPAVParameterBlock@@@Z` differ.
+   - StatsOverlayDefaults.cpp: `?UnknownFunction464e80@StatsOverlay@@QAEXH@Z`
+     exists only in the old object.
+2. One edit was made in the new tree only. The "Sphere" ObjectShape value in
+   ReadStaticModels was changed from 1 to 2. The proof gave DIFF in the
+   `.text` bytes of `?ReadStaticModels@Scene@@...`.
+
+Pins: the eight NAME-ONLY units change their decorated names, so their
+whole-object digests change. Three of them are pinned:
+
+- SceneManager.cpp (relocations 1273, sections 272);
+- QuarryStuntEvent.cpp (393, 86);
+- SceneManagerNearMisses.cpp (484, 96).
+
+They are pinned 10 times across six fixtures, and those pins made six
+modules fail:
+
+- eco_light_objects.json
+- race_detail_objects.json
+- scene_motion_objects.json
+- soultree_attachment_emitters_objects.json
+- soultree_position_objects.json
+- texture_history_timer_objects.json
+
+work/naming/w22/repin_all.py (work/naming/repin.py) swapped each digest only
+after checking that the unit is NAME-ONLY in report-final.txt and that its
+relocation and section counts were unchanged. The log is
+work/naming/w29/repin.log. Pinned digests:
+
+| Unit | Old | New | Fixtures |
+| --- | --- | --- | --- |
+| SceneManager.cpp | `b3cd7b3bcecb` | `07aefc358850` | eco_light, texture_history_timer |
+| SceneManager.cpp | `cffb89f0c58c` | `d71f442dee04` | scene_motion |
+| SceneManager.cpp | `3ba831ee951d` | `f4f2d6e5e6ca` | soultree_position |
+| QuarryStuntEvent.cpp | `1395805734a3` | `6978c516b78e` | eco_light, race_detail |
+| SceneManagerNearMisses.cpp | `93b93afe7d7a` | `52b885be7378` | eco_light, soultree_attachment_emitters |
+| SceneManagerNearMisses.cpp | `7e53a949b61b` | `17b3b60a914b` | scene_motion |
+| SceneManagerNearMisses.cpp | `dc538fc9481f` | `26d0bddc6e68` | soultree_position |
+
+The different digests of one unit come from different compile profiles.
+
+Tests: work/naming/w29/pick_tests.py and pinmods.py selected 79 modules,
+including:
+
+- test_model_render_state_connections;
+- test_scene_callbacks;
+- test_stats_overlay_default;
+- the six repinned modules.
+
+All of them pass after the repin except one: the
+vehicle_simulate_frame case of test_emu_diff. That case fails in a worktree
+before and after this wave.
+tools/static_check.py passes.
+
+### Types
+
+| Old | New | Tier | Evidence |
+| --- | --- | --- | --- |
+| `UnknownSceneShapeKeyword` | `SceneObjectShapeKeyword` | 1 | The 0x24-byte {name, value} record of ReadStaticModels' shape table, {"Box", 0} and {"Sphere", 1}, looked up with the model's "ObjectShape" string (`0x005734f0`) |
+| `UnknownSceneEmitterKeyword` | `SceneEmitterTypeKeyword` | 1 | The 0x1c-byte record of the "EmitterType%d" table (`0x005734a8`): "DustEmitter", "DirtChunkEmitter", "DirtSprayEmitter", "ExhaustEmitter"; the default case prints "Unknown EmitterType (%s) for [%s]." (`0x00573418`) |
+| `UnknownSceneLodObject` | `SceneSoultreeObjectView` | 2 | Its methods SetAxesPtr `0x004fbd70` and SetPosition `0x004fc660` are SoultreeObject methods; config/game_build.json aliases both to `SoultreeObject`. The objects behind it (character +0x1a0, CarProcedural +0x34 carModel) are D3DIMSoultreeObjects, whose primary base is SoultreeObject at +0 (RTTI). Ready since Wave 28. |
+| `UnknownScenePhysicsObject` | `SceneSoultreePhysicsObjectView` | 2 | Constructor `0x005037c0` is bound as `SoultreePhysicsObject` (SoulTreePhysics.bindings.json) and aliased to it in config/game_build.json; slot 40 LoadPhysicsModel `0x00503970`; bases SoultreePhysicsBaseObject (+0) and D3DIMSoultreeObject (+0x21c), as RTTI gives them |
+| `UnknownScenePhysicsBody` | `SceneSoultreePhysicsBaseObjectView` | 2 | The +0 base of that view: RTTI SoultreePhysicsObject : SoultreePhysicsBaseObject (+0), D3DIMSoultreeObject (mdisp 540 = 0x21c, the view's extent); its 41 slots end with slot 37 AddAttachment and slot 40, the SoultreePhysicsObject primary vtable `0x00557f54` |
+| `UnknownSceneDustEmitter` | `SceneDustParticleEmitterView` | 2 | Constructor `0x004b8a00` is DustParticleEmitter's (RTTI, vtable `0x00555ab8`, Bike.bindings.json) and the game_build alias target; created for "DustEmitter" |
+| `UnknownSceneChunkEmitter` | `SceneDirtChunkParticleEmitterView` | 2 | Constructor `0x004b8df0` is DirtChunkParticleEmitter's (vtable `0x00555b34`); created for "DirtChunkEmitter" |
+| `UnknownSceneSprayEmitter` | `SceneDirtSprayParticleEmitterView` | 2 | Constructor `0x004b9310` is DirtSprayParticleEmitter's (vtable `0x00555ba8`); created for "DirtSprayEmitter" |
+| `UnknownSceneParticleEmitter` | `SceneParticleEmitterView` | 2 | The view-only base of the three emitter views: slot 27 Create, which all three call (`0x004ba040`, one ICF-folded body). Retail has no ParticleEmitter class (each RTTI chain is Emitter : GameObject : BaseObject); the name describes the view, not a retail base. |
+
+### Methods
+
+| Owner | Old | New | Tier | Evidence |
+| --- | --- | --- | --- | --- |
+| Scene | `UnknownFunction4de580` (4 overloads) | `LogParameter` | 3 | Shared empty `ret 0xc` body `0x004de580`; the Scene readers pass (47 calls in the ten readers test_scene_callbacks checks) (section, key, value read) in string, float, int and Vector3* forms (docs/SCENE_CALLBACKS.md); see the paragraph above for "LogProgress" |
+| Scene | `UnknownFolded4de580` | `LogDefaultParameter` | 3 | The same empty body under a second declaration; its two calls in ReadEnvironment `0x004ebfc0` pass the literal defaults "dirtpart.tga" and "graynoise.tga" when ParticleTextureMapName or DetailTextureMapName is missing |
+| Scene | `UnknownFunction464e80` | `LogMessage` | 3 | Shared empty `ret 4` body `0x00464e80`; the Scene readers (25 calls in those ten) pass the formatted error or notice text ("Cannot find data for [%s] in %s.", "Scene:  No AuralScape, ...") or "" after a section |
+| StatsOverlay | `UnknownFunction464e80` | `SetCueIndex` | 3 | The same empty body; its only caller, BaseQuarryEvent::Tick (`0x004de4a3`), passes visualCue->NextCueIndex() right after storing it in radarOverlay->cueIndex |
+| MorphBastardModifier | `UnknownFunction464e80` | `OnChannelsUpdated` | 3 | The same empty body; ModifyMesh (`0x004a4ce9`) calls it with the object index i right after UpdateChannels(&morphObjects[i]) |
+
+### What remains
+
+The Wave 28 table still holds for the other groups (376 uses, 74 names, by
+work/naming/w28/remain.py):
+
+| Uses | Names | Group |
+| --- | --- | --- |
+| 177 | 25 | types of statics or globals and their accessors (`UnknownSceneKeyword` among them: `s_lightTypes` is a static array of it) |
+| 87 | 30 | `UnknownVirtualSlotN` and `UnknownMethodN` |
+| 46 | 7 | typedef aliases of named classes |
+| 33 | 5 | retired or comment-only names and the retail string "Unknown" |
+| 20 | 4 | class or role not established |
+| 11 | 2 | types whose RTTI descriptor is emitted |
+| 2 | 1 | `UnknownEventGraphicsTest` |
+
+The Scene loader group is closed. The SceneManagerNearMisses.cpp pads and the
+other multi-member pads need a declaration split, not a rename.
