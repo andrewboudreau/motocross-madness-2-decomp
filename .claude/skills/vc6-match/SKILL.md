@@ -130,6 +130,8 @@ near misses; `tools/near_miss_drops.py` lists ones whose gap is a single drop.
   scalars as locals of the sound `if` block plus `automatic` as a local of the keyFramed block give retail's
   0xcfc frame and upper slots (5113 -> 5288); either change alone, or moving scalars to the loop body, does
   nothing. Map candidate and retail slots by paired instruction index first to see which variables retail shares.
+  Only address-taken scalars respond: MorphBastard LoadParameterFile `0x004a33b0` gains 8 from a function-scope
+  `targetValue` assigned in place, while 108 scope combinations of its register locals are flat.
 
 ## 4. Record and ship
 - Exact: set `"expect": "exact"` in the neighbouring `targets.json`, update tests if they hash objects

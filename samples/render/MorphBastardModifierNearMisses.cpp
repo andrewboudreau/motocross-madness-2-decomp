@@ -3,7 +3,7 @@
 // class evidence.
 //
 // MorphBastardModifier::LoadParameterFile (0x004a33b0, 2046 bytes): the
-// parameter-file loader, 1942 of 2046 positions. Calls, strings, lines,
+// parameter-file loader, 1950 of 2046 positions. Calls, strings, lines,
 // field offsets and the frame size (0x350) match retail; the object's rigid
 // inverse is MorphBastardInvertRigid (an inline building a Vector3; the
 // plain-locals form leaves the frame 0x18 bytes short). An existing channel
@@ -38,6 +38,20 @@
 // through a `const Vector3&` to row 3, is worse (masked 935-1148 of 1738,
 // base 1634); writing every product's operands the other way round
 // changes nothing.
+// 2026-11: `targetValue` is a function-scope local assigned 0 before the
+// target loop (1942 -> 1950; the same at object-loop scope). As a local of
+// the channel loop with an initialiser it was 1942, declared in the target
+// loop 1351, ahead of the channel pointer 1273. (The s14 function-scope
+// figure above was measured on an older base.) The scopes of the other two
+// address-taken scalars: targetCount at function or object-loop scope is
+// the same code, probe/found/channelAxis in the axis or target loop the
+// same, at object-loop or function scope 4 worse. On the new base the
+// scopes of k (shared by both channel loops: 1342), j, isNew, i and
+// controller (108 combinations) change nothing. Left: the remaining home
+// offsets, the store scheduling at the end of the object's inverse
+// (retail stores m[3][1] before the last faddp and takes &targetCount
+// after the m[3][2] store), and the m[3][0] products of the channel
+// inverse.
 //
 // s22, leaf-age copies in the channel inverse: m[0][0] and/or m[0][1]
 // copied into float locals before the Vector3 (retail loads them before
@@ -159,6 +173,7 @@ inline void MorphBastardInvertRigidInPlace(Matrix4* m)
 MorphBastardModifier* MorphBastardModifier::LoadParameterFile(void* value, const char* path,
                                                                  MorphBastardNode* model)
 {
+    float targetValue;
     char section[0x100];
     char objectName[0x100];
     char controllerName[0x100];
@@ -250,7 +265,7 @@ MorphBastardModifier* MorphBastardModifier::LoadParameterFile(void* value, const
             channel->targets[0].deltas = 0;
             channel->targets[0].vertexIndices = 0;
             channel->targets[0].lastWeights = 0;
-            float targetValue = 0;
+            targetValue = 0;
             for (int t = 1; t < channel->targetCount; t++) {
                 sprintf(section, "MorphBastard %i Target %i", i, channel->targetNumbers[t]);
                 block->SelectSection(section);
