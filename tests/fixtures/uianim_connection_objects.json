@@ -8,7 +8,7 @@
     "src/reconstructed/GUIManager.cpp": {
       "sections": 202,
       "relocations": 834,
-      "sha256": "08ddb8a4cefc3aa1c41a730dd4f6cea16af14c6ed150c428f465e2ad10211a4f"
+      "sha256": "cf7dce93c0b87c86ade19a747b8db851e0ba95add7ae14dc8b51e31ea286f57f"
     },
     "src/reconstructed/DlgProcs.cpp": {
       "sections": 421,
@@ -18,7 +18,7 @@
     "samples/ui/GUIManagerNearMisses.cpp": {
       "sections": 209,
       "relocations": 871,
-      "sha256": "65e67305526f239663394affe088f7be41699c2229950dba3fd13be3ec590fdd"
+      "sha256": "1e74534cedb4aa77f13f90f69b3c2d84bb30c017ca351bb19f82492c60d91290"
     },
     "samples/ui/DlgProcsNearMisses.cpp": {
       "sections": 558,
