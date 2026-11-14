@@ -54,6 +54,17 @@ near misses; `tools/near_miss_drops.py` lists ones whose gap is a single drop.
 - Index sums in strength-reduced loops: `for (j = 0; j < 64; j += 16)` lets VC6 reassociate `[i + j + t]` to
   `t + i + j`; a row counter with a named `int j = row * 16;` keeps `lea r, [i + j]` (Griddraw `0x00481300`).
   Term order and parentheses do not move it; `row << 4` is worse.
+  A k-scan (prefix k = 0..63 typedefs, work/w18/probe.py) is flat for all 65 render/eco/track near misses, so most
+  order-only rows are not this effect; BikeRace CreateRacers (k = 6..8) is the positive control.
+- x87 operand order of a commutative product follows leaf age: copying a member into a named float local just before
+  the product (`float minX = data->gridMinX; ... cell * minX`) makes it the newer leaf, loaded first, and the copy
+  folds (Griddraw ReadNode `0x0047e600`). If the local stays live it costs a spill instead.
+- Block layout follows the flow graph, not the spelling: if/else order, switch, goto and label placement canonicalise.
+  A redundant early return/re-test that jump threading later removes changes the graph (AddChatLine `0x004f3720`:
+  `if (player != -1 && !GetPlayerName(player, name)) return;` before the system/player split).
+- A width conversion between locals (`unsigned char r = intVar`) blocks copy propagation and keeps a callee-saved copy
+  plus the stack home alive (UIMultiState::ContainsPoint `0x00478e10`, 231 -> 288/329). Zero reuse from `test/jne`
+  only happens on the fall-through edge; at a jump target VC6 emits the immediate.
 - In Git Bash, `/` compiler flags in env vars (`MCM2_EXTRA_FLAGS`) need `MSYS_NO_PATHCONV=1`, or they are ignored.
 
 ## 4. Record and ship
