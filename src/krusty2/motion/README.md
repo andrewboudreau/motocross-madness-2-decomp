@@ -175,7 +175,8 @@ stay in `samples/physics/motion/Motnctrl.cpp`.
     - **LoadVue `0x4a5e40`, 48.08%**: the structure and calls are identical, but the registers are permuted (ebx/ebp and
       esi/edi).
     - **RotatePose `0x4a7dc0`, 90.66%**: the Vec3Normalize temporaries use a different stack slot.
-    - **PoseRotation `0x4a7fd0`, 55.70%**: the inline budget differs.
+    - PoseRotation `0x4a7fd0` is now strict exact in the sample (`from`/`to` references in the axisZ block and five
+      initialised function-level locals; the count is confirmed, the locals' identities are provisional).
     - **Slot 7 `0x4a70c0`** (candidate 3376 vs 3327 bytes; aligned instructions 675 of 958): the frame-accurate
       advance with pose extrapolation and blending. The call sequence is retail's and the clamp/smoothstep region
       matches byte for byte. One blend inline expanded in both loops always calls `CharacterPose::CharacterPose`

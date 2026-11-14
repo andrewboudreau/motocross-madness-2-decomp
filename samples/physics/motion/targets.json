@@ -104,8 +104,8 @@
     "candidate_symbol_contains": "?PoseRotation@@",
     "target_va": "0x004a7fd0",
     "target_size": 1121,
-    "expect": "partial",
-    "notes": "cdecl; slot 7 helper. 1097/1121 strict (was 660): UnitVector takes the squared length through the nested PoseLengthSquared inline and scales in an else block, which spends VC6's inline budget like retail (axisY path: DotProduct called, operator* expanded with the constructor called; axisZ path: everything called; identity axis constructor called). Only the axisZ cross product's operand loads differ (b first here, a first in retail); see Motnctrl.cpp for the forms tried",
+    "expect": "exact",
+    "notes": "cdecl; slot 7 helper. Strict exact: UnitVector takes the squared length through the nested PoseLengthSquared inline and scales in an else block (inline budget), the axisZ block binds from/to references to the two axes, and five initialised function-level locals precede them (named clamp bounds and identity-axis components). The count (5 mod 8) is confirmed by the bytes; which locals retail had is provisional; see Motnctrl.cpp",
     "bindings": "Motnctrl.bindings.json"
   },
   {

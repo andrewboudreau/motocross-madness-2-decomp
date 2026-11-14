@@ -15,7 +15,7 @@ names and reconstructed types remain provisional.
 | LoadVue | `0x004a5e40` | 1090 | 1088 | Nonexact |
 | Character slot 7 | `0x004a70c0` | 3327 | 3333 | Nonexact |
 | RotatePose | `0x004a7dc0` | 523 | 523 | Nonexact |
-| PoseRotation | `0x004a7fd0` | 1121 | 1121 | Nonexact |
+| PoseRotation | `0x004a7fd0` | 1121 | 1121 | Strict exact (sample; local identities provisional) |
 | ClampFloat | `0x004a8440` | 44 | 44 | Strict exact |
 | InterpolatePose | `0x004a8470` | 1205 | 1205 | Strict exact (canonical `src/krusty2/motion/Motnctrl.cpp`) |
 | CharacterPose constructor | `0x004a8930` | 3 | 3 | Strict exact |

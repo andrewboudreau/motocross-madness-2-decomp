@@ -210,48 +210,53 @@ void RotatePose(CharacterPose* src, CharacterPose* dst, Vec3 axis, float angle)
 // 0x004a7fd0 (cdecl, called twice by slot 7): the rotation taking pose a's axes to pose b's, as
 // an axis and an angle.  It rotates axisY onto axisY when they differ, otherwise axisZ onto axisZ;
 // identical axes give the axis (0, 0, 1) and the angle 0.
-// Near miss (1097/1121): the call sequence and frame match; only the axisZ cross product (laid out
-// first) loads b's component first in each product where retail loads a's (the axisY one matches).
-// No gain from a local cross helper with or without parentheses or with swapped operands, a named
-// cross local, swapped comparison operands, or swapped DotProduct arguments (registers swap, 1099
-// strict but esi/edi exchanged, not kept).  Also no gain: a const Vec3& alias of a->axisZ or
-// b->axisZ (in the cross or in the test, 1069..1097), a Vec3 copy (188..198), a pointer alias
-// (1097), an inline PoseAxisDiffers test by reference or by value (23..130), or reordered or
-// swapped component comparisons in the axisZ test (1004..1006).  Retail holds a in edi and b in
-// esi.  Nor from a PoseAxisRotation inline for either path or both (326..334 differing lines),
-// a cross wrapper (173), the axisZ test negated as `!(... == ... && ...)` (inert) or with
-// swapped operands (the test changes, the cross does not).
-// Retail holds a in edi and b in esi in both paths, yet loads b first in the axisY cross
-// and a first in the axisZ one, so the fixed indirect-word order of VC6_PATTERN_CORPUS
-// section 6 is not decided by the pointer pair alone. Also inert: `else if` / `else`
-// chaining and `*&` operands; swapped axisZ compares with or without swapped dot
-// arguments give 1089-1093.
-// Session 17 (count window, not adopted): `const Vec3& from = a->axisZ; const Vec3& to =
-// b->axisZ;` used in the axisZ cross and both unit vectors, plus five dead initialised
-// locals (int or float, any position) is strict exact (1121/1121); the references alone fix
-// the y/z rows, the count the x row (about seven symbols over this form). Not kept: the
-// count is not a real source feature (docs/VC6_OPERAND_ORDER.md section 2). No real local
-// supplies it: uninitialised or file-scope dummies are inert; unused Vec3 locals (4 diffs
-// at best), a named final axis, a named cross or unit-vector result, a PoseLengthSquared
-// local, CharacterPose* copies, dead component reads, axisY references in the test or
-// cross (4+) and top-declared references or pointers for both axes (139) all miss.
+// Strict exact (1121/1121).  Two things decide the axisZ cross product, whose operand loads were
+// the only difference (b's component first in each product, retail a's):
+//  - `from`/`to` references to the two axisZ vectors, declared in the axisZ block and used by the
+//    cross and both unit vectors, fix the y and z rows;
+//  - the number of initialised locals defined at function level before those references fixes
+//    the x row: VC6 needs five (mod 8).  They count whether used or dead and whether int, float,
+//    pointer or const; uninitialised, static and typedef declarations, empty blocks, locals of
+//    the helpers or of other functions and file-scope declarations do not (file-scope typedef
+//    scan k = 0..17 is flat).  Five locals inside the axisY block, between the two tests or at
+//    the head of the axisZ block count the same; after the references they do not (1105).
+//    The count runs 1089, 1089, 1087, 1097, 1113, 1121, 1113, 1097 for 0..7 extra locals.
+// Confirmed: the count.  Provisional: which locals retail had.  The named clamp bounds and
+// identity-axis components below are every literal of the function and all are used; the two
+// bounds with a named zero and one (Vec3(zero, zero, high)) plus any other two locals, or pose
+// pointer copies with the bounds and one more, match equally.  The axisY path must keep the
+// member spellings: references there cost 1095 at best for any count.
+// Ruled out before the count was found: a local cross helper with or without parentheses or
+// with swapped operands, a named cross local, swapped comparison operands, swapped DotProduct
+// arguments (1099, esi/edi exchanged), a Vec3 copy (188..198), an inline PoseAxisDiffers test
+// (23..130), reordered or swapped axisZ comparisons (1004..1006), a PoseAxisRotation inline
+// (326..334 differing lines), a cross wrapper (173), `else if` chaining and `*&` operands
+// (inert), top-declared references or pointers for both axes (108..139, size 1128), a bool
+// for the axisY test (61) and `-one` as the lower bound (1113 at best).
 void PoseRotation(CharacterPose* a, CharacterPose* b, Vec3* axis, float* angle)
 {
+    const float minCosine = -1.0f;
+    const float maxCosine = 1.0f;
+    const float identityX = 0.0f;
+    const float identityY = 0.0f;
+    const float identityZ = 1.0f;
     if (a->axisY.x != b->axisY.x || a->axisY.y != b->axisY.y || a->axisY.z != b->axisY.z) {
         *axis = UnitVector(CrossProduct(a->axisY, b->axisY));
         *angle = DotProduct(UnitVector(a->axisY), UnitVector(b->axisY));
-        ClampFloat(-1.0f, 1.0f, angle);
+        ClampFloat(minCosine, maxCosine, angle);
         *angle = (float)acos(*angle);
         return;
     }
     if (a->axisZ.x != b->axisZ.x || a->axisZ.y != b->axisZ.y || a->axisZ.z != b->axisZ.z) {
-        *axis = UnitVector(CrossProduct(a->axisZ, b->axisZ));
-        *angle = PoseDot(UnitVector(a->axisZ), UnitVector(b->axisZ));
-        ClampFloat(-1.0f, 1.0f, angle);
+        const Vec3& from = a->axisZ;
+        const Vec3& to = b->axisZ;
+        *axis = UnitVector(CrossProduct(from, to));
+        *angle = PoseDot(UnitVector(from), UnitVector(to));
+        ClampFloat(minCosine, maxCosine, angle);
         *angle = (float)acos(*angle);
         return;
     }
-    *axis = Vec3(0.0f, 0.0f, 1.0f);
+    *axis = Vec3(identityX, identityY, identityZ);
     *angle = 0.0f;
 }
 
