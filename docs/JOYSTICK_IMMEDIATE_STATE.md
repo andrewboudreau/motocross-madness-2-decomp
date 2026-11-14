@@ -18,19 +18,25 @@ calls therefore use the same primary pointer. This does not establish original
 translation-unit ownership.
 
 The standalone [candidate](../samples/inputdevice/JoystickImmediateState.cpp)
-is extracted unchanged from PCJoystickDeviceNearMisses.cpp. Authentic VC6 SP3
-`vc6_o2_mt` emits **453 bytes, 373 matching positions** against the complete
+is the body PCJoystickDeviceNearMisses.cpp includes. Authentic VC6 SP3
+`vc6_o2_mt` emits **454 bytes, 453 matching positions** against the complete
 454-byte reference. It remains nonexact source in samples.
 
-All 14 instruction differences come from register choice: the opcodes and
-stack slots match. In both QueueEvent blocks and in the POV copy, retail uses
-the next scratch register in the cycle eax, ecx, edx. For example, the release
-block loads `joystickIndex` and `g_TrackGame` into ecx/edx, where the
-candidate uses eax/ecx. The one-byte size difference follows from this:
-retail's first POV load uses edx, while the candidate's uses eax, which has the
-short `mov eax, [mem]` encoding.
+The one differing instruction is the release block's `pressed` argument:
+retail pushes the zero register (`push ebp`), the candidate pushes eax. The
+candidate assigns and copies the new state in one statement
+(`int pressed = buttonStates[i].state = state.buttons[i] >> 7;`) and passes
+that copy in the release block. The copy stays in eax while the arguments are
+loaded, so the release block loads `joystickIndex` and `g_TrackGame` into
+ecx/edx as retail does, and the press block and the POV copy follow in
+retail's eax, ecx, edx cycle. With `pressed` stored by its own statement VC6
+replaces it by 0 after the `== 0` test, whether the argument is written
+`pressed` or `0`; eax is then free, every later scratch register is one step
+behind and the function is one byte short (453 bytes, 373 matching). Retail
+shows both effects at once, the propagated zero and the busy eax; no form
+tried gives both.
 
-None of these forms moves the register cycle:
+Before the chained copy, none of these forms moved the register cycle:
 - **Pressed value:** `/128`; an unsigned type; casts to uchar, int and uint;
   `(x & 0x80) >> 7`; and a `& 0x80` test (worse, 321).
 - **Branches:** `if (pressed)` with the arms swapped (356); `!pressed`; one
@@ -46,6 +52,14 @@ None of these forms moves the register cycle:
 - **POV copy:** a struct copy (371) or unrolled assignments (460 bytes).
 - **Axes:** chained axis assignments, for each axis and for all of them;
   unchaining axis 1 (109) or writing it in member form (116) is much worse.
+- **With the chained copy:** the release or changed test on
+  `buttonStates[i].state`; `!pressed`, `pressed < 1`, `pressed != 1`, a
+  `switch`, `if (previous)`, `continue` on no change, a `changed` local; the
+  argument as `pressed != 0`, `pressed ? 1 : 0`, `!!pressed`, `pressed & 1`
+  (457 bytes), `pressed == 1` (461 bytes) or `buttonStates[i].state`; the press
+  block passing `pressed` (433 bytes, one merged call); zero stores from an
+  `int time = 0` local, chained, or storing `pressed` (452 matching); a
+  ControlInterface* local at loop, changed-block or arm scope.
 
 ## Behavior and existing providers
 
@@ -134,7 +148,7 @@ menus and racing remain unverified while linkage is incomplete.
 
 Private `work/joystick30/check_extraction.py` and `extraction-proof.json`
 compare the aggregate against commit `ffc9f7e5`: both complete functions
-(immediate 453 bytes and buffered 1,641 bytes) and all three remaining nondebug
+(immediate 453 bytes at that commit and buffered 1,641 bytes) and all three remaining nondebug
 COFF sections retain their full bytes, characteristics and named relocations.
 The one excluded string section on each side is explicitly identified as the
 compiler's absolute `__FILE__` path: `_JoystickImmediateBaseline.cpp` versus

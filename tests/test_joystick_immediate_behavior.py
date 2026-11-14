@@ -74,14 +74,14 @@ class JoystickImmediateBehaviorTests(unittest.TestCase):
 
             candidate_path, candidate = compile_source(ROOT / 'samples/inputdevice/JoystickImmediateState.cpp', 'candidate')
             fixture_path, _ = compile_source(ROOT / 'tests/fixtures/joystick_immediate_compare.cpp', 'fixture', True)
-            self.assertEqual(candidate.find_symbol(SYMBOL).function_size, 453)
+            self.assertEqual(candidate.find_symbol(SYMBOL).function_size, 454)
             self.assertEqual({s.name for s in candidate.symbols if s.storage_class == 2 and s.section_number > 0 and s.type == 0x20}, {SYMBOL})
             self.assertEqual({s.name for s in candidate.symbols if s.storage_class == 2 and s.section_number == 0},
                 {'?FeedAxis@JoystickDevice@@QAEXHMM@Z', '?QueueEvent@ControlInterface@@QAEXHHHH@Z', '?g_TrackGame@@3PAVTrackGame@@A', '__fltused'})
             self.assertFalse(any(s.name.startswith(('.CRT', '.text$x', '.xdata')) for s in candidate.sections))
             report = compare(image, candidate, SYMBOL, 0x4c3790, 454, ROOT / 'samples/inputdevice/JoystickImmediateState.bindings.json')
             self.assertFalse(report['strict_exact'])
-            self.assertEqual(report['strict_match']['matching_positions'], 373)
+            self.assertEqual(report['strict_match']['matching_positions'], 453)
             _, aggregate = compile_source(ROOT / 'samples/inputdevice/PCJoystickDeviceNearMisses.cpp', 'aggregate')
 
             def fingerprint(obj):

@@ -2,8 +2,8 @@
 // they match. See docs/INPUT_DEVICES.md.
 //
 // PCJoystickDevice::ReadImmediateState (0x004c3790, 454 bytes): complete
-// candidate is 453 bytes, with 373 matching positions. The former 452-byte
-// extent truncated the final ret 4. The unchanged standalone body below is
+// candidate is 454 bytes, with 453 matching positions. The former 452-byte
+// extent truncated the final ret 4. The standalone body below is
 // behaviorally reviewed; see docs/JOYSTICK_IMMEDIATE_STATE.md for the native
 // comparison and its finite, scripted COM boundary.
 //

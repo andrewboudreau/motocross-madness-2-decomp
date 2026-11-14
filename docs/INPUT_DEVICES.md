@@ -156,7 +156,7 @@ zero-initialized storage.
   reads a DIJOYSTATE-shaped state, feeds axes through `0x00489c00`, queues
   button changes on the ControlInterface, and keeps the POV values. The complete
   retail extent is 454 bytes; the earlier 452-byte extent cut the final return.
-  The unchanged standalone candidate emits 453 bytes with 373 matching positions.
+  The standalone candidate emits 454 bytes with 453 matching positions.
   Its [functional review](JOYSTICK_IMMEDIATE_STATE.md#functional-build-review)
   uses the actual strict binding/queue helpers and a scripted COM boundary.
 
