@@ -103,6 +103,14 @@ near misses; `tools/near_miss_drops.py` lists ones whose gap is a single drop.
   of the two written out is canonicalised to the same code (BuildFaceGeometry `0x0043dc60`, 1100 -> exact).
 - sweep_variants templates: an inline choice ending in `{` followed by `@|` parses as nested; keep braces outside choices.
 - In Git Bash, `/` compiler flags in env vars (`MCM2_EXTRA_FLAGS`) need `MSYS_NO_PATHCONV=1`, or they are ignored.
+- A test the optimiser folds late flips `[base + index]` operand order. When a loop's
+  address sums come out `[esi + eax]` for retail's `[eax + esi]` (or the reverse) and
+  nothing else differs, look for a missing test of a non-const local whose value is known
+  (`int flag = 1; if (!flag) return;`, `mode ? "a" : "w"`, a forwarded byte store read
+  back) before the loop. It emits no instruction, but the block it removes changes the
+  order the sums are built in. Tests the front end folds (literals, const/enum, inline
+  constant arguments, a repeated guard) do not. EcoSystem 0x00458da0 reaches 461/461 this
+  way; apply it only with evidence for the test's wording (it is otherwise dead code).
 
 ## 4. Record and ship
 - Exact: set `"expect": "exact"` in the neighbouring `targets.json`, update tests if they hash objects

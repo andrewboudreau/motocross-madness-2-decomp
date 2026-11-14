@@ -103,6 +103,33 @@
 //               dead `name[length] = 1;` before the store and an
 //               end-pointer spelling. `name[0x103] = 0;` after the
 //               extension copy (73-129) and memcpy for strncpy (41) lose.
+//               Round 10: the toggle is not the byte access. Any test of
+//               a non-const local holding a known value, written before
+//               the loop, gives retail's 461/461: VC6 folds it late
+//               (constant propagation in the optimiser) and emits the
+//               same instructions with the address sums the other way
+//               round. `if (name[length]) return;` after the store is
+//               one such test (store forwarded, test folded). Others, all
+//               461: `int flag = 1; if (!flag) return;` at the top, after
+//               the name head, after the fopen guard or after the count
+//               line; `if (!file || !flag) return;`; `if (flag)
+//               FilePrintf(count)`; `fopen(name, flag ? "a" : "w")` with
+//               flag 0; `i = 0; if (i == 0) FilePrintf(count)`; an error
+//               flag set from `!file`. None is applied: each is dead code
+//               with no evidence for its wording, so the row stays 457
+//               until retail's actual test is identified. Tests the front
+//               end folds do not flip (457): literal `if (1)`, const or
+//               enum flags at file or function scope, a constant argument
+//               of an inline head helper (`if (size <= 0) return;`), an
+//               inline helper returning 1, a repeated `if (!file)`,
+//               `if (file)` wrappers, `do {} while (0)`, empty ifs, a
+//               `max` local in the clamp. A folded test inside or after
+//               the loop does not flip either, and one that emits code
+//               (`if (!path) return;`, `if (placedCount > 0)` around the
+//               loop: 452) flips the order but changes bytes. Also 457:
+//               `i = 0` or `file = 0` early (five places each), a `type`
+//               local for the definition index, `while`/`do` loops;
+//               `int length = 0x103; if (pathLength <= length) ..` is 47.
 //   0x00459ce0  the frame slots: same size, the locals and temporaries
 //               are assigned in a different order (323/3300); retail
 //               keeps the first sample's TGA in ebx and reloads

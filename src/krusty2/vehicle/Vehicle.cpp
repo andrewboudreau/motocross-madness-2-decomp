@@ -2343,6 +2343,10 @@ void Vehicle::PlaceWheels()
 // one moved store), long locals with the store at each of positions 0-6 (833/835), a
 // named zero built by constructor, members, chain or copy-init with the store first, in
 // the middle or last (837-841) and a function-scope zero Vec3 (537).
+// Round 10, also no gain: `wheel->normalLoad = 0.0f` written as the x, y or z argument
+// of the zero vector's constructor (841 each), `Vec3(0.0f)` (837), `wheel->normalLoad =
+// load = 0.0f` (840) and a plain struct assignment with the store on either side (336,
+// lea again).
 // Wheel drive and contact impulse pass (tier 3 reading).  Counts the in-contact
 // wheels with a nonzero +0x2a0 and, unless crashed, lets each wheel apply its share of the
 // drive (0x00514170).  Then for every wheel in contact: the load pushing into the ground
