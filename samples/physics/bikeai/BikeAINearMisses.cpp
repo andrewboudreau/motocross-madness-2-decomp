@@ -6,44 +6,57 @@
 // canonical file, with the BikeAILength/BikeAISegmentLength/BikeAIDotZ/
 // BikeAINormalize helpers the functions here share.
 //
-// 0x0040e510 (1936 bytes, AI path steering direction): every branch, call and
-// constant is reconstructed; the candidate is 1935 bytes (retail's extent ends in one
-// nop) and aligns 1:1 except the y product's operand order and frame slots.  The walk along the
-// path uses its own index (`index = best`): with one variable for the nearest search
-// and the walk, VC6 swaps esi/edi against retail (path in esi, index in edi).  The
-// three perpendiculars are built component-wise (`perp.x = seg.z; perp.y = 0;
-// perp.z = -seg.x; perp = SafeNormalize(perp)`) as in 0x0040d200, which copies seg.z with integer
-// moves like retail.  The walk reuses `seg` for its direction (1844 -> 1846 over a
-// separate `dir`), and the final step is written per component with the parameter
-// assigned in the first product (`step.x = (t = ahead / len + bestT) * seg.x; step.y =
-// t * seg.y; ...`): retail keeps the sum on the FPU stack for x (`fst t; fmul x`) and
-// reloads t from memory for y and z (1422 -> 1846; `seg * (t = ...)` keeps t on the
-// FPU stack for all three, a separate `t = ...;` gives `fstp t; fld x; fmul t`, and a
-// `const float&` scale helper gives the same as the latter).  Left: the y product loads
-// seg.y before t (retail t first; z already loads t first, seg.z having an older x87
-// leaf from `perp.x = seg.z`; operand order, the y/z store order, the step declaration's
-// position, a dead `seg.y = 0` after the segment differences and component-wise
-// segment differences do not change it; nor do the walk lengths written out in the
-// body, by-value or by-pointer length helpers, `seg` read through a reference or
-// `(&seg)->y`, by-reference scale helpers for y or y and z, or brackets around single
-// products of the step rows, `ahead / len`, the length-helper terms and the outDir sum,
-// all 1884) and frame slots.  One perpendicular `perp` at the
-// enclosing scope serves both intersection blocks and the final shift, which puts it at
-// retail's +0x14 (block-local `perp`s in the two blocks: 1865; hoisting one of them: 1872;
-// all three as one: 1884).  Left in the frame: retail pairs `seg` with `step` at +0x20
-// and the segment difference temporary with `target` at +0x2c; here `seg` shares
-// `target`'s slot and the temporary takes +0x20, with `step` alone at +0x38 (hoisting
-// `step`, `target` or `dist`, block-local segments and perp/seg declaration order are
-// inert or lose a byte).  The walk's two segment
-// lengths use BikeAISegmentLength, as 0x0040d200 does: its `(x*x)` parentheses issue
-// the named copy's z store after the z*z product like retail (BikeAILength issues it
-// before the first faddp; `(y*y)` parentheses do the same as `(x*x)`, `(z*z)`, a flat
-// sum, z first or y first change nothing; 1846 -> 1865).  Declaration order of the Vec3 locals does not
-// change VC6's frame (all 24 permutations tried); declaring bestT before best fixed
-// the immediate store of bestT = 0.  Also inert on the slots (session 14): a
-// per-block `seg`, a `seg` reference alias and splitting the walk direction's
-// declaration from its first assignment; block-scoped `t` locals for the two
-// intersection tests lose 630 strict bytes.
+// 0x0040e510 (AI path steering direction): EXACT, 1935/1935 code bytes.  Retail's
+// 1936th byte (0x0040ec9f) is the nop that aligns 0x0040eca0, not part of the function.
+// What it took, in the order found:
+//  * The walk along the path uses its own index (`index = best`): with one variable
+//    for the nearest search and the walk, VC6 swaps esi/edi against retail (path in
+//    esi, index in edi).
+//  * The three perpendiculars are built component-wise (`perp.x = seg.z; perp.y = 0;
+//    perp.z = -seg.x; perp = SafeNormalize(perp)`) as in 0x0040d200, and one `perp` at
+//    the enclosing scope serves both intersection blocks and the final shift (retail's
+//    +0x14; block-local perps 1865, hoisting one 1872).
+//  * The final step is written per component with the parameter assigned in the first
+//    product (`step.x = (t = ahead / len + bestT) * seg.x; step.y = t * seg.y; ...`):
+//    retail keeps the sum on the FPU stack for x (`fst t; fmul x`) and reloads t for y
+//    and z.  `t = ahead / len + bestT; target = path->points[index] + seg * t;`
+//    compiles to the same bytes; `seg * (t = ...)` keeps t on the stack for all three.
+//  * ONE segment vector for the whole function (1884 -> 1925).  Retail keeps the
+//    single-point tail's flattened direction (0x0040ebdc..) in the slot of the walk's
+//    segment (+0x20) and the operator- temporaries in the next one (+0x2c); a separate
+//    `Vec3 toFirst` in the tail is packed into the dead `pos` argument instead and
+//    leaves `seg` three references short, so VC6's use-density sort swaps the two
+//    slots.  Declaring `seg` at function scope and reusing it in the tail gives
+//    retail's frame everywhere.  This is the same lever as SoultreeObject::SetAxesIn
+//    (0x004fc050): two named struct values with disjoint lives in one retail slot are
+//    one reused variable.  Diagnostic that pointed at it: three extra reads of `seg`
+//    after the walk flip the layout to retail's, one does not.
+//  * The walk's segment length sums `((x*x) + (y*y)) + z*z` (BikeAISegmentLength,
+//    1925 -> 1933): with the frame right, the redundant parentheses around y*y make
+//    VC6 load the y product before the x product, as retail does at both walk sites
+//    (`(x*x + (y*y)) + z*z` does the same; `((x*x) + y*y) + z*z` loads x first, the
+//    flat sum and BikeAILength lose 13-31 bytes).  0x0040d200 is unaffected (its
+//    seg.y is 0 and the term folds) and stays exact.
+//  * `seg.y = 0.0f` after each neighbour-segment difference (1933 -> 1935): the
+//    segment is flattened before the 2D perpendicular and intersection, as the tail
+//    and 0x0040d200 do.  The store is dead (IntersectLines reads x and z only) and
+//    emits nothing, but it creates seg.y's x87 leaf before `t`'s (first referenced as
+//    `&t` in the same block), so the step's y product loads t first like its z product
+//    (docs/VC6_OPERAND_ORDER.md 1.2).  The first block's store alone is enough; the
+//    second is kept for symmetry.  `perp.y = seg.y * 0.0f` (VC6 folds the product) and
+//    `seg.y = 0.0f; perp.y = seg.y;` give the same bytes.  Evidence tier: the store
+//    is an inference from the leaf order, not something retail's bytes show directly.
+// Forms that did not move the y product or the frame before these (all 1884): operand
+// order and store order of the step rows, the step declaration's position, a dead
+// `seg.y = 0` after the walk's differences, component-wise differences (worse), walk
+// lengths written out in the body, by-value or by-pointer length helpers, `seg` read
+// through a reference, member operators, a separate walk `dir`, block-local segments,
+// all 24 declaration orders of the Vec3 locals, the nearest-point loop reusing `seg`
+// (identical code), `Vec3 seg(0.0f, 0.0f, 0.0f)`; block-scoped `t` locals lose 630
+// bytes; the single-point tail written first lays the code out differently (120).
+// `perp * side` through an inline with a named result gives the final sum's slots but
+// swaps its operands (1888 before the reuse).  Declaring bestT before best fixed the
+// immediate store of bestT = 0.
 //
 // The inline length helper used here has the same body as the out-of-line copy at
 // 0x00413190 (matched in the canonical file as a plain function).  Retail's
@@ -156,7 +169,7 @@
 int IntersectLines(float ax, float az, float dax, float daz, float bx, float bz,
                           float dbx, float dbz, float* s, float* u);
 
-// 0x0040e510, 1936 bytes, cdecl: steering direction along an AI path.  The fourth
+// 0x0040e510, 1935 bytes (+1 nop of alignment), cdecl: steering direction along an AI path.  The fourth
 // argument is the bike's speed (0x0040eca0 pushes it as a float); it is not read.  Finds the
 // path point nearest to 'pos', refines the segment by intersecting the perpendicular
 // through 'pos' with the neighbouring segments, walks 'lookAhead' (+ |offset| in race
@@ -170,6 +183,7 @@ int PathSteeringDirection(Vec3* outDir, Vec3 pos, BikeAIRacingLine* path, float 
         return 0;
     float bestT = 0.0f;
     int best = 0;
+    Vec3 seg;
     if (path->count >= 2) {
         float bestDist = 1000000.0f;
         int last = path->count - 1;
@@ -183,10 +197,10 @@ int PathSteeringDirection(Vec3* outDir, Vec3 pos, BikeAIRacingLine* path, float 
         int nearest = best;
         float t;
         float offset;
-        Vec3 seg;
         Vec3 perp;
         if (nearest > 0) {
             seg = path->points[nearest] - path->points[nearest - 1];
+            seg.y = 0.0f;
             perp.x = seg.z;
             perp.y = 0.0f;
             perp.z = -seg.x;
@@ -202,6 +216,7 @@ int PathSteeringDirection(Vec3* outDir, Vec3 pos, BikeAIRacingLine* path, float 
         }
         if (nearest < path->count - 1) {
             seg = path->points[nearest + 1] - path->points[nearest];
+            seg.y = 0.0f;
             perp.x = seg.z;
             perp.y = 0.0f;
             perp.z = -seg.x;
@@ -258,12 +273,12 @@ int PathSteeringDirection(Vec3* outDir, Vec3 pos, BikeAIRacingLine* path, float 
         *outDir = SafeNormalize(*outDir);
         return 1;
     }
-    Vec3 toFirst = path->points[0] - pos;
-    toFirst.y = 0.0f;
+    seg = path->points[0] - pos;
+    seg.y = 0.0f;
     if (outDir->x == 0.0f && outDir->z == 0.0f)
         outDir->z = 1.0f;
     else
-        *outDir = SafeNormalize(toFirst);
+        *outDir = SafeNormalize(seg);
     path->index = 0;
     path->t = 0.0f;
     return 1;

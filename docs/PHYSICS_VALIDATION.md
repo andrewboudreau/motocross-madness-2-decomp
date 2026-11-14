@@ -217,8 +217,8 @@ Extent: `0x40d070..0x416e1f` (strong inference). Bike.cpp ends at
 `0x415640`. A second Math3D set at `0x417350` means BikeCamera code
 (`0x416e20..0x417aff`) is a separate, unattested unit.
 
-Five near misses and one exact COMDAT are in `samples/physics/bikeai`:
-- the steering direction `0x40e510` differs by an esi/edi swap and frame order;
+Four near misses, the exact steering direction and one exact COMDAT are in `samples/physics/bikeai`:
+- the steering direction `0x40e510` is strict exact (one reused segment vector);
 - the obstacle query `0x415640` (6112 bytes, 5987/6111) differs in the order of
   its one-use temporaries and two argument-push placements;
 - the two-wheel look-ahead simulation `0x40eca0` (17585 bytes, extent

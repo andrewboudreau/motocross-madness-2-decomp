@@ -105,6 +105,14 @@ near misses; `tools/near_miss_drops.py` lists ones whose gap is a single drop.
   share another) can be one reused variable: `Vec3 x; if (c) { x = Cross(z, y); ... } ... x = Cross(y, z);`.
   Sibling blocks, inline helpers and scope moves do not reproduce that colouring (SetAxesIn `0x004fc050`,
   1137 -> exact with unchanged instructions).
+  The same reuse fixes a use-density slot swap: a tail-path local that VC6 packs into a dead by-value argument
+  slot while retail has it in the main vector's frame slot is that vector reused (PathSteeringDirection `0x0040e510`,
+  1884 -> 1925). To size such a shortfall, add k probe reads of the variable and see where the layout flips.
+- A commutative product that loads a struct member before a scalar local (retail the scalar first) means the member's
+  leaf is too new: its only earlier reads were copy-propagated or inside an inline helper. A plain store to the member
+  earlier in dominating order (`seg.y = 0.0f;` when flattening, dead and emitting nothing) or `m * 0.0f` (folded by VC6)
+  creates the leaf; a dead initialiser at the declaration does not (`0x0040e510`, 1933 -> exact). Confirm with a probe read
+  first, and apply it only where the store has a meaning the neighbouring code shares.
 - sweep_variants templates: an inline choice ending in `{` followed by `@|` parses as nested; keep braces outside choices.
 - In Git Bash, `/` compiler flags in env vars (`MCM2_EXTRA_FLAGS`) need `MSYS_NO_PATHCONV=1`, or they are ignored.
 - A test the optimiser folds late flips `[base + index]` operand order. When a loop's

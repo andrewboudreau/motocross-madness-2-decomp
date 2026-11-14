@@ -81,14 +81,16 @@ inline float BikeAILength(const Vec3& v)
 
 // Length of a path segment, in 0x0040d200 (seg.y is 0 there, so VC6 folds the y*y
 // term) and at 0x0040e510's walk.  Same result as BikeAILength; the redundant
-// parentheses around x*x are a source-form difference (docs/VC6_OPERAND_ORDER.md
-// section 3): with them VC6 emits the preceding store (`seg.y = 0` in 0x0040d200, the
-// named copy's z in 0x0040e510) after the x*x product, as retail does at all four
-// segment sites, while the takeoff-speed and nearest-point sites (BikeAILength) need the
-// plain form.
+// parentheses around x*x and y*y are a source-form difference
+// (docs/VC6_OPERAND_ORDER.md section 3): with the x*x pair VC6 emits the preceding
+// store (`seg.y = 0` in 0x0040d200, the named copy's z in 0x0040e510) after the x*x
+// product, as retail does at all four segment sites, and with the y*y pair 0x0040e510's
+// walk loads the y product before the x product, as retail does at both of its sites
+// (inert in 0x0040d200).  The takeoff-speed and nearest-point sites (BikeAILength) need
+// the plain form.
 inline float BikeAISegmentLength(const Vec3& v)
 {
-    float lenSq = ((v.x * v.x) + v.y * v.y) + v.z * v.z;
+    float lenSq = ((v.x * v.x) + (v.y * v.y)) + v.z * v.z;
     if (lenSq == 0.0f)
         return 0.0f;
     if (lenSq == 1.0f)
