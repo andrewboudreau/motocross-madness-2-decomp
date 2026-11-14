@@ -173,10 +173,9 @@ public:
     int NextCueIndex();               // 0x0048bc30: the next cue index when it changed, else -1
     int CanCycleCues();               // 0x0048bc80: a cue is active and more than one racer exists
 
-    // The cue's screen fractions (0.5f, 0.1f from its callers). A plain
-    // `return screenX;` emits the same code but renumbers VC6's $L/$T labels.
-    float ScreenXFraction() { return *(float*)&screenX; }
-    float ScreenYFraction() { return *(float*)&screenY; }
+    // The cue's screen fractions (0.5f, 0.1f from its callers).
+    float ScreenXFraction() { return screenX; }
+    float ScreenYFraction() { return screenY; }
     // The placement block slot 10 repeats in each mode.
     void PlaceCue();
 

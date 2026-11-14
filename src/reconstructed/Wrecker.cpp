@@ -175,18 +175,16 @@ static inline Vector3& operator*=(Vector3& v, float s) {
     return v;
 }
 
-// Per-step update of a GameObject (slot 11, Step). The named pointer (one
-// more local symbol in each of the two expansions) is what gives the first
-// carry-over product retail's term order in relative._23 (a._23 * b._22
-// before a._33 * b._23): written as `object->Step(step)` that element sums
-// the other way (4174/4178 with the old view cast inline). VC6 SP3 orders equal
-// candidates there by the count of referenced local symbols created before
-// the product, modulo 8: two to seven more give retail's order, one more
-// is worse, eight more is back to the old order (dead initialised ints
-// probe the same window; the uninitialised ones are not counted).
+// Per-step update of a GameObject (slot 11, Step). Slot 10 is 4174/4178:
+// the first carry-over product sums relative._23 as a._33 * b._23 before
+// a._23 * b._22 (retail the other way). VC6 SP3 orders equal candidates
+// there by the count of referenced local symbols created before the
+// product, modulo 8: a copy `GameObject* stepped = object;` here (one more
+// symbol in each of the two expansions) gives retail's order, as do two to
+// seven dead initialised ints. Those locals exist only for the compiler,
+// so they are not applied.
 static inline void WreckerStep(GameObject* object, float step) {
-    GameObject* stepped = object;
-    stepped->Step(step);
+    object->Step(step);
 }
 
 // Slot 11 of the collision model, called on its GameObject subobject at +0xc

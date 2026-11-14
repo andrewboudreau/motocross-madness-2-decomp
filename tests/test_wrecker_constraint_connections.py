@@ -216,7 +216,7 @@ class WreckerConstraintConnections(unittest.TestCase):
             run=subprocess.run([str(binary)],capture_output=True,text=True,timeout=30)
             self.assertEqual(run.returncode,0,run.stdout+run.stderr)
             self.assertEqual(run.stdout.strip(),'Wrecker probes: 2568 cases, 8 independently modeled access faults')
-            self.assertEqual(strict,87)
+            self.assertEqual(strict,85)
             print('%d strict checks; two complete objects and partials; %s'%(strict,run.stdout.strip()))
 
 

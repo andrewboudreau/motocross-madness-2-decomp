@@ -54,7 +54,7 @@ class WreckerModelConnections(unittest.TestCase):
                 objects[name] = CoffObject(output)
 
             callers = [case for case in CASES if case['source'] == sources['wrecker']]
-            self.assertGreaterEqual(len(callers), 29)
+            self.assertGreaterEqual(len(callers), 28)
             for case in callers:
                 result = compare(image, objects['wrecker'], case['symbol'],
                                  int(case['target_va'], 0), case['target_size'],

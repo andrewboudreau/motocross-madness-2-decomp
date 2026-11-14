@@ -72,6 +72,8 @@ multiply.
 Near miss: the path search `0x005179f0` (929/929 bytes, two differ). Where
 the walk reaches b's node, retail loads the two addends of
 `length + fromStart` in the other order; no source order tried changes it.
+A dead `float length = 0.0f;` at the top matches; that compiler-only store is
+not applied.
 
 Exact: the closest position on one node `0x00516ca0` (586 bytes). The
 segment parameter is clamped to [0, 1] first and the difference chosen after

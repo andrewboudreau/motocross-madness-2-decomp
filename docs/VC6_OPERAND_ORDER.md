@@ -136,7 +136,8 @@ leaf. Bike slot 76 (`v.x *= (s = ...)`) makes `s` newer than `v.x`; a named
 - Track `0x005179f0` (`length = fromStart + length`): retail loads `fromStart`
   first. A dead `float length = 0.0f;` at the top of the function gives `length`
   its leaf before `fromStart` is computed, so `fromStart` is the newer leaf and VC6
-  emits `fld fromStart; fadd length`; the function is exact with it. Moving the
+  emits `fld fromStart; fadd length`; the function is exact with it. That store is
+  compiler-only, so it is not applied and the function stays at 927/929. Moving the
   `length = toEnd` store up instead folds `toEnd` away and changes the frame.
 - Code that the optimiser removes still creates leaves: SoultreeObject
   WorldToLocalDirection `0x004fd710` inverts its matrix copy with the rigid
@@ -699,7 +700,8 @@ trying on other `[base+index]` / `add r, r` order near misses.
   reference) reorders it, which points at the loop optimiser's renumbering of induction
   addresses rather than at the source text.
 - A dead initialiser creates a local's leaf: `float length = 0.0f;` that is never
-  read still makes later-computed values newer than `length`. Track `0x5179f0`.
+  read still makes later-computed values newer than `length`. Track `0x5179f0`
+  (diagnostic only: such stores are not applied).
 - A vector built by a constructor with by-value parameters and then normalised gives
   x scalar-first and y/z component-first, with a final `fstp st(0)`; per-component
   stores into a named local give all three scalar-first. Track `0x518130`.
@@ -859,7 +861,8 @@ try on similar code. None is a rule.
     operand order inside a product, or store scheduling. A trivial standalone
     function does not respond at all.
   - A named cast pointer in an inline helper that is expanded twice adds two;
-    this fixed Wrecker slot 10 (`0x005306e0`).
+    this matches Wrecker slot 10 (`0x005306e0`), but the copy is a dummy local,
+    so it is not applied (4174/4178).
   - A per-row search over all 24 term orders moved Scale from 596 to 618 bytes.
   - Of 17 term-order near misses swept with 0 to 33 dead locals, only four
     respond: Shadow slot 29, D3DIMSoulTree `0x00443aa0`, SoultreeTransform

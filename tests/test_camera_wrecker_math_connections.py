@@ -90,7 +90,7 @@ class CameraWreckerMathConnections(unittest.TestCase):
                 self.assertTrue(proof['strict_exact'], proof)
                 counts[name] += 1
             self.assertGreaterEqual(counts['FollowCamera'], 38)
-            self.assertGreaterEqual(counts['Wrecker'], 29)
+            self.assertGreaterEqual(counts['Wrecker'], 28)
 
             # The sample includes Wrecker.cpp, but still needs its own call-only
             # constructor view. Preserve both partial comparisons honestly.

@@ -27,9 +27,9 @@ relocation resolved by the bindings. Two near misses are parked in
   `Step(float dt)` of the shared GameObject declaration. Wrecker.cpp calls it
   through two inline helpers, `WreckerStep` (a `GameObject*`) and
   `WreckerStepModel` (the collision model, whose `Step` resolves to the `+0xc`
-  subobject without a null check); their parameters and `WreckerStep`'s named
-  pointer are part of the local-symbol count that orders slot 10's last
-  carry-over product (see below), so neither is written as a direct call.
+  subobject without a null check); their parameters are part of the
+  local-symbol count that orders slot 10's last carry-over product (see
+  below), so neither is written as a direct call.
 - Confirmed: Bike slot 97 (`0x00409420`) allocates 0x53c bytes and calls the
   constructor `0x0052ff90` with 1, then `0x00530190` with "rider.col"
   (`src/krusty2/vehicle/Bike.cpp`, now using the canonical Wrecker class;
@@ -218,10 +218,12 @@ python -m unittest discover -s tests -p test_wrecker_model_connections.py -v
   operand in the second), the axis rebuild `WreckerOrthonormalize` (up =
   forward x right), the old position copied through `WreckerCopy` from a
   pointer to `lastPose` and the subtract called by value. The last term
-  pair (`relative._23` adds `a._23 * b._22` before `a._33 * b._23`) needs the
-  named pointer in `WreckerStep`: VC6 orders those equal terms by the
-  count of referenced local symbols created before the product, modulo 8
-  (two to seven more than a direct `object->Step(step)` give retail's order).
+  pair (`relative._23` adds `a._23 * b._22` before `a._33 * b._23`) sums the
+  other way, so slot 10 is 4174/4178: VC6 orders those equal terms by the
+  count of referenced local symbols created before the product, modulo 8.
+  A copy `GameObject* stepped = object;` in `WreckerStep` (two to seven more
+  symbols) gives retail's order but exists only for the compiler, so it is not
+  applied.
 - `0x00530190` is `SetupWrecker`. The krusty2 names `SetBody` (`0x0043b9e0`),
   `AddProbePoint` (`0x0043c7f0`), `FindMotion`/`SetMotion`/`AdvanceMotion`/
   `SetMotionByName` (`0x004a6b30`/`0x004a8b40`/`0x004a6bb0`/`0x004a8b10`)

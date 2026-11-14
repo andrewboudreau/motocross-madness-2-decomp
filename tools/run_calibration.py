@@ -6656,15 +6656,6 @@ CASES = [
         'reason': 'cross-registers ignore lists (line 0xb4)',
     },
     {
-        'name': 'Wrecker slot 10 0x5306e0',
-        'bindings': 'src/reconstructed/Wrecker.bindings.json',
-        'source': 'src/reconstructed/Wrecker.cpp',
-        'symbol': '?Tick@Wrecker@@UAEHM@Z',
-        'target_va': '0x005306e0',
-        'target_size': 4178,
-        'reason': 'per-frame update; the named slot-11 view pointer in WreckerStep gives the carry-over product its relative._23 term order',
-    },
-    {
         'name': 'Wrecker probe trail particles 0x531da0',
         'bindings': 'src/reconstructed/Wrecker.bindings.json',
         'source': 'src/reconstructed/Wrecker.cpp',
@@ -23534,15 +23525,6 @@ CASES = [
         'symbol': '?IsAtOrAfter@Track@@QAEHUTrackPos@@0@Z',
         'target_va': '0x005179a0',
         'target_size': 67,
-    },
-    {
-        'name': 'Track 0x5179f0 shortest path distance',
-        'bindings': 'src/reconstructed/Track.bindings.json',
-        'source': 'src/reconstructed/Track.cpp',
-        'symbol': '?ShortestPath@Track@@QAEHUTrackPos@@0PAPAUTrackListItem@@PAM@Z',
-        'target_va': '0x005179f0',
-        'target_size': 929,
-        'reason': 'Track.cpp __FILE__ DebugCalloc lines 1175..1258; dead `length = 0` initialiser makes fromStart the newer leaf',
     },
     {
         'name': 'Track 0x517da0 distance between positions',

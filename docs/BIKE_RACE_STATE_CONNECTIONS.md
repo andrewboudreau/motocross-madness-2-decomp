@@ -90,6 +90,10 @@ Retail keeps both replay blocks' buffers in the same two frame slots; block-scop
 crossed. The six count-dependent bytes above are unchanged by it, and the count scans were not
 repeated with the new form.
 
+Removing the no-op `*(float*)&screenX`/`screenY` casts from the VisualCue accessors in
+Krusty3DObjects.h (included by the sample) moved the window again: the sample is now 13,394
+(XOR EDI/MOV EBX at +538 swapped). Forms that only shift this count are not applied.
+
 | Complete CreateRacers fingerprint | Before | After |
 |---|---|---|
 | Raw body SHA-256 | `1a2b16687fa89e9a0ed33dba31a1e46452caaaefa3ad73ce630b317a32bf07c4` | `9c7483a4d5ff8514f8a350f528dbe11d8d82d4d694439f87d069fd6fbf9e748b` |
