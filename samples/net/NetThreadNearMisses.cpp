@@ -17,6 +17,16 @@
 // the buffer passed to the dispatch (106), inline Receive wrappers taking the
 // buffer, the size or the interface (234, 194), a local interface pointer, a
 // function-pointer local and inline accessors for the buffer and the size.
+// Swept after that (1800 renderings, none above 274): the local declared
+// without or with a null initialiser, `do`/`while (1)`, the reload as an
+// assignment inside the Receive argument list or as the first statement of
+// the body, the allocation chained into the global and the local in either
+// order or tested inside the `if`, the local in the DebugFree test, and the
+// dispatch written as an early `continue` for size < 4 (271 of 349). The loop
+// written with labels only (reload/retry gotos, no loop statement) loses the
+// local altogether (130 of 385). The two loads VC6 emits are byte-identical
+// to retail's one and both sit directly before the join, so this is a loop
+// head retail has and the candidate does not, not a missed tail merge.
 //
 // HandleReceivedMessage (0x004afa90) is exact in src/reconstructed/NetThread.cpp:
 // the acknowledgement reads the local player into a local before SendRaw and
