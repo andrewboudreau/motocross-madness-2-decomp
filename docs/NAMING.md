@@ -1610,3 +1610,126 @@ and UIDialogTick.cpp):
   NAME-ONLY.
 
 No fixture was repinned.
+
+## Wave 19: SDK layouts, scene sections, helpers and messages
+
+Wave 19 names the long tail of distinct `Unknown*` types and helpers that are
+not views of named classes. It skips `UnknownVirtualSlotN`, `UnknownMethodN`,
+the shared stubs, `UnknownPodium*`, statics and the types of statics. Names
+only: no declaration, typedef, forward declaration or member was added or
+removed. `git grep -ohE '\bUnknown[A-Z][A-Za-z0-9_]*' -- src samples` fell
+from 466 unique names and 3350 uses to 394 unique names and 2947 uses. `field_0x` lines fell
+from 1879 to 1872 (1998 to 1991 occurrences).
+
+Method: work/naming/w19/triage.py lists each name's definitions and the
+comments before them, show.py prints the bodies, strs.py finds a literal in
+mcm2.exe's .rdata/.data and the retail instructions that reference it, and
+coll.py counts a candidate name across the tracked tree. The renames are the
+maps work/naming/w19/map-A.json, map-B.json, map-D.json, map-E.json and
+map-E2.json, applied with work/naming/rename.py (map-E2 excludes
+InGameProcs.cpp), and the field renames are work/naming/w19/fields.py. A new
+name that two units define locally replaces one old name shared by exactly
+those definitions, so no unit gains a second definition. The field leads came
+from work/naming/classreads.py v2 (`layouts`, then `scan`).
+
+Result (every unit whose closure reaches one of the 96 changed files,
+from 664e1883 to the final tree, map work/naming/w19/map-wave19.json with 73
+entries): 307 units, 292 IDENTICAL, 6 IDENTICAL-COMDAT-ORDER
+(DlgProcsNearMisses.cpp, Group4_DlgMain.cpp, Group5_PCBailoutDlg.cpp,
+Group6_BikeRaceCreate.cpp, KrustyUI.cpp, OptionProcs.cpp) and 9 NAME-ONLY
+(MSZoneInterface.cpp, PCControl.cpp, PCJoystickDevice.cpp,
+Parameterblocks.cpp, TrackGame.cpp, TrackOverlay.cpp and the fixtures
+media_control_open_compare.cpp, primary_sound_format_compare.cpp and
+race_sound_refill_compare.cpp: the units whose decorated names carry a
+renamed type). There was no DIFF and no compile failure, and no .bss or
+.data offset moved. No unit is NAME-ONLY because of a helper or field
+rename.
+
+Negative controls:
+
+- Without the map, PCControl.obj gives DIFF in the relocations of
+  `?CreateDevices@PCControlInterface@@UAEHXZ`.
+- A live change (`return 1` to `return 2` after "GUID_ConstantForce" in the
+  new tree's PCControl.cpp, work/naming/w19/live.py) gives DIFF in the
+  bytes of `?GetForceFeedbackEffectName@@YAHUGuid@@PAD@Z`.
+
+Fixture pins: whole-object digests of NAME-ONLY units only, each with
+unchanged section and relocation counts: TrackOverlay.cpp in
+chat_name_tag_objects.json, stats_standings_objects.json,
+clipper_global_objects.json and visibility_connections_objects.json, and
+TrackGame.cpp in startup_list_objects.json (work/naming/repin.py; the two
+canonical TrackOverlay records by hand after the same check). The
+mangled names in the bindings of MSZoneInterface, TrackGame, PCControl,
+PCJoystickDevice, Parameterblocks and TrackOverlay and in
+tools/run_calibration.py were renamed with the types.
+
+### Types
+
+| Old name | New name | Tier | Evidence |
+| --- | --- | --- | --- |
+| `UnknownDirectInput` | `DirectInput7` | 1 | IID_IDirectInput7A `0x005569e0`, passed to `DirectInputCreateEx`; the view's ten slots are the SDK's IDirectInput7A order (Wave 17). |
+| `UnknownDirectPlay4A`, `UnknownDirectPlayLobby3A` | `DirectPlay4A`, `DirectPlayLobby3A` | 1 | IID_IDirectPlay4A `0x005567b0` and IID_IDirectPlayLobby3A `0x00556870`; MSZoneInterface::SetDirectPlay (`0x004aa350`) stores both. |
+| `UnknownEnumerateEx` | `DirectDrawEnumerateExFunction` | 1 | The typedef of the pointer `GetProcAddress(library, "DirectDrawEnumerateExA")` returns (PCVideoCard.cpp). |
+| `UnknownDeviceObjectData`, `UnknownEffectParams`, `UnknownEffectInfo`, `UnknownDeviceInstance`, `UnknownObjectInstance`, `UnknownDataFormat`, `UnknownDeviceCaps`, `UnknownInputProperty`, `UnknownInputPropertyRange`, `UnknownEnvelope`, `UnknownPeriodic`, `UnknownJoystickState` | `DIDeviceObjectData`, `DIEffect`, `DIEffectInfo`, `DIDeviceInstance`, `DIDeviceObjectInstance`, `DIDataFormat`, `DIDevCaps`, `DIPropDword`, `DIPropRange`, `DIEnvelope`, `DIPeriodic`, `DIJoyState` | 2 | PCInputDevice.h and PCJoystickDevice.h: each layout and size is the DirectInput 7 structure the call that fills it takes (GetDeviceData, CreateEffect, GetEffectInfo, EnumDevices, EnumObjects, SetDataFormat with `c_dfDI*`, GetCapabilities, Get/SetProperty with DIPROP_* headers, GetDeviceState). `c_dfDIKeyboard`/`c_dfDIMouse`/`c_dfDIJoystick` are `extern "C"`, so their decorated names do not carry the type. |
+| `UnknownDeviceIdentifier`, `UnknownBltFx`, `UnknownEnumCallback`, `UnknownViewport`, `UnknownScreenVertex`, `UnknownMediaSurfaceDesc` | `DDDeviceIdentifier2`, `DDBltFx`, `DDEnumCallback`, `D3DViewport7`, `D3DTLVertex`, `DDSurfaceDesc` | 2 | The 0x430-byte GetDeviceIdentifier record, the Blt effects record, the DirectDrawEnumerateA callback, the SetViewport record, the FVF 0x1c4 vertex and MediaControl's 0x6c-byte (DirectX 6) surface description. Earlier waves' convention: `DDSurfaceDesc2`, `DDSCaps2`, `DDPixelFormat`. |
+| `UnknownFogBackdropVertex` | `FogBackdropVertex` | 3 | Fog.cpp's backdrop vertex; it is the D3DTLVERTEX layout, but PCVideoCard.cpp's `D3DTLVertex` is a separate local definition, so the role name avoids two definitions of one name. |
+| `UnknownLogFont`, `UnknownTextExtent`, `UnknownMemoryStatus`, `UnknownWaveFormat`, `UnknownPaletteEntry` | `LogFont`, `Win32Size`, `MemoryStatus`, `WaveFormatEx`, `PaletteEntry` | 2 | The CreateFontIndirectA record (0x3c bytes, three local definitions), GetTextExtentPoint32A's SIZE, GlobalMemoryStatus's record (two local definitions), the WAVEFORMATEX the primary buffer's SetFormat takes, and the PALETTEENTRY table. Win32Size follows Wave 14's `Win32Rect`. |
+| `UnknownEaxListenerParameters` | `EaxReverbProperties` | 2 | The 16-byte {environment, volume, decayTime, damping} record RaceSound passes to PCSoundInterface `0x004bed40` (for example environment 9, volume 0.361, decay 7.0, damping 0.332): EAX 1.0's EAX_REVERBPROPERTIES. |
+| `UnknownLobbyGetProperty`, `UnknownLobbyGetPropertyResponse` | `DPLMsgGetProperty`, `DPLMsgGetPropertyResponse` | 2 | MSZoneInterface.cpp's lobby messages type 7 and type 8: DPLMSG_GETPROPERTY and DPLMSG_GETPROPERTYRESPONSE. |
+| `UnknownQuarryLeaveMessage` (QuarryStuntEvent.cpp), `UnknownPlayerLeftMessage` (SelectGamePicProcs.cpp only) | `DPMsgDestroyPlayerOrGroup` | 2 | System message 5 is DPSYS_DESTROYPLAYERORGROUP; both views read the player id at +0x08 (dpId) and leave +0x04 (dwPlayerType). Neither unit includes the other. |
+| `UnknownChatMessage`, `UnknownKickMessage`, `UnknownLobbyStartMessage`, `UnknownLoadFailedMessage` | `ChatMessage`, `RemovePlayerMessage`, `LobbyStartMessage`, `LoadFailedMessage` | 3 | Application messages 0x85 (chat text), 0x8e (the removed player's id), 0x83 (the 0x8d8-byte race start with the racer slots) and 0xcc (a race failed to load), named after the handlers that read them. |
+| `UnknownSceneLight`, `UnknownSceneEnvironment`, `UnknownSceneFog`, `UnknownSceneBuffer`, `UnknownSceneCaster` | `SceneLight`, `SceneEnvironment`, `SceneFog`, `SceneStaticModels`, `SceneStaticModel` | 2 | The .scn sections the loaders read into Scene+0xac, +0xa4, +0xb0 and +0xb8: "Light%d" (`0x00572f54`), "Environment" (`0x00573300`), "Fog" (`0x00573060`), "StaticModels" (`0x005735f8`) with one "Model%d" (`0x0057359c`) element each. |
+| `UnknownParameterValue`, `UnknownParameterSection` | `ParameterValue`, `ParameterSection` | 2 | Parameterblocks.cpp's parsed row value (0 int, 1 float, 2 string) and its 0x40c-byte section index (stream offset, line count, name). |
+| `UnknownHiResMeterEntry` | `HiResMeterTimer` | 2 | HiResMeter's `timers[50]`; the columns are slot 10's "MS Timers [...]" literal (`0x0056c4ec`). |
+| `UnknownGameUiSection` | `DialogSection` | 2 | UIDialog+0x9cc: one 0x3c-byte .dtm section per name, its kind set by the "Set_*" markers (Wave 12's `sectionKind`). |
+| `UnknownTrackRecordRow`, `UnknownRaceSoundChannel`, `UnknownSoundFade`, `UnknownRecorderThreadParameters`, `UnknownGauge` | `TrackRecordRow`, `EngineSoundChannel`, `SoundFade`, `RecorderThreadParameters`, `GaugeNeedle` | 3 | The track-record list row, RaceSound's eleven per-racer engine channels, PCAudio's volume fade, what 0x004e7a90 passes to the recorder's worker thread, and InstrumentOverlay's dial needle (+0x11c). |
+
+### Helpers
+
+Static inline helpers named after their decoded bodies (tier 3, the Wave 14
+precedent):
+
+| Old name | New name | Unit |
+| --- | --- | --- |
+| `UnknownMin`, `UnknownMax` | `MinFloat`, `MaxFloat` | GearRatios.cpp |
+| `UnknownFunctionMax` | `MaxFloat` | BikeRace.cpp |
+| `UnknownMinInt`, `UnknownMaxInt` | `MinInt`, `MaxInt` | GameUi.cpp |
+| `UnknownSquareMagnitude` | `EcoSquareMagnitude` | EcoSystem.cpp (Math3D.h already has a `SquareMagnitude` with another summation order) |
+| `UnknownSetIdentity`, `UnknownEcoNormalizeXZ`, `UnknownEcoScaleXZ`, `UnknownEcoMin1`, `UnknownEcoZ`, `UnknownEcoOffset`, `UnknownEcoRandom`, `UnknownEcoTgaIsSet`, `UnknownEcoLean`, `UnknownEcoLitColor`, `UnknownEcoLightOn` | `EcoSetIdentity`, `EcoNormalizeXZ`, `EcoScaleXZ`, `EcoMinOne`, `EcoComponentZ`, `EcoSum`, `EcoRandomUnit`, `EcoTgaIsSet`, `EcoLean`, `EcoLitColor`, `EcoLightIntensity` | EcoSystemNearMisses.cpp, Group4_EcoSystem.cpp |
+| `UnknownScaled`, `UnknownRandomSkill` | `ScaledVector`, `RandomSkill` | BikeRaceNearMisses.cpp, Group6_BikeRaceCreate*.cpp |
+| `UnknownFileExists` | `FileExists` | ProCircuitProcs.cpp |
+| `UnknownDropDownList` | `DropDownListBox` | OptionProcs.cpp |
+| `UnknownAsVec3` | `Vector3AsVec3` | Group6_BikeRaceViews.cpp (other bringup units already have an `AsVec3`) |
+
+### Fields
+
+| Class | Offset | Old name | New name | Tier | Evidence |
+| --- | --- | --- | --- | --- | --- |
+| `ObjectPicker` | +0x2c | `field_0x2c` | `pickedObject` | 2 | PickerHitCallback (`0x00417b00`) stores the hit CollisionObject there, and PickAt (`0x004b0500`) returns it when QueryCollisions hits. |
+| `GameCursor` | +0x50 | `field_0x50` | `drawScale` | 3 | Draw (`0x0043ed40`) multiplies the destination's right and bottom by it; the constructor stores 1.0 and nothing else writes it. |
+
+Left as placeholders:
+
+- `UnknownBltRect` and `UnknownBltEffects` (ManagedTextureGroup.cpp): copies
+  of `Win32Rect` and `DDBltFx`. Using those names would be a merge, not a
+  rename.
+- `UnknownPlayerLeftMessage` (InGameProcs.cpp): application message 0x89,
+  a different record from the type-5 view renamed above.
+- `UnknownSceneKeyword`: the type of the static `s_lightTypes`.
+  `UnknownSceneShapeKeyword` and `UnknownSceneEmitterKeyword` (samples) wait
+  with it.
+- The `UnknownOpt*Settings` types (globals), `UnknownFunction4ea7e0`,
+  `UnknownFunction4864f0`, and the `UnknownCompare*` comparators: no literal
+  names them, and the sort keys were not decoded this wave.
+- `TrackGameMode::field_0xa20` and `UnknownOptSoundSettings::field_0x00`
+  (TrackGame+0xf98): the default is 0, and LeaveRaceForMenu and EventManager
+  (`0x0045e7b6`) call StopCDAudio when it is clear. That suggests a CD music
+  option, but no dialog control or literal names it.
+- `Scene::field_0x88`: Scene's initialiser (`0x004ea7e0`) stores its char
+  argument, and 0x004ecd60 passes it to a constructor whose parameter is not
+  decoded.
+- `UIDialog::field_0x180` (7 by default): it is passed as the second argument
+  of PlayControlSound, which the base implementation ignores.
+- The union arms `UIScrollBar::field_0x1ec/0x204/0x218`,
+  `UIEditBox::field_0x204` and `UIListBox::field_0x218` are already named by
+  their typed arms.
