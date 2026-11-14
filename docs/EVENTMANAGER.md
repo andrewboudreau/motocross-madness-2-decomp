@@ -140,7 +140,7 @@ Near miss (draft):
   "Podium3/4/5_%02d" motion kept at +0x430; it also uses "CrowdLoop.wav"
   and clears the podium area with `0x0045fce0` / `0x0045fdc0`. A nonzero
   result makes `0x0045e600` block UI interaction for slot 10. The
-  candidate is in `samples/game/EventManagerNearMisses.cpp` (4139 of 4247
+  candidate is in `samples/game/EventManagerNearMisses.cpp` (4167 of 4247
   bytes with its bindings; the 0x460 frame, extent, control flow, calls and
   EH states match, and the header lists the shapes found and what still
   differs: mainly retail's spilled z square, see BIKERACE.md). Retail's buffers are a 0x80-byte name, a 0x104-byte path, a

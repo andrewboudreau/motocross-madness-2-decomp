@@ -10,7 +10,7 @@
 // left every later scratch register one step off (454 of 533 bytes).
 //
 // EventManager::CreatePodiumScene (0x0045d480, 4247 bytes): the podium
-// scene; 4139 of 4247 bytes (bindings: EventManagerNearMisses.bindings.json,
+// scene; 4167 of 4247 bytes (bindings: EventManagerNearMisses.bindings.json,
 // with the EH handler 0x0054ab22 the prologue pushes). Control flow, calls,
 // strings, `new` lines, EH states and the frame size (0x460) follow retail.
 // Shapes found: the last-race test assigned to `ok` (retail materialises the
@@ -21,17 +21,25 @@
 // offsets/facings loop and the plain camera sites; plain, all-local,
 // component-local, Square-helper, dot-product and three-float-helper forms
 // load all three components first, and a lone `zz` local is 6 bytes longer),
-// the nested InProCircuitCareer test (three Winner sprintf copies), and the
+// the nested InProCircuitCareer test (three Winner sprintf copies) with the
+// career in a `ProCircuit* circuit` local inside it (a named value takes no
+// scratch-register turn: read as g_TrackGame->proCircuit->careerFlags the
+// branch and the OpenArchiveFile arguments ran one register behind, 4139;
+// an inline accessor returning the career scores the same 4167; the racer
+// compare with its operands reversed loses a byte; the two tests as nested
+// ifs duplicate an arm, 2618), and the
 // buffers name[0x80], path[0x104], message[0x184] plus the crowd message's
 // own [0x80] buffer at +0x168. Left: retail spills the z square to the
 // temporary [esp+0x1c] (`fstp [t]; fstp st(0); faddp; fadd [t]`, as BikeRace
 // 0x00417ed0 does) where VC6 here keeps it on the stack (`faddp st(3); fxch;
 // fadd st(1); fxch` and two pops; the 11 sum, bracket, order and
 // declaration forms of 2026-10-19 do not spill), so the scalar homes at
-// +0x1c/+0x20 swap; the register rotation of the Winner branch (one step
-// behind retail), the place counter store (retail stores 1 after the count
+// +0x1c/+0x20 swap; the place counter store (retail stores 1 after the count
 // test), the z component order of `podiumPosition + offsets[place - 1]` and
-// the loop's two increments.
+// the loop's two increments (the place store and increment are unchanged by
+// ++place, place = place + 1, the counter declared ahead of the loop, a while
+// loop or the increment at the end of the body; reversed test operands 4165,
+// place++ < count from 0 3666, place <= count 3256).
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -290,7 +298,8 @@ int EventManager::CreatePodiumScene() {
         while (racer && ((UnknownPodiumRacer*)racer)->place != place)
             racer = PODIUM_OWNER(owner)->raceView->NextBike(&iterator);
         if (g_TrackGame->InProCircuitCareer()) {
-            if ((g_TrackGame->proCircuit->careerFlags & 2) &&
+            ProCircuit* circuit = g_TrackGame->proCircuit;
+            if ((circuit->careerFlags & 2) &&
                 racer == PODIUM_OWNER(owner)->raceView->localRacer)
                 sprintf(name, "%s\\Winnerd.mcf", "Res");
             else
