@@ -19,8 +19,9 @@
 // retail's `opaque` is a lone int whose address escapes. Two probes reproduce
 // all 354 bytes of 0x004734c0:
 //   (a) `int opaque; RECT rect; if (0) PtInRect((RECT*)&opaque, point);` (any
-//       never-executed call that is handed `&opaque`; `(void)&opaque` and an
-//       unused `int* p = &opaque` do not expose it), or
+//       never-executed call that is handed `&opaque`; `(void)&opaque`, an
+//       unused `int* p = &opaque` and an empty inline function taking the
+//       flag's address or a reference do not expose it), or
 //   (b) `struct { int opaque; RECT rect; } s;` (the PtInRect argument exposes
 //       the whole aggregate),
 // each with this body, the opaque flag cleared after the rect copy:
