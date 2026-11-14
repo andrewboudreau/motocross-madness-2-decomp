@@ -1,6 +1,6 @@
 """FileStream::Write 0x004618e0, the stream write (tools/emu_diff.py case).
 
-The linked body is samples/io/FileStream.cpp. The stream follows 0..2 inner streams (+0x1c) to
+The linked body is src/reconstructed/FileStream.cpp. The stream follows 0..2 inner streams (+0x1c) to
 the innermost one; an encoded file (+0x08) resynchronises with ftell 0x005365d6 / fseek
 0x00534eac (fclose 0x00534c3d and fileHandle cleared when the seek fails) and writes through
 WriteXorEncoded 0x0045c6a0 with the running key (+0x01), a plain one through fwrite 0x005350b7.
@@ -9,7 +9,7 @@ fwrite count) are drawn per case.
 """
 RETAIL_VA = 0x004618e0
 SYMBOL = '?Write@FileStream@@QAEHPBXHH@Z'
-SOURCE = 'samples/io/FileStream.cpp'
+SOURCE = 'src/reconstructed/FileStream.cpp'
 PROBES = {0x00461903: 'seek failed', 0x00461959: 'plain write'}
 
 

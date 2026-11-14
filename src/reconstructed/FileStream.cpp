@@ -25,6 +25,9 @@
 #include "TextureMap.h"
 #include "ResourceManager.h"
 
+// 0x0045c6a0 (cdecl): fwrite that encodes the bytes with the running key *key.
+int WriteXorEncoded(const unsigned char* buffer, int size, int count, FILE* file, unsigned char* key);
+
 // The stream that holds the file: the innermost one.
 static inline FileStream* InnermostStream(FileStream* stream)
 {
@@ -239,6 +242,36 @@ int FileStream::Tell()
         return position - stream->headerSize;
     }
     return -1;
+}
+
+// 0x004618e0: writes `count` items of `size` bytes. An encoded file first seeks to
+// its own position (the C rule for switching an update stream from reading to
+// writing) and writes through the running key.
+// The file handle goes through a local for ftell, fseek and fwrite. VC6 hands
+// expression temporaries eax, ecx and edx in turn, in source order; a value read
+// into a named local does not take a turn. With `stream->fileHandle` written
+// straight into those three calls every later scratch register is one step off
+// retail's (the fclose argument in edx for eax, and so on to the end).
+int FileStream::Write(const void* buffer, int size, int count)
+{
+    FileStream* stream = InnermostStream(this);
+    FILE* file;
+    if (stream->fileEncoded) {
+        file = stream->fileHandle;
+        long position = ftell(file);
+        file = stream->fileHandle;
+        if (fseek(file, position, SEEK_SET)) {
+            fclose(stream->fileHandle);
+            stream->fileHandle = 0;
+        }
+        if (!WriteXorEncoded((const unsigned char*)buffer, size, count, stream->fileHandle,
+                             (unsigned char*)&stream->textMode)) {
+            return count - 1;
+        }
+        return count;
+    }
+    file = stream->fileHandle;
+    return fwrite(buffer, size, count, file);
 }
 
 // 0x00461980: the next byte, decoded with the running key in an encoded file; -1 at

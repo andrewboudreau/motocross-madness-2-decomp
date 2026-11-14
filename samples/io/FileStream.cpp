@@ -1,7 +1,7 @@
 // FileStream.cpp -- near misses of the buffered file stream (FileStream,
 // declared in src/reconstructed/TextureMap.h), 0x00460d10..0x00461d57. The thirteen
-// methods that match retail are in src/reconstructed/FileStream.cpp; these five
-// (header check, seek, read, write, write-header) stay here with
+// methods that match retail are in src/reconstructed/FileStream.cpp; these four
+// (header check, seek, read, write-header) stay here with
 // their notes. The bindings file covers both.
 //
 // A stream reads a file directly or a slice (+0x130, +0x04) of an inner stream (+0x1c);
@@ -33,29 +33,13 @@
 //   stay at 257 or below; VC6 keeps the store out of the rep movsd/movsb pair.
 //   Session 21: the seed between strcat and strlen lands after strlen's
 //   `or ecx, -1` (257, lea esi hoisted with it); /ML keeps 255.
-// - 0x004618e0: retail loads buffer/size/count into registers before the pushes;
-//   VC6 here pushes them from the stack. Register locals, a helper for the fseek
-//   block and an unsigned count do not change it.
-//   A `FILE* file = stream->fileHandle;` local in the fwrite tail does schedule all
-//   loads before the pushes, but in ecx/edx/eax where retail uses edx/eax/ecx
-//   (a register tie-break); not kept. 136/152: the scratch registers are
-//   rotated one step against retail throughout (fclose argument eax vs edx,
-//   encoded call's file and key edx/ecx vs ecx/eax, fwrite's file esi vs
-//   ecx). Also unchanged:
-//   the tail-call form `if (innerStream) return innerStream->...`, every
-//   int/unsigned/long/size_t count and const void*/void*/const char* buffer
-//   type, a 0..63 typedef and 0..19 prototype prefix, a standalone TU,
-//   while/for/next InnermostStream loops, `!= 0`/NULL tests, int position,
-//   a result local or ternary for the encoded return, a key local, inline
-//   helpers for the close, resync, encoded write and plain write, dead
-//   locals or empty statements at six positions and an else-return copy.
-//   FILE* locals in the seek block and a nested fseek(f, ftell(f)) are worse.
-//   A later 88-variant sweep (fseek `!= 0`, a result local, FILE* locals or
-//   references for some or all reads of fileHandle, comma zeroing, ternary,
-//   else and positive encoded returns, the top-level branch inverted) stays
-//   at 136 or below. Locals for buffer, size, count and the file in all 24
-//   read orders keep the fwrite tail at 136; the same for the encoded call
-//   (with a `char* key` local) gives 75.
+// - 0x004618e0 (Write) is exact in src/reconstructed/FileStream.cpp: the file
+//   handle goes through a FILE* local for ftell, fseek and fwrite (not for
+//   fclose or the encoded write). VC6 hands expression temporaries eax, ecx
+//   and edx in turn; a value read into a named local takes no turn, so the
+//   locals shift every later scratch register by one step, which was the
+//   whole 136/152 gap. Source shapes, statement order, helpers, types and a
+//   0..63 declaration prefix never moved it.
 // - 0x00461340: retail loads the decoded position (+0x0c) once and keeps the next
 //   pointer in a different register (see the function's note).
 // - /G6 makes every one of these worse.
@@ -72,8 +56,6 @@
 #include "../../src/reconstructed/TextureMap.h"
 #include "../../src/reconstructed/ResourceManager.h"
 
-// 0x0045c6a0 (cdecl): fwrite that encodes the bytes with the running key *key.
-int WriteXorEncoded(const unsigned char* buffer, int size, int count, FILE* file, unsigned char* key);
 // 0x0045c7b0 (cdecl): fread that decodes the bytes with the running key *key.
 int ReadXorDecoded(unsigned char* buffer, int size, int count, FILE* file, unsigned char* key);
 
@@ -351,31 +333,6 @@ int FileStream::Read(void* buffer, int size, int count)
         }
     }
     return count;
-}
-
-// 0x004618e0. Near miss (88%): retail loads every argument into a register before
-// the pushes; VC6 here pushes from memory.
-// Session 19: tail-recursive forms 136, a nested `fseek(..., ftell(..), ..)` 32, a
-// `count--` loop 101.
-// 2026-11-11: the fwrite through a FILE* local, an explicit else arm, a named result and
-// size_t casts keep 136 (same register rotation: retail's handle/size/textMode go to
-// edx/eax/ecx, here ecx/edx/eax); testing !fileEncoded first gives 29.
-int FileStream::Write(const void* buffer, int size, int count)
-{
-    FileStream* stream = InnermostStream(this);
-    if (stream->fileEncoded) {
-        long position = ftell(stream->fileHandle);
-        if (fseek(stream->fileHandle, position, SEEK_SET)) {
-            fclose(stream->fileHandle);
-            stream->fileHandle = 0;
-        }
-        if (!WriteXorEncoded((const unsigned char*)buffer, size, count, stream->fileHandle,
-                             (unsigned char*)&stream->textMode)) {
-            return count - 1;
-        }
-        return count;
-    }
-    return fwrite(buffer, size, count, stream->fileHandle);
 }
 
 // Writes the "FAOE" header; 0 when a write fails. As an inline helper the failure

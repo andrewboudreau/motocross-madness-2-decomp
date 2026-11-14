@@ -11,6 +11,8 @@
   "?SetBufferSize@FileStream@@QAEHH@Z": "0x00461310",
   "?Tell@FileStream@@QAEHXZ": "0x00461600",
   "?Write@FileStream@@QAEHPBXHH@Z": "0x004618e0",
+  "?WriteXorEncoded@@YAHPBEHHPAU_iobuf@@PAE@Z": "0x0045c6a0",
+  "_fwrite": "0x005350b7",
   "?ReadByte@FileStream@@QAEHXZ": "0x00461980",
   "?WriteByte@FileStream@@QAEHH@Z": "0x00461a60",
   "?ReadLine@FileStream@@QAEHPADH@Z": "0x00461aa0",

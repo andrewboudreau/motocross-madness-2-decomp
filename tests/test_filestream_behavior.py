@@ -1,4 +1,4 @@
-"""Private differential tests for the reviewed nonexact stream methods."""
+"""Private differential tests for the stream methods that are or were reviewed nonexact."""
 from __future__ import annotations
 
 import hashlib
@@ -13,11 +13,17 @@ import unittest
 
 from mcm2tool.pe import PEImage
 from mcm2tool.toolchain import find_child_ci, find_vc6_bin, infer_vc98_root
+from test_edit_box_on_char import extract
 
 
 ROOT = Path(__file__).resolve().parents[1]
 TARGETS = {0x460DB0: 186, 0x461340: 702, 0x461640: 663,
            0x4618E0: 152, 0x461B90: 282}
+# Methods of the differential set that are exact now: their bodies are taken from
+# the canonical unit and compiled with the remaining candidates.
+PROMOTED = ('int FileStream::Write(',)
+PROMOTED_PRELUDE = ('int WriteXorEncoded(const unsigned char* buffer, int size, int count, '
+                    'FILE* file, unsigned char* key);\n')
 DEPENDENCIES = {0x534EAC, 0x534C3D, 0x5365D6, 0x534F65, 0x5350B7,
                 0x5359D2, 0x45C6A0, 0x45C7B0, 0x461600, 0x461D20,
                 0x461980, 0x461A60}
@@ -57,16 +63,21 @@ class FileStreamBehaviorTests(unittest.TestCase):
             patch_file = output / 'calls.bin'
             patch_file.write_bytes(b''.join(patches))
             objects = []
-            for source in ('samples/io/FileStream.cpp',
-                           'tests/fixtures/filestream_compare.cpp'):
-                obj = output / (Path(source).stem + '.obj')
+            canonical = (ROOT / 'src/reconstructed/FileStream.cpp').read_text()
+            candidates = output / 'FileStreamCandidates.cpp'
+            candidates.write_text(
+                '#include "%s"\n' % (ROOT / 'samples/io/FileStream.cpp').as_posix()
+                + PROMOTED_PRELUDE
+                + '\n'.join(extract(canonical, prefix) for prefix in PROMOTED) + '\n')
+            for source in (candidates, ROOT / 'tests/fixtures/filestream_compare.cpp'):
+                obj = output / (source.stem + '.obj')
                 command = [
                     sys.executable, str(ROOT / 'tools/compile.py'),
-                    str(ROOT / source), '-o', str(obj),
+                    str(source), '-o', str(obj),
                     '--vc6-root', str(compiler_root), '--profile', 'vc6_o2_mt',
                     '--include', str(ROOT / 'src/krusty2'),
                 ]
-                if source.startswith('samples/'):
+                if source is candidates:
                     # Replace only external dependency names in this test
                     # object. The candidate's control flow remains unchanged.
                     for original, mock in (

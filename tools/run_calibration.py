@@ -21911,6 +21911,15 @@ CASES = [
         'reason': 'stream methods called by Track/SceneManager/Motnctrl, contiguous (tier 3)',
     },
     {
+        'name': 'FileStream ?Write@',
+        'bindings': 'src/reconstructed/FileStream.bindings.json',
+        'source': 'src/reconstructed/FileStream.cpp',
+        'symbol': '?Write@FileStream@@QAEHPBXHH@Z',
+        'target_va': '0x004618e0',
+        'target_size': 152,
+        'reason': 'stream methods called by Track/SceneManager/Motnctrl, contiguous (tier 3)',
+    },
+    {
         'name': 'KrustyVCR ?OpenRecording@',
         'bindings': 'src/reconstructed/KrustyVCR.bindings.json',
         'source': 'src/reconstructed/KrustyVCR.cpp',

@@ -28,15 +28,6 @@
   },
   {
     "source": "FileStream.cpp",
-    "candidate_symbol_contains": "?Write@FileStream@@QAEHPBXHH@Z",
-    "target_va": "0x004618e0",
-    "target_size": 152,
-    "expect": "partial",
-    "bindings": "FileStream.bindings.json",
-    "status": "Complete behavior reviewed against retail; equal 152-byte extent but different register allocation."
-  },
-  {
-    "source": "FileStream.cpp",
     "candidate_symbol_contains": "?WriteHeader@FileStream@@QAEHPBD@Z",
     "target_va": "0x00461b90",
     "target_size": 282,

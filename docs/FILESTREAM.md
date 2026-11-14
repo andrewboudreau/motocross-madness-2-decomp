@@ -25,7 +25,7 @@ and included by `TextureMap.h`.
 - Encoded files start with "FAOE". Their bytes go through a running key at
   `+0x01`, seeded from the file name.
 
-## Exact (13), `src/reconstructed/FileStream.cpp`
+## Exact (14), `src/reconstructed/FileStream.cpp`
 
 | VA | Size (bytes) |
 |---|---|
@@ -36,6 +36,7 @@ and included by `TextureMap.h`.
 | `0x00460f50` | 957 |
 | `0x00461310` | 39 |
 | `0x00461600` | 63 |
+| `0x004618e0` | 152 |
 | `0x00461980` | 224 |
 | `0x00461a60` | 56 |
 | `0x00461aa0` | 229 |
@@ -59,6 +60,12 @@ Source forms that mattered:
     (`char c = *p++;`), as in `0x00461b90`.
   - Retail clears only bytes 1..7 of the access string before strncpy
     overwrites it (`memset(access + 1, 0, sizeof(access) - 1)`).
+- **`0x004618e0`:** the file handle goes through a `FILE*` local for
+  `ftell`, `fseek` and `fwrite` (`file = stream->fileHandle;` before each),
+  not for `fclose` or the encoded write. VC6 hands expression temporaries
+  eax, ecx and edx in turn, in source order; a value read into a named local
+  takes no turn. With the member written straight into those calls every
+  later scratch register was one step off retail's (136/152).
 - **`0x00461980`:** the decode reads the byte into a `char` temporary and
   the key straight from the field: `c = *p; decoded = key ^ c; key += c;
   *p = decoded;`. That is the one spelling under which VC6 loads the key
@@ -71,7 +78,7 @@ Source forms that mattered:
 - **`0x00461cb0`:** returns `_fstat`'s result, not void. `TextureMap.h` and
   `SceneManager.bindings.json` now use the `int` signature.
 
-## Near misses (5), `samples/io/FileStream.cpp`
+## Near misses (4), `samples/io/FileStream.cpp`
 
 The notes are in the source header.
 
@@ -80,24 +87,24 @@ The notes are in the source header.
 | `0x00460db0` | 186 | 176 | 16% | header check |
 | `0x00461340` | 702 | 695 | 49% (strict 343) | seek |
 | `0x00461640` | 663 | 670 | 71% | read |
-| `0x004618e0` | 152 | 152 | 88% | write |
 | `0x00461b90` | 282 | 282 | 90% | write the header |
 
 Each miss comes down to one of:
 - register assignment, or
 - instruction scheduling (the 0xfa seed store and the name pointer in
-  `0x00461b90`, the argument loads in `0x004618e0`).
+  `0x00461b90`).
 
 The control flow of each one is reconstructed. None is a strict byte match.
 Candidate extents above are measured from authentic VC6 SP3 COFF metadata with
-`vc6_o2_mt`; masked percentages are diagnostic only. All five are registered as
+`vc6_o2_mt`; masked percentages are diagnostic only. All four are registered as
 `expect: partial` in `samples/io/targets.json`.
 
 ## Functional build review
 
 The source build explicitly includes `samples/io/FileStream.cpp` as
-`reviewed-nonexact`. Its five methods complement the thirteen exact methods in
+`reviewed-nonexact`. Its four methods complement the fourteen exact methods in
 `src/reconstructed/FileStream.cpp`; the candidate stays in `samples/`.
+`Write` was reviewed there too and is exact now.
 It supplies the missing `Read` and `Seek` bodies used throughout texture,
 scene, terrain and audio loading, plus the header checks and writes needed by
 `Open`. This is source linkage progress, not a successful game startup.
@@ -118,7 +125,7 @@ The sample's `WriteXorEncoded` declaration now uses the canonical
 `const unsigned char*` input and `unsigned char*` key types from
 `EcoSystem.cpp`. Explicit casts at the stream boundary preserve its call
 arguments. The subsequent shared inline ResetTextMode consolidation can
-change Seek's emitted instructions; the five methods remain reviewed nonexact
+change Seek's emitted instructions; the four remaining methods are reviewed nonexact
 candidates and are checked behaviorally rather than claimed byte-identical.
 
 The native VC6 differential test runs **12,390 scenarios** against the
