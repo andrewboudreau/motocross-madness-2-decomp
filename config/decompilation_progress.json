@@ -4,10 +4,10 @@
   "retail_text_bytes": 1368518,
   "retail_source_paths": 111,
   "rtti_types": 252,
-  "vc6_selected_targets": 3019,
-  "vc6_exact_targets": 3017,
-  "notes": "3017 of 3019 unique retail address/extent pairs passed strict comparison in 3070 calibration cases using authentic VC6 SP3 (Windows, native CL.EXE). There are 3063 strict rows and 3054 distinct source/address/extent cases; multiple source definitions may share a retail address. Every strict comparison resolves all relocations or has no relocation bytes. The 2 nonexact pairs are the FollowRacer near misses (0x4a9d20, 0x4a9e80). BaseObject::Release and the seven UI probe addresses now have strict rows; the seven bindings-free CompilerShapeProbe rows remain deliberate regression probes. The separately reviewed physics runner has 1087 strict exact results among 1152 comparisons; those results are not included in this calibration percentage. Neither suite is a census of retail functions or evidence that the source-built game links or runs. RTTI/source-path and .text figures retain their hash-pinned executable provenance.",
-  "vc6_case_count": 3070,
+  "vc6_selected_targets": 3021,
+  "vc6_exact_targets": 3019,
+  "notes": "3019 of 3021 unique retail address/extent pairs passed strict comparison in 3072 calibration cases using authentic VC6 SP3 (Windows, native CL.EXE). There are 3065 strict rows and 3056 distinct source/address/extent cases; multiple source definitions may share a retail address. Every strict comparison resolves all relocations or has no relocation bytes. The 2 nonexact pairs are the FollowRacer near misses (0x4a9d20, 0x4a9e80). BaseObject::Release and the seven UI probe addresses now have strict rows; the seven bindings-free CompilerShapeProbe rows remain deliberate regression probes. The separately reviewed physics runner has 1088 strict exact results among 1152 comparisons; those results are not included in this calibration percentage. Neither suite is a census of retail functions or evidence that the source-built game links or runs. RTTI/source-path and .text figures retain their hash-pinned executable provenance.",
+  "vc6_case_count": 3072,
   "vc6_profile": "vc6_o2_mt",
-  "reviewed_commit": "calibration rerun after wave 21 and the PoseRotation, FileStream Write/CheckHeader and ShowControlToolTip matches (main 1a8c08c9), 2026-11-13"
+  "reviewed_commit": "calibration rerun after the register sweep (LeaveRaceForMenu, HandleReceivedMessage), wave 22 and the local-count sweep (HullVsHull), main ae01415a, 2026-11-13"
 }
