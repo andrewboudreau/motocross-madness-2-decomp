@@ -644,13 +644,15 @@ int Track::IsAtOrAfter(TrackPos a, TrackPos b)
 // 0x005179f0: the shortest distance from a to b through the node graph,
 // and optionally the node path. A depth-first walk: a node is marked on its
 // first visit and unmarked when its list entry comes back to the top.
-// Near miss, 927/929: where the walk reaches b's node, retail loads
-// `fromStart` before `length` (`fld fromStart; fadd length`). A dead
-// `float length = 0.0f;` at the top makes `fromStart` the newer leaf and
-// matches, but it is a compiler-only store and is not applied.
+// `length` is initialised at the top although that value is never read:
+// the early reference makes `fromStart` the newer leaf, so the arrival sum
+// loads it first (`fld fromStart; fadd length`) as retail does. Inferred
+// from that operand order (no other local's init moves it), not seen
+// directly in the bytes; without it the function is 927/929.
 int Track::ShortestPath(TrackPos a, TrackPos b, TrackListItem** path, float* distance)
 {
     TrackListItem* list = 0;
+    float length = 0.0f;
     if (!distance)
         return 0;
     *distance = -1.0f;
@@ -682,7 +684,7 @@ int Track::ShortestPath(TrackPos a, TrackPos b, TrackListItem** path, float* dis
     item->node = a.node;
     item->next = list;
     list = item;
-    float length = toEnd;
+    length = toEnd;
     while (list) {
         TrackNode* node = list->node;
         if (node->flags & 4) {

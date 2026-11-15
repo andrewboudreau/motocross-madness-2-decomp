@@ -69,11 +69,11 @@ Near miss: the segment direction `0x00518130` (246/250 bytes,
 x87 stack until a final `fstp st(0)`; VC6 here consumes it in the last
 multiply.
 
-Near miss: the path search `0x005179f0` (929/929 bytes, two differ). Where
-the walk reaches b's node, retail loads the two addends of
-`length + fromStart` in the other order; no source order tried changes it.
-A dead `float length = 0.0f;` at the top matches; that compiler-only store is
-not applied.
+Exact: the path search `0x005179f0` (929 bytes). Where the walk reaches b's
+node, retail loads `fromStart` before `length`; that order needs an early
+reference to `length`, and `float length = 0.0f;` at the top (a plausible
+init whose value is never read) gives it. Inferred from the operand order;
+without it the function is 927/929 and no source order tried changes it.
 
 Exact: the closest position on one node `0x00516ca0` (586 bytes). The
 segment parameter is clamped to [0, 1] first and the difference chosen after

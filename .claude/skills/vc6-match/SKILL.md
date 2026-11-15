@@ -8,10 +8,18 @@ description: Byte-match one MCM2 function against retail with authentic VC6 SP3 
 Goal: readable C++ whose VC6 SP3 `/O2` output equals the retail bytes with relocations resolved.
 Rules from AGENTS.md apply: no inline asm, no byte arrays, no extent trimming, inference stays marked as inference.
 
-User rule (2026-11-14): readable source that behaves the same but does not byte match beats source that games the
-compiler. Never apply a form whose only purpose is codegen: dead tests, `if (0)` blocks, dummy/unused locals, bare
-labels, redundant or compiler-eliminated stores, casts that change nothing. Probe with them, record them in the
-header, leave the function a near miss. Natural restructurings (scope, statement order, a reused local, grouping) are fine.
+User rule (2026-11-14, refined): readable source that behaves the same but does not byte match beats source that
+games the compiler. Before applying a form that changes no behaviour (a store that is never read, an extra local,
+a cast, a test), ask two questions:
+1. Would a person plausibly have written it? An init at the top (`count = 0;` beside the other clears, `float
+   length = 0.0f;`), flattening a vector (`seg.y = 0.0f;` before a 2D step) or naming a constant that is read: yes.
+   A copy of a parameter into a new pointer, `*(float*)&` on a float, `if (0)`, a test whose result is unused or a
+   bare label: no.
+2. Do the bytes point at this form? Good: only this local's init gives retail's order, no other single local does.
+   Bad: any of several interchangeable tweaks works equally (2-7 extra locals for a count modulo 8, a typedef count).
+Apply only when both answers are yes, and say in the comment that the form is inferred from the bytes. Otherwise
+record it in the header as a probe and leave the function a near miss. Natural restructurings (scope, statement
+order, a reused local, grouping) are fine.
 
 ## Setup (once per shell; Windows-style paths)
 ```bash
@@ -102,9 +110,8 @@ near misses; `tools/near_miss_drops.py` lists ones whose gap is a single drop.
   scope, makes its leaf older than values computed later, which flips the operand order of an integer add or
   `[base + index]` it takes part in (Scene::ReadStaticModels `0x004ecd60`, 4534 -> exact) and the order of two
   reloads before a call (`remap = 0;`, GatherModelTriangles `0x0042c260`, 1622 -> 1626). A declaration alone, or
-  the initialiser at first use, does not. When the local is assigned again before any read, that clear is a dead
-  store: diagnostic only, never applied (both functions stay at the lower score). Apply it only where the zero is
-  actually read.
+  the initialiser at first use, does not. Sweep one `x = 0;` per local first; pairs can cancel. Keep it only if one
+  specific local works and the clear reads naturally (see the rule at the top).
 - Two strength-reduced induction variables of mirrored expressions (`column * 128 - 256` and `256 - column * 128`)
   spilled in the wrong order: name one (`int x = column * 128 - 256;`) and write the other as `-x`. Every spelling
   of the two written out is canonicalised to the same code (BuildFaceGeometry `0x0043dc60`, 1100 -> exact).
@@ -118,9 +125,8 @@ near misses; `tools/near_miss_drops.py` lists ones whose gap is a single drop.
 - A commutative product that loads a struct member before a scalar local (retail the scalar first) means the member's
   leaf is too new: its only earlier reads were copy-propagated or inside an inline helper. A plain store to the member
   earlier in dominating order (`seg.y = 0.0f;` when flattening, dead and emitting nothing) or `m * 0.0f` (folded by VC6)
-  creates the leaf; a dead initialiser at the declaration does not (`0x0040e510`, 1933 -> 1935). Use it only as a
-  diagnostic: the user rule is that dead or compiler-eliminated stores chosen for codegen are NOT applied (record the
-  form in the header; readable non-matching source beats a gamed match). `0x0040e510` stays at 1933.
+  creates the leaf; a dead initialiser at the declaration does not (`0x0040e510`, 1933 -> exact). Confirm with a probe read
+  first, and apply it only where the store has a meaning the neighbouring code shares.
 - sweep_variants templates: an inline choice ending in `{` followed by `@|` parses as nested; keep braces outside choices.
 - In Git Bash, `/` compiler flags in env vars (`MCM2_EXTRA_FLAGS`) need `MSYS_NO_PATHCONV=1`, or they are ignored.
 - A test the optimiser folds late flips `[base + index]` operand order. When a loop's

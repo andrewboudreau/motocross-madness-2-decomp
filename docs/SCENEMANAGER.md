@@ -164,9 +164,9 @@ member lookup resolving to the virtual base's protected `field_0x10`.
   a pointer are an inlined `__asm` float-to-int helper. The bring-up body
   (`src/bringup/Group4_SceneTick.cpp`) keeps the frame with a per-function
   pragma (docs/GAME_BUILD.md#frame-pointer-units).
-- `0x004ecd60` (4543 bytes with its padding and jump table) is 4534 of
-  4536 strict in `samples/track/SceneManagerNearMisses.cpp` (one add order
-  in the name terminator; a dead `count = 0;` would match but is not applied): the "StaticModels" reader, which builds each model's
+- `0x004ecd60` (4543 bytes with its padding and jump table) is strict
+  exact in `samples/track/SceneManagerNearMisses.cpp` (4536 of 4536
+  compared positions): the "StaticModels" reader, which builds each model's
   physics object (constructor `0x005037c0`, slots 37/40), collision points
   (`0x0043a330`), particle emitters (`0x004b8a00`, `0x004b8df0`,
   `0x004b9310`, slot 27), collision object (`0x00431e70`) and sound emitter.

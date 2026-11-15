@@ -23527,6 +23527,15 @@ CASES = [
         'target_size': 67,
     },
     {
+        'name': 'Track 0x5179f0 shortest path distance',
+        'bindings': 'src/reconstructed/Track.bindings.json',
+        'source': 'src/reconstructed/Track.cpp',
+        'symbol': '?ShortestPath@Track@@QAEHUTrackPos@@0PAPAUTrackListItem@@PAM@Z',
+        'target_va': '0x005179f0',
+        'target_size': 929,
+        'reason': 'Track.cpp __FILE__ DebugCalloc lines 1175..1258; the early `length = 0` initialiser (inferred from the add order) makes fromStart the newer leaf',
+    },
+    {
         'name': 'Track 0x517da0 distance between positions',
         'bindings': 'src/reconstructed/Track.bindings.json',
         'source': 'src/reconstructed/Track.cpp',

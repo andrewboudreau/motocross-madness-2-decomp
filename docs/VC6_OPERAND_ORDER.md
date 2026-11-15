@@ -136,8 +136,8 @@ leaf. Bike slot 76 (`v.x *= (s = ...)`) makes `s` newer than `v.x`; a named
 - Track `0x005179f0` (`length = fromStart + length`): retail loads `fromStart`
   first. A dead `float length = 0.0f;` at the top of the function gives `length`
   its leaf before `fromStart` is computed, so `fromStart` is the newer leaf and VC6
-  emits `fld fromStart; fadd length`; the function is exact with it. That store is
-  compiler-only, so it is not applied and the function stays at 927/929. Moving the
+  emits `fld fromStart; fadd length`; the function is exact with it (927/929
+  without). The init is inferred from the order, not seen in the bytes. Moving the
   `length = toEnd` store up instead folds `toEnd` away and changes the frame.
 - Code that the optimiser removes still creates leaves: SoultreeObject
   WorldToLocalDirection `0x004fd710` inverts its matrix copy with the rigid
@@ -700,8 +700,7 @@ trying on other `[base+index]` / `add r, r` order near misses.
   reference) reorders it, which points at the loop optimiser's renumbering of induction
   addresses rather than at the source text.
 - A dead initialiser creates a local's leaf: `float length = 0.0f;` that is never
-  read still makes later-computed values newer than `length`. Track `0x5179f0`
-  (diagnostic only: such stores are not applied).
+  read still makes later-computed values newer than `length`. Track `0x5179f0`.
 - A vector built by a constructor with by-value parameters and then normalised gives
   x scalar-first and y/z component-first, with a final `fstp st(0)`; per-component
   stores into a named local give all three scalar-first. Track `0x518130`.

@@ -2,17 +2,16 @@
 // match. See docs/SCENEMANAGER.md.
 //
 // Scene::ReadStaticModels (0x004ecd60, 4536 code bytes): the "StaticModels"
-// reader, 4534/4536 strict. The one difference is the model name's terminator
+// reader, strict exact. The last difference was the model name's terminator
 // `staticModels->casters[i].fileName[count] = 0`: retail adds the element
 // offset to the array pointer first (`add edx,ebx; mov [edx+esi+0x10],0`),
-// the candidate adds the count first.
-// NOT APPLIED (compiler gaming, no evidence): a dead `count = 0;` with the
-// other clears at the top gives 4536/4536. `count` is overwritten at the
-// strcspn clamp before any read; the store only ages its leaf past the
-// `i * sizeof` temporary, and VC6 adds the older leaf last
-// (docs/VC6_OPERAND_ORDER.md 1.2). It was applied in round 9 and reverted.
-// A dead initialisation of `length` instead, or `count` declared at function
-// scope without the early store, leaves the candidate order. Forms that never moved it while `count`
+// the candidate added the count first. `count` is a function-scope local
+// that is zeroed with `models` at the top: its leaf is then older than the
+// `i * sizeof` temporary created at the first `casters[i]`, and VC6 adds the
+// older leaf last (docs/VC6_OPERAND_ORDER.md 1.2). The clear is inferred
+// from that order (its value is never read; 4534/4536 without it). A dead
+// initialisation of `length` instead, or `count` declared at function scope without the early
+// store, leaves the candidate order. Forms that never moved it while `count`
 // was first assigned at the strcspn clamp: pointer and index spellings, the
 // clamp forms, inline helpers, an element pointer local, declaration order,
 // `count`/`length`/`i` types, `'\0'`, `*(p + count)`, extra uses of `count`,
@@ -368,6 +367,7 @@ int Scene::ReadStaticModels(LightManager* lights, int particleManager, int textu
     char colPath[0x104];
 
     models = 0;
+    count = 0;
     staticModels = 0;
     int found = parameters.SelectSection("StaticModels");
     if (sceneManager->sceneNamed && found) {

@@ -22,8 +22,8 @@
     "candidate_symbol_contains": "?ReadStaticModels@Scene@@QAEHPAVLightManager@@HHHP6AXH@ZH@Z",
     "target_va": "0x004ecd60",
     "target_size": 4536,
-    "expect": "partial",
+    "expect": "exact",
     "bindings": "SceneManagerNearMisses.bindings.json",
-    "status": "Strict 4534/4536 (the jump table follows): the name terminator adds the count before the casters[i] offset. A dead `count = 0;` at the top matches but is not applied (compiler-only store). Kept as a sample with ReadAnimations (0x004edfe0, 5289/5335, still partial)."
+    "status": "Strict exact (4536/4536 code bytes; the jump table follows): `count` is a function-scope local zeroed at the top, so its leaf is older than the casters[i] offset and the name terminator adds the offset first. Kept as a sample with ReadAnimations (0x004edfe0, 5289/5335, still partial)."
   }
 ]
