@@ -61,7 +61,7 @@ Score is the masked linked score from `linked_accuracy.py`. "Emu" means a
 | `ProbePartialTextureUploads`, `ProbeNonLocalTextureMemory` | 0x4cab00, 0x4ca5a0 | near miss 0.826 | No emu case. Runs in the hardware test on a fresh profile. |
 | `Game` constructor, init, slot 2, render | 0x467990, 0x467b70, 0x467af0, 0x467eb0 | exact | |
 | `Game::Tick` | 0x4685d0 | near miss 0.749 | `QueryPerformanceCounter` in place of inline `rdtsc`. Emu: 60 runs, 0 mismatches. |
-| `ResourceManager::AddArchive`, `FileStream::Read` | 0x4e9030, 0x461640 | near miss (0.931) | No emu case. Every asset goes through these. |
+| `ResourceManager::AddArchive`, `FileStream::Read` | 0x4e9030, 0x461640 | near miss (0.931) | Emu cases `resource_add_archive` and `filestream_read` agree with retail (800 runs each). Every asset goes through these. |
 | `KrustyUI::Create`, `UIDialog::Tick` | 0x4988a0, 0x46ef00 | exact | |
 | `ReadDialogResource` | 0x46a920 | bring-up 0.967 (16,120 B) | Every menu screen. Emu: 0 mismatches. |
 | `MainDlg::HandleEvent` | 0x44b200 | bring-up 0.992 | No emu case. |
@@ -141,7 +141,7 @@ from reviewed near-miss sources outside `src/bringup`.
 | 1 | User runs the current build with `MCM2_AUTORACE` (test plan below). | 10 min | Turns blocker 1 into a fact either way. |
 | 2 | Keep a record of the last exe hash and commit that ran, with its frames, in the ignored run directory; cite it from `GAME_BUILD.md`. | 30 min | Stops the run status drifting from the tree. |
 | 3 | Emu cases for `CreateModeSurfaces`, `ProfileDisplays` and the two texture probes, with fake DirectDraw vtables in replay mode. | 1 day | Start-up bodies whose failure ends the process silently. |
-| 4 | Emu cases for `FileStream::Read` and `ResourceManager::AddArchive`. | 0.5 day | Every asset load depends on them. |
+| 4 | Done: `tools/emu_cases/filestream_read.py` (buffered, encoded, wrapped and short reads) and `resource_add_archive.py` (replay mode: header, growth, merge, realloc failure, unwind) agree with retail in 800 of 800 runs each; planted bugs are caught. Both bodies had earlier native differential checks (docs/FILESTREAM.md, docs/RESOURCEMANAGER.md). | - | Every asset load depends on them. |
 | 5 | Emu case for `BikeRace::CreateRacers`. | 1 day | Largest uncovered bring-up body on the race path. |
 | 6 | Strengthen `terrain_load` so most runs take the success path. | 0.5 day | The case currently passes mostly by failing early in both builds. |
 | 7 | Emu cases for `PCTextureMap::CreateSurface`, `CopyRectTo`, `CopyScreenToTexture`, `Clone`, `CopyMipLevels`. | 1-2 days | Texture corruption is hard to spot by eye. |
