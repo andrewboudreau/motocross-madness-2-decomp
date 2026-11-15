@@ -73,6 +73,7 @@ CLEAN_CASES = {
     'terrain_shadow_slot28': 100,
     # Fixed by the second sweep: sized to show the old difference with the default seed.
     'bike_steer_torque': 100,
+    'bike_apply_collision_event': 100,
     'collision_hull_vs_hull': 300,
     # SET_FLAG: the unreachable set-flag arm too (its push dot order was fixed 2026-11-12).
     'segment_triangle_query': (300, {'SET_FLAG': True}),

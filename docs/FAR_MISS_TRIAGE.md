@@ -17,7 +17,7 @@ something different from retail.
 - All 92 are linked by the current game build. `tools/linked_accuracy.py`
   reports no unexpected or missing call for the 88 it scores; the four it does
   not score are in `Bike.obj` (0x00405190, 0x00406ae0, 0x00407440, 0x0040c000).
-- 19 of the 92 have no differential emulation case (listed at the end). The
+- 18 of the 92 have no differential emulation case (19 at triage time) (listed at the end). The
   cases that exist were not run in this pass.
 - The index is stale for several rows. Three are now within 256 bytes and so
   no longer far misses: `0x0050dad0` (4913/5020), `0x004e6f80` (2056/2148), `0x0052a940` (3229/3254). Rows marked "(masked)" in the index were scored on
@@ -93,7 +93,7 @@ the function were wrong, not a finding that it is.
 | 25 | `0x004e7d60` | VCRInterface::Tick | samples/race/RecorderNearMisses.cpp:42 | 270/2448; index 272/2448 | R | low | yes, samples/race/RecorderTick.cpp (0.960) | 109 | 799/792 insns, same 62 calls and 24 stores; 54 masked diffs, slot order. |
 | 26 | `0x004e9030` | ResourceManager::AddArchive | samples/render/ResourceManagerNearMisses.cpp:31 | 120/804; index 100/804 | R | low, no emu case | yes, same file (0.991) | 103 | 265/266 insns, 5 diffs, all from retail homing `archive` in the `new` temporary's slot. |
 | 27 | `0x004da7b0` | ProjectedShadow::Init | samples/physics/shadow/ProjectedShadowNearMisses.cpp:18 | 153/778 masked (link error in match_one); index 153/777 (masked) | R | low | yes, same file (0.992) | 94 | 239/239 insns, 4 masked diffs: register choice in the sprintf/QueryFlag set-up. |
-| 28 | `0x00405190` | ApplyCollisionEvent @Bike | src/krusty2/vehicle/Bike.cpp | 1758/2874 | R | high, no emu case | yes, Bike.obj (not scored) | 89 | Frame 0xac equal; the 68-insn count gap is the trailing jump and byte tables in the retail extent. Left: slot offsets of velA, blend and the 0x3ea temporary. Collision response with locals left uninitialised on purpose (provisional) and no differential case. |
+| 28 | `0x00405190` | ApplyCollisionEvent @Bike | src/krusty2/vehicle/Bike.cpp | 1758/2874 | R | low: `bike_apply_collision_event` agrees (1200 runs, 0 differ) | yes, Bike.obj (not scored) | 89 | Frame 0xac equal; the 68-insn count gap is the trailing jump and byte tables in the retail extent. Left: slot offsets of velA, blend and the 0x3ea temporary. Collision response with locals left uninitialised on purpose (provisional) and no differential case when triaged; `tools/emu_cases/bike_apply_collision_event.py` now covers every kind (0 of 1200 differ). |
 | 29 | `0x004cf2a0` | DitherConvert | samples/render/PixtransNearMisses.cpp:376 | 276/1759 | R | low | yes, same file (0.973) | 89 | 562/566 insns; ebp push placement and y-loop pointer set-up order. |
 | 30 | `0x00426be0` | BoxTriangleQuery | samples/physics/bvh/BoundingBoxTreeQueryNearMisses.cpp:263 | 1542/2576; index 1673/2572 | R | low | yes, same file (1.000) | 83 | Linked masked score 1.000 (626/626). Min/max of the projections stay on the x87 stack in retail; frame slot offsets. |
 | 31 | `0x004c3100` | PCJoystickDevice::ReadBufferedState | samples/inputdevice/JoystickBufferedState.cpp:25 | 120/1641; index 102/1449 (masked) | S | low | yes, same file (0.915) | 76 | Inline boundary: 23 calls against retail's 22 (retail expands FilterAxisSpike with arm-local temporaries, which leaves no zero register); 48 masked diffs. |
@@ -121,7 +121,7 @@ the function were wrong, not a finding that it is.
 | 53 | `0x004f8220` | MPBikeRiderDlg::FillBikeRiderLists | samples/ui/SelectGamePicProcsNearMisses.cpp:36 | 110/840 | R | low | yes, src/bringup/Group2_MPBikeRiderDlg.cpp (0.932) | 44 | 258/257 insns; zero register ebp vs edi, and `flags & 4` kept in a slot in retail. |
 | 54 | `0x00427c10` | SegmentTriangleQuery | samples/physics/bvh/BoundingBoxTreeQueryNearMisses.cpp:528 | 424/1112; index 374/1110 | R | low | yes, same file (0.959) | 41 | 353/352 insns; retail keeps the constant 1 in ebp and copies segment[1] at entry, so registers and slots differ. |
 | 55 | `0x004815e0` | DrawableGridNode::ComputeViewerDetail | samples/render/GriddrawNearMisses.cpp:348 | 64/1083 | R | low | yes, same file (0.887) | 41 | 308/314 insns; retail keeps both axis deltas on the x87 stack across the near/far branch. |
-| 56 | `0x00435830` | CollisionObject::SetTransform | src/krusty2/collision/CollisionObject.cpp:2699 | 890/1684; index 902/1684 | S | med | yes, same file (0.833) | 40 | Hull case's inline 4x4 product: per-element term order differs from retail (131 masked diffs, 513/523 insns). The source parenthesises each sum; whether the remaining order is association or only load order was not re-derived here. |
+| 56 | `0x00435830` | CollisionObject::SetTransform | src/krusty2/collision/CollisionObject.cpp:2699 | 890/1684; index 902/1684 | S | med | yes, same file (0.833) | 40 | Hull case's inline 4x4 product: per-element term order differs from retail (131 masked diffs, 513/523 insns). The source parenthesises each sum; `collision_set_transform` agrees bit for bit at 0x27f, 0x7f, 0x37f and 0xe7f (1200 runs, no ulp tolerance), so the difference is load order, not association. |
 | 57 | `0x004bdc00` | SoundMemoryManager::LoaderThreadProc | samples/audio/AudioLoaderThread.cpp:9 | 91/483 | R | low | yes, same file (0.871) | 39 | Same calls, stores and branches (155/155 insns). Retail keeps audio in ebp and `&cs` in ebx; the candidate caches an import pointer in a register (2 `call reg` against 0). |
 | 58 | `0x00483d40` | GridNode::IntersectSegment | samples/render/GridNodeNearMisses.cpp:105 | 178/3984 masked (link error in match_one); index 68/4396 | S | low | yes, same file (0.916) | 38 | Retail has an ebp frame and four bare `fistp [eax]` from an inline-asm rounding helper (8 direct calls vs 12). |
 | 59 | `0x005059d0` | Terrain::Load | src/krusty2/broadphase/Terrain.cpp:138 | 894/2117; index 894/2116 | R | low | yes, same file (0.985) | 37 | 627/628 insns; VC6 caches 3 in ebx where retail caches -1 after the palette branch. Header: about 80 forms tried. |
@@ -278,13 +278,14 @@ would plausibly write, singled out by the bytes).
     (src/bringup/Group2_VehicleWheel.cpp), so a fix in
     src/krusty2/tire/Tire.cpp must be carried over.
 
-13. **0x00405190 Bike::ApplyCollisionEvent** (1758/2874, high risk, no differential case).
-    Not a matching priority: the remaining difference is slot offsets. It is
-    here because it is collision response, the source leaves locals
-    uninitialised on purpose (provisional), `linked_accuracy` does not score
-    it, and nothing emulates it. Next: add a `tools/emu_cases` case covering
-    each event kind before any further source change
-    (src/krusty2/vehicle/Bike.cpp:1938).
+13. **0x00405190 Bike::ApplyCollisionEvent** (1758/2874; risk now low).
+    Not a matching priority: the remaining difference is slot offsets. It was
+    listed for gameplay risk (collision response, locals left uninitialised on
+    purpose, not scored by `linked_accuracy`). Done since the triage:
+    `tools/emu_cases/bike_apply_collision_event.py` runs every event kind with
+    stubbed solvers that log the values behind each pointer argument; retail
+    and the source build agree in 1200 of 1200 runs at three control words,
+    and a planted 0.6f -> 0.61f change is caught.
 
 14. **0x004e9030 ResourceManager::AddArchive** (120/804, no differential case).
     Confirmed: 5 diffs, all from retail homing `archive` in the slot of the
@@ -312,7 +313,7 @@ would plausibly write, singled out by the bytes).
 
 ## Coverage gaps
 
-No differential emulation case mentions these VAs: `0x004049d0`, `0x00405190`, `0x00406ae0`, `0x00407440`, `0x0040c000`, `0x00448560`, `0x0044b200`, `0x004513a0`, `0x004738a0`, `0x00478570`, `0x00486170`, `0x004a2560`, `0x004c69c0`, `0x004c7b40`, `0x004ca5a0`, `0x004cab00`, `0x004e14a0`, `0x004e9030`, `0x0050dad0`.
+No differential emulation case mentions these VAs: `0x004049d0`, `0x00406ae0`, `0x00407440`, `0x0040c000`, `0x00448560`, `0x0044b200`, `0x004513a0`, `0x004738a0`, `0x00478570`, `0x00486170`, `0x004a2560`, `0x004c69c0`, `0x004c7b40`, `0x004ca5a0`, `0x004cab00`, `0x004e14a0`, `0x004e9030`, `0x0050dad0`.
 
 `match_one.py` cannot link 0x004db8c0, 0x004dc2b0 and 0x00483d40 (unresolved
 rounding helper), nor 0x004de590 and 0x004da7b0 (one unresolved symbol each);
