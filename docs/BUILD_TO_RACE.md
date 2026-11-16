@@ -40,8 +40,8 @@ subsystem, characteristics, stack and `SizeOfImage`. Addresses differ from
 retail everywhere, so crash EIPs map through the build's own `mcm2.map`.
 
 CRT start-up (S): the `/MT` CRT comes from the VC6 libraries; the `__xc_a..z`
-table is emulated by `tools/static_initializers.py` except one initializer
-that calls `GetVersionExA` (retail 0x4aa7b0).
+table is emulated by `tools/static_initializers.py`; every initializer runs
+in both images, the game object's (retail 0x4aa7b0) with fixed import answers.
 
 ## Boot path
 
@@ -155,7 +155,7 @@ from reviewed near-miss sources outside `src/bringup`.
 | 12 | Re-run the old crash scenarios and map any new EIP. | 1 h of user time | Closes blocker 7. |
 | 13 | Replace the placeholder globals in `Group1_Globals.cpp` and `Group4_EcoBridges.cpp` with retail-shaped data. | 1-2 days | Removes known layout differences. |
 | 14 | Review the 19 best-guess candidate sources, largest on the race path first. | 3-5 days | Each is a body nobody has checked against retail behaviour. |
-| 15 | Add `GetVersionExA` to `static_initializers.py`. | 2 h | Completes the static-initializer check. |
+| 15 | Done: `static_initializers.py` answers `GetVersionExA` and the other imports the game object's initializer calls (directory, IMM32, drives, locale, registry, CRT TLS) with fixed values. All initializers run in both images; 11 more data bindings compare and match, among them the trig tables and `g_TrackGameInstance` (docs/REBUILD_GAPS.md). | - | Completes the static-initializer check. |
 | 16 | Link a `.rsrc` with user-supplied icons and a version block. | 0.5 day | Icon and file properties; no data may be committed. |
 | 17 | Import `DirectInputCreateEx` by name if a matching import library can be built. | 0.5 day | Removes a machine-specific ordinal. |
 | 18 | Add the source-build hash route to the shim (accept an exe that has `mcm2.map` beside it). | 2 h | Drops `MCM2_FORCE_RUNTIME` from every run. |

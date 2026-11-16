@@ -8,8 +8,8 @@ A namespace-scope ``static const Vec3 kVec3XAxis = Vec3(1.0f, 0.0f, 0.0f);`` is
 zeros on both sides. This module runs every entry of that table, in table order,
 in one emulated copy of the image and records the bytes each entry writes.
 
-Three LIBCMT routines are replaced, by name (``STUBS``): ``__nh_malloc``
-(``malloc`` and ``operator new``) hands out zeroed blocks from a scratch heap,
+Four LIBCMT routines are replaced, by name (``STUBS``): ``__nh_malloc``
+(``malloc`` and ``operator new``) and ``_calloc`` hand out zeroed blocks from a scratch heap,
 ``_free`` does nothing and ``__onexit`` (``atexit``) returns its argument.
 ``fs`` points at a scratch thread block, so SEH frames work. An entry that
 faults, calls an import or runs past the instruction limit is undone (its
@@ -46,9 +46,16 @@ MAX_INSNS = 2_000_000
 HLT = 0xf4
 # Replaced routines: (action, argument index, bytes the callee pops). Actions:
 # 'alloc' returns a zeroed scratch-heap block of argument-many bytes, 'size' the size of the
-# block the argument names, 'arg' the argument, an int that constant.
+# block the argument names, 'arg' the argument, 'osversion' fills the OSVERSIONINFOA the
+# argument names with OS_VERSION and returns TRUE, 'directory' copies WORKING_DIRECTORY to
+# the buffer the argument names and returns its length, 'drives' answers
+# GetLogicalDriveStringsA from DRIVES, 'drivetype' and 'volume' look the root up in it,
+# 'tlsget'/'tlsset' read and store a TLS slot (0 until set), 'calloc' is 'alloc' of the
+# argument times the next one, 'decimal' writes DECIMAL_SEPARATOR to the buffer the argument
+# names and returns its size, an int that constant.
 # LIBCMT routines (by map/atlas name, __cdecl):
-STUBS = {'__nh_malloc': ('alloc', 0, 0), '_free': (0, 0, 0), '__onexit': ('arg', 0, 0)}
+STUBS = {'__nh_malloc': ('alloc', 0, 0), '_calloc': ('calloc', 0, 0), '_free': (0, 0, 0),
+         '__onexit': ('arg', 0, 0)}
 # Imports (by IAT name, __stdcall) an initializer may call without changing what it writes.
 # The game's operator new (MemTag.cpp) calls HeapAlloc and HeapSize itself.
 IMPORTS = {'__imp__GetProcessHeap': (1, 0, 0),
@@ -63,7 +70,38 @@ IMPORTS = {'__imp__GetProcessHeap': (1, 0, 0),
            '__imp__LeaveCriticalSection': (0, 0, 4),
            '__imp__InitializeCriticalSection': (0, 0, 4),
            '__imp__QueryPerformanceFrequency': (0, 0, 4),  # no counter (FALSE)
-           '__imp__CoInitialize': (0, 0, 4)}             # S_OK
+           '__imp__CoInitialize': (0, 0, 4),             # S_OK
+           # PCGame's constructor (retail 0x004aa7b0): the version, the working directory,
+           # IMM32 loaded and no input context (so ImmAssociateContext is not called and
+           # the constructor clears the IME fields)
+           '__imp__GetVersionExA': ('osversion', 0, 4),
+           '__imp__GetCurrentDirectoryA': ('directory', 1, 8),
+           '__imp__LoadLibraryA': (0x10000000, 0, 4),
+           '__imp__ImmCreateContext': (0, 0, 0),
+           # its DriveList (DirectoryList.cpp 0x00449e70)
+           '__imp__GetLogicalDriveStringsA': ('drives', 0, 8),
+           '__imp__GetDriveTypeA': ('drivetype', 0, 4),
+           '__imp__GetVolumeInformationA': ('volume', 0, 32),
+           # the CRT's _getptd: the first call allocates and initialises the thread's
+           # data (calloc, _initptd) and stores it, later calls read it back
+           '__imp__GetLastError': (0, 0, 0),
+           '__imp__SetLastError': (0, 0, 4),
+           '__imp__TlsGetValue': ('tlsget', 0, 4),
+           '__imp__TlsSetValue': ('tlsset', 0, 8),
+           '__imp__GetCurrentThreadId': (1, 0, 0),         # _initptd records it
+           # TrackGame's constructor (0x00520870): lang.dll (LoadLibraryA above), the
+           # decimal separator saved and set to '.', and registry ints that fall back to
+           # their defaults (no key: ERROR_FILE_NOT_FOUND)
+           '__imp__GetLocaleInfoA': ('decimal', 2, 16),
+           '__imp__SetLocaleInfoA': (1, 0, 12),
+           '__imp__RegOpenKeyExA': (2, 0, 20),
+           '__imp__RegCloseKey': (6, 0, 4)}               # closed even when the open failed
+# Fixed answers (Windows 98 SE: major, minor, build, platform, CSD string; a directory):
+# both images read the same values, so the bytes the PCGame initializer derives compare.
+OS_VERSION = (4, 10, 0x040a08ae, 1, b' A')
+WORKING_DIRECTORY = b'C:\\MCM2'
+DECIMAL_SEPARATOR = b'.'
+DRIVES = {b'C': (3, b'SYSTEM'), b'D': (5, b'MCM2')}   # DRIVE_FIXED, DRIVE_CDROM; volume names
 
 
 @dataclass
@@ -197,17 +235,27 @@ def run_initializers(pe, table: tuple[int, int] | None, iat: dict[str, int] | No
     image_lo, image_hi = base, base + pe.size_of_image
     log: list[tuple[int, bytes]] = []
     heap = [HEAP]
+    tls: dict[int, int] = {}
     blocks: dict[int, int] = {}
 
     def on_write(uc_, access, address, size, value, user):
         if image_lo <= address < image_hi:
             log.append((address, bytes(uc_.mem_read(address, size))))
 
+    def host_write(address, data):
+        # host writes skip the write hook: log them as on_write would
+        if image_lo <= address < image_hi:
+            log.append((address, bytes(uc.mem_read(address, len(data)))))
+        uc.mem_write(address, data)
+
     def on_stub(uc_, address, size, spec):
         action, index, pops = spec
         sp = uc_.reg_read(UC_X86_REG_ESP)
         ret = struct.unpack('<I', bytes(uc_.mem_read(sp, 4)))[0]
         arg = struct.unpack('<I', bytes(uc_.mem_read(sp + 4 + 4 * index, 4)))[0]
+        if action == 'calloc':
+            action = 'alloc'
+            arg *= struct.unpack('<I', bytes(uc_.mem_read(sp + 8 + 4 * index, 4)))[0]
         if action == 'alloc':
             block = heap[0]
             heap[0] = (block + max(arg, 1) + 15) & ~15
@@ -217,6 +265,40 @@ def run_initializers(pe, table: tuple[int, int] | None, iat: dict[str, int] | No
             value = blocks.get(arg, 0xffffffff)
         elif action == 'arg':
             value = arg
+        elif action == 'osversion':
+            major, minor, build, platform, csd = OS_VERSION
+            host_write(arg + 4, struct.pack('<4I', major, minor, build, platform) + csd.ljust(128, b'\0'))
+            value = 1
+        elif action == 'directory':
+            host_write(arg, WORKING_DIRECTORY + b'\0')
+            value = len(WORKING_DIRECTORY)
+        elif action == 'drives':
+            # GetLogicalDriveStringsA(size, buffer): the length without the final NUL
+            strings = b''.join(letter + b':\\\0' for letter in DRIVES) + b'\0'
+            buffer = struct.unpack('<I', bytes(uc_.mem_read(sp + 8, 4)))[0]
+            if arg >= len(strings):
+                host_write(buffer, strings)
+            value = len(strings) - 1
+        elif action == 'decimal':
+            size = struct.unpack('<I', bytes(uc_.mem_read(sp + 8 + 4 * index, 4)))[0]
+            if size > len(DECIMAL_SEPARATOR):
+                host_write(arg, DECIMAL_SEPARATOR + b'\0')
+            value = len(DECIMAL_SEPARATOR) + 1
+        elif action == 'tlsget':
+            value = tls.get(arg, 0)
+        elif action == 'tlsset':
+            tls[arg] = struct.unpack('<I', bytes(uc_.mem_read(sp + 8, 4)))[0]
+            value = 1
+        elif action in ('drivetype', 'volume'):
+            kind, name = DRIVES.get(bytes(uc_.mem_read(arg, 1)), (1, b''))   # DRIVE_NO_ROOT_DIR
+            if action == 'drivetype':
+                value = kind
+            else:
+                # GetVolumeInformationA(root, name, size, serial, length, flags, fs, fs size)
+                name_buffer, size = struct.unpack('<II', bytes(uc_.mem_read(sp + 8, 8)))
+                if name_buffer and size > len(name):
+                    host_write(name_buffer, name + b'\0')
+                value = 1 if name else 0
         else:
             value = action
         uc_.reg_write(UC_X86_REG_EAX, value)

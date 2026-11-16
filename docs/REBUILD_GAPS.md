@@ -943,11 +943,22 @@ whose per-unit copies differed only in padding, 44 pointer-only).
 No header-static value bug was found. Every unit's copy equals retail at the
 VA its bindings name, and each group of 97 to 103 linked `kVec3*` copies
 agrees. A negative check swapped `kVec3XAxis`/`kVec3YAxis` in one unit's
-bindings and got two mismatches, `(1, 0, 0)` against `(0, 1, 0)`. One
-initializer per image calls `GetVersionExA` (retail 0x004aa7b0, ours
-0x004bc460) and is not emulated, so its large object (retail
-0x0059af5c-0x0065b3e0) stays unknown. No binding currently compares
-against it.
+bindings and got two mismatches, `(1, 0, 0)` against `(0, 1, 0)`.
+
+Every initializer now runs in both images (retail 352 of 352, the source build
+509 of 509, 0 uncertain bytes). The game object's initializer (retail
+0x004aa7b0: `InitFastMath`, the `PCGame` and `TrackGame` constructors) calls
+imports that `IMPORTS` answers with fixed values, the same for both images: a
+Windows 98 SE `GetVersionExA`, `C:\MCM2` as the working directory, IMM32 loaded
+with no input context, drives C: (fixed) and D: (CD-ROM), a `.` decimal
+separator, registry keys absent (every `GetRegistryInt` takes its default), and
+the CRT's per-thread data through emulated TLS (`_calloc` is replaced like
+`__nh_malloc`). With that, 11 more data bindings compare and match (850 to 861;
+uninitialised 461 to 450): `g_SinTable`, `g_CosTable`, `g_TanTable`,
+`g_FastSqrtTable`, `g_FastInvSqrtTable`, `g_TrigTableScale`,
+`g_TrackGameInstance`, `g_FilterKeys` (two bindings), `g_DebugSocket` and the
+file name at 0x0065b4ac. The values depend on those answers only where the
+constructors copy them (version, directory, separator, handles).
 
 96 VAs carry two or more different linked bodies (a bring-up stand-in next to the
 reconstruction, or two reconstructions of one function); they are listed for

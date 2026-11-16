@@ -3,7 +3,7 @@ import struct
 import unittest
 from dataclasses import dataclass
 
-from tools.static_initializers import cxx_table, initterm_tables, run_initializers
+from tools.static_initializers import OS_VERSION, cxx_table, initterm_tables, run_initializers
 
 try:
     import unicorn  # noqa: F401
@@ -18,6 +18,7 @@ INITTERM = BASE + 0x1100
 TABLE = BASE + 0x2000           # four entries
 SHORT_TABLE = BASE + 0x2020     # one entry: a C initializer table
 VALUE, COUNTER, PARTIAL, IAT = BASE + 0x2100, BASE + 0x2104, BASE + 0x2108, BASE + 0x2180
+VERSION_TABLE, VERSION_INFO = BASE + 0x20e0, BASE + 0x2040   # one entry; a 0x94-byte OSVERSIONINFOA
 
 
 @dataclass
@@ -62,9 +63,11 @@ def image() -> FakePE:
         BASE + 0x1070: b'\xc7\x05' + struct.pack('<II', PARTIAL, 7)
         + b'\xff\x15' + struct.pack('<I', IAT) + b'\xc3',
         INITTERM: b'\xc3',
+        # GetVersionExA(&info): the answered import fills the structure
+        BASE + 0x1080: push(VERSION_INFO) + b'\xff\x15' + struct.pack('<I', IAT) + b'\xc3',
     }
     data = {TABLE: struct.pack('<4I', BASE + 0x1040, BASE + 0x1050, BASE + 0x1060, BASE + 0x1070),
-            SHORT_TABLE: struct.pack('<I', 0)}
+            SHORT_TABLE: struct.pack('<I', 0), VERSION_TABLE: struct.pack('<I', BASE + 0x1080)}
     return FakePE(text, data)
 
 
@@ -80,16 +83,24 @@ class TableTests(unittest.TestCase):
 class RunTests(unittest.TestCase):
     def test_values_shared_state_and_failed_entries(self):
         pe = image()
-        res = run_initializers(pe, (TABLE, TABLE + 16), {'__imp__GetVersionExA': IAT})
+        res = run_initializers(pe, (TABLE, TABLE + 16), {'__imp__GetTickCount': IAT})
         self.assertEqual(res.ok, [BASE + 0x1040, BASE + 0x1050, BASE + 0x1060])
         self.assertEqual(bytes(res.values[VALUE + k] for k in range(4)), struct.pack('<f', 1.0))
         # two entries bump one counter: running state, not either entry's value
         self.assertEqual(res.values[COUNTER], 2)
         self.assertIn(COUNTER, res.shared)
         self.assertNotIn(VALUE, res.shared)
-        self.assertEqual(res.failed, {BASE + 0x1070: 'calls __imp__GetVersionExA'})
+        self.assertEqual(res.failed, {BASE + 0x1070: 'calls __imp__GetTickCount'})
         self.assertIn(PARTIAL, res.uncertain)
         self.assertNotIn(PARTIAL, res.values)
+
+    def test_get_version_ex_writes_the_fixed_version(self):
+        res = run_initializers(image(), (VERSION_TABLE, VERSION_TABLE + 4), {'__imp__GetVersionExA': IAT})
+        self.assertEqual(res.ok, [BASE + 0x1080])
+        major, minor, build, platform, csd = OS_VERSION
+        got = bytes(res.values[VERSION_INFO + 4 + k] for k in range(16 + len(csd)))
+        self.assertEqual(got, struct.pack('<4I', major, minor, build, platform) + csd)
+        self.assertNotIn(VERSION_INFO, res.values)    # dwOSVersionInfoSize is the caller's
 
 
 if __name__ == '__main__':
