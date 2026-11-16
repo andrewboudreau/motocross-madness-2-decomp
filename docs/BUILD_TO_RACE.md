@@ -105,11 +105,13 @@ from reviewed near-miss sources outside `src/bringup`.
    `ReadDialogResource`, `LoadEventObjects`, `LoadBike`, the
    KrustyBike and bike-AI units, `DrawCurrentLod`. 19 candidate sources are
    marked best-guess-unreviewed in `config/game_build.json`.
-3. **Texture near misses have no differential case** (C):
-   `PCTextureMap::CreateSurface`, `CopyRectTo`, `CopyScreenToTexture`. Of 189
-   non-identical bodies, 34 (53,289 B) had none at the review; since then
+3. **Near misses without a differential case** (C): of 189 non-identical
+   bodies, 34 (53,289 B) had none at the review; since then
    `FileStream::Read`, `AddArchive`, `CreateRacers`, `ProfileDisplays`,
-   `CreateModeSurfaces` and both texture probes have gained cases.
+   `CreateModeSurfaces`, both texture probes and the five texture bodies
+   (`PCTextureMap::CreateSurface`, `CopyRectTo`, `Clone`,
+   `CacheTexture::CopyMipLevels`, `GUIManager::CopyScreenToTexture`) have
+   gained cases.
 4. **Low-score render bodies** (C for scores): pixel halvers, `TransformPoints`,
    `LightVertices`, `TestBox`, the visibility walk, particles, projected
    shadow. A wrong result here shows as missing or miscoloured geometry, not
@@ -145,7 +147,7 @@ from reviewed near-miss sources outside `src/bringup`.
 | 4 | Done: `tools/emu_cases/filestream_read.py` (buffered, encoded, wrapped and short reads) and `resource_add_archive.py` (replay mode: header, growth, merge, realloc failure, unwind) agree with retail in 800 of 800 runs each; planted bugs are caught. Both bodies had earlier native differential checks (docs/FILESTREAM.md, docs/RESOURCEMANAGER.md). | - | Every asset load depends on them. |
 | 5 | Done: `tools/emu_cases/bike_race_create_racers.py` (replay mode) covers the rider archive, replay ranking, the pro circuit career, single player, ghost, AI (event and random skill) and network loads (local, remote players, remote and host AI). It agrees with retail in 400 of 400 runs, all probes reached; a planted grid-position bug gives 47 mismatches in 200. The behaviour is confirmed against these modelled inputs only: callee results are replayed, not run. | - | Largest bring-up body on the race path. |
 | 6 | Strengthen `terrain_load` so most runs take the success path. | 0.5 day | The case currently passes mostly by failing early in both builds. |
-| 7 | Emu cases for `PCTextureMap::CreateSurface`, `CopyRectTo`, `CopyScreenToTexture`, `Clone`, `CopyMipLevels`. | 1-2 days | Texture corruption is hard to spot by eye. |
+| 7 | Done: `texture_create_surface` (shared and mip surfaces, the format fallback lists, DirectDraw creation, palette, conversion, mip build, colour key and render states), `texture_copy_rect_to` (BltFast and the 8/16-bit table paths with real pixels), `texture_clone`, `cache_texture_copy_mip_levels` (mip chains of real depth) and `gui_copy_screen_to_texture` (the captured and dimmed pixels at 1-4 bytes) agree with retail in every run, all probes reached. Planted bugs are caught: a wrong fallback format (40), swapped address states (20), `||` in the mip count (112), a halved-twice rect (486), a `>=` level walk (152), the wrong dim mask (98) or checkerboard phase (58). Retail calls GetCaps through null for a mip-mapped 888/8888 texture (no DirectDraw fallback on that path); the cases avoid that input. Callee results are modelled, not run. | - | Texture corruption is hard to spot by eye. |
 | 8 | Emu cases for the pixel converters (0x4d0d40, 0x4cea10, 0x4ce5f0) over full input ranges. | 0.5 day | Pure functions with the lowest scores; cheap and exhaustive. |
 | 9 | Emu or native differential for `TransformPoints`, `LightVertices` and `TestBox`. | 1 day | Decide whether low scores hide behaviour differences. |
 | 10 | Frame comparison: the same `autorace.bin` on retail and source build, compare frames at fixed times. | 1 day, needs user runs | First whole-program check of rendering and physics. |

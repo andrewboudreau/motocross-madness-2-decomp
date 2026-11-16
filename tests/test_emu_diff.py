@@ -83,6 +83,9 @@ CLEAN_CASES = {
     'pcgame_profile_displays': 200,
     'texture_copy_rect_to': 400,
     'texture_clone': 300,
+    'gui_copy_screen_to_texture': 300,
+    'texture_create_surface': 300,
+    'cache_texture_copy_mip_levels': 400,
     'collision_hull_vs_hull': 300,
     # SET_FLAG: the unreachable set-flag arm too (its push dot order was fixed 2026-11-12).
     'segment_triangle_query': (300, {'SET_FLAG': True}),
