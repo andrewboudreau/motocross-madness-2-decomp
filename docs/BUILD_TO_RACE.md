@@ -74,7 +74,7 @@ Score is the masked linked score from `linked_accuracy.py`. "Emu" means a
 | `BaseQuarryEvent::PrepareGeometry` | 0x4e14a0 | near miss | No emu case. |
 | `EcoSystem::GenerateObjects` | 0x459ce0 | bring-up 0.914 | Uses a private `NormalDistribution(100)` in place of the retail shared one. |
 | `BikeRace::Create` | 0x417ed0 | bring-up 0.998 | Emu: 0 mismatches. |
-| `BikeRace::CreateRacers` | 0x419970 | bring-up 0.999 (13,428 B) | No emu case. |
+| `BikeRace::CreateRacers` | 0x419970 | bring-up 0.999 (13,428 B) | Emu case `bike_race_create_racers` (replay mode) agrees with retail in 400 of 400 runs, all 19 load paths reached. |
 | `LoadBike` | 0x4079c0 | bring-up 0.987 | Emu: 0 mismatches. |
 | `EventManager::Tick`, `BikeRace::Tick`, `KrustyBike::Tick` | 0x45f200, 0x41d2b0, 0x4977a0 | exact | |
 | `KrustyBike::SimulateFrame`, `Vehicle::SimulateFrame` | 0x496790, 0x52a940 | near miss 0.999, 0.998 | |
@@ -102,7 +102,7 @@ from reviewed near-miss sources outside `src/bringup`.
    is inference.
 2. **Bring-up bodies on the load and race path are unreviewed
    approximations** (C for the scores, P for behaviour). The large ones:
-   `ReadDialogResource`, `LoadEventObjects`, `CreateRacers`, `LoadBike`, the
+   `ReadDialogResource`, `LoadEventObjects`, `LoadBike`, the
    KrustyBike and bike-AI units, `DrawCurrentLod`. 19 candidate sources are
    marked best-guess-unreviewed in `config/game_build.json`.
 3. **Start-up and texture near misses have no differential case** (C):
@@ -142,7 +142,7 @@ from reviewed near-miss sources outside `src/bringup`.
 | 2 | Keep a record of the last exe hash and commit that ran, with its frames, in the ignored run directory; cite it from `GAME_BUILD.md`. | 30 min | Stops the run status drifting from the tree. |
 | 3 | Emu cases for `CreateModeSurfaces`, `ProfileDisplays` and the two texture probes, with fake DirectDraw vtables in replay mode. | 1 day | Start-up bodies whose failure ends the process silently. |
 | 4 | Done: `tools/emu_cases/filestream_read.py` (buffered, encoded, wrapped and short reads) and `resource_add_archive.py` (replay mode: header, growth, merge, realloc failure, unwind) agree with retail in 800 of 800 runs each; planted bugs are caught. Both bodies had earlier native differential checks (docs/FILESTREAM.md, docs/RESOURCEMANAGER.md). | - | Every asset load depends on them. |
-| 5 | Emu case for `BikeRace::CreateRacers`. | 1 day | Largest uncovered bring-up body on the race path. |
+| 5 | Done: `tools/emu_cases/bike_race_create_racers.py` (replay mode) covers the rider archive, replay ranking, the pro circuit career, single player, ghost, AI (event and random skill) and network loads (local, remote players, remote and host AI). It agrees with retail in 400 of 400 runs, all probes reached; a planted grid-position bug gives 47 mismatches in 200. The behaviour is confirmed against these modelled inputs only: callee results are replayed, not run. | - | Largest bring-up body on the race path. |
 | 6 | Strengthen `terrain_load` so most runs take the success path. | 0.5 day | The case currently passes mostly by failing early in both builds. |
 | 7 | Emu cases for `PCTextureMap::CreateSurface`, `CopyRectTo`, `CopyScreenToTexture`, `Clone`, `CopyMipLevels`. | 1-2 days | Texture corruption is hard to spot by eye. |
 | 8 | Emu cases for the pixel converters (0x4d0d40, 0x4cea10, 0x4ce5f0) over full input ranges. | 0.5 day | Pure functions with the lowest scores; cheap and exhaustive. |
