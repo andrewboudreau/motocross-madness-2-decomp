@@ -46,3 +46,7 @@ float NormalDistribution::Lookup(float mean, float value, float sigma)
 
 // $E initialiser at 0x004aff90 (+ atexit 0x004affa0 / $F 0x004affb0).
 static NormalDistribution g_normalDistribution(100);
+
+// 0x0056ece0 (initialised .data, ahead of this file's __FILE__ string at 0x0056ece4):
+// the table EcoSystem::GenerateObjects weighs slope and altitude with. Tier 3 name.
+NormalDistribution* g_SharedNormalDistribution = &g_normalDistribution;

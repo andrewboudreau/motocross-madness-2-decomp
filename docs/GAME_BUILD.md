@@ -732,8 +732,8 @@ clearly more faithful, the game now links the sample's text:
   - `Group6_KrustyBikeCtor.cpp`
   - `Group3_KrustyUIShadow.cpp`
   - `Group0_SoultreeBridge.cpp` and `Group0_SoultreeBridge.h`
-- `Group4_EcoBridges.cpp` lost its five forwarders. It keeps only the shared
-  normal-distribution table.
+- `Group4_EcoBridges.cpp` lost its five forwarders, then its shared
+  normal-distribution pointer, which `NormalDistribution.cpp` now defines.
 - Some samples also carry functions that other units of the build provide,
   so they cannot be linked whole:
   - `BikeRaceNearMisses`

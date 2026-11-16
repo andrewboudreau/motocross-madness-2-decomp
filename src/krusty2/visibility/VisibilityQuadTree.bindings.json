@@ -54,7 +54,6 @@
   "?g_visibilityBoxVertices@@3PAUVisibilityBoxVertex@@A": "0x68a768",
   "?g_visibilityClipper@@3PAVVisibilityClipper@@A": "0x575a98",
   "?g_visibilityDebugDraw@@3HA": "0x68ab9c",
-  "?g_visibilityEntries@@3PAUVisibilityGlobalEntry@@A": "0x68a774",
   "?g_visibilityFreeze@@3HA": "0x68aba0",
   "?g_visibilityQueryTicks@@3HA": "0x68ab88",
   "?g_visibilityTickStat@@3VPeakHold@@A": "0x68ab90",

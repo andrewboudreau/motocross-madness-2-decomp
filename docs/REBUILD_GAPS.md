@@ -872,9 +872,7 @@ Vtables, RTTI and EH tables are skipped. Binding evidence: 3,035 bindings,
   binds the sample's name to `g_visibilityClipper`'s statically initialised
   cell.
 - Size checks: `s_g3TrickFrame` (128 B, which reaches into `s_kbTimeTo60Armed`)
-  is the documented chained-trick overread. `g_visibilityBoxVertices` and
-  `g_visibilityEntries` overlap in retail `.bss` (12 B apart). Those two are
-  separate arrays in our build, as their source comments say. No bound table
+  is the documented chained-trick overread. No bound table
   is shorter than retail's extent, apart from `kbSecondsPerMillisecond`, whose
   tail is the next object.
 - Uncovered retail game data: 479 nonzero runs (7,686 B). Code refers to 198

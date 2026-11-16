@@ -60,7 +60,7 @@ extern UnknownEcoDetailBand* g_UnknownGlobal59af14;
 // CollisionVec3/TerrainVec3, EcoTerrainView against Terrain); link_aliases
 // binds each to the provider at the same retail address (same 12-byte vectors,
 // same pushed arguments, Terrain's GameObject base at offset 0). The former
-// forwarders (Group4_EcoBridges.cpp) cost both bodies their call shape.
+// forwarders (formerly Group4_EcoBridges.cpp) cost both bodies their call shape.
 
 static inline void EcoSetIdentity(Matrix4* m) {
     memset(m, 0, sizeof(Matrix4));

@@ -3,6 +3,7 @@
   "??1NormalDistribution@@QAE@XZ": "0x4b0050",
   "?DebugFree@@YAXPAXPBDH@Z": "0x004a2e60",
   "?DebugMalloc@@YAPAXIPBDH@Z": "0x4a2e20",
+  "?g_SharedNormalDistribution@@3PAVNormalDistribution@@A": "0x56ece0",
   "_$E1": "0x4aff90",
   "_$E2": "0x4affb0",
   "_$E3": "0x4affa0",

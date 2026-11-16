@@ -22,13 +22,16 @@ PeakHold g_visibilityTickStat(5000);        // 0x0068ab90
 // separate active traversal context at 0x00689b78. Names are provisional.
 QuadTree* g_collisionQuadTree;  // 0x0068aba4
 
-struct VisibilityGlobalEntry {   // 0x20-byte entries at 0x0068a774, reset by the ctor
+// The debug box strip DrawBox fills and draws (FVF 0x1e2, the D3DLVERTEX layout); the ctor
+// resets every vertex's colour so the lines come out 0x2000ffff.
+struct VisibilityBoxVertex {   // 0x20 bytes, 16 of them at 0x0068a768
+    float x, y, z;
     int reserved;
     int color;
     int specular;
-    char field_0x0c[0x14];
+    float tu, tv;
 };
-extern VisibilityGlobalEntry g_visibilityEntries[16];
+extern VisibilityBoxVertex g_visibilityBoxVertices[16];   // 0x0068a768 (ends at the frozen camera, 0x0068a968)
 
 // Debug toggles and the frozen camera snapshot (slot 23).  Names tier 3.
 extern int g_visibilityDebugDraw;          // 0x0068ab9c toggled by key 0x44 in slot 23; gates slot 14
@@ -55,9 +58,9 @@ VisibilityQuadTree::VisibilityQuadTree(int flags)
     liveNodeCount = 0;
     rootNode = 0;
     for (int i = 0; i < 16; i++) {
-        g_visibilityEntries[i].color = 0x2000ffff;
-        g_visibilityEntries[i].specular = 0;
-        g_visibilityEntries[i].reserved = 0;
+        g_visibilityBoxVertices[i].color = 0x2000ffff;
+        g_visibilityBoxVertices[i].specular = 0;
+        g_visibilityBoxVertices[i].reserved = 0;
     }
 }
 
@@ -155,12 +158,6 @@ int VisibilityQuadTree::Render3D()
         ((VisibilityQuadTreeNode*)rootNode)->DebugDraw(x, z, 0, 0, 0x4000, View()->camera);
     return 1;
 }
-
-struct VisibilityBoxVertex {   // 0x20 bytes, 16 of them at 0x0068a768
-    float x, y, z;
-    char field_0x0c[0x14];
-};
-extern VisibilityBoxVertex g_visibilityBoxVertices[16];   // 0x0068a768 (ends at the frozen camera, 0x0068a968)
 
 // Builds the 16-vertex line strip that traces the box (bottom square, one vertical edge, top
 // square, the remaining vertical edges) and draws it.

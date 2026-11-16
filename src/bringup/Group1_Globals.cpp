@@ -22,8 +22,9 @@ VisibilityClipper* g_visibilityClipper = &s_visibilityClipperObject;
 
 // Grid texture use table (Grid1.cpp RecordTextureUse).  Retail places the sizes at
 // 0x0065b65c and the textures at 0x0066047c: 0x4e20 bytes apart.
-// best guess: 5000 entries each, the largest capacity the retail layout allows for the
-// sizes table; retail never bounds-checks the count.
+// 5000 entries each (strong inference from the layout): the sizes table fills its
+// 0x4e20-byte gap exactly; the textures table's gap to 0x006652a4 is 0x4e28, 5000
+// pointers and 8 unbound bytes. Retail never bounds-checks the count.
 int g_gridTextureSizes[5000];          // 0x0065b65c
 ManagedTexture* g_gridTextures[5000];  // 0x0066047c
 int g_gridTextureCount;                // 0x0068a2ec
@@ -34,21 +35,14 @@ int g_gridBoxTests;
 // 0x00689158: the 61 sprite-cell texture rectangles ParticleManager slot 27 fills.
 ParticleUVRect g_particleCellUVs[61];
 
-// VisibilityQuadTree.cpp's two views of the debug box strip.  Retail has ONE 16-entry
-// 0x20-byte vertex array at 0x0068a768 (x, y, z, then reserved/colour/specular/uv); the
-// entry view at 0x0068a774 is the same storage offset by 0xc, so the constructor's
-// colour reset (0x2000ffff) lands in the vertices DrawBox emits.
-// best guess: two separate arrays (C++ cannot alias them); DrawBox's debug lines then use
-// zero colours.  The layouts repeat VisibilityQuadTree.cpp's local declarations.
-struct VisibilityGlobalEntry {
+// VisibilityQuadTree.cpp's debug box strip: one 16-entry D3DLVERTEX-shaped array, as in
+// retail. The constructor's colour reset (0x2000ffff) lands in the vertices DrawBox
+// emits. The layout repeats VisibilityQuadTree.cpp's declaration.
+struct VisibilityBoxVertex {
+    float x, y, z;
     int reserved;
     int color;
     int specular;
-    char field_0x0c[0x14];
-};
-struct VisibilityBoxVertex {
-    float x, y, z;
-    char field_0x0c[0x14];
+    float tu, tv;
 };
 VisibilityBoxVertex g_visibilityBoxVertices[16];   // 0x0068a768
-VisibilityGlobalEntry g_visibilityEntries[16];     // 0x0068a774 (overlaps the above in retail)
