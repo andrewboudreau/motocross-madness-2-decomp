@@ -667,7 +667,10 @@ libraries:
     (hint 2): no VC6 library names `blade.dll`.
 
   So a rebuild needs a DirectX 7 SDK `dinput.lib` and a `blade.lib` made from
-  a `.def`, whose export order must give hints 2 and 3. The game loads
+  a `.def`, whose export order must give hints 2 and 3. The game build makes
+  both from `config/game-imports/*.def` with VC6 LIB, then sets the short
+  import members to `IMPORT_OBJECT_NAME_UNDECORATE` (VC6 LINK reads it; VC6
+  LIB has no `.def` form for it); the linked import table equals retail. The game loads
   `DDRAW.DLL` itself (strings `DDRAW.DLL` and `DirectDrawCreateEx` in `.data`).
 - **Headers:** the VC6 `INCLUDE` headers are DirectX 5. IID_IDirectDraw7,
   IID_IDirect3D7 and IID_IDirectInput7A all occur in the image, so a rebuild

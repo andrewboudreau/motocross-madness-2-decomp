@@ -1,3 +1,5 @@
 LIBRARY DINPUT.dll
+; Retail imports this by name with this hint (as the DirectX SDK import
+; library holds it); build_game.py turns VC6 LIB's ordinal entry into that.
 EXPORTS
-    DirectInputCreateEx@20 @2 NONAME
+    DirectInputCreateEx@20 @1

@@ -241,6 +241,49 @@ def link_game(build: Path, objects: list[Path], libraries: list[Path],
     return row
 
 
+IMPORT_NAME_UNDECORATE = 3  # WINNT.H IMPORT_OBJECT_NAME_UNDECORATE
+
+
+def named_imports(definition: Path) -> set[str]:
+    """The ``.def`` exports given as ``name@N @hint`` without NONAME.
+
+    Retail imports these by undecorated name with that hint, as an SDK import
+    library holds them. VC6 LIB writes such a line as an import by ordinal
+    (the hint), and has no ``.def`` form for an undecorated name.
+    """
+    names = set()
+    for line in definition.read_text(encoding='ascii').splitlines():
+        words = line.split(';', 1)[0].split()
+        if len(words) >= 2 and words[1].startswith('@') and 'NONAME' not in words:
+            names.add(words[0])
+    return names
+
+
+def undecorate_imports(library: Path, names: set[str]) -> int:
+    """Turn VC6 LIB's import-by-ordinal members for ``names`` into imports by name.
+
+    Each short import member (IMPORT_OBJECT_HEADER) keeps its symbol and its
+    ordinal field, which becomes the hint; only the name type changes, to
+    IMPORT_OBJECT_NAME_UNDECORATE (``_DirectInputCreateEx@20`` imports
+    ``DirectInputCreateEx``). VC6 LINK reads that type. Returns the count.
+    """
+    data = bytearray(library.read_bytes())
+    position, changed = 8, 0
+    while position + 60 <= len(data):
+        size = int(data[position + 48:position + 58])
+        body = position + 60
+        if data[body:body + 4] == b'\0\0\xff\xff':
+            symbol = bytes(data[body + 20:body + size]).split(b'\0', 1)[0].decode('ascii')
+            kind = struct.unpack_from('<H', data, body + 18)[0]
+            if symbol.lstrip('_') in names and (kind >> 2) & 7 == 0:
+                kind = (kind & ~(7 << 2)) | (IMPORT_NAME_UNDECORATE << 2)
+                struct.pack_into('<H', data, body + 18, kind)
+                changed += 1
+        position = body + size + (size & 1)
+    library.write_bytes(bytes(data))
+    return changed
+
+
 def source_revision(root: Path) -> dict:
     """The commit the build starts from and whether tracked files differ from it."""
     try:
@@ -311,6 +354,11 @@ def build_game(vc6: Path, jobs: int, compile_only: bool = False) -> tuple[dict, 
             report['import_libraries'].append(row)
             if row['returncode'] or not library.is_file():
                 return report, build
+            named = named_imports(definition)
+            row['imported_by_name'] = undecorate_imports(library, named)
+            if row['imported_by_name'] != len(named):
+                raise ValueError(f'{definition.name}: {row["imported_by_name"]} of '
+                                 f'{len(named)} named imports found in {library.name}')
             libraries.append(library)
         for name in spec['libraries']:
             library = find_child_ci(libdir, name)

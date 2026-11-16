@@ -5,8 +5,11 @@ from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 
+import struct
+
 from tools.build_game import (compile_flags, compile_source, header_hashes, link_game,
-                             response_file, run_command, source_files, valid_object)
+                             named_imports, response_file, run_command, source_files,
+                             undecorate_imports, valid_object)
 
 
 class GameBuildTests(unittest.TestCase):
@@ -224,6 +227,29 @@ class GameBuildTests(unittest.TestCase):
                 result = run_command(['cl'], root, {}, root / 'start.log')
             self.assertEqual(result['returncode'], -1)
             self.assertIn('cannot start', (root / 'start.log').read_text())
+
+    def test_named_imports_become_undecorated_names_keeping_the_hint(self):
+        def member(symbol: bytes, hint: int) -> bytes:
+            # IMPORT_OBJECT_HEADER as VC6 LIB writes it: code, import by ordinal.
+            names = symbol + b'\0DINPUT.dll\0'
+            body = struct.pack('<HHHHIIHH', 0, 0xffff, 0, 0x14c, 0, len(names), hint, 0) + names
+            header = b'DINPUT.dll/     ' + b' ' * 32 + str(len(body)).ljust(10).encode() + b'`\n'
+            return header + body + b'\n' * (len(body) & 1)
+
+        with tempfile.TemporaryDirectory() as tmp:
+            definition = Path(tmp) / 'dinput.def'
+            definition.write_text('LIBRARY DINPUT.dll\n; a comment @9\nEXPORTS\n'
+                                  '    DirectInputCreateEx@20 @1\n    Other@4 @7 NONAME\n')
+            library = Path(tmp) / 'dinput.lib'
+            library.write_bytes(b'!<arch>\n' + member(b'_DirectInputCreateEx@20', 1)
+                                + member(b'_Other@4', 7))
+            names = named_imports(definition)
+            self.assertEqual(names, {'DirectInputCreateEx@20'})
+            self.assertEqual(undecorate_imports(library, names), 1)
+            data = library.read_bytes()
+        first, second = 8 + 60, data.index(b'_Other@4') - 20
+        self.assertEqual(struct.unpack_from('<HH', data, first + 16), (1, 3 << 2))
+        self.assertEqual(struct.unpack_from('<HH', data, second + 16), (7, 0))
 
 
 if __name__ == '__main__':

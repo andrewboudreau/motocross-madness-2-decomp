@@ -27,7 +27,7 @@ python tools/emu_diff.py <case> -n 30               # one case at a time
 | 803,572 of 1,129,714 scored retail bytes are masked-identical in the linked exe. | C | `linked_accuracy.py`. 189 bodies (326,142 B) are not. |
 | Initialised game data, strings, reals and GUIDs equal retail where a symbol is bound. | C | `linked_data_accuracy.py`: 0 different. 479 nonzero retail runs (7,686 B, 198 code-referenced) are covered by no bound symbol. |
 | Bindings are consistent. | C | `audit_bindings.py`: 19,383 bindings, 0 findings; 0 link aliases bound to a different VA. |
-| Imports equal retail (244 functions, 15 DLLs), except three bound by ordinal. | C | `blade.dll` #3, #4 and `DINPUT.dll` #2 (`config/game-imports/*.def`). The ordinals match the staged `blade.dll` and this machine's `SysWOW64\dinput.dll`. |
+| Imports equal retail (244 functions, 15 DLLs), names and hints included. | C | Build `build-qz1cs5ms` against `work/game/mcm2.exe` with `pefile`. `blade.dll` and `DINPUT.dll` are imported by undecorated name with retail's hints (2, 3 and 1): `build_game.py` turns VC6 LIB's ordinal entries from `config/game-imports/*.def` into SDK-style imports by name. |
 | The exe has no `.rsrc` section. | C | Retail carries 4 icons, a group icon and a version block (8,768 B). No dialogs or strings live in the retail exe. |
 | A source build booted to title, loaded a track, rendered a race and returned to the menu. | C | Run of 2026-11-05 20:55 in `work/run/srcbuild` (exe `090daf45...`), `MCM2_AUTORACE`: 24 frames, clean `ExitProcess` after 4 minutes. |
 | The loading backdrop no longer stays behind the HUD. | S | Absent in every race frame of that run; no later run confirms it. |
@@ -120,8 +120,7 @@ from reviewed near-miss sources outside `src/bringup`.
    whose `mcm2.map` beside it names the exe's link timestamp (S: built, not
    yet run); the game exits within a
    second under RDP or a disconnected session, as retail does; the EULA must
-   be accepted by the user; registry values must exist; `dinput.dll` is bound
-   by ordinal, which holds on this machine only.
+   be accepted by the user; registry values must exist.
 6. **Placeholder globals and guessed initial values** (C that they exist, P
    for effect): `g_visibilityClipper` is an empty static; the grid texture
    tables are capped at 5,000 entries; the visibility box and entry arrays
@@ -158,7 +157,7 @@ from reviewed near-miss sources outside `src/bringup`.
 | 14 | Review the 19 best-guess candidate sources, largest on the race path first. | 3-5 days | Each is a body nobody has checked against retail behaviour. |
 | 15 | Done: `static_initializers.py` answers `GetVersionExA` and the other imports the game object's initializer calls (directory, IMM32, drives, locale, registry, CRT TLS) with fixed values. All initializers run in both images; 11 more data bindings compare and match, among them the trig tables and `g_TrackGameInstance` (docs/REBUILD_GAPS.md). | - | Completes the static-initializer check. |
 | 16 | Link a `.rsrc` with user-supplied icons and a version block. | 0.5 day | Icon and file properties; no data may be committed. |
-| 17 | Import `DirectInputCreateEx` by name if a matching import library can be built. | 0.5 day | Removes a machine-specific ordinal. |
+| 17 | Done: VC6 LIB writes no import by undecorated name from a `.def`, but VC6 LINK reads one (WINNT.H `IMPORT_OBJECT_NAME_UNDECORATE`), as in the SDK's import libraries. `build_game.py` sets that name type on the `.def` entries given as `name@N @hint` without NONAME; the hint stays. `DirectInputCreateEx` and both `blade.dll` imports are now by name with retail's hints; the whole import table equals retail. Built and audited, not yet run. | - | Removes a machine-specific ordinal. |
 | 18 | Done (not yet run): the shim turns its hooks on for a source build when the `mcm2.map` beside it carries the exe's PE link timestamp (`Timestamp is` line; equal in the last three builds, retail differs). A stale map does not count. `MCM2_FORCE_RUNTIME` stays as an override. | - | Drops `MCM2_FORCE_RUNTIME` from every run. |
 | 19 | Exercise podium, replay and return-to-menu with `MCM2_AUTORACE_EXIT`, then a full lap by hand. | 30 min of user time | These paths have never run in a source build. |
 | 20 | Done: whole-program emulation is out of scope (see Out of scope). | - | `blade.dll`, DirectDraw and COM make a unicorn boot impractical; per-function replay cases give the coverage. |
@@ -178,7 +177,7 @@ Preconditions: `query user` shows an Active console session, not RDP. Game
 closed. Staged directory `work/run/srcbuild` holds the demo data and the
 runtime DLLs.
 
-1. Copy `work/game-build/build-dms49u5e/mcm2.exe` and `mcm2.map` into
+1. Copy `work/game-build/build-qz1cs5ms/mcm2.exe` (imports by name) and `mcm2.map` into
    `work/run/srcbuild`, and install the current shim with
    `python runtime/build.py --stage work/run/srcbuild`. Move the old
    `frames`, `errorlog.txt` and `mcm2_runtime.log` aside.

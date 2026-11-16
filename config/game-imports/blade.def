@@ -1,4 +1,6 @@
 LIBRARY blade.dll
+; Retail imports these by name with these hints (as the DirectX SDK import
+; library holds them); build_game.py turns VC6 LIB's ordinal entries into that.
 EXPORTS
-    DirectDrawCreateEx@16 @3 NONAME
-    DirectDrawEnumerateA@8 @4 NONAME
+    DirectDrawCreateEx@16 @2
+    DirectDrawEnumerateA@8 @3

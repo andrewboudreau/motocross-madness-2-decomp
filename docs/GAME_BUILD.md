@@ -2374,8 +2374,10 @@ field; HEAD at its build time was `92ecebd7` (S: the tree may have differed).
 Two environment details matter for the source build:
 
 - The generated import libraries (`config/game-imports/*.def`) import
-  `blade.dll`/`DINPUT.dll` by ordinal; retail imports by name. The runtime's
-  import hooks therefore match these three by ordinal too, which is what lets
+  `blade.dll`/`DINPUT.dll` by undecorated name with retail's hints, as the
+  DirectX SDK libraries do (`build_game.py` sets the name type VC6 LIB cannot
+  write from a `.def`). Builds before that imported these three by ordinal, so
+  the runtime's import hooks match them by name or ordinal, which is what lets
   its 16-bit display-mode emulation apply (otherwise
   `PCVideoCard::SetDisplayMode(640, 480, 16)` finds no mode and
   `PCGame::StartUp` exits silently).
