@@ -25,9 +25,10 @@ import struct
 RETAIL_VA = 0x005059d0
 SYMBOL = '?Load@Terrain@@QAEPAV1@HPAVTerrainStream@@HPAUTerrainSurfaceDesc@@HHPBDH@Z'
 SOURCE = 'src/krusty2/broadphase/Terrain.cpp'
-PROBES = {0x00505bcb: 'header ok', 0x00505cf3: 'palette', 0x00505e73: 'blocks',
+PROBES = {0x00505a77: 'no stream', 0x00505bba: 'tag ok', 0x00505bcb: 'header ok',
+          0x00505cf3: 'palette', 0x00505d8c: 'palette created', 0x00505e73: 'blocks',
           0x00505f32: 'managed', 0x00505fcd: 'texture map', 0x005061b1: 'inverse cell',
-          0x005061e8: 'fail'}
+          0x005061e4: 'loaded', 0x005061e8: 'fail'}
 
 READ, SEEK, TELL = 0x00461640, 0x00461340, 0x00461600
 NEW, CALLOC, MALLOC = 0x004a3010, 0x004a2fc0, 0x004a2e20
@@ -124,26 +125,28 @@ def _word(rng):
 
 def cases(rng, n):
     for _ in range(n):
-        surfaces = rng.choice([0, 0, 1, 2, 5, -1])
-        records = [(rng.choice([0x100, 0x100, 0x80, 0x40, 1, 0, -8]), rng.choice([0x100, 0x40]),
+        # Mostly well-formed files (a "TRN" tag, version 5, whole records), so most runs
+        # load; every failure exit keeps a share of the runs.
+        surfaces = rng.choice([0, 1, 1, 2, 2, 3, 5, -1])
+        records = [(rng.choice([0x100, 0x100, 0x100, 0x200, 0x80, 0x40, 1, 0, -8]), rng.choice([0x100, 0x40]),
                     rng.randrange(0, 8)) for _ in range(max(surfaces, 0))]
-        blocks = rng.choice([0, 1, 3, -1])
+        blocks = rng.choice([0, 1, 1, 3, 3, -1])
         yield dict(seed=rng.getrandbits(32),
-                   tag=rng.choice([b'TRN\0'] * 6 + [b'TRX\0', b'TRNX', b'trn\0', b'']),
-                   version=rng.choice([5] * 6 + [4, 6, -5]),
-                   palette=rng.choice([0, 0, 1]), palette_ok=rng.random() < 0.8,
+                   tag=rng.choice([b'TRN\0'] * 30 + [b'TRX\0', b'TRNX', b'trn\0', b'']),
+                   version=rng.choice([5] * 30 + [4, 6, -5]),
+                   palette=rng.choice([0, 0, 1]), palette_ok=rng.random() < 0.85,
                    header=(rng.getrandbits(32), rng.choice([1.0, 2.5, 0.125, rng.uniform(0.01, 64)]),
                            rng.choice([0x40, 0x80, 0x100, 0, 7]), rng.getrandbits(32)),
                    blocks=(rng.choice([max(blocks, 0), max(blocks, 0) + 2]), blocks),
                    owned=rng.choice([0, 1, 3]), surfaces=surfaces, records=records,
-                   truncate=rng.choice([None] * 6 + [rng.randrange(0, 80)]),
-                   stream=rng.random() < 0.95, inner=rng.random() < 0.3,
+                   truncate=rng.choice([None] * 20 + [rng.randrange(0, 80)]),
+                   stream=rng.random() < 0.97, inner=rng.random() < 0.3,
                    name=rng.choice([None, 'detail.tga', '', 'x' * 120]),
                    detail=rng.random() < 0.8, registry=rng.random() < 0.6,
                    software=rng.choice([0, 1, 7]), enabled=rng.random() < 0.5,
                    half=rng.choice([0, 1, 9]), light=rng.choice([0, 1, 0x1234]),
                    quality=rng.choice([0, 1, 2, 9, -1]),
-                   null_lines=rng.choice([()] * 8 + [(0x11c,), (0x122,), (0x1e6,), (0x167,)]),   # the surfaces are used unchecked
+                   null_lines=rng.choice([()] * 16 + [(0x11c,), (0x122,), (0x1e6,), (0x167,)]),   # the surfaces are used unchecked
                    level=rng.choice([0, 1, 2, 3]), shift=rng.choice([4, 6, 8, 12]),
                    colour=rng.choice([0xffffffff, 0, 0x80402010, rng.getrandbits(32)]))
 
