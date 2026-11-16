@@ -13,6 +13,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "runtime.h"
 #include "sha256.h"
@@ -87,6 +88,44 @@ static int HashFile(const char* path, char hex[65])
 }
 
 /*
+ * A source build: the linker map beside the executable (mcm2.map, written by
+ * tools/build_game.py) names this image's own link timestamp. A map from another
+ * build, or none, does not count.
+ */
+static int IsMappedSourceBuild(const char* exePath)
+{
+    static const char kTag[] = " Timestamp is ";
+    char path[MAX_PATH];
+    char head[512];
+    char* slash;
+    char* tag;
+    HANDLE file;
+    DWORD got = 0;
+    unsigned long stamp;
+    const IMAGE_DOS_HEADER* dos = (const IMAGE_DOS_HEADER*)GetModuleHandleA(NULL);
+    const IMAGE_NT_HEADERS* nt =
+        (const IMAGE_NT_HEADERS*)((const char*)dos + dos->e_lfanew);
+
+    lstrcpynA(path, exePath, sizeof(path) - 8);
+    slash = strrchr(path, '\\');
+    strcpy(slash ? slash + 1 : path, "mcm2.map");
+    file = CreateFileA(path, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING,
+                       FILE_ATTRIBUTE_NORMAL, NULL);
+    if (file == INVALID_HANDLE_VALUE)
+        return 0;
+    ReadFile(file, head, sizeof(head) - 1, &got, NULL);
+    CloseHandle(file);
+    head[got] = 0;
+    tag = strstr(head, kTag);
+    if (!tag)
+        return 0;
+    stamp = strtoul(tag + sizeof(kTag) - 1, NULL, 16);
+    LogLine("mcm2.map timestamp %08lx, executable %08lx", stamp,
+            (unsigned long)nt->FileHeader.TimeDateStamp);
+    return stamp == nt->FileHeader.TimeDateStamp;
+}
+
+/*
  * TrackGameMode::FindDataDirectory (0x00523c90) refuses to start ("Installation
  * error", string 0x13b3) unless the installer's InstallType and
  * HardDriveRootPath values exist; InstallType "Full" also skips the CD check
@@ -147,11 +186,20 @@ static void Startup(void)
     }
     g_retailVerified = strcmp(hex, kRetailSha256) == 0;
     LogLine("executable sha256 %s (%s)", hex,
-            g_retailVerified ? "matches the demo build" : "UNKNOWN build; hooks stay off");
+            g_retailVerified ? "matches the demo build" : "not the demo build");
     /* A source-built executable has other addresses but the same imports; the
-       import hooks and install keys still apply when asked for. */
-    if (!g_retailVerified && !GetEnvironmentVariableA("MCM2_FORCE_RUNTIME", NULL, 0))
-        return;
+       import hooks and install keys apply to it too. It is recognised by its
+       map, or forced for any executable with MCM2_FORCE_RUNTIME. */
+    if (!g_retailVerified) {
+        if (IsMappedSourceBuild(exePath)) {
+            LogLine("source build (its mcm2.map matches); hooks on");
+        } else if (GetEnvironmentVariableA("MCM2_FORCE_RUNTIME", NULL, 0)) {
+            LogLine("MCM2_FORCE_RUNTIME set; hooks on");
+        } else {
+            LogLine("UNKNOWN build; hooks stay off");
+            return;
+        }
+    }
 
     slash = strrchr(exePath, '\\');
     if (slash)

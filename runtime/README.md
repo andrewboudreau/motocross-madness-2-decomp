@@ -28,12 +28,13 @@ emulates the 16-bit full-screen display around the game's renderer.
 |---|---|
 | `MCM2_FPS` | Frame limit for the emulated Flip (default 60, `0` for none). |
 | `MCM2_NATIVE_FULLSCREEN=1` | Turns the display emulation off (does not work on current Windows; for comparison). |
+| `MCM2_FORCE_RUNTIME=1` | Turns the hooks on for an executable that is neither the demo build nor a source build with its own `mcm2.map` beside it. |
 
 ## Modules
 
 | DLL | Why it exists | Behaviour |
 |---|---|---|
-| `d3drm.dll` | Retail imports `D3DRMVectorRotate` (hint 17, FollowCamera's only d3drm call). Windows Vista and later ship no `d3drm.dll`, so the stock demo does not start. | Implements the rotation (unit-length result, axis not modified). Checks the executable's SHA-256 against the target build. Writes `mcm2_runtime.log` next to the exe. Records a portable install (below). Patches the exe's imports before `WinMain` (`trace.c`) and emulates the display (`present.c`, `vtrace.c`). |
+| `d3drm.dll` | Retail imports `D3DRMVectorRotate` (hint 17, FollowCamera's only d3drm call). Windows Vista and later ship no `d3drm.dll`, so the stock demo does not start. | Implements the rotation (unit-length result, axis not modified). Checks the executable's SHA-256 against the target build, or accepts a source build whose `mcm2.map` beside it carries the executable's link timestamp; otherwise its hooks stay off. Writes `mcm2_runtime.log` next to the exe. Records a portable install (below). Patches the exe's imports before `WinMain` (`trace.c`) and emulates the display (`present.c`, `vtrace.c`). |
 | `dplayx.dll` | Retail imports `DirectPlayLobbyCreateA` (ordinal 4). On Windows 10/11 the system `dplayx.dll` blocks the loader on the "Windows Features: DirectPlay" prompt (`Fondue.exe`). | Returns `DPERR_UNAVAILABLE`. Only `ConnectUsingLobby` calls it and it handles failure, so lobby-launched multiplayer is off. |
 
 ## Start-up requirements (Windows 11)
@@ -155,7 +156,7 @@ race uses about 22% of one core, against about 50% with Blade.
 
 ## Fast race start (`MCM2_AUTORACE`)
 
-Set `MCM2_AUTORACE=1` (with `MCM2_FORCE_RUNTIME=1` for a source build) to skip the
+Set `MCM2_AUTORACE=1` to skip the
 menus. `Present()` runs on the game thread and calls `AutoRaceTick`
 (`src/bringup/Group9_AutoRace.cpp`, found by name in `mcm2.map` beside the exe):
 

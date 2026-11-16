@@ -116,8 +116,9 @@ from reviewed near-miss sources outside `src/bringup`.
    `LightVertices`, `TestBox`, the visibility walk, particles, projected
    shadow. A wrong result here shows as missing or miscoloured geometry, not
    as a crash. The 11-05 frames look right for one camera on one track (S).
-5. **Environment** (C): the shim accepts only known exe hashes
-   (`MCM2_FORCE_RUNTIME=1` for a source build); the game exits within a
+5. **Environment** (C): the shim accepts the demo's hash, or a source build
+   whose `mcm2.map` beside it names the exe's link timestamp (S: built, not
+   yet run); the game exits within a
    second under RDP or a disconnected session, as retail does; the EULA must
    be accepted by the user; registry values must exist; `dinput.dll` is bound
    by ordinal, which holds on this machine only.
@@ -158,7 +159,7 @@ from reviewed near-miss sources outside `src/bringup`.
 | 15 | Done: `static_initializers.py` answers `GetVersionExA` and the other imports the game object's initializer calls (directory, IMM32, drives, locale, registry, CRT TLS) with fixed values. All initializers run in both images; 11 more data bindings compare and match, among them the trig tables and `g_TrackGameInstance` (docs/REBUILD_GAPS.md). | - | Completes the static-initializer check. |
 | 16 | Link a `.rsrc` with user-supplied icons and a version block. | 0.5 day | Icon and file properties; no data may be committed. |
 | 17 | Import `DirectInputCreateEx` by name if a matching import library can be built. | 0.5 day | Removes a machine-specific ordinal. |
-| 18 | Add the source-build hash route to the shim (accept an exe that has `mcm2.map` beside it). | 2 h | Drops `MCM2_FORCE_RUNTIME` from every run. |
+| 18 | Done (not yet run): the shim turns its hooks on for a source build when the `mcm2.map` beside it carries the exe's PE link timestamp (`Timestamp is` line; equal in the last three builds, retail differs). A stale map does not count. `MCM2_FORCE_RUNTIME` stays as an override. | - | Drops `MCM2_FORCE_RUNTIME` from every run. |
 | 19 | Exercise podium, replay and return-to-menu with `MCM2_AUTORACE_EXIT`, then a full lap by hand. | 30 min of user time | These paths have never run in a source build. |
 | 20 | Done: whole-program emulation is out of scope (see Out of scope). | - | `blade.dll`, DirectDraw and COM make a unicorn boot impractical; per-function replay cases give the coverage. |
 
@@ -178,9 +179,12 @@ closed. Staged directory `work/run/srcbuild` holds the demo data and the
 runtime DLLs.
 
 1. Copy `work/game-build/build-dms49u5e/mcm2.exe` and `mcm2.map` into
-   `work/run/srcbuild`. Move the old `frames`, `errorlog.txt` and
-   `mcm2_runtime.log` aside.
-2. Run with `MCM2_FORCE_RUNTIME=1 MCM2_AUTORACE=1 MCM2_AUTORACE_EXIT=120`.
+   `work/run/srcbuild`, and install the current shim with
+   `python runtime/build.py --stage work/run/srcbuild`. Move the old
+   `frames`, `errorlog.txt` and `mcm2_runtime.log` aside.
+2. Run with `MCM2_AUTORACE=1 MCM2_AUTORACE_EXIT=120`. The log should say
+   `source build (its mcm2.map matches); hooks on`; if it says the build is
+   unknown, add `MCM2_FORCE_RUNTIME=1` and report it.
    `autorace.bin` already exists there, so the saved event loads on its own.
    Accept the EULA and the hardware-test box.
 3. Read `mcm2_runtime.log`, `autorace.log`, `errorlog.txt`, `frames/*.bmp`.
