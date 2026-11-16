@@ -121,6 +121,14 @@ def record(run: Path, builds: Path) -> dict:
         result['errorlog'] = {'access_violations': count,
                               'written': written.isoformat(timespec='seconds'),
                               'written_during_session': since is not None and written >= since}
+    state = run / 'statelog.txt'
+    if state.is_file():
+        written = datetime.fromtimestamp(state.stat().st_mtime)
+        lines = state.read_text(encoding='latin-1', errors='replace').splitlines()
+        result['state_log'] = {'frames': len(lines),
+                               'race_frames': sum(' | ' in line for line in lines),
+                               'faults': sum(line.endswith(' fault') for line in lines),
+                               'written_during_session': since is not None and written >= since}
     return result
 
 

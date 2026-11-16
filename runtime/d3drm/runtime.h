@@ -11,6 +11,17 @@ void TraceDirectDrawObject(void* object);
 void TraceInnerDirectDrawObject(void* object);
 void TraceDirectInputObject(void* object);
 void InstallSampler(void);
+int IsRetailDemo(void);
+
+/* replay.c: repeatable runs (fixed clock, retail autorace, state log). */
+void SetGameThread(void);
+int FixedClockEnabled(void);
+DWORD FixedClockNow(void);
+void FixedClockFrame(void);
+DWORD FixedClockFrames(void);
+DWORD GameSymbol(const char* decoratedName);
+void PortedAutoRaceTick(void);
+void LogFrameState(void);
 
 /* present.c: emulated 16-bit full screen. */
 int EmulatesFullscreen(void);

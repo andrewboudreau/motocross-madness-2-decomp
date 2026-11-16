@@ -122,9 +122,8 @@ from reviewed near-miss sources outside `src/bringup`.
    second under RDP or a disconnected session, as retail does; the EULA must
    be accepted by the user; registry values must exist.
 6. **Placeholder globals and guessed initial values** (C that they exist, P
-   for effect): `g_visibilityClipper` is an empty static; the grid texture
-   tables are capped at 5,000 entries; the visibility box and entry arrays
-   are separate where retail overlaps them; the KrustyBike stall thresholds
+   for effect): `g_visibilityClipper` is an empty static (retail gives no
+   size or owner, see `CLIPPER_GLOBAL_CONNECTIONS.md`); the KrustyBike stall thresholds
    and trick tables are file-local copies; `k = 0` in `DrawCurrentLod`.
    `audit_bindings.py` lists 47 `data/unknown` names no object defines and 63
    placeholders (CRT helpers only, benign).
@@ -150,10 +149,10 @@ from reviewed near-miss sources outside `src/bringup`.
 | 7 | Done: `texture_create_surface` (shared and mip surfaces, the format fallback lists, DirectDraw creation, palette, conversion, mip build, colour key and render states), `texture_copy_rect_to` (BltFast and the 8/16-bit table paths with real pixels), `texture_clone`, `cache_texture_copy_mip_levels` (mip chains of real depth) and `gui_copy_screen_to_texture` (the captured and dimmed pixels at 1-4 bytes) agree with retail in every run, all probes reached. Planted bugs are caught: a wrong fallback format (40), swapped address states (20), `||` in the mip count (112), a halved-twice rect (486), a `>=` level walk (152), the wrong dim mask (98) or checkerboard phase (58). Retail calls GetCaps through null for a mip-mapped 888/8888 texture (no DirectDraw fallback on that path); the cases avoid that input. Callee results are modelled, not run. | - | Texture corruption is hard to spot by eye. |
 | 8 | Done: the converters already had cases (`convert555_to8` 0x4d0d40, `halve565` 0x4cea10, `halve555` 0x4ce5f0; 40-60 runs in the suite). Against the game build object they agree with retail in 2,000 of 2,000 runs each (`-n 2000 --seed 7`): random full 16-bit pixels, every filter path (packed, keyed with all-key blocks, rounded) and random 32 KiB index tables. Not exhaustive: sizes stay small (halvers up to 8x8 output, the converter 8-40 pixels wide, as its caller passes multiples of eight). | - | Pure functions with the lowest scores. |
 | 9 | Done: emu cases cover `TransformPoints` (0x4a1b00), `VisibilityClipper::TestBox` (0x52f570) and `GridVertexSink::LightVertices` (0x49e4a0) with its three workers, plus three linked forwarders (`shadow_clipper_testbox`, `light_manager_light_vertices`, `shadow_transform_ortho`). They reach every retail branch edge but one the caller rules out (0x49f99c), with no mismatch in 300-400 runs per FPU control word against the game build and `--compile`. `grid_light_vertices` now reaches the term-array regrow path (allocators stubbed at 0x4a2e20/0x4a2e60, with failures) and the exact-unit-length branches; `visibility_testbox` adds boxes on the clip planes, which moved the centre-test boundary mutants from uncaught to caught. Every planted bug is caught except two that compile to identical code. The low scores hide no behaviour difference found so far. | - | Decide whether low scores hide behaviour differences. |
-| 10 | Frame comparison: the same `autorace.bin` on retail and source build, compare frames at fixed times. | 1 day, needs user runs | First whole-program check of rendering and physics. |
-| 11 | Log a per-frame state hash (rider position, speed, lap time) from `AutoRaceTick` in both builds. | 1 day | Cheaper and stricter than images for physics and AI. |
+| 10 | Frame comparison: the same `autorace.bin` on retail and source build, compare frames at fixed times. Retail can now load it: the runtime ports `AutoRaceTick` (item 11), and with the fixed clock both builds reach the race on a fixed frame. | 1 day, needs user runs | First whole-program check of rendering and physics. |
+| 11 | Built, not yet run. With `MCM2_STATE_LOG=1` the runtime (`runtime/d3drm/replay.c`) writes `statelog.txt`, one line per presented frame: menu, race clock and each racer's position, velocity, speed, laps, gates, place and total time as raw float bits. `MCM2_FIXED_CLOCK=<ms>` makes the game clock and every `srand` seed repeatable. Retail runs a port of `AutoRaceTick` (`MCM2_AUTORACE_PORT=1` uses it on a source build too). `tools/compare_state_logs.py` aligns two logs at the first race frame and names the first field that differs. `tests/test_runtime_replay.py` checks the retail addresses against the bindings and every offset with VC6 `offsetof`. | - | Cheaper and stricter than images for physics and AI. |
 | 12 | Re-run the old crash scenarios and map any new EIP. | 1 h of user time | Closes blocker 7. |
-| 13 | Replace the placeholder globals in `Group1_Globals.cpp` and `Group4_EcoBridges.cpp` with retail-shaped data. | 1-2 days | Removes known layout differences. |
+| 13 | Done, except the clipper object: `g_SharedNormalDistribution` (0x56ece0) is defined in `NormalDistribution.cpp`, whose `__FILE__` string follows it in retail `.data` (VC6 lays them out in that order); `Group4_EcoBridges.cpp` is gone. The visibility box strip is one D3DLVERTEX-shaped array, so the constructor's 0x2000ffff colour reaches DrawBox's lines as in retail (constructor 0x52d340 and DrawBox 0x52e1f0 stay exact). The 5,000-entry grid texture tables fill retail's gaps exactly. `g_visibilityClipper` stays an empty static: retail gives no size or owner. | - | Removes known layout differences. |
 | 14 | Review the 19 best-guess candidate sources, largest on the race path first. | 3-5 days | Each is a body nobody has checked against retail behaviour. |
 | 15 | Done: `static_initializers.py` answers `GetVersionExA` and the other imports the game object's initializer calls (directory, IMM32, drives, locale, registry, CRT TLS) with fixed values. All initializers run in both images; 11 more data bindings compare and match, among them the trig tables and `g_TrackGameInstance` (docs/REBUILD_GAPS.md). | - | Completes the static-initializer check. |
 | 16 | Link a `.rsrc` with user-supplied icons and a version block. | 0.5 day | Icon and file properties; no data may be committed. |
@@ -177,7 +176,7 @@ Preconditions: `query user` shows an Active console session, not RDP. Game
 closed. Staged directory `work/run/srcbuild` holds the demo data and the
 runtime DLLs.
 
-1. Copy `work/game-build/build-qz1cs5ms/mcm2.exe` (imports by name) and `mcm2.map` into
+1. Copy `work/game-build/build-92m0hh0c/mcm2.exe` (imports by name, item 13 data) and `mcm2.map` into
    `work/run/srcbuild`, and install the current shim with
    `python runtime/build.py --stage work/run/srcbuild`. Move the old
    `frames`, `errorlog.txt` and `mcm2_runtime.log` aside.
@@ -199,6 +198,28 @@ runtime DLLs.
 | Stays on the loading screen or backdrop remains behind the HUD. | Load did not finish or no colour clear. | Turn the sky cube off or force `clearTarget`; see "Loading dialog close path" in `GAME_BUILD.md`. |
 | Race runs but geometry, textures or lighting look wrong. | Render stand-ins (blocker 4). | Same event on retail; items 7-10. |
 | Rider does not move or AI stands still by hand. | Input acquire, or KrustyBike and AI bodies. | Compare with retail; item 11. |
+
+### Comparison runs (items 10 and 11)
+
+Run these after the run above has written `work/run/srcbuild/autorace.bin`.
+Each run uses the same variables and the same saved event:
+
+    MCM2_AUTORACE=1 MCM2_AUTORACE_PORT=1 MCM2_AUTORACE_EXIT=60
+    MCM2_FIXED_CLOCK=16 MCM2_STATE_LOG=1 MCM2_AUTO_EULA=1
+
+1. Stage retail with `python runtime/build.py --stage work/run/demo` and copy
+   `work/run/srcbuild/autorace.bin` into `work/run/demo`.
+2. Run retail twice. After each run, copy `statelog.txt` aside (`retail1.txt`,
+   `retail2.txt`) and run
+   `python tools/compare_state_logs.py retail1.txt retail2.txt`.
+   "identical race frames" means the fixed clock makes a run repeatable.
+   Otherwise the first differing frame shows where something else varies
+   (another thread, input or a timer the clock does not cover). Report it
+   before comparing builds.
+3. Run the source build in `work/run/srcbuild` with the same variables, then
+   `python tools/compare_state_logs.py retail1.txt work/run/srcbuild/statelog.txt`.
+   The first differing field (racer, quantity, frame) is where the
+   reconstruction's physics or AI leaves retail.
 
 Then, without `MCM2_AUTORACE`: start Voodoo Basin and Donner Pass from the
 menus, ride a full lap, bail out once, finish, and leave through the podium.

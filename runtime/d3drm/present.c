@@ -231,6 +231,15 @@ static void RunAutoRaceTick(void)
         s_state = 2;
         if (!GetEnvironmentVariableA("MCM2_AUTORACE", NULL, 0))
             return;
+        /* Retail has no AutoRaceTick; replay.c ports it (also used on a
+           source build with MCM2_AUTORACE_PORT, to compare like with like). */
+        if (IsRetailDemo() || GetEnvironmentVariableA("MCM2_AUTORACE_PORT", NULL, 0)) {
+            s_tick = PortedAutoRaceTick;
+            s_state = 1;
+            LogLine("autorace: using the runtime's port of AutoRaceTick");
+            s_tick();
+            return;
+        }
         GetModuleFileNameA(NULL, path, sizeof(path));
         slash = strrchr(path, 0x5c);
         lstrcpyA(slash ? slash + 1 : path, "mcm2.map");
@@ -330,7 +339,9 @@ static void PresentFrame(EmulatedPrimary* self)
 
 static void Present(EmulatedPrimary* self)
 {
+    FixedClockFrame();
     RunAutoRaceTick();
+    LogFrameState();
     PresentFrame(self);
 }
 

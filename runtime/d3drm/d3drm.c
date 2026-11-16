@@ -30,6 +30,11 @@ static char g_logPath[MAX_PATH];
 static LONG g_rotateCalls;
 static int g_retailVerified;
 
+int IsRetailDemo(void)
+{
+    return g_retailVerified;
+}
+
 void LogLine(const char* format, ...)
 {
     char line[512];
@@ -204,6 +209,7 @@ static void Startup(void)
     slash = strrchr(exePath, '\\');
     if (slash)
         *slash = 0;
+    SetGameThread(); /* DllMain runs on the thread that runs WinMain */
     ProvisionInstallKeys(exePath);
     InstallStartupTrace();
     InstallSampler();

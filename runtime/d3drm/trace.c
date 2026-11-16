@@ -46,6 +46,7 @@ static DirectSoundCreateProc s_DirectSoundCreate;
 static CoCreateInstanceProc s_CoCreateInstance;
 static FARPROC(WINAPI* s_BladeGetProcAddress)(HMODULE, LPCSTR);
 static UINT(WINAPI* s_timeBeginPeriod)(UINT);
+static DWORD(WINAPI* s_timeGetTime)(void);
 static UINT(WINAPI* s_timeEndPeriod)(UINT);
 static LONG(WINAPI* s_RegOpenKeyExA)(HKEY, LPCSTR, DWORD, REGSAM, PHKEY);
 static LONG(WINAPI* s_RegQueryValueExA)(HKEY, LPCSTR, LPDWORD, LPDWORD, LPBYTE, LPDWORD);
@@ -274,6 +275,14 @@ static UINT WINAPI GameTimeEndPeriod(UINT period)
     return 0;
 }
 
+/* The game clock's only time source; replay.c can make it repeatable. */
+static DWORD WINAPI GameTimeGetTime(void)
+{
+    if (FixedClockEnabled())
+        return FixedClockNow();
+    return s_timeGetTime();
+}
+
 /* Registry reads, for settings such as Game's "TestKey" (0x00467b70). */
 static LONG WINAPI TraceRegOpenKeyExA(HKEY key, LPCSTR subKey, DWORD options, REGSAM access,
                                       PHKEY result)
@@ -346,6 +355,7 @@ static ImportHook s_hooks[] = {
     {"DSOUND.dll", NULL, 1, TraceDirectSoundCreate, (void**)&s_DirectSoundCreate},
     {"WINMM.dll", "timeBeginPeriod", 0, GameTimeBeginPeriod, (void**)&s_timeBeginPeriod},
     {"WINMM.dll", "timeEndPeriod", 0, GameTimeEndPeriod, (void**)&s_timeEndPeriod},
+    {"WINMM.dll", "timeGetTime", 0, GameTimeGetTime, (void**)&s_timeGetTime},
     {"ADVAPI32.dll", "RegOpenKeyExA", 0, TraceRegOpenKeyExA, (void**)&s_RegOpenKeyExA},
     {"ADVAPI32.dll", "RegQueryValueExA", 0, TraceRegQueryValueExA,
      (void**)&s_RegQueryValueExA},

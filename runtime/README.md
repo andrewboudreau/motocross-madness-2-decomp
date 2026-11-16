@@ -29,6 +29,9 @@ emulates the 16-bit full-screen display around the game's renderer.
 | `MCM2_FPS` | Frame limit for the emulated Flip (default 60, `0` for none). |
 | `MCM2_NATIVE_FULLSCREEN=1` | Turns the display emulation off (does not work on current Windows; for comparison). |
 | `MCM2_FORCE_RUNTIME=1` | Turns the hooks on for an executable that is neither the demo build nor a source build with its own `mcm2.map` beside it. |
+| `MCM2_AUTORACE=1`, `MCM2_AUTORACE_EXIT`, `MCM2_AUTORACE_PORT=1` | Fast race start from `autorace.bin` (below). |
+| `MCM2_FIXED_CLOCK=<ms>` | Repeatable game clock, advancing that many milliseconds per frame (below). |
+| `MCM2_STATE_LOG=1` | Per-frame racer state to `statelog.txt` (below). |
 
 ## Modules
 
@@ -174,3 +177,32 @@ Without `MCM2_AUTORACE` nothing is called. Run loop: build with `tools/build_gam
 
 `MCM2_AUTORACE_EXIT=<seconds>` also leaves the race for the main menu after that many
 seconds (`EventManager::LeaveRaceForMenu(kMenuMain)`), to exercise the return-to-menu path.
+
+Retail has no `AutoRaceTick`. On retail the runtime runs its own port of it
+(`runtime/d3drm/replay.c`), with the same steps and the same `autorace.bin`, which holds
+the 0x1ec-byte race settings at `TrackGame+0x2d70`. `MCM2_AUTORACE_PORT=1` uses the port on
+a source build too, so both builds are driven by identical code.
+
+## Repeatable runs and the state log
+
+For comparing retail with a source build frame by frame (`docs/BUILD_TO_RACE.md`,
+items 10 and 11):
+
+- `MCM2_FIXED_CLOCK=<ms>` makes `timeGetTime` a virtual clock. Every game timer goes
+  through the game's millisecond clock (0x4bfa80, the only `timeGetTime` call), and
+  every `srand` is seeded from it.
+  - Each presented frame moves the clock to start + frame Ã— ms.
+  - Every 256th call from the game thread within a frame adds 1 ms, so loops that wait
+    on the clock still end.
+  - Calls from other threads read the clock without moving it.
+  - Wall-clock pacing (`MCM2_FPS`) is unaffected.
+- `MCM2_STATE_LOG=1` writes `statelog.txt` beside the executable, one line per presented
+  frame: frame, clock, menu, the race clock, then each racer, local first.
+  - Per racer: position, velocity, speed, laps, gates, place and total time.
+  - Floats are logged as raw bits.
+  - Each line is flushed, so a crash keeps every frame before it.
+- `python tools/compare_state_logs.py A B` lines the logs up at their first race frame
+  and reports the first differing field, with floats decoded.
+- Addresses: a source build's come from its `mcm2.map`; retail's come from a table that
+  `tests/test_runtime_replay.py` checks against the bindings. That test also checks every
+  layout offset with VC6 `offsetof` over the reconstructed headers.

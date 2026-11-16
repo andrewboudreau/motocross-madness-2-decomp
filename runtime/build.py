@@ -26,7 +26,7 @@ MODULES = {
     'd3drm': {
         'sources': ['runtime/d3drm/d3drm.c', 'runtime/d3drm/trace.c',
                     'runtime/d3drm/vtrace.c', 'runtime/d3drm/sampler.c',
-                    'runtime/d3drm/present.c'],
+                    'runtime/d3drm/present.c', 'runtime/d3drm/replay.c'],
         'def': 'runtime/d3drm/d3drm.def',
         'libs': ['kernel32.lib', 'user32.lib', 'gdi32.lib', 'advapi32.lib'],
     },
