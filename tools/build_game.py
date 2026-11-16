@@ -241,6 +241,18 @@ def link_game(build: Path, objects: list[Path], libraries: list[Path],
     return row
 
 
+def source_revision(root: Path) -> dict:
+    """The commit the build starts from and whether tracked files differ from it."""
+    try:
+        commit = subprocess.run(['git', 'rev-parse', 'HEAD'], cwd=root, capture_output=True,
+                                text=True, check=True).stdout.strip()
+        changed = subprocess.run(['git', 'status', '--porcelain', '--untracked-files=no'],
+                                 cwd=root, capture_output=True, text=True, check=True).stdout
+    except (OSError, subprocess.CalledProcessError):
+        return {'commit': None, 'dirty': None}
+    return {'commit': commit, 'dirty': bool(changed.strip())}
+
+
 def build_game(vc6: Path, jobs: int, compile_only: bool = False) -> tuple[dict, Path]:
     config = ROOT / 'config/game_build.json'
     spec = json.loads(config.read_text())
@@ -249,7 +261,7 @@ def build_game(vc6: Path, jobs: int, compile_only: bool = False) -> tuple[dict, 
     build = Path(tempfile.mkdtemp(prefix='build-', dir=output))
     report = {'stage': 'toolchain', 'compiled': False, 'linked': False,
               'runtime_verified': False, 'build_directory': str(build),
-              'config_sha256': sha256_file(config)}
+              'config_sha256': sha256_file(config), 'source_revision': source_revision(ROOT)}
     try:
         report['toolchain_hashes'] = verify_toolchain(vc6)
         runner = runner_kind()

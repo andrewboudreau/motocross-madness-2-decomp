@@ -2361,6 +2361,16 @@ shim otherwise leaves its hooks off for an unknown executable hash) and reading
 `frames/frame_*.bmp` and `mcm2_runtime.log`. This is a boot-to-race smoke test
 only; the best-guess bodies above remain unreviewed and long play is untested.
 
+Which executable last ran is recorded, not remembered: `python
+tools/record_run.py` writes `work/run/srcbuild/run_record.json` (ignored) with
+the executable's SHA-256, the build directory whose link hash it equals, that
+build's commit and dirty flag (`build_game.py` records them in `report.json`),
+and the last session in `mcm2_runtime.log`: date, hooks, how it ended, the
+frames written since and whether `errorlog.txt` changed. The last recorded run
+is 2026-11-05 20:55, exe `090daf45...`, build `build-__uzihse`, 24 frames,
+hooks on, clean exit, no new error-log entry. That build predates the commit
+field; HEAD at its build time was `92ecebd7` (S: the tree may have differed).
+
 Two environment details matter for the source build:
 
 - The generated import libraries (`config/game-imports/*.def`) import

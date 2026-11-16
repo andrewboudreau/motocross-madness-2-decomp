@@ -143,7 +143,7 @@ from reviewed near-miss sources outside `src/bringup`.
 | # | Item | Effort | Why |
 |---|---|---|---|
 | 1 | User runs the current build with `MCM2_AUTORACE` (test plan below). | 10 min | Turns blocker 1 into a fact either way. |
-| 2 | Keep a record of the last exe hash and commit that ran, with its frames, in the ignored run directory; cite it from `GAME_BUILD.md`. | 30 min | Stops the run status drifting from the tree. |
+| 2 | Done: `tools/record_run.py` writes `run_record.json` into the run directory (exe hash, matching build, its commit and dirty flag, last session, frames, error-log changes); `build_game.py` now records the commit in `report.json`; `GAME_BUILD.md` cites the last record. | - | Stops the run status drifting from the tree. |
 | 3 | Done: `pcvideocard_create_mode_surfaces` (budget threshold, negative and overflowing budgets), `pcvideocard_probe_nonlocal`, `pcvideocard_probe_partial_uploads` and `pcgame_profile_displays` (replay mode with fake DirectDraw, surface, display and registry vtables) agree with retail in every run, all probes reached. Planted bugs are caught: a `>=` budget test (66), the wrong caps bit (98), a 32-pixel tile step (100), a changed error code (44), nine textures instead of ten (56), a misspelt registry key (274). Callee results are modelled, not run. | - | Start-up bodies whose failure ends the process silently. |
 | 4 | Done: `tools/emu_cases/filestream_read.py` (buffered, encoded, wrapped and short reads) and `resource_add_archive.py` (replay mode: header, growth, merge, realloc failure, unwind) agree with retail in 800 of 800 runs each; planted bugs are caught. Both bodies had earlier native differential checks (docs/FILESTREAM.md, docs/RESOURCEMANAGER.md). | - | Every asset load depends on them. |
 | 5 | Done: `tools/emu_cases/bike_race_create_racers.py` (replay mode) covers the rider archive, replay ranking, the pro circuit career, single player, ghost, AI (event and random skill) and network loads (local, remote players, remote and host AI). It agrees with retail in 400 of 400 runs, all probes reached; a planted grid-position bug gives 47 mismatches in 200. The behaviour is confirmed against these modelled inputs only: callee results are replayed, not run. | - | Largest bring-up body on the race path. |
@@ -187,7 +187,8 @@ runtime DLLs.
    unknown, add `MCM2_FORCE_RUNTIME=1` and report it.
    `autorace.bin` already exists there, so the saved event loads on its own.
    Accept the EULA and the hardware-test box.
-3. Read `mcm2_runtime.log`, `autorace.log`, `errorlog.txt`, `frames/*.bmp`.
+3. Run `python tools/record_run.py`, then read `mcm2_runtime.log`,
+   `autorace.log`, `errorlog.txt`, `frames/*.bmp`.
 
 | Outcome | Meaning | Next |
 |---|---|---|
