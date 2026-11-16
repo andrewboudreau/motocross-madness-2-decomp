@@ -80,8 +80,8 @@ Score is the masked linked score from `linked_accuracy.py`. "Emu" means a
 | `KrustyBike::SimulateFrame`, `Vehicle::SimulateFrame` | 0x496790, 0x52a940 | near miss 0.999, 0.998 | |
 | Bike AI | 0x40eca0, 0x414370, 0x517340 | bring-up 0.957, 0.951, 0.842 | 34,965 B unit. |
 | `SceneTick` | 0x4eab00 | bring-up 0.941 | |
-| Visibility walk, `TestBox` | 0x481de0, 0x52f570 | near miss 0.733, bring-up 0.796 | Decide what is drawn. |
-| `LightVertices`, `TransformPoints` | 0x49e4a0, 0x4a1b00 | bring-up 0.754, 0.336 | Low scores come mostly from inline-asm retail bodies. |
+| Visibility walk, `TestBox` | 0x481de0, 0x52f570 | near miss 0.733, bring-up 0.796 | Decide what is drawn. `TestBox`: emu cases `visibility_testbox`, `shadow_clipper_testbox` (item 9). |
+| `LightVertices`, `TransformPoints` | 0x49e4a0, 0x4a1b00 | bring-up 0.754, 0.336 | Low scores come mostly from inline-asm retail bodies. Emu cases agree with retail on every reached branch (item 9). |
 | `DrawCurrentLod` | 0x440f30 | bring-up 0.901 (7,851 B) | Reads a local retail leaves uninitialised; source sets it to 0. |
 | Particles, projected shadow | 0x4bac60, 0x4db8c0, 0x4dbd30, 0x4dc2b0 | bring-up 0.712; near miss 0.738-0.837 | |
 | Texture creation and copies | 0x4c69c0, 0x4c7b40, 0x486170, 0x50c960, 0x50dad0 | near miss 0.867-0.957 | No emu cases. |
@@ -112,9 +112,9 @@ from reviewed near-miss sources outside `src/bringup`.
    (`PCTextureMap::CreateSurface`, `CopyRectTo`, `Clone`,
    `CacheTexture::CopyMipLevels`, `GUIManager::CopyScreenToTexture`) have
    gained cases.
-4. **Low-score render bodies** (C for scores): pixel halvers, `TransformPoints`,
-   `LightVertices`, `TestBox`, the visibility walk, particles, projected
-   shadow. A wrong result here shows as missing or miscoloured geometry, not
+4. **Low-score render bodies** (C for scores): the visibility walk, particles,
+   projected shadow. The pixel halvers, `TransformPoints`, `LightVertices` and
+   `TestBox` agree with retail in differential cases (items 8 and 9). A wrong result here shows as missing or miscoloured geometry, not
    as a crash. The 11-05 frames look right for one camera on one track (S).
 5. **Environment** (C): the shim accepts the demo's hash, or a source build
    whose `mcm2.map` beside it names the exe's link timestamp (S: built, not
@@ -150,7 +150,7 @@ from reviewed near-miss sources outside `src/bringup`.
 | 6 | Done: `terrain_load` models mostly well-formed `.trn` files, so 440 of 600 runs load (was 184), and every failure exit keeps runs (no stream, bad tag or version, palette failure, truncation, null allocation). New probes cover the tag and header checks, palette creation and the loaded exit; a 0x200 width exercises the `width == 0x100` test. 600 of 600 runs agree with retail. Planted bugs caught: height-field argument (434), `>=` width test (46), bounds padding (280), quality default (468), block seek (448). Callee results are modelled, not run. | - | The case used to pass mostly by failing early in both builds. |
 | 7 | Done: `texture_create_surface` (shared and mip surfaces, the format fallback lists, DirectDraw creation, palette, conversion, mip build, colour key and render states), `texture_copy_rect_to` (BltFast and the 8/16-bit table paths with real pixels), `texture_clone`, `cache_texture_copy_mip_levels` (mip chains of real depth) and `gui_copy_screen_to_texture` (the captured and dimmed pixels at 1-4 bytes) agree with retail in every run, all probes reached. Planted bugs are caught: a wrong fallback format (40), swapped address states (20), `||` in the mip count (112), a halved-twice rect (486), a `>=` level walk (152), the wrong dim mask (98) or checkerboard phase (58). Retail calls GetCaps through null for a mip-mapped 888/8888 texture (no DirectDraw fallback on that path); the cases avoid that input. Callee results are modelled, not run. | - | Texture corruption is hard to spot by eye. |
 | 8 | Done: the converters already had cases (`convert555_to8` 0x4d0d40, `halve565` 0x4cea10, `halve555` 0x4ce5f0; 40-60 runs in the suite). Against the game build object they agree with retail in 2,000 of 2,000 runs each (`-n 2000 --seed 7`): random full 16-bit pixels, every filter path (packed, keyed with all-key blocks, rounded) and random 32 KiB index tables. Not exhaustive: sizes stay small (halvers up to 8x8 output, the converter 8-40 pixels wide, as its caller passes multiples of eight). | - | Pure functions with the lowest scores. |
-| 9 | Emu or native differential for `TransformPoints`, `LightVertices` and `TestBox`. | 1 day | Decide whether low scores hide behaviour differences. |
+| 9 | Done: emu cases cover `TransformPoints` (0x4a1b00), `VisibilityClipper::TestBox` (0x52f570) and `GridVertexSink::LightVertices` (0x49e4a0) with its three workers, plus three linked forwarders (`shadow_clipper_testbox`, `light_manager_light_vertices`, `shadow_transform_ortho`). They reach every retail branch edge but one the caller rules out (0x49f99c), with no mismatch in 300-400 runs per FPU control word against the game build and `--compile`. `grid_light_vertices` now reaches the term-array regrow path (allocators stubbed at 0x4a2e20/0x4a2e60, with failures) and the exact-unit-length branches; `visibility_testbox` adds boxes on the clip planes, which moved the centre-test boundary mutants from uncaught to caught. Every planted bug is caught except two that compile to identical code. The low scores hide no behaviour difference found so far. | - | Decide whether low scores hide behaviour differences. |
 | 10 | Frame comparison: the same `autorace.bin` on retail and source build, compare frames at fixed times. | 1 day, needs user runs | First whole-program check of rendering and physics. |
 | 11 | Log a per-frame state hash (rider position, speed, lap time) from `AutoRaceTick` in both builds. | 1 day | Cheaper and stricter than images for physics and AI. |
 | 12 | Re-run the old crash scenarios and map any new EIP. | 1 h of user time | Closes blocker 7. |

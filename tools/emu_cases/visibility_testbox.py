@@ -1,6 +1,7 @@
 """VisibilityClipper::TestBox 0x0052f570 (tools/emu_diff.py case).
 
-Boxes against perspective and random matrices; some straddle the eye plane (w near zero or
+Boxes against perspective and random matrices and an exact unit clip matrix whose half-unit
+boxes put the centre and corners exactly on the clip planes; some straddle the eye plane (w near zero or
 negative), where the projected corners leave int and the checked conversion must store
 0x80000000 as retail's 32-bit fistp does. The function has no calls; it writes the eight
 clip-space corners to 0x0068abc8, the screen rectangle and the inside count.
@@ -34,9 +35,13 @@ def perspective(rng):
 
 def cases(rng, n):
     for i in range(n):
-        kind = rng.choice(['persp', 'persp', 'persp', 'random', 'eye'])
+        kind = rng.choice(['persp', 'persp', 'persp', 'random', 'eye', 'edge'])
         if kind == 'random':
             m = [rng.uniform(-2, 2) for _ in range(16)]
+        elif kind == 'edge':
+            # clip space 0 <= x, y, z <= w = 1 exactly, so half-unit centres and extents
+            # put the centre and corners on the planes (the < 0.0 tests at equality)
+            m = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]
         else:
             m = perspective(rng)
         if kind == 'eye':
@@ -45,11 +50,20 @@ def cases(rng, n):
             w = m[3] * center[0] + m[7] * center[1] + m[11] * center[2] + m[15]
             if abs(m[11]) > 1e-3:
                 center[2] -= (w - rng.choice([0.0, 1e-6, -1e-6, 1e-3])) / m[11]
+        elif kind == 'edge':
+            # mostly inside, one coordinate on a plane (the centre trivial-accept tests at
+            # equality), sometimes just outside
+            center = [rng.choice([0.0, 0.25, 0.5, 1.0, -0.5, 1.5]) for _ in range(3)]
+            center[rng.randrange(3)] = rng.choice([0.0, 1.0])
         else:
             center = [rng.uniform(-200, 200), rng.uniform(-30, 30), rng.uniform(-200, 200)]
         extent = [rng.choice([rng.uniform(0, 2), rng.uniform(0, 40), 0.0]) for _ in range(3)]
+        if kind == 'edge':
+            extent = [rng.choice([0.0, 0.5, 1.0, 0.25]) for _ in range(3)]
         width, height = rng.choice([(640, 480), (800, 600), (512, 384), (rng.randrange(1, 2048), rng.randrange(1, 2048))])
         mode = rng.randrange(4)  # bit 0: screenRect, bit 1: cornersInside
+        if kind == 'edge' and rng.random() < 0.5:
+            mode = 0              # the centre test runs only without either output
         yield (m, center, extent, width, height, rng.randrange(-50, 50), rng.randrange(-50, 50), mode)
 
 

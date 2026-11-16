@@ -9,8 +9,10 @@ arrays (+0xf8/+0xfc/+0x100) and their capacity (+0x110); a light is type (+0x2c)
 matrices; 0 to 64 vertices with unit, scaled and axis-aligned normals (0.6/0.8 ties);
 strides 0xc/0x10/0x20 with or without the normals inside the vertex buffer; 0 to 5
 lights of every type (1 point, 2 spot, 3 unknown, 4 directional, 6 ambient); the
-optional colour array; a term-array capacity below, at and above the count, so retail's
-DebugMalloc/DebugFree regrow path runs as retail code.
+optional colour array; a term-array capacity below (or no array), at and above the count.
+The regrow path's DebugFree and DebugMalloc (0x004a2e60/0x004a2e20) are stubbed at their
+retail entries, noting size, __FILE__ text and line; one run in ten fails the allocation,
+which clears the capacity and returns.
 
 Group4Vis_ColorByte (src/bringup/Group4_GridLightColor.cpp, a separate unit without
 /QIfist) is retail's inlined `fld; fmul 255.0f; call __ftol`; here it is a stub that
@@ -35,7 +37,17 @@ BINDINGS = {
     # the game build's link alias: the Vector3 view of retail's Vec3TransformNormal
     '?Vec3TransformNormal@@YAXPAUVector3@@U1@PBUMatrix4@@@Z': 0x0042a450,
 }
-PROBES = {0x0049e6b0: 'LightAny', 0x0049f1c0: 'LightOne', 0x0049f8d0: 'LightAmbientPlusOne'}
+PROBES = {0x0049e6b0: 'LightAny', 0x0049f1c0: 'LightOne', 0x0049f8d0: 'LightAmbientPlusOne',
+          0x0049e4dd: 'free terms', 0x0049e525: 'terms malloc failed', 0x0049e534: 'terms regrown',
+          0x0049ec26: 'LightAny unit positional', 0x0049ee43: 'LightAny unit point',
+          0x0049f394: 'LightOne unit point', 0x0049f5cc: 'LightOne unit positional',
+          0x0049fce3: 'AmbientPlusOne unit positional', 0x0049ffb9: 'AmbientPlusOne unit point'}
+DEBUG_MALLOC, DEBUG_FREE = 0x004a2e20, 0x004a2e60
+
+
+def _cstr(ctx, at, limit=0x100):
+    text = ctx.read(at, limit)
+    return text[:text.index(0)] if 0 in text else text
 
 
 def f32(x):
@@ -76,6 +88,18 @@ def color_byte(cx, ecx, args):
 def setup(ctx, seed):
     assert ctx.stub('Group4Vis_ColorByte', ret=color_byte, nargs=1, log=False) == COLOR_BYTE_STUB
     r = random.Random(seed)
+    malloc_fails = r.random() < 0.1
+
+    def debug_malloc(cx, ecx, args):
+        # DebugMalloc(size, file, line): the file text, not its address (the images differ)
+        cx.note('DebugMalloc', args[0], _cstr(cx, args[1]), args[2])
+        return 0 if malloc_fails else cx.alloc(args[0] + 16, fill=0xcd)
+
+    def debug_free(cx, ecx, args):
+        cx.note('DebugFree', args[0], _cstr(cx, args[1]), args[2])
+        return 0
+    ctx.stub_at(DEBUG_MALLOC, 'DebugMalloc', nargs=3, ret=debug_malloc, log=False)
+    ctx.stub_at(DEBUG_FREE, 'DebugFree', nargs=3, ret=debug_free, log=False)
     identity = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]
     kind = r.random()
     if kind < 0.15:
@@ -99,6 +123,12 @@ def setup(ctx, seed):
         if r.random() < 0.1:
             n = [x * r.uniform(0.8, 1.2) for x in n]
         verts.append(([r.uniform(-300, 300) for _ in range(3)], n, r.getrandbits(32)))
+    # exact unit light vectors (retail skips the normalisation when the squared length is
+    # exactly 1): with the identity matrix, a positional light on an axis and a point light
+    # one unit from an integral vertex 0
+    unit_light = m == identity and count and r.random() < 0.7
+    if unit_light:
+        verts[0] = ([float(r.randint(-300, 300)) for _ in range(3)], verts[0][1], verts[0][2])
     shape = r.random()
     if shape < 0.3:
         types = [r.choice([1, 2, 3, 4, 6])]
@@ -121,16 +151,24 @@ def setup(ctx, seed):
         e = ctx.alloc(0xb0, fill=0x33)
         ctx.pack(e + 0x2c, 'i', t)
         ctx.pack(e + 0x54, '4f', *col, 1.0)
-        ctx.pack(e + 0x64, '3f', *[r.uniform(-600, 600) for _ in range(3)])
+        position = [r.uniform(-600, 600) for _ in range(3)]
+        if unit_light and t in (1, 2):
+            step = r.choice([[0, 1, 0], [0, -1, 0], [1, 0, 0], [0, 0, -1]])
+            position = step if t == 2 else [p + d for p, d in zip(verts[0][0], step)]
+        ctx.pack(e + 0x64, '3f', *position)
         ctx.pack(e + 0x70, '3f', *d)
         lights.append(e)
     ctx.pack(sink + 0x2c, 'i', len(lights))
     if lights:
         ctx.pack(sink + 0x30, '%dI' % len(lights), *lights)
-    cap = r.choice([count, count + 5, 64])
+    # below the count (or no array yet) the arrays are regrown through DebugFree and
+    # DebugMalloc (stubbed at their retail entries; an allocation sometimes fails)
+    cap = r.choice([count, count + 5, 64, r.randrange(count) if count else 0, r.randrange(count) if count else 0])
     size = 12 * max(cap, 1) + 16
     terms = ctx.alloc(size, bytes((i * 7 + 3) & 0xff for i in range(size)))
-    ctx.pack(sink + 0xf8, '3I', terms, terms + 4 * cap, terms + 8 * cap)
+    if cap < count and r.random() < 0.3:
+        terms = 0
+    ctx.pack(sink + 0xf8, '3I', terms, terms + 4 * cap if terms else 0, terms + 8 * cap if terms else 0)
     ctx.pack(sink + 0x110, 'ii', cap, 7)
 
     matrix = ctx.alloc(64)
