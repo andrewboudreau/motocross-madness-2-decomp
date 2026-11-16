@@ -50,7 +50,7 @@ Score is the masked linked score from `linked_accuracy.py`. "Emu" means a
 
 | Step | Retail VA | State | Notes |
 |---|---|---|---|
-| CRT entry, static initializers | 0x5380a5 | library; partly emulated | One initializer not emulated. |
+| CRT entry, static initializers | 0x5380a5 | library; emulated | All initializers run in both images (`static_initializers.py`). |
 | `WinMain`, `WinMainBody`, window, `MainWindowProc` | 0x4a0bc0, 0x4a0680, 0x4a0c50, 0x4a0d50 | exact | Icon load returns NULL without `.rsrc` (cosmetic). |
 | `GetDXVersion` | 0x448560 | near miss 0.914 | 720-scenario native differential test, no emu case. |
 | `FindDataDirectory` | 0x523c90 | exact | Needs the registry values the shim writes. |
@@ -160,7 +160,16 @@ from reviewed near-miss sources outside `src/bringup`.
 | 17 | Import `DirectInputCreateEx` by name if a matching import library can be built. | 0.5 day | Removes a machine-specific ordinal. |
 | 18 | Add the source-build hash route to the shim (accept an exe that has `mcm2.map` beside it). | 2 h | Drops `MCM2_FORCE_RUNTIME` from every run. |
 | 19 | Exercise podium, replay and return-to-menu with `MCM2_AUTORACE_EXIT`, then a full lap by hand. | 30 min of user time | These paths have never run in a source build. |
-| 20 | Split whole-program emulation off as out of scope; note it here. | none | `blade.dll`, DirectDraw and COM make a unicorn boot impractical; per-function replay cases give the coverage. |
+| 20 | Done: whole-program emulation is out of scope (see Out of scope). | - | `blade.dll`, DirectDraw and COM make a unicorn boot impractical; per-function replay cases give the coverage. |
+
+## Out of scope
+
+Whole-program emulation: booting either exe under unicorn to a race. The boot
+path loads `blade.dll`, creates DirectDraw, Direct3D and DirectInput objects
+through COM and pumps a window message loop; emulating that means modelling
+those libraries rather than checking the game. Coverage comes from the
+per-function `tools/emu_cases` (replay mode answers the COM and callee calls),
+the static-initializer run, and live runs on the user's desktop.
 
 ## Runtime test plan (the user runs these)
 
