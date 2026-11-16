@@ -77,6 +77,10 @@ CLEAN_CASES = {
     'filestream_read': 200,
     'resource_add_archive': 200,
     'bike_race_create_racers': 200,
+    'pcvideocard_create_mode_surfaces': 400,
+    'pcvideocard_probe_nonlocal': 300,
+    'pcvideocard_probe_partial_uploads': 300,
+    'pcgame_profile_displays': 200,
     'collision_hull_vs_hull': 300,
     # SET_FLAG: the unreachable set-flag arm too (its push dot order was fixed 2026-11-12).
     'segment_triangle_query': (300, {'SET_FLAG': True}),

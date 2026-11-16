@@ -56,9 +56,9 @@ Score is the masked linked score from `linked_accuracy.py`. "Emu" means a
 | `FindDataDirectory` | 0x523c90 | exact | Needs the registry values the shim writes. |
 | `PCGame::StartUp` | 0x4bfc50 | exact | |
 | Enumerate, choose display, joystick, load profile | 0x4c9600, 0x4ccd60, 0x4cd610, 0x4c16f0 | exact | |
-| `ProfileDisplays` | 0x4c0d10 | near miss 0.998 | No emu case. |
-| `CreateModeSurfaces` | 0x4ca520 | near miss 0.774 (116 B) | No emu case. Retail quits here when video memory reads negative. |
-| `ProbePartialTextureUploads`, `ProbeNonLocalTextureMemory` | 0x4cab00, 0x4ca5a0 | near miss 0.826 | No emu case. Runs in the hardware test on a fresh profile. |
+| `ProfileDisplays` | 0x4c0d10 | near miss 0.998 | Emu case `pcgame_profile_displays` (replay mode, fake PCGame registry, display and DirectDraw vtables) agrees in 600 of 600 runs, all 12 probes reached. |
+| `CreateModeSurfaces` | 0x4ca520 | near miss 0.774 (116 B) | Emu case `pcvideocard_create_mode_surfaces` agrees in 800 of 800 runs, including negative and overflowing budgets. Retail quits here when video memory reads negative. |
+| `ProbePartialTextureUploads`, `ProbeNonLocalTextureMemory` | 0x4cab00, 0x4ca5a0 | near miss 0.826 | Emu cases `pcvideocard_probe_partial_uploads` and `pcvideocard_probe_nonlocal` (replay mode, fake COM objects) agree in 600 of 600 runs each. Runs in the hardware test on a fresh profile. |
 | `Game` constructor, init, slot 2, render | 0x467990, 0x467b70, 0x467af0, 0x467eb0 | exact | |
 | `Game::Tick` | 0x4685d0 | near miss 0.749 | `QueryPerformanceCounter` in place of inline `rdtsc`. Emu: 60 runs, 0 mismatches. |
 | `ResourceManager::AddArchive`, `FileStream::Read` | 0x4e9030, 0x461640 | near miss (0.931) | Emu cases `resource_add_archive` and `filestream_read` agree with retail (800 runs each). Every asset goes through these. |
@@ -105,10 +105,11 @@ from reviewed near-miss sources outside `src/bringup`.
    `ReadDialogResource`, `LoadEventObjects`, `LoadBike`, the
    KrustyBike and bike-AI units, `DrawCurrentLod`. 19 candidate sources are
    marked best-guess-unreviewed in `config/game_build.json`.
-3. **Start-up and texture near misses have no differential case** (C):
-   `CreateModeSurfaces`, the two texture probes, `PCTextureMap::CreateSurface`,
-   `CopyRectTo`, `CopyScreenToTexture`, `FileStream::Read`, `AddArchive`,
-   `ProfileDisplays`. Of 189 non-identical bodies, 34 (53,289 B) have none.
+3. **Texture near misses have no differential case** (C):
+   `PCTextureMap::CreateSurface`, `CopyRectTo`, `CopyScreenToTexture`. Of 189
+   non-identical bodies, 34 (53,289 B) had none at the review; since then
+   `FileStream::Read`, `AddArchive`, `CreateRacers`, `ProfileDisplays`,
+   `CreateModeSurfaces` and both texture probes have gained cases.
 4. **Low-score render bodies** (C for scores): pixel halvers, `TransformPoints`,
    `LightVertices`, `TestBox`, the visibility walk, particles, projected
    shadow. A wrong result here shows as missing or miscoloured geometry, not
@@ -140,7 +141,7 @@ from reviewed near-miss sources outside `src/bringup`.
 |---|---|---|---|
 | 1 | User runs the current build with `MCM2_AUTORACE` (test plan below). | 10 min | Turns blocker 1 into a fact either way. |
 | 2 | Keep a record of the last exe hash and commit that ran, with its frames, in the ignored run directory; cite it from `GAME_BUILD.md`. | 30 min | Stops the run status drifting from the tree. |
-| 3 | Emu cases for `CreateModeSurfaces`, `ProfileDisplays` and the two texture probes, with fake DirectDraw vtables in replay mode. | 1 day | Start-up bodies whose failure ends the process silently. |
+| 3 | Done: `pcvideocard_create_mode_surfaces` (budget threshold, negative and overflowing budgets), `pcvideocard_probe_nonlocal`, `pcvideocard_probe_partial_uploads` and `pcgame_profile_displays` (replay mode with fake DirectDraw, surface, display and registry vtables) agree with retail in every run, all probes reached. Planted bugs are caught: a `>=` budget test (66), the wrong caps bit (98), a 32-pixel tile step (100), a changed error code (44), nine textures instead of ten (56), a misspelt registry key (274). Callee results are modelled, not run. | - | Start-up bodies whose failure ends the process silently. |
 | 4 | Done: `tools/emu_cases/filestream_read.py` (buffered, encoded, wrapped and short reads) and `resource_add_archive.py` (replay mode: header, growth, merge, realloc failure, unwind) agree with retail in 800 of 800 runs each; planted bugs are caught. Both bodies had earlier native differential checks (docs/FILESTREAM.md, docs/RESOURCEMANAGER.md). | - | Every asset load depends on them. |
 | 5 | Done: `tools/emu_cases/bike_race_create_racers.py` (replay mode) covers the rider archive, replay ranking, the pro circuit career, single player, ghost, AI (event and random skill) and network loads (local, remote players, remote and host AI). It agrees with retail in 400 of 400 runs, all probes reached; a planted grid-position bug gives 47 mismatches in 200. The behaviour is confirmed against these modelled inputs only: callee results are replayed, not run. | - | Largest bring-up body on the race path. |
 | 6 | Strengthen `terrain_load` so most runs take the success path. | 0.5 day | The case currently passes mostly by failing early in both builds. |
