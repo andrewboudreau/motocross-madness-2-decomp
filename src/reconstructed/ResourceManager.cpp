@@ -116,8 +116,65 @@ void ResourceManager::SetItemObject(void* entry, void* object)
         ReleaseItem(item);
 }
 
-// 0x004e9030 (opens an "RS2" archive and adds its items) is a near miss:
-// samples/render/ResourceManagerNearMisses.cpp.
+// 0x004e9030: opens an "RS2" archive and adds its items.
+// Not exact (120 of 804 bytes, 798 compiled: retail homes the archive in
+// the `new` temporary's stack slot and returns it from there, VC6 keeps it
+// in ebx; docs/RESOURCEMANAGER.md lists the forms tried).
+FileStream* ResourceManager::AddArchive(const char* path, int flags)
+{
+    int count;
+    char magic[4];
+    int i;
+
+    FileStream* archive = new(__FILE__, 212) FileStream(this);
+    if (archive->Open(path, "rb", flags || archive->IsValidFile(path))) {
+        if (archive->Read(magic, 4, 1) == 1 && !_stricmp(magic, "RS2")
+            && archive->Read(&count, 4, 1) == 1) {
+            if (itemCount + count > itemCapacity) {
+                items = (ResourceItem**)DebugRealloc(items, (itemCount + count) * 4, __FILE__, 231);
+                if (items) {
+                    for (i = itemCapacity; i < itemCount + count; i++)
+                        items[i] = 0;
+                    itemCapacity = itemCount + count;
+                }
+            }
+            if (archiveCount + 1 > archiveCapacity) {
+                archives = (FileStream**)DebugRealloc(archives, (archiveCount + 8) * 4, __FILE__, 246);
+                if (archives) {
+                    archiveCapacity = archiveCount + 8;
+                    archives[archiveCount++] = archive;
+                }
+            }
+            if (archives && items) {
+                for (i = 0; i < count; i++) {
+                    items[itemCount + i] = new(__FILE__, 261) ResourceItem;
+                    archive->Read(&items[itemCount + i]->nameSize, 4, 1);
+                    items[itemCount + i]->name =
+                        (char*)DebugRealloc(items[itemCount + i]->name,
+                                            items[itemCount + i]->nameSize, __FILE__, 268);
+                    archive->Read(items[itemCount + i]->name,
+                                                   items[itemCount + i]->nameSize, 1);
+                    archive->Read(&items[itemCount + i]->offset, 4, 1);
+                    archive->Read(&items[itemCount + i]->size, 4, 1);
+                    items[itemCount + i]->archive = archive;
+                    if (MergeWithExisting(items[itemCount + i])) {
+                        items[itemCount + i]->Release();
+                        i--;
+                        count--;
+                    }
+                }
+            }
+            itemCount += count;
+            return archive;
+        }
+        if (archive)
+            delete archive;
+        return 0;
+    }
+    if (archive)
+        delete archive;
+    return 0;
+}
 
 // 0x004e9360
 ResourceItem* ResourceManager::FindItem(const char* name, int seek)

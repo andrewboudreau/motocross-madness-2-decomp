@@ -373,12 +373,6 @@
       "evidence": "docs/FILESTREAM.md#functional-build-review"
     },
     {
-      "path": "samples/render/ResourceManagerNearMisses.cpp",
-      "status": "reviewed-nonexact",
-      "reason": "Complete AddArchive loader checked in 17292 native differential scenarios including constructor unwind paths; VC6 emits 798 bytes versus 804 retail bytes.",
-      "evidence": "docs/RESOURCEMANAGER.md#functional-build-review"
-    },
-    {
       "path": "samples/game/QuarryStuntEventNearMisses.cpp",
       "status": "reviewed-nonexact",
       "reason": "Near-miss body admitted so the source build can link and run; defines BaseQuarryEvent::PrepareGeometry. BaseQuarryEvent::PrepareGeometry 0x004e14a0 (the debug Atmosphere page) was reviewed instruction by instruction against retail: 506 of 529 normalised instructions align; the rest is register choice in the page prologue (retail rereads TrackGame+0x38, which nothing stores between the two loads), one independent mov reordered after a ControlInterface call, and jump-table entries shifted by the 2-byte prologue difference. No behaviour difference.",

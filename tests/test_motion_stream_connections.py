@@ -23,7 +23,6 @@ class MotionStreamConnectionTests(unittest.TestCase):
             'stream': 'src/reconstructed/FileStream.cpp',
             'partial_stream': 'samples/io/FileStream.cpp',
             'resources': 'src/reconstructed/ResourceManager.cpp',
-            'archive_candidate': 'samples/render/ResourceManagerNearMisses.cpp',
             'parameters': 'src/reconstructed/Parameterblocks.cpp',
         }
         with tempfile.TemporaryDirectory(prefix='mcm2-motion-stream-') as directory:
@@ -72,8 +71,7 @@ class MotionStreamConnectionTests(unittest.TestCase):
             }
             motion_imports = imports(objects['motion']) | imports(objects['d3d'])
             self.assertTrue(stream_calls | resource_calls | parameter_calls <= motion_imports)
-            supplied = {s.name for name in ('stream', 'partial_stream', 'resources',
-                                           'archive_candidate', 'parameters')
+            supplied = {s.name for name in ('stream', 'partial_stream', 'resources', 'parameters')
                         for s in objects[name].symbols
                         if s.storage_class == 2 and s.section_number > 0}
             self.assertTrue(stream_calls | resource_calls | parameter_calls <= supplied)

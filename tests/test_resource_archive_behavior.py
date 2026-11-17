@@ -15,6 +15,7 @@ from mcm2tool.coff import CoffObject
 from mcm2tool.pe import PEImage
 from mcm2tool.toolchain import find_child_ci, find_vc6_bin, infer_vc98_root
 from tools.eh_funcinfo import candidate, retail, shape
+from tools.unit_source import standalone_source
 
 ROOT = Path(__file__).resolve().parents[1]
 SYMBOL = '?AddArchive@ResourceManager@@QAEPAVFileStream@@PBDH@Z'
@@ -65,9 +66,14 @@ class ResourceArchiveBehaviorTests(unittest.TestCase):
             output = Path(directory)
             patch_file = output / 'calls.bin'
             patch_file.write_bytes(b''.join(patches))
+            # AddArchive lives in ResourceManager.cpp; the oracle links a
+            # validation unit of the same name holding only that definition
+            # (tools/unit_source.py), so its __FILE__ names retail's file.
+            unit = output / 'ResourceManager.cpp'
+            unit.write_text(standalone_source(ROOT / 'src/reconstructed/ResourceManager.cpp',
+                                              ['ResourceManager::AddArchive']), encoding='latin-1')
             objects = []
-            for source in ('samples/render/ResourceManagerNearMisses.cpp',
-                           'tests/fixtures/resource_archive_compare.cpp'):
+            for source in (str(unit), 'tests/fixtures/resource_archive_compare.cpp'):
                 obj = output / (Path(source).stem + '.obj')
                 result = subprocess.run([
                     sys.executable, str(ROOT / 'tools/compile.py'), str(ROOT / source),
@@ -76,7 +82,7 @@ class ResourceArchiveBehaviorTests(unittest.TestCase):
                 ], cwd=ROOT, capture_output=True, text=True, encoding='latin-1',
                     env={**os.environ, 'PYTHONPATH': str(ROOT)})
                 self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-                if source.startswith('samples/'):
+                if source == str(unit):
                     compiled = CoffObject(obj)
                     self.assertEqual(compiled.machine, 0x14c)
                     methods = {s.name for s in compiled.symbols

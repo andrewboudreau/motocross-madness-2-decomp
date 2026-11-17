@@ -3,8 +3,8 @@
 Opens an "RS2" archive and appends its directory to the manager: grows the item table,
 appends the archive (retail does so only in the grown-storage branch), then reads each
 entry (name size, name, offset, size) into a new ResourceItem and drops entries that
-MergeWithExisting folds into an existing one. The linked body is
-samples/render/ResourceManagerNearMisses.cpp.
+MergeWithExisting folds into an existing one. The linked body is in
+src/reconstructed/ResourceManager.cpp.
 
 Every callee is replayed. Modelled: operator new 0x004a3010 (fresh 0xcd blocks), the
 ResourceItem constructor 0x004e8d70 (zeroed, fake vtable so Release is a logged slot
@@ -12,8 +12,7 @@ call), DebugRealloc 0x004a2ec0 (fresh block holding the old contents, or 0 when 
 case makes that call fail), FileStream::Read 0x00461640 (serves the header, the count and
 the entries; the case can cut it short at any read), _stricmp 0x00536070, Open 0x00460f50,
 IsValidFile 0x00460e70 and MergeWithExisting 0x004e8f40 (case-chosen results). new and
-DebugRealloc note size and line but not __FILE__: the sample's file name differs from
-retail's ResourceManager.cpp by design.
+DebugRealloc note size and line but not __FILE__ (the build's path differs from retail's).
 
 Manager layout (src/reconstructed/ResourceManager.h): +0x00 item capacity, +0x04 archive
 capacity, +0x08 item count, +0x0c archive count, +0x10 archives, +0x14 items.
@@ -23,7 +22,7 @@ import struct
 
 RETAIL_VA = 0x004e9030
 SYMBOL = '?AddArchive@ResourceManager@@QAEPAVFileStream@@PBDH@Z'
-SOURCE = 'samples/render/ResourceManagerNearMisses.cpp'
+SOURCE = 'src/reconstructed/ResourceManager.cpp'
 
 NEW, CTOR, ISVALID, OPEN, READ, STRICMP = 0x004a3010, 0x00460d10, 0x00460e70, 0x00460f50, 0x00461640, 0x00536070
 REALLOC, ITEM_CTOR, MERGE = 0x004a2ec0, 0x004e8d70, 0x004e8f40

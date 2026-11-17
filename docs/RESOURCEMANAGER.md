@@ -18,12 +18,10 @@ releases archives. `ResourceManager.h` provides the shared full declaration;
 an alias of ResourceItem. SceneManager's `UnknownSceneResourceManager` is
 likewise an alias of the same manager. Both include paths can be used together.
 
-The archive opener `0x004e9030` is a nonexact candidate in
-`samples/render/ResourceManagerNearMisses.cpp`. It is a standalone source
-containing only `AddArchive`; it does not include the canonical `.cpp` or
-redefine the global manager. Independent review accepted it for explicit
-reviewed-nonexact admission through `config/game_build.json`; its source
-remains in `samples/` and is not a strict-match provider.
+The archive opener `0x004e9030` is in ResourceManager.cpp, between
+SetItemObject `0x004e9010` and FindItem `0x004e9360` as in retail, with a
+`// Not exact` status comment. Its behaviour test links a validation unit
+named `ResourceManager.cpp` holding only that definition.
 
 Under `vc6_o2_mt` the candidate scores 120/804 strict (798 bytes; 263/266
 aligned instructions). Retail stores EBX into the `new` temporary's slot
@@ -156,3 +154,21 @@ is `AddArchive`. The full header also names `FindItem` (`0x004e9360`),
 `ReleaseItem` (`0x004e9900`). These semantic names remain provisional.
 The canonical signatures now also cover the former reduced declarations;
 these source-level names remain inferred even where the ABI is confirmed.
+
+## Forms tried
+
+s20: a separate `result = archive` local returned at the end is copy-propagated
+back into EBX (unchanged, 120 strict of 804). The archives append only in the
+grown-storage branch is retail behavior (checked against 0x004e9030).
+s21 (all 120 strict unless noted; the copy is propagated into EBX):
+`archive = result = new`, `result = archive = new`, `result = new;
+archive = result`, `result = 0` or `archive = 0` first, a reference
+`FileStream*& result = archive`, an inline NewArchive helper
+(two forms) and a cast return. `if ((archive = new ...) != 0) result =
+archive; else result = 0;` is worse (131/820); a dead `slot = &result`
+is eliminated. Retail homes the ResourceItem temporary in the dead
+`flags` argument slot ([esp + 0x2c]); QuarryStuntEvent 0x004de590 (also a
+near miss) shows the same new-temporary homing.
+k-scan (s22): compiled behind 0..63 prepended typedefs, 0x004e9030 has the
+same code at every count, so its difference is not a declaration-count
+effect (docs/VC6_OPERAND_ORDER.md section 2).

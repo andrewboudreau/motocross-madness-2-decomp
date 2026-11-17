@@ -73,7 +73,7 @@ static int SourceFile(const char* file) {
     const char* slash = strrchr(file, '/');
     if (!name || (slash && slash > name)) name = slash;
     name = name ? name + 1 : file;
-    if (strcmp(name, "ResourceManager.cpp") && strcmp(name, "ResourceManagerNearMisses.cpp")) ExitProcess(96);
+    if (strcmp(name, "ResourceManager.cpp")) ExitProcess(96);
     return 1;
 }
 void* operator new(unsigned int size, const char* file, int line) {
