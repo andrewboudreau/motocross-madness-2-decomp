@@ -13,11 +13,14 @@ from mcm2tool.pe import PEImage
 from mcm2tool.toolchain import find_child_ci, find_vc6_bin, infer_vc98_root
 from tools.match import compare
 from tools.run_calibration import CASES
+from tools.unit_source import standalone_source
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCE = 'samples/render/BitStringShifts.cpp'
-AGGREGATE = 'samples/render/GR_BitStringNearMisses.cpp'
+# The shifts live in GR_BitString.cpp in retail order. SOURCE is a private
+# validation unit holding only their definitions (tools/unit_source.py).
+SOURCE = 'validation unit'
 CANONICAL = 'src/reconstructed/GR_BitString.cpp'
+BINDINGS = 'src/reconstructed/GR_BitString.bindings.json'
 FIXTURE = 'tests/fixtures/bitstring_shifts_compare.cpp'
 MASK = '?g_WordHighBitMasks@@3PAIA'
 TARGETS = (
@@ -95,9 +98,16 @@ class BitStringShiftsTests(unittest.TestCase):
         compiler=Path(os.environ['VC6_ROOT']).resolve()
         with tempfile.TemporaryDirectory(prefix='mcm2-bitstring-shifts-') as directory:
             output=Path(directory);objects={};paths={}
-            for index,source in enumerate((SOURCE,AGGREGATE,CANONICAL,FIXTURE)):
+            text=(ROOT/CANONICAL).read_text(encoding='latin1')
+            macro=text[text.index('#define UNKNOWN_BIG_ENDIAN_WORD'):]
+            macro=macro[:macro.index('\n\n')]
+            unit=output/'bitstring_shifts_unit.cpp'
+            unit.write_text(standalone_source(ROOT/CANONICAL,
+                ['GR_BitString::ShiftBitsTowardFront','GR_BitString::ShiftBitsTowardBack'],
+                'extern unsigned int g_WordHighBitMasks[33];\n'+macro+'\n'),encoding='latin1')
+            for index,source in enumerate((SOURCE,CANONICAL,FIXTURE)):
                 path=output/('unit%d.obj'%index)
-                command=[sys.executable,str(ROOT/'tools/compile.py'),str(ROOT/source),'-o',str(path),
+                command=[sys.executable,str(ROOT/'tools/compile.py'),str(unit if source==SOURCE else ROOT/source),'-o',str(path),
                          '--vc6-root',str(compiler),'--profile','vc6_o2_mt']
                 if source==FIXTURE:
                     command+=['--extra','/Od']
@@ -105,11 +115,6 @@ class BitStringShiftsTests(unittest.TestCase):
                                       env={**os.environ,'PYTHONPATH':str(ROOT)})
                 self.assertEqual(result.returncode,0,result.stdout+result.stderr)
                 objects[source],paths[source]=CoffObject(path),path
-            # Captured same-path, authentic pre-extraction aggregate. All nondebug
-            # sections, flags, bytes, relocation addends and destinations are kept.
-            self.assertEqual(object_fingerprint(objects[AGGREGATE]),{
-                'sections':22,'relocations':38,
-                'sha256':'fdf01992b932c42d773a3aed1eacad7ff64f3b31775f8f26cc3ae32116401f5b'})
             candidate=objects[SOURCE]
             self.assertEqual({s.name for s in candidate.symbols if s.section_number==0},{MASK})
             self.assertEqual({s.name for s in candidate.symbols if s.section_number>0 and s.storage_class==2},
@@ -118,13 +123,13 @@ class BitStringShiftsTests(unittest.TestCase):
                                  for s in candidate.sections if not s.name.startswith('.debug')))
             for symbol,va,size,emitted,score,returns in TARGETS:
                 records=[]
-                for source in (SOURCE,AGGREGATE):
+                for source in (SOURCE,CANONICAL):
                     obj=objects[source];entry=obj.find_symbol(symbol)
                     self.assertEqual((entry.function_size,entry.extent_source),(emitted,'coff_function_aux'))
                     body,extent,relocs=obj.symbol_extent(entry)
                     records.append((body,[(r.virtual_address-entry.value,r.type,
                                           obj.symbol_by_index[r.symbol_index].name) for r in relocs]))
-                    proof=compare(retail,obj,symbol,va,size,(ROOT/SOURCE).with_suffix('.bindings.json'))
+                    proof=compare(retail,obj,symbol,va,size,ROOT/BINDINGS)
                     self.assertEqual(proof['strict_match']['matching_positions'],score)
                     self.assertFalse(proof['strict_exact'])
                 self.assertEqual(records[0],records[1])
@@ -133,7 +138,7 @@ class BitStringShiftsTests(unittest.TestCase):
             cases=[c for c in CASES if c['source']==CANONICAL]
             self.assertEqual(len(cases),9)
             for case in cases:
-                for source in (CANONICAL,AGGREGATE):
+                for source in (CANONICAL,):
                     proof=compare(retail,objects[source],case['symbol'],int(case['target_va'],16),
                                   case['target_size'],ROOT/case['bindings'])
                     self.assertTrue(proof['strict_exact'],proof)
@@ -147,13 +152,13 @@ class BitStringShiftsTests(unittest.TestCase):
             linker=find_child_ci(find_vc6_bin(compiler),'link.exe')
             libraries=find_child_ci(infer_vc98_root(compiler),'lib');executable=output/'compare.exe'
             result=subprocess.run([str(linker),'/nologo','/subsystem:console','/base:0x100000','/fixed','/opt:ref',
-                f'/out:{executable}',f'/libpath:{libraries}',str(paths[SOURCE]),str(paths[CANONICAL]),
+                f'/out:{executable}',f'/libpath:{libraries}',str(paths[CANONICAL]),
                 str(paths[FIXTURE]),'kernel32.lib'],cwd=ROOT,capture_output=True,text=True,encoding='latin1')
             self.assertEqual(result.returncode,0,result.stdout+result.stderr)
             result=subprocess.run([str(executable),str(image)],capture_output=True,text=True,timeout=90)
             self.assertEqual(result.returncode,0,result.stdout+result.stderr)
             self.assertIn('BitStringShifts: 422838 complete-body, independent bit-oracle, wrapper, alias and fault cases match',result.stdout)
-            print('%d strict checks; full aggregate preserved; '%strict+result.stdout.strip())
+            print('%d strict checks; validation unit equals the unit; '%strict+result.stdout.strip())
 
 
 if __name__=='__main__':

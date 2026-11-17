@@ -9,7 +9,7 @@ import struct
 
 RETAIL_VA = 0x004239c0
 SYMBOL = '?ShiftBitsTowardFront@GR_BitString@@QAEXH@Z'
-SOURCE = 'samples/render/BitStringShifts.cpp'
+SOURCE = 'src/reconstructed/GR_BitString.cpp'
 FPCWS = (0x027f,)   # integer only
 
 

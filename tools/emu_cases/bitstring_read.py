@@ -9,7 +9,7 @@ import struct
 
 RETAIL_VA = 0x00423ef0
 SYMBOL = '?ReadBits@GR_BitString@@QAEIH@Z'
-SOURCE = 'samples/render/BitStringRead.cpp'
+SOURCE = 'src/reconstructed/GR_BitString.cpp'
 FPCWS = (0x027f,)   # integer only
 
 

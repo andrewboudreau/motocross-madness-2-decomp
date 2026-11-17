@@ -1,12 +1,11 @@
 # Global bit reader and source LZW integration
 
-`GR_BitString::ReadBits(int)` is reconstructed as ordinary C++ in
-[`samples/render/BitStringRead.cpp`](../samples/render/BitStringRead.cpp).
+`GR_BitString::ReadBits(int)` is reconstructed as ordinary C++, last in
+[GR_BitString.cpp](../src/reconstructed/GR_BitString.cpp) as in retail.
 The complete retail body is **125 bytes**, `0x00423ef0..0x00423f6c`, including
 `RET 4`; the following three NOP bytes precede the next function. VC6 SP3
 emits **150 bytes**, with **1 relocation-resolved matching position**. This
-is a nonexact candidate, not a matching source promotion or recovered original
-translation unit. Its retail frame, BSWAP and local-return sequence suggest
+is not exact. Its retail frame, BSWAP and local-return sequence suggest
 original inline assembly, but that attribution is inference. The reconstruction
 uses neither assembly nor copied code, and production never maps retail code.
 

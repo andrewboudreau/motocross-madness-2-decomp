@@ -16,8 +16,9 @@ from tools.run_calibration import CASES
 from tools.build_game import compile_source as game_compile
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCE = 'samples/render/BitStringRead.cpp'
+# ReadBits lives in GR_BitString.cpp, last in retail order.
 CANONICAL = 'src/reconstructed/GR_BitString.cpp'
+SOURCE = CANONICAL
 SYMBOL = '?ReadBits@GR_BitString@@QAEIH@Z'
 GLOBALS = {'?g_LowBitMaskTable@@3PAIA','?g_BitReaderWord@@3IA',
            '?g_BitReaderBitsUsed@@3HA','?g_BitReaderCursor@@3PAIA'}
@@ -88,7 +89,7 @@ class BitStringReadTests(unittest.TestCase):
         vc6=Path(os.environ['VC6_ROOT']).resolve()
         with tempfile.TemporaryDirectory(prefix='mcm2-bitstring-read-') as directory:
             output=Path(directory);objects={};paths={}
-            sources=(SOURCE,CANONICAL,'samples/render/BitStringShifts.cpp',
+            sources=(CANONICAL,
                      'src/reconstructed/Lzw.cpp','src/reconstructed/MemTag.cpp',
                      'tests/fixtures/bitstring_read_compare.cpp','tests/fixtures/lzw_source_decode.cpp')
             for index,source in enumerate(sources):
@@ -105,7 +106,7 @@ class BitStringReadTests(unittest.TestCase):
             body,size,relocs=candidate.symbol_extent(entry)
             self.assertEqual(size,150)
             self.assertEqual({candidate.symbol_by_index[r.symbol_index].name for r in relocs},GLOBALS)
-            report=compare(retail,candidate,SYMBOL,0x423ef0,125,(ROOT/SOURCE).with_suffix('.bindings.json'))
+            report=compare(retail,candidate,SYMBOL,0x423ef0,125,ROOT/'src/reconstructed/GR_BitString.bindings.json')
             self.assertFalse(report['strict_exact'])
             self.assertEqual(report['strict_match']['matching_positions'],1)
             self.assertFalse(any(s.name.startswith('.CRT') for s in candidate.sections))
@@ -148,7 +149,7 @@ class BitStringReadTests(unittest.TestCase):
                 ('tests/fixtures/lzw_source_decode.cpp',['src/reconstructed/Lzw.cpp','src/reconstructed/MemTag.cpp'],
                  'LzwSourceDecode: 2051 packed-stream, dictionary, allocation and reader-state cases PASS')):
                 executable=output/(Path(fixture).stem+'.exe')
-                units=[SOURCE,CANONICAL,'samples/render/BitStringShifts.cpp',fixture]+extra
+                units=[CANONICAL,fixture]+extra
                 result=subprocess.run([str(linker),'/nologo','/subsystem:console','/base:0x100000','/fixed','/opt:ref',
                     f'/out:{executable}',f'/libpath:{libraries}',*[str(paths[s])for s in units],'kernel32.lib'],
                     cwd=ROOT,capture_output=True,text=True,encoding='latin1')

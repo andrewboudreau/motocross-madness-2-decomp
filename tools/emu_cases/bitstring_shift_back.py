@@ -6,5 +6,5 @@ from tools.emu_cases.bitstring_shift_front import cases, setup  # noqa: F401
 
 RETAIL_VA = 0x00423b70
 SYMBOL = '?ShiftBitsTowardBack@GR_BitString@@QAEXH@Z'
-SOURCE = 'samples/render/BitStringShifts.cpp'
+SOURCE = 'src/reconstructed/GR_BitString.cpp'
 FPCWS = (0x027f,)   # integer only

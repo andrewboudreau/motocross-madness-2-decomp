@@ -2,24 +2,70 @@
 
 ## Functional build review
 
-`samples/render/BitStringShifts.cpp` supplies the two missing sub-word shifts
-used by `GR_BitString`'s canonical whole-word wrappers. These are individually
-reviewed, nonexact candidates. Names are provisional; original translation-unit
-ownership is unproven. No assembly or retail dispatch is used in production.
+The two sub-word shifts used by `GR_BitString`'s whole-word wrappers sit in
+[GR_BitString.cpp](../src/reconstructed/GR_BitString.cpp) between those wrappers
+and the constructor, in retail order. They are not exact. Names are
+provisional; the unit's file name is not recovered (no `__FILE__`).
 
 | Method | Retail VA | Complete retail bytes | Candidate bytes | Resolved matching positions |
 |---|---:|---:|---:|---:|
 | `ShiftBitsTowardFront(int)` | `0x004239c0` | 420 | 420 | 343 |
 | `ShiftBitsTowardBack(int)` | `0x00423b70` | 442 | 442 | 387 |
 
-Both bodies are compiled through `GR_BitStringNearMisses.cpp` too, which
-includes the standalone source. Authentic VC6 SP3 `vc6_o2_mt` produces the same complete
-function bytes and relocation records in either context. The same-path aggregate
-before and after extraction preserves all 22 nondebug sections and 38 relocations,
-including flags, payloads, addends and destinations; no filename normalization or
-other exclusions are necessary. All nine canonical functions are strict in both
-the canonical and aggregate objects (18 checks). The regression pins the complete
-aggregate fingerprint and the two complete nonexact scores.
+The test compiles a validation unit holding only the two definitions
+(`tools/unit_source.py`) and requires its bodies and relocations to equal the
+whole unit's; the unit's nine calibration cases stay strict. The regression
+pins the two complete nonexact scores.
+
+## Forms tried
+
+### ShiftBitsTowardFront (`0x004239c0`)
+
+0x004239c0 (343/420): retail keeps `this` in ebp and `count` in ebx and
+computes `32 - count` into edi before the first word; VC6 here swaps the
+two and computes it later. `src = (unsigned int*)data + 1;` gives retail's
+allocation and order (7 differing instructions) but re-reads `data` where
+retail forms `lea edx, [esi + 4]`, so it stays `dst + 1`. Unchanged at 343:
+every order of the words/dst/carryShift assignments (declared at the top or
+assigned as in ShiftTowardFront), for/while(--i)/for(;--i;) loops,
+`register` on any subset of the locals, `const int count`, a `count` copy,
+the first word in its own local or block, `src = dst; *src++ = ...`, the
+src step in the for header, swap-macro spellings (operands and `+`), a
+`fill` local or swapped fill arms (worse), and `32 - count` written out
+for any subset of the carryShift uses (worse), and 0..8 dead initialised
+locals.
+
+### ShiftBitsTowardBack (`0x00423b70`)
+
+0x00423b70 (387/442): retail computes `src = dst - 1` (lea esi, [edx - 4]),
+steps it forward with `dst` after the last word (add esi, 4) and
+pre-decrements it at the loop top; the bottom-decrement loop gave 93/438.
+Left: retail keeps `src` in esi and `dst` in edx (VC6 here the other way)
+and two swap-macro ORs end in the other register. Unchanged at 387: `src`
+assigned before or after the first read, `src++` and `dst++` as separate
+statements or a comma expression, `*--src` in the zero test, while(--i)
+and a split `*--dst` in the 0xffffffff arm. Worse: `src = dst - 1` after
+the store (83), src assigned from `data` (59), while(--words) (154),
+swapped fill arms (367), the first word read through `src[1]` (45),
+a mask local in the 0xffffffff arm (204), a count-up loop (155),
+`32 - count` in place of carryShift (15) and `src` re-derived from
+`data` (17); `&data[words - 1]` and a separate `>>= count` stay 387.
+Also 387: 0..8 dead initialised locals, `i != 0`/`--i` and `for (i =
+words; --i;)` loops, `--src`, `!*src`, a split `dst--` in the 0xffffffff
+arm and the head's `dst++`/`src++` in either order. `i > 0` is 386, `dst--`
+hoisted ahead of the value test 155 and ahead of the fill arms 343.
+Wave 32: whenever VC6 folds `src = dst - 1; src++` away (src defined after
+`dst++`, `src++` ahead of the store, `src = data + words - 2; dst = src +
+1`) src gets esi and dst edx as retail and the loop matches (149-151 of 158
+instructions, 437-439 bytes), but the head then lacks retail's unfolded
+`lea esi, [edx - 4]` .. `add edx, 4` / `add esi, 4`; every form that keeps
+the pair unfolded gives dst esi. Also 387: the swap macro with its terms
+reversed, `<< 24` forms or casts, an inline swap taking a reference or a
+pointer, a `w = *--src` local, the head steps in the for initialiser
+(`dst++, src++`; `src++, dst++` 6/443), `dst[0] =`. Worse: `dst[-1] =` 378,
+an inline swap by value 170, `i` assigned before the first store 122, a
+post-decrement mirror of the loop 60/417, an indexed `w[i]` loop 33/428, a
+`last` temporary 13.
 
 ## Identity, extent and dependencies
 

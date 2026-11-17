@@ -7,11 +7,10 @@
 // (0x00578e90..0x00578e9b) is referenced only from this range. No `$E`
 // initializers: every table is statically initialized.
 //
-// The complete reader 0x00423ef0 is an ordinary C++ nonexact candidate in
-// samples/render/BitStringRead.cpp; see docs/BITSTRING_READ.md. Its retail EBP
+// Every function of the range is here in retail order. The two sub-word
+// shifts and the reader 0x00423ef0 are not exact; the reader's retail EBP
 // frame, BSWAP and local-return sequence suggest an original inline-assembly
-// body, but that source attribution remains inference. The two sub-word
-// shifts are reviewed nonexact candidates in samples/render/BitStringShifts.cpp.
+// body, but that source attribution remains inference.
 
 #include "GR_BitString.h"
 
@@ -152,6 +151,86 @@ void GR_BitString::ShiftTowardBack(int count) {
         ShiftBitsTowardBack(count);
 }
 
+// 0x004239c0: shifts the words toward the front by 1..31 bits (the caller
+// moves whole words); zero and all-ones words take short paths.
+// Not exact (343 of 420 bytes: retail keeps `this` in ebp and `count` in ebx
+// and computes `32 - count` first; docs/BITSTRING_SHIFTS.md lists the forms tried).
+void GR_BitString::ShiftBitsTowardFront(int count) {
+    unsigned int* dst = (unsigned int*)data;
+    unsigned int* src;
+    int words = (bitCount + 31) / 32;
+    int carryShift = 32 - count;
+    unsigned int value;
+    int i;
+
+    value = *dst;
+    value = UNKNOWN_BIG_ENDIAN_WORD(value) << count;
+    *dst = UNKNOWN_BIG_ENDIAN_WORD(value);
+    src = dst + 1;
+    for (i = words - 1; i; i--) {
+        if (*src == 0) {
+            dst++;
+        } else if (*src == 0xffffffff) {
+            *dst++ |= ~g_WordHighBitMasks[carryShift];
+            *src = g_WordHighBitMasks[carryShift];
+        } else {
+            *src = UNKNOWN_BIG_ENDIAN_WORD(*src);
+            value = *src >> carryShift;
+            if (value)
+                *dst |= UNKNOWN_BIG_ENDIAN_WORD(value);
+            dst++;
+            *src <<= count;
+            if (*src)
+                *src = UNKNOWN_BIG_ENDIAN_WORD(*src);
+        }
+        src++;
+    }
+    if (!fillWord)
+        *dst &= g_WordHighBitMasks[carryShift];
+    else
+        *dst |= ~g_WordHighBitMasks[carryShift];
+}
+
+// 0x00423b70: shifts the words toward the back by 1..31 bits, last word first.
+// Not exact (387 of 442 bytes: retail keeps `src` in esi and `dst` in edx and
+// leaves the `src = dst - 1` step unfolded; docs/BITSTRING_SHIFTS.md).
+void GR_BitString::ShiftBitsTowardBack(int count) {
+    int words = (bitCount + 31) / 32;
+    unsigned int* dst = (unsigned int*)data + words - 1;
+    unsigned int* src = dst - 1;
+    int carryShift = 32 - count;
+    unsigned int value;
+    int i;
+
+    value = *dst;
+    value = UNKNOWN_BIG_ENDIAN_WORD(value) >> count;
+    *dst++ = UNKNOWN_BIG_ENDIAN_WORD(value);
+    src++;
+    for (i = words - 1; i; i--) {
+        src--;
+        if (*src == 0) {
+            dst--;
+        } else if (*src == 0xffffffff) {
+            *--dst |= g_WordHighBitMasks[count];
+            *src = ~g_WordHighBitMasks[count];
+        } else {
+            *src = UNKNOWN_BIG_ENDIAN_WORD(*src);
+            value = *src << carryShift;
+            if (value)
+                *--dst |= UNKNOWN_BIG_ENDIAN_WORD(value);
+            else
+                dst--;
+            *src >>= count;
+            if (*src)
+                *src = UNKNOWN_BIG_ENDIAN_WORD(*src);
+        }
+    }
+    if (!fillWord)
+        *--dst &= ~g_WordHighBitMasks[count];
+    else
+        *--dst |= g_WordHighBitMasks[count];
+}
+
 // 0x00423d50
 GR_BitString::GR_BitString(const void* buffer, int bits, int flag) {
     bitCount = bits;
@@ -225,4 +304,33 @@ void GR_BitString::Invert() {
             p++;
         } while (--words);
     }
+}
+
+// 0x00423ef0: reads the next `count` (0..32) bits of the sequential reader,
+// eagerly loading the next word when the current one runs out.
+// Not exact (1 of 125 bytes, 150 compiled): retail's ebp frame, bswap and
+// store-then-reload return look like an inline-assembly body (inference);
+// docs/BITSTRING_READ.md.
+unsigned int GR_BitString::ReadBits(int count)
+{
+    unsigned int result = g_LowBitMaskTable[count];
+    unsigned int word = g_BitReaderWord;
+    int used = g_BitReaderBitsUsed + count;
+    if (used < 32) {
+        g_BitReaderBitsUsed = used;
+        result &= word >> (32 - used);
+    } else {
+        unsigned int* next = g_BitReaderCursor;
+        used -= 32;
+        g_BitReaderBitsUsed = used;
+        next++;
+        unsigned int raw = *next;
+        result &= word << used;
+        raw = (raw >> 24) | ((raw >> 8) & 0xff00) | ((raw << 8) & 0xff0000) | (raw << 24);
+        g_BitReaderCursor = next;
+        g_BitReaderWord = raw;
+        if (used != 0)
+            result |= raw >> (32 - used);
+    }
+    return result;
 }
