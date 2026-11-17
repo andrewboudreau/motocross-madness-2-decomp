@@ -271,7 +271,7 @@ Two recurring VC6 shapes: chained assignments (`a = b = 0`) give retail's
 reversed store order, and the region `Init` helper is inlined wherever a
 block is taken.
 
-Near misses (`samples/render/CacheTextureNearMisses.cpp`):
+Not exact, in CacheTexture.cpp in retail order:
 - `0x005102d0` (558 bytes), blit the occupant's mip levels into its
   region (DirectDraw `GetAttachedSurface`/`Blt`, then slot 9 or +0x188):
   retail places the shared `return 0` block before the final branch.

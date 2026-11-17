@@ -1,6 +1,6 @@
 """Track::PlaceNear 0x00517340, placing a point on the track graph near a position (tools/emu_diff.py case).
 
-The game links this body (samples/track/TrackNearMisses.cpp) behind KbRaceSub::PlaceNear,
+The game links this body (src/reconstructed/Track.cpp) behind KbRaceSub::PlaceNear,
 which the BikeAI code calls. A random track graph (nodes with polyline segments and strip
 edges, links forming chains, branches and cycles) is walked from its start node; the point lies
 on a strip, between strips or off the track. IsInsideStrip, DistanceAlong, ShortestPath,
@@ -13,7 +13,7 @@ import struct
 
 RETAIL_VA = 0x00517340
 SYMBOL = '?PlaceNear@Track@@QAEHUVector3@@UTrackPos@@MMHPAU3@@Z'
-SOURCE = 'samples/track/TrackNearMisses.cpp'
+SOURCE = 'src/reconstructed/Track.cpp'
 PROBES = {0x0051741e: 'IsInsideStrip call', 0x005175ad: 'out-of-memory FreeWorkList exit',
           0x0051777e: 'path loop'}
 

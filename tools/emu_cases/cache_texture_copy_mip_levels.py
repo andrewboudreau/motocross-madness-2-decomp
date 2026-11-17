@@ -6,7 +6,7 @@ walked down (GetAttachedSurface) to the level no wider than the rect, then each 
 is Blt into the cache surface chain with the rect halved per level, counting texels in
 the owner group. Any Blt or first-walk failure returns 0; otherwise the whole rect is
 uploaded (slot 9) when the display's partial upload result is positive, else +0x188 is
-set. The linked body is samples/render/CacheTextureNearMisses.cpp.
+set. The linked body is src/reconstructed/CacheTexture.cpp.
 
 Modelled: the occupant's UpdatePageCoords (0x00510610), the surfaces' COM
 GetAttachedSurface (+0x30: the next level, DDERR_NOTFOUND past a chain's 1-pixel
@@ -23,7 +23,7 @@ import struct
 
 RETAIL_VA = 0x005102d0
 SYMBOL = '?CopyMipLevels@CacheTexture@@'
-SOURCE = 'samples/render/CacheTextureNearMisses.cpp'
+SOURCE = 'src/reconstructed/CacheTexture.cpp'
 UPDATE_PAGE_COORDS = 0x00510610
 TRACK_GAME = 0x0056e26c
 PROBES = {0x005103d3: 'walked down', 0x0051040a: 'blitted', 0x005104a3: 'next level',

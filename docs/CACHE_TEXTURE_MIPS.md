@@ -1,9 +1,11 @@
 # CacheTexture mip copying
 
-`samples/render/CacheTextureNearMisses.cpp` contains the complete readable
-`CacheTexture::CopyMipLevels` candidate. The existing standalone file and its
-bindings are unchanged. It remains nonexact in `samples/`; no original
-translation-unit ownership is established by this grouping.
+`CacheTexture::CopyMipLevels` is in
+[CacheTexture.cpp](../src/reconstructed/CacheTexture.cpp) after `RemoveTexture`
+`0x005102b0`, in retail order, with a `// Not exact` status comment.
+CacheTexture.cpp holds part of the retail `TextureCache.cpp` unit
+([ORIGINAL_UNITS.md](ORIGINAL_UNITS.md)). The behaviour test links a
+validation unit holding only this definition.
 
 ## Identity, extent and dependencies
 
@@ -116,14 +118,6 @@ asserted safe for real DirectDraw surfaces.
 
 ## Preservation and reproduction
 
-No candidate extraction or production source edit was needed.
-`work/cache-mips27/check_source.py` independently compiles the candidate from
-baseline `eb470e531e943af060ddd08ec40b9ea5accdf505` and the current file.
-`source-preservation.json` records the source unchanged after line-ending
-normalization, and the complete function plus all three nondebug sections
-identical in bytes, flags, sizes and relocation targets/addends. There is
-no filename-storage exception and no initializer to exclude.
-
 ```powershell
 $env:PYTHONPATH = '.'
 $env:VC6_ROOT = (Resolve-Path work/vc6sp3-disc).Path
@@ -131,10 +125,81 @@ $env:MCM2_EXE = (Resolve-Path work/game/mcm2.exe).Path
 python -m unittest discover -s tests -p test_cache_texture_mips_behavior.py -v
 ```
 
-The candidate is explicitly admitted as `reviewed-nonexact` in
-`config/game_build.json`. The isolated source link in `build-8ezxtlff` compiles
-216/216 translation units and reduces unresolved names from 378 to 377:
-CopyMipLevels disappears and no new missing name appears. All pre-existing
-production objects remain unchanged under the separately reviewed collision
-and gearbox connections. This link result remains a failure; startup, menus
-and racing are unverified.
+The game build links this body from CacheTexture.cpp. Startup, menus and
+racing with it are covered only by the per-function checks above.
+
+## Forms tried
+
+CacheTexture::CopyMipLevels (0x005102d0, 558 bytes; ours 569): blits the
+occupant's mip levels into its region. Retail places the shared `return 0`
+block between the second loop and the overlay check (its loop ends
+`jle; jmp top`). Both failures as one early-failure test after the loops
+(the Blt result kept in `result` and `break`, then `if (result) return 0;`
+in place of the else arm) gives that block order: 16 -> 5 differing
+instructions (s14). Left: VC6 keeps `result` in a frame slot and tests
+it again at the loop's normal exit, where retail jumps straight to the
+overlay check. Unchanged at 5: `(result = Blt) != 0`, `int result`,
+`!= 0`. Worse: a separate Blt variable (16-17), `!result` in the loop
+condition (38-57), the early test without the Blt in `result` (16), the
+first loop returning directly (18). The tries below were made on the
+earlier form with the Blt `return 0` in the loop (16 diffs). The
+halvings are written sourceSide, side, levelWidth, left, right, top,
+bottom (the best of all 5040 orders, 450 -> 462 of 558, which matches
+retail's loads).
+Tried (s14, 450 at the old shift order): the Blt failure as `break`
+(the else's `return 0` still goes last), the else without braces,
+`goto failed` with `failed:` placed right after the loop and the
+overlay check behind `upload:` (450-454), `if (sourceSide > 0)` around
+a do/while or a bottom-tested for(;;) (293), a top-tested `for (;;)`
+and a trailing `continue` (450). With `if (result) { return 0; } else`
+VC6 keeps the `return 0` in place, so it is not always moved to the end.
+Tried (s10, all unchanged at 450/558 or worse): the Blt failure as an
+else arm or a goto into the else, `for (;;)`-style and for-increment
+loops, the inner break as an if/else, the first loop returning 0
+directly, an early `if (result) return 0;` (397), a do/while (293),
+the Blt result stored and tested after the loop (338) and `goto failed`
+to a label at the end or in an `if (result)` block (450-454). This is the
+known `jle exit; jmp top` loop-bottom shape that VC6 has not reproduced.
+Also 462 (s14, current order): the Blt `return 0` braced, with and
+without an unbraced else, the Blt result in a named local, and `!= 0`.
+Also 462 at the current order (s14 corpus pass): `goto failed` with
+`failed: return 0;` after the loop and the overlay check behind
+`upload:`, `failed:` inside the else arm, and the Blt `return 0` as an
+if arm with the rest of the body in its else. `if (result) { return 0;
+}` ahead of the loop (braced or not) gives 545 bytes. In the exact
+loop-bottom examples (docs/VC6_PATTERN_CORPUS.md) the early return is
+the body's last test; here it is the first.
+s20 (409/462 strict, both worse than the current form): `if (result) return 0;`
+between the loops with the Blt failure as an in-loop `return 0` (545 bytes,
+the return block lands after the first loop); a trailing `continue` or
+`return 0` at the loop-body end (same); and the whole second loop plus the
+upload inside `if (result == 0) { ... return 1; } return 0;` (462).
+s21 (all 466/558 strict, 9 differing instructions; VC6 moves the shared
+`return 0` to the end and keeps a plain `jg top` latch): `if (result)
+goto failed;` after the first loop (unbraced, braced, `!= 0`) with the
+second loop as `while` and `failed: return 0;` in its Blt arm or `if
+(Blt) goto failed;`; a `for (;;) { if (sourceSide <= 0) break; ... }`
+with the label in the Blt arm; tails with no extra code, `if (0) {
+failed: return 0; }`, or `goto upload; failed: return 0; upload:`. More
+matching bytes than the kept form but more differing instructions.
+s22. Retail's shape: the first loop's failure and the test after it both
+jump to one `return 0` block placed right after the second loop, whose
+latch is `jle upload; jmp top` with no `result` store or test, and the
+second loop's GetAttachedSurface failures go to the upload. Tried:
+- a constant failure flag (`if (Blt) { result = 1; break; }` or an `ok`
+  flag, then `if (result) return 0;`) in a `while`: 466, 9 instructions.
+  VC6 threads the flag away (no store, no test) but puts the `return 0`
+  after the upload arm's `ret` and keeps `jg top`.
+- `if (!result) { while { if (Blt) goto failed; ... } } else { failed:
+  return 0; }`, and the body as `if (!Blt) { ...; continue; } return 0;`:
+  462, 9 instructions.
+- `if (sourceSide > 0) do { ... } while (sourceSide > 0);` with the Blt
+  failure as `return 0`, as `result = Blt; if (result) return 0;`, as an
+  if/else body, with the constant flag, as a bottom-tested `for (;;)`,
+  or with `sourceResult`/`destinationResult` zeroed at the loop top:
+  294/586 (the loop head is copied to the back edge); with the first
+  loop's `if (result) return 0;` ahead of it 250/590; zeroed locals plus
+  `result = Blt; break` 277/614.
+k-scan (s22): compiled behind 0..63 prepended typedefs, 0x005102d0 has the
+same code at every count, so its difference is not a declaration-count
+effect (docs/VC6_OPERAND_ORDER.md section 2).

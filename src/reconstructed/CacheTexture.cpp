@@ -301,3 +301,67 @@ int CacheTexture::PlaceTexture(ManagedTexture* texture, CacheTextureRegion* regi
 void CacheTexture::RemoveTexture(ManagedTexture* texture) {
     ReleaseRegion(texture->region, 1);
 }
+
+// 0x005102d0: blits the occupant's mip levels into its region, then uploads
+// the page or marks it dirty.
+// Not exact (337 of 558 bytes, 569 compiled: retail places the shared
+// `return 0` block right after the second loop, whose latch is `jle; jmp top`;
+// VC6 keeps `result` in a frame slot and retests it at the loop exit;
+// docs/CACHE_TEXTURE_MIPS.md lists the forms tried).
+int CacheTexture::CopyMipLevels(CacheTextureRegion* region, int level) {
+    region->occupant->UpdatePageCoords(level);
+    float scale = 1.0f / (1 << level);
+    int width = textureWidth;
+    Win32Rect rect;
+    rect.left = (long)(width * region->left);
+    rect.top = (long)(textureHeight * region->top);
+    rect.right = (long)(((region->right - region->left) * scale + region->left) * width);
+    rect.bottom = (long)(((region->bottom - region->top) * scale + region->top) * textureHeight);
+    int side = rect.right - rect.left;
+    int levelWidth = width;
+    Win32Rect whole = rect;
+    DirectDrawSurface* source = region->occupant->systemSurface;
+    DirectDrawSurface* destination = systemSurface;
+    DirectDrawSurface* nextSource = 0;
+    DirectDrawSurface* nextDestination = 0;
+    int sourceSide = region->occupant->textureWidth;
+    DDSCaps2 caps;
+    memset(&caps, 0, sizeof(caps));
+    caps.caps = 0x401000;   // DDSCAPS bits; reference_diff reads them as ??0AgeManager (false positive)
+    long result = 0;
+    while (sourceSide > side) {
+        result = source->GetAttachedSurface(&caps, &nextSource);
+        if (result)
+            break;
+        source = nextSource;
+        sourceSide >>= 1;
+    }
+    if (!result) {
+        while (sourceSide > 0) {
+            result = destination->Blt(&rect, source, 0, 0x1000000, 0);
+            if (result)
+                break;
+            ownerGroup->texelsBlitted += (rect.bottom - rect.top) * (rect.right - rect.left);
+            long sourceResult = source->GetAttachedSurface(&caps, &nextSource);
+            long destinationResult = destination->GetAttachedSurface(&caps, &nextDestination);
+            if (sourceResult || destinationResult)
+                break;
+            source = nextSource;
+            destination = nextDestination;
+            sourceSide >>= 1;
+            side >>= 1;
+            levelWidth >>= 1;
+            rect.left >>= 1;
+            rect.right >>= 1;
+            rect.top >>= 1;
+            rect.bottom >>= 1;
+        }
+    }
+    if (result)
+        return 0;
+    if (g_TrackGame->display->partialTextureUploadResult > 0)
+        Upload(&whole, -1);
+    else
+        field_0x188 = 1;
+    return 1;
+}

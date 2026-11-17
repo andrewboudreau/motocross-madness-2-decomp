@@ -241,12 +241,6 @@
       "evidence": "docs/FOLLOWED_RACER_PICKER.md#functional-build-review"
     },
     {
-      "path": "samples/render/CacheTextureNearMisses.cpp",
-      "status": "reviewed-nonexact",
-      "reason": "Complete CopyMipLevels passes 5674 native state, rectangle, attachment, callback, floating-point and failure scenarios with the real strict coordinate helper and VC6 CRT conversion. The unchanged 569-byte candidate has 337 matching positions against 558 retail bytes. COM and Upload boundaries are scripted, with at most twelve successful attachments; actual pixel copying, DirectDraw ownership and integrated rendering remain untested.",
-      "evidence": "docs/CACHE_TEXTURE_MIPS.md#functional-build-review"
-    },
-    {
       "path": "samples/render/TextureClone.cpp",
       "status": "reviewed-nonexact",
       "reason": "Complete texture cloning and both allocation cleanup states pass 135464 native state, argument, color-key, callback, failure and unwind scenarios. VC6 emits 590 bytes against the full 600-byte retail body with 333 matching positions. The actual strict pixel-size helper executes; allocation, constructors, registration, surfaces, creation and deletion are scripted. Existing constructor/destructor/deleting-wrapper providers are separately strict; integrated texture lifecycle and rendering remain untested.",
@@ -376,12 +370,6 @@
       "path": "samples/render/PixtransNearMisses.cpp",
       "status": "reviewed-nonexact",
       "reason": "Near-miss body admitted so the source build can link and run; defines DitherConvert, Halve1555, Halve8, Halve8888. Halve8888 and Halve1555 pass the native retail differential test (tests/test_pixtrans_halve_behavior.py) and the emu_diff cases halve8888/halve1555; DitherConvert agrees with retail in the dither_convert emu_diff case; Halve8 is checked against the retail disassembly only; bytes nonexact. Differential review against retail (tools/emu_diff.py, re-run 2026-11-16): halve8888 0x4cdf10 0 of 60 runs differ; halve1555 0x4ce420 0 of 60 runs differ; halve8 0x4cee30 0 of 100 runs differ; dither_convert 0x4cf2a0 0 of 60 runs differ. Bytes nonexact.",
-      "evidence": "docs/GAME_BUILD.md#best-guess-review"
-    },
-    {
-      "path": "samples/track/TrackNearMisses.cpp",
-      "status": "reviewed-nonexact",
-      "reason": "Near-miss body admitted so the source build can link and run; defines Track::PlaceNear. Differential review against retail (tools/emu_diff.py, re-run 2026-11-16): track_place_near 0x517340 0 of 400 runs differ. Bytes nonexact.",
       "evidence": "docs/GAME_BUILD.md#best-guess-review"
     },
     {

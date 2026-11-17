@@ -11,6 +11,7 @@ from mcm2tool.coff import CoffObject
 from mcm2tool.pe import PEImage
 from mcm2tool.toolchain import find_child_ci, find_vc6_bin, infer_vc98_root, sha256_file
 from tools.match import compare
+from tools.unit_source import standalone_source
 ROOT = Path(__file__).resolve().parents[1]
 SYMBOL = '?CopyMipLevels@CacheTexture@@QAEHPAUCacheTextureRegion@@H@Z'
 DIRECT = {0x5102e9: 0x510610, 0x510315: 0x534a88, 0x51032a: 0x534a88,
@@ -77,14 +78,18 @@ class CacheTextureMipsBehaviorTests(unittest.TestCase):
                 self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
                 return obj, CoffObject(obj)
 
-            candidate_path, candidate = compile_source(ROOT / 'samples/render/CacheTextureNearMisses.cpp', 'candidate')
+            # The body lives in CacheTexture.cpp; link a validation unit holding only it.
+            unit = output / 'CacheTexture.cpp'
+            unit.write_text(standalone_source(ROOT / 'src/reconstructed/CacheTexture.cpp', ['CacheTexture::CopyMipLevels']),
+                            encoding='latin-1')
+            candidate_path, candidate = compile_source(unit, 'candidate')
             fixture_path, _ = compile_source(ROOT / 'tests/fixtures/cache_texture_mips_compare.cpp', 'fixture', True)
             self.assertEqual(candidate.find_symbol(SYMBOL).function_size, 569)
             self.assertEqual({s.name for s in candidate.symbols if s.storage_class == 2 and s.section_number > 0 and s.type == 0x20}, {SYMBOL})
             self.assertEqual({s.name for s in candidate.symbols if s.storage_class == 2 and s.section_number == 0},
                 {'?UpdatePageCoords@ManagedTexture@@QAEXH@Z', '?g_TrackGame@@3PAVTrackGame@@A', '__ftol', '__fltused'})
             self.assertFalse(any(s.name.startswith(('.CRT', '.text$x', '.xdata')) for s in candidate.sections))
-            report = compare(image, candidate, SYMBOL, 0x5102d0, 558, ROOT / 'samples/render/CacheTextureNearMisses.bindings.json')
+            report = compare(image, candidate, SYMBOL, 0x5102d0, 558, ROOT / 'src/reconstructed/CacheTexture.bindings.json')
             self.assertFalse(report['strict_exact'])
             self.assertEqual(report['strict_match']['matching_positions'], 337)
             # The complete canonical helper body is compiled on an empty

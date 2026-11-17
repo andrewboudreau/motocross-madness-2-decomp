@@ -64,10 +64,11 @@ relocation bound:
 | `0x00518640` | 67 | formats whole seconds as `mm:ss` |
 | `0x00518690` | 134 | formats a lap time, or `--:--.--` when unset |
 
-Near miss: the segment direction `0x00518130` (246/250 bytes,
-`samples/track/TrackNearMisses.cpp`). Retail keeps the inverse length on the
-x87 stack until a final `fstp st(0)`; VC6 here consumes it in the last
-multiply.
+Not exact, in Track.cpp in retail order: `PlaceNear` `0x00517340` (1509
+bytes, 1533 compiled). The walk, strip test, candidate list and acceptance
+tests follow retail, but VC6 gives the candidate list a frame slot and other
+registers in the path loop (forms tried below). Its emulation case
+`track_place_near` runs 0 mismatches.
 
 Exact: the path search `0x005179f0` (929 bytes). Where the walk reaches b's
 node, retail loads `fromStart` before `length`; that order needs an early
@@ -190,3 +191,34 @@ python tools/run_calibration.py --compiler vc6 --profile vc6_o2_mt \
 
 The `# Track.cpp` block at the end of `CASES` in `tools/run_calibration.py`
 lists the Track cases.
+
+## Forms tried
+
+Track::PlaceNear (0x00517340, 1509 bytes; the candidate is
+1533): the walk, the strip test, the candidate list and the acceptance
+tests follow retail instruction for instruction, but VC6 here gives the
+candidate list a frame slot (0x24 bytes of locals against retail's 0x20)
+and assigns the path loop's pointer, node and segment to edi/esi/ebx
+with start.t in ebp, where retail uses ebx/esi/edi and reloads start.t
+from the frame. A do-while walk, separate or shared loop variables, an
+aggregate TrackPos, function-scope distances and an inline accept helper
+do not change it. The fifth parameter is the work list (RaceStatus.cpp's
+binding declares it int). Retail's entry stores give the slots: list
+(+0x18 above the saved registers, immediate 0), found (+0x1c, from the
+ebp zero, so candidates = 0 shares the zero web) and this (+0x20);
+candidates lives in ebp for the whole function with no home. Here
+candidates gets ebp in the strip loop, a slot at +0x20 and is reloaded
+around the path loop, where ebp holds start.t. Dropping the dead
+`list = 0` removes its store (1525 bytes) but retail has it.
+This is the linked body (KbRaceSub::PlaceNear forwards to it). The
+differential run (tools/emu_cases/track_place_near.py) found one behaviour
+difference, now fixed: the path loop's second DistanceAlong took
+(candidate, start), where retail passes (start, from). The candidate failed
+44 of 600 runs before the fix and 0 of 600 after it. The remaining
+differences are frame size, register choice, load scheduling and where the
+out-of-memory FreeWorkList exit sits (inside the walk loop here, after it in
+retail).
+
+k-scan (s22): compiled behind 0..63 prepended typedefs, 0x00517340 has the
+same code at every count, so its difference is not a declaration-count
+effect (docs/VC6_OPERAND_ORDER.md section 2).

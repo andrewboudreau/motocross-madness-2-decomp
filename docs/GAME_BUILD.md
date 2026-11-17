@@ -677,7 +677,7 @@ per-function checks on random and edge inputs.
 | `PixtransNearMisses.cpp` | `dither_convert` | 0x4cf2a0 | 60 |
 | `Tgafile.cpp` | `tga_write` | 0x512990 | 200 |
 | `DropTextOverlaySetup.cpp` | `drop_text_setup` | 0x51af00 | 800 |
-| `TrackNearMisses.cpp` | `track_place_near` | 0x517340 | 400 |
+| `Track.cpp` | `track_place_near` | 0x517340 | 400 |
 
 ## Collision and contact near-miss bodies
 
@@ -1300,7 +1300,7 @@ run as retail code; only calls with side effects outside the function
 | 0x0040a520 | `Bike::IntegrateSteerTorque` (steer torque) | 600 | 140 of 600 | both left-bar arms stored the subtraction into `torque` and dotted it, where retail stores `offset` and dots `base` | 0.989 |
 | 0x00436720 | `CollisionObject::HullVsHull` | 600 | 29 of 600 (24-bit) | second contact-normal rotation grouped `(y + z) + x` in place as retail | 0.978 |
 | 0x00427c10 | `SegmentTriangleQuery` (sample) | 800 | 32 of 800 | end point's y row grouped `(y + z) + x` (`TransformPointYZX`) | 0.955 |
-| 0x00517340 | `Track::PlaceNear` (sample, via `KbRaceSub::PlaceNear`) | 600 | 44 of 600 | path loop's second `DistanceAlong` took (candidate, start); retail passes (start, from) | 0.842 (0.868 before) |
+| 0x00517340 | `Track::PlaceNear` (Track.cpp, via `KbRaceSub::PlaceNear`) | 600 | 44 of 600 | path loop's second `DistanceAlong` took (candidate, start); retail passes (start, from) | 0.842 (0.868 before) |
 | 0x00491d10 | `KrustyBike::FindPlacement` | 600 | 112 of 600 | stored-vector path returned the pointer; retail leaves the bits of `outPosition->z` in eax | 0.947 |
 | 0x00414370 | `KrustyBike::UpdateAIRacingLine` (AI racing line) | 1000 | 114 of 1000 | outside free roam retail reads the trick delay from the difficulty's frame slot (an uninitialised local that VC6 gives that slot). Later source shapes, 0 of 1000 at both control words after each: `for (t = T0, i = 0; t <= T1; t += 0.1f)` point loops with a leading count break, the finished bike's off-track exit as an else that frees the list and returns, and the kinds 1/5 count stores through an `&aiPath` pointer (aligned 1092 -> 1188 of 1302) | 0.899 -> 0.951 (strict 0.805 -> 0.921) |
 | 0x0048eea0 | `KrustyBike::UpdateRiderPose` | 1500 | 28 of 1500 | retail indexes the 16-entry `s_kbTrickFrame` (0x0056d060) with chained tricks (16..31) too and reads the next 16 words of `.data`; the bring-up copy now has 32 entries holding those words ([below](#chained-trick-frame-overread)) | 0.955 |

@@ -608,6 +608,137 @@ int Track::NodeHasSegment(TrackSegment* segment, TrackNode* node)
     return 0;
 }
 
+// 0x00517340: places a position near p, `distance` along the track from
+// `from` and within `range`, on the strip or on the work list's path.
+// Not exact (1509 bytes, 1533 compiled: VC6 gives the candidate list a frame
+// slot and other registers in the path loop; behaviour matches, see
+// tools/emu_cases/track_place_near.py; docs/TRACK.md lists the forms tried).
+int Track::PlaceNear(Vector3 p, TrackPos from, float distance, float range, int path, TrackPos* out)
+{
+    float best;
+    float t;
+    TrackListItem* list = 0;
+    int found = 0;
+    TrackCandidate* candidates = 0;
+    TrackListItem* item = (TrackListItem*)DebugCalloc(1, sizeof(TrackListItem), __FILE__, 843);
+    if (!item)
+        return 0;
+    if (out) {
+        *out = from;
+        best = -range;
+    }
+    item->node = startNode;
+    list = item;
+    do {
+        TrackNode* node = list->node;
+        if (node->flags & 4) {
+            node->flags &= ~4;
+            item = list;
+            list = list->next;
+            DebugFree(item, __FILE__, 865);
+        } else {
+            node->flags |= 4;
+            TrackSegment* next;
+            for (TrackSegment* segment = list->node->firstSegment; segment && (next = segment->next) != 0;
+                 segment = segment->next) {
+                if (IsInsideStrip(*(TrackVec3*)&p, segment, next)) {
+                    float ex = next->pointX - segment->pointX;
+                    float ez = next->pointZ - segment->pointZ;
+                    if (ex == 0.0f && ez == 0.0f) {
+                        t = 0.0f;
+                    } else {
+                        t = ((p.x - segment->pointX) * ex + (p.z - segment->pointZ) * ez) / (ez * ez + ex * ex);
+                        if (t > 1.0f)
+                            t = 1.0f;
+                        else if (t < 0.0f)
+                            t = 0.0f;
+                    }
+                    TrackCandidate* candidate = (TrackCandidate*)DebugCalloc(1, sizeof(TrackCandidate), __FILE__, 889);
+                    if (!candidate)
+                        return 0;
+                    candidate->next = candidates;
+                    candidate->pos.node = list->node;
+                    candidate->pos.segment = segment;
+                    candidate->pos.t = t;
+                    candidates = candidate;
+                }
+            }
+            int count = list->node->linkCount;
+            TrackNode** links = list->node->links;
+            for (int i = 0; i < count; i++) {
+                if (!(links[i]->flags & 4)) {
+                    item = (TrackListItem*)DebugCalloc(1, sizeof(TrackListItem), __FILE__, 907);
+                    if (!item) {
+                        FreeWorkList(&list, 0);
+                        return 0;
+                    }
+                    item->node = links[i];
+                    item->next = list;
+                    list = item;
+                }
+            }
+        }
+    } while (list);
+    while (candidates) {
+        if (distance < 0.0f || range < 0.0f) {
+            if (!found && out)
+                *out = candidates->pos;
+            found = 1;
+        }
+        if (!found || out) {
+            float ahead = DistanceAlong(from, candidates->pos);
+            float behind = DistanceAlong(candidates->pos, from);
+            if (ahead >= 0.0f && ahead <= distance || behind >= 0.0f && behind <= range) {
+                found = 1;
+                if (out && (ahead > best || -behind > best)) {
+                    *out = candidates->pos;
+                    if (ahead > best)
+                        best = ahead;
+                    else
+                        best = -behind;
+                }
+            }
+            for (TrackListItem* step = (TrackListItem*)path; !found && step; step = step->next) {
+                TrackPos start;
+                start.node = step->node;
+                start.segment = start.node->firstSegment;
+                start.t = 0.0f;
+                // Retail measures the second distance from the path node to `from`
+                // (0x00517737..0x0051776b: arguments start, from), not back from the
+                // candidate; the tests below then compare the two distances from start.
+                ahead = DistanceAlong(start, candidates->pos);
+                behind = DistanceAlong(start, from);
+                if (NodeHasSegment(candidates->pos.segment, step->node)
+                    && (!NodeHasSegment(from.segment, step->node)
+                        || ahead >= 0.0f && behind >= 0.0f && ahead < behind)) {
+                    found = 1;
+                    if (out && (ahead > best || -behind > best)) {
+                        *out = candidates->pos;
+                        if (ahead > best)
+                            best = ahead;
+                        else
+                            best = -behind;
+                    }
+                }
+                if (ahead >= 0.0f && ahead <= distance || behind >= 0.0f && behind <= range) {
+                    found = 1;
+                    if (out && (ahead > best || -behind > best)) {
+                        *out = candidates->pos;
+                        if (ahead > best)
+                            best = ahead;
+                        else
+                            best = -behind;
+                    }
+                }
+            }
+        }
+        TrackCandidate* done = candidates;
+        candidates = candidates->next;
+        DebugFree(done, __FILE__, 994);
+    }
+    return found;
+}
+
 // 0x00517930: frees a work list; its nodes too unless they came from the
 // file (bit 0), or all of them when `all` is set.
 int Track::FreeWorkList(TrackListItem** list, int all)
