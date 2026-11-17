@@ -1,6 +1,6 @@
 """ReceiveMessages 0x004af8e0, the DirectPlay receive loop (tools/emu_diff.py case).
 
-Linked from samples/net/NetThreadNearMisses.cpp. g_TrackGame (0x0056e26c) +8 is the network
+Linked from src/reconstructed/NetThread.cpp. g_TrackGame (0x0056e26c) +8 is the network
 interface (null in some runs), its +4 the IDirectPlay4A (null in some runs) and +0x48 the
 critical section. The receive buffer and its size are retail's statics 0x006886d8 and
 0x006886dc (bound), seeded with a buffer or null and a random size.
@@ -21,13 +21,13 @@ import struct
 
 RETAIL_VA = 0x004af8e0
 SYMBOL = '?ReceiveMessages@@YAJI@Z'
-SOURCE = 'samples/net/NetThreadNearMisses.cpp'
+SOURCE = 'src/reconstructed/NetThread.cpp'
 TRACK_GAME = 0x0056e26c
 RECEIVE_BUFFER, RECEIVE_SIZE = 0x006886d8, 0x006886dc
 ENTER_CS_IAT, LEAVE_CS_IAT = 0x0055025c, 0x00550284
 BINDINGS = {
     '_s_ReceiveBuffer': RECEIVE_BUFFER,
-    '_g_UnknownGlobal6886dc': RECEIVE_SIZE,
+    '_s_ReceiveBufferSize': RECEIVE_SIZE,
     '?HandleReceivedMessage@@YAXPAEIHHI@Z': 0x004afa90,
 }
 PROBES = {0x004af93b: 'invalid interface', 0x004af99b: 'free old buffer',

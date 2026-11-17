@@ -8,6 +8,7 @@
 
 #include "TrackGame.h"
 #include "Net.h"
+#include "DirectPlayMessages.h"
 
 #define NET_LOCK(cs) ((CRITICAL_SECTION*)&(cs))
 
@@ -1181,6 +1182,77 @@ int NetworkInterface::Update(int value)
     }
     LeaveCriticalSection(NET_LOCK(lock));
     return 1;
+}
+
+// Ring slot at a byte offset into the received-message array. Addressing the
+// slot as messages + offset (offset = index * sizeof) gives retail's
+// [eax+edi+4] SIB order; messages[index] gives [edi+eax+4].
+static inline NetMessage& MessageAt(NetMessage* messages, int offset)
+{
+    return *(NetMessage*)((char*)messages + offset);
+}
+
+// 0x004aced0: dispatches the received messages in ring order.
+// Not exact (361 of 370 bytes: in the system-message block retail loads the
+// sender before forming the message pointer with `lea`, VC6 forms it first;
+// docs/NET.md lists the forms tried).
+void NetworkInterface::DispatchMessages(int value)
+{
+    char name[16];
+    char systemName[16];
+    int index;
+    int last;
+    int more;
+
+    ResendPending(value);
+    if (nextMessage || wrappedMessages) {
+        if (!wrappedMessages) {
+            index = 0;
+            last = nextMessage - 1;
+        } else {
+            index = nextMessage;
+            last = nextMessage - 1;
+            if (last < 0)
+                last = 0xff;
+        }
+        do {
+            more = index != last;
+            int offset = index * sizeof(NetMessage);
+            if (MessageAt(messages, offset).from && !FindPlayer(MessageAt(messages, offset).from) &&
+                GetPlayerName(MessageAt(messages, offset).from, name))
+                AddPlayer(MessageAt(messages, offset).from, name);
+            if (MessageAt(messages, offset).type == 0x40) {
+                AcknowledgeMessage(*(short*)(MessageAt(messages, offset).data + 2));
+            } else {
+                g_TrackGame->OnNetworkMessage(
+                    MessageAt(messages, offset).type, MessageAt(messages, offset).data,
+                    MessageAt(messages, offset).from, MessageAt(messages, offset).to,
+                    MessageAt(messages, offset).flags);
+                NetMessage* message = &messages[index];
+                if (!message->from) {
+                    // DirectPlay system message: type, player type, player id.
+                    int* system = (int*)message->data;
+                    switch (message->type) {
+                    case DPSYS_CREATEPLAYERORGROUP:
+                        if (system[2] && system[1] == 1) {
+                            GetPlayerName(system[2], systemName);
+                            AddPlayer(system[2], systemName);
+                        }
+                        break;
+                    case DPSYS_DESTROYPLAYERORGROUP:
+                        RemovePlayer(system[2]);
+                        break;
+                    }
+                }
+            }
+            MessageAt(messages, offset).type = 0;
+            if (++index >= 0x100)
+                index = 0;
+        } while (more);
+        nextMessage = 0;
+        wrappedMessages = 0;
+    }
+    ringFull = 0;
 }
 
 // 0x004ad050 (slot 0): sends the held messages to the group.

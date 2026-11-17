@@ -1,9 +1,8 @@
 // NetThread.cpp -- reconstruction of D:\aardvark\VC\krusty2\NetThread.cpp
 // (0x004af680..0x004aff73). See NetThread.h, Net.h and docs/NET.md.
-// The receive loop 0x004af8e0 is a near miss in
-// samples/net/NetThreadNearMisses.cpp.
 
 #include <windows.h>
+#include <stdio.h>
 #include <string.h>
 #include <process.h>
 
@@ -13,16 +12,19 @@
 #include "DirectPlayMessages.h"
 
 #define NET_LOCK(cs) ((CRITICAL_SECTION*)&(cs))
+#define NET_DPERR_BUFFERTOOSMALL 0x8877001e
+#define NET_E_INVALIDARG         0x80070057
 
 // cdecl 0x004ad5a0 (Net.cpp): reports a DirectPlay error with its source position.
 void ReportDirectPlayError(long result, const char* file, int line);
 
 // File statics (tier 2: 0x006886d0..0x006886e4 are referenced only from
-// 0x004af680..0x004aff73); 0x006886dc (the buffer's size) is used only by the
-// near miss in samples/net/NetThreadNearMisses.cpp.
+// 0x004af680..0x004aff73); 0x006886dc (the buffer's size) is used only by
+// ReceiveMessages.
 static unsigned int s_LastKeepAliveTime;              // time of the previous keep-alive pass
 static unsigned int s_KeepAliveTime;              // time of the current pass
 static unsigned char* s_ReceiveBuffer;            // receive buffer
+static unsigned int s_ReceiveBufferSize;          // its size
 static int s_DuplicateToggle;                       // duplicate toggle
 static int g_UnknownGlobal6886e4;                       // duplicate filter enabled (never written)
 
@@ -98,6 +100,55 @@ done:
     }
     LeaveCriticalSection(NET_LOCK(net->lock));
     _endthreadex(0);
+    return 0;
+}
+
+// 0x004af8e0: drains DirectPlay's receive queue into HandleReceivedMessage,
+// growing the receive buffer when a message does not fit.
+// Not exact (274 of 338 bytes, 339 compiled: retail reloads the buffer at the
+// loop head and the reallocation jumps past that load; VC6 loads it before
+// the loop and after the dispatch; docs/NETTHREAD.md lists the forms tried).
+long ReceiveMessages(unsigned int time)
+{
+    char text[256];
+    EnterCriticalSection(NET_LOCK(g_TrackGame->network->lock));
+    if (!g_TrackGame->network) {
+        sprintf(text, "LpGame->LpNetworkInterface invalid = 0x%x \n",
+                g_TrackGame->network);
+        LeaveCriticalSection(NET_LOCK(g_TrackGame->network->lock));
+        return NET_E_INVALIDARG;
+    }
+    if (!g_TrackGame->network->directPlay) {
+        sprintf(text, "LpDirectPlayX invalid = 0x%x\n",
+                g_TrackGame->network->directPlay);
+        LeaveCriticalSection(NET_LOCK(g_TrackGame->network->lock));
+        return NET_E_INVALIDARG;
+    }
+    unsigned long size = s_ReceiveBufferSize;
+    unsigned char* buffer = s_ReceiveBuffer;
+    for (;;) {
+        unsigned long from = 0;
+        unsigned long to = 0;
+        long result = g_TrackGame->network->directPlay->Receive(
+            &from, &to, 1 /* DPRECEIVE_ALL */, buffer, &size);
+        if (result == NET_DPERR_BUFFERTOOSMALL) {
+            if (s_ReceiveBuffer)
+                DebugFree(s_ReceiveBuffer, __FILE__, 221);
+            s_ReceiveBufferSize = 0;
+            buffer = (unsigned char*)DebugMalloc(size, __FILE__, 223);
+            s_ReceiveBuffer = buffer;
+            if (!buffer)
+                break;
+            s_ReceiveBufferSize = size;
+        } else {
+            if (result < 0)
+                break;
+            if (size >= 4)
+                HandleReceivedMessage(s_ReceiveBuffer, size, from, to, time);
+            buffer = s_ReceiveBuffer;
+        }
+    }
+    LeaveCriticalSection(NET_LOCK(g_TrackGame->network->lock));
     return 0;
 }
 

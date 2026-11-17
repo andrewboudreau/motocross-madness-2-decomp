@@ -2,7 +2,7 @@
  * Replacement dplayx.dll for the MCM2 demo executable.
  *
  * Retail imports one DirectPlay function, DirectPlayLobbyCreateA by ordinal
- * 4, which only ConnectUsingLobby calls (samples/net/NetNearMisses.cpp); a
+ * 4, which only ConnectUsingLobby calls (src/reconstructed/Net.cpp); a
  * negative result makes it report an error and give up. On Windows 10/11 the
  * system dplayx.dll is a stub that blocks the process loader on the
  * "install DirectPlay" feature prompt, so this module reports DirectPlay as

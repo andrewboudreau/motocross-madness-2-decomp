@@ -1,6 +1,6 @@
 """NetworkInterface::DispatchMessages 0x004aced0, the received-message ring walk (emu_diff case).
 
-Linked from samples/net/NetNearMisses.cpp. The interface (ECX) holds the ring +0x34 (256
+Linked from src/reconstructed/Net.cpp. The interface (ECX) holds the ring +0x34 (256
 records of 0x8f4 bytes: type +0, from +4, to +8, flags +0x0c, data +0x14; a system message's
 player flag and id at +0x18/+0x1c), the cleared ring-full word +0x38, the wrap flag +0x3c and
 nextMessage +0x40. Runs cover an empty ring, an unwrapped ring and a wrapped ring with the
@@ -19,7 +19,7 @@ import struct
 
 RETAIL_VA = 0x004aced0
 SYMBOL = '?DispatchMessages@NetworkInterface@@QAEXH@Z'
-SOURCE = 'samples/net/NetNearMisses.cpp'
+SOURCE = 'src/reconstructed/Net.cpp'
 TRACK_GAME = 0x0056e26c
 MESSAGE_SIZE = 0x8f4
 PROBES = {0x004ad038: 'empty ring', 0x004acf10: 'wrap to 0xff', 0x004acf74: 'add player',

@@ -1,9 +1,10 @@
 # Net.cpp: the DirectPlay network layer
 
 `src/reconstructed/Net.cpp` reconstructs `D:\aardvark\VC\krusty2\Net.cpp`
-(`0x004aab00`..`0x004ae2e7`). 84 functions match strictly under the default
-VC6 profile and are registered as calibration cases; two near misses
-are in `samples/net/NetNearMisses.cpp`. The RTTI names are `NetworkInterface`,
+(`0x004aab00`..`0x004ae2e7`). 86 functions match strictly under the default
+VC6 profile and are registered as calibration cases; the near miss
+`DispatchMessages` `0x004aced0` is in the file in retail order with a
+`// Not exact` status comment. The RTTI names are `NetworkInterface`,
 `InfoType`, `PlayerInfoType`, `ConnectionInfoType` and `SessionInfoType`. All
 other type, member and function names are provisional.
 
@@ -84,11 +85,11 @@ Function and member names in `Net.h` are provisional (tier 3) unless noted:
   pointers. The WinSock client gained its fields and `0x004ad530`/`0x004ad570`.
 - `EventManager.cpp`: `0x004ac800` now returns `NetPlayer*`.
 
-## Near misses (samples/net/NetNearMisses.cpp)
+## Near miss
 
 | VA | Size | Match | Difference |
 |---|---:|---:|---|
-| `0x004aced0` | 370 | 95.5% | SIB operand order and how field_0x34 is reloaded after the slot-17 call |
+| `0x004aced0` | 370 | 361/370 | the system-message block: retail loads the sender before forming the message pointer with `lea`; VC6 forms it first and swaps ebx and ebp (forms tried below) |
 
 ## Source shapes that mattered
 
@@ -165,3 +166,61 @@ revision, library object or defining translation unit.
 python tools/run_calibration.py --compiler vc6 --profile vc6_o2_mt \
   --vc6-root "$VC6_ROOT" --exe work/game/mcm2.exe --jobs 8
 ```
+
+## Forms tried
+
+NetworkInterface::DispatchMessages (0x004aced0, 370 bytes): 361/370.
+Addressing the slot through a byte offset (MessageAt below) fixes the
+SIB base/index order everywhere (was 355/370 with messages[index]). The
+rest is in the system-message block: retail loads [edx+edi+4] (from) and
+then forms the pointer with `lea ebx,[edx+edi]`; VC6 here forms it first
+(`mov ecx,[esi+0x34]; mov ebx,edi; add ebx,ecx`) and pushes system[2]
+from edx instead of eax. Taking the pointer only inside the `if (!from)`
+(through offset or index) gives retail's load+lea but swaps ebx and ebp
+for the index and the pointer (197/370); local declaration order, name
+buffer order, `last != index`, a split increment, removing the `system`
+local or the `message` pointer, per-case `system` locals and a loop-scope
+pointer declared outside the `if` do not change that swap. Using offset in
+the pointer itself (`&MessageAt(..)` or a cast) outside the `if` gives a
+368-byte form; a reference for the whole loop body is far worse. Sweeps of
+the in-`if` pointer form (144 combinations: pointer and test forms, the
+`system` local, the switch operand, increment forms and the `more` operand
+order) keep the ebx/ebp swap (best 197) and leave the original at 361.
+Also unchanged or worse: `value` reused as `last`, an inverted head test
+(326), a `NetMessage* base` local (83), `++index >= 0x100`, a split
+increment with `== 0x100` (360) and an `== 0xff` reset (318/372).
+Session 15, worse: `last = nextMessage - 1` hoisted above the if/else (16),
+`last` assigned before `index` in both arms (18), `offset` computed before
+`more` (190).
+Session 14: `messages + index`, `&(messages[index])` and `(int*)(..)`
+spellings keep 361. `&MessageAt(messages, offset)` for the pointer with
+`message->from` (or a reference) gives retail's ebx/ebp and the system
+pushes but forms the pointer with `mov; add` (368 bytes, 3 code diffs);
+testing `MessageAt(messages, offset).from` instead gives retail's
+load+lea with the ebx/ebp swap (197), with or without the system local.
+Testing `MessageAt(messages, offset).from` and taking the pointer inside
+the `if` (or using no pointer) is identical to retail once registers are
+masked (0 hunks, 139 aligned): only the ebx/ebp swap is left, so VC6 here
+weights the index above the message web, where retail weights it below.
+Pointer scope, `register`, const, a reference, per-use MessageAt and a
+pointer shared with the 0x40 block do not change the weights.
+Session 21: tools/decl_shift_scan.py on that 197 form (test through
+MessageAt, `&MessageAt(messages, offset)` taken inside the `if`) is 197 at
+every k = 0..63, so the ebx/ebp swap is not the symbol-arena tie-break;
+retail keeps index in ebp and gives ebx to `last`'s loop-top reload, the
+vtable and the message pointer. /ML keeps 361; /G6 gives 72.
+Session 24, on that 197 form (all keep the swap unless noted): a `from`
+local read through MessageAt before the pointer is taken, the pointer taken
+before the test, a `NetMessage&` (232, 368 bytes), an assignment inside the
+test (232), a `NetMessage* base = messages` local (83); the system block
+with or without the `system` local or the pointer (no pointer: 60), an
+`unsigned long*` view; `index++` then the test, a ternary or if/else
+increment (144), `more` after `offset` (190), `last != index` (198) or
+`index - last` (79); all six declaration orders of index/last/more before
+or after the name buffers, `value` reused as `last`, a `next` local,
+`offset` at function scope, `for (;;)` with a break, `while (more != 0)`,
+a `bool more` (76) and `last = index - 1` (57).
+Session 25 for 0x004aced0 (all 361, or the known 232/197 families): six
+spellings of the `from` test times four pointer spellings with data/type
+read through MessageAt (96 forms), 0..7 dead initialised locals and a
+named player local for RemovePlayer.

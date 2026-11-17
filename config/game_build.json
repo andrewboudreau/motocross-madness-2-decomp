@@ -343,18 +343,6 @@
       "evidence": "docs/GAME_BUILD.md#best-guess-review"
     },
     {
-      "path": "samples/net/NetNearMisses.cpp",
-      "status": "reviewed-nonexact",
-      "reason": "Near-miss body admitted so the source build can link and run; defines NetworkInterface::DispatchMessages. Differential review against retail (tools/emu_diff.py, re-run 2026-11-16): net_dispatch_messages 0x4aced0 0 of 120 runs differ. Bytes nonexact.",
-      "evidence": "docs/GAME_BUILD.md#best-guess-review"
-    },
-    {
-      "path": "samples/net/NetThreadNearMisses.cpp",
-      "status": "reviewed-nonexact",
-      "reason": "Near-miss body admitted so the source build can link and run; defines ReceiveMessages. Differential review against retail (tools/emu_diff.py, re-run 2026-11-16): net_receive_messages 0x4af8e0 0 of 200 runs differ. Bytes nonexact.",
-      "evidence": "docs/GAME_BUILD.md#best-guess-review"
-    },
-    {
       "path": "samples/physics/helpers/GraphicsTestNearMisses.cpp",
       "status": "reviewed-nonexact",
       "reason": "Near-miss body admitted so the source build can link and run; defines GraphicsTest::DrawCircle. Differential review against retail (tools/emu_diff.py, re-run 2026-11-16): graphics_test_draw_circle 0x47bd10 0 of 120 runs differ. Bytes nonexact.",

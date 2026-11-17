@@ -643,8 +643,8 @@ per-function checks on random and edge inputs.
 
 | File | Case | Retail | Runs |
 |---|---|---|---:|
-| `NetNearMisses.cpp` | `net_dispatch_messages` | 0x4aced0 | 120 |
-| `NetThreadNearMisses.cpp` | `net_receive_messages` | 0x4af8e0 | 200 |
+| `Net.cpp` | `net_dispatch_messages` | 0x4aced0 | 120 |
+| `NetThread.cpp` | `net_receive_messages` | 0x4af8e0 | 200 |
 | `KrustyBikeTrickPick.cpp` | `krusty_trick_pick` | 0x48d780 | 800 |
 | `BoundingBoxTreeQueryNearMisses.cpp` | `segment_segment_distance` | 0x42a640 | 200 |
 | `BoundingBoxTreeQueryNearMisses.cpp` | `segment_triangle_query` | 0x427c10 | 600 |
