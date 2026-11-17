@@ -170,7 +170,8 @@ class TerrainConnectionsTests(unittest.TestCase):
             for source, symbol, va, size, bindings in dict.fromkeys(cases):
                 self.assertTrue(compare(retail, objects[source], symbol, va, size, bindings)['strict_exact'],
                                 (source, symbol))
-            self.assertEqual(len(dict.fromkeys(cases)), 193)
+            # TrackOverlay.cpp gained CollectRacers and DrawNameTag (95 -> 97 cases).
+            self.assertEqual(len(dict.fromkeys(cases)), 195)
             # Load remains nonexact; keep its complete candidate instruction
             # bytes, while joining only the three evidenced stream calls.
             entry = provider.find_symbol('?Load@Terrain@@')
