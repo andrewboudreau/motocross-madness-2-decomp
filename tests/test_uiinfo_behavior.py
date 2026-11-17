@@ -12,6 +12,7 @@ from mcm2tool.coff import CoffObject
 from mcm2tool.pe import PEImage
 from mcm2tool.toolchain import find_child_ci, find_vc6_bin, infer_vc98_root
 from tools.match import compare
+from tools.unit_source import standalone_source
 
 ROOT = Path(__file__).resolve().parents[1]
 METHODS = {
@@ -73,7 +74,12 @@ class UiInfoBehaviorTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix='mcm2-uiinfo-') as directory:
             output = Path(directory)
             objects = []
-            sources = [('samples/game/UiInfoNearMisses.cpp', 'candidate', []),
+            # Both bodies live in UiInfo.cpp (retail uiinfo.cpp); link a
+            # validation unit holding only them.
+            unit = output / 'uiinfo.cpp'
+            unit.write_text(standalone_source(ROOT / 'src/reconstructed/UiInfo.cpp',
+                ['TrackGameMode::ResetDefaults', 'TrackGameMode::FindDataFile']), encoding='latin-1')
+            sources = [(unit, 'candidate', []),
                        ('tests/fixtures/uiinfo_compare.cpp', 'scripted', []),
                        ('tests/fixtures/uiinfo_compare.cpp', 'native_files', ['/DUIINFO_REAL_FILES'])]
             for source, stem, flags in sources:
@@ -96,7 +102,7 @@ class UiInfoBehaviorTests(unittest.TestCase):
                         self.assertEqual(entry.extent_source, 'coff_function_aux')
                         self.assertEqual(entry.function_size, compiled_size)
                         report = compare(image, compiled, symbol, va, size,
-                                         ROOT / 'samples/game/UiInfoNearMisses.bindings.json')
+                                         ROOT / 'src/reconstructed/UiInfo.bindings.json')
                         self.assertEqual(report['strict_match']['matching_positions'], matching)
             patch_file = output / 'calls.bin'
             patch_file.write_bytes(b''.join(patches))

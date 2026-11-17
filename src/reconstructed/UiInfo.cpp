@@ -2,7 +2,7 @@
 // TrackGameMode's methods. The literal __FILE__ (0x00575780) is used at
 // 0x00522134 (constructor, line 71), 0x00522d2d..0x00522d9f (lines 383-385)
 // and 0x00523e81 (line 873); TypeRegistry.cpp ends at 0x00521f2b and VCR.cpp
-// starts at 0x00524110. Near misses are in samples/game/UiInfoNearMisses.cpp.
+// starts at 0x00524110.
 // The constructor also makes VC6 emit SessionInfoType's inline constructor
 // (0x00523b90), its implicit destructor (0x00523c80, the same bytes as
 // InfoType's) and SessionList's implicit destructor
@@ -132,6 +132,56 @@ TrackGameMode::TrackGameMode() {
 }
 
 #undef UNKNOWN_SET_DIRECTORY
+
+// 0x00522440: restores the default settings.
+// Not exact (383 of 427 bytes: retail schedules the +0x2828 store after
+// `mov edx, 2` and the second rep movsd after the +0x196c store;
+// docs/UIINFO.md lists the forms tried).
+void TrackGameMode::ResetDefaults() {
+    ResetInterfaceOptions((TrackGameInterfaceOptions*)&instrumentOverlayOn);
+    ResetSoundOptions((TrackGameSoundOptions*)&cdAudioOn);
+    ResetGraphicsOptions((TrackGameGraphicsOptions*)&displayModeIndex);
+    g_TrackGame->mode.ChooseDisplayMode(0, &displayModeIndex);
+    ResetControlOptions((TrackGameControlOptions*)responseSliders);
+    ReloadResourceStrings(resourceStrings);
+    ResetGarageOptions((TrackGameGarageOptions*)garageOptions);
+    ResetGarageOptions((TrackGameGarageOptions*)optionsBackup);
+    ResetGarageOptions((TrackGameGarageOptions*)multiplayerGarageOptions);
+    ResetSettingsEntries();
+    raceSettings.gateSeed = 1;
+    raceSettings.races = 2;
+    raceSettings.treeCollision = 1;
+    raceSettings.raceMode = 0;
+    raceSettings.riderCollision = 1;
+    raceSettings.lapCount = 5;
+    raceSettings.timeLimitMinutes = 15.0f;
+    raceSettings.randomGates = 0;
+    raceSettings.gateCount = 30;
+    raceSettings.aiRacerCount = 0;
+    raceSettings.multiplayerAiRacerCount = 0;
+    raceSettings.shortTimeLimit = 0;
+    raceSettings.maxBikeClass = 4;
+    savedCameraState = 0;
+    memcpy(&multiplayerSettings, &raceSettings, sizeof(multiplayerSettings));
+    memcpy(&savedSettings, &raceSettings, sizeof(savedSettings));
+    *(unsigned char*)&bikeUnlockFlags &= ~1;
+    savedCameraDistance = 10.3f;
+    savedCameraPitch = 0.47123885f;
+    savedCameraYaw = 1.0646508f;
+    savedCameraFieldOfView = 85.0f;
+    videoSettings[4] = detailLevel;
+    videoSettings[3] = detailLevel;
+    videoSettings[2] = detailLevel;
+    videoSettings[1] = detailLevel;
+    field_0x1bdc = 0;
+    nameTagShade = 0;
+    saveReplay = 0;
+    plateNumber = 101;
+    for (int i = 0; i < 6; i++)
+        bonusTrackUnlocked[i] = 0;
+    savedDifficulty = 2;
+    difficulty = 2;
+}
 
 // 0x005225f0
 TrackGameMode::~TrackGameMode() {
@@ -529,6 +579,45 @@ int TrackGameMode::WaitForCd() {
     }
     SendMessageA(g_TrackGame->windowHandle, 0x112, 0xf120, 0);
     return 1;
+}
+
+// 0x005238f0 (TrackGame slot 18): finds `name` under the installed data
+// directory, else on the CD.
+// Not exact (190 of 355 bytes, 357 compiled: retail keeps fopen's result in
+// eax until the found block, VC6 gives `file` edx; docs/UIINFO.md lists the
+// forms tried).
+int TrackGameMode::FindDataFile(const char* name, char* path) {
+    char buffer[0x104];
+    int skip;
+    FILE* file;
+
+    strcpy(path, "");
+    skip = strlen(installDirectory);
+    if (!_strnicmp(name, installDirectory, skip)) {
+        skip++;
+    } else {
+        skip = strlen(cdDataDirectory);
+        if (skip && !_strnicmp(name, cdDataDirectory, skip))
+            skip++;
+        else
+            skip = 0;
+    }
+    sprintf(buffer, "%s\\%s", installDirectory, name + skip);
+    file = fopen(buffer, "r");
+    if (!file) {
+        if (installType == 2)
+            return 0;
+        if (!FindCdDirectory() && !WaitForCd())
+            return 0;
+        sprintf(buffer, "%s\\%s", cdDataDirectory, name + skip);
+        file = fopen(buffer, "r");
+    }
+    if (file) {
+        strcpy(path, buffer);
+        fclose(file);
+        return 1;
+    }
+    return 0;
 }
 
 // 0x00523a60

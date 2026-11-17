@@ -1,6 +1,6 @@
 """TrackGameMode::ResetDefaults 0x00522440, the default settings (tools/emu_diff.py case).
 
-The candidate is samples/game/UiInfoNearMisses.cpp. The mode object is 0x3000 random bytes,
+The linked body is in src/reconstructed/UiInfo.cpp. The mode object is 0x3000 random bytes,
 so every store, the two 0x1ec-byte raceSettings copies (+0x27f8 -> +0x2bd0 and +0x29e4), the
 bikeUnlockFlags bit clear and the detail-level fan-out are compared byte for byte. The eight
 callees (ResetInterfaceOptions 0x00522720, ResetSoundOptions 0x00522780, ResetGraphicsOptions
@@ -12,7 +12,7 @@ The detail level (read before the fan-out) is set from the run's random stream.
 """
 RETAIL_VA = 0x00522440
 SYMBOL = '?ResetDefaults@TrackGameMode@@QAEXXZ'
-SOURCE = 'samples/game/UiInfoNearMisses.cpp'
+SOURCE = 'src/reconstructed/UiInfo.cpp'
 TRACK_GAME = 0x0056e26c
 
 

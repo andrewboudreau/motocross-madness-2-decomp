@@ -5,7 +5,7 @@ display into the registry under DriverInfo\\<guid>\\: its mode list, whether win
 full screen (IDirectDraw7::SetDisplayMode 640 x 480 x 16), software and hardware rendering
 work, its video memory (GetAvailableVidMem), AGP (ProbeNonLocalTextureMemory), whether ten
 256 x 256 textures fit (CreateSurface) and the partial texture blit result
-(ProbePartialTextureUploads). Returns 1. The linked body is samples/game/PCGameNearMisses.cpp.
+(ProbePartialTextureUploads). Returns 1. The linked body is in src/reconstructed/PCGame.cpp.
 
 Fakes: PCGame's registry helpers are virtual (+0x50 GetRegistryInt, +0x58 GetRegistryFlag,
 +0x64 SetRegistryInt, +0x6c SetRegistryFlag, +0x74 SetRegistryBinary, +0x88
@@ -33,7 +33,7 @@ from tools.emu_cases import bike_race_create as base
 
 RETAIL_VA = 0x004c0d10
 SYMBOL = '?ProfileDisplays@PCGame@@QAEHXZ'
-SOURCE = 'samples/game/PCGameNearMisses.cpp'
+SOURCE = 'src/reconstructed/PCGame.cpp'
 SPRINTF, NEW, LOAD_PROFILE, LIMIT_MODES = 0x00534aaf, 0x004a3010, 0x004c16f0, 0x004c0760
 SET_WINDOWED, SET_FULLSCREEN, REFRESH_CAPS = 0x004c9d20, 0x004c9c90, 0x004c9b50
 TARGET_CTOR, INIT_TARGET, PROBE_AGP, PROBE_PARTIAL = 0x004c4ee0, 0x004c4f80, 0x004ca5a0, 0x004cab00

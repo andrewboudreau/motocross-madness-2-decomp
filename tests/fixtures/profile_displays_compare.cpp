@@ -61,7 +61,7 @@ static int SourceFile(const char* file) {
     const char* name=strrchr(file,'\\'),*slash=strrchr(file,'/');
     if (!name || (slash && slash>name)) name=slash;
     name=name?name+1:file;
-    if (strcmp(name,"PCGame.cpp") && strcmp(name,"PCGameNearMisses.cpp")) Fail(83);
+    if (strcmp(name,"PCGame.cpp")) Fail(83);
     return 1;
 }
 void* operator new(unsigned int size,const char* file,int line) {

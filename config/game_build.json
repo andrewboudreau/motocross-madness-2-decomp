@@ -271,18 +271,6 @@
       "evidence": "docs/FOLLOW_CAMERA_TICK.md#functional-build-review"
     },
     {
-      "path": "samples/game/UiInfoNearMisses.cpp",
-      "status": "reviewed-nonexact",
-      "reason": "Complete defaults reset and data-file lookup pass 21332 native scripted comparisons and 192 actual VC6 CRT file searches. Full retail extents are 427/355 bytes; VC6 emits 427/357 bytes. CD discovery and prompts remain scripted.",
-      "evidence": "docs/UIINFO.md#functional-build-review"
-    },
-    {
-      "path": "samples/game/PCGameNearMisses.cpp",
-      "status": "reviewed-nonexact",
-      "reason": "Complete ProfileDisplays passes 8486 native state, ordered-call, resource and unwind comparisons. The unchanged VC6 body is 1790 bytes with 1776 matching positions. Display and registry dependencies are scripted; real driver behavior remains untested.",
-      "evidence": "docs/PCGAME.md#functional-build-review"
-    },
-    {
       "path": "samples/physics/motion/Motnctrl.cpp",
       "status": "reviewed-nonexact",
       "reason": "Complete Character playback and pose helpers pass 835584 native state/pose comparisons; LoadVue passes 33280 parse/ownership/unwind scenarios. Playback uses the canonical vector-call providers and preserves retail x87 frame-rate precision. Candidate playback is 3333 bytes versus 3327 retail; three existing helper matches remain strict.",

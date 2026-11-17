@@ -22,9 +22,9 @@
       "sha256": "402df7bd928fb2c250e7f94e06042005f1cfeca20c5f8107edc4e02ad53d2861"
     },
     "src/reconstructed/UiInfo.cpp": {
-      "sections": 100,
-      "relocations": 404,
-      "sha256": "500c3a1644f358200ab8616300888698f85b73e754a569df07c9509284e239d7"
+      "sections": 103,
+      "relocations": 429,
+      "sha256": "4f051cb88535f698ea96144b0ec12bab92c0f78030df5377f3e388d4908618d7"
     }
   }
 }

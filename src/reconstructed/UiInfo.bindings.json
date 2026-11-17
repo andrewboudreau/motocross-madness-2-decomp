@@ -128,5 +128,7 @@
   "_fwrite": "0x005350b7",
   "_rand": "0x00534c1b",
   "_sprintf": "0x00534aaf",
-  "_strncpy": "0x00534b10"
+  "_strncpy": "0x00534b10",
+  "??_C@_05KEJO@?$CFs?2?$CFs?$AA@": "0x005667dc",
+  "__strnicmp": "0x005476f0"
 }

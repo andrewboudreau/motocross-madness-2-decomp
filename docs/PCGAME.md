@@ -80,10 +80,9 @@ modes down with a named `count - remaining` index: an ascending index swaps
 the SIB base and index registers of the four stores (the same difference as
 EcoSystem's `0x00458da0`).
 
-Near miss: the profiling pass `0x004c0d10` (1790 bytes,
-`samples/game/PCGameNearMisses.cpp`, 1776 of 1790 positions; it returns 1
-from both exits). Only the scheduling of one surface-description store
-differs (notes in the sample). The
+Not exact, in PCGame.cpp in retail order: the profiling pass `0x004c0d10`
+(1790 bytes, 1776 of 1790 positions; it returns 1 from both exits). Only the
+scheduling of one surface-description store differs (forms tried below). The
 pass uses the display's DirectDraw-shaped interface (+0x190) for the
 following, which are inference:
 - SetDisplayMode (method 21);
@@ -92,16 +91,15 @@ following, which are inference:
 
 ### Functional build review
 
-`samples/game/PCGameNearMisses.cpp` contains only the complete
-`PCGame::ProfileDisplays` body. `StartUp` calls it after display enumeration.
+`PCGame::ProfileDisplays` is in PCGame.cpp after `0x004c0c60`; the behaviour
+test links a validation unit holding only it. `StartUp` calls it after
+display enumeration.
 The source emits all 1790 bytes under authentic VC6 SP3 `/O2 /GR /GX /MT`;
 1776 positions match after relocation resolution. The remaining difference is
 instruction scheduling around the surface-description size store and
-`FillPixelFormat`. This is a reviewed behavioral candidate, not a strict match
-or a reconstruction of the complete original translation unit.
+`FillPixelFormat`. This is a reviewed behavioral candidate, not a strict match.
 
-The functional build explicitly admits this candidate. Its initial admission
-supplied `ProfileDisplays` but exposed a previously unlinked dependency,
+Its initial admission to the build supplied `ProfileDisplays` but exposed a previously unlinked dependency,
 `int PCVideoCard::ProbePartialTextureUploads(RenderTarget*)`
 (`0x004cab00`, 1129 retail bytes). Its complete body is now independently
 reviewed and in [PCVideoCard.cpp](PARTIAL_TEXTURE_UPLOADS.md),
@@ -192,3 +190,42 @@ Fields: `deviceGuid` (+0x2f8, "Renderer"), `companyName` (+0x320,
 (+0x540). `displayProfilesStale` names bit 0 at +0x548. UI, input and
 TrackGame callers use these provisional names; the declarations retain
 the decoded offsets and layout.
+
+## Forms tried
+
+PCGame::ProfileDisplays (0x004c0d10, 1790 bytes, returns 1 from both
+exits): 1776 of 1790 positions match. The capability block is cleared
+with memset before its caps word is set (retail stores 0 then
+0x10000000 to +0x20); with four field stores the block ranked above the
+name buffer and every frame offset and register differed (208 of 1772).
+`display` is assigned before `renderTarget` (retail loads the display
+pointer before the renderTarget store). Remaining: retail stores the
+surface description's size (0x7c) right after the memset, VC6 here after
+pushing the 0x005119c0 arguments. Not moved by sizeof/0x7c spellings, a
+pointer to the description, an inline clear helper (reference or
+pointer), a format local or the description declared outside the loop.
+Also unchanged: a memset+size helper (pointer or reference), a helper
+that also makes the 0x005119c0 call, a derived description whose
+constructor clears and sizes it, a pixel-format pointer local (before or
+after the clear), a format local after the size store, `(char*)&desc +
+0x48`, a PCRenderTarget cast for the format and sizeof(type); storing
+the size through memset's return value is worse (1344). The canonical
+PCRenderTarget::MeasureTextureMemory (0x004c5950) has the same three
+statements and retail there does store the size after the pushes.
+Session 20: also unchanged (still 1776/1790, one instruction out of place): a
+`fmt = target->surfacePixelFormat` local, a PCRenderTarget cast for the
+format, and storing flags or width/height right after the size (both much
+worse, 1190 and 1197 masked). The candidate already walks `&surfaces[count]`
+as a running pointer like retail ([esp+0x10]/[esp+0x14] set before the
+clear), so the loop shape is not the difference; only the size store's
+scheduling relative to the 0x005119c0 pushes is.
+Session 21, flags: /ML, /Op, /GB and /G5 keep 1776; /Oa (674), /Ow (677)
+and /G6 (1288) are worse.
+Session 24, unchanged (1776): the format read through an `unsigned long`
+view or an `unsigned long` local, the size stored through an `int` view or
+a `DDSurfaceDesc2*` local, and a PCRenderTarget cast.
+ProfileDisplays, unchanged at 1776 (2026-11): template inline accessors
+for the format (with and without a temporary) and for the pixel-format
+address (reference or pointer), inline clear helpers for the descriptor,
+an init helper returning the descriptor for the size store, and the
+memset result cast and used.

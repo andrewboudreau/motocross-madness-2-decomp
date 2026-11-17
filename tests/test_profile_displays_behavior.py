@@ -12,6 +12,7 @@ from mcm2tool.coff import CoffObject
 from mcm2tool.pe import PEImage
 from mcm2tool.toolchain import find_child_ci, find_vc6_bin, infer_vc98_root
 from tools.match import compare
+from tools.unit_source import standalone_source
 
 ROOT = Path(__file__).resolve().parents[1]
 SYMBOL = '?ProfileDisplays@PCGame@@QAEHXZ'
@@ -62,18 +63,23 @@ class ProfileDisplaysBehaviorTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix='mcm2-profile-displays-') as directory:
             output = Path(directory)
             objects = []
-            for source in ('samples/game/PCGameNearMisses.cpp', 'tests/fixtures/profile_displays_compare.cpp'):
+            # The body lives in PCGame.cpp; link a validation unit holding only it.
+            unit = output / 'PCGame.cpp'
+            unit.write_text(standalone_source(ROOT / 'src/reconstructed/PCGame.cpp', ['PCGame::ProfileDisplays'],
+                'extern "C" const Guid IID_IDirect3DHALDevice;\n'
+                'void FillPixelFormat(int format, void* pixelFormat);\n'), encoding='latin-1')
+            for source in (unit, ROOT / 'tests/fixtures/profile_displays_compare.cpp'):
                 obj = output / (Path(source).stem + '.obj')
-                result = subprocess.run([sys.executable, str(ROOT / 'tools/compile.py'), str(ROOT / source),
+                result = subprocess.run([sys.executable, str(ROOT / 'tools/compile.py'), str(source),
                     '-o', str(obj), '--vc6-root', str(compiler), '--profile', 'vc6_o2_mt',
                     '--include', str(ROOT / 'src/krusty2'),
                     # VC6 /O2 ICEs compiling the fixture's seven-argument
                     # scripted display callback. Production stays /O2.
-                    *(['--extra', '/Od'] if source.startswith('tests/') else [])], cwd=ROOT, capture_output=True,
+                    *(['--extra', '/Od'] if source != unit else [])], cwd=ROOT, capture_output=True,
                     text=True, encoding='latin-1', env={**os.environ, 'PYTHONPATH': str(ROOT)})
                 self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
                 objects.append(str(obj))
-                if source.startswith('samples/'):
+                if source == unit:
                     candidate = CoffObject(obj)
                     methods = {s.name for s in candidate.symbols
                                if s.storage_class == 2 and s.section_number > 0 and s.type == 0x20}
@@ -102,7 +108,7 @@ class ProfileDisplaysBehaviorTests(unittest.TestCase):
                     cleanup = relocated(action.section_number, action.value + 18)
                     self.assertEqual(cleanup.name, '??3@YAXPAXPBDH@Z')
                     report = compare(image, candidate, SYMBOL, 0x4c0d10, 1790,
-                                     ROOT / 'samples/game/PCGameNearMisses.bindings.json')
+                                     ROOT / 'src/reconstructed/PCGame.bindings.json')
                     self.assertEqual(report['strict_match']['matching_positions'], 1776)
             patch_file = output / 'calls.bin'
             patch_file.write_bytes(b''.join(patches))

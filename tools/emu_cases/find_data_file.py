@@ -1,6 +1,6 @@
 """TrackGameMode::FindDataFile 0x005238f0, the data file lookup (tools/emu_diff.py case).
 
-The linked body is samples/game/UiInfoNearMisses.cpp. Offsets from the retail body: the mode's
+The linked body is in src/reconstructed/UiInfo.cpp. Offsets from the retail body: the mode's
 install type +0x23cc (2: no CD fallback), install directory +0x23d0 and CD data directory
 +0x24d4. Names start with either directory in any letter case, a prefix of it, or neither; the
 CD directory may be empty. _strnicmp 0x005476f0 is modelled (ASCII case folding, as the C
@@ -11,7 +11,7 @@ case. `path` is compared as memory.
 """
 RETAIL_VA = 0x005238f0
 SYMBOL = '?FindDataFile@TrackGameMode@@QAEHPBDPAD@Z'
-SOURCE = 'samples/game/UiInfoNearMisses.cpp'
+SOURCE = 'src/reconstructed/UiInfo.cpp'
 PROBES = {0x0052394d: 'install prefix', 0x0052397c: 'cd prefix', 0x005239b1: 'not installed',
           0x005239d4: 'cd retry', 0x00523a01: 'found'}
 

@@ -43,7 +43,7 @@ Compiled layout confirms the eight-byte list's pointer/count offsets0/4 and
 the owning mode's field at+0x25dc.
 
 Five complete before/after objects are unchanged: TrackGame, ZoneReport, Parser,
-DirectoryList and UiInfo. Their 321 nondebug sections and 1,256 relocations
+DirectoryList and UiInfo. Their 324 nondebug sections and 1,281 relocations
 retain every payload byte, section flag, raw relocation addend and resolved
 destination, with no name mappings or excluded regions. Portable retained pins
 normalize only the five explicitly enumerated diagnostic source paths. The
