@@ -16,14 +16,17 @@ from mcm2tool.toolchain import find_child_ci, find_vc6_bin, infer_vc98_root
 from tools.match import compare
 from tools.build_game import ROOT as TOOL_ROOT, compile_source as game_compile
 from test_edit_box_on_char import extract
+from follow_camera_unit import write_unit
 import test_eco_quadtree_connections as views
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCE = 'samples/camera/FollowCameraConstructor.cpp'
-AGGREGATE = 'samples/camera/FollowCameraNearMisses.cpp'
+# The constructor lives in FollowCamera.cpp (retail FollowCam.cpp). The
+# candidate is a validation unit holding only it; the plain store list it
+# replaced is the negative-control fixture.
+SOURCE = 'src/reconstructed/FollowCamera.cpp'
+PLAIN = 'tests/fixtures/follow_camera_constructor_plain.cpp'
 SYMBOL = '??0FollowCamera@@QAE@H@Z'
-FILENAMES = (AGGREGATE, 'samples/camera/FollowCameraLoadFile.cpp',
-             'samples/camera/FollowCameraTick.cpp', 'samples/camera/FollowCameraControls.cpp')
+FILENAMES = (SOURCE,)
 ALIASES = {'_FixtureMalloc': '_malloc', '_FixtureFree': '_free', '_FixtureMsize': '__msize'}
 
 
@@ -127,21 +130,18 @@ class FollowCameraConstructorTests(unittest.TestCase):
                 return path, CoffObject(path)
             def includes(text, parent):
                 return re.sub(r'#include "([^"]+)"', lambda m: '#include "'+str((parent/m[1]).resolve()).replace('\\', '/')+'"', text)
-            candidate_path, candidate = compile_source(ROOT/SOURCE, 'candidate', False)
-            aggregate_path, aggregate = compile_source(ROOT/AGGREGATE, 'aggregate', False)
-            original_text = (ROOT/AGGREGATE).read_text()
-            original_source = out/'original.cpp'
-            original_source.write_text(includes(original_text[:original_text.index('FollowCamera::FollowCamera(int flags)')]+
-                extract(original_text, 'FollowCamera::FollowCamera(int flags)')+'\n', (ROOT/AGGREGATE).parent))
-            original_path, original = compile_source(original_source, 'original')
+            (out/'unit').mkdir()
+            candidate_path, candidate = compile_source(write_unit(out/'unit', 'FollowCamera::FollowCamera'), 'candidate')
+            aggregate_path, aggregate = compile_source(ROOT/SOURCE, 'aggregate')
+            original_path, original = compile_source(ROOT/PLAIN, 'original')
             for obj, binding, size, matching in (
                 (candidate, ROOT/SOURCE.replace('.cpp', '.bindings.json'), 569, 100),
-                (original, ROOT/AGGREGATE.replace('.cpp', '.bindings.json'), 564, 511),
-                (aggregate, ROOT/AGGREGATE.replace('.cpp', '.bindings.json'), 564, 511)):
+                (original, ROOT/SOURCE.replace('.cpp', '.bindings.json'), 564, 511),
+                (aggregate, ROOT/SOURCE.replace('.cpp', '.bindings.json'), 569, 100)):
                 proof = compare(image, obj, SYMBOL, 0x462ee0, 564, binding)
                 self.assertEqual((proof['candidate_size'], proof['strict_match']['matching_positions']), (size, matching))
                 self.assertFalse(proof['strict_exact'])
-            self.assertEqual(function(original, SYMBOL), function(aggregate, SYMBOL))
+            self.assertEqual(function(candidate, SYMBOL), function(aggregate, SYMBOL))
             pins = json.loads((ROOT/'tests/fixtures/follow_camera_constructor_objects.json').read_text())
             rows = whole(aggregate)
             actual = dict(sections=len(rows), relocations=sum(len(r[-1]) for r in rows),
@@ -155,7 +155,7 @@ class FollowCameraConstructorTests(unittest.TestCase):
             spec = json.loads((TOOL_ROOT/'config/game_build.json').read_text())
             built = game_compile(ROOT/SOURCE, out/'game-command', vc6, [TOOL_ROOT/i for i in spec['includes']], spec['profile'], env)
             self.assertTrue(built['compiled'], built)
-            self.assertEqual(whole(candidate), whole(CoffObject(Path(built['object']))))
+            self.assertEqual(whole(aggregate), whole(CoffObject(Path(built['object']))))
 
             keep = {'Camera': {'Camera', '~Camera'}, 'PCCamera': {'PCCamera'},
                     'FollowCamera': {'ShowCameraStateName', 'SaveCameraPreset', 'RestoreCameraPreset',
@@ -166,6 +166,9 @@ class FollowCameraConstructorTests(unittest.TestCase):
                 source = ROOT/'src/reconstructed'/(name+'.cpp')
                 _, canonical[name] = compile_source(source, 'canonical-'+name)
                 text = source.read_text()
+                if name == 'FollowCamera':
+                    # The candidate (or the negative control) supplies the constructor.
+                    text = text.replace(extract(text, 'FollowCamera::FollowCamera(int flags)'), '')
                 edits = []
                 pattern = re.compile(r'^[^/\n]*?\b'+name+r'::(~?\w+)\([^;\n]*\)[^;{\n]*\{', re.M)
                 for match in pattern.finditer(text):
@@ -242,7 +245,7 @@ class FollowCameraConstructorTests(unittest.TestCase):
             self.assertEqual(control.returncode,36,control.stdout+control.stderr)
             self.assertIn('Guard oracle available2c4',control.stdout)
             self.assertEqual(strict,27)
-            print('27 complete strict checks; unchanged aggregate; 7392 native cases; original guard-order control rejected')
+            print('27 complete strict checks; canonical unit; 7392 native cases; original guard-order control rejected')
 
 
 if __name__ == '__main__':

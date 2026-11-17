@@ -135,18 +135,6 @@
       "evidence": "docs/VEGETATION_COLLISION_OBJECT.md#functional-build-review"
     },
     {
-      "path": "samples/camera/FollowCameraConstructor.cpp",
-      "status": "reviewed-nonexact",
-      "reason": "Complete 564-byte retail constructor reconstructed as a separate 569-byte candidate with 100 resolved matching positions. Original 564-byte/511-position sample remains unchanged. Passes 7392 finite native initialization, progressive-write, allocation and actual-helper unwind cases with 27 strict helper/initializer/caller checks and a failing original-order control. Small explicit volatile accesses preserve observed partial-write order, not inferred original member qualifiers. Shared strict helper and native CRT reference; second allocation NULL is excluded as an existing unsafe fallback-buffer overrun. Masked FP, prepared storage and bounded allocation behavior only; full camera lifetime and gameplay remain unverified.",
-      "evidence": "docs/FOLLOW_CAMERA_CONSTRUCTOR.md#functional-build-review"
-    },
-    {
-      "path": "samples/camera/FollowCameraLoadFile.cpp",
-      "status": "reviewed-nonexact",
-      "reason": "Complete camera-file loader checked in 1551 finite native cases with actual stream, math and CRT helpers, constructor unwind and progressive output faults. VC6 emits 980 bytes versus 1014 retail bytes, with 429 resolved matching positions. Two retained negative controls demonstrate the repaired first-cross rounding and matrix-store order. Shared stream CheckHeader/Seek remain nonexact; debug allocation is scripted and full camera lifetime is unverified.",
-      "evidence": "docs/FOLLOW_CAMERA_LOAD_FILE.md#functional-build-review"
-    },
-    {
       "path": "samples/track/StatsStandingsDraw.cpp",
       "status": "reviewed-nonexact",
       "reason": "Complete standings drawing candidate checked in 3228 finite native scenarios with actual iteration, formatting, texture and overlay helpers. VC6 emits 1004 bytes against 1002 retail bytes, with 605 resolved matching positions. All 37 aggregate sections and 162 relocations are preserved except two iterator calls connected to the existing BikeRace provider. COM, GDI and resource callbacks are scripted; integrated HUD rendering remains unverified.",
@@ -239,18 +227,6 @@
       "status": "reviewed-nonexact",
       "reason": "Complete MediaControl Open passes 11125 native scripted COM, OS and helper scenarios including output aliasing, callback mutations, failures and faults. VC6 emits 656 bytes against the complete 646-byte retail body with 53 matching positions. Actual SDK and canonical GUID providers are checked; live DirectShow decoding, DirectDraw drivers and downstream Release cleanup remain untested.",
       "evidence": "docs/MEDIA_CONTROL_OPEN.md#functional-build-review"
-    },
-    {
-      "path": "samples/camera/FollowCameraControls.cpp",
-      "status": "reviewed-nonexact",
-      "reason": "Complete FollowCamera control handler passes 195339 native input, whole-state, callback, exception, fault and floating-point scenarios. VC6 emits 4046 bytes against the complete 4058-byte retail body, retaining 927 matching positions. Input callbacks are scripted; real DirectInput and rendered camera behavior remain untested.",
-      "evidence": "docs/FOLLOW_CAMERA_CONTROLS.md#functional-build-review"
-    },
-    {
-      "path": "samples/camera/FollowCameraTick.cpp",
-      "status": "reviewed-nonexact",
-      "reason": "Complete FollowCamera Tick passes 674335 native full-state, callback, allocation, fault and floating-point comparisons with actual initialized strict FastSqrt. VC6 retains 3659 of 3672 matching positions; axis initializers are strict. Terrain, rotation, other camera methods and input callbacks are scripted, so rendered-camera behavior remains untested.",
-      "evidence": "docs/FOLLOW_CAMERA_TICK.md#functional-build-review"
     },
     {
       "path": "samples/physics/motion/Motnctrl.cpp",

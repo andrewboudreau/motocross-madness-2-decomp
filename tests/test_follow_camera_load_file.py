@@ -19,10 +19,13 @@ from tools.run_calibration import CASES
 from tools.match import compare
 from test_edit_box_on_char import extract
 from test_edit_box_draw import signature
+from follow_camera_unit import write_unit
 
 ROOT=Path(__file__).resolve().parents[1]
-SOURCE=ROOT/'samples/camera/FollowCameraLoadFile.cpp'
-AGGREGATE=ROOT/'samples/camera/FollowCameraNearMisses.cpp'
+# LoadCameraFile lives in FollowCamera.cpp (retail FollowCam.cpp); the test's
+# candidate is a validation unit holding only it (write_unit).
+AGGREGATE=ROOT/'src/reconstructed/FollowCamera.cpp'
+BINDINGS=ROOT/'src/reconstructed/FollowCamera.bindings.json'
 SYMBOL='?LoadCameraFile@FollowCamera@@QAEXPBD@Z'
 DIRECT={0x46510f:0x4a3010,0x465131:0x460d10,0x46515f:0x460f50,
         0x46518a:0x461aa0,0x4651a2:0x5476f0,0x4651c3:0x461aa0,
@@ -41,9 +44,8 @@ def object_view(obj,portable=False):
                 sec=obj.section(s.section_number)
                 raw=obj.data[sec.raw_ptr+s.value:sec.raw_ptr+sec.raw_size]
                 value=raw.rstrip(b'\0').replace(b'\\',b'/')
-                if value.rsplit(b'/',1)[-1] in (b'FollowCameraLoadFile.cpp',b'FollowCameraNearMisses.cpp',b'FollowCameraTick.cpp',b'FollowCameraControls.cpp'):
+                if value.rsplit(b'/',1)[-1]==b'FollowCamera.cpp':
                     assert raw.endswith(b'\0') and s.value==0
-                    assert Path(value.decode()).resolve()==(ROOT/'samples/camera'/value.rsplit(b'/',1)[-1].decode()).resolve()
                     filenames[sec.index]='filename:'+value.rsplit(b'/',1)[-1].decode()
     keys={};anonymous={}
     for sec in sections:
@@ -153,12 +155,13 @@ class FollowCameraLoadFileTests(unittest.TestCase):
                 run=subprocess.run(command,cwd=TOOL_ROOT,capture_output=True,text=True,encoding='latin1',env={**os.environ,'PYTHONPATH':str(TOOL_ROOT)})
                 self.assertEqual(run.returncode,0,run.stdout+run.stderr)
                 return path,CoffObject(path)
-            candidate_path,candidate=compile_source(SOURCE,'candidate',includes=False)
-            _,aggregate=compile_source(AGGREGATE,'aggregate',includes=False)
+            (out/'unit').mkdir();SOURCE=write_unit(out/'unit','FollowCamera::LoadCameraFile')
+            candidate_path,candidate=compile_source(SOURCE,'candidate')
+            _,aggregate=compile_source(AGGREGATE,'aggregate')
             pins=json.loads((ROOT/'tests/fixtures/follow_camera_load_file_objects.json').read_text())
             self.assertEqual(record(candidate),pins['candidate']);self.assertEqual(record(aggregate),pins['aggregate'])
             self.assertEqual(loader_signature(candidate),loader_signature(aggregate))
-            report=compare(image,candidate,SYMBOL,0x4650e0,1014,SOURCE.with_suffix('.bindings.json'))
+            report=compare(image,candidate,SYMBOL,0x4650e0,1014,BINDINGS)
             self.assertEqual((report['candidate_size'],report['strict_match']['matching_positions'],report['strict_exact']),(980,429,False))
             self.assertEqual({s.name for s in candidate.symbols if s.section_number>0 and s.storage_class==2 and s.type==32},{SYMBOL,'??_H@YGXPAXIHP6EX0@Z@Z'})
             self.assertEqual(signature(candidate,'??_H@YGXPAXIHP6EX0@Z@Z'),signature(aggregate,'??_H@YGXPAXIHP6EX0@Z@Z'))
@@ -212,9 +215,9 @@ class FollowCameraLoadFileTests(unittest.TestCase):
                 self.assertEqual(signature(helpers['stream_candidates'],symbol),signature(whole_stream,symbol))
             # Same actual command as the game build, including current includes/profile.
             spec=json.loads((TOOL_ROOT/'config/game_build.json').read_text())
-            built=game_compile(SOURCE,out/'game-command',compiler,[TOOL_ROOT/p for p in spec['includes']],spec['profile'],{**os.environ,'PYTHONPATH':str(TOOL_ROOT)})
+            built=game_compile(AGGREGATE,out/'game-command',compiler,[TOOL_ROOT/p for p in spec['includes']],spec['profile'],{**os.environ,'PYTHONPATH':str(TOOL_ROOT)})
             self.assertTrue(built['compiled'],built)
-            self.assertEqual(object_view(candidate),object_view(CoffObject(Path(built['object']))))
+            self.assertEqual(object_view(aggregate),object_view(CoffObject(Path(built['object']))))
             crt_bindings=out/'crt.json'
             crt_bindings.write_text(json.dumps({'_strlen':'0x53cc40','__input':'0x53c180',
                 '___lc_handle':'0x68ae24','___unguarded_readlc_active':'0x68c49c',
@@ -256,7 +259,7 @@ class FollowCameraLoadFileTests(unittest.TestCase):
                 source_text=source_text.replace('"../../src/','"'+(ROOT/'src').as_posix()+'/')
                 source=out/(name+'.cpp');source.write_text(source_text)
                 obj,o=compile_source(source,name)
-                proof=compare(image,o,SYMBOL,0x4650e0,1014,SOURCE.with_suffix('.bindings.json'))
+                proof=compare(image,o,SYMBOL,0x4650e0,1014,BINDINGS)
                 self.assertEqual((proof['candidate_size'],proof['strict_match']['matching_positions']),(size,positions))
                 if name=='math_control':
                     raw,_,rels=loader_signature(o)

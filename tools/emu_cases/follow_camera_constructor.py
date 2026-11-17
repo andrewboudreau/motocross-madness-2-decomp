@@ -1,6 +1,6 @@
 """FollowCamera::FollowCamera(int) 0x00462ee0, the follow camera's constructor (emu_diff case).
 
-The candidate is samples/camera/FollowCameraConstructor.cpp. The object is random bytes. The
+The candidate is in src/reconstructed/FollowCamera.cpp. The object is random bytes. The
 base constructor PCCamera::PCCamera 0x004bed80 is a logged stub (thiscall, the flags) that
 writes a random fieldOfView +0x16c and eye +0x170, which the body copies; the direct call to
 FollowCamera::SetCameraState 0x00466e50 is a logged stub that writes a random state +0x244,
@@ -14,7 +14,7 @@ import random
 
 RETAIL_VA = 0x00462ee0
 SYMBOL = '??0FollowCamera@@QAE@H@Z'
-SOURCE = 'samples/camera/FollowCameraConstructor.cpp'
+SOURCE = 'src/reconstructed/FollowCamera.cpp'
 
 
 def cases(rng, n):

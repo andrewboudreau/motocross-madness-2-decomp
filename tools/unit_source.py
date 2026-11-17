@@ -33,11 +33,12 @@ def _skip_literal(text: str, i: int) -> int:
 def function_definition(text: str, qualified: str) -> str:
     """The definition of ``Class::Name`` or ``Name``, from its line to the closing brace.
 
-    The declarator must start a line (``void RaceSound::RefillStream() {``) and
-    be the only definition with that qualified name; overloads are rejected.
+    The declarator must start a line (``void RaceSound::RefillStream() {``, or a
+    constructor's ``Camera::Camera(int flags) : Base(flags) {``) and be the only
+    definition with that qualified name; overloads are rejected.
     """
     name = re.escape(qualified)
-    pattern = re.compile(r'^[^\s#/][^;{}()\n]*?\b' + name + r'\s*\([^;{}]*\)[^;{}]*\{', re.M)
+    pattern = re.compile(r'^(?=[^\s#/])[^;{}()\n]*?\b' + name + r'\s*\([^;{}]*\)[^;{}]*\{', re.M)
     matches = list(pattern.finditer(text))
     if len(matches) != 1:
         raise ValueError(f'{qualified}: expected one definition, found {len(matches)}')

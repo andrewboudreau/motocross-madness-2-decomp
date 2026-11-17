@@ -1,11 +1,9 @@
 # FollowCamera control handler
 
-`samples/camera/FollowCameraControls.cpp` contains the unchanged complete
-`FollowCamera::ProcessCameraInput(bool, float)` candidate. The aggregate
-`FollowCameraNearMisses.cpp` includes it, with the original input macros and
-angle helpers shared through `FollowCameraControlSupport.h`. The slot name and
-original translation-unit ownership remain provisional. No shared production
-class declaration is changed.
+`FollowCamera::ProcessCameraInput(bool, float)` (slot 45) is in [FollowCamera.cpp](../src/reconstructed/FollowCamera.cpp) (retail `FollowCam.cpp`),
+in retail order, with a `// Not exact` status comment. The input macros
+(`FOLLOWCAMERA_KEY`, `FOLLOWCAMERA_CONTROLS`) and the turn/tilt angle helpers
+sit just above it. The slot name remains provisional.
 
 ## Complete extent and preserved source
 
@@ -26,21 +24,12 @@ full 4,058-byte retail body. The historical truncated comparison also reported
 927 positions; the regression records that comparison separately. No function
 extent is shortened to match the candidate.
 
-The persistent test compares the complete standalone and aggregate body,
-including named relocation sites, types and addends, and checks every emitted
-floating-point constant against retail. The standalone object defines only
-the handler, has no CRT initializer, and imports only `g_TrackGame` and the
-normal CRT floating-point marker. The operation adds no new helper dependency.
-
-The private extraction proof against `10b2cc52` preserves all five emitted
-aggregate function bodies and all **64 nondebug sections**, including EH,
-CRT, constants and writable storage. It resolves compiler-generated local
-labels to section/offset destinations and explicitly normalizes the checked
-diagnostic filenames used by the temporary baseline and aggregate. The new
-control handler contains no diagnostic filename reference. Reproduction and
-report remain in ignored files:
-`work/game-build/check_follow_controls_extraction.py` and
-`work/game-build/follow-controls-extraction-proof.json`.
+The persistent test compares the validation unit's complete body (the
+unit's includes, the vector operators, the input helpers and the handler)
+with the canonical unit's, including named relocation sites, types and
+addends, and checks every emitted floating-point constant against retail.
+The validation unit defines only the handler, has no CRT initializer, and
+imports only `g_TrackGame` and the normal CRT floating-point marker.
 
 ## Functional build review
 
@@ -59,8 +48,8 @@ queries. Override target movement deliberately still returns false; this is
 the retail behavior, not a newly inferred success convention.
 
 `tests/test_follow_camera_controls_behavior.py` runs **195,339 native
-scenarios** against the hash-pinned complete retail body. Both standalone and
-aggregate candidates use authentic VC6 SP3 `/O2`. The separate fixture uses
+scenarios** against the hash-pinned complete retail body. The validation unit and the
+canonical unit are compiled with authentic VC6 SP3 `/O2`. The separate fixture uses
 `/Od` because VC6's optimizer crashes on its callback setup. The production
 candidate and mapped retail body are not patched or wrapped with replacement
 implementations; virtual input tables are the only scripted dependencies.
@@ -94,15 +83,7 @@ against an inert or identically miswired comparison.
 This finite evidence supports explicit **reviewed-nonexact** functional build
 admission. No actual DirectInput devices, concurrent input updates, rendering
 or complete camera lifecycle are exercised. NaN-payload equivalence for
-arbitrary input states is not established. The remaining constructor, camera
-file loader and unrelated terrain-query declaration require their own evidence;
-this operation does not supply or substitute them.
-
-The isolated real build `build-3r0sggzf` compiles **204/204 translation units**.
-Against `build-3bhn75px`, unresolved names decrease from **493 to 492**:
-only `FollowCamera::ProcessCameraInput(bool, float)` disappears, and no new
-missing name appears. The executable still does not link; startup and live
-camera operation remain unverified.
+arbitrary input states is not established.
 
 ```powershell
 $env:VC6_ROOT = (Resolve-Path work/vc6sp3-disc).Path

@@ -22,13 +22,11 @@ SOURCES = (
     'src/reconstructed/CubeDraw.cpp',
     'src/reconstructed/FollowCamera.cpp',
     'src/reconstructed/TrackOverlay.cpp',
-    'samples/camera/FollowCameraNearMisses.cpp',
     'samples/track/TrackOverlayNearMisses.cpp',
     'src/krusty2/visibility/VisibilityQuadTree.cpp',
 )
 PROVIDER = SOURCES[-1]
-FILENAMES = SOURCES + ('samples/camera/FollowCameraTick.cpp',
-                       'samples/camera/FollowCameraLoadFile.cpp')
+FILENAMES = SOURCES
 METHODS = [('TransformVectors', 0x52f0a0, 156), ('TestDot', 0x52f140, 72),
            ('ProjectPoint', 0x52f340, 389), ('CullQuad', 0x52f4d0, 155),
            ('CullPolygon', 0x52fac0, 234)]
@@ -244,7 +242,7 @@ class VisibilityConnectionsTests(unittest.TestCase):
             result = subprocess.run([str(executable), str(image)], capture_output=True, text=True, timeout=120)
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             self.assertIn('66845 visibility scenarios match', result.stdout)
-            print('Visibility connections:', strict, 'strict checks; six whole objects;', result.stdout.strip())
+            print('Visibility connections:', strict, 'strict checks; five whole objects;', result.stdout.strip())
 
 
 if __name__ == '__main__': unittest.main()

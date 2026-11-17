@@ -62,19 +62,19 @@ conversion, hidden result argument, or pointer adjustment was introduced.
 ## Complete-object preservation
 
 The retained baseline fingerprints cover every nondebug section byte, flags,
-relocation kind/addend and resolved section/offset destination in six objects
+relocation kind/addend and resolved section/offset destination in five objects
 (current pins; the CubeDrawNearMisses object went away when BuildFaceGeometry
-moved into CubeDraw.cpp):
+moved into CubeDraw.cpp, and FollowCameraNearMisses when its four bodies moved
+into FollowCamera.cpp):
 
 | Object | Sections | Relocations |
 | --- | ---: | ---: |
 | CubeDraw | 52 | 224 |
-| FollowCamera | 98 | 250 |
+| FollowCamera | 120 | 469 |
 | TrackOverlay | 215 | 920 |
-| FollowCameraNearMisses | 66 | 337 |
 | TrackOverlayNearMisses | 27 | 111 |
 | VisibilityQuadTree | 88 | 342 |
-| Total | 546 | 2,184 |
+| Total | 502 | 2,066 |
 
 The same-path private before/after comparison allows exactly the five decorated
 method-name substitutions recorded in

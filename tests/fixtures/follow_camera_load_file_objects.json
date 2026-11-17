@@ -2,13 +2,13 @@
   "candidate": {
     "sections": 9,
     "relocations": 37,
-    "sha256": "81fef40311c4a433bb58fec4c4621b4326f73b9771ee181dec3fecd34947acfb"
+    "sha256": "d0d72ea83cf845d014bc999978ec6dab2558fb4d26fdfb087ee6ba7ef7debfbd"
   },
   "aggregate": {
-    "sections": 66,
-    "relocations": 337,
-    "sha256": "f71fed6c1304316be319b15fdeab8dd565d828a98fedf8440508d22f3c27a044"
+    "sections": 120,
+    "relocations": 469,
+    "sha256": "ee9671923cca6c5faec352dedc27406585481c98cbe2b909e88200f31fdb6ffd"
   },
-  "note": "Private round53 pre-admission pins. Full same-path before/after proof accounts all66 nondebugsections: only corrected loader, its saved-stream EH displacement and verified diagnosticfilename change;63sections/302relocs unchanged. All static/public offsets,CRT/storage flags and other full methods retained.",
+  "note": "Candidate: the LoadCameraFile validation unit (same 9 sections and 37 relocations as the former standalone sample; only its normalised filename label changed). Aggregate: canonical src/reconstructed/FollowCamera.cpp.",
   "original_loader_raw_sha256": "7faa49b31e825e407e535a5e037a34dfd958455203d18300de47d26df6b39103"
 }

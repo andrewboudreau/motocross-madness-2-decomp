@@ -12,6 +12,7 @@ from mcm2tool.coff import CoffObject
 from mcm2tool.pe import PEImage
 from mcm2tool.toolchain import find_child_ci, find_vc6_bin, infer_vc98_root, sha256_file
 from tools.match import compare
+from follow_camera_unit import write_unit
 
 ROOT = Path(__file__).resolve().parents[1]
 SYMBOL = '?Tick@FollowCamera@@UAEHM@Z'
@@ -68,51 +69,57 @@ class FollowCameraTickBehaviorTests(unittest.TestCase):
             output = Path(directory)
             objects = []
             compiled = {}
-            for source in ('samples/camera/FollowCameraTick.cpp', 'samples/camera/FollowCameraNearMisses.cpp',
-                           'src/reconstructed/FastMath.cpp',
-                           'tests/fixtures/follow_camera_tick_compare.cpp'):
-                obj = output / (Path(source).stem + '.obj')
-                result = subprocess.run([sys.executable, str(ROOT / 'tools/compile.py'), str(ROOT / source),
+            # Tick lives in FollowCamera.cpp (retail FollowCam.cpp); the candidate
+            # is a validation unit holding it and the file's vector statics.
+            (output / 'unit').mkdir()
+            unit = write_unit(output / 'unit', 'FollowCamera::Tick')
+            for name, source in (('candidate', unit), ('canonical', ROOT / 'src/reconstructed/FollowCamera.cpp'),
+                                 ('FastMath', ROOT / 'src/reconstructed/FastMath.cpp'),
+                                 ('fixture', ROOT / 'tests/fixtures/follow_camera_tick_compare.cpp')):
+                obj = output / (name + '.obj')
+                result = subprocess.run([sys.executable, str(ROOT / 'tools/compile.py'), str(source),
                     '-o', str(obj), '--vc6-root', str(compiler), '--profile', 'vc6_o2_mt',
                     '--include', str(ROOT / 'src/krusty2'),
                     # VC6's optimizer ICEs on the fixture's large main callback
                     # table/loop. Candidate and real math providers retain /O2.
-                    *(['--extra','/Od'] if source.startswith('tests/') else [])], cwd=ROOT, capture_output=True,
+                    *(['--extra','/Od'] if name == 'fixture' else [])], cwd=ROOT, capture_output=True,
                     text=True, encoding='latin-1', env={**os.environ, 'PYTHONPATH': str(ROOT)})
                 self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-                if not source.endswith('FollowCameraNearMisses.cpp'):
+                if name != 'canonical':
                     objects.append(str(obj))
                 candidate = CoffObject(obj)
-                compiled[source] = candidate
-                if source.endswith('FollowCameraTick.cpp'):
+                compiled[name] = candidate
+                if name == 'candidate':
                     entry = candidate.find_symbol(SYMBOL)
                     self.assertEqual(entry.extent_source, 'coff_function_aux')
                     self.assertEqual(entry.function_size, 3672)
                     report = compare(image, candidate, SYMBOL, 0x465c20, 3672,
-                                     ROOT / 'samples/camera/FollowCameraTick.bindings.json')
+                                     ROOT / 'src/reconstructed/FollowCamera.bindings.json')
                     self.assertEqual(report['strict_match']['matching_positions'],3659)
                     self.assertEqual([m['offset'] for m in report['strict_match']['mismatches']],
                                      [331,332,333,334,907,908,909,910,911,912,913,914,915])
-                    binding_path = ROOT/'samples/camera/FollowCameraTick.bindings.json'
+                    binding_path = ROOT/'src/reconstructed/FollowCamera.bindings.json'
                     bindings = json.loads(binding_path.read_text())
-                    for name, address, size in (('_$E2',0x466f60,5),('_$E1',0x466f70,60),
-                                                ('_$E5',0x466ff0,5),('_$E4',0x467000,60)):
-                        entry = candidate.find_symbol(name)
+                    for initializer, address, size in (('_$E2',0x466f10,5),('_$E1',0x466f20,60),
+                                                       ('_$E5',0x466f60,5),('_$E4',0x466f70,60),
+                                                       ('_$E8',0x466ff0,5),('_$E7',0x467000,60),
+                                                       ('_$E11',0x4670b0,5),('_$E10',0x4670c0,60)):
+                        entry = candidate.find_symbol(initializer)
                         self.assertEqual(entry.extent_source,'codeview_proc')
                         self.assertEqual(candidate.symbol_extent(entry)[1],size)
-                        self.assertTrue(compare(image,candidate,name,address,size,binding_path)['strict_exact'])
+                        self.assertTrue(compare(image,candidate,initializer,address,size,binding_path)['strict_exact'])
                     crt = [s for s in candidate.sections if s.name=='.CRT$XCU']
                     self.assertEqual(len(crt),1)
-                    self.assertEqual(crt[0].raw_size,8)
+                    self.assertEqual(crt[0].raw_size,16)
                     self.assertEqual([candidate.symbol_by_index[r.symbol_index].name for r in candidate.relocations
-                                      if r.section_number==crt[0].index],['_$E2','_$E5'])
+                                      if r.section_number==crt[0].index],['_$E2','_$E5','_$E8','_$E11'])
                     for entry in candidate.symbols:
                         if entry.name.startswith('__real@4@'):
                             section = candidate.section(entry.section_number)
                             self.assertFalse(section.characteristics & 0x80000000)
                             start = section.raw_ptr+entry.value
                             self.assertEqual(candidate.data[start:start+4],image.bytes_at_va(int(bindings[entry.name],0),4))
-                elif source.endswith('FastMath.cpp'):
+                elif name == 'FastMath':
                     for symbol, address in (('?FastSqrt@@YAMM@Z',0x460b50),('?InitFastSqrtTable@@YAXXZ',0x460ae0)):
                         size = candidate.find_symbol(symbol).function_size
                         report = compare(image,candidate,symbol,address,size,ROOT/'src/reconstructed/FastMath.bindings.json')
@@ -120,10 +127,17 @@ class FollowCameraTickBehaviorTests(unittest.TestCase):
             def complete(coff):
                 entry = coff.find_symbol(SYMBOL)
                 body,size,relocations = coff.symbol_extent(entry)
-                return body,size,[(r.virtual_address-entry.value,r.type,coff.symbol_by_index[r.symbol_index].name)
+                def target(symbol):
+                    # The __FILE__ literal's name encodes the unit's path.
+                    if symbol.name.startswith('??_C@') and symbol.section_number > 0:
+                        section = coff.section(symbol.section_number)
+                        text = coff.data[section.raw_ptr+symbol.value:section.raw_ptr+section.raw_size].split(b'\0')[0]
+                        if text.lower().endswith(b'followcamera.cpp'):
+                            return '__FILE__ literal'
+                    return symbol.name
+                return body,size,[(r.virtual_address-entry.value,r.type,target(coff.symbol_by_index[r.symbol_index]))
                                   for r in relocations]
-            self.assertEqual(complete(compiled['samples/camera/FollowCameraTick.cpp']),
-                             complete(compiled['samples/camera/FollowCameraNearMisses.cpp']))
+            self.assertEqual(complete(compiled['candidate']), complete(compiled['canonical']))
             patch_file = output / 'calls.bin'
             patch_file.write_bytes(b''.join(struct.pack('<II',a,b) for a,b in calls.items()))
             executable = output / 'camera.exe'

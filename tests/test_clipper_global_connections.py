@@ -24,15 +24,13 @@ SOURCES = (
     'src/reconstructed/Griddraw.cpp',
     'src/krusty2/shadow/D3DIMSoultreeShadow.cpp',
     'src/krusty2/visibility/VisibilityQuadTree.cpp',
-    'samples/camera/FollowCameraNearMisses.cpp',
     'samples/track/TrackOverlayNearMisses.cpp',
     'samples/render/GriddrawNearMisses.cpp',
     'samples/physics/shadow/D3DIMSoultreeShadowNearMisses.cpp',
     'samples/physics/visibility/VisibilityQuadTreeTraversal.cpp',
     'src/krusty2/broadphase/Terrain.cpp',
 )
-FILENAMES = SOURCES + ('samples/camera/FollowCameraTick.cpp',
-                       'samples/camera/FollowCameraLoadFile.cpp')
+FILENAMES = SOURCES
 
 def view(obj, normalize_paths=()):
     """Complete sections and destinations, with known source paths made portable."""
@@ -186,7 +184,10 @@ class ClipperGlobalConnectionsTests(unittest.TestCase):
             # into CubeDraw.cpp (three sections) and drops the sample's five.
             # The EcoSystem near misses move from their sample (98 sections, 444
             # relocations) into the canonical object (75 sections, 423 relocations).
-            self.assertEqual(sum(row['sections'] for row in pins['objects'].values()), 1001)
+            # The FollowCamera near misses move from their sample (66 sections, 337
+            # relocations) into FollowCamera.cpp (98 -> 120 sections, 250 -> 469
+            # relocations); the sample's duplicate COMDATs disappear.
+            self.assertEqual(sum(row['sections'] for row in pins['objects'].values()), 957)
             # The corrected camera loader adds its explicit first-cross call relocation.
             # QueryGround's emulation-found normal/height repairs drop one Terrain relocation.
             # The D3DIMSoultreeShadow slot 30 frame pragma takes ebp, so the shadow-point
@@ -194,8 +195,8 @@ class ClipperGlobalConnectionsTests(unittest.TestCase):
             # LoadTexturesAndCoords' promotion moves its COMDAT from the sample to CubeDraw.cpp
             # and the rewritten BuildFaceGeometry differs: three more relocations.
             # BuildFaceGeometry's own promotion keeps all 41 of its relocations.
-            self.assertEqual(sum(row['relocations'] for row in pins['objects'].values()), 4707)
-        print('Clipper global:', strict, 'strict checks; 14 whole objects; 46 retail pointer loads; storage remains unresolved')
+            self.assertEqual(sum(row['relocations'] for row in pins['objects'].values()), 4589)
+        print('Clipper global:', strict, 'strict checks; 13 whole objects; 46 retail pointer loads; storage remains unresolved')
 
 
 if __name__ == '__main__': unittest.main()

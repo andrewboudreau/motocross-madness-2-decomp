@@ -59,12 +59,12 @@ the zero from al (`xor al, al; mov [esi+0x277], al`). With
 storing `enable`, a named local) VC6 propagates the constant and stores the
 immediate.
 
-A near miss is kept in `samples/camera/FollowCameraNearMisses.cpp`:
-
-The complete per-frame Tick is shared with the standalone
-`samples/camera/FollowCameraTick.cpp` candidate. Its explicit nonexact build
-review, initializer proof and native behavioral boundary are documented in
-[FOLLOW_CAMERA_TICK.md](FOLLOW_CAMERA_TICK.md#functional-build-review).
+Four bodies are still near misses. They sit in
+`src/reconstructed/FollowCamera.cpp` (retail FollowCam.cpp) in retail order,
+each with a `Not exact` status comment; the source forms tried are listed in
+[Near misses: forms tried](#near-misses-forms-tried). The per-frame Tick's
+nonexact build review, initializer proof and native behavioral boundary are
+documented in [FOLLOW_CAMERA_TICK.md](FOLLOW_CAMERA_TICK.md#functional-build-review).
 
 - The constructor (`0x00462ee0`, 564 bytes) has every value and offset right,
   and its virtual call to slot 71 binds statically to `0x00466e50`. Copying
@@ -458,7 +458,7 @@ The rows are copied x, y, z through `m[][]` in forward, up, position order.
 That gives retail's interleaved eax/ecx/edx copies; operator() or other
 orders serialise them.
 
-Near misses (`samples/camera/FollowCameraNearMisses.cpp`):
+Near misses (in `src/reconstructed/FollowCamera.cpp`):
 - The constructor, already known.
 - Slot 10 `0x00465c20` (3672 bytes, the per-frame update): 13 bytes differ,
   with no member-pointer or reference-cast workarounds. The remaining bytes
@@ -474,9 +474,8 @@ Near misses (`samples/camera/FollowCameraNearMisses.cpp`):
   normalising the second one straight from the call gives its frame 0x18c.
 - Slot 45 `0x00463a30`: the full retail extent is 4,058 bytes, including
   `ret 8` at `0x00464a07`. The old 4,055-byte estimate omitted that return.
-  The unchanged 4,046-byte candidate retains 927 matching positions. It is
-  shared with `samples/camera/FollowCameraControls.cpp`; complete behavioral
-  and extraction evidence is recorded in
+  The unchanged 4,046-byte candidate retains 927 matching positions. Its
+  complete behavioral and extraction evidence is recorded in
   [FOLLOW_CAMERA_CONTROLS.md](FOLLOW_CAMERA_CONTROLS.md#functional-build-review).
 
 `FollowCamera.h` also types slot 41 as returning `Vector3` (slot 10 stores
@@ -492,3 +491,80 @@ a returned `bool` expression (BikeCamera's is one `||` expression; separate
 `int` (tested as full eax in KrustyBikeCamera slot 56) with no conversion
 code, while a `bool` return adds `neg`/`sbb`/`neg`. The exact type name is
 provisional; `bool` is ruled out by that override.
+
+## Near misses: forms tried
+
+Carried over from the header of the former `samples/camera` aggregate when
+its four bodies moved into FollowCamera.cpp. Matching positions are
+against the complete retail extents.
+
+### Constructor `0x00462ee0`
+
+The plain store list (564 bytes; 511 of 564; the canonical body keeps the
+volatile fault-order model instead, see FOLLOW_CAMERA_CONSTRUCTOR.md): every
+store value, offset and the static slot-71 call are right. Storing the
+saved state and parameter before the +0x224 copy (120 orders of the five
+post-call copies) gives retail's second +0x16c load for +0x254 (418 ->
+511). Left: VC6 schedules two zero stores (+0x274, +0x2dc) into the
+load-delay slot of the +0x29c global-vector copy, where retail placed
++0x2e4/+0x276. Moving the pair to any of 28 positions (either order)
+fills the slot with whichever two stores precede `mov ecx, esi` (515 at
+best, after +0x298, which is not retail's store order); moving the
++0x29c copy (29 positions) is worse. All orders of the six statements
+after the copy (720) or of the six before the slot-71 call (720) keep a
+non-retail fill (526 at best, with more diffs); 0..33 dead int locals
+change nothing. s21: `isSettled` as unsigned char instead of bool in
+FollowCamera.h (probe only) changes nothing.
+
+### Slot 10 Tick `0x00465c20`
+
+FollowCamera::Tick (0x00465c20, 3672 bytes): the per-frame
+update. Slots 75 (bool) and 55 (unsigned char) return one byte, as retail
+uses their al. The body matches except 13 bytes: retail computes the second
+D3DRMVectorRotate call's `&direction` before pushing `&position`, and in
+state 5 reserves the 0x00460b50 argument slot (`push ecx`) after the two
+squares, not before. Unchanged by /G3-/G5, /Ob2, separate locals, inline
+wrappers (for the call, the sum or the rotation), term order, a distinct
+variable for the second rotation, or extern/non-static axis vectors.
+Source shapes it needs: one function-scope `position`/`target` pair shared
+with the first-frame block, `if/else` (not ?:) for +0x2b4, the state 5
+deltas as member arithmetic, Set(targetFieldOfView, FLT_MAX) for every +0x294
+write, and the store orders below (found by permutation).
+The state 5 `push ecx` is placed in the first x87 stall slot of its block
+(after the third `fsub`, before `fld st(0)`); retail's slot (after the
+two squares) is where VC6 puts it when the block starts at `fld st(0)`,
+as in state 7 after its `je` and at every other retail site of the
+pattern. No source form moves it: dx/dy/dz as locals (any order, const,
+register, function scope), a Vector3 delta, macro or inline squares,
+inline subtractions, every association/parenthesisation, a named sum,
+an inline call wrapper, double, a switch, a block; /G6 moves it the
+other way (before the subtractions). For the rotation, a scoped or
+separate result variable, the call's return value, D3DVECTOR casts and
+`position = direction * k + target` are all worse.
+0..15 dead initialised int locals at the top of the function change nothing.
+
+### Slot 45 ProcessCameraInput `0x00463a30`
+
+FollowCamera::ProcessCameraInput (0x00463a30, 4058 complete bytes):
+the previous 4055-byte estimate omitted the final three-byte ret 8.
+The control flow, the stack frame (0x20, with ebp/edi holding the 1.55/7.0
+constants) and every FPU sequence agree, but the code drifts by a few bytes
+(4046 bytes). Each joystick block is guarded by `if (activeJoystick) { ... }`:
+retail's null test jumps to the shared epilogue at 0x004649fe. The speed
+blocks name the view's side axis and the `x * speed` scale (`float xs`), which
+gives retail's fstp/fmul; a scale local declared before the axis, or
+`(x * speed)` inline, is worse. Left: at each joystick test retail tests a
+copy (mov edx, [ecx+0xc]) and reloads the pointer for the call (mov edx, ecx;
+mov ecx, [edx+0xc]) where VC6 reuses the tested register (inline free/member
+wrappers, a const reference, `!= 0`, and type-punned or offset reads of
+activeJoystick do not change this); retail returns `moved` with mov al, bl
+where VC6 emits xor al, al. The clamp/wrap must come from inline helpers
+(they keep the sum on the FPU stack), and the key queries must be macros: with inline
+helpers VC6 runs out of inline budget and calls the Vector3 constructor.
+
+### LoadCameraFile `0x004650e0`
+
+FollowCamera::LoadCameraFile (0x004650e0, complete 1014 bytes) keeps the
+access-order model. Native evidence corrects first-cross float rounding
+and progressive matrix-store faults; see docs/FOLLOW_CAMERA_LOAD_FILE.md.
+It remains nonexact. The previous candidate was 952 bytes / 519 positions.

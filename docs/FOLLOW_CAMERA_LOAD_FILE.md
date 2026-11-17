@@ -1,9 +1,9 @@
 # FollowCamera camera-file loader
 
 `FollowCamera::LoadCameraFile` supplies the flyby camera resource path reached by
-`KrustyBikeCamera::SetupFlyby`. The readable standalone candidate remains in
-`samples/camera/FollowCameraLoadFile.cpp`: its behavior has finite native evidence,
-but it is not byte-exact and does not establish original translation-unit ownership.
+`KrustyBikeCamera::SetupFlyby`. It is in [FollowCamera.cpp](../src/reconstructed/FollowCamera.cpp) (retail `FollowCam.cpp`), in retail
+order, with a `// Not exact` status comment: its behavior has finite native
+evidence, but it is not byte-exact.
 
 ## Identity and complete extent
 
@@ -31,7 +31,7 @@ retail behavior rather than introducing an ownership policy.
 
 ## Two observed behavior corrections
 
-The old aggregate candidate emitted 952 bytes with 519 resolved matching positions
+The old candidate emitted 952 bytes with 519 resolved matching positions
 against the full 1,014-byte target. Connecting its local Vector3 math values to the
 existing Vec3 normalization/cross providers preserved every old raw instruction
 byte and call offset under those two proved math-name changes.
@@ -93,7 +93,7 @@ boundaries; no executed game helper returns a scripted result.
 
 The graph uses the already reviewed nonexact stream CheckHeader (176 versus 186 bytes)
 and Seek (695 versus 702 bytes). Their complete source bytes and named relocations equal
-the existing admitted sample. Both loader runs share these helpers; this is not an
+the canonical stream source. Both loader runs share these helpers; this is not an
 untouched retail stream graph. Vec3Normalize (150 bytes), CrossProductCall (91 bytes),
 FastInvSqrt (107 bytes) and its table initializer (74 bytes) execute as strict actual source.
 The table is initialized by its real initializer before loading.
@@ -160,44 +160,25 @@ file and bounded record count; concurrent file changes are not modeled. Archive,
 encoded and write paths are excluded. Prepared raw camera storage does not prove
 full camera construction, integrated flyby startup, menus or rendered frames.
 
-## Aggregate and compiler artifacts
+## Validation unit and compiler artifacts
 
-The standalone compiles with relative includes and no project include paths.
-Its whole output is independently identical under the actual game compiler command.
-It has nine nondebug sections and 37 relocations, including the normal emitted
-48-byte vector-constructor iterator COMDAT and constructor EH metadata. The
-compiler iterator is unchanged from the original aggregate, not claimed as a
-new recovered retail method. No additional initializer or global runtime storage
-is introduced by the standalone candidate.
+The behaviour test links a validation unit named `FollowCamera.cpp`: the
+unit's includes, the `CrossProductCall` declaration, the loader's vector
+helpers and LoadCameraFile, all sliced from the canonical file. It has nine
+nondebug sections and 37 relocations, including the normal emitted 48-byte
+vector-constructor iterator COMDAT and constructor EH metadata; the iterator
+is a compiler artifact, not a recovered retail method. No initializer or
+global runtime storage is introduced. The canonical unit's complete object
+(120 nondebug sections, 469 relocations) is pinned as well and reproduced by
+the game compile command. Only verified `FollowCamera.cpp` filename
+identities are made portable.
 
-Same-path original/corrected aggregate proof accounts for all 66 nondebug sections.
-63 sections and 302 relocations remain identical, including all other methods,
-static axis initializer bodies, 60-byte BSS, 16-byte CRT list, RTTI/vtables and data.
-Three changes are explicit: the corrected loader section/padding, its saved-stream
-EH displacement (-396 to -420), and validated diagnostic filename storage. The EH
-state graph and cleanup action are otherwise unchanged. Generated label names are
-compared through actual destinations, not ignored. Retained full-object pins include
-public/static symbol offsets, flags and relocation destinations; only verified
-filename identities are made portable. Original TU ownership is not established.
-
-The existing clipper and visibility regressions also pin the complete camera
-aggregate. Their published old fingerprints were independently reproduced before
-updating only those two records for the three reviewed changes above. Each test
-explicitly recognizes the new loader filename for path portability; all other
-object records remain unchanged. The complete aggregate now has 337 relocations,
-up from 336 because the first cross product calls the existing source helper.
+The clipper and visibility regressions pin the complete FollowCamera.cpp
+object too.
 
 ## Functional build review
 
-Independent source review and native reruns accepted this candidate for explicit
-reviewed-nonexact functional-build admission. Isolated build `build-rmu8z7mx`
-compiles 262/262 translation units and reduces unresolved names from 220 to 219:
-only LoadCameraFile is removed, with no additions. All 261 prior production objects
-(10,695 sections and 45,776 relocations) are preserved under the one independently
-verified ProCircuit name connection. Independent recompilation reproduces the
-new loader object's nine nondebug sections and 37 relocations under the actual
-game command and retained pin. Native behavior evidence is finite; the function
-remains nonexact, and the source-built game still has unrelated unresolved providers.
+Native behavior evidence is finite; the function remains nonexact.
 
 Reproduce from repository root with private inputs:
 

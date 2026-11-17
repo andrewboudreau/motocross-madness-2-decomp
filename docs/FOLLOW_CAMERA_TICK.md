@@ -1,13 +1,9 @@
 # FollowCamera per-frame update
 
-`samples/camera/FollowCameraTick.cpp` extracts the complete existing
-`FollowCamera::Tick(float)` candidate without changing its body. The aggregate
-`FollowCameraNearMisses.cpp` includes it and shares the candidate vector
-operators through `FollowCameraCandidateOperators.h`. The aggregate keeps its
-existing private axes; the standalone translation unit initializes its own
-two axes. Neither context references retail storage in production. This does
-not establish ownership of the complete original `FollowCam.cpp` translation
-unit.
+`FollowCamera::Tick(float)` (slot 10) is in [FollowCamera.cpp](../src/reconstructed/FollowCamera.cpp) (retail `FollowCam.cpp`), in retail
+order, with a `// Not exact` status comment. The behaviour test links a
+validation unit named `FollowCamera.cpp` holding the file's vector statics,
+the vector operators and Tick, all sliced from the canonical file.
 
 ## Retail extent and source preservation
 
@@ -35,25 +31,15 @@ terms in that argument (3659). Retail's two differences are both argument
 scheduling: `lea ecx, [esp + N]` ahead of `push eax` in the second rotation,
 and the square-root argument's `push ecx` after the two squares.
 
-The persistent regression compares complete standalone and aggregate Tick
-bytes and named relocations, including addends. A private before/after proof
-against `364d4e27` additionally preserves all five aggregate function extents
-and all **64 nondebug sections**, including code, EH maps, CRT entries, constants
-and writable storage. Compiler-generated `$L`/`$T` names are resolved to their
-unchanged section/offset targets. Diagnostic `__FILE__` strings are explicitly
-checked and excluded from the storage comparison: extraction introduces a
-separate `FollowCameraTick.cpp` string, while the remaining aggregate retains
-its own filename. No other section or relocation difference is ignored.
-Private reproduction:
-`work/game-build/check_follow_camera_extraction.py`; report:
-`work/game-build/follow-camera-extraction-proof.json`.
+The regression compares the validation unit's complete Tick bytes and named
+relocations, including addends, with the canonical unit's. Only the
+`__FILE__` literal, identified by its contents, is named portably: its
+mangled name encodes the unit's path.
 
-The standalone axis initializer wrappers and bodies are independently strict
-against `0x00466f60`/`0x00466f70` and `0x00466ff0`/`0x00467000`, with full extents
-of 5/60 bytes for each pair. The regression checks both ordered CRT entries
-and every emitted four-byte floating constant against its retail value. This
-proves the required axis initialization; it does not assign the entire retail
-translation unit or its other initializers to this standalone candidate.
+The validation unit's eight axis initializers (wrappers and bodies
+`0x00466f10`..`0x004670c0`, 5/60 bytes each pair) are strict. The regression
+checks the four ordered CRT entries and every emitted four-byte floating
+constant against its retail value.
 
 ## Functional build review
 
@@ -67,8 +53,8 @@ to the two squared horizontal deltas, as retail does. Mode restoration,
 one-byte virtual results, global input-pointer reloads and the ordering of
 allocation/ownership stores remain unchanged.
 
-`tests/test_follow_camera_tick_behavior.py` compiles the actual standalone
-candidate and actual `FastMath.cpp` with `/O2`. It separately compiles the
+`tests/test_follow_camera_tick_behavior.py` compiles the validation unit
+and actual `FastMath.cpp` with `/O2`. It separately compiles the
 private fixture with `/Od` because VC6's optimizer crashes on that fixture's
 large callback-table setup. Both `FastSqrt` and `InitFastSqrtTable` are checked
 strict before the source implementations execute with the initialized table
@@ -112,11 +98,6 @@ camera behavior. The rotation callback is a deterministic test transformation,
 not a replacement Direct3DRM implementation. Finite full-state equivalence under
 these boundary scripts supports explicit **reviewed-nonexact** build admission;
 it does not establish end-to-end camera operation or whole-game readiness.
-
-The real source build `build-o43h9kq8` compiles all 202 translation units.
-Compared with `build-wjtz79k7`, unresolved symbols fall from 504 to 503:
-only `FollowCamera::Tick` disappears, with no new unresolved dependencies.
-The full game still does not link.
 
 ```powershell
 $env:VC6_ROOT = (Resolve-Path work/vc6sp3-disc).Path

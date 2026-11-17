@@ -1,6 +1,6 @@
 """FollowCamera::ProcessCameraInput 0x00463a30, slot 45: keyboard/joystick camera controls.
 
-The candidate is samples/camera/FollowCameraControls.cpp. The camera block is random floats;
+The candidate is in src/reconstructed/FollowCamera.cpp. The camera block is random floats;
 offsets from the retail body: the view matrix's first column +0xac/+0xbc/+0xcc, eye +0x170,
 view direction +0x17c, followDistance +0x220 (around the 7 and 50 thresholds), followPitch
 +0x22c (near the +-1.55 clamp), followYaw +0x234 (near +-pi), cameraState +0x244, overrideActive
@@ -17,7 +17,7 @@ import struct
 
 RETAIL_VA = 0x00463a30
 SYMBOL = '?ProcessCameraInput@FollowCamera@@UAE_N_NM@Z'
-SOURCE = 'samples/camera/FollowCameraControls.cpp'
+SOURCE = 'src/reconstructed/FollowCamera.cpp'
 TRACK_GAME = 0x0056e26c
 KEYS = [0x48, 0x50, 0x4b, 0x4d, 0x4a, 0x0c, 0x4e, 0x0d]
 PROBES = {0x00463a63: 'move target', 0x00463d1b: 'target joystick', 0x00463ee6: 'not target',

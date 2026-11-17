@@ -1,15 +1,12 @@
 {
-  "baseline": "Published c524a871; original aggregate and its 564/511 constructor remain unchanged.",
+  "baseline": "Canonical src/reconstructed/FollowCamera.cpp (retail FollowCam.cpp) with the constructor in retail order, and the constructor's validation unit.",
   "filenames": [
-    "samples/camera/FollowCameraNearMisses.cpp",
-    "samples/camera/FollowCameraLoadFile.cpp",
-    "samples/camera/FollowCameraTick.cpp",
-    "samples/camera/FollowCameraControls.cpp"
+    "src/reconstructed/FollowCamera.cpp"
   ],
   "aggregate": {
-    "sections": 66,
-    "relocations": 337,
-    "sha256": "815b757d5bdb86a25d20feec8c71aeb2b97617472c789d257aa9b0fa1812eb75"
+    "sections": 120,
+    "relocations": 469,
+    "sha256": "47f8e5c51b9246b77d0b8f9469cae670704a2371984b7453aa45f6bb500c87af"
   },
   "candidate": {
     "sections": 31,

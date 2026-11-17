@@ -102,7 +102,7 @@ int Camera::Tick(float dt){VerifyThis(this);Event& e=Begin(105);e.args[0]=dt;Fin
 void* operator new(size_t size,const char* file,int line){
     if(size!=20 || line<0x4b0 || line>0x4b6 || line==0x4b3)ExitProcess(87);
     const char* suffix=strrchr(file,'\\');if(!suffix)suffix=strrchr(file,'/');suffix=suffix?suffix+1:file;
-    if(strcmp(file,"D:\\aardvark\\VC\\krusty2\\FollowCam.cpp") && strcmp(suffix,"FollowCameraTick.cpp") && strcmp(suffix,"FollowCameraNearMisses.cpp"))ExitProcess(88);
+    if(strcmp(file,"D:\\aardvark\\VC\\krusty2\\FollowCam.cpp") && strcmp(suffix,"FollowCamera.cpp"))ExitProcess(88);
     Begin(106,size,line);Finish();int n=observed.allocations++;if(n>=6)ExitProcess(89);
     if(scenario.failAllocation==n+1)return 0;return world.heap[n];
 }

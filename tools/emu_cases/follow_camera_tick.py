@@ -1,6 +1,6 @@
 """FollowCamera::Tick 0x00465c20, the follow camera's per-frame update (tools/emu_diff.py case).
 
-The candidate is samples/camera/FollowCameraTick.cpp. The camera block is random floats with
+The candidate is in src/reconstructed/FollowCamera.cpp. The camera block is random floats with
 the flags and states set from the case; offsets from src/reconstructed/FollowCamera.h, checked
 against the retail body: renderContext +0x18 (currentCamera +8), fieldOfView +0x16c, eye
 +0x170, min/max field of view +0x1dc/+0x1e0, FollowCamera fields +0x220..+0x304 (cameraState
@@ -25,7 +25,7 @@ import struct
 
 RETAIL_VA = 0x00465c20
 SYMBOL = '?Tick@FollowCamera@@UAEHM@Z'
-SOURCE = 'samples/camera/FollowCameraTick.cpp'
+SOURCE = 'src/reconstructed/FollowCamera.cpp'
 TRACK_GAME = 0x0056e26c
 FLT_MAX = 3.4028234663852886e38
 PROBES = {0x00465c69: 'place', 0x00465f3b: 'start blend', 0x0046607f: 'allocate eases',

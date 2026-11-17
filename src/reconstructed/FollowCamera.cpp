@@ -3,6 +3,11 @@
 #include "FollowCamera.h"
 
 #include "DebugAlloc.h"
+#include "TextureMap.h"
+#include "ResourceEntry.h"
+
+#include <stdio.h>
+#include <string.h>
 
 // FollowCam.cpp's per-file vector constants: 0x0065b448, 0x0065b458,
 // 0x0065b468 and 0x0065b438, initialised by 0x00466f10..0x004670fb
@@ -26,6 +31,84 @@ static inline Vector3& operator*=(Vector3& v, float scale) {
 
 static inline Vector3 operator+(const Vector3& a, const Vector3& b) {
     return Vector3(a.x + b.x, a.y + b.y, a.z + b.z);
+}
+
+// Slots 45 and 50 also subtract.
+static inline Vector3& operator-=(Vector3& v, const Vector3& other) {
+    v.x -= other.x;
+    v.y -= other.y;
+    v.z -= other.z;
+    return v;
+}
+
+static inline Vector3 operator-(const Vector3& a, const Vector3& b) {
+    return Vector3(a.x - b.x, a.y - b.y, a.z - b.z);
+}
+
+// 0x00462ee0. Not exact (100 of 564 bytes, 569 compiled: the volatile accesses
+// model retail's decoded write order before a guarded destination faults;
+// the plain store list reaches 511/564 but writes later fields first.
+// docs/FOLLOW_CAMERA_CONSTRUCTOR.md, docs/FOLLOW_CAMERA.md forms tried)
+// Virtual calls in a constructor bind statically, so slot 71 is a direct call.
+FollowCamera::FollowCamera(int flags) : PCCamera(flags) {
+    isPlaced = 0;
+    targetPoint = kVec3Zero;
+    cachedTarget = kVec3Zero;
+    worldYaw = 0;
+    targetDistance = 0;
+    // These explicit accesses preserve the observed writes before a guarded
+    // destination faults. They do not establish original volatile member types.
+    volatile FollowCamera* ordered = this;
+    ordered->followHeading.x = kVec3ZAxis.x;
+    ordered->followHeading.y = kVec3ZAxis.y;
+    float headingZ = kVec3ZAxis.z;
+    ordered->points = 0;
+    ordered->isCrashView = 0;
+    ordered->followHeading.z = headingZ;
+    lift = 0;
+    lookAheadDistance = 27.0f;
+    targetFieldOfView = fieldOfView;
+    state4FieldOfView = fieldOfView;
+    fieldOfViewEase = 0;
+    subject = 0;
+    targetEaseX = 0;
+    targetEaseY = 0;
+    targetEaseZ = 0;
+    positionEaseX = 0;
+    positionEaseY = 0;
+    positionEaseZ = 0;
+    distanceEase = 0;
+    fovKeysEnabled = 0;
+    overrideActive = 0;
+    isMovingTarget = 0;
+    ordered->isSettled = 0;
+    ordered->pointCapacity = 0;
+    pointCount = 0;
+    followHeight = 7.0f;
+    subjectCellSize = 3.0f;
+    cameraState = 0;
+    SetCameraState(0);
+    resumeEyePosition = eyePosition;
+    savedCameraState = cameraState;
+    resumeState = cameraState;
+    savedFieldOfView = fieldOfView;
+    initialDistance = followDistance;
+    initialPitch = followPitch;
+    initialYaw = followYaw;
+    resumeFieldOfView = fieldOfView;
+    settleChecked = 0;
+    wasWide = 0;
+    stateCount = 0;
+    stateIndex = 0;
+    blendClock = 0;
+    turnYaw = 0;
+    isBlending = 0;
+    recordsPerSecond = 15.0f;
+    frameTime = 0;
+    distanceFovMinimum = 10.0f;
+    distanceForMinimumFov = 280.0f;
+    distanceFovMaximum = 70.0f;
+    distanceForMaximumFov = 20.0f;
 }
 
 // 0x00463350 (scalar deleting wrapper 0x00463120): frees the owned values,
@@ -228,6 +311,211 @@ void FollowCamera::SteerToKeepTargetOnScreen(float dt) {
         SetTableEntry(0, &targetPoint, 0, 0, 0, 0, 0);
         SteerToKeepPointsOnScreen(dt, 0, 0);
     }
+}
+
+// Slot 45's input queries go through the game's ControlInterface each time.
+// Macros, not inline functions: with inline helpers VC6 runs out of inline
+// budget in slot 45 and calls the Vector3 constructor out of line.
+#define FOLLOWCAMERA_CONTROLS() (g_TrackGame->controlInterface)
+static inline FollowCameraJoystickDeviceView* FollowCameraJoystick(ControlInterface* controls) {
+    return (FollowCameraJoystickDeviceView*)controls->activeJoystick;
+}
+#define FOLLOWCAMERA_KEY(control) (FOLLOWCAMERA_CONTROLS()->IsDeviceButtonDown((control), 0, 0x3f, 0))
+
+// Slot 45's reverse keys subtract the step instead (fsubr).
+inline void FollowCameraTurnBack(float& angle, float step) {
+    angle -= step;
+    if (angle > 3.1415927f)
+        angle -= 6.2831855f;
+    else if (angle < -3.1415927f)
+        angle += 6.2831855f;
+}
+
+inline void FollowCameraTiltBack(float& angle, float step) {
+    angle -= step;
+    if (angle > 1.55f)
+        angle = 1.55f;
+    else if (angle < -1.55f)
+        angle = -1.55f;
+}
+
+// 0x00463a30. Inactive: clears +0x274. With the override on and +0x26c set
+// (slot 23), the keys and the joystick move the cached target (+0x2a8);
+// otherwise, outside states 3, 6 and 7, state 5 moves the camera position
+// (+0x170) and the other states turn the pitch (+0x22c, +-1.55), the yaw
+// (+0x234, wrapped to +-pi) and the distance (+0x220, at least 7). Steps are
+// 300 or 30 units per second; below distance 50 the turn rate grows by
+// 3 - 0.04 * distance. Returns whether the camera moved.
+// Not exact (927 of 4058 bytes, 4046 compiled: VC6 reuses the tested
+// joystick register where retail reloads it, and returns `moved` through
+// xor al, al; docs/FOLLOW_CAMERA_CONTROLS.md, docs/FOLLOW_CAMERA.md forms tried)
+bool FollowCamera::ProcessCameraInput(bool active, float dt) {
+    bool moved = false;
+    if (active) {
+    if (overrideActive && isMovingTarget) {
+        float x;
+        float y;
+        float speed = dt * 300.0f;
+        isSettled = 0;
+        if (FOLLOWCAMERA_KEY(0x48))
+            cachedTarget.y += speed;
+        if (FOLLOWCAMERA_KEY(0x50) && targetDistance > 0.0f)
+            cachedTarget.y -= speed;
+        if (FOLLOWCAMERA_KEY(0x4b))
+            cachedTarget -= Vector3(viewMatrix(0, 0), viewMatrix(1, 0), viewMatrix(2, 0)) * speed;
+        if (FOLLOWCAMERA_KEY(0x4d))
+            cachedTarget += Vector3(viewMatrix(0, 0), viewMatrix(1, 0), viewMatrix(2, 0)) * speed;
+        if (FOLLOWCAMERA_KEY(0x4a) || FOLLOWCAMERA_KEY(0x0c))
+            cachedTarget += speed * viewDirection;
+        if ((FOLLOWCAMERA_KEY(0x4e) || FOLLOWCAMERA_KEY(0x0d)) && targetDistance > 0.0)
+            cachedTarget -= speed * viewDirection;
+        if (FOLLOWCAMERA_CONTROLS()->activeJoystick) {
+            if (FollowCameraJoystick(FOLLOWCAMERA_CONTROLS())
+                    ->GetPovDirection(0, &x, &y)) {
+                if (targetDistance > 0.0f)
+                    cachedTarget.y += y * speed;
+                Vector3 side(viewMatrix(0, 0), viewMatrix(1, 0), viewMatrix(2, 0));
+                float xs = x * speed;
+                cachedTarget += side * xs;
+                if (x != 0.0f || y != 0.0f)
+                    return moved;
+            }
+            if (FOLLOWCAMERA_CONTROLS()->IsDeviceButtonDown(2, 2, 0xc, 0))
+                cachedTarget += speed * viewDirection;
+            if (FOLLOWCAMERA_CONTROLS()->IsDeviceButtonDown(3, 2, 0xc, 0) && targetDistance > 0.0)
+                cachedTarget -= speed * viewDirection;
+        }
+    } else if (cameraState != 3 && cameraState != 6 && cameraState != 7) {
+    float x;
+    float y;
+    float turn = dt * 30.0f;
+    float speed = dt * 300.0f;
+    if (cameraState == 5) {
+        if (FOLLOWCAMERA_KEY(0x48)) {
+            eyePosition.y += speed;
+            moved = true;
+        }
+        if (FOLLOWCAMERA_KEY(0x50) && targetDistance > 6.5f) {
+            eyePosition.y -= speed;
+            moved = true;
+        }
+        if (FOLLOWCAMERA_KEY(0x4b)) {
+            eyePosition -= Vector3(viewMatrix(0, 0), viewMatrix(1, 0), viewMatrix(2, 0)) * speed;
+            moved = true;
+        }
+        if (FOLLOWCAMERA_KEY(0x4d)) {
+            eyePosition += Vector3(viewMatrix(0, 0), viewMatrix(1, 0), viewMatrix(2, 0)) * speed;
+            moved = true;
+        }
+        if (FOLLOWCAMERA_KEY(0x4a) || FOLLOWCAMERA_KEY(0x0c)) {
+            eyePosition -= speed * viewDirection;
+            moved = true;
+        }
+        if ((FOLLOWCAMERA_KEY(0x4e) || FOLLOWCAMERA_KEY(0x0d)) && targetDistance > 6.5f) {
+            eyePosition += speed * viewDirection;
+            moved = true;
+        }
+        if (FOLLOWCAMERA_CONTROLS()->activeJoystick) {
+            if (FollowCameraJoystick(FOLLOWCAMERA_CONTROLS())
+                    ->GetPovDirection(0, &x, &y)) {
+                if (targetDistance > 6.5f)
+                    eyePosition.y += y * speed;
+                Vector3 side(viewMatrix(0, 0), viewMatrix(1, 0), viewMatrix(2, 0));
+                float xs = x * speed;
+                eyePosition += side * xs;
+                if (x != 0.0 || y != 0.0f)
+                    moved = true;
+                if (x != 0.0f || y != 0.0f)
+                    return moved;
+            }
+            if (FOLLOWCAMERA_CONTROLS()->IsDeviceButtonDown(2, 2, 0xc, 0)) {
+                eyePosition -= speed * viewDirection;
+                moved = true;
+            }
+            if (FOLLOWCAMERA_CONTROLS()->IsDeviceButtonDown(3, 2, 0xc, 0) && targetDistance > 6.5f) {
+                eyePosition += speed * viewDirection;
+                moved = true;
+            }
+        }
+        return moved;
+    }
+    if (FOLLOWCAMERA_KEY(0x48)) {
+        if (followDistance < 50.0)
+            FollowCameraTilt(followPitch, (3.0f - followDistance * 0.04f) * turn * 0.01745329f);
+        else
+            FollowCameraTilt(followPitch, turn * 0.01745329f);
+        moved = true;
+    }
+    if (FOLLOWCAMERA_KEY(0x50)) {
+        if (followDistance < 50.0)
+            FollowCameraTilt(followPitch, (3.0f - followDistance * 0.04f) * turn * -0.01745329f);
+        else
+            FollowCameraTiltBack(followPitch, turn * 0.01745329f);
+        moved = true;
+    }
+    if (FOLLOWCAMERA_KEY(0x4b)) {
+        if (followDistance < 50.0)
+            FollowCameraTurn(followYaw, (3.0f - followDistance * 0.04f) * turn * 0.01745329f);
+        else
+            FollowCameraTurn(followYaw, turn * 0.01745329f);
+        moved = true;
+    }
+    if (FOLLOWCAMERA_KEY(0x4d)) {
+        if (followDistance < 50.0)
+            FollowCameraTurn(followYaw, (3.0f - followDistance * 0.04f) * turn * -0.01745329f);
+        else
+            FollowCameraTurnBack(followYaw, turn * 0.01745329f);
+        moved = true;
+    }
+    if (FOLLOWCAMERA_KEY(0x4a) || FOLLOWCAMERA_KEY(0x0c)) {
+        followDistance += turn;
+        if (followDistance < 7.0f)
+            followDistance = 7.0f;
+        moved = true;
+    }
+    if (FOLLOWCAMERA_KEY(0x4e) || FOLLOWCAMERA_KEY(0x0d)) {
+        followDistance -= turn;
+        if (followDistance < 7.0f)
+            followDistance = 7.0f;
+        moved = true;
+    }
+    if (FOLLOWCAMERA_CONTROLS()->activeJoystick) {
+        if (FollowCameraJoystick(FOLLOWCAMERA_CONTROLS())
+                ->GetPovDirection(0, &x, &y)) {
+            if (followDistance < 50.0)
+                FollowCameraTilt(followPitch, (3.0f - followDistance * 0.04f) * y * turn * 0.01745329f);
+            else
+                FollowCameraTilt(followPitch, y * turn * 0.01745329f);
+            if (followDistance < 50.0)
+                FollowCameraTurn(followYaw, (3.0f - followDistance * 0.04f) * x * turn * -0.01745329f);
+            else
+                FollowCameraTurn(followYaw, x * turn * -0.01745329f);
+            if (x != 0.0 || y != 0.0f)
+                moved = true;
+            if (x != 0.0f || y != 0.0f)
+                return moved;
+        }
+        if (FOLLOWCAMERA_CONTROLS()->IsDeviceButtonDown(2, 2, 0xc, 0)) {
+            followDistance += turn;
+            if (followDistance < 7.0f)
+                followDistance = 7.0f;
+            moved = true;
+        }
+        if (FOLLOWCAMERA_CONTROLS()->IsDeviceButtonDown(3, 2, 0xc, 0)) {
+            followDistance -= turn;
+            if (followDistance < 7.0f)
+                followDistance = 7.0f;
+            moved = true;
+        }
+    }
+    return moved;
+    } else {
+        isSettled = 1;
+    }
+    } else {
+        isSettled = 0;
+    }
+    return moved;
 }
 
 // 0x00464a80: the point the camera follows, by state.
@@ -562,6 +850,76 @@ inline Vector3 FollowCameraNormalize(const Vector3& v) {
         reinterpret_cast<const Vec3*>(&v), scale));
 }
 
+// LoadCameraFile's vector helpers: 0x005087b0 normalises a copy; the cross
+// product of the first frame is expanded inline.
+Vec3 Vec3Normalize(const Vec3&);
+inline Vec3 FollowCameraCross(const Vec3& a, const Vec3& b) {
+    return Vec3((a.y * b.z) - a.z * b.y, (a.z * b.x) - a.x * b.z, (a.x * b.y) - a.y * b.x);
+}
+
+// 0x004650e0. Not exact (429 of 1014 bytes, 980 compiled: the matrix
+// stores model retail's interleaved order; docs/FOLLOW_CAMERA_LOAD_FILE.md)
+// Each "CAMERA" line holds two skipped words, three skipped numbers, a
+// direction, an up hint and a position (each stored x, z, y) and one more
+// value. The frame matrix gets the side, the corrected up and the direction
+// as rows 0-2 and the position as row 3.
+void FollowCamera::LoadCameraFile(const char* path) {
+    FileStream* stream =
+        new(__FILE__, 0x3c7) FileStream(g_ResourceManager);
+    if (!stream->Open(path, "rt", 0)) {
+        delete stream;
+        return;
+    }
+    char line[256];
+    frameCount = 0;
+    while (stream->ReadLine(line, 0xff)) {
+        if (!_strnicmp(line, "CAMERA", 6))
+            frameCount++;
+    }
+    frames = new(__FILE__, 0x3e1) Matrix4[frameCount];
+    field_0x33c = new(__FILE__, 0x3e2) float[frameCount];
+    stream->Seek(stream->sliceOffset, 0, 1);
+    int k = 0;
+    while (stream->ReadLine(line, 0xff)) {
+        if (!_strnicmp(line, "CAMERA", 6)) {
+            Vec3 direction;
+            Vec3 upHint;
+            Vec3 position;
+            sscanf(line, "%*s%*s%*f%*f%*f%f%f%f%f%f%f%f%f%f%f", &direction.x, &direction.z,
+                   &direction.y, &upHint.x, &upHint.z, &upHint.y, &position.x, &position.z,
+                   &position.y, &field_0x33c[k]);
+            Matrix4* frame = &frames[k];
+            Vec3 forward = direction;
+            Vec3 side = CrossProductCall(upHint, direction);
+            Vec3 up = Vec3Normalize(FollowCameraCross(direction, side));
+            forward = Vec3Normalize(forward);
+            side = CrossProductCall(up, forward);
+            // Reconstructed access-order model: retail interleaves these stores.
+            // Preserve progressive access faults; this does not assert that the
+            // original matrix type was volatile.
+            volatile Matrix4* output = frame;
+            output->m[0][0] = side.x;
+            output->m[0][1] = side.y;
+            output->m[1][0] = up.x;
+            output->m[1][1] = up.y;
+            output->m[0][2] = side.z;
+            output->m[1][2] = up.z;
+            output->m[2][0] = forward.x;
+            output->m[0][3] = 0.0f;
+            output->m[1][3] = 0.0f;
+            output->m[2][1] = forward.y;
+            output->m[2][2] = forward.z;
+            output->m[2][3] = 0.0f;
+            output->m[3][0] = position.x;
+            output->m[3][1] = position.y;
+            output->m[3][2] = position.z;
+            output->m[3][3] = 1.0f;
+            k++;
+        }
+    }
+    delete stream;
+}
+
 // 0x004654e0: an orthonormal basis from `forward` and `up` (up is made
 // perpendicular to forward, both are normalised) stored with the side vector
 // as rows 0-2 of the +0x344 matrix.
@@ -663,6 +1021,213 @@ bool FollowCamera::PlayRecordedFrame(float dt, const Vector3* offset) {
     }
     ShowSubject();
     return true;
+}
+
+// 0x00465c20. Not exact (3659 of 3672 bytes: retail computes the second
+// rotation's &direction before pushing &position, and places state 5's
+// argument slot after the two squares; docs/FOLLOW_CAMERA_TICK.md,
+// docs/FOLLOW_CAMERA.md forms tried)
+int FollowCamera::Tick(float dt) {
+    Vector3 position;
+    Vector3 target;
+    Vector3 smoothed;
+    bool current = ((RenderTarget*)renderContext)->currentCamera == this;
+    followHeading = ComputeFollowHeading();
+    if (!isPlaced) {
+        isPlaced = 1;
+        targetPoint = GetLeadTargetPoint(0);
+        position = followHeading * -followDistance;
+        position += targetPoint;
+        reinterpret_cast<Terrain*>(subject)->QueryGround(reinterpret_cast<TerrainVec3*>(&position), 0, 0, 0);
+        Vector3 direction = position - targetPoint;
+        D3DRMVectorRotate(&position, &direction, &kVec3XAxis, followPitch);
+        D3DRMVectorRotate(&direction, &position, &kVec3YAxis, followYaw);
+        direction *= followDistance;
+        position = direction + targetPoint;
+        SetFrame(&position, 0, 0, 0, 0);
+        target = followHeading * lookAheadDistance;
+        target += targetPoint;
+        reinterpret_cast<Terrain*>(subject)->QueryGround(reinterpret_cast<TerrainVec3*>(&target), 0, 0, 0);
+        LookAt(target);
+        wasWide = FollowCameraAbs(followYaw) > 2.0f;
+    }
+    if (cameraState != 6 && isCrashView && !IsSubjectCrashed()) {
+        isCrashView = 0;
+        followDistance = savedDistance;
+        followPitch = savedPitch;
+        followYaw = savedYaw;
+    }
+    bool wide = FollowCameraAbs(followYaw) > 2.0f;
+    if (cameraState != 6 && !wasWide && wide)
+        isBlending = 1;
+    if (overrideActive)
+        targetPoint = cachedTarget;
+    else
+        targetPoint = GetLeadTargetPoint(dt);
+    if (cameraState == 5) {
+        float dx = eyePosition.x - targetPoint.x;
+        float dy = eyePosition.y - targetPoint.y;
+        float dz = eyePosition.z - targetPoint.z;
+        targetDistance = FastSqrt(dz * dz + dx * dx + dy);
+    }
+    bool moved = ProcessCameraInput(current, dt);
+    UpdateTurnYaw(wide);
+    bool following = ShouldFollowSubject();
+    target = SelectFollowPoint(wide || isSettled, following, dt);
+    position = ComputeCameraPosition(following, target, dt);
+    if (!positionEaseX) {
+        targetEaseZ = new(__FILE__, 0x4b0) FollowCameraEase(target.z, 0.3f);
+        targetEaseX = new(__FILE__, 0x4b1) FollowCameraEase(target.x, 0.3f);
+        targetEaseY = new(__FILE__, 0x4b2) FollowCameraEase(target.y, 0.3f);
+        EaseTargetToward(target);
+        positionEaseX = new(__FILE__, 0x4b4) FollowCameraEase(position.x, 0.3f);
+        positionEaseY = new(__FILE__, 0x4b5) FollowCameraEase(position.y, 0.3f);
+        positionEaseZ = new(__FILE__, 0x4b6) FollowCameraEase(position.z, 0.3f);
+        EasePositionToward(position);
+    }
+    if (cameraState == 5) {
+        if (!overrideActive) {
+            targetFieldOfView = (distanceForMinimumFov - targetDistance) / (distanceForMinimumFov - distanceForMaximumFov) *
+                              (distanceFovMaximum - distanceFovMinimum) + distanceFovMinimum;
+            if (targetFieldOfView < distanceFovMinimum)
+                targetFieldOfView = distanceFovMinimum;
+            if (targetFieldOfView > distanceFovMaximum)
+                targetFieldOfView = distanceFovMaximum;
+            if (moved)
+                targetFieldOfView = (targetFieldOfView - fieldOfView) * 0.75f + fieldOfView;
+        }
+    } else if (cameraState == 7) {
+        float dx = eyePosition.x - target.x;
+        if (dx < 0.0f) dx = -dx;
+        float dz = eyePosition.z - target.z;
+        if (dz < 0.0f) dz = -dz;
+        targetFieldOfView = ((200.0f - FastSqrt(dz * dz + dx * dx)) / 180.0f) * 60.0f + 10.0f;
+        if (targetFieldOfView < 10.0f) targetFieldOfView = 10.0f;
+        if (targetFieldOfView > 70.0f) targetFieldOfView = 70.0f;
+        fieldOfViewEase->Set(targetFieldOfView, FLT_MAX);
+    } else if (following) {
+        if (cameraState != 3) {
+            if (cameraState == 4)
+                SaveCameraPreset();
+            isSettled = TrySettleOnPoint(position, wide, moved);
+        }
+    } else if (IsSubjectCrashed()) {
+        isCrashView = 1;
+    }
+    cachedTarget.x = targetEaseX->Update(target.x, dt);
+    cachedTarget.y = targetEaseY->Update(target.y, dt);
+    cachedTarget.z = targetEaseZ->Update(target.z, dt);
+    smoothed.x = positionEaseX->Update(position.x, dt);
+    smoothed.y = positionEaseY->Update(position.y, dt);
+    smoothed.z = positionEaseZ->Update(position.z, dt);
+    if (isBlending) {
+        GetTargetVelocity();
+        blendClock += dt;
+        blendClock = FollowCameraMin(blendClock, 1.0f);
+        float blend = blendClock;
+        isSettled = 0;
+        smoothed.x = (position.x - smoothed.x) * blend + smoothed.x;
+        smoothed.y = (position.y - smoothed.y) * blend + smoothed.y;
+        smoothed.z = (position.z - smoothed.z) * blend + smoothed.z;
+        if (!moved && blend >= 1.0f) {
+            EasePositionToward(position);
+            EaseTargetToward(cachedTarget);
+            blendClock = 0.0f;
+            isBlending = moved;
+        }
+    }
+    if (savedCameraState == 6 || resumeState == 7) {
+        isSettled = 1;
+        if (resumeState == 7)
+            resumeState = cameraState;
+        else
+            savedCameraState = cameraState;
+        EasePositionToward(position);
+        EaseTargetToward(target);
+        smoothed = position;
+        cachedTarget = target;
+    } else if (isSettled) {
+        smoothed = position;
+        if (!overrideActive)
+            cachedTarget = target;
+    }
+    ClampPositionAboveGround(&smoothed);
+    if (current) {
+        float roll;
+        if (cameraState == 3 && following) {
+            roll = GetRoll();
+            HideSubject();
+        } else {
+            roll = 0.0f;
+            ShowSubject();
+        }
+        SetFrame(&smoothed, 0, 0, &roll, 0);
+        LookAt(cachedTarget);
+        if (IsTargetViewHeld()) {
+            if (cameraState != 7 && !isCrashView) {
+                resumeState = cameraState;
+                resumeFieldOfView = targetFieldOfView;
+                initialPitch = followPitch;
+                initialYaw = followYaw;
+                initialDistance = followDistance;
+                cameraState = 7;
+                resumeEyePosition = eyePosition;
+                LookAtTargetPoint();
+                fieldOfViewEase->Set(targetFieldOfView, FLT_MAX);
+            }
+        } else if (cameraState == 7) {
+            cameraState = resumeState;
+            followPitch = initialPitch;
+            followYaw = initialYaw;
+            followDistance = initialDistance;
+            targetFieldOfView = resumeFieldOfView;
+            eyePosition = resumeEyePosition;
+            resumeState = 7;
+            fieldOfViewEase->Set(targetFieldOfView, FLT_MAX);
+        }
+        if (cameraState != 5 && cameraState != 7) {
+            if (IsLookBackHeld()) {
+                if (cameraState != 6 && !isCrashView) {
+                    savedCameraState = cameraState;
+                    initialPitch = followPitch;
+                    initialYaw = followYaw;
+                    initialDistance = followDistance;
+                    cameraState = 6;
+                    savedFieldOfView = targetFieldOfView;
+                    ApplyReverseViewPreset();
+                    fieldOfViewEase->Set(targetFieldOfView, FLT_MAX);
+                }
+            } else if (cameraState == 6) {
+                cameraState = savedCameraState;
+                targetFieldOfView = savedFieldOfView;
+                savedCameraState = 6;
+                followPitch = initialPitch;
+                followYaw = initialYaw;
+                followDistance = initialDistance;
+                fieldOfViewEase->Set(targetFieldOfView = savedFieldOfView, FLT_MAX);
+
+            }
+        }
+        if (g_TrackGame->paused || (cameraState != 5 && cameraState != 7)) {
+            if (g_TrackGame->controlInterface->IsDeviceButtonDown(0xc7, 0, 0x80000000, 0)) {
+                targetFieldOfView -= 3.0f;
+                if (targetFieldOfView < minFieldOfView)
+                    targetFieldOfView = minFieldOfView;
+            }
+            if (g_TrackGame->controlInterface->IsDeviceButtonDown(0xcf, 0, 0x80000000, 0)) {
+                targetFieldOfView += 3.0f;
+                if (targetFieldOfView > maxFieldOfView)
+                    targetFieldOfView = maxFieldOfView;
+            }
+        }
+        SetFieldOfView(fieldOfViewEase->Update(targetFieldOfView, dt));
+        Camera::Tick(dt);
+        wasWide = wide;
+        return 1;
+    }
+    ShowSubject();
+    wasWide = wide;
+    return 1;
 }
 
 // 0x00466ad0: Camera's controls first; then, with the game's +0x2d4 bit 0,

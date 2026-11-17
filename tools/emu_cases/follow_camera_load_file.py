@@ -1,6 +1,6 @@
 """FollowCamera::LoadCameraFile 0x004650e0, loads the CAMERA records of a text file (emu_diff case).
 
-The candidate is samples/camera/FollowCameraLoadFile.cpp. File I/O is stubbed with a
+The candidate is in src/reconstructed/FollowCamera.cpp. File I/O is stubbed with a
 case-generated file: the stream (0x134 bytes from operator new 0x004a3010, FollowCam.cpp line
 0x3c7) is built by a logged stub of FileStream's constructor 0x00460d10 that sets
 sliceOffset +0x130; Open 0x00460f50 answers the case's flag; ReadLine 0x00461aa0 copies the
@@ -19,7 +19,7 @@ import struct
 
 RETAIL_VA = 0x004650e0
 SYMBOL = '?LoadCameraFile@FollowCamera@@QAEXPBD@Z'
-SOURCE = 'samples/camera/FollowCameraLoadFile.cpp'
+SOURCE = 'src/reconstructed/FollowCamera.cpp'
 PROBES = {0x00465131: 'stream constructed', 0x004651d5: 'allocate frames', 0x004652b3: 'record',
           0x004654ae: 'done'}
 

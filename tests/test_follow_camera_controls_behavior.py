@@ -12,6 +12,7 @@ from mcm2tool.coff import CoffObject
 from mcm2tool.pe import PEImage
 from mcm2tool.toolchain import find_child_ci, find_vc6_bin, infer_vc98_root, sha256_file
 from tools.match import compare
+from follow_camera_unit import write_unit
 
 ROOT = Path(__file__).resolve().parents[1]
 SYMBOL = '?ProcessCameraInput@FollowCamera@@UAE_N_NM@Z'
@@ -50,23 +51,27 @@ class FollowCameraControlsBehaviorTests(unittest.TestCase):
         compiler=Path(os.environ['VC6_ROOT']).resolve()
         linker=find_child_ci(find_vc6_bin(compiler),'link.exe')
         libraries=find_child_ci(infer_vc98_root(compiler),'lib')
-        binding_path=ROOT/'samples/camera/FollowCameraControls.bindings.json'
+        binding_path=ROOT/'src/reconstructed/FollowCamera.bindings.json'
         bindings=json.loads(binding_path.read_text())
         with tempfile.TemporaryDirectory(prefix='mcm2-follow-controls-') as directory:
             output=Path(directory);objects=[];compiled={}
-            for source in ('samples/camera/FollowCameraControls.cpp','samples/camera/FollowCameraNearMisses.cpp',
-                           'tests/fixtures/follow_camera_controls_compare.cpp'):
-                obj=output/(Path(source).stem+'.obj')
-                result=subprocess.run([sys.executable,str(ROOT/'tools/compile.py'),str(ROOT/source),'-o',str(obj),
+            # ProcessCameraInput lives in FollowCamera.cpp (retail FollowCam.cpp);
+            # the candidate is a validation unit holding only it.
+            (output/'unit').mkdir()
+            unit=write_unit(output/'unit','FollowCamera::ProcessCameraInput')
+            for name,source in (('candidate',unit),('canonical',ROOT/'src/reconstructed/FollowCamera.cpp'),
+                                ('fixture',ROOT/'tests/fixtures/follow_camera_controls_compare.cpp')):
+                obj=output/(name+'.obj')
+                result=subprocess.run([sys.executable,str(ROOT/'tools/compile.py'),str(source),'-o',str(obj),
                     '--vc6-root',str(compiler),'--profile','vc6_o2_mt','--include',str(ROOT/'src/krusty2'),
                     # VC6 optimizer ICE in the fixture's main callback setup;
                     # both actual candidate compilations remain /O2.
-                    *(['--extra','/Od'] if source.startswith('tests/') else [])],
+                    *(['--extra','/Od'] if name=='fixture' else [])],
                     cwd=ROOT,capture_output=True,text=True,encoding='latin-1',env={**os.environ,'PYTHONPATH':str(ROOT)})
                 self.assertEqual(result.returncode,0,result.stdout+result.stderr)
-                compiled[source]=CoffObject(obj)
-                if not source.endswith('FollowCameraNearMisses.cpp'):objects.append(str(obj))
-            candidate=compiled['samples/camera/FollowCameraControls.cpp']
+                compiled[name]=CoffObject(obj)
+                if name!='canonical':objects.append(str(obj))
+            candidate=compiled['candidate']
             entry=candidate.find_symbol(SYMBOL)
             self.assertEqual(entry.extent_source,'coff_function_aux')
             self.assertEqual(entry.function_size,4046)
@@ -92,7 +97,7 @@ class FollowCameraControlsBehaviorTests(unittest.TestCase):
             def complete(coff):
                 entry=coff.find_symbol(SYMBOL);body,size,rs=coff.symbol_extent(entry)
                 return body,size,[(r.virtual_address-entry.value,r.type,coff.symbol_by_index[r.symbol_index].name) for r in rs]
-            self.assertEqual(complete(candidate),complete(compiled['samples/camera/FollowCameraNearMisses.cpp']))
+            self.assertEqual(complete(candidate),complete(compiled['canonical']))
             executable=output/'controls.exe'
             result=subprocess.run([str(linker),'/nologo','/subsystem:console','/base:0x100000','/fixed','/opt:ref',
                 f'/out:{executable}',f'/libpath:{libraries}',*objects,'kernel32.lib'],cwd=ROOT,

@@ -1,7 +1,10 @@
-// Complete 0x00462ee0 constructor. The original 564-byte near-miss remains
-// in FollowCameraNearMisses.cpp; this separate candidate corrects observable
-// partial-write ordering. Original translation-unit ownership is unproven.
-#include "../../src/reconstructed/FollowCamera.h"
+// Negative control for tests/test_follow_camera_constructor.py: the plain
+// FollowCamera constructor store list (511 of 564 bytes against retail
+// 0x00462ee0). Its compiler schedule writes later fields before retail's
+// +0x2e4 store, so the guarded partial-write oracle must reject it; the
+// canonical constructor in src/reconstructed/FollowCamera.cpp models the
+// decoded order. Validation only, never linked into the game.
+#include "FollowCamera.h"
 
 static Vector3 kVec3Zero = Vector3(0.0f, 0.0f, 0.0f);
 static Vector3 kVec3XAxis = Vector3(1.0f, 0.0f, 0.0f);
@@ -14,15 +17,9 @@ FollowCamera::FollowCamera(int flags) : PCCamera(flags) {
     cachedTarget = kVec3Zero;
     worldYaw = 0;
     targetDistance = 0;
-    // These explicit accesses preserve the observed writes before a guarded
-    // destination faults. They do not establish original volatile member types.
-    volatile FollowCamera* ordered = this;
-    ordered->followHeading.x = kVec3ZAxis.x;
-    ordered->followHeading.y = kVec3ZAxis.y;
-    float headingZ = kVec3ZAxis.z;
-    ordered->points = 0;
-    ordered->isCrashView = 0;
-    ordered->followHeading.z = headingZ;
+    followHeading = kVec3ZAxis;
+    points = 0;
+    isCrashView = 0;
     lift = 0;
     lookAheadDistance = 27.0f;
     targetFieldOfView = fieldOfView;
@@ -39,8 +36,8 @@ FollowCamera::FollowCamera(int flags) : PCCamera(flags) {
     fovKeysEnabled = 0;
     overrideActive = 0;
     isMovingTarget = 0;
-    ordered->isSettled = 0;
-    ordered->pointCapacity = 0;
+    isSettled = 0;
+    pointCapacity = 0;
     pointCount = 0;
     followHeight = 7.0f;
     subjectCellSize = 3.0f;

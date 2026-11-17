@@ -26,10 +26,9 @@ CALLERS = (
     ('Krusty3DObjects', '?Tick@RunwayLights@@', 0x48a760, 1509, 5),
     ('PlacementQueries', '?ClampToPlacementSquare@@', 0x4b0b80, 619, 4),
     ('BikeRace', '?DrawTrack@BikeRace@@', 0x423140, 715, 6),
-    ('FollowCameraTick', '?Tick@FollowCamera@@', 0x465c20, 3672, 2),
+    ('FollowCamera', '?Tick@FollowCamera@@', 0x465c20, 3672, 2),
 )
-SOURCES = {stem: ('samples/camera/' if stem == 'FollowCameraTick' else 'src/reconstructed/')
-           + stem + '.cpp' for stem, *_ in CALLERS}
+SOURCES = {stem: 'src/reconstructed/' + stem + '.cpp' for stem, *_ in CALLERS}
 
 
 @unittest.skipUnless(os.name == 'nt' and os.environ.get('VC6_ROOT') and os.environ.get('MCM2_EXE'),

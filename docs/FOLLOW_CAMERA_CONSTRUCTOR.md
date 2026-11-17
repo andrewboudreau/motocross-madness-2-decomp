@@ -1,9 +1,8 @@
 # FollowCamera construction
 
-`samples/camera/FollowCameraConstructor.cpp` is a separate readable candidate
-for the missing `FollowCamera::FollowCamera(int)` provider. It preserves the
-genuine existing class declaration and fixes an observable partial-write
-ordering discrepancy. Original translation-unit ownership remains unproven.
+`FollowCamera::FollowCamera(int)` is the first function of [FollowCamera.cpp](../src/reconstructed/FollowCamera.cpp) (retail `FollowCam.cpp`),
+with a `// Not exact` status comment. It preserves the existing class
+declaration and fixes an observable partial-write ordering discrepancy.
 
 ## Identity, extent and source status
 
@@ -22,21 +21,20 @@ to this constructor, then installs its own table at `0x00558c30`.
 This supports the constructor call boundary independently of a shared address.
 Individual semantic field names remain reconstructed names.
 
-The original constructor in `FollowCameraNearMisses.cpp` remains unchanged,
-including its existing 564-byte candidate and 511 matching resolved positions.
-The new candidate emits **569 bytes with 100 matching resolved positions**
-against the complete 564-byte retail function. Neither candidate is strict.
-The original sample and its calibration rows are not replaced or silently
-rescored.
+The plain store list, kept as the negative control
+`tests/fixtures/follow_camera_constructor_plain.cpp`, emits 564 bytes with
+511 matching resolved positions. The canonical body emits **569 bytes with
+100 matching resolved positions** against the complete 564-byte retail
+function. Neither is strict.
 
-The retained negative control compiles that original constructor and runs the
+The retained negative control compiles that plain constructor and runs the
 same current fixture. It must fail with exit 36 at the independent partial-write
 oracle for `0x2c4` writable receiver bytes. The original compiler schedule
 writes later fields before the retail `points` write at `+0x2e4`, changing both
 the first fault and the object prefix left behind. The new source uses a small
 set of explicit volatile accesses to model the decoded write order. This is
 an observed-behavior reconstruction, **not evidence that the original members
-had volatile types**. The normal values and original sample remain unchanged.
+had volatile types**. The stored values are unchanged.
 
 ## Actual initialization and unwind closure
 
@@ -145,25 +143,19 @@ this is not arbitrary floating-point gameplay coverage.
 
 ## Object and storage preservation
 
-The original aggregate retains all **66 nondebug sections and 337 relocations**,
-including the original constructor, other functions, EH data, RTTI and startup
-artifacts. Its retained filename normalization enumerates exactly the four
-existing camera sample filenames; it does not collapse arbitrary paths.
-Fresh private-root and actual-root aggregate objects reproduce the same pin.
+The canonical unit's complete object (**120 nondebug sections, 469
+relocations**) is pinned and reproduced by the ordinary game compile
+command. Its filename normalization covers only `FollowCamera.cpp`.
 
-The new candidate has **31 nondebug sections and 139 relocations**. Its ordinary
-TU emits the genuine FollowCamera table/RTTI and constructor EH artifacts, plus
-60 bytes of writable private BSS and 16 bytes of `.CRT$XCU`. The four local vector
-objects are at BSS offsets 0, 32, 48 and 16 for zero, X, Y and Z. All eight
-initializer functions are strict and match the existing aggregate; their CRT
-entry targets and destination offsets are checked. These artifacts are included
-in the complete object pin, not omitted as incidental overhead. The original
-translation-unit grouping remains unknown.
-
-The candidate compiles without project include-path arguments and reproduces
-the ordinary game compile command's complete object. A separate directory-root
-compilation also reproduces every nondebug section and relocation. No compiler
-profile override or matching-only code arrangement is used.
+The validation unit (the unit's includes, the four file-scope vector
+statics and the constructor) has **31 nondebug sections and 139
+relocations**: the FollowCamera table/RTTI and constructor EH artifacts,
+60 bytes of writable private BSS and 16 bytes of `.CRT$XCU`. The four
+vector objects are at BSS offsets 0, 32, 48 and 16 for zero, X, Y and Z.
+All eight initializer functions are strict; their CRT entry targets and
+destination offsets are checked. The constructor body is compared with the
+canonical unit's. No compiler profile override or matching-only code
+arrangement is used.
 
 ## Reproduction
 
@@ -174,22 +166,13 @@ $env:PYTHONPATH='.;tests'
 python tests/test_follow_camera_constructor.py
 ```
 
-For the private proposal, replace the test path with
-`work/connections60/startup/tree/tests/test_follow_camera_constructor.py`.
 The retail SHA-256 is
 `31fde4cc686a5ee89ef9095b90235325b195596867ecacefe511263e1509b874`.
 
 ### Functional build review
 
-The candidate is admitted individually as reviewed nonexact in the functional
-build. The original strict and partial samples remain intact. Actual build
-`work/game-build/build-5ou5d2p9` compiles 272/272 sources and removes exactly
-the missing constructor: **185 -> 184** unresolved names, none added. All 271
-previous objects remain unchanged, including 10,833 nondebug sections and
-46,129 relocations. The new object's complete 31-section/139-relocation view
-matches the private reviewed candidate without filename exclusions. Compiler
-flags are unchanged. Every previous calibration and physics extent, score and
-strict result is preserved.
+The constructor compiles as part of FollowCamera.cpp in the functional
+build.
 
 Actual-path constructor, loader, tick, controls and D3DIM connection tests pass.
 Evidence covers the complete constructor and finite helper, allocator, guard

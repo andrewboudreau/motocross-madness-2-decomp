@@ -126,10 +126,10 @@ extern "C" Vector3* __stdcall D3DRMVectorRotate(Vector3* result, Vector3* vector
 
 class FollowCamera : public PCCamera {
 public:
-    explicit FollowCamera(int flags); // 0x00462ee0 (near miss: samples/camera)
+    explicit FollowCamera(int flags); // 0x00462ee0 (near miss)
     virtual ~FollowCamera();          // destructor core 0x00463350
 
-    virtual int Tick(float frameTime);                 // 0x00465c20 (near miss: samples/camera)
+    virtual int Tick(float frameTime);                 // 0x00465c20 (near miss)
     virtual int OnControlPress(ControlEvent* event, InputButtonState* entry);       // 0x00466ad0, not reconstructed
 
     virtual Vector3 GetTargetVelocity() = 0;
@@ -142,7 +142,7 @@ public:
     // provisional name: VehicleCamera returns targetPoint + rotated followHeading * distance *
     // lookAheadDistance; used while following.
     virtual Vector3 ComputeLookAheadPoint(unsigned char a, float dt) = 0;
-    // 0x00465000 (near miss: samples/camera)
+    // 0x00465000
     virtual bool TrySettleOnPoint(const Vector3& point, bool enable, bool force);
     virtual Vector3 GetTargetPoint();
     // 0x004636e0
