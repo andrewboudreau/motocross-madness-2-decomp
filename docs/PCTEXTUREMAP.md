@@ -107,9 +107,8 @@ Exact (25 calibration cases):
   at the top of every pass. The next-level surfaces live in the dead
   parameter slots.
 
-Near misses (`samples/render/PCTextureMapNearMisses.cpp`):
-- `0x004c7b40` (750-byte retail / 775-byte candidate) is extracted into
-  [TextureRectCopy.cpp](../samples/render/TextureRectCopy.cpp). The nonexact
+Not exact, in PCTextureMap.cpp in retail order (forms tried below):
+- `0x004c7b40` (750-byte retail / 775-byte candidate). The nonexact
   [functional review](TEXTURE_RECT_COPY.md) preserves the non-8-bit low-address
   read and the evidenced destination-before-source WORD access order.
 - slot 6 (ratio 0.78 of 600 bytes), the copy. It makes a `ManagedTexture`
@@ -188,3 +187,43 @@ replace are in Git history. Tier 3 unless the entry says otherwise.
 The complete slot-4 candidate now has a separate [functional build review](TEXTURE_SURFACE_CREATE.md#functional-build-review), including the corrected full return extent, actual source-format helpers and native surface/failure boundary tests.
 
 The complete slot-6 Clone candidate has a separate [functional build review](TEXTURE_CLONE.md#functional-build-review), including both allocation cleanup states, existing deleting-destructor providers and native copy/color-key/failure boundary tests.
+
+## Forms tried
+
+PCTextureMap::Clone (0x004c71c0, 600 bytes): the copy.
+Everything lines up except that VC6 here keeps the constant 1 in ebp and
+the copy in ebx (retail: ebx and ebp), which also moves the 8-bit key
+expansion's scratch registers. The shape that gets this close: the
+cached flag normalised to 0/1 (`(mapFlags & 1) != 0`, stored in the
+slot the `new` temporary reuses), the manager in a local before each
+`new`, the copy assigned directly (a separate ManagedTexture local
+assigns ebp before the registration call; retail after), the two
+caps-derived flags as separate `if`s, and the ManagedTexture `new`
+first (its EH state is 0). `int cached = mapFlags & 1` keeps the
+store but not the constant register; `if (mapFlags & 1)` keeps the
+register but tests the byte in place.
+A bool/char `cached` gets retail's ebx/ebp split (the byte `and al, bl`
+needs a byte register) but takes its own byte slot and grows the frame;
+unsigned/long/ternary/!! forms, separate copy locals, a single return,
+1..33 dead locals and moving Clone within the TU leave it unchanged.
+
+The 8-bit colour key (2026-11, all 333/600 strict): the key in an
+unsigned int, int, unsigned long or const local (initialised or
+assigned), built in two or three statements, through template inline
+helpers returning unsigned or int (one expression, two steps, a named
+result), a by-value three-byte helper, and the index in a local. VC6
+canonicalises all of them; retail's `mov eax, edx` before the push and
+the late vtable load do not appear.
+
+PCTextureMap::CreateSurface (0x004c69c0, 2033 bytes): the setup.
+Everything but the non-mip format fallback chain lines up, including
+the mip chain (same source shape). VC6 cross-jumps the identical
+CreateSystemSurface call tails of that chain into the first case
+(4444); retail merges them into the last (565) in mirror order, which
+also changes which blocks interleave their array stores with the pushes.
+if/else, nested negated ifs, switch, goto-to-label, return/goto mixes,
+aggregate initializers and an inline helper all keep VC6's order.
+k-scan (s22): compiled behind 0..63 prepended typedefs, 0x004c69c0,
+0x004c71c0, 0x004c7b40 have the same code at every count, so their
+differences are not a declaration-count effect (docs/VC6_OPERAND_ORDER.md
+section 2).

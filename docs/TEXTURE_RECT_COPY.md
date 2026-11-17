@@ -1,9 +1,7 @@
 # Texture rectangle copying
 
-`PCTextureMap::CopyRectTo` is implemented as a complete nonexact candidate in
-[TextureRectCopy.cpp](../samples/render/TextureRectCopy.cpp). The aggregate
-`PCTextureMapNearMisses.cpp` includes that source at the original body position.
-Original TU ownership remains unproven.
+`PCTextureMap::CopyRectTo` is in [PCTextureMap.cpp](../src/reconstructed/PCTextureMap.cpp) (retail `PCTexMap.cpp`) after
+`BlitTo` `0x004c7b00`, in retail order, with a `// Not exact` status comment.
 
 ## Extent, ABI and dependencies
 
@@ -102,18 +100,6 @@ through `*pixel` inline, operands swapped, a `lookup` byte-pointer local, an
 ordinary `destinationPixel` local) all return to the 755-byte source-first
 body; `unsigned long` or `int` volatile locals emit the current 775 bytes.
 
-Private preservation checks against baseline `94c364f0` establish that the
-initial extraction retained all three aggregate functions and seven nondebug
-sections. After the correction, only CopyRectTo and its text section change.
-The other two complete functions and six sections, including Clone's EH
-funclets, EH metadata, filename storage and CreateSurface, retain their full
-bytes, section flags and named relocations. No filename exception, extent
-trimming or omitted cleanup block is used. Reproduction scripts and reports
-are in ignored `work/rect-copy29/check_extraction.py`, `source-preservation.json`,
-`check_correction.py` and `correction-proof.json`. The extraction script
-reconstructs the intermediate unchanged body from the original baseline;
-the correction script verifies the current source explicitly.
-
 ## Functional build review
 
 The isolated authentic source build `work/game-build/build-oxgukjco/report.json`
@@ -121,10 +107,10 @@ compiles 220/220 translation units and removes only this unresolved symbol:
 **367 → 366**. All prior production objects remain unchanged under the three
 separately reviewed KrustyBike provider substitutions for this composition.
 
-The reviewed candidate is admitted individually as **nonexact source**. The
-native test compiles the actual standalone source separately with authentic
-VC6 SP3 `/O2`, checks its full emitted extent and imports, and requires the
-aggregate to emit identical candidate bytes. The private validation executable
+It is linked from PCTextureMap.cpp as **nonexact source**. The native test
+compiles a validation unit holding only this definition with authentic VC6 SP3
+`/O2`, checks its full emitted extent and imports, and requires the canonical
+unit to emit identical bytes. The private validation executable
 maps the hash-pinned retail image inside its own reserved storage; **no retail
 instructions are patched**. Both implementations call the same scripted COM
 surface vtables. Production never maps or executes retail code.

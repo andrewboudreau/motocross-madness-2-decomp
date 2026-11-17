@@ -18,23 +18,23 @@ discards the 32-bit stream prefix, and later reads use the current code width.
 The declaration connection alone does not supply the separately missing
 `GR_BitString::ReadBits` method.
 
-Before/after compilation at the same source paths preserves all **164 nondebug
-sections and 512 relocations** across the canonical loader and its near-miss
-aggregate. The only permitted destination substitution is:
+The test pins the complete canonical PCTextureMap.cpp object (**162 nondebug
+sections and 512 relocations**, including the near misses that moved into it).
+The declaration change's only destination substitution was:
 
 ```text
 ?ExpandLzw@@YAXPAX0H@Z -> ?ExpandLzw@@YAXPAEPBXH@Z
 ```
 
 Every payload byte, section flag, relocation addend and internal destination
-is retained. The sample's seven sections are unchanged without substitutions.
+is retained.
 The shared header includes the actual `Lzw.h` declaration, preserving its
 visibility to other header consumers. The complete transitive menu consumer,
 `ProCircuitProcs.cpp`, also retains all 334 sections and 2,083 relocations.
-The retained regression checks all three complete-object fingerprints, both actual
+The retained regression checks both complete-object fingerprints, both actual
 call relocations, the primary slot-5 destination, all 27 strict canonical
 texture cases and all 11 strict LZW cases. Portable fingerprints normalize only
-the three exact source filenames; the private same-path proof excludes nothing.
+the two exact source filenames; the private same-path proof excludes nothing.
 
 The isolated real build `build-otes7syr` compiles all 250 translation units and
 removes only this obsolete decoder symbol: **263 to 262 unresolved names**.

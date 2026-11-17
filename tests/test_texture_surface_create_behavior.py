@@ -11,6 +11,9 @@ from mcm2tool.coff import CoffObject
 from mcm2tool.pe import PEImage
 from mcm2tool.toolchain import find_child_ci,find_vc6_bin,infer_vc98_root,sha256_file
 from tools.match import compare
+from tools.unit_source import standalone_source
+# CreateSurface's imports (the candidate's undefined externals).
+IMPORTS = frozenset(['?AverageColor@@YAHPAXHHHHPAUTextureColorMapperView@@@Z', '?ConvertPixels@@YAHPAX0HHHHHHHPAUTextureColorMapperView@@HI@Z', '?CreateSystemSurface@PCTextureMap@@QAEHPAUDDSurfaceDesc2@@HPAH@Z', '?DumpLevel@PCTextureMap@@QAEHPAUDirectDrawSurface@@PBD@Z', '?FillPixelFormat@@YAXHPAX@Z', '?GrowSecondScratchBuffer@TextureMapManager@@QAEPAXI@Z', '?IsFormat4444Or8888@@YAHH@Z', '?PixelFormatBytesPerPixel@@YAHH@Z', '?g_DebugDumpTextureLevels@@3HA', '?g_SharedMipTextureSurfaces@@3PAPAUDirectDrawSurface@@A', '?g_SharedTextureSurfaces@@3PAPAUDirectDrawSurface@@A', '?g_TrackGame@@3PAVTrackGame@@A'])
 ROOT=Path(__file__).resolve().parents[1]
 SYMBOL='?CreateSurface@PCTextureMap@@UAEHPAXHHHHHHPAUTextureColorMapperView@@H0HHHHPAUTextureContext@@HI@Z'
 HELPERS={'PixelFormatBytesPerPixel':('int',0x511970,78),'FillPixelFormat':('void',0x5119c0,266),'IsFormat4444Or8888':('int',0x511ad0,30)}
@@ -43,9 +46,14 @@ class TextureSurfaceCreateBehaviorTests(unittest.TestCase):
    def compile_source(source,name,fixture=False):
     obj=output/(name+'.obj');result=subprocess.run([sys.executable,str(ROOT/'tools/compile.py'),str(source),'-o',str(obj),'--vc6-root',str(compiler),'--profile','vc6_o2_mt','--include',str(ROOT/'src/krusty2'),'--include',str(ROOT/'src/reconstructed'),*(['--extra','/Od']if fixture else[])],cwd=ROOT,capture_output=True,text=True,encoding='latin1',env={**os.environ,'PYTHONPATH':str(ROOT)})
     self.assertEqual(result.returncode,0,result.stdout+result.stderr);return obj,CoffObject(obj)
-   candidate_path,candidate=compile_source(ROOT/'samples/render/TextureSurfaceCreate.cpp','candidate')
+   # CreateSurface lives in PCTextureMap.cpp (retail PCTexMap.cpp); the candidate is a
+   # validation unit holding it and its inline helper, the aggregate the canonical unit.
+   unit=output/'PCTexMap.cpp';text=(ROOT/'src/reconstructed/PCTextureMap.cpp').read_text(encoding='latin-1')
+   helper=text[text.index('static inline void AppendRenderStatePair('):text.index('// 0x004c69c0:')]
+   unit.write_text(standalone_source(ROOT/'src/reconstructed/PCTextureMap.cpp',['PCTextureMap::CreateSurface'],helper),encoding='latin-1')
+   candidate_path,candidate=compile_source(unit,'candidate')
    fixture_path,_=compile_source(ROOT/'tests/fixtures/texture_surface_create_compare.cpp','fixture',True)
-   _,aggregate=compile_source(ROOT/'samples/render/PCTextureMapNearMisses.cpp','aggregate')
+   _,aggregate=compile_source(ROOT/'src/reconstructed/PCTextureMap.cpp','aggregate')
    # Validation-only extraction of three complete current canonical bodies,
    # never retail bytes. Their emitted full extents must remain strict.
    canonical=(ROOT/'src/reconstructed/Tgafile.cpp').read_text();helper_source='#include <string.h>\n#include "RenderInterfaces.h"\n'
@@ -55,7 +63,7 @@ class TextureSurfaceCreateBehaviorTests(unittest.TestCase):
     helper_source+=canonical[start:b].replace(name,'Actual'+name)+'\n'
    helper_file=output/'format_helpers.cpp';helper_file.write_text(helper_source)
    helper_path,helpers=compile_source(helper_file,'helpers')
-   binding=json.loads((ROOT/'samples/render/TextureSurfaceCreate.bindings.json').read_text())
+   binding=json.loads((ROOT/'src/reconstructed/PCTextureMap.bindings.json').read_text())
    helper_binding={s.name:binding[s.name.replace('Actual','')]for s in helpers.symbols if s.type==0x20 and s.section_number>0}
    helper_bindings_path=output/'helpers.bindings.json';helper_bindings_path.write_text(json.dumps(helper_binding))
    self.assertEqual(len(helper_binding),3)
@@ -64,10 +72,10 @@ class TextureSurfaceCreateBehaviorTests(unittest.TestCase):
     self.assertTrue(compare(image,helpers,symbol,int(va,16),entry.function_size,helper_bindings_path)['strict_exact'])
    self.assertEqual(candidate.find_symbol(SYMBOL).function_size,2028)
    self.assertEqual({s.name for s in candidate.symbols if s.storage_class==2 and s.section_number>0 and s.type==0x20},{SYMBOL})
-   self.assertEqual({s.name for s in candidate.symbols if s.storage_class==2 and s.section_number==0},set(binding)-{SYMBOL})
+   self.assertEqual({s.name for s in candidate.symbols if s.storage_class==2 and s.section_number==0},IMPORTS)
    self.assertFalse(any(s.name.startswith(('.CRT','.xdata','.text$x'))for s in candidate.sections))
-   for coff,bindings in [(candidate,'TextureSurfaceCreate'),(aggregate,'PCTextureMapNearMisses')]:
-    report=compare(image,coff,SYMBOL,0x4c69c0,2033,ROOT/f'samples/render/{bindings}.bindings.json');self.assertFalse(report['strict_exact']);self.assertEqual(report['strict_match']['matching_positions'],518)
+   for coff in (candidate,aggregate):
+    report=compare(image,coff,SYMBOL,0x4c69c0,2033,ROOT/'src/reconstructed/PCTextureMap.bindings.json');self.assertFalse(report['strict_exact']);self.assertEqual(report['strict_match']['matching_positions'],518)
    def normalized(coff):
     entry=coff.find_symbol(SYMBOL);body,size,relocs=coff.symbol_extent(entry)
     return body,size,[(r.virtual_address-entry.value,r.type,coff.symbol_by_index[r.symbol_index].name)for r in relocs]

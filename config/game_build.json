@@ -229,28 +229,10 @@
       "evidence": "docs/CONTROL_HIT_TEST.md#functional-build-review"
     },
     {
-      "path": "samples/render/TextureRectCopy.cpp",
-      "status": "reviewed-nonexact",
-      "reason": "Complete rectangle-copy implementation reviewed against retail COM calls, clipping, indexed pixels, aliases, callbacks and failure/fault state. Explicit ordered WORD reads preserve the observed destination-before-source fault order. All non-8-bit processed pixels retain retail's low-address byte lookup; successful non-8-bit processing is not validated. The 775-byte body has 364 matching positions against 750 retail bytes; real DirectDraw and game rendering remain untested.",
-      "evidence": "docs/TEXTURE_RECT_COPY.md#functional-build-review"
-    },
-    {
       "path": "samples/race/FollowedRacerPicker.cpp",
       "status": "reviewed-nonexact",
       "reason": "Complete host racer selection passes 4270 native selection, iterator, packet, callback, floating-point and fault scenarios with the real strict iterator and VC6 conversion. An evidenced cached-view correction changes the old 346-byte/69-position partial to 342 bytes/67 positions against 340 retail bytes. Only five packet bytes are initialized by retail; the test preserves that boundary. Random values, network send and replay queue are scripted; live networking, replay files and racing remain untested.",
       "evidence": "docs/FOLLOWED_RACER_PICKER.md#functional-build-review"
-    },
-    {
-      "path": "samples/render/TextureClone.cpp",
-      "status": "reviewed-nonexact",
-      "reason": "Complete texture cloning and both allocation cleanup states pass 135464 native state, argument, color-key, callback, failure and unwind scenarios. VC6 emits 590 bytes against the full 600-byte retail body with 333 matching positions. The actual strict pixel-size helper executes; allocation, constructors, registration, surfaces, creation and deletion are scripted. Existing constructor/destructor/deleting-wrapper providers are separately strict; integrated texture lifecycle and rendering remain untested.",
-      "evidence": "docs/TEXTURE_CLONE.md#functional-build-review"
-    },
-    {
-      "path": "samples/render/TextureSurfaceCreate.cpp",
-      "status": "reviewed-nonexact",
-      "reason": "Complete PCTextureMap surface setup passes 12226 native descriptor, mip-count, reference, conversion-boundary, callback and fault scenarios, using three strict source-format helpers. VC6 emits 2028 bytes against the corrected complete 2033-byte retail body with 518 matching positions. COM surfaces, conversion and larger helpers are scripted; minimum mip size is positive, and actual pixel conversion, drivers and integrated rendering remain untested.",
-      "evidence": "docs/TEXTURE_SURFACE_CREATE.md#functional-build-review"
     },
     {
       "path": "samples/gameui/MediaControlNearMisses.cpp",

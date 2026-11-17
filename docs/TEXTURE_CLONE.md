@@ -1,9 +1,10 @@
 # PCTextureMap texture cloning
 
-`samples/render/TextureClone.cpp` contains the complete existing readable
-`PCTextureMap::Clone` candidate. `PCTextureMapNearMisses.cpp` includes that file
-at the former body position. It remains a nonexact candidate in `samples/`;
-original translation-unit ownership is unproven.
+`PCTextureMap::Clone` is in [PCTextureMap.cpp](../src/reconstructed/PCTextureMap.cpp) (retail `PCTexMap.cpp`) after
+`CreateSurface`, in retail order, with a `// Not exact` status comment. The
+behaviour test links a validation unit named `PCTexMap.cpp` holding only this
+definition, and checks its body, cleanup/handler code and FuncInfo/unwind map
+against the canonical unit's.
 
 ## Retail identity and complete extent
 
@@ -114,19 +115,7 @@ scripted callee; this does not validate those inputs through real surface
 creation. Palette indices stay within their 256-entry storage. Other than
 the strict pixel-size helper, dependencies remain scripted boundaries.
 
-## Extraction preservation and reproduction
-
-`work/texture-clone26/check_extraction.py` compiles the `799f6e9d` aggregate
-and the new include-based aggregate. `extraction-proof.json` records all
-three complete public function bodies and all six remaining nondebug
-sections, including EH code/data and relocation targets/addends, unchanged.
-The sole storage exception is the checked `__FILE__` string: the private
-baseline filename stands in for the former aggregate filename, while the
-extracted body names `TextureClone.cpp`. The string itself and relocations
-to it are explicitly identified; unrelated strings are not normalized.
-No initializer or additional executable body is introduced. The retained
-test also checks standalone versus aggregate body, cleanup/handler code,
-FuncInfo/unwind-map and filename storage in full.
+## Reproduction
 
 ```powershell
 $env:PYTHONPATH = '.'

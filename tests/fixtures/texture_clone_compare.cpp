@@ -41,7 +41,7 @@ static void Finish(){Snapshot(observed.events[observed.count-1].state);
  case 6:At(world.source,0x30)=0;At(world.source,0x68)^=1;break;
  }}ToReference();if(scenario.throwAt==observed.count)throw 0x791;
 }
-static int SourceFile(const char* p){const char* a=strrchr(p,'\\'),*b=strrchr(p,'/');if(!a||(b&&b>a))a=b;a=a?a+1:p;if(strcmp(a,"PCTexMap.cpp")&&strcmp(a,"TextureClone.cpp"))Fail(82);return 1;}
+static int SourceFile(const char* p){const char* a=strrchr(p,'\\'),*b=strrchr(p,'/');if(!a||(b&&b>a))a=b;a=a?a+1:p;if(strcmp(a,"PCTexMap.cpp"))Fail(82);return 1;}
 void* operator new(unsigned size,const char* file,int line){Begin(1,0,size,SourceFile(file),line);Finish();if(size!=0x80&&size!=0xbc)Fail(83);if(scenario.failNew)return 0;live=1;return Allocated();}
 void operator delete(void* p,const char* file,int line){Begin(10,p,SourceFile(file),line);Finish();if(p&&p!=Allocated())Fail(84);if(p)live=0;++deleted;}
 PCTextureMap::PCTextureMap(TextureMapManager* manager,int flags){Begin(2,this,Identity(manager),flags);Finish();At(this,0)=(DWORD)textureTables[0];At(this,0x10)=(DWORD)manager;At(this,0x68)=0x200;}

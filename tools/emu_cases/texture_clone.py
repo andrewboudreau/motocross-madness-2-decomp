@@ -6,7 +6,7 @@ system surface (+0x70) is locked read-only, the copy's CreateSurface (slot 4, 17
 arguments) gets its pixels, pitch / bytes per pixel and flags from the surface caps
 (8 without 0x30000000, 4 without 0x1000); after Unlock the colour key is applied (slot
 18) as 8-bit palette RGB or expanded 555/565. Any failure deletes the copy and returns 0.
-The linked body is samples/render/TextureClone.cpp.
+The linked body is in src/reconstructed/PCTextureMap.cpp.
 
 Modelled: new, both constructors (writing fake vtables), the surface's Lock (+0x64,
 COM, writes pitch, pixels and caps) and Unlock (+0x80), PixelFormatBytesPerPixel
@@ -23,7 +23,7 @@ import struct
 
 RETAIL_VA = 0x004c71c0
 SYMBOL = '?Clone@PCTextureMap@@'
-SOURCE = 'samples/render/TextureClone.cpp'
+SOURCE = 'src/reconstructed/PCTextureMap.cpp'
 NEW, MANAGED_CTOR, TEXTURE_CTOR, ADD_TEXTURE, BYTES_PER_PIXEL = 0x004a3010, 0x00510500, 0x004c5f00, 0x0050c6c0, 0x00511970
 TRACK_GAME = 0x0056e26c
 PROBES = {0x004c71f1: 'cached', 0x004c724d: 'plain', 0x004c72d2: 'locked', 0x004c7372: '8-bit key',

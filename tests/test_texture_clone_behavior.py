@@ -11,6 +11,7 @@ from mcm2tool.coff import CoffObject
 from mcm2tool.pe import PEImage
 from mcm2tool.toolchain import find_child_ci, find_vc6_bin, infer_vc98_root, sha256_file
 from tools.match import compare
+from tools.unit_source import standalone_source
 ROOT = Path(__file__).resolve().parents[1]
 SYMBOL = '?Clone@PCTextureMap@@UAEPAVTextureMap@@XZ'
 RANGES = {0x4c71c0: 600, 0x54cd00: 26, 0x54cd1a: 26, 0x54cd34: 10}
@@ -81,9 +82,14 @@ class TextureCloneBehaviorTests(unittest.TestCase):
                 self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
                 return obj, CoffObject(obj)
 
-            candidate_path, candidate = compile_source(ROOT / 'samples/render/TextureClone.cpp', 'candidate')
+            # Clone lives in PCTextureMap.cpp (retail PCTexMap.cpp); the candidate is a
+            # validation unit holding only it, the aggregate the canonical unit.
+            unit = output / 'PCTexMap.cpp'
+            unit.write_text(standalone_source(ROOT / 'src/reconstructed/PCTextureMap.cpp', ['PCTextureMap::Clone']),
+                            encoding='latin-1')
+            candidate_path, candidate = compile_source(unit, 'candidate')
             fixture_path, _ = compile_source(ROOT / 'tests/fixtures/texture_clone_compare.cpp', 'fixture', True)
-            _, aggregate = compile_source(ROOT / 'samples/render/PCTextureMapNearMisses.cpp', 'aggregate')
+            _, aggregate = compile_source(ROOT / 'src/reconstructed/PCTextureMap.cpp', 'aggregate')
             # Private validation compiles the complete current canonical helper body;
             # the generated name avoids a collision with its observing callback.
             canonical = (ROOT / 'src/reconstructed/Tgafile.cpp').read_text()
@@ -104,8 +110,8 @@ class TextureCloneBehaviorTests(unittest.TestCase):
             self.assertEqual({s.name for s in candidate.symbols if s.storage_class == 2 and s.section_number > 0 and s.type == 0x20}, {SYMBOL})
             self.assertEqual({s.name for s in candidate.symbols if s.storage_class == 2 and s.section_number == 0}, IMPORTS)
             self.assertFalse(any(s.name.startswith('.CRT') for s in candidate.sections))
-            for coff, binding in [(candidate, 'TextureClone'), (aggregate, 'PCTextureMapNearMisses')]:
-                report = compare(image, coff, SYMBOL, 0x4c71c0, 600, ROOT / f'samples/render/{binding}.bindings.json')
+            for coff in (candidate, aggregate):
+                report = compare(image, coff, SYMBOL, 0x4c71c0, 600, ROOT / 'src/reconstructed/PCTextureMap.bindings.json')
                 self.assertFalse(report['strict_exact'])
                 self.assertEqual(report['strict_match']['matching_positions'], 333)
 
@@ -118,16 +124,31 @@ class TextureCloneBehaviorTests(unittest.TestCase):
                     name = target.name
                     if name.startswith(('$L', '$T')):
                         name = f'{coff.section(target.section_number).name}+{target.value}'
+                    elif name.startswith('??_C@'):
+                        # The __FILE__ literal's name encodes the unit's path.
+                        name = '__FILE__ literal'
                     rows.append((relocation.virtual_address - symbol.value, relocation.type, name))
                 return body, size, rows
 
             self.assertEqual(normalized(candidate), normalized(aggregate))
 
             def owned_sections(coff):
-                main = coff.find_symbol(SYMBOL).section_number
-                owned = [s for s in coff.sections if s.index == main or s.name in ('.text$x', '.xdata$x', '.data')]
+                # Clone's text section and the EH funclet/metadata sections it
+                # reaches through relocations (the canonical unit has other
+                # functions' EH sections too).
+                owned, pending = [], [coff.find_symbol(SYMBOL).section_number]
+                while pending:
+                    index = pending.pop(0)
+                    if index in owned:
+                        continue
+                    owned.append(index)
+                    for relocation in coff.relocations:
+                        target = coff.symbol_by_index[relocation.symbol_index]
+                        if (relocation.section_number == index and target.section_number > 0
+                                and coff.section(target.section_number).name in ('.text$x', '.xdata$x')):
+                            pending.append(target.section_number)
                 rows = []
-                for section in owned:
+                for section in (coff.section(index) for index in owned):
                     relocations = []
                     for relocation in coff.relocations:
                         if relocation.section_number != section.index:
@@ -136,6 +157,8 @@ class TextureCloneBehaviorTests(unittest.TestCase):
                         name = target.name
                         if name.startswith(('$L', '$T')):
                             name = f'{coff.section(target.section_number).name}+{target.value}'
+                        elif name.startswith('??_C@'):
+                            name = '__FILE__ literal'
                         relocations.append((relocation.virtual_address, relocation.type, name))
                     rows.append((section.name, section.characteristics, section.raw_size,
                                  coff.data[section.raw_ptr:section.raw_ptr + section.raw_size], relocations))

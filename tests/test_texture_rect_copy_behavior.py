@@ -9,6 +9,7 @@ from mcm2tool.coff import CoffObject
 from mcm2tool.pe import PEImage
 from mcm2tool.toolchain import find_child_ci, find_vc6_bin, infer_vc98_root, sha256_file
 from tools.match import compare
+from tools.unit_source import standalone_source
 
 ROOT = Path(__file__).resolve().parents[1]
 SYMBOL = '?CopyRectTo@PCTextureMap@@QAEHKKPAUDirectDrawSurface@@PAUWin32Rect@@HPAE@Z'
@@ -65,7 +66,12 @@ class TextureRectCopyBehaviorTests(unittest.TestCase):
                 self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
                 return obj, CoffObject(obj)
 
-            candidate_path, candidate = compile_source(ROOT / 'samples/render/TextureRectCopy.cpp', 'candidate')
+            # CopyRectTo lives in PCTextureMap.cpp (retail PCTexMap.cpp); link a
+            # validation unit holding only it.
+            unit = output / 'PCTexMap.cpp'
+            unit.write_text(standalone_source(ROOT / 'src/reconstructed/PCTextureMap.cpp', ['PCTextureMap::CopyRectTo']),
+                            encoding='latin-1')
+            candidate_path, candidate = compile_source(unit, 'candidate')
             fixture_path, _ = compile_source(ROOT / 'tests/fixtures/texture_rect_copy_compare.cpp', 'fixture', True)
             self.assertEqual(candidate.find_symbol(SYMBOL).function_size, 775)
             self.assertEqual({s.name for s in candidate.symbols if s.storage_class == 2 and s.section_number > 0 and s.type == 0x20}, {SYMBOL})
@@ -73,10 +79,10 @@ class TextureRectCopyBehaviorTests(unittest.TestCase):
             self.assertFalse(any(s.name.startswith(('.CRT', '.text$x', '.xdata')) for s in candidate.sections))
             body, size, relocations = candidate.symbol_extent(candidate.find_symbol(SYMBOL))
             self.assertFalse(relocations)
-            report = compare(image, candidate, SYMBOL, 0x4c7b40, 750, ROOT / 'samples/render/TextureRectCopy.bindings.json')
+            report = compare(image, candidate, SYMBOL, 0x4c7b40, 750, ROOT / 'src/reconstructed/PCTextureMap.bindings.json')
             self.assertFalse(report['strict_exact'])
             self.assertEqual(report['strict_match']['matching_positions'], 364)
-            _, aggregate = compile_source(ROOT / 'samples/render/PCTextureMapNearMisses.cpp', 'aggregate')
+            _, aggregate = compile_source(ROOT / 'src/reconstructed/PCTextureMap.cpp', 'aggregate')
             self.assertEqual(aggregate.symbol_extent(aggregate.find_symbol(SYMBOL))[:2], (body, size))
             self.assertFalse(aggregate.symbol_extent(aggregate.find_symbol(SYMBOL))[2])
             _, background = compile_source(ROOT / 'src/reconstructed/BackgroundImage.cpp', 'background')

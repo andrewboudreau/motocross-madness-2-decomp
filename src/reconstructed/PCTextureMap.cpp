@@ -6,6 +6,7 @@
 #include "DebugAlloc.h"
 #include "PCRenderTarget.h"
 #include "TrackGame.h"
+#include "ManagedTexture.h"
 #include "D3DConstants.h"
 
 // 0x004c5f00
@@ -250,6 +251,302 @@ int PCTextureMap::CreateSystemSurface(DDSurfaceDesc2* desc, int flags, int* form
     return 0;
 }
 
+// Appends a render-state pair for slot 19 to apply.
+static inline void AppendRenderStatePair(TextureMap* map, int state, int value) {
+    map->statePairs[map->statePairCount].state = state;
+    map->statePairs[map->statePairCount].value = value;
+    map->statePairCount++;
+}
+
+// 0x004c69c0: sets the texture up from `bits` (or empty): picks the format,
+// counts the mip levels down to `minimumSize`, reuses a shared surface or
+// creates one (trying formats in order), converts the bits into it, builds
+// the mip levels and records the alpha or colour-key render states.
+// Not exact (518 of 2033 bytes, 2028 compiled: VC6 cross-jumps the identical
+// CreateSystemSurface call tails of the non-mip format fallback chain into
+// its first case, retail into its last; docs/PCTEXTUREMAP.md lists the forms
+// tried and docs/TEXTURE_SURFACE_CREATE.md the behaviour review).
+int PCTextureMap::CreateSurface(void* bits, int width, int height, int stride, int minimumSize,
+                                int sourceFormat, int format, TextureColorMapperView* palette,
+                                int flags, void* surfacePalette, int checkMemory, int unused,
+                                int addressU, int addressV, TextureContext* choice,
+                                int alphaThreshold, unsigned int key) {
+    int formats[5];
+    int mipmapped;
+    DDSurfaceDesc2 desc;
+    unsigned char pixelFormat[0x20];
+    DDSCaps2 caps;
+    int shared;
+    textureWidth = width;
+    textureHeight = height;
+    minimumMipSize = minimumSize;
+    colorMapper = palette;
+    texturePalette = surfacePalette;
+    if (choice)
+        format = IsFormat4444Or8888(format) ? choice->alphaFormat : choice->opaqueFormat;
+    mapFormat = format;
+    FillPixelFormat(format, pixelFormat);
+    mipmapped = flags & 2;
+    mipCount = 1;
+    if (!mipmapped) {
+        minimumMipSize = width;
+        if (!systemSurface) {
+            memset(&desc, 0, sizeof(desc));
+            desc.size = sizeof(desc);
+            desc.height = height;
+            desc.width = width;
+            memcpy(&desc.pixelFormat, pixelFormat, sizeof(pixelFormat));
+            desc.flags = (~flags & 4) << 10 | 7;
+            shared = 0;
+            if (flags & 4) {
+                desc.caps[0] = 0x800;
+            } else {
+                desc.caps[0] = 0x1000;
+                if (!(flags & 8) && !g_TrackGame->bladeRenderer &&
+                    !(g_TrackGame->texturesCached) &&
+                    (mapFormat == 555 || mapFormat == 565)) {
+                    shared = 1;
+                    if (g_SharedTextureSurfaces[mipCount]) {
+                        systemSurface = g_SharedTextureSurfaces[mipCount];
+                        systemSurface->AddRef();
+                    } else {
+                        desc.caps[0] = 0x1800;
+                    }
+                } else {
+                    desc.caps[0] = 0x1800;
+                }
+            }
+            if (!systemSurface) {
+                if (mapFormat == 4444) {
+                    formats[0] = mapFormat;
+                    formats[1] = 1555;
+                    formats[2] = 555;
+                    formats[3] = 565;
+                    formats[4] = 0;
+                    if (!CreateSystemSurface(&desc, flags, formats))
+                        goto failed;
+                } else if (mapFormat == 1555) {
+                    formats[0] = mapFormat;
+                    formats[1] = 555;
+                    formats[2] = 565;
+                    formats[3] = 0;
+                    if (!CreateSystemSurface(&desc, flags, formats))
+                        goto failed;
+                } else if (mapFormat == 8) {
+                    formats[0] = mapFormat;
+                    formats[1] = 555;
+                    formats[2] = 565;
+                    formats[3] = 0;
+                    if (!CreateSystemSurface(&desc, flags, formats))
+                        goto failed;
+                } else if (mapFormat == 555) {
+                    formats[0] = mapFormat;
+                    formats[1] = 565;
+                    formats[2] = 0;
+                    if (!CreateSystemSurface(&desc, flags, formats))
+                        goto failed;
+                } else if (mapFormat == 565) {
+                    formats[0] = mapFormat;
+                    formats[1] = 555;
+                    formats[2] = 0;
+                    if (!CreateSystemSurface(&desc, flags, formats))
+                        goto failed;
+                } else if (g_TrackGame->display->directDraw->CreateSurface(&desc, &systemSurface, 0)) {
+                    goto failed;
+                }
+            }
+            if (shared) {
+                g_SharedTextureSurfaces[mipCount] = systemSurface;
+                systemSurface->AddRef();
+            }
+            if (texturePalette && mapFormat == 8 && systemSurface->SetPalette(texturePalette))
+                goto failed;
+        }
+    } else {
+        int levelWidth = width;
+        int levelHeight = height;
+        for (;;) {
+            levelWidth >>= 1;
+            levelHeight >>= 1;
+            if (levelWidth < minimumSize && levelHeight < minimumSize)
+                break;
+            mipCount++;
+        }
+        if (bits && sourceFormat != mapFormat &&
+            (!checkMemory || PixelFormatBytesPerPixel(565) > PixelFormatBytesPerPixel(sourceFormat)) &&
+            !ownerManager->GrowSecondScratchBuffer(PixelFormatBytesPerPixel(565) * width * height))
+            return 0;
+        if (!systemSurface) {
+            memset(&desc, 0, sizeof(desc));
+            desc.size = sizeof(desc);
+            desc.height = height;
+            desc.width = width;
+            desc.mipMapCount = mipCount;
+            memcpy(&desc.pixelFormat, pixelFormat, sizeof(pixelFormat));
+            shared = 0;
+            desc.flags = 0x21007;
+            if (flags & 4) {
+                desc.caps[0] = 0x400808;
+            } else {
+                // DDSCAPS flags; tools/reference_diff.py reads 0x401008 and 0x401808 as
+                // .text addresses; they are DDSCAPS bits, not pointers (a false positive).
+                desc.caps[0] = 0x401008;
+                if (!(flags & 8) && !g_TrackGame->bladeRenderer &&
+                    !(g_TrackGame->texturesCached) &&
+                    (mapFormat == 555 || mapFormat == 565)) {
+                    shared = 1;
+                    if (g_SharedMipTextureSurfaces[mipCount]) {
+                        systemSurface = g_SharedMipTextureSurfaces[mipCount];
+                        systemSurface->AddRef();
+                    } else {
+                        desc.caps[0] = 0x401808;
+                    }
+                } else {
+                    desc.caps[0] = 0x401808;
+                }
+            }
+            if (!systemSurface) {
+                if (mapFormat == 4444) {
+                    formats[0] = mapFormat;
+                    formats[1] = 1555;
+                    formats[2] = 555;
+                    formats[3] = 565;
+                    formats[4] = 0;
+                    if (!CreateSystemSurface(&desc, flags, formats))
+                        goto failed;
+                } else if (mapFormat == 1555) {
+                    formats[0] = mapFormat;
+                    formats[1] = 555;
+                    formats[2] = 565;
+                    formats[3] = 0;
+                    if (!CreateSystemSurface(&desc, flags, formats))
+                        goto failed;
+                } else if (mapFormat == 8) {
+                    formats[0] = mapFormat;
+                    formats[1] = 555;
+                    formats[2] = 565;
+                    formats[3] = 0;
+                    if (!CreateSystemSurface(&desc, flags, formats))
+                        goto failed;
+                } else if (mapFormat == 555) {
+                    formats[0] = mapFormat;
+                    formats[1] = 565;
+                    formats[2] = 0;
+                    if (!CreateSystemSurface(&desc, flags, formats))
+                        goto failed;
+                } else if (mapFormat == 565) {
+                    formats[0] = mapFormat;
+                    formats[1] = 555;
+                    formats[2] = 0;
+                    if (!CreateSystemSurface(&desc, flags, formats))
+                        goto failed;
+                }
+            }
+            if (shared) {
+                g_SharedMipTextureSurfaces[mipCount] = systemSurface;
+                systemSurface->AddRef();
+            }
+            if (texturePalette && mapFormat == 8 && systemSurface->SetPalette(texturePalette))
+                goto failed;
+        }
+    }
+    if (systemSurface->GetCaps(&caps))
+        goto failed;
+    if (bits) {
+        memset(&desc, 0, sizeof(desc));
+        desc.size = sizeof(desc);
+        if (systemSurface->Lock(0, &desc, DDLOCK_WAIT | DDLOCK_NOSYSLOCK, 0))
+            goto failed;
+        void* destination = desc.surface;
+        int bytesPerPixel = PixelFormatBytesPerPixel(mapFormat);
+        ConvertPixels(destination, bits, width, height, desc.pitch / bytesPerPixel, stride, mapFormat,
+                              sourceFormat, 0, palette, alphaThreshold, key);
+        if (!(flags & 4))
+            averageColor = AverageColor(destination, desc.width, desc.height, desc.pitch / bytesPerPixel,
+                                               mapFormat, palette);
+        if (systemSurface->Unlock(0))
+            goto failed;
+        if (mipmapped && !BuildMipLevels(2))
+            goto failed;
+    }
+    if (g_DebugDumpTextureLevels)
+        DumpLevel(systemSurface, 0);
+    if (IsFormat4444Or8888(format) & !IsFormat4444Or8888(mapFormat)) {
+        ApplyColorKey(0xff00ff);
+        return 1;
+    }
+    if (IsFormat4444Or8888(mapFormat)) {
+        AppendRenderStatePair(this, 0x29, 0);
+        AppendRenderStatePair(this, 0x1b, 1);
+        AppendRenderStatePair(this, 0x13, addressU);
+        AppendRenderStatePair(this, 0x14, addressV);
+    } else {
+        AppendRenderStatePair(this, 0x29, 0);
+        AppendRenderStatePair(this, 0x1b, 0);
+    }
+    return 1;
+failed:
+    return 0;
+}
+
+// 0x004c71c0: a copy of the texture (a ManagedTexture registered with this
+// one's cache, or a PCTextureMap of the game's manager), filled from +0x70
+// through its slot 4 and given the same colour key; 0 on failure.
+// Not exact (333 of 600 bytes, 590 compiled: VC6 keeps the constant 1 in ebp
+// and the copy in ebx, retail the other way round; docs/PCTEXTUREMAP.md lists
+// the forms tried and docs/TEXTURE_CLONE.md the behaviour review).
+TextureMap* PCTextureMap::Clone() {
+    TextureMap* copy;
+    TextureMapManager* manager;
+    int cached = (mapFlags & 1) != 0;
+    if (cached) {
+        manager = ownerManager;
+        copy = new(__FILE__, 976) ManagedTexture(manager);
+        copy->mapFlags |= 1;
+        ((ManagedTexture*)this)->group->AddTexture((ManagedTexture*)copy);
+    } else {
+        manager = g_TrackGame->textureManager;
+        copy = new(__FILE__, 986) PCTextureMap(manager, 1);
+    }
+    if (systemSurface) {
+        DDSurfaceDesc2 desc;
+        memset(&desc, 0, sizeof(desc));
+        desc.size = sizeof(desc);
+        if (!systemSurface->Lock(0, &desc, DDLOCK_WAIT | DDLOCK_READONLY | DDLOCK_NOSYSLOCK, 0)) {
+            int systemMemory = 0;
+            int noAlpha = 0;
+            if (!(desc.caps[0] & 0x30000000))
+                systemMemory = 8;
+            if (!(desc.caps[0] & 0x1000))
+                noAlpha = 4;
+            int created = copy->CreateSurface(desc.surface, textureWidth, textureHeight,
+                                              desc.pitch / PixelFormatBytesPerPixel(mapFormat), minimumMipSize,
+                                              mapFormat, mapFormat, colorMapper, noAlpha | systemMemory,
+                                              texturePalette, 0, 0, 2, 1, 0, 0x80, 0xff00ff);
+            if (!systemSurface->Unlock(0) && created) {
+                if (usesColorKey) {
+                    if (mapFormat == 8) {
+                        copy->ApplyColorKey((colorMapper->entries[colorKeyValue][0] << 8 |
+                                             colorMapper->entries[colorKeyValue][1]) << 8 |
+                                                   colorMapper->entries[colorKeyValue][2]);
+                    } else {
+                        unsigned int key = colorKeyValue;
+                        unsigned int color;
+                        if (mapFormat == 555)
+                            color = (key & 0x7c00) << 9 | (key & 0x3e0) << 6 | (key & 0x1f) << 3;
+                        else
+                            color = (key & 0xf800) << 8 | (key & 0x7e0) << 5 | (key & 0x1f) << 3;
+                        copy->ApplyColorKey(color);
+                    }
+                }
+                return copy;
+            }
+        }
+    }
+    delete copy;
+    return 0;
+}
+
 // 0x004c6040
 void PCTextureMap::RecreateIfLost() {
     if (textureSurface && textureSurface->IsLost()) {
@@ -345,6 +642,76 @@ int PCTextureMap::BlitTo(void* destinationRect, DirectDrawSurface* destination,
                                         void* sourceRect, int flags, int skip) {
     if (!skip)
         return !destination->Blt(destinationRect, systemSurface, sourceRect, flags, 0);
+    return 0;
+}
+
+// 0x004c7b40: copies `rect` of +0x70 to (x, y) in `destination`. Without a
+// table this is BltFast; with one, both surfaces are locked and each
+// destination pixel becomes table[source << 8 | destination], clipped to
+// the destination. Every non-8-bit format follows the WORD path and reads
+// a byte through the destination WORD value, including its low-address fault.
+// Not exact (364 of 750 bytes, 775 compiled: the destination WORD is read
+// before the source one, as retail faults; register choice and loop entry
+// differ; docs/TEXTURE_RECT_COPY.md).
+int PCTextureMap::CopyRectTo(unsigned long x, unsigned long y, DirectDrawSurface* destination,
+                                        Win32Rect* rect, int flags, unsigned char* table) {
+    DDSurfaceDesc2 source;
+    DDSurfaceDesc2 target;
+    long left, top, right, bottom;
+    if (!table) {
+        if (destination->BltFast(x, y, systemSurface, rect, flags))
+            goto failed;
+        return 1;
+    }
+    memset(&source, 0, sizeof(source));
+    source.size = sizeof(source);
+    if (systemSurface->Lock(0, &source, 0x811, 0))
+        goto failed;
+    memset(&target, 0, sizeof(target));
+    target.size = sizeof(target);
+    if (destination->Lock(0, &target, 0x811, 0))
+        goto failed;
+    top = rect->top;
+    bottom = rect->bottom;
+    left = rect->left;
+    right = rect->right;
+    if (x < target.width && y < target.height) {
+        if (right - left + x + 1 >= target.width)
+            right = target.width - x + left - 2;
+        if (bottom - top + y + 1 >= target.height)
+            bottom = target.height - y + top - 2;
+        if (target.pixelFormat.bitCount == 8) {
+            unsigned char* from = (unsigned char*)source.surface + source.pitch * top + left;
+            unsigned char* to = (unsigned char*)target.surface + target.pitch * y + x;
+            for (long row = top; row <= bottom; row++) {
+                unsigned char* pixel = to;
+                for (long column = left; column <= right; column++, pixel++)
+                    *pixel = table[(from[column - left] << 8) + *pixel];
+                from += source.pitch;
+                to += target.pitch;
+            }
+        } else {
+            unsigned short* from = (unsigned short*)source.surface + source.pitch * top / 2 + left;
+            unsigned short* to = (unsigned short*)target.surface + target.pitch * y / 2 + x;
+            for (long row = top; row <= bottom; row++) {
+                unsigned short* pixel = to;
+                for (long column = left; column <= right; column++, pixel++) {
+                    // Preserve the observed destination-before-source access/fault order.
+                    unsigned short destinationPixel = *(volatile unsigned short*)pixel;
+                    unsigned short sourcePixel = *(volatile unsigned short*)(from + column - left);
+                    *pixel = table[(sourcePixel << 8) + *(unsigned char*)destinationPixel];
+                }
+                from += source.pitch / 2;
+                to += target.pitch / 2;
+            }
+        }
+    }
+    if (destination->Unlock(0))
+        goto failed;
+    if (systemSurface->Unlock(0))
+        goto failed;
+    return 1;
+failed:
     return 0;
 }
 

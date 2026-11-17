@@ -16,8 +16,7 @@ from tools.match import compare
 from tools.run_calibration import CASES
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCES = ('src/reconstructed/PCTextureMap.cpp', 'samples/render/PCTextureMapNearMisses.cpp',
-           'src/reconstructed/ProCircuitProcs.cpp')
+SOURCES = ('src/reconstructed/PCTextureMap.cpp', 'src/reconstructed/ProCircuitProcs.cpp')
 PROVIDER = '?ExpandLzw@@YAXPAEPBXH@Z'
 RETIRED = '?ExpandLzw@@YAXPAX0H@Z'
 
@@ -26,8 +25,7 @@ def whole_object(obj):
     """Keep all nondebug contents; normalize only the checkout prefix of source paths."""
     sections = [s for s in obj.sections if not s.name.startswith('.debug')]
     prefix = str(ROOT).replace('\\', '/') + '/'
-    # The near-miss aggregate's literal names its included TextureClone.cpp.
-    filenames = (*SOURCES, 'samples/render/TextureClone.cpp')
+    filenames = SOURCES
 
     def filename(data):
         value, nul, tail = data.partition(b'\0')
@@ -116,7 +114,7 @@ class TextureLzwConnectionTests(unittest.TestCase):
                     self.assertEqual(sum(len(r[3]) for r in rows), pins[source]['relocations'])
                     self.assertEqual(hashlib.sha256(json.dumps(rows).encode()).hexdigest(), pins[source]['sha256'])
                 for case in CASES:
-                    if case['source'] != source or source == SOURCES[2]:
+                    if case['source'] != source or source == SOURCES[1]:
                         continue
                     proof = compare(retail, coff, case['symbol'], int(case['target_va'], 0),
                                     case['target_size'], ROOT/case['bindings'])

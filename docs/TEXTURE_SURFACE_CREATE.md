@@ -1,9 +1,9 @@
 # Creating texture surfaces
 
-`samples/render/TextureSurfaceCreate.cpp` contains the complete readable
-`PCTextureMap::CreateSurface` candidate extracted unchanged from
-`PCTextureMapNearMisses.cpp`, including its source-level render-state append
-helper. The aggregate now includes that file. The missing provider is required
+`PCTextureMap::CreateSurface` is in [PCTextureMap.cpp](../src/reconstructed/PCTextureMap.cpp) (retail `PCTexMap.cpp`) after
+`CreateSystemSurface` `0x004c68e0`, in retail order, with a `// Not exact`
+status comment and its source-level render-state append helper. The
+behaviour test links a validation unit holding the two. The provider is required
 by PCTextureMap, ManagedTexture and CacheTexture vtables and by the menu screen
 capture path. The test independently verifies primary vtable `0x00555fec`,
 object offset zero and slot 4's target `0x004c69c0`. The semantic method name
@@ -19,19 +19,10 @@ complete function. The test decodes every instruction and validates all direct
 branch destinations before comparing the complete extent.
 
 VC6 SP3 `/O2` emits **2,028 bytes**, with **518 matching positions** against
-that complete retail body. The standalone and aggregate forms have identical
-full emitted bodies and relocation roles. No source algorithm has changed,
+that complete retail body. The validation unit and the canonical unit emit
+identical full bodies and relocation roles. No source algorithm has changed,
 and no function extent has been shortened. There is no local EH registration,
 cleanup funclet, CRT initializer or additional public function in this object.
-
-The independent baseline/current aggregate proof against `7dd638b8` preserves
-all **three functions** and **six nondebug sections**, including complete bytes
-and relocation destinations, types and addends. The extracted body has no
-filename references. Only the known temporary baseline aggregate's diagnostic
-filename is normalized to the current aggregate filename; the extraction adds
-no filename storage. Private proof:
-`work/game-build/check_texture_create_extraction.py` and
-`work/game-build/texture-create-extraction-proof.json`.
 
 ## Functional build review
 

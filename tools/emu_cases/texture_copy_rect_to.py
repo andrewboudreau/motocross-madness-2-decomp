@@ -3,7 +3,7 @@
 Copies `rect` of the texture's system surface (+0x70) to (x, y) in `destination`. Without
 a table it is IDirectDrawSurface7::BltFast; with one, both surfaces are locked and each
 destination pixel becomes table[source << 8 | destination], clipped (unsigned compares)
-to the destination. The linked body is samples/render/TextureRectCopy.cpp.
+to the destination. The linked body is in src/reconstructed/PCTextureMap.cpp.
 
 The surfaces are fake COM objects (__stdcall, ECX scratch, so the stack arguments alone
 are logged): BltFast (+0x1c), Lock (+0x64, writes height, width, pitch, the pixels and
@@ -21,7 +21,7 @@ from tools.emu_diff import _frame_token
 
 RETAIL_VA = 0x004c7b40
 SYMBOL = '?CopyRectTo@PCTextureMap@@'
-SOURCE = 'samples/render/TextureRectCopy.cpp'
+SOURCE = 'src/reconstructed/PCTextureMap.cpp'
 PROBES = {0x004c7b92: 'success', 0x004c7c62: 'clip right', 0x004c7c7f: 'clip bottom',
           0x004c7cef: '8-bit pixel', 0x004c7d93: '16-bit pixel', 0x004c7e21: 'failure',
           0x004c7def: 'unlock destination'}

@@ -5,7 +5,7 @@ down to `minimumSize`, grows the manager's scratch buffer for a converted mip ch
 reuses a shared 555/565 surface or creates one (CreateSystemSurface with a format
 fallback list, else IDirectDraw7::CreateSurface), sets the palette, converts `bits`
 into the locked surface, builds the mip levels and records the colour key or the
-render-state pairs. The linked body is samples/render/TextureSurfaceCreate.cpp.
+render-state pairs. The linked body is in src/reconstructed/PCTextureMap.cpp.
 
 IsFormat4444Or8888 (0x00511ad0), FillPixelFormat (0x005119c0) and
 PixelFormatBytesPerPixel (0x00511970) are leaf functions without globals and run
@@ -31,7 +31,7 @@ import struct
 
 RETAIL_VA = 0x004c69c0
 SYMBOL = '?CreateSurface@PCTextureMap@@'
-SOURCE = 'samples/render/TextureSurfaceCreate.cpp'
+SOURCE = 'src/reconstructed/PCTextureMap.cpp'
 IS_ALPHA, FILL_FORMAT, BYTES_PER_PIXEL = 0x00511ad0, 0x005119c0, 0x00511970
 CREATE_SYSTEM, GROW, CONVERT, AVERAGE, DUMP = 0x004c68e0, 0x00511370, 0x004d1d20, 0x004d24d0, 0x004c84e0
 TRACK_GAME, SHARED_MIP, SHARED, DUMP_LEVELS = 0x0056e26c, 0x0068a36c, 0x0068a394, 0x00689968
