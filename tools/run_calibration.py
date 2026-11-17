@@ -10112,6 +10112,15 @@ CASES = [
         'reason': 'writes vptr 0x550490, jmp GameObject dtor',
     },
     {
+        'name': 'cubedraw.cpp DrawableCube::BuildFaceGeometry 0x0043dc60',
+        'bindings': 'src/reconstructed/CubeDraw.bindings.json',
+        'source': 'src/reconstructed/CubeDraw.cpp',
+        'symbol': '?BuildFaceGeometry@DrawableCube@@QAEHXZ',
+        'target_va': '0x0043dc60',
+        'target_size': 1104,
+        'reason': 'face grids, normals and cell triangles; switch table included',
+    },
+    {
         'name': 'cubedraw.cpp kVec3Zero init wrapper 0x0043e870',
         'bindings': 'src/reconstructed/CubeDraw.bindings.json',
         'source': 'src/reconstructed/CubeDraw.cpp',

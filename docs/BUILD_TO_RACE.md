@@ -103,8 +103,8 @@ from reviewed near-miss sources outside `src/bringup`.
 2. **Bring-up bodies on the load and race path are unreviewed
    approximations** (C for the scores, P for behaviour). The large ones:
    `ReadDialogResource`, `LoadEventObjects`, `LoadBike`, the
-   KrustyBike and bike-AI units, `DrawCurrentLod`. 19 candidate sources are
-   marked best-guess-unreviewed in `config/game_build.json`.
+   KrustyBike and bike-AI units, `DrawCurrentLod`. The best-guess candidate
+   sources are reviewed (item 14); the bring-up bodies are not.
 3. **Near misses without a differential case** (C): of 189 non-identical
    bodies, 34 (53,289 B) had none at the review; since then
    `FileStream::Read`, `AddArchive`, `CreateRacers`, `ProfileDisplays`,
@@ -153,7 +153,7 @@ from reviewed near-miss sources outside `src/bringup`.
 | 11 | Built, not yet run. With `MCM2_STATE_LOG=1` the runtime (`runtime/d3drm/replay.c`) writes `statelog.txt`, one line per presented frame: menu, race clock and each racer's position, velocity, speed, laps, gates, place and total time as raw float bits. `MCM2_FIXED_CLOCK=<ms>` makes the game clock and every `srand` seed repeatable. Retail runs a port of `AutoRaceTick` (`MCM2_AUTORACE_PORT=1` uses it on a source build too). `tools/compare_state_logs.py` aligns two logs at the first race frame and names the first field that differs. `tests/test_runtime_replay.py` checks the retail addresses against the bindings and every offset with VC6 `offsetof`. | - | Cheaper and stricter than images for physics and AI. |
 | 12 | Re-run the old crash scenarios and map any new EIP. | 1 h of user time | Closes blocker 7. |
 | 13 | Done, except the clipper object: `g_SharedNormalDistribution` (0x56ece0) is defined in `NormalDistribution.cpp`, whose `__FILE__` string follows it in retail `.data` (VC6 lays them out in that order); `Group4_EcoBridges.cpp` is gone. The visibility box strip is one D3DLVERTEX-shaped array, so the constructor's 0x2000ffff colour reaches DrawBox's lines as in retail (constructor 0x52d340 and DrawBox 0x52e1f0 stay exact). The 5,000-entry grid texture tables fill retail's gaps exactly. `g_visibilityClipper` stays an empty static: retail gives no size or owner. | - | Removes known layout differences. |
-| 14 | Review the 19 best-guess candidate sources, largest on the race path first. | 3-5 days | Each is a body nobody has checked against retail behaviour. |
+| 14 | Done: all 19 are reviewed. BuildFaceGeometry was already strict exact and moved into CubeDraw.cpp. 35 differential cases over the other bodies (one new, `halve8`) re-ran clean, 0 of 8392 runs differ. PrepareGeometry (the debug Atmosphere page) differs only in register choice and one independent move (docs/GAME_BUILD.md#best-guess-review). | - | No candidate source is best-guess any more. |
 | 15 | Done: `static_initializers.py` answers `GetVersionExA` and the other imports the game object's initializer calls (directory, IMM32, drives, locale, registry, CRT TLS) with fixed values. All initializers run in both images; 11 more data bindings compare and match, among them the trig tables and `g_TrackGameInstance` (docs/REBUILD_GAPS.md). | - | Completes the static-initializer check. |
 | 16 | Link a `.rsrc` with user-supplied icons and a version block. | 0.5 day | Icon and file properties; no data may be committed. |
 | 17 | Done: VC6 LIB writes no import by undecorated name from a `.def`, but VC6 LINK reads one (WINNT.H `IMPORT_OBJECT_NAME_UNDECORATE`), as in the SDK's import libraries. `build_game.py` sets that name type on the `.def` entries given as `name@N @hint` without NONAME; the hint stays. `DirectInputCreateEx` and both `blade.dll` imports are now by name with retail's hints; the whole import table equals retail. Built and audited, not yet run. | - | Removes a machine-specific ordinal. |

@@ -24,7 +24,6 @@ SOURCES = (
     'src/reconstructed/Griddraw.cpp',
     'src/krusty2/shadow/D3DIMSoultreeShadow.cpp',
     'src/krusty2/visibility/VisibilityQuadTree.cpp',
-    'samples/render/CubeDrawNearMisses.cpp',
     'samples/camera/FollowCameraNearMisses.cpp',
     'samples/track/TrackOverlayNearMisses.cpp',
     'samples/ecosystem/EcoSystemNearMisses.cpp',
@@ -184,15 +183,18 @@ class ClipperGlobalConnectionsTests(unittest.TestCase):
             # and twelve relocations.
             # ChatOverlay::Setup moves from the TrackOverlay sample into the canonical
             # object (five sections into it, ten out of the sample).
-            self.assertEqual(sum(row['sections'] for row in pins['objects'].values()), 1026)
+            # BuildFaceGeometry's promotion moves its function and two float constants
+            # into CubeDraw.cpp (three sections) and drops the sample's five.
+            self.assertEqual(sum(row['sections'] for row in pins['objects'].values()), 1024)
             # The corrected camera loader adds its explicit first-cross call relocation.
             # QueryGround's emulation-found normal/height repairs drop one Terrain relocation.
             # The D3DIMSoultreeShadow slot 30 frame pragma takes ebp, so the shadow-point
             # pointer is reloaded at two more sites, as retail does.
             # LoadTexturesAndCoords' promotion moves its COMDAT from the sample to CubeDraw.cpp
             # and the rewritten BuildFaceGeometry differs: three more relocations.
+            # BuildFaceGeometry's own promotion keeps all 41 of its relocations.
             self.assertEqual(sum(row['relocations'] for row in pins['objects'].values()), 4728)
-        print('Clipper global:', strict, 'strict checks; 15 whole objects; 46 retail pointer loads; storage remains unresolved')
+        print('Clipper global:', strict, 'strict checks; 14 whole objects; 46 retail pointer loads; storage remains unresolved')
 
 
 if __name__ == '__main__': unittest.main()

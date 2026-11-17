@@ -61,9 +61,9 @@ undefined external in every affected object.
 `tests/test_clipper_global_connections.py` compiles the actual sources with
 authentic VC6 SP3 and checks:
 
-- 345 complete strict calibration/physics comparisons.
-- Fifteen complete canonical and sample objects: 1,035 nondebug sections and
-  4,712 relocations, including Terrain's 85 sections and 517 relocations.
+- 351 complete strict calibration/physics comparisons.
+- Fourteen complete canonical and sample objects: 1,024 nondebug sections and
+  4,728 relocations, including Terrain's 87 sections and 528 relocations.
 - All section flags, complete payloads, relocation types/addends and defined
   target section/offset identities. External identities change only under the
   six enumerated pointer-name substitutions.
@@ -87,8 +87,8 @@ destinations, including the complete handler. Only that named digest and its
 explanation change; QueryGround's fingerprint and the fingerprint format remain
 unchanged.
 
-The previous method-boundary regression also passes: 214 strict comparisons,
-seven complete objects and 66,845 native cases (including 432 access faults).
+The previous method-boundary regression also passes: 217 strict comparisons,
+six complete objects and 66,845 native cases (including 432 access faults).
 Those finite method tests execute the actual clipper helpers, including
 `CullPolygon`; their prepared-storage and masked-FP limits remain documented in
 [VISIBILITY_CONNECTIONS.md](VISIBILITY_CONNECTIONS.md). This pointer declaration

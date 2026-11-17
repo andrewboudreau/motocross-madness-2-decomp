@@ -62,18 +62,19 @@ conversion, hidden result argument, or pointer adjustment was introduced.
 ## Complete-object preservation
 
 The retained baseline fingerprints cover every nondebug section byte, flags,
-relocation kind/addend and resolved section/offset destination in seven objects:
+relocation kind/addend and resolved section/offset destination in six objects
+(current pins; the CubeDrawNearMisses object went away when BuildFaceGeometry
+moved into CubeDraw.cpp):
 
 | Object | Sections | Relocations |
 | --- | ---: | ---: |
-| CubeDraw | 47 | 174 |
+| CubeDraw | 52 | 224 |
 | FollowCamera | 98 | 250 |
-| TrackOverlay | 207 | 863 |
-| CubeDrawNearMisses | 17 | 55 |
-| FollowCameraNearMisses | 66 | 336 |
-| TrackOverlayNearMisses | 37 | 162 |
-| VisibilityQuadTree | 87 | 341 |
-| Total | 559 | 2,181 |
+| TrackOverlay | 215 | 920 |
+| FollowCameraNearMisses | 66 | 337 |
+| TrackOverlayNearMisses | 27 | 111 |
+| VisibilityQuadTree | 88 | 342 |
+| Total | 546 | 2,184 |
 
 The same-path private before/after comparison allows exactly the five decorated
 method-name substitutions recorded in
@@ -88,7 +89,7 @@ source does not compile because GUIManager is incomplete at its tooltip font
 accesses. Adding the genuine `GUIManagerCore.h` include fixes that omission. The
 sample's complete-object comparison starts from this repaired baseline, before
 any visibility changes; it is not a claim of equality with a compilable original
-HEAD sample object. The other six before objects need no baseline repair.
+HEAD sample object. The other before objects needed no baseline repair.
 
 The isolated game link removed exactly these five missing names, with no added
 undefined symbols. Parent integration checks cover all existing game objects
@@ -96,7 +97,7 @@ because this declaration header also has transitive consumers.
 
 ## Native validation
 
-`test_visibility_connections.py` reports **214 strict comparisons**, seven
+`test_visibility_connections.py` reports **217 strict comparisons**, six
 complete-object pins and **66,845 native scenarios**, including 432 access-fault
 outcomes. It extracts the unchanged five complete source method definitions,
 compiles them separately with authentic VC6 SP3, and requires both their full

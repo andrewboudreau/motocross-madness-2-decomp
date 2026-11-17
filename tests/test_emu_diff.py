@@ -214,6 +214,7 @@ CLEAN_CASES = {
     'bike_race_create': 60,
     # Render/texture/text/UI sweep: pixel conversion, texture building, text layout and UI layout.
     'halve1555': 60,
+    'halve8': 100,
     'dither_convert': 60,
     'grid_build_node_texture': 60,
     'grid_build_block_texture': 60,

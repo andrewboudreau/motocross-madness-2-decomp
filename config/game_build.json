@@ -458,45 +458,39 @@
     },
     {
       "path": "samples/game/QuarryStuntEventNearMisses.cpp",
-      "status": "best-guess-unreviewed",
-      "reason": "Near-miss body admitted so the source build can link and run; defines BaseQuarryEvent::PrepareGeometry. Behavior unverified against retail; bytes nonexact.",
-      "evidence": "docs/GAME_BUILD.md#best-guess-admissions"
+      "status": "reviewed-nonexact",
+      "reason": "Near-miss body admitted so the source build can link and run; defines BaseQuarryEvent::PrepareGeometry. BaseQuarryEvent::PrepareGeometry 0x004e14a0 (the debug Atmosphere page) was reviewed instruction by instruction against retail: 506 of 529 normalised instructions align; the rest is register choice in the page prologue (retail rereads TrackGame+0x38, which nothing stores between the two loads), one independent mov reordered after a ControlInterface call, and jump-table entries shifted by the 2-byte prologue difference. No behaviour difference.",
+      "evidence": "docs/GAME_BUILD.md#best-guess-review"
     },
     {
       "path": "samples/net/NetNearMisses.cpp",
-      "status": "best-guess-unreviewed",
-      "reason": "Near-miss body admitted so the source build can link and run; defines NetworkInterface::DispatchMessages. Behavior unverified against retail; bytes nonexact.",
-      "evidence": "docs/GAME_BUILD.md#best-guess-admissions"
+      "status": "reviewed-nonexact",
+      "reason": "Near-miss body admitted so the source build can link and run; defines NetworkInterface::DispatchMessages. Differential review against retail (tools/emu_diff.py, re-run 2026-11-16): net_dispatch_messages 0x4aced0 0 of 120 runs differ. Bytes nonexact.",
+      "evidence": "docs/GAME_BUILD.md#best-guess-review"
     },
     {
       "path": "samples/net/NetThreadNearMisses.cpp",
-      "status": "best-guess-unreviewed",
-      "reason": "Near-miss body admitted so the source build can link and run; defines ReceiveMessages. Behavior unverified against retail; bytes nonexact.",
-      "evidence": "docs/GAME_BUILD.md#best-guess-admissions"
+      "status": "reviewed-nonexact",
+      "reason": "Near-miss body admitted so the source build can link and run; defines ReceiveMessages. Differential review against retail (tools/emu_diff.py, re-run 2026-11-16): net_receive_messages 0x4af8e0 0 of 200 runs differ. Bytes nonexact.",
+      "evidence": "docs/GAME_BUILD.md#best-guess-review"
     },
     {
       "path": "samples/physics/helpers/GraphicsTestNearMisses.cpp",
-      "status": "best-guess-unreviewed",
-      "reason": "Near-miss body admitted so the source build can link and run; defines GraphicsTest::DrawCircle. Behavior unverified against retail; bytes nonexact.",
-      "evidence": "docs/GAME_BUILD.md#best-guess-admissions"
+      "status": "reviewed-nonexact",
+      "reason": "Near-miss body admitted so the source build can link and run; defines GraphicsTest::DrawCircle. Differential review against retail (tools/emu_diff.py, re-run 2026-11-16): graphics_test_draw_circle 0x47bd10 0 of 120 runs differ. Bytes nonexact.",
+      "evidence": "docs/GAME_BUILD.md#best-guess-review"
     },
     {
       "path": "samples/physics/visibility/VisibilityQuadTreeTraversal.cpp",
-      "status": "best-guess-unreviewed",
-      "reason": "Near-miss body admitted so the source build can link and run; defines VisibilityQuadTreeNode::Traverse. Behavior unverified against retail; bytes nonexact.",
-      "evidence": "docs/GAME_BUILD.md#best-guess-admissions"
-    },
-    {
-      "path": "samples/render/CubeDrawNearMisses.cpp",
-      "status": "best-guess-unreviewed",
-      "reason": "Near-miss body admitted so the source build can link and run; defines DrawableCube::BuildFaceGeometry. Behavior unverified against retail; bytes nonexact.",
-      "evidence": "docs/GAME_BUILD.md#best-guess-admissions"
+      "status": "reviewed-nonexact",
+      "reason": "Near-miss body admitted so the source build can link and run; defines VisibilityQuadTreeNode::Traverse. Differential review against retail (tools/emu_diff.py, re-run 2026-11-16): visibility_traverse 0x52d610 0 of 300 runs differ. Bytes nonexact.",
+      "evidence": "docs/GAME_BUILD.md#best-guess-review"
     },
     {
       "path": "samples/render/DebugOverlayNearMisses.cpp",
-      "status": "best-guess-unreviewed",
-      "reason": "Near-miss body admitted so the source build can link and run; defines DebugOverlay::LoadFont. Behavior unverified against retail; bytes nonexact.",
-      "evidence": "docs/GAME_BUILD.md#best-guess-admissions"
+      "status": "reviewed-nonexact",
+      "reason": "Near-miss body admitted so the source build can link and run; defines DebugOverlay::LoadFont. Differential review against retail (tools/emu_diff.py, re-run 2026-11-16): overlay_load_font 0x447a00 0 of 200 runs differ. Bytes nonexact.",
+      "evidence": "docs/GAME_BUILD.md#best-guess-review"
     },
     {
       "path": "samples/render/GridNodeNearMisses.cpp",
@@ -506,47 +500,47 @@
     },
     {
       "path": "samples/render/GriddrawNearMisses.cpp",
-      "status": "best-guess-unreviewed",
-      "reason": "Near-miss body admitted so the source build can link and run; defines DrawableGridNode::ComputeViewerDetail, DrawableGridNode::RebuildBlockBuffers, DrawableGridNode::WalkVisibilityQuadrants, GridVertexCache::GetVertex. Behavior unverified against retail; bytes nonexact.",
-      "evidence": "docs/GAME_BUILD.md#best-guess-admissions"
+      "status": "reviewed-nonexact",
+      "reason": "Near-miss body admitted so the source build can link and run; defines DrawableGridNode::ComputeViewerDetail, DrawableGridNode::RebuildBlockBuffers, DrawableGridNode::WalkVisibilityQuadrants, GridVertexCache::GetVertex. Differential review against retail (tools/emu_diff.py, re-run 2026-11-16): grid_viewer_detail 0x4815e0 0 of 200 runs differ; grid_walk_visibility 0x481de0 0 of 80 runs differ; grid_vertex_cache_get_vertex 0x47de90 0 of 300 runs differ; grid_rebuild_block_buffers 0x47f210 0 of 120 runs differ. Bytes nonexact.",
+      "evidence": "docs/GAME_BUILD.md#best-guess-review"
     },
     {
       "path": "samples/render/PixtransNearMisses.cpp",
-      "status": "best-guess-unreviewed",
-      "reason": "Near-miss body admitted so the source build can link and run; defines DitherConvert, Halve1555, Halve8, Halve8888. Halve8888 and Halve1555 pass the native retail differential test (tests/test_pixtrans_halve_behavior.py) and the emu_diff cases halve8888/halve1555; DitherConvert agrees with retail in the dither_convert emu_diff case; Halve8 is checked against the retail disassembly only; bytes nonexact.",
-      "evidence": "docs/GAME_BUILD.md#best-guess-admissions"
+      "status": "reviewed-nonexact",
+      "reason": "Near-miss body admitted so the source build can link and run; defines DitherConvert, Halve1555, Halve8, Halve8888. Halve8888 and Halve1555 pass the native retail differential test (tests/test_pixtrans_halve_behavior.py) and the emu_diff cases halve8888/halve1555; DitherConvert agrees with retail in the dither_convert emu_diff case; Halve8 is checked against the retail disassembly only; bytes nonexact. Differential review against retail (tools/emu_diff.py, re-run 2026-11-16): halve8888 0x4cdf10 0 of 60 runs differ; halve1555 0x4ce420 0 of 60 runs differ; halve8 0x4cee30 0 of 100 runs differ; dither_convert 0x4cf2a0 0 of 60 runs differ. Bytes nonexact.",
+      "evidence": "docs/GAME_BUILD.md#best-guess-review"
     },
     {
       "path": "samples/render/TgafileNearMisses.cpp",
-      "status": "best-guess-unreviewed",
-      "reason": "Near-miss body admitted so the source build can link and run; defines WriteTga. Behavior unverified against retail; bytes nonexact.",
-      "evidence": "docs/GAME_BUILD.md#best-guess-admissions"
+      "status": "reviewed-nonexact",
+      "reason": "Near-miss body admitted so the source build can link and run; defines WriteTga. Differential review against retail (tools/emu_diff.py, re-run 2026-11-16): tga_write 0x512990 0 of 200 runs differ. Bytes nonexact.",
+      "evidence": "docs/GAME_BUILD.md#best-guess-review"
     },
     {
       "path": "samples/track/TrackNearMisses.cpp",
-      "status": "best-guess-unreviewed",
-      "reason": "Near-miss body admitted so the source build can link and run; defines Track::PlaceNear. Behavior unverified against retail; bytes nonexact.",
-      "evidence": "docs/GAME_BUILD.md#best-guess-admissions"
+      "status": "reviewed-nonexact",
+      "reason": "Near-miss body admitted so the source build can link and run; defines Track::PlaceNear. Differential review against retail (tools/emu_diff.py, re-run 2026-11-16): track_place_near 0x517340 0 of 400 runs differ. Bytes nonexact.",
+      "evidence": "docs/GAME_BUILD.md#best-guess-review"
     },
     {
       "path": "samples/physics/shadow/TerrainShadow.cpp",
-      "status": "best-guess-unreviewed",
+      "status": "reviewed-nonexact",
       "extra_flags": [
         "/QIfist"
       ],
-      "reason": "Near-miss bodies admitted so the source build can link and run; defines TerrainShadow slots 27, 28 and 30, which the vtable emitted by src/reconstructed/TerrainShadow.cpp (the exact constructor, Attach, slot 29 and Render3D) references. /QIfist turns slot 30's FistpFloatToInt cast into a FISTP under the current rounding mode, as retail's inline fistp helper; slot 30 is the file's only float-to-int conversion (slots 27 and 28 make no __ftol call with or without the flag). Checked against the retail disassembly; slot 30 also differentially (tools/emu_cases/terrain_shadow_slot30.py: 0 of 3000 runs differ).",
+      "reason": "Near-miss bodies admitted so the source build can link and run; defines TerrainShadow slots 27, 28 and 30, which the vtable emitted by src/reconstructed/TerrainShadow.cpp (the exact constructor, Attach, slot 29 and Render3D) references. /QIfist turns slot 30's FistpFloatToInt cast into a FISTP under the current rounding mode, as retail's inline fistp helper; slot 30 is the file's only float-to-int conversion (slots 27 and 28 make no __ftol call with or without the flag). Checked against the retail disassembly; slot 30 also differentially (tools/emu_cases/terrain_shadow_slot30.py: 0 of 3000 runs differ). Differential review against retail (tools/emu_diff.py, re-run 2026-11-16): terrain_shadow_slot30 0x509aa0 0 of 400 runs differ; terrain_shadow_slot28 0x5097d0 0 of 200 runs differ; terrain_shadow_slot27 0x508bc0 0 of 200 runs differ. Bytes nonexact.",
       "evidence": "docs/GAME_BUILD.md#shadow-slot-30-rounding"
     },
     {
       "path": "samples/physics/contact/ContactImpulse.cpp",
-      "status": "best-guess-unreviewed",
-      "reason": "ContactSolveImpulse 0x005004a0: 1062-byte near miss (size exact, 940/1062 strict, retail's out-of-line call sequence) replacing the inline-arithmetic bring-up stand-in. Same formula and update order; not differentially tested.",
+      "status": "reviewed-nonexact",
+      "reason": "ContactSolveImpulse 0x005004a0: 1062-byte near miss (size exact, 940/1062 strict, retail's out-of-line call sequence) replacing the inline-arithmetic bring-up stand-in. Same formula and update order; not differentially tested. Differential review against retail (tools/emu_diff.py, re-run 2026-11-16): contact_solve_impulse 0x5004a0 0 of 120 runs differ. Bytes nonexact.",
       "evidence": "docs/GAME_BUILD.md#collision-and-contact-near-miss-bodies"
     },
     {
       "path": "samples/physics/constraint/ConstraintMethodCollisionModelNearMisses.cpp",
-      "status": "best-guess-unreviewed",
-      "reason": "ConstraintMethodCollisionModel::ApplyContactImpulse 0x0043bdb0: 2619-byte near miss (size exact, 2515/2619 strict, call sequence and operands as retail) replacing the inline-arithmetic bring-up stand-in; includes the canonical unit (included_sources). Same formula; not differentially tested.",
+      "status": "reviewed-nonexact",
+      "reason": "ConstraintMethodCollisionModel::ApplyContactImpulse 0x0043bdb0: 2619-byte near miss (size exact, 2515/2619 strict, call sequence and operands as retail) replacing the inline-arithmetic bring-up stand-in; includes the canonical unit (included_sources). Same formula; not differentially tested. Differential review against retail (tools/emu_diff.py, re-run 2026-11-16): constraint_contact_impulse 0x43bdb0 0 of 120 runs differ. Bytes nonexact.",
       "evidence": "docs/GAME_BUILD.md#collision-and-contact-near-miss-bodies"
     },
     {
@@ -569,8 +563,8 @@
     },
     {
       "path": "samples/physics/bvh/BoundingBoxTreeQueryNearMisses.cpp",
-      "status": "best-guess-unreviewed",
-      "reason": "BoxCapsuleOverlap 0x00425900, BoxTriangleQuery 0x00426be0, SegmentTriangleQuery 0x00427c10, TreeTreeQueryNodes 0x004280e0 and SegmentSegmentDistance 0x0042a640 replace the Group0_BvhQuery bring-up copies of the same bodies; the file includes the canonical BoundingBoxTreeQuery.cpp (included_sources) for the unit's file statics and defines the never-written 0x00579668 flag. The out-of-line vector call views resolve through link_aliases. All five agree with retail under tools/emu_diff.py (docs/GAME_BUILD.md, second differential sweep).",
+      "status": "reviewed-nonexact",
+      "reason": "BoxCapsuleOverlap 0x00425900, BoxTriangleQuery 0x00426be0, SegmentTriangleQuery 0x00427c10, TreeTreeQueryNodes 0x004280e0 and SegmentSegmentDistance 0x0042a640 replace the Group0_BvhQuery bring-up copies of the same bodies; the file includes the canonical BoundingBoxTreeQuery.cpp (included_sources) for the unit's file statics and defines the never-written 0x00579668 flag. The out-of-line vector call views resolve through link_aliases. All five agree with retail under tools/emu_diff.py (docs/GAME_BUILD.md, second differential sweep). Differential review against retail (tools/emu_diff.py, re-run 2026-11-16): segment_segment_distance 0x42a640 0 of 200 runs differ; segment_triangle_query 0x427c10 0 of 600 runs differ; box_capsule_overlap 0x425900 0 of 88 runs differ; box_triangle_query 0x426be0 0 of 180 runs differ; tree_tree_query 0x4280e0 0 of 150 runs differ; box_overlap 0x424ab0 0 of 94 runs differ. Bytes nonexact.",
       "evidence": "docs/GAME_BUILD.md#collision-and-contact-near-miss-bodies"
     },
     {
@@ -581,29 +575,29 @@
     },
     {
       "path": "samples/physics/shadow/ProjectedShadowNearMisses.cpp",
-      "status": "best-guess-unreviewed",
+      "status": "reviewed-nonexact",
       "extra_flags": [
         "/QIfist"
       ],
-      "reason": "ProjectedShadow ComputeBounds 0x004db0d0, RenderShadow 0x004db8c0, Present 0x004dbd30 and TintCasterVertices 0x004dc2b0 replace the bring-up stand-ins; includes the canonical unit (included_sources). /QIfist turns the rounding helper's cast into a 64-bit fistp under the current rounding mode, range-checked to retail's 32-bit result. Differentially tested (tools/emu_cases/projected_shadow_render.py, projected_shadow_tint.py: 0 of 7000 runs differ); bytes nonexact.",
+      "reason": "ProjectedShadow ComputeBounds 0x004db0d0, RenderShadow 0x004db8c0, Present 0x004dbd30 and TintCasterVertices 0x004dc2b0 replace the bring-up stand-ins; includes the canonical unit (included_sources). /QIfist turns the rounding helper's cast into a 64-bit fistp under the current rounding mode, range-checked to retail's 32-bit result. Differentially tested (tools/emu_cases/projected_shadow_render.py, projected_shadow_tint.py: 0 of 7000 runs differ); bytes nonexact. Differential review against retail (tools/emu_diff.py, re-run 2026-11-16): projected_shadow_render 0x4db8c0 0 of 400 runs differ; projected_shadow_tint 0x4dc2b0 0 of 400 runs differ; projected_shadow_bounds 0x4db0d0 0 of 120 runs differ; projected_shadow_init 0x4da7b0 0 of 200 runs differ; projected_shadow_present 0x4dbd30 0 of 200 runs differ. Bytes nonexact.",
       "evidence": "docs/GAME_BUILD.md#projectedshadow-near-miss-bodies"
     },
     {
       "path": "samples/physics/shadow/D3DIMSoultreeShadowNearMisses.cpp",
-      "status": "best-guess-unreviewed",
+      "status": "reviewed-nonexact",
       "extra_flags": [
         "/QIfist"
       ],
-      "reason": "D3DIMSoultreeShadow slots 29 (0x00446c30) and 30 (0x00446f40) replace the Group5_D3DIMSoultreeShadow bring-up stand-ins. /QIfist turns FistpFloatToInt's cast into a FISTP under the current rounding mode, as retail's inline fistp helper; the outcode array is sized to the 3000-entry vertex limit. Checked against the retail disassembly and differentially (tools/emu_cases/d3dim_shadow_slot30.py: 0 of 3000 runs differ).",
+      "reason": "D3DIMSoultreeShadow slots 29 (0x00446c30) and 30 (0x00446f40) replace the Group5_D3DIMSoultreeShadow bring-up stand-ins. /QIfist turns FistpFloatToInt's cast into a FISTP under the current rounding mode, as retail's inline fistp helper; the outcode array is sized to the 3000-entry vertex limit. Checked against the retail disassembly and differentially (tools/emu_cases/d3dim_shadow_slot30.py: 0 of 3000 runs differ). Differential review against retail (tools/emu_diff.py, re-run 2026-11-16): d3dim_shadow_slot30 0x446f40 0 of 400 runs differ; d3dim_shadow_slot29 0x446c30 0 of 200 runs differ. Bytes nonexact.",
       "evidence": "docs/GAME_BUILD.md#shadow-slot-30-rounding"
     },
     {
       "path": "samples/physics/bikeai/KrustyBikeTrickPick.cpp",
-      "status": "best-guess-unreviewed",
+      "status": "reviewed-nonexact",
       "extra_flags": [
         "/QIfist"
       ],
-      "reason": "KrustyBike::PickTrick 0x0048d780 (the AI trick pick) replaces the Group3_KrustyBikeAISupport bring-up copy. /QIfist turns FistpFloatToInt's cast into a FISTP under the current rounding mode, as retail's inline fistp helper at 0x0048d834; the index stays in [-0.5, 15.5). Checked against the retail disassembly and differentially (tools/emu_cases/krusty_trick_pick.py: 0 of 6000 runs differ at 53- and 24-bit precision).",
+      "reason": "KrustyBike::PickTrick 0x0048d780 (the AI trick pick) replaces the Group3_KrustyBikeAISupport bring-up copy. /QIfist turns FistpFloatToInt's cast into a FISTP under the current rounding mode, as retail's inline fistp helper at 0x0048d834; the index stays in [-0.5, 15.5). Checked against the retail disassembly and differentially (tools/emu_cases/krusty_trick_pick.py: 0 of 6000 runs differ at 53- and 24-bit precision). Differential review against retail (tools/emu_diff.py, re-run 2026-11-16): krusty_trick_pick 0x48d780 0 of 800 runs differ. Bytes nonexact.",
       "evidence": "docs/GAME_BUILD.md#inline-fistp-rounding-samples"
     },
     {
@@ -617,11 +611,11 @@
     },
     {
       "path": "samples/track/DropTextOverlaySetup.cpp",
-      "status": "best-guess-unreviewed",
+      "status": "reviewed-nonexact",
       "extra_flags": [
         "/QIfist"
       ],
-      "reason": "DropTextOverlay::Setup 0x0051af00 replaces the Group4_Overlay bring-up copy. /QIfist turns FistpFloatToInt's cast into a FISTP under the current rounding mode, as retail's inline fistp helper at 0x0051af3e and 0x0051af64; screen coordinates stay in int range. Checked against the retail disassembly and differentially (tools/emu_cases/drop_text_setup.py); the parenthesised scale products keep retail's (size * scale) * x order, which VC6 otherwise reassociates (96 of 2000 runs differed at 24-bit precision, now 0 of 4000). The EBP frame retail's inline asm gives Setup comes from a #pragma optimize(\"y\", off) region in the source (docs/GAME_BUILD.md#frame-pointer-units).",
+      "reason": "DropTextOverlay::Setup 0x0051af00 replaces the Group4_Overlay bring-up copy. /QIfist turns FistpFloatToInt's cast into a FISTP under the current rounding mode, as retail's inline fistp helper at 0x0051af3e and 0x0051af64; screen coordinates stay in int range. Checked against the retail disassembly and differentially (tools/emu_cases/drop_text_setup.py); the parenthesised scale products keep retail's (size * scale) * x order, which VC6 otherwise reassociates (96 of 2000 runs differed at 24-bit precision, now 0 of 4000). The EBP frame retail's inline asm gives Setup comes from a #pragma optimize(\"y\", off) region in the source (docs/GAME_BUILD.md#frame-pointer-units). Differential review against retail (tools/emu_diff.py, re-run 2026-11-16): drop_text_setup 0x51af00 0 of 800 runs differ. Bytes nonexact.",
       "evidence": "docs/GAME_BUILD.md#inline-fistp-rounding-samples"
     }
   ],

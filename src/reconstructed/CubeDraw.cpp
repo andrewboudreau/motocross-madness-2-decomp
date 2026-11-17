@@ -1,6 +1,5 @@
 // CubeDraw.cpp -- reconstruction of D:\aardvark\VC\krusty2\cubedraw.cpp.
-// See CubeDraw.h for the TU extent and the class. The geometry builder
-// 0x0043dc60 is exact in samples/render/CubeDrawNearMisses.cpp (not promoted yet).
+// See CubeDraw.h for the TU extent and the class.
 
 #include <string.h>
 
@@ -117,6 +116,113 @@ DrawableCube* DrawableCube::Load(void* value, FileStream* stream,
 fail:
     Release();
     return 0;
+}
+
+// 0x0043dc60: each face's 5x5 grid of points, its normal and the two
+// triangles of each of its 16 cells. Shape notes (docs/CUBE.md): one column
+// local `x` with `-x` for the mirrored faces gives retail's order of the two
+// induction-variable spills; a flat grid walked by one running `point`, a
+// separate corner index `first` and a cell index `index` that is not reset
+// per row give retail's pointers; case 5 stores its normal after its
+// position, so VC6 does not cross-jump the other cases' tails into it.
+int DrawableCube::BuildFaceGeometry()
+{
+    CubeLitVertex grid[25];
+    for (int face = 0; face < 6; face++) {
+        int point = 0;
+        for (int row = 0; row < 5; row++) {
+            for (int column = 0; column < 5; column++, point++) {
+                int x = column * 128 - 256;
+                switch (face) {
+                case 0:
+                    grid[point].position.x = (float)x * 100.0f;
+                    grid[point].position.y = (float)(256 - row * 128) * 100.0f;
+                    grid[point].position.z = 25600.0f;
+                    s_faceNormals[0].x = s_faceNormals[0].y = 0.0f;
+                    s_faceNormals[0].z = -1.0f;
+                    break;
+                case 1:
+                    grid[point].position.x = -25600.0f;
+                    grid[point].position.y = (float)(256 - row * 128) * 100.0f;
+                    grid[point].position.z = (float)x * 100.0f;
+                    s_faceNormals[1].z = s_faceNormals[1].y = 0.0f;
+                    s_faceNormals[1].x = 1.0f;
+                    break;
+                case 2:
+                    grid[point].position.x = (float)(-x) * 100.0f;
+                    grid[point].position.y = (float)(256 - row * 128) * 100.0f;
+                    grid[point].position.z = -25600.0f;
+                    s_faceNormals[2].x = s_faceNormals[2].y = 0.0f;
+                    s_faceNormals[2].z = 1.0f;
+                    break;
+                case 3:
+                    grid[point].position.x = 25600.0f;
+                    grid[point].position.y = (float)(256 - row * 128) * 100.0f;
+                    grid[point].position.z = (float)(-x) * 100.0f;
+                    s_faceNormals[3].z = s_faceNormals[3].y = 0.0f;
+                    s_faceNormals[3].x = -1.0f;
+                    break;
+                case 4:
+                    grid[point].position.x = (float)x * 100.0f;
+                    grid[point].position.y = 25600.0f;
+                    grid[point].position.z = (float)(row * 128 - 256) * 100.0f;
+                    s_faceNormals[4].x = s_faceNormals[4].z = 0.0f;
+                    s_faceNormals[4].y = -1.0f;
+                    break;
+                case 5:
+                    grid[point].position.x = (float)x * 100.0f;
+                    grid[point].position.y = -25600.0f;
+                    grid[point].position.z = (float)(256 - row * 128) * 100.0f;
+                    s_faceNormals[5].x = s_faceNormals[5].z = 0.0f;
+                    s_faceNormals[5].y = 1.0f;
+                    break;
+                }
+                grid[point].diffuse = 0xffffffff;
+                grid[point].tu = (float)column * 0.25f;
+                grid[point].tv = (float)row * 0.25f;
+            }
+        }
+        int first = 0;
+        int index = 0;
+        for (int cellRow = 0; cellRow < 4; cellRow++, first++) {
+            for (int cellColumn = 0; cellColumn < 4; cellColumn++, first++, index++) {
+                CubeLitVertex* corner = &grid[first];
+                s_cellVertices[face][index][0].position = corner[0].position;
+                s_cellVertices[face][index][0].diffuse = 0xffffffff;
+                s_cellVertices[face][index][0].specular = 0;
+                s_cellVertices[face][index][0].tu = 0.0f;
+                s_cellVertices[face][index][0].tv = 0.0f;
+                s_cellVertices[face][index][1].position = corner[1].position;
+                s_cellVertices[face][index][1].diffuse = 0xffffffff;
+                s_cellVertices[face][index][1].specular = 0;
+                s_cellVertices[face][index][1].tu = 1.0f;
+                s_cellVertices[face][index][1].tv = 0.0f;
+                s_cellVertices[face][index][2].position = corner[6].position;
+                s_cellVertices[face][index][2].diffuse = 0xffffffff;
+                s_cellVertices[face][index][2].specular = 0;
+                s_cellVertices[face][index][2].tu = 1.0f;
+                s_cellVertices[face][index][2].tv = 1.0f;
+                s_cellVertices[face][index][3].position = corner[0].position;
+                s_cellVertices[face][index][3].diffuse = 0xffffffff;
+                s_cellVertices[face][index][3].specular = 0;
+                s_cellVertices[face][index][3].tu = 0.0f;
+                s_cellVertices[face][index][3].tv = 0.0f;
+                s_cellVertices[face][index][4].position = corner[6].position;
+                s_cellVertices[face][index][4].diffuse = 0xffffffff;
+                s_cellVertices[face][index][4].specular = 0;
+                s_cellVertices[face][index][4].tu = 1.0f;
+                s_cellVertices[face][index][4].tv = 1.0f;
+                s_cellVertices[face][index][5].position = corner[5].position;
+                s_cellVertices[face][index][5].diffuse = 0xffffffff;
+                s_cellVertices[face][index][5].specular = 0;
+                s_cellVertices[face][index][5].tu = 0.0f;
+                s_cellVertices[face][index][5].tv = 1.0f;
+            }
+        }
+        for (int i = 0; i < 25; i++)
+            s_facePoints[face][i] = grid[i].position;
+    }
+    return 1;
 }
 
 // 0x0043e0b0: loads the cube's textures and sets each cell's texture

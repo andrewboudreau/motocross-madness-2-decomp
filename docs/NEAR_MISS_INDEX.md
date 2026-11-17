@@ -213,7 +213,7 @@ the column) and direct `s_cellVertices[face][index][k]` stores give retail's row
 pointer; every cell-pointer form folded the row away. The same counters take
 BuildFaceGeometry `0x0043dc60` from 121/1064 to 1100/1104.
 BuildFaceGeometry `0x0043dc60` (class c, 1100/1104) is exact too, in
-samples/render/CubeDrawNearMisses.cpp: the column coordinate is one named local,
+CubeDraw.cpp: the column coordinate is one named local,
 `int x = column * 128 - 256;` at the top of the loop body, and the two faces that need
 the mirrored value use `-x`. VC6 still strength-reduces `x` and `-x` into two induction
 variables, but spills `-x`'s first, as retail does; every spelling of the two expressions

@@ -599,7 +599,8 @@ Goal: a source-built game that links, runs and races. Near-miss bodies in
 `samples/` whose behavior has not been differentially tested are admitted
 with status `best-guess-unreviewed` (distinct from `reviewed-nonexact`) so the
 link frontier can move. They are guesses until each is reviewed; none of them
-is a strict match and none replaces a `src/` definition.
+is a strict match and none replaces a `src/` definition. All of them have since
+been reviewed (see [Best-guess review](#best-guess-review)).
 
 Selection is a greedy link-only search over the compiled objects: add the
 candidate that lowers the unresolved count most, reject any that creates a
@@ -611,6 +612,73 @@ exposes new dependencies: all 44 files together raise the count from 175 to
 249, the 13 chosen files lower it from **175 to 152** with no strict match
 changed (separate objects; `src/` is untouched).
 
+## Best-guess review
+
+On 2026-11-16 every `best-guess-unreviewed` candidate source was reviewed and
+is now `reviewed-nonexact`; `config/game_build.json` has no best-guess entries
+left. Each entry's `reason` names its cases and runs.
+
+- **Differential.** 17 files define 35 linked near-miss bodies, each with a
+  `tools/emu_cases` case (`halve8` is new: keyed and plain palettes, a NULL
+  palette). The cases were re-run in the `CLEAN_CASES` sizes of
+  `tests/test_emu_diff.py`, compiled with each candidate's configured flags:
+  0 of 8392 runs differ, no retail fault, and every probe is reached. Functions the
+  files take from an included canonical source are strict exact and need no
+  case.
+- **Promoted.** `DrawableCube::BuildFaceGeometry` (0x0043dc60) had been strict
+  exact (1104 of 1104 bytes with its switch table) since its shape was found.
+  It moved into `src/reconstructed/CubeDraw.cpp` with a calibration case;
+  `CubeDrawNearMisses.cpp` is gone.
+- **Instruction review.** `BaseQuarryEvent::PrepareGeometry` (0x004e14a0, the
+  debug Atmosphere page) has no case. Decoded against retail, 506 of 529
+  normalised instructions align. The rest is behaviour-neutral:
+  - register choice in the page prologue: retail rereads `TrackGame+0x38`,
+    and nothing stores between the two loads;
+  - one independent `mov edi, eax` moved past a load after the first
+    ControlInterface call;
+  - jump-table entries shifted by the 2-byte prologue difference.
+
+Not covered: integrated behaviour (callers, real assets, long play). These are
+per-function checks on random and edge inputs.
+
+| File | Case | Retail | Runs |
+|---|---|---|---:|
+| `NetNearMisses.cpp` | `net_dispatch_messages` | 0x4aced0 | 120 |
+| `NetThreadNearMisses.cpp` | `net_receive_messages` | 0x4af8e0 | 200 |
+| `KrustyBikeTrickPick.cpp` | `krusty_trick_pick` | 0x48d780 | 800 |
+| `BoundingBoxTreeQueryNearMisses.cpp` | `segment_segment_distance` | 0x42a640 | 200 |
+| `BoundingBoxTreeQueryNearMisses.cpp` | `segment_triangle_query` | 0x427c10 | 600 |
+| `BoundingBoxTreeQueryNearMisses.cpp` | `box_capsule_overlap` | 0x425900 | 88 |
+| `BoundingBoxTreeQueryNearMisses.cpp` | `box_triangle_query` | 0x426be0 | 180 |
+| `BoundingBoxTreeQueryNearMisses.cpp` | `tree_tree_query` | 0x4280e0 | 150 |
+| `BoundingBoxTreeQueryNearMisses.cpp` | `box_overlap` | 0x424ab0 | 94 |
+| `ConstraintMethodCollisionModelNearMisses.cpp` | `constraint_contact_impulse` | 0x43bdb0 | 120 |
+| `ContactImpulse.cpp` | `contact_solve_impulse` | 0x5004a0 | 120 |
+| `GraphicsTestNearMisses.cpp` | `graphics_test_draw_circle` | 0x47bd10 | 120 |
+| `D3DIMSoultreeShadowNearMisses.cpp` | `d3dim_shadow_slot30` | 0x446f40 | 400 |
+| `D3DIMSoultreeShadowNearMisses.cpp` | `d3dim_shadow_slot29` | 0x446c30 | 200 |
+| `ProjectedShadowNearMisses.cpp` | `projected_shadow_render` | 0x4db8c0 | 400 |
+| `ProjectedShadowNearMisses.cpp` | `projected_shadow_tint` | 0x4dc2b0 | 400 |
+| `ProjectedShadowNearMisses.cpp` | `projected_shadow_bounds` | 0x4db0d0 | 120 |
+| `ProjectedShadowNearMisses.cpp` | `projected_shadow_init` | 0x4da7b0 | 200 |
+| `ProjectedShadowNearMisses.cpp` | `projected_shadow_present` | 0x4dbd30 | 200 |
+| `TerrainShadow.cpp` | `terrain_shadow_slot30` | 0x509aa0 | 400 |
+| `TerrainShadow.cpp` | `terrain_shadow_slot28` | 0x5097d0 | 200 |
+| `TerrainShadow.cpp` | `terrain_shadow_slot27` | 0x508bc0 | 200 |
+| `VisibilityQuadTreeTraversal.cpp` | `visibility_traverse` | 0x52d610 | 300 |
+| `DebugOverlayNearMisses.cpp` | `overlay_load_font` | 0x447a00 | 200 |
+| `GriddrawNearMisses.cpp` | `grid_viewer_detail` | 0x4815e0 | 200 |
+| `GriddrawNearMisses.cpp` | `grid_walk_visibility` | 0x481de0 | 80 |
+| `GriddrawNearMisses.cpp` | `grid_vertex_cache_get_vertex` | 0x47de90 | 300 |
+| `GriddrawNearMisses.cpp` | `grid_rebuild_block_buffers` | 0x47f210 | 120 |
+| `PixtransNearMisses.cpp` | `halve8888` | 0x4cdf10 | 60 |
+| `PixtransNearMisses.cpp` | `halve1555` | 0x4ce420 | 60 |
+| `PixtransNearMisses.cpp` | `halve8` | 0x4cee30 | 100 |
+| `PixtransNearMisses.cpp` | `dither_convert` | 0x4cf2a0 | 60 |
+| `TgafileNearMisses.cpp` | `tga_write` | 0x512990 | 200 |
+| `DropTextOverlaySetup.cpp` | `drop_text_setup` | 0x51af00 | 800 |
+| `TrackNearMisses.cpp` | `track_place_near` | 0x517340 | 400 |
+
 ## Collision and contact near-miss bodies
 
 Seven collision and contact functions had been linked from bring-up
@@ -619,14 +687,14 @@ linked bodies scored poorly against retail. The game build now links the
 near-miss bodies from `samples/` instead:
 
 - `samples/physics/bvh/BoundingBoxTreeQueryNearMisses.cpp` is a
-  `best-guess-unreviewed` candidate source. It includes the canonical
+  reviewed candidate source. It includes the canonical
   `src/krusty2/bvh/BoundingBoxTreeQuery.cpp` (an `included_sources` entry) for
   its file statics: the vertex array, relative frames, motion matrix and axis
   scratch. It adds the five near-miss bodies and defines the never-written
   0x00579668 flag. The bring-up copy `Group0_BvhQuery.cpp` was deleted.
 - `samples/physics/contact/ContactImpulse.cpp` and
   `samples/physics/constraint/ConstraintMethodCollisionModelNearMisses.cpp`
-  are `best-guess-unreviewed` candidate sources. The second file includes
+  are reviewed candidate sources. The second file includes
   `ConstraintMethodCollisionModel.cpp` (an `included_sources` entry).
 - `Group0_ContactImpulse.cpp` and `Group3_ConstraintCollision.cpp` were
   deleted.
@@ -930,7 +998,8 @@ masked scores from `linked_accuracy.py`, before and after.
   Retail's `bswap`, its ebp frames and its packed stores look hand-written
   (inference), so these scores are capped.
 - **BuildFaceGeometry.** Every switch case, call, string and format was
-  checked; they agree with retail. What remains is block layout.
+  checked; they agree with retail. It has since become strict exact and moved
+  into CubeDraw.cpp.
 - **AddChatLine** is now strict exact in `src/reconstructed/SelectGamePicProcs.cpp`:
   the name lookup is its own early return ahead of the system/player split,
   which gives VC6 retail's flow graph before jump threading.
@@ -952,7 +1021,7 @@ link or round like retail:
   through `__ftol` and truncates.
 
 Now `samples/physics/shadow/ProjectedShadowNearMisses.cpp` is a
-`best-guess-unreviewed` candidate source compiled with `/QIfist`. It includes the
+reviewed candidate source compiled with `/QIfist`. It includes the
 canonical `src/krusty2/shadow/ProjectedShadow.cpp` (an `included_sources`
 entry), and the bring-up file was deleted. The sample also provides
 `ProjectedShadow::Init` (0x004da7b0), which the `UnknownKrustyUIShadow::Init`
@@ -2359,7 +2428,7 @@ and renders a race (rider, HUD, radar, speedometer) next to the retail
 `blade.dll`/assets. Verified by launching it with `MCM2_FORCE_RUNTIME=1` (the
 shim otherwise leaves its hooks off for an unknown executable hash) and reading
 `frames/frame_*.bmp` and `mcm2_runtime.log`. This is a boot-to-race smoke test
-only; the best-guess bodies above remain unreviewed and long play is untested.
+only; long play is untested.
 
 Which executable last ran is recorded, not remembered: `python
 tools/record_run.py` writes `work/run/srcbuild/run_record.json` (ignored) with
