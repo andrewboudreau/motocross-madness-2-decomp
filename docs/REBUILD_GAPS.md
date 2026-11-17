@@ -189,13 +189,13 @@ xrefs, else the name match.
 | 16 | `ConstraintMethodCollisionModel.cpp` | `0x0043b800..0x0043caa0` (doc) | 1 | src | `krusty2/constraint/ConstraintMethodCollisionModel.cpp` |
 | 17 | `cube.cpp` | `0x0043d4ff..0x0043d55d` (xref) | 2 | src | `reconstructed/Cube.cpp` |
 | 18 | `cubedraw.cpp` | `0x0043da8f..0x0043e2cb` (xref) | 3 | src | `reconstructed/CubeDraw.cpp` |
-| 19 | `cursor.cpp` | `0x0043ea00..0x0043f160` (doc) | 1 | src | `reconstructed/GameCursor.cpp` |
+| 19 | `cursor.cpp` | `0x0043ea00..0x0043f160` (doc) | 1 | src | `reconstructed/cursor.cpp` |
 | 20 | `D3DIMSoulTree.CPP` | `0x0043f160..0x00445240` (doc) | 67 | src | `reconstructed/D3DIMSoulTree.cpp` |
 | 21 | `D3DIMSoultreeModifier.cpp` | `0x004452fa..0x0044544b` (xref) | 6 | src | `reconstructed/D3DIMSoultreeModifier.cpp` |
 | 22 | `D3DIMSoultreeMotnctrl.cpp` | `0x004456e7..0x00445fec` (xref) | 12 | src | `krusty2/motion/D3DIMSoultreeMotnctrl.cpp` |
 | 23 | `D3DIMSoultreeShadow.cpp` | `0x00447024..0x00447045` (xref) | 2 | src | `krusty2/shadow/D3DIMSoultreeShadow.cpp` |
 | 24 | `DebugOverlay.cpp` | `0x00447a67..0x00447a68` (xref) | 1 | src | `reconstructed/DebugOverlay.cpp` |
-| 25 | `dirlist.cpp` | `0x00449ea6..0x0044af57` (xref) | 9 | src | `reconstructed/DirectoryList.cpp` |
+| 25 | `dirlist.cpp` | `0x00449ea6..0x0044af57` (xref) | 9 | src | `reconstructed/dirlist.cpp` |
 | 26 | `dlgprocs.cpp` | `0x0044b317..0x00455152` (xref) | 62 | src | `reconstructed/DlgProcs.cpp` |
 | 27 | `EcoSystem.cpp` | `0x00455ee6..0x0045c50a` (xref) | 35 | src | `reconstructed/EcoSystem.cpp` |
 | 28 | `EventManager.cpp` | `0x0045cc6f..0x0045e89b` (xref) | 8 | src | `reconstructed/EventManager.cpp` |
@@ -203,7 +203,7 @@ xrefs, else the name match.
 | 30 | `FontTexture.cpp` | `0x004671a1..0x0046750d` (xref) | 5 | src | `reconstructed/FontTexture.cpp` |
 | 31 | `FontTextureManager.cpp` | `0x004676da..0x0046771b` (xref) | 2 | src | `reconstructed/FontTextureManager.cpp` |
 | 32 | `Game.cpp` | `0x00467b0d..0x00468afe` (xref) | 7 | src | `reconstructed/Game.cpp` |
-| 33 | `gameobj.cpp` | `0x00468cdf..0x00469d38` (xref) | 3 | src | `reconstructed/GameObject.cpp` |
+| 33 | `gameobj.cpp` | `0x00468cdf..0x00469d38` (xref) | 3 | src | `reconstructed/gameobj.cpp` |
 | 34 | `gameui.cpp` | `0x00469db0..0x0047b670` (doc) | 94 | src | `reconstructed/GameUi.cpp` |
 | 35 | `Grid1.cpp` | `0x0047c97a..0x0047d49c` (xref) | 2 | src | `reconstructed/Grid1.cpp` |
 | 36 | `Gridbase.cpp` | `0x0047dc36..0x0047dc37` (xref) | 1 | src | `reconstructed/Gridbase.cpp` |
@@ -260,7 +260,7 @@ xrefs, else the name match.
 | 87 | `Spheres.cpp` | `0x00504969..0x0050496a` (xref) | 1 | src | `krusty2/motion/Spheres.cpp` |
 | 88 | `SteeringControl.cpp` | `0x00504bd2..0x00504bd3` (xref) | 1 | src | `krusty2/motion/SteeringControl.cpp` |
 | 89 | `Terrain.cpp` | `0x0050567c..0x00507b39` (xref) | 13 | src | `reconstructed/TerrainSupport.cpp`, `krusty2/broadphase/Terrain.cpp` |
-| 90 | `Texmap.cpp` | `0x0050a6bc..0x0050ab11` (xref) | 5 | src | `reconstructed/TextureMap.cpp` |
+| 90 | `Texmap.cpp` | `0x0050a6bc..0x0050ab11` (xref) | 5 | src | `reconstructed/Texmap.cpp` |
 | 91 | `TextService.cpp` | `0x0050ac4e..0x0050aea1` (xref) | 2 | src | `reconstructed/TextService.cpp` |
 | 92 | `TextureCache.cpp` | `0x0050c4e2..0x0050c587` (xref) | 2 | src | `reconstructed/ManagedTextureGroup.cpp` |
 | 93 | `TextureMapManager.cpp` | `0x00510c5e..0x005113fc` (xref) | 10 | src | `reconstructed/TextureMapManager.cpp` |
@@ -268,7 +268,7 @@ xrefs, else the name match.
 | 95 | `Track.cpp` | `0x00515eab..0x00517ced` (xref) | 27 | src | `reconstructed/Track.cpp` |
 | 96 | `TrackOverlay.cpp` | `0x0051b550..0x0051d851` (xref) | 12 | src | `reconstructed/TrackOverlay.cpp` |
 | 97 | `TrackRecord.cpp` | `0x0051ef63..0x0052022e` (xref) | 6 | src | `reconstructed/TrackRecord.cpp` |
-| 98 | `trkgame.cpp` | `0x00521086..0x005215ac` (xref) | 10 | src | `reconstructed/TrackGame.cpp` |
+| 98 | `trkgame.cpp` | `0x00521086..0x005215ac` (xref) | 10 | src | `reconstructed/trkgame.cpp` |
 | 99 | `TypeRegistry.cpp` | `0x00521e8a..0x00521ee6` (xref) | 2 | src | `reconstructed/TypeRegistry.cpp` |
 | 100 | `uiinfo.cpp` | `0x00521f30..0x00524106` (doc) | 5 | src | `reconstructed/UiInfo.cpp` |
 | 101 | `VCR.cpp` | `0x0052412e..0x00524685` (xref) | 11 | src | `reconstructed/VCR.cpp` |
@@ -295,12 +295,12 @@ Repository `.cpp` files without a retail name: 60 under `src/`, 52 under
 `src/` files, 33 have names that fit the alphabetical bracket of their median
 address (possible original units, e.g. `BaseObject.cpp`, `Camera.cpp`,
 `CDAudio.cpp`, `VehicleCamera.cpp`), 8 sit inside another unit's xref span
-(`DirectoryList.cpp` in dirlist.cpp, `FollowCamera.cpp` in FollowCam.cpp,
-`GameObject.cpp` in gameobj.cpp, `PCJoystickDevice`/`PCKeyboardDevice`/
+(`dirlist.cpp` in dirlist.cpp, `FollowCamera.cpp` in FollowCam.cpp,
+`gameobj.cpp` in gameobj.cpp, `PCJoystickDevice`/`PCKeyboardDevice`/
 `PCMouseDevice.cpp` in PCInputDeviceType.cpp, `PCTextureMap.cpp` in
 PCTexMap.cpp; RaceSound.cpp in racesnd.cpp, since renamed to its unit) and 19 cannot be original names
-under alphabetical linking (e.g. `TrackGame.cpp` after trkgame.cpp,
-`TextureMap.cpp` before Texmap.cpp, `ManagedTexture`/`ManagedTextureGroup`/
+under alphabetical linking (e.g. `trkgame.cpp` after trkgame.cpp,
+`Texmap.cpp` before Texmap.cpp, `ManagedTexture`/`ManagedTextureGroup`/
 `CacheTexture.cpp` in the TextureCache.cpp bracket, `GR_BitString.cpp`
 between bikerace.cpp and BlockAllocator.cpp). For a rebuild these must be
 merged into, or renamed to, the retail unit that owns their address range.

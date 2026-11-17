@@ -54,8 +54,8 @@ ends with the shared dialog deleting destructor and its vector set:
 share a dialog (0x85c/0x85d, 0x866-0x868, 0x910/0x911, 0xbb9-0xbbb) keep
 their number as a suffix, as does 0x88e, which opens one of four dialogs.
 KrustyUI.cpp, DlgProcs.cpp, EventManager.cpp, ProCircuitProcs.cpp,
-NetProcs.cpp, InGameProcs.cpp, TrackRecord.cpp and TrackGame.cpp use the
-names (TrackGame.cpp's calibration is byte-identical with the header).
+NetProcs.cpp, InGameProcs.cpp, TrackRecord.cpp and trkgame.cpp use the
+names (trkgame.cpp's calibration is byte-identical with the header).
 Including the header in SelectGamePicProcs.cpp, at any position and even
 with no use, changes VC6's code for `FillFileList` `0x004f17a0`, so that
 file keeps the numbers.
@@ -159,7 +159,7 @@ also exact in `KrustyUI.cpp` (916 bytes; calibration case
 
 The GUI page and control classes are declared in
 `src/reconstructed/GameUi.h`, not `KrustyUI.h`. Declaring them in a header
-that TrackGame.cpp includes disturbs TrackGame slot 1 (see
+that trkgame.cpp includes disturbs TrackGame slot 1 (see
 [TrackGame](TRACKGAME.md)). The +0x48/+0x50/+0x58 list entries are views
 local to KrustyUI.cpp for the same reason.
 

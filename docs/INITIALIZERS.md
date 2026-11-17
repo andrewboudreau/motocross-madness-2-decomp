@@ -97,7 +97,7 @@ Unregistered `.CRT$XCU` entries are not listed.
 | 292-299 | 504f70-5051eb | 689f60 | SteeringControl (first set only) | SteeringControl.cpp | first set consistent; second set (296-299) unread, could open SurfaceMap.cpp |
 | 300-303 | 5089a0-508adb | 689fe8 | Terrain | Terrain.cpp | **fixed** (was TerrainShadow.cpp) |
 | 305-314 | 5054c0-5055ff | 68a008.. | Terrain | TerrainSupport.cpp (Terrain.cpp slice) | consistent |
-| 315-318 | 50a3a0-50a4db | 68a330 | none | TextureMap.cpp | ambiguous: opens Texmap.cpp or closes TerrainShadow's code |
+| 315-318 | 50a3a0-50a4db | 68a330 | none | Texmap.cpp | ambiguous: opens Texmap.cpp or closes TerrainShadow's code |
 | 323-326 | 51dba0-51dcdb | 68a400 | TrackOverlay | TrackOverlay.cpp | consistent |
 | 327-331 | 521d00-521e6b | 68a450 | none | TypeRegistry.cpp | ambiguous: opens TypeRegistry.cpp or closes trkgame.cpp |
 | 332-335 | 5278e0-527a1b | 68a6d8 | Vehicle | Vehicle.cpp | consistent |

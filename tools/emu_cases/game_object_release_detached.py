@@ -1,7 +1,7 @@
 """GameObject::ReleaseDetached 0x00469c80, which removes released dialogs from the tree
 (tools/emu_diff.py case).
 
-The linked body is src/reconstructed/GameObject.cpp. Game::Tick calls it on the root once per
+The linked body is src/reconstructed/gameobj.cpp. Game::Tick calls it on the root once per
 frame (retail 0x0046883c). It walks the children (firstChild +0x10, nextSibling +0xc): a child
 with pendingRelease (bit 3 of +0x25) is unlinked by the real retail Unlink 0x004691f0 and
 released through its slot 2 (a stub that logs it), inside g_MemTagStack's (0x0056df04)
@@ -15,7 +15,7 @@ import random
 
 RETAIL_VA = 0x00469c80
 SYMBOL = '?ReleaseDetached@GameObject@@QAEXXZ'
-SOURCE = 'src/reconstructed/GameObject.cpp'
+SOURCE = 'src/reconstructed/gameobj.cpp'
 PREFER_OBJECT = {'?ReleaseDetached@GameObject@@QAEXXZ'}
 FPCWS = (0x027f,)
 ITERATORS, MEM_TAGS = 0x0065b548, 0x0056df04

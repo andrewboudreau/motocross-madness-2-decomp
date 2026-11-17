@@ -35,7 +35,7 @@ class ResourceConnectionTests(unittest.TestCase):
         self.assertEqual(hashlib.sha256(EXE.read_bytes()).hexdigest(), expected['mcm2_sha256'])
         retail = PEImage(EXE)
         sources = {name: f'src/reconstructed/{name}.cpp' for name in (
-            'ResourceManager', 'SceneManager', 'TextureMap', 'PCAudio',
+            'ResourceManager', 'SceneManager', 'Texmap', 'PCAudio',
             'Palette8', 'Quantize', 'GameUi', 'EcoSystem', 'KrustyUI')}
         sources['layout'] = 'tests/fixtures/resource_connections.cpp'
         with tempfile.TemporaryDirectory(prefix='mcm2-resource-connections-') as directory:

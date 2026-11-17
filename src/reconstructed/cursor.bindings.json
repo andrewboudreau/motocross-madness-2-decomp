@@ -49,7 +49,7 @@
   "?PreTick@GameObject@@UAEHH@Z": "0x00469430",
   "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
   "?g_ResourceManager@@3PAVResourceManager@@A": "0x00572b44",
-  "__FILE__:gamecursor.cpp": "0x0056890c",
+  "__FILE__:cursor.cpp": "0x0056890c",
   "__except_list": "0x00000000",
   "__ftol": "0x00534a88",
   "__imp__AdjustWindowRectEx@16": "0x00550324",

@@ -20,7 +20,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SOURCES = ('src/reconstructed/Pixtrans.cpp', 'samples/render/PixtransNearMisses.cpp')
 FILENAMES = SOURCES
 PROOFS = ('src/reconstructed/Quantize.cpp', 'src/reconstructed/Palette8.cpp',
-          'src/reconstructed/TextureMap.cpp', 'src/reconstructed/PCTextureMap.cpp')
+          'src/reconstructed/Texmap.cpp', 'src/reconstructed/PCTextureMap.cpp')
 RENAMES = {'?GetIndexFrom%s@TextureColorMapperView@@QAEPAEXZ' % n:
            '?GetIndexFrom%s@ColorMapper@@QAEPAEXZ' % n for n in ('555', '565')}
 NATIVE = ((SOURCES[0], 'int Convert24To8(', '?Convert24To8@@', 0x4d0aa0, 232),

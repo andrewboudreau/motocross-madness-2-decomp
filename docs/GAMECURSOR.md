@@ -1,6 +1,6 @@
 # cursor.cpp (GameCursor)
 
-`src/reconstructed/GameCursor.h` / `GameCursor.cpp`. Retail calls this file
+`src/reconstructed/GameCursor.h` / `cursor.cpp`. Retail calls this file
 cursor.cpp; the reconstruction is named after its class.
 
 Evidence:

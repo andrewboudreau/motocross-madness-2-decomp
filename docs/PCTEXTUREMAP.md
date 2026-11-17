@@ -152,7 +152,7 @@ Also exact:
 
 ## TextureMap
 
-`src/reconstructed/TextureMap.h` / `TextureMap.cpp` (Texmap.cpp's
+`src/reconstructed/TextureMap.h` / `Texmap.cpp` (Texmap.cpp's
 literals). Exact (13 calibration cases): the eight kVec3 `$E`
 (`0x0050a3a0..0x0050a4db`, statics at `0x0068a330`) and
 - the constructor `0x0050a4e0` (manager at +0x10, registered through

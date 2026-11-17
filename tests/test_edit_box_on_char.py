@@ -22,7 +22,7 @@ HELPERS = [('GameUi','?OnChar@UIControl@@',0x472320,166),
            ('GameUi','?FilterCharacter@UIEditBox@@',0x473fc0,160),
            ('GameUi','?GetName@UIControl@@',0x470df0,7),
            ('GameUi','?RequestRedraw@UIControl@@',0x470640,21),
-           ('GameObject','?OnChar@GameObject@@',0x469c00,60),
+           ('gameobj','?OnChar@GameObject@@',0x469c00,60),
            ('PCAudio','??0SoundRefillNotifier@@',0x4bb720,26),
            ('PCAudio','?SetVolume@Sound@@',0x4bcbe0,185),
            ('PCAudio','?PlayWithOptions@Sound@@',0x4bc6b0,656),
@@ -168,7 +168,7 @@ class EditBoxOnCharBehaviorTests(unittest.TestCase):
             table=aggregate.find_symbol('??_7UIEditBox@@6B@')
             routes={r.virtual_address-table.value:aggregate.symbol_by_index[r.symbol_index].name for r in aggregate.relocations if r.section_number==table.section_number}
             self.assertEqual(routes[20*4],SYMBOL)
-            ui=(ROOT/'src/reconstructed/GameUi.cpp').read_text();audio=(ROOT/'src/reconstructed/PCAudio.cpp').read_text();game=(ROOT/'src/reconstructed/GameObject.cpp').read_text()
+            ui=(ROOT/'src/reconstructed/GameUi.cpp').read_text();audio=(ROOT/'src/reconstructed/PCAudio.cpp').read_text();game=(ROOT/'src/reconstructed/gameobj.cpp').read_text()
             helpers='#include <string.h>\n#include "GameUi.h"\n#include "DialogProc.h"\n#include "PCAudio.h"\n#include "SoundInterface.h"\n#include "TrackGame.h"\n#include "DebugAlloc.h"\n#define SoundSystem() ((PCSoundInterface*)g_TrackGame->soundInterface)\n'
             for sig in ['int UIControl::OnChar(','char UIEditBox::FilterCharacter(','char* UIControl::GetName(','void UIControl::RequestRedraw(']:helpers+=extract(ui,sig)+'\n'
             helpers+=extract(game,'int GameObject::OnChar(')+'\n'+extract(audio,'SoundRefillNotifier::SoundRefillNotifier(')+'\n'
@@ -176,7 +176,7 @@ class EditBoxOnCharBehaviorTests(unittest.TestCase):
             helper_file=output/'helpers.cpp';helper_file.write_text(helpers)
             helper_path,helper=compile_source(helper_file,'helpers')
             canonical={}
-            for name in ('GameUi','PCAudio','GameObject'):
+            for name in ('GameUi','PCAudio','gameobj'):
                 _,canonical[name]=compile_source(ROOT/f'src/reconstructed/{name}.cpp',name)
             strict=0
             for name,symbol,va,size in HELPERS:

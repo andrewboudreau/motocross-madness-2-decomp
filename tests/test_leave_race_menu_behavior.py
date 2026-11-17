@@ -135,7 +135,7 @@ class LeaveRaceForMenuBehaviorTests(unittest.TestCase):
                         self.assertTrue(compare(image,candidate,name,address,size,binding_path)['strict_exact'])
                     table=candidate.find_symbol('??_7TransDlg@@6B@')
                     all_bindings={}
-                    for name in ('BaseObject','GameObject','GameUi','DlgProcs'):
+                    for name in ('BaseObject','gameobj','GameUi','DlgProcs'):
                         all_bindings.update(json.loads((ROOT/f'src/reconstructed/{name}.bindings.json').read_text()))
                     for slot in range(32):
                         target=relocated(table.section_number,table.value+slot*4)

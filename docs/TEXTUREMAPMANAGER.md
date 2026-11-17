@@ -165,7 +165,7 @@ report) follow the same header comments. The near-miss repacks are
 the manager's memory count `0x00511580` is `CountTextureMemory`, and its
 grow-only scratch buffers `0x00511310`/`0x00511370` are `GrowScratchBuffer`
 and `GrowSecondScratchBuffer`. `0x0050c6c0` (adds a texture) keeps its
-address name because Cube.cpp, SoultreeMaterial.cpp and TextureMap.cpp call it.
+address name because Cube.cpp, SoultreeMaterial.cpp and Texmap.cpp call it.
 
 ## CacheTexture
 

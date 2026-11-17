@@ -18,7 +18,7 @@ from tools.run_calibration import CASES
 ROOT = Path(__file__).resolve().parents[1]
 SOURCES = ('src/reconstructed/KrustyUI.cpp',
            'src/krusty2/shadow/ProjectedShadow.cpp', 'src/krusty2/shadow/D3DIMSoultreeShadow.cpp',
-           'src/reconstructed/GameObject.cpp')
+           'src/reconstructed/gameobj.cpp')
 ROUTES = (
     ('??0ProjectedShadow@@QAE@H@Z', 0x4da570, 331, SOURCES[1]),
     ('??0D3DIMSoultreeShadow@@QAE@H@Z', 0x446840, 67, SOURCES[2]),

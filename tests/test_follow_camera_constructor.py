@@ -178,7 +178,7 @@ class FollowCameraConstructorTests(unittest.TestCase):
                 source_path = out/(name+'-init.cpp')
                 source_path.write_text('extern "C" __declspec(noreturn) void FixtureUnvisited();\n'+includes(text, source.parent))
                 path, native[name] = compile_source(source_path, name+'-init'); paths.append(path)
-            for name in ('GameObject', 'BaseObject', 'MemTag', 'MatrixUtil', 'GraphicsState', 'FastMath', 'VectorCalls'):
+            for name in ('gameobj', 'BaseObject', 'MemTag', 'MatrixUtil', 'GraphicsState', 'FastMath', 'VectorCalls'):
                 path, native[name] = compile_source(ROOT/'src/reconstructed'/(name+'.cpp'), name)
                 canonical[name] = native[name]; paths.append(path)
             _, canonical['VehicleCamera'] = compile_source(ROOT/'src/reconstructed/VehicleCamera.cpp', 'VehicleCamera')
@@ -190,8 +190,8 @@ class FollowCameraConstructorTests(unittest.TestCase):
             strict = 0
             checks = [('Camera','??0Camera@@QAE@H@Z',0x42e340,402),('Camera','??1Camera@@UAE@XZ',0x42f020,37),
                 ('PCCamera','??0PCCamera@@QAE@H@Z',0x4bed80,25),('PCCamera','??1PCCamera@@UAE@XZ',0x4624d0,5),
-                ('GameObject','??0GameObject@@QAE@H@Z',0x468ca0,149),('GameObject','??1GameObject@@UAE@XZ',0x468d60,97),
-                ('GameObject','?AppendClassName@GameObject',0x469ce0,201),('BaseObject','??0BaseObject',0x405120,16),
+                ('gameobj','??0GameObject@@QAE@H@Z',0x468ca0,149),('gameobj','??1GameObject@@UAE@XZ',0x468d60,97),
+                ('gameobj','?AppendClassName@GameObject',0x469ce0,201),('BaseObject','??0BaseObject',0x405120,16),
                 ('BaseObject','??1BaseObject',0x405150,7),('MemTag','?DebugMalloc@@',0x4a2e20,57),
                 ('MemTag','?DebugFree@@',0x4a2e60,96),('MemTag','?DebugRealloc@@',0x4a2ec0,256),
                 ('MemTag','?DebugMemcpy@@',0x4a3120,35),('MatrixUtil','?IdentityMatrix@@',0x4a1410,71),

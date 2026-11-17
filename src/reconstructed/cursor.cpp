@@ -1,4 +1,4 @@
-// GameCursor.cpp -- reconstruction of D:\aardvark\VC\krusty2\cursor.cpp.
+// cursor.cpp -- reconstruction of D:\aardvark\VC\krusty2\cursor.cpp.
 // See GameCursor.h for the TU extent and the class.
 
 #include <windows.h>

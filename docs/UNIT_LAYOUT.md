@@ -99,7 +99,7 @@ Each of these was laid out strictly, with all relocations resolved:
 | `ArcadeObject.cpp` | `0x00401260..0x00401940` (plus the open `0x00401940`) | `0x005495d0..0x0054964e` | `0x0055fd08..0x0055fd68` |
 | `Arrow.cpp` | `0x00401950..0x00401a30` (ICF section bound elsewhere) | from `0x00549650` | from `0x0055fd68` |
 | `SoultreeMaterial.cpp` | `0x004fefe0..0x00500220` | `0x0054e280..0x0054e2f8` | from `0x00563930` |
-| `cursor.cpp` (`GameCursor.cpp`) | `0x0043ea00..0x0043f160` (the whole doc extent) | from `0x00549ff0` | from `0x00560478` |
+| `cursor.cpp` (`cursor.cpp`) | `0x0043ea00..0x0043f160` (the whole doc extent) | from `0x00549ff0` | from `0x00560478` |
 
 `tests/test_unit_layout.py` checks `AgeManager` and `ArcadeObject` when
 `VC6_ROOT` and `MCM2_EXE` are set.

@@ -46,7 +46,7 @@
   "_$E5": "0x0050a3f0",
   "_$E7": "0x0050a450",
   "_$E8": "0x0050a440",
-  "__FILE__:texturemap.cpp": "0x00574b0c",
+  "__FILE__:texmap.cpp": "0x00574b0c",
   "__except_list": "0x00000000",
   "_kVec3XAxis": "0x0068a350",
   "_kVec3YAxis": "0x0068a360",

@@ -45,7 +45,7 @@ HELPER_GROUPS = [
      [('TrackOverlay', 'int CompareScoresDescending(', 0x5199f0, 43)]),
     ('resource', '#include <stdio.h>\n#include <string.h>\n#include "TrackGame.h"\n'
      'extern "C" __declspec(dllimport) int __stdcall LoadStringA(void*,unsigned int,char*,int);\n',
-     [('TrackGame', 'int TrackGame::LoadResourceString(', 0x521970, 189)]),
+     [('trkgame', 'int TrackGame::LoadResourceString(', 0x521970, 189)]),
     ('surface', '#include <string.h>\n#include "PCTextureMap.h"\n#include "PCRenderTarget.h"\n'
      '#include "TrackGame.h"\n#include "Tgafile.h"\n#include "Overlay.h"\n',
      [('PCTextureMap', 'void* PCTextureMap::LockSurface(', 0x4c79e0, 99),

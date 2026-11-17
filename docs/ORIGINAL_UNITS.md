@@ -53,6 +53,9 @@ behaviour tests use it to link one function of a unit against retail.
 3. Repoint calibration cases, emulator cases (`SOURCE`), tests, fixtures and
    `config/game_build.json` (remove the `candidate_sources` entry). Search for
    the bare stem too (`'RaceSound'`): many tests build paths from names.
+   Rekey `__FILE__:<unit>` bindings, and repin object-hash fixtures whose
+   only change is the `??_C@` name of the `__FILE__` string (section and
+   relocation counts must stay the same).
 4. Check that every calibration case of the unit stays exact: moving code can
    change VC6 codegen in unrelated functions of the same unit.
 5. Rebuild, rerun `linked_accuracy` and require `accuracy_diff.py` to report
@@ -63,3 +66,8 @@ behaviour tests use it to link one function of a unit against retail.
 | Unit | File | Notes |
 |---|---|---|
 | `racesnd.cpp` | `src/reconstructed/racesnd.cpp` | All 16 retail functions; `RefillStream` not exact. `0x004e57d0` is still also reached through the `Group5_KbRaceHandler` bring-up wrapper (the handler's class is unproven: its other method `0x004de580` lies in QuarryStuntEvent.cpp's span). |
+| `cursor.cpp` | `src/reconstructed/cursor.cpp` | Renamed from `GameCursor.cpp`; 8 calibration cases exact. |
+| `dirlist.cpp` | `src/reconstructed/dirlist.cpp` | Renamed from `DirectoryList.cpp`; 27 cases exact. |
+| `gameobj.cpp` | `src/reconstructed/gameobj.cpp` | Renamed from `GameObject.cpp` (the class header stays `GameObject.h`); 43 cases exact. |
+| `Texmap.cpp` | `src/reconstructed/Texmap.cpp` | Renamed from `TextureMap.cpp`; 13 cases exact. |
+| `trkgame.cpp` | `src/reconstructed/trkgame.cpp` | Renamed from `TrackGame.cpp`; 19 cases exact. |

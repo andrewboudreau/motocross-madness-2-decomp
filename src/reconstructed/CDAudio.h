@@ -1,6 +1,6 @@
 #pragma once
 
-// The CD-audio player TrackGame keeps at +0x3340 (TrackGame.cpp line 343
+// The CD-audio player TrackGame keeps at +0x3340 (trkgame.cpp line 343
 // allocates 0x10 bytes, calls Initialize, and its destructor deletes it;
 // 0x00521a40 calls Stop). No RTTI and no __FILE__: the code at
 // 0x00431050..0x004312a8 opens the MCI "cdaudio" device (literal 0x00568460)

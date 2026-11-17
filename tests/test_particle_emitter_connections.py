@@ -73,8 +73,8 @@ class ParticleEmitterConnections(unittest.TestCase):
      self.assertTrue(compare(pe,provider,row['symbol'],int(row['va'],16),row['extent'],binding)['strict_exact'],row)
      strict+=1
    for source,symbol,va,size in (
-    ('src/reconstructed/GameObject.cpp','??0GameObject@@QAE@H@Z',0x468ca0,149),
-    ('src/reconstructed/GameObject.cpp','??1GameObject@@UAE@XZ',0x468d60,97),
+    ('src/reconstructed/gameobj.cpp','??0GameObject@@QAE@H@Z',0x468ca0,149),
+    ('src/reconstructed/gameobj.cpp','??1GameObject@@UAE@XZ',0x468d60,97),
     ('src/reconstructed/FastMath.cpp','?FastSqrt@@YAMM@Z',0x460b50,85),
     ('src/krusty2/effects/Particles.cpp','?AddParticle@ParticleManager',0x4baa50,158)):
     provider=compile_source(source)

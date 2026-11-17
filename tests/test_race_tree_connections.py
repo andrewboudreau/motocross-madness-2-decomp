@@ -14,8 +14,8 @@ from tools.match import compare
 ROOT = Path(__file__).resolve().parents[1]
 CASES = (
     ('src/reconstructed/BikeRace.cpp', '?Tick@BikeRace@@UAEHM@Z', 0x41d2b0, 5980),
-    ('src/reconstructed/GameObject.cpp', '?DisableByClassName@GameObject@@IAEXPBD@Z', 0x468dd0, 308),
-    ('src/reconstructed/GameObject.cpp', '?EnableByClassName@GameObject@@IAEXPBD@Z', 0x468f10, 308),
+    ('src/reconstructed/gameobj.cpp', '?DisableByClassName@GameObject@@IAEXPBD@Z', 0x468dd0, 308),
+    ('src/reconstructed/gameobj.cpp', '?EnableByClassName@GameObject@@IAEXPBD@Z', 0x468f10, 308),
 )
 
 

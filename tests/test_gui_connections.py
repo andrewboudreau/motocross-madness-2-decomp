@@ -35,7 +35,7 @@ class GuiConnectionTests(unittest.TestCase):
         # and the -1 pushed before the SetUp argument list.
         self.assertEqual(retail.bytes_at_va(0x4857ea, 3), bytes.fromhex('c22800'))
         sources = {name: f'src/reconstructed/{name}.cpp' for name in (
-            'GUIManager', 'KrustyUI', 'BikeRace', 'EventManager', 'TrackGame',
+            'GUIManager', 'KrustyUI', 'BikeRace', 'EventManager', 'trkgame',
             'DlgProcs', 'OptionProcs', 'SelectGamePicProcs', 'TrackOverlay')}
         sources.update({'event_sample': 'samples/game/EventManagerNearMisses.cpp',
                         'layout': 'tests/fixtures/gui_layout.cpp'})

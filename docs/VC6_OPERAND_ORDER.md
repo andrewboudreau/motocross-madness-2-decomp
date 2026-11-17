@@ -167,7 +167,7 @@ mov eax, [esp+0x1c]   ; availPhys
 add edx, eax
 ```
 
-Prepending unrelated declarations to TrackGame.cpp (before its includes)
+Prepending unrelated declarations to trkgame.cpp (before its includes)
 gives, for some counts,
 
 ```
@@ -509,8 +509,8 @@ float t5(V* v, V* w)        { return v->z*w->z + (v->x*w->x + v->y*w->y); } // y
 TrackGame slot 1 window (needs `$VC6_ROOT`, `$MCM2_EXE`):
 
 ```bash
-python3 tools/decl_shift_scan.py src/reconstructed/TrackGame.cpp \
-    src/reconstructed/TrackGame.bindings.json --include src/reconstructed \
+python3 tools/decl_shift_scan.py src/reconstructed/trkgame.cpp \
+    src/reconstructed/trkgame.bindings.json --include src/reconstructed \
     --fn 0x520ab0:Startup@TrackGame --kmax 63
 # 0x520ab0 ...: exact only at some k (scheduling tie-break); scores [245, 584]; exact windows [(0, 4), (13, 63)]
 ```

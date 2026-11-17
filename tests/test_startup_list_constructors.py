@@ -19,8 +19,8 @@ import test_eco_quadtree_connections as objects
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = 'src/reconstructed/StartupListConstructors.cpp'
-SOURCES = ('src/reconstructed/TrackGame.cpp', 'src/reconstructed/ZoneReport.cpp',
-           'src/reconstructed/Parser.cpp', 'src/reconstructed/DirectoryList.cpp',
+SOURCES = ('src/reconstructed/trkgame.cpp', 'src/reconstructed/ZoneReport.cpp',
+           'src/reconstructed/Parser.cpp', 'src/reconstructed/dirlist.cpp',
            'src/reconstructed/UiInfo.cpp')
 PROVIDERS = (('??0ParserList@@QAE@XZ', 0x4aae20, 9),
              ('??0DriveList@@QAE@XZ', 0x4676a0, 16))

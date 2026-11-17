@@ -23,7 +23,7 @@ D3DIMSoulTree.CPP's. A unit's own arrays get their `$E` in place at the
 top of the file, while the shared header's vectors are emitted after the
 functions but listed first. AuralScape.cpp shows the same pattern. So the
 `0x0043e870` group is cubedraw's, and cursor.cpp has none. Those eight
-cases moved here from GameCursor.cpp. The Parameterblocks.h copies
+cases moved here from cursor.cpp. The Parameterblocks.h copies
 `0x0043e9b0` and `0x0043e9e0`, first called from `0x0043d980`, also fall
 in this file's range; they are not claimed as cubedraw code, but both are
 strict exact as calibration cases compiled from CubeDraw.cpp.

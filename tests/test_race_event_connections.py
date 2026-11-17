@@ -18,7 +18,7 @@ from tools.run_calibration import CASES
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCES = tuple('src/reconstructed/' + n + '.cpp' for n in
-                ('BikeRace', 'DlgProcs', 'racesnd', 'QuarryStuntEvent', 'EventManager', 'TrackGame')) + (
+                ('BikeRace', 'DlgProcs', 'racesnd', 'QuarryStuntEvent', 'EventManager', 'trkgame')) + (
                 'samples/race/BikeRaceNearMisses.cpp', 'samples/ui/DlgProcsNearMisses.cpp')
 PROVIDERS = (('?ResetClock@BaseQuarryEvent@@QAEXXZ', 0x4e1f00, 9),
              ('?ShowOnOffMessage@BaseQuarryEvent@@QAEXHH@Z', 0x4e0c30, 175))

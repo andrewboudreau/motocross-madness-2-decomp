@@ -17,7 +17,7 @@ ROOT = Path(__file__).resolve().parents[1]
 GUI = '?OnPaletteChanged@GUIManager@@QAEXXZ'
 FINDER = '??1SceneArchiveFinder@@QAE@XZ'
 PROVIDERS = {'GUIManagerHooks': GUI, 'SceneArchiveFinderLifetime': FINDER}
-CALLERS = ('GUIManager', 'GameUi', 'TrackGame', 'SceneManager')
+CALLERS = ('GUIManager', 'GameUi', 'trkgame', 'SceneManager')
 
 
 @unittest.skipUnless(os.environ.get('VC6_ROOT') and os.environ.get('MCM2_EXE'),
@@ -82,7 +82,7 @@ class EmptyLifecycleProviderTests(unittest.TestCase):
                     ROOT / ('src/reconstructed/' + stem + '.bindings.json'))['strict_exact'])
             # Actual complete caller TUs retain calls to separate role-specific
             # symbols. No provider is an alias of the other or a wrapper.
-            for caller, symbol in (('GUIManager', GUI), ('GameUi', GUI), ('TrackGame', FINDER)):
+            for caller, symbol in (('GUIManager', GUI), ('GameUi', GUI), ('trkgame', FINDER)):
                 obj = objects['src/reconstructed/' + caller + '.cpp']
                 self.assertIn(symbol, {obj.symbol_by_index[r.symbol_index].name for r in obj.relocations if r.type == 0x14})
             probe = objects[fixture]

@@ -24,7 +24,7 @@ PROVIDERS = (
     ('TrackOverlay', 'TextQueueMessage::TextQueueMessage(const TextQueueMessage& other)', '??0TextQueueMessage@@QAE@ABV0@@Z', 0x51b250, 74),
     ('TrackOverlay', 'void TextQueueOverlay::ReplaceHeadMessage(TextQueueMessage* message)', '?ReplaceHeadMessage@TextQueueOverlay@@', 0x51b540, 146),
     ('EventManager', 'TextQueueOverlay* EventManager::FindTextQueue()', '?FindTextQueue@EventManager@@', 0x45d340, 78),
-    ('TrackGame', 'int TrackGame::LoadResourceString(int id, char* buffer, int size)', '?LoadResourceString@TrackGame@@', 0x521970, 189))
+    ('trkgame', 'int TrackGame::LoadResourceString(int id, char* buffer, int size)', '?LoadResourceString@TrackGame@@', 0x521970, 189))
 
 
 def extract(source, signature):
@@ -84,7 +84,7 @@ class BikeTextConnectionsTests(unittest.TestCase):
                 prefix = '#include <stdio.h>\n#include <string.h>\n' + ''.join(
                     '#include "%s"\n' % (ROOT / 'src/reconstructed' / h).as_posix()
                     for h in ('TrackGame.h', 'EventManager.h', 'RaceView.h', 'DebugAlloc.h'))
-                if stem == 'TrackGame':
+                if stem == 'trkgame':
                     prefix += 'extern "C" __declspec(dllimport) int __stdcall LoadStringA(void*,unsigned int,char*,int);\n'
                 target.write_text(prefix + ''.join(extract(source, p[1]) for p in PROVIDERS if p[0] == stem))
                 compile_source(target, stem)
@@ -133,7 +133,7 @@ class BikeTextConnectionsTests(unittest.TestCase):
             executable = output / 'boundaries.exe'
             result = subprocess.run([str(find_child_ci(find_vc6_bin(compiler), 'link.exe')), '/nologo',
                 '/subsystem:console', f'/out:{executable}', f'/libpath:{find_child_ci(infer_vc98_root(compiler), "lib")}',
-                *(str(paths[key]) for key in ('TrackOverlay', 'EventManager', 'TrackGame', *fixtures)),
+                *(str(paths[key]) for key in ('TrackOverlay', 'EventManager', 'trkgame', *fixtures)),
                 'kernel32.lib', 'user32.lib'], cwd=ROOT, capture_output=True, text=True, encoding='latin1')
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             result = subprocess.run([str(executable)], capture_output=True, text=True, timeout=30)

@@ -22,7 +22,7 @@ CollisionCharacter.cpp (`__FILE__` xref `0x00431a12`).
 
 ## CDAudio (9 exact)
 
-TrackGame.cpp line 343 allocates 0x10 bytes. It runs the constructor
+trkgame.cpp line 343 allocates 0x10 bytes. It runs the constructor
 `0x00431050`, then calls `0x004310c0` and stores the object at
 TrackGame+0x3340. TrackGame's destructor deletes it, and `0x00521a40` calls
 `0x004310e0` on it. TrackGame's source and bindings now use these names.

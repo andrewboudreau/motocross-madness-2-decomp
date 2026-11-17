@@ -12,7 +12,7 @@ extern int g_ActiveGameObjectIterators;
 
 // RTTI: GameObject : BaseObject. GameObject introduces primary slots 4-26.
 // Signatures are shared with the physics hierarchy so overrides keep the retail
-// slots in every translation unit. Reconstructed bodies are in GameObject.cpp.
+// slots in every translation unit. Reconstructed bodies are in gameobj.cpp.
 class GameObject : public BaseObject {
 public:
     // 0x00468ca0 (gameobj.cpp); only the low bit of the argument is used.

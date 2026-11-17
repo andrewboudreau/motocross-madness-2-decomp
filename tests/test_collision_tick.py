@@ -17,7 +17,7 @@ ROOT = Path(__file__).resolve().parents[1]
 PROVIDER = 'src/reconstructed/CollisionObjectTick.cpp'
 COLLISION = 'src/krusty2/collision/CollisionObject.cpp'
 CONSTRAINT = 'src/krusty2/constraint/ConstraintMethodCollisionModel.cpp'
-GAME = 'src/reconstructed/GameObject.cpp'
+GAME = 'src/reconstructed/gameobj.cpp'
 TICK = '?Tick@CollisionObject@@UAEHM@Z'
 
 

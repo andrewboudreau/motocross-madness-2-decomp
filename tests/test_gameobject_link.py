@@ -24,7 +24,7 @@ class GameObjectLinkTests(unittest.TestCase):
             output = Path(directory)
             objects = []
             for source in ('src/reconstructed/BaseObject.cpp',
-                           'src/reconstructed/GameObject.cpp',
+                           'src/reconstructed/gameobj.cpp',
                            'src/reconstructed/MemTag.cpp',
                            'tests/fixtures/gameobject_smoke.cpp'):
                 obj = output / (Path(source).stem + '.obj')

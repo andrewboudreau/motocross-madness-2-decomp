@@ -17,7 +17,7 @@ ROOT = Path(__file__).resolve().parents[1]
 CALLER = 'src/krusty2/collision/CollisionObject.cpp'
 PROVIDERS = (
     ('src/krusty2/bvh/BoundingBoxTreeQuery.cpp', '?FreeBoxTree@@YAXPAUQueryTreeNode@@@Z', 0x42a160, 52),
-    ('src/reconstructed/GameObject.cpp', '?AppendClassName@GameObject@@QAEXPAV1@@Z', 0x469ce0, 201),
+    ('src/reconstructed/gameobj.cpp', '?AppendClassName@GameObject@@QAEXPAV1@@Z', 0x469ce0, 201),
     ('src/krusty2/soultree/soultree.cpp', '?CountNodes@SoultreeObject@@QAEHXZ', 0x4fda30, 46),
     ('src/krusty2/soultree/soultree.cpp', '?CollectDescendants@SoultreeObject@@QAEXPAHPAPAV1@@Z', 0x4fda60, 76),
     ('src/reconstructed/D3DIMSoulTree.cpp', '?NodeMovesVertices@D3DIMSoultreeObject@@QAEHPAVSoultreeObject@@H@Z', 0x445060, 91),

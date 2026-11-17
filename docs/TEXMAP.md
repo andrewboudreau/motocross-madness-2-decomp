@@ -1,6 +1,6 @@
 # Texmap.cpp and TextureCache.cpp
 
-**Texmap.cpp** (`0x0050a3a0..0x0050ac2f`, `src/reconstructed/TextureMap.cpp`)
+**Texmap.cpp** (`0x0050a3a0..0x0050ac2f`, `src/reconstructed/Texmap.cpp`)
 is now fully matched: 13 functions. The unit opens with its four kVec3
 `$E` pairs; Terrain.cpp's last function ends at `0x0050a392`. Its
 `__FILE__` literal at `0x00574b0c` has xrefs `0x0050a6bc..0x0050ab10`, and

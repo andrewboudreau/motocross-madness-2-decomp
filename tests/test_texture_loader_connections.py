@@ -30,7 +30,7 @@ class TextureLoaderConnections(unittest.TestCase):
             self.assertEqual(call[0],0xe8)
             self.assertEqual(site+5+struct.unpack('<i',call[1:])[0],target)
         sources={name:'src/reconstructed/'+name+'.cpp' for name in
-          ('TextureMap','SoultreeMaterial','BikeNumberPainter','FontTexture','TrackOverlay','EcoSystem','SceneManager')}
+          ('Texmap','SoultreeMaterial','BikeNumberPainter','FontTexture','TrackOverlay','EcoSystem','SceneManager')}
         sources.update({'Particles':'src/krusty2/effects/Particles.cpp',
             'Terrain':'src/krusty2/broadphase/Terrain.cpp',
             'motion':'src/krusty2/motion/D3DIMSoultreeMotnctrl.cpp',
@@ -51,7 +51,7 @@ class TextureLoaderConnections(unittest.TestCase):
                     if obj.symbol_by_index[r.symbol_index].section_number==0}
             def definitions(obj):
                 return {s.name for s in obj.symbols if s.section_number>0 and s.storage_class==2}
-            self.assertIn(LOADER,definitions(objects['TextureMap']))
+            self.assertIn(LOADER,definitions(objects['Texmap']))
             for name in ('SoultreeMaterial','BikeNumberPainter','FontTexture','TrackOverlay','EcoSystem','Particles','Terrain'):
                 calls=imports(objects[name])
                 self.assertIn(LOADER,calls,name)
@@ -67,7 +67,7 @@ class TextureLoaderConnections(unittest.TestCase):
                     case['target_size'],ROOT/case['bindings'])
                 self.assertTrue(result['strict_exact'],result)
                 matched.add((name,int(case['target_va'],0)))
-            self.assertTrue({('TextureMap',0x50a590),('SoultreeMaterial',0x4fefe0),
+            self.assertTrue({('Texmap',0x50a590),('SoultreeMaterial',0x4fefe0),
                 ('SoultreeMaterial',0x4ff0b0),('SoultreeMaterial',0x5000f0),
                 ('SceneManager',0x4eb570)}<=matched)
             self.assertGreaterEqual(len(matched),236)

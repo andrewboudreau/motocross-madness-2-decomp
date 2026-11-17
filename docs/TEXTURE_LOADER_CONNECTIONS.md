@@ -1,7 +1,7 @@
 # Shared texture-loader declaration
 
 `src/reconstructed/TextureLoader.h` declares the existing `TerrainLoadTexture`
-provider in `TextureMap.cpp`: `0x0050a590`, 1442 bytes. The function name is
+provider in `Texmap.cpp`: `0x0050a590`, 1442 bytes. The function name is
 provisional. Its decoded implementation and complete relocation-resolved
 VC6 match establish the shared call destination; this change adds no loader
 body or claim about original translation-unit ownership.

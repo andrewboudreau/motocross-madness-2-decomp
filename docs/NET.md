@@ -70,7 +70,7 @@ Function and member names in `Net.h` are provisional (tier 3) unless noted:
   - Its WSOCK32 calls bind to the ordinal-import thunks
     `0x005330ac`..`0x005330e2`: ordinals 111, 3, 19, 115, 23, 52, 9, 10, 4
     and 12.
-  - TrackGame.cpp constructs it, calls `0x004ad3e0` and deletes it;
+  - trkgame.cpp constructs it, calls `0x004ad3e0` and deletes it;
     `0x0052085c` calls `0x004ad570`.
 - The enumeration counters are at `0x006886ac` (connections, at most 5),
   `0x006886b0` (sessions, at most 5) and `0x006886b4` (players, at most 7).

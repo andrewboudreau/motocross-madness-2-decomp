@@ -1,6 +1,6 @@
 """GameObject::MarkPendingRelease 0x004692c0, slot 26 (tools/emu_diff.py case).
 
-The linked body is src/reconstructed/GameObject.cpp. It calls slot 26 on every child
+The linked body is src/reconstructed/gameobj.cpp. It calls slot 26 on every child
 (firstChild +0x10, nextSibling +0xc), then sets pendingRelease (bit 3 of +0x25), which the
 next Game::Tick's ReleaseDetached 0x00469c80 acts on. The tree is up to three levels deep
 with seeded flag bytes; every node's vtable has ``ctx.entry`` at slot 26, so the recursion
@@ -10,7 +10,7 @@ import random
 
 RETAIL_VA = 0x004692c0
 SYMBOL = '?MarkPendingRelease@GameObject@@UAEXXZ'
-SOURCE = 'src/reconstructed/GameObject.cpp'
+SOURCE = 'src/reconstructed/gameobj.cpp'
 FPCWS = (0x027f,)
 PROBES = {0x004692cb: 'child', 0x004692d9: 'mark'}
 

@@ -2,7 +2,7 @@
 
 RTTI: `TrackGame : PCGame : Game` (vtable `0x00558938`). The translation unit
 is trkgame.cpp (literal `__FILE__` references). Canonical source is
-`src/reconstructed/TrackGame.h` / `TrackGame.cpp`. Names are provisional.
+`src/reconstructed/TrackGame.h` / `trkgame.cpp`. Names are provisional.
 
 ## It is the global game object
 
@@ -26,7 +26,7 @@ Every TrackGame function is exact (18 calibration cases):
 
 Slot 1 is sensitive to unrelated header content. VC6's register choice for
 its `availPhys + availPageFile` sum (edx/eax) changes when declarations are
-added to headers TrackGame.cpp includes. The sensitivity is not tied to
+added to headers trkgame.cpp includes. The sensitivity is not tied to
 names or to the build path; adding unused probe declarations flips it at
 irregular counts. After a header edit, re-run the full calibration. If slot 1
 regresses, keep new types local to the file that uses them (as

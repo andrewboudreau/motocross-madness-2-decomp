@@ -972,7 +972,7 @@
           "slot": 2,
           "symbol": "?Release@GameObject@@UAEHXZ",
           "va": "0x4696c0",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 81,
           "strict": true
         },
@@ -988,7 +988,7 @@
           "slot": 4,
           "symbol": "?Disable@GameObject@@UAEXXZ",
           "va": "0x4690a0",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 13,
           "strict": true
         },
@@ -996,7 +996,7 @@
           "slot": 5,
           "symbol": "?Enable@GameObject@@UAEXXZ",
           "va": "0x4690b0",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 13,
           "strict": true
         },
@@ -1004,7 +1004,7 @@
           "slot": 6,
           "symbol": "?OnDisable@GameObject@@UAEXXZ",
           "va": "0x469050",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 30,
           "strict": true
         },
@@ -1012,7 +1012,7 @@
           "slot": 7,
           "symbol": "?OnEnable@GameObject@@UAEXXZ",
           "va": "0x469070",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 35,
           "strict": true
         },
@@ -1020,7 +1020,7 @@
           "slot": 8,
           "symbol": "?SetRenderContext@GameObject@@UAEPAV1@PAX@Z",
           "va": "0x4692f0",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 12,
           "strict": true
         },
@@ -1028,7 +1028,7 @@
           "slot": 9,
           "symbol": "?PreTick@GameObject@@UAEHH@Z",
           "va": "0x469430",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 65,
           "strict": true
         },
@@ -1036,7 +1036,7 @@
           "slot": 11,
           "symbol": "?Step@GameObject@@UAEHM@Z",
           "va": "0x4da540",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 8,
           "strict": true
         },
@@ -1044,7 +1044,7 @@
           "slot": 12,
           "symbol": "?PrepareGeometry@GameObject@@UAEHXZ",
           "va": "0x469300",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 48,
           "strict": true
         },
@@ -1052,7 +1052,7 @@
           "slot": 13,
           "symbol": "?RenderPre3D@GameObject@@UAEHXZ",
           "va": "0x469330",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 47,
           "strict": true
         },
@@ -1060,7 +1060,7 @@
           "slot": 14,
           "symbol": "?Render3D@GameObject@@UAEHXZ",
           "va": "0x469360",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 55,
           "strict": true
         },
@@ -1068,7 +1068,7 @@
           "slot": 15,
           "symbol": "?RenderPost3D@GameObject@@UAEHXZ",
           "va": "0x4693a0",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 47,
           "strict": true
         },
@@ -1076,7 +1076,7 @@
           "slot": 16,
           "symbol": "?SetPaused@GameObject@@UAEHH@Z",
           "va": "0x469480",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 74,
           "strict": true
         },
@@ -1084,7 +1084,7 @@
           "slot": 17,
           "symbol": "?OnDeactivate@GameObject@@UAEHXZ",
           "va": "0x469500",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 42,
           "strict": true
         },
@@ -1092,7 +1092,7 @@
           "slot": 18,
           "symbol": "?OnActivate@GameObject@@UAEHXZ",
           "va": "0x4694d0",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 42,
           "strict": true
         },
@@ -1100,7 +1100,7 @@
           "slot": 19,
           "symbol": "?OnInputEvent@GameObject@@UAEHH@Z",
           "va": "0x469530",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 68,
           "strict": true
         },
@@ -1108,7 +1108,7 @@
           "slot": 20,
           "symbol": "?OnChar@GameObject@@UAEHH@Z",
           "va": "0x469c00",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 60,
           "strict": true
         },
@@ -1116,7 +1116,7 @@
           "slot": 21,
           "symbol": "?OnKeyDown@GameObject@@UAEHH@Z",
           "va": "0x469c40",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 60,
           "strict": true
         },
@@ -1124,7 +1124,7 @@
           "slot": 22,
           "symbol": "?OnControlRelease@GameObject@@UAEHPAUControlEvent@@PAUInputButtonState@@@Z",
           "va": "0x469580",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 76,
           "strict": true
         },
@@ -1132,7 +1132,7 @@
           "slot": 23,
           "symbol": "?OnControlPress@GameObject@@UAEHPAUControlEvent@@PAUInputButtonState@@@Z",
           "va": "0x4695d0",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 76,
           "strict": true
         },
@@ -1140,7 +1140,7 @@
           "slot": 24,
           "symbol": "?OnNetworkMessage@GameObject@@UAEHHPAXHHH@Z",
           "va": "0x469620",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 94,
           "strict": true
         },
@@ -1148,7 +1148,7 @@
           "slot": 25,
           "symbol": "?AttachRenderContext@GameObject@@UAEHPAX@Z",
           "va": "0x469720",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 68,
           "strict": true
         },
@@ -1156,7 +1156,7 @@
           "slot": 26,
           "symbol": "?MarkPendingRelease@GameObject@@UAEXXZ",
           "va": "0x4692c0",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 36,
           "strict": true
         }
@@ -1177,7 +1177,7 @@
           "slot": 2,
           "symbol": "?Release@GameObject@@UAEHXZ",
           "va": "0x4696c0",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 81,
           "strict": true
         },
@@ -1193,7 +1193,7 @@
           "slot": 4,
           "symbol": "?Disable@GameObject@@UAEXXZ",
           "va": "0x4690a0",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 13,
           "strict": true
         },
@@ -1201,7 +1201,7 @@
           "slot": 5,
           "symbol": "?Enable@GameObject@@UAEXXZ",
           "va": "0x4690b0",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 13,
           "strict": true
         },
@@ -1209,7 +1209,7 @@
           "slot": 6,
           "symbol": "?OnDisable@GameObject@@UAEXXZ",
           "va": "0x469050",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 30,
           "strict": true
         },
@@ -1217,7 +1217,7 @@
           "slot": 7,
           "symbol": "?OnEnable@GameObject@@UAEXXZ",
           "va": "0x469070",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 35,
           "strict": true
         },
@@ -1225,7 +1225,7 @@
           "slot": 8,
           "symbol": "?SetRenderContext@GameObject@@UAEPAV1@PAX@Z",
           "va": "0x4692f0",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 12,
           "strict": true
         },
@@ -1233,7 +1233,7 @@
           "slot": 9,
           "symbol": "?PreTick@GameObject@@UAEHH@Z",
           "va": "0x469430",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 65,
           "strict": true
         },
@@ -1241,7 +1241,7 @@
           "slot": 11,
           "symbol": "?Step@GameObject@@UAEHM@Z",
           "va": "0x4da540",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 8,
           "strict": true
         },
@@ -1249,7 +1249,7 @@
           "slot": 12,
           "symbol": "?PrepareGeometry@GameObject@@UAEHXZ",
           "va": "0x469300",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 48,
           "strict": true
         },
@@ -1257,7 +1257,7 @@
           "slot": 13,
           "symbol": "?RenderPre3D@GameObject@@UAEHXZ",
           "va": "0x469330",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 47,
           "strict": true
         },
@@ -1265,7 +1265,7 @@
           "slot": 14,
           "symbol": "?Render3D@GameObject@@UAEHXZ",
           "va": "0x469360",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 55,
           "strict": true
         },
@@ -1273,7 +1273,7 @@
           "slot": 15,
           "symbol": "?RenderPost3D@GameObject@@UAEHXZ",
           "va": "0x4693a0",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 47,
           "strict": true
         },
@@ -1281,7 +1281,7 @@
           "slot": 16,
           "symbol": "?SetPaused@GameObject@@UAEHH@Z",
           "va": "0x469480",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 74,
           "strict": true
         },
@@ -1289,7 +1289,7 @@
           "slot": 17,
           "symbol": "?OnDeactivate@GameObject@@UAEHXZ",
           "va": "0x469500",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 42,
           "strict": true
         },
@@ -1297,7 +1297,7 @@
           "slot": 18,
           "symbol": "?OnActivate@GameObject@@UAEHXZ",
           "va": "0x4694d0",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 42,
           "strict": true
         },
@@ -1305,7 +1305,7 @@
           "slot": 19,
           "symbol": "?OnInputEvent@GameObject@@UAEHH@Z",
           "va": "0x469530",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 68,
           "strict": true
         },
@@ -1313,7 +1313,7 @@
           "slot": 20,
           "symbol": "?OnChar@GameObject@@UAEHH@Z",
           "va": "0x469c00",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 60,
           "strict": true
         },
@@ -1321,7 +1321,7 @@
           "slot": 21,
           "symbol": "?OnKeyDown@GameObject@@UAEHH@Z",
           "va": "0x469c40",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 60,
           "strict": true
         },
@@ -1329,7 +1329,7 @@
           "slot": 22,
           "symbol": "?OnControlRelease@GameObject@@UAEHPAUControlEvent@@PAUInputButtonState@@@Z",
           "va": "0x469580",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 76,
           "strict": true
         },
@@ -1337,7 +1337,7 @@
           "slot": 23,
           "symbol": "?OnControlPress@GameObject@@UAEHPAUControlEvent@@PAUInputButtonState@@@Z",
           "va": "0x4695d0",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 76,
           "strict": true
         },
@@ -1345,7 +1345,7 @@
           "slot": 24,
           "symbol": "?OnNetworkMessage@GameObject@@UAEHHPAXHHH@Z",
           "va": "0x469620",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 94,
           "strict": true
         },
@@ -1353,7 +1353,7 @@
           "slot": 25,
           "symbol": "?AttachRenderContext@GameObject@@UAEHPAX@Z",
           "va": "0x469720",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 68,
           "strict": true
         },
@@ -1361,7 +1361,7 @@
           "slot": 26,
           "symbol": "?MarkPendingRelease@GameObject@@UAEXXZ",
           "va": "0x4692c0",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 36,
           "strict": true
         }
@@ -1382,7 +1382,7 @@
           "slot": 2,
           "symbol": "?Release@GameObject@@UAEHXZ",
           "va": "0x4696c0",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 81,
           "strict": true
         },
@@ -1398,7 +1398,7 @@
           "slot": 4,
           "symbol": "?Disable@GameObject@@UAEXXZ",
           "va": "0x4690a0",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 13,
           "strict": true
         },
@@ -1406,7 +1406,7 @@
           "slot": 5,
           "symbol": "?Enable@GameObject@@UAEXXZ",
           "va": "0x4690b0",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 13,
           "strict": true
         },
@@ -1414,7 +1414,7 @@
           "slot": 6,
           "symbol": "?OnDisable@GameObject@@UAEXXZ",
           "va": "0x469050",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 30,
           "strict": true
         },
@@ -1422,7 +1422,7 @@
           "slot": 7,
           "symbol": "?OnEnable@GameObject@@UAEXXZ",
           "va": "0x469070",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 35,
           "strict": true
         },
@@ -1430,7 +1430,7 @@
           "slot": 8,
           "symbol": "?SetRenderContext@GameObject@@UAEPAV1@PAX@Z",
           "va": "0x4692f0",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 12,
           "strict": true
         },
@@ -1438,7 +1438,7 @@
           "slot": 9,
           "symbol": "?PreTick@GameObject@@UAEHH@Z",
           "va": "0x469430",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 65,
           "strict": true
         },
@@ -1446,7 +1446,7 @@
           "slot": 11,
           "symbol": "?Step@GameObject@@UAEHM@Z",
           "va": "0x4da540",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 8,
           "strict": true
         },
@@ -1454,7 +1454,7 @@
           "slot": 12,
           "symbol": "?PrepareGeometry@GameObject@@UAEHXZ",
           "va": "0x469300",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 48,
           "strict": true
         },
@@ -1462,7 +1462,7 @@
           "slot": 13,
           "symbol": "?RenderPre3D@GameObject@@UAEHXZ",
           "va": "0x469330",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 47,
           "strict": true
         },
@@ -1470,7 +1470,7 @@
           "slot": 14,
           "symbol": "?Render3D@GameObject@@UAEHXZ",
           "va": "0x469360",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 55,
           "strict": true
         },
@@ -1478,7 +1478,7 @@
           "slot": 15,
           "symbol": "?RenderPost3D@GameObject@@UAEHXZ",
           "va": "0x4693a0",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 47,
           "strict": true
         },
@@ -1486,7 +1486,7 @@
           "slot": 16,
           "symbol": "?SetPaused@GameObject@@UAEHH@Z",
           "va": "0x469480",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 74,
           "strict": true
         },
@@ -1494,7 +1494,7 @@
           "slot": 17,
           "symbol": "?OnDeactivate@GameObject@@UAEHXZ",
           "va": "0x469500",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 42,
           "strict": true
         },
@@ -1502,7 +1502,7 @@
           "slot": 18,
           "symbol": "?OnActivate@GameObject@@UAEHXZ",
           "va": "0x4694d0",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 42,
           "strict": true
         },
@@ -1510,7 +1510,7 @@
           "slot": 19,
           "symbol": "?OnInputEvent@GameObject@@UAEHH@Z",
           "va": "0x469530",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 68,
           "strict": true
         },
@@ -1518,7 +1518,7 @@
           "slot": 20,
           "symbol": "?OnChar@GameObject@@UAEHH@Z",
           "va": "0x469c00",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 60,
           "strict": true
         },
@@ -1526,7 +1526,7 @@
           "slot": 21,
           "symbol": "?OnKeyDown@GameObject@@UAEHH@Z",
           "va": "0x469c40",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 60,
           "strict": true
         },
@@ -1534,7 +1534,7 @@
           "slot": 22,
           "symbol": "?OnControlRelease@GameObject@@UAEHPAUControlEvent@@PAUInputButtonState@@@Z",
           "va": "0x469580",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 76,
           "strict": true
         },
@@ -1542,7 +1542,7 @@
           "slot": 23,
           "symbol": "?OnControlPress@GameObject@@UAEHPAUControlEvent@@PAUInputButtonState@@@Z",
           "va": "0x4695d0",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 76,
           "strict": true
         },
@@ -1550,7 +1550,7 @@
           "slot": 24,
           "symbol": "?OnNetworkMessage@GameObject@@UAEHHPAXHHH@Z",
           "va": "0x469620",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 94,
           "strict": true
         },
@@ -1558,7 +1558,7 @@
           "slot": 25,
           "symbol": "?AttachRenderContext@GameObject@@UAEHPAX@Z",
           "va": "0x469720",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 68,
           "strict": true
         },
@@ -1566,7 +1566,7 @@
           "slot": 26,
           "symbol": "?MarkPendingRelease@GameObject@@UAEXXZ",
           "va": "0x4692c0",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 36,
           "strict": true
         }
@@ -1587,7 +1587,7 @@
           "slot": 2,
           "symbol": "?Release@GameObject@@UAEHXZ",
           "va": "0x4696c0",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 81,
           "strict": true
         },
@@ -1603,7 +1603,7 @@
           "slot": 4,
           "symbol": "?Disable@GameObject@@UAEXXZ",
           "va": "0x4690a0",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 13,
           "strict": true
         },
@@ -1611,7 +1611,7 @@
           "slot": 5,
           "symbol": "?Enable@GameObject@@UAEXXZ",
           "va": "0x4690b0",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 13,
           "strict": true
         },
@@ -1619,7 +1619,7 @@
           "slot": 6,
           "symbol": "?OnDisable@GameObject@@UAEXXZ",
           "va": "0x469050",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 30,
           "strict": true
         },
@@ -1627,7 +1627,7 @@
           "slot": 7,
           "symbol": "?OnEnable@GameObject@@UAEXXZ",
           "va": "0x469070",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 35,
           "strict": true
         },
@@ -1635,7 +1635,7 @@
           "slot": 8,
           "symbol": "?SetRenderContext@GameObject@@UAEPAV1@PAX@Z",
           "va": "0x4692f0",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 12,
           "strict": true
         },
@@ -1643,7 +1643,7 @@
           "slot": 9,
           "symbol": "?PreTick@GameObject@@UAEHH@Z",
           "va": "0x469430",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 65,
           "strict": true
         },
@@ -1651,7 +1651,7 @@
           "slot": 11,
           "symbol": "?Step@GameObject@@UAEHM@Z",
           "va": "0x4da540",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 8,
           "strict": true
         },
@@ -1659,7 +1659,7 @@
           "slot": 12,
           "symbol": "?PrepareGeometry@GameObject@@UAEHXZ",
           "va": "0x469300",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 48,
           "strict": true
         },
@@ -1667,7 +1667,7 @@
           "slot": 13,
           "symbol": "?RenderPre3D@GameObject@@UAEHXZ",
           "va": "0x469330",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 47,
           "strict": true
         },
@@ -1675,7 +1675,7 @@
           "slot": 14,
           "symbol": "?Render3D@GameObject@@UAEHXZ",
           "va": "0x469360",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 55,
           "strict": true
         },
@@ -1683,7 +1683,7 @@
           "slot": 15,
           "symbol": "?RenderPost3D@GameObject@@UAEHXZ",
           "va": "0x4693a0",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 47,
           "strict": true
         },
@@ -1691,7 +1691,7 @@
           "slot": 16,
           "symbol": "?SetPaused@GameObject@@UAEHH@Z",
           "va": "0x469480",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 74,
           "strict": true
         },
@@ -1699,7 +1699,7 @@
           "slot": 17,
           "symbol": "?OnDeactivate@GameObject@@UAEHXZ",
           "va": "0x469500",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 42,
           "strict": true
         },
@@ -1707,7 +1707,7 @@
           "slot": 18,
           "symbol": "?OnActivate@GameObject@@UAEHXZ",
           "va": "0x4694d0",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 42,
           "strict": true
         },
@@ -1715,7 +1715,7 @@
           "slot": 19,
           "symbol": "?OnInputEvent@GameObject@@UAEHH@Z",
           "va": "0x469530",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 68,
           "strict": true
         },
@@ -1723,7 +1723,7 @@
           "slot": 20,
           "symbol": "?OnChar@GameObject@@UAEHH@Z",
           "va": "0x469c00",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 60,
           "strict": true
         },
@@ -1731,7 +1731,7 @@
           "slot": 21,
           "symbol": "?OnKeyDown@GameObject@@UAEHH@Z",
           "va": "0x469c40",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 60,
           "strict": true
         },
@@ -1739,7 +1739,7 @@
           "slot": 22,
           "symbol": "?OnControlRelease@GameObject@@UAEHPAUControlEvent@@PAUInputButtonState@@@Z",
           "va": "0x469580",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 76,
           "strict": true
         },
@@ -1747,7 +1747,7 @@
           "slot": 23,
           "symbol": "?OnControlPress@GameObject@@UAEHPAUControlEvent@@PAUInputButtonState@@@Z",
           "va": "0x4695d0",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 76,
           "strict": true
         },
@@ -1755,7 +1755,7 @@
           "slot": 24,
           "symbol": "?OnNetworkMessage@GameObject@@UAEHHPAXHHH@Z",
           "va": "0x469620",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 94,
           "strict": true
         },
@@ -1763,7 +1763,7 @@
           "slot": 25,
           "symbol": "?AttachRenderContext@GameObject@@UAEHPAX@Z",
           "va": "0x469720",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 68,
           "strict": true
         },
@@ -1771,7 +1771,7 @@
           "slot": 26,
           "symbol": "?MarkPendingRelease@GameObject@@UAEXXZ",
           "va": "0x4692c0",
-          "source": "src/reconstructed/GameObject.cpp",
+          "source": "src/reconstructed/gameobj.cpp",
           "extent": 36,
           "strict": true
         }

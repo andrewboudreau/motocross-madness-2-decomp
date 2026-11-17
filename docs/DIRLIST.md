@@ -1,6 +1,6 @@
 # dirlist.cpp
 
-`src/reconstructed/DirectoryList.h` / `DirectoryList.cpp`. Evidence: the
+`src/reconstructed/DirectoryList.h` / `dirlist.cpp`. Evidence: the
 `__FILE__` literal `D:\aardvark\VC\krusty2\dirlist.cpp` (`0x00569204`;
 DebugMalloc line 32, `new` lines 44, 328, 374, 464/465, 480 and 512, delete
 line 63), RTTI `DirectoryList` (vtable `0x005516e0`, 0x21c bytes) and
