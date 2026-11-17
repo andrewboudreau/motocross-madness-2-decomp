@@ -22,17 +22,18 @@ from test_garage_shadow_connections import function_text
 import test_eco_quadtree_connections as whole
 
 ROOT = Path(__file__).resolve().parents[1]
-CALLER = 'src/reconstructed/Wrecker.cpp'
-SAMPLE = 'samples/race/WreckerNearMisses.cpp'
+CALLER = 'src/reconstructed/wrecker.cpp'
 PROVIDER = 'src/krusty2/constraint/ConstraintMethodCollisionModel.cpp'
-# The canonical ConstraintMethodCollisionModel calls Wrecker.cpp makes; each
-# must be imported once by the caller and the sample and defined by PROVIDER.
+# The canonical ConstraintMethodCollisionModel calls wrecker.cpp makes; each
+# must be imported once by the caller and defined by PROVIDER.
 CONSTRAINT_CALLS = (
     '??0ConstraintMethodCollisionModel@@QAE@H@Z',
     '?SetBody@ConstraintMethodCollisionModel@@QAEXPAVConBody@@HPBD@Z',
     '?AddProbePoint@ConstraintMethodCollisionModel@@QAEXUConVec3@@PAVConNode@@@Z',
 )
-FILENAMES = (CALLER, SAMPLE, 'samples/race/../../src/reconstructed/Wrecker.cpp')
+FILENAMES = (CALLER,)
+HEADERS = {CALLER: 'src/reconstructed/Wrecker.h',
+           PROVIDER: 'src/krusty2/constraint/ConstraintMethodCollisionModel.h'}
 CRT_NAMES = {'_FixtureMalloc': '_malloc', '_FixtureFree': '_free', '_FixtureMsize': '__msize'}
 
 
@@ -149,32 +150,30 @@ class WreckerConstraintConnections(unittest.TestCase):
                     cwd=TOOL_ROOT,capture_output=True,text=True,env={**os.environ,'PYTHONPATH':str(TOOL_ROOT)})
                 self.assertEqual(run.returncode,0,run.stdout+run.stderr)
                 objects[label]=CoffObject(dest);paths[label]=dest;return objects[label]
-            for label,source in (('caller',CALLER),('sample',SAMPLE),('provider',PROVIDER),
+            for label,source in (('caller',CALLER),('provider',PROVIDER),
                 ('bike','src/krusty2/vehicle/Bike.cpp'),('rigid','src/krusty2/rigidbody/PhysicsRigidBody.cpp'),
                 ('body','src/krusty2/rigidbody/PhysicsBody.cpp'),
                 ('scene','src/krusty2/soultree/soultree.cpp'),('allocator','src/reconstructed/MemTag.cpp')):
                 # These callers also belong to standalone calibration, where
                 # their shared header must resolve without project include flags.
-                compile_source(source,label,include_project=label not in ('caller','sample'))
+                compile_source(source,label,include_project=label!='caller')
             pins=json.loads((ROOT/'tests/fixtures/wrecker_constraint_objects.json').read_text())['objects']
-            for label,source in (('caller',CALLER),('sample',SAMPLE)): self.assertEqual(pin(objects[label]),pins[source])
-            binding=json.loads((ROOT/CALLER).with_suffix('.bindings.json').read_text())
-            merged=out/'aggregate.json';binding.update(json.loads((ROOT/SAMPLE).with_suffix('.bindings.json').read_text()));merged.write_text(json.dumps(binding))
+            self.assertEqual(pin(objects['caller']),pins[CALLER])
+            merged=(ROOT/CALLER).with_suffix('.bindings.json');binding=json.loads(merged.read_text())
             strict=0
-            for label in ('caller','sample'):
-                for case in CASES:
-                    if case['source']!=CALLER:continue
-                    self.assertTrue(compare(image,objects[label],case['symbol'],int(case['target_va'],0),case['target_size'],merged)['strict_exact'],case)
-                    strict+=1
+            for case in CASES:
+                if case['source']!=CALLER:continue
+                self.assertTrue(compare(image,objects['caller'],case['symbol'],int(case['target_va'],0),case['target_size'],merged)['strict_exact'],case)
+                strict+=1
             for case in json.loads((ROOT/'src/krusty2/constraint/targets.json').read_text()):
                 self.assertTrue(compare(image,objects['provider'],case['candidate_symbol_contains'],int(case['target_va'],0),case['target_size'],(ROOT/PROVIDER).with_suffix('.bindings.json'))['strict_exact'],case);strict+=1
             for symbol,va,size,score,digest in (
                 ('?PushProbesOutOfBox@Wrecker@@',0x5329e0,1312,1200,'ee990cbeffbb403f2238ce88038c256717237b874c57444ad28b5ed7ff53e2cb'),
                 ('?SprayContactParticles@Wrecker@@',0x531740,1624,1606,'439fd80876fa804dde2e6522a6deaae3048455a89c2d1074ae21263310e408d6')):
-                result=compare(image,objects['sample'],symbol,va,size,merged)
+                result=compare(image,objects['caller'],symbol,va,size,merged)
                 self.assertEqual((result['candidate_size'],result['strict_match']['matching_positions']),(size,score))
                 with patch('mcm2tool.resolved_match.compare_bytes',lambda original,candidate:{'digest':hashlib.sha256(candidate).hexdigest()}):
-                    value=match_object(objects['sample'],symbol,va,b'',{k:int(v,0) for k,v in binding.items()})
+                    value=match_object(objects['caller'],symbol,va,b'',{k:int(v,0) for k,v in binding.items()})
                 self.assertEqual(value['digest'],digest)
             for label,symbol,va,size,binding_path in (
                 ('bike','?CreateWrecker@Bike@@',0x409420,1516,'src/krusty2/vehicle/Bike.bindings.json'),
@@ -182,14 +181,13 @@ class WreckerConstraintConnections(unittest.TestCase):
                 ('scene','?FindByName@SoultreeObject@@',0x4fdae0,84,'src/krusty2/soultree/soultree.bindings.json'),
                 ('body','?SetNode@PhysicsBody@@',0x4cbdf0,17,'src/krusty2/rigidbody/PhysicsBody.bindings.json')):
                 self.assertTrue(compare(image,objects[label],symbol,va,size,ROOT/binding_path)['strict_exact'],symbol);strict+=1
-            for label in ('caller','sample'):
-                imports=[objects[label].symbol_by_index[r.symbol_index].name for r in objects[label].relocations]
-                for target in CONSTRAINT_CALLS:self.assertEqual(imports.count(target),1)
+            imports=[objects['caller'].symbol_by_index[r.symbol_index].name for r in objects['caller'].relocations]
+            for target in CONSTRAINT_CALLS:self.assertEqual(imports.count(target),1)
             for target in CONSTRAINT_CALLS:self.assertGreater(objects['provider'].find_symbol(target).section_number,0)
             for source,label,signature,symbol,va,size,file_va in (
                 (CALLER,'append','void Wrecker::AddProbe(', '?AddProbe@Wrecker@@',0x532900,210,0x575ab8),
                 (PROVIDER,'probe','void ConstraintMethodCollisionModel::AddProbePoint(', '?AddProbePoint@ConstraintMethodCollisionModel@@',0x43c7f0,139,0x568818)):
-                src=out/(label+'.cpp');src.write_text('#include "'+str((ROOT/source).with_suffix('.h')).replace('\\','/')+'"\n#include "constraint/ConstraintMethodCollisionModel.h"\n#include "DebugAlloc.h"\n'+function_text((ROOT/source).read_text(),signature)+'\n')
+                src=out/(label+'.cpp');src.write_text('#include "'+str(ROOT/HEADERS[source]).replace('\\','/')+'"\n#include "constraint/ConstraintMethodCollisionModel.h"\n#include "DebugAlloc.h"\n'+function_text((ROOT/source).read_text(),signature)+'\n')
                 obj=compile_source(src,label)
                 filenames=(str(src).replace('\\','/'),str(ROOT/source).replace('\\','/'))
                 self.assertEqual(function(obj,symbol,filenames),function(objects['caller' if label=='append' else 'provider'],symbol,filenames))
@@ -216,7 +214,7 @@ class WreckerConstraintConnections(unittest.TestCase):
             run=subprocess.run([str(binary)],capture_output=True,text=True,timeout=30)
             self.assertEqual(run.returncode,0,run.stdout+run.stderr)
             self.assertEqual(run.stdout.strip(),'Wrecker probes: 2568 cases, 8 independently modeled access faults')
-            self.assertEqual(strict,85)
+            self.assertEqual(strict,57)
             print('%d strict checks; two complete objects and partials; %s'%(strict,run.stdout.strip()))
 
 

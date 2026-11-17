@@ -60,7 +60,7 @@ struct WreckerD3DMatrix {
 };
 
 // Vector storage shared with the scene-node helpers. The complete scene-node
-// declaration is needed only by Wrecker.cpp; other consumers use pointer types.
+// declaration is needed only by wrecker.cpp; other consumers use pointer types.
 #include "../krusty2/math/Vec3.h"
 
 // The character's current motion (src/krusty2 Motion, Motnctrl.h).
@@ -135,7 +135,7 @@ public:
     explicit Wrecker(int flags);                       // 0x0052ff90
     virtual ~Wrecker();                                // 0x005300a0 / 0x005300c0
     // Slot 10, 0x005306e0 (4178 bytes): the per-frame wreck update
-    // (Wrecker.cpp).
+    // (wrecker.cpp).
     virtual int Tick(float frameTime);
     // Slot 14, 0x004de400: `jmp GameObject slot 14`. The linker folded
     // this body with identical ones of other classes, so the copy that
@@ -152,7 +152,7 @@ public:
     void AddIgnoredObject(CollisionObject* object); // appends to ignoreObjects
     void EndWreck();                  // 0x005327c0: back to state 0, the pose reset
     void SetPushBox(UnknownWreckerSkeleton* frame, Vector3 center, Vector3 halfExtents); // 0x005328b0: boxFrame/boxCenter/boxHalfExtents
-    void PushProbesOutOfBox(float frameTime); // 0x005329e0: pushImpulse (samples/race/WreckerNearMisses.cpp)
+    void PushProbesOutOfBox(float frameTime); // 0x005329e0: pushImpulse (near miss)
     void AddProbe(Vector3 offset, int bone); // 0x00532900: a probe point and its position/hit slots
     void SprayContactParticles(Vector3 a, Vector3 b, Vector3 normal, float frameTime);
     void EmitProbeTrail(Vector3 from, Vector3 to, float frameTime);

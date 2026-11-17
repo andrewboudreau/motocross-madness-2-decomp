@@ -18,7 +18,7 @@
 #define MCM2_PHYSICS_RIGIDBODY_PHYSICSBODY_H
 
 // Relative includes: Wrecker.h (src/reconstructed) includes this header for the body
-// Wrecker creates at +0x40, and Wrecker.cpp is compiled without src/krusty2 on the path.
+// Wrecker creates at +0x40, and wrecker.cpp is compiled without src/krusty2 on the path.
 // math/Math3D.h is included by PhysicsBody.cpp and PhysicsRigidBody.cpp, not here: its
 // per-TU constant vectors would clash with the Vector3 set wrecker.cpp defines for itself.
 #include "../math/Vec3.h"

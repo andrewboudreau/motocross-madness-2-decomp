@@ -101,7 +101,7 @@ Unregistered `.CRT$XCU` entries are not listed.
 | 323-326 | 51dba0-51dcdb | 68a400 | TrackOverlay | TrackOverlay.cpp | consistent |
 | 327-331 | 521d00-521e6b | 68a450 | none | TypeRegistry.cpp | ambiguous: opens TypeRegistry.cpp or closes trkgame.cpp |
 | 332-335 | 5278e0-527a1b | 68a6d8 | Vehicle | Vehicle.cpp | consistent |
-| 348-351 | 532f00-53303b | 68acf0 | Wrecker | Wrecker.cpp | consistent |
+| 348-351 | 532f00-53303b | 68acf0 | Wrecker | wrecker.cpp | consistent |
 
 ## Remaining ambiguity
 

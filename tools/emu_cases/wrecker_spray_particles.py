@@ -1,6 +1,6 @@
 """Wrecker::SprayContactParticles 0x00531740 (tools/emu_diff.py case).
 
-The linked body is the samples/race/WreckerNearMisses.cpp candidate. Offsets from the
+The linked body is the src/reconstructed/wrecker.cpp near miss. Offsets from the
 retail body: +0x44 wreck state (zero selects +0xbc linearStep, else the rigid body +0x40's
 velocity at +0x154), +0x11c the particle manager (+0x2c active count, +0x40 the particle
 pointer table, +0x1f98 gravity), +0x124 spray frame (wraps 0x2d -> 0x1d), +0x128 the 256-entry
@@ -14,7 +14,7 @@ import struct
 
 RETAIL_VA = 0x00531740
 SYMBOL = '?SprayContactParticles@Wrecker@@QAEXUVector3@@00M@Z'
-SOURCE = 'samples/race/WreckerNearMisses.cpp'
+SOURCE = 'src/reconstructed/wrecker.cpp'
 PROBES = {0x00531800: 'moving', 0x00531a3d: 'spray', 0x00531c21: 'random wrap',
           0x00531d6b: 'frame wrap'}
 

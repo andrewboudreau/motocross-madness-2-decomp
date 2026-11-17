@@ -149,8 +149,8 @@ not bmpfile.cpp code.
 | `0x0042a640..0x0042abff` | 1471 | BoundingBoxTreeBuild.cpp (+0x111e) | `SegmentSegmentDistance`, near miss in `samples/physics/bvh` |
 | `0x0048eea0` (the ninth, not listed at the snapshot) | 2920 | - | KrustyBike slot 102, near miss in `samples/physics/krustybike` |
 | `0x00481300..0x004813d7` | 215 | Griddraw.cpp (+0x129c) | `DrawableGridNode::WalkSlot4Block`, strict exact in `src/reconstructed/Griddraw.cpp` |
-| `0x00532580..0x005327b2` | 562 | wrecker.cpp (+0x3b8) | `Wrecker::RebuildPoseSteps`, strict exact in `src/reconstructed/Wrecker.cpp` |
-| `0x005329e0..0x00532f00` | 1312 | wrecker.cpp (-0x64) | `Wrecker` `0x005329e0`, near miss in `samples/race/WreckerNearMisses.cpp` |
+| `0x00532580..0x005327b2` | 562 | wrecker.cpp (+0x3b8) | `Wrecker::RebuildPoseSteps`, strict exact in `src/reconstructed/wrecker.cpp` |
+| `0x005329e0..0x00532f00` | 1312 | wrecker.cpp (-0x64) | `Wrecker` `0x005329e0`, near miss in `src/reconstructed/wrecker.cpp` |
 
 ## Translation units and link order
 
@@ -277,7 +277,7 @@ xrefs, else the name match.
 | 104 | `vfwdeco.cpp` | `0x0052d07e..0x0052d0b3` (xref) | 3 | src | `reconstructed/VfwDeco.cpp` |
 | 105 | `VideoCard.cpp` | `0x0052d22a..0x0052d22b` (xref) | 1 | src | `reconstructed/VideoCard.cpp` |
 | 106 | `VisibilityQuadTree.cpp` | `0x0052d4c9..0x0052d4ca` (xref) | 1 | src | `krusty2/visibility/VisibilityQuadTree.cpp` |
-| 107 | `wrecker.cpp` | `0x005300f8..0x0053297d` (xref) | 14 | src | `reconstructed/Wrecker.cpp` |
+| 107 | `wrecker.cpp` | `0x005300f8..0x0053297d` (xref) | 14 | src | `reconstructed/wrecker.cpp` |
 
 Totals: **107 units `src`, 0 `samples only`**, **none without any reconstruction**. That only
 says some function is reconstructed; per-unit byte coverage is in the report

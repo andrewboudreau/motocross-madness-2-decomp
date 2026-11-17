@@ -77,7 +77,7 @@ class BikeSnapPlacementTests(unittest.TestCase):
                 '\n'.join(function_text(text, signature) for signature in
                           ('void CollisionObject::UpdatePlacement(', 'void CollisionObject::SnapPlacement(')) + '\n')
             objects, paths = {}, {}
-            wrecker = 'src/reconstructed/Wrecker.cpp'
+            wrecker = 'src/reconstructed/wrecker.cpp'
             constraint = 'src/krusty2/constraint/ConstraintMethodCollisionModel.cpp'
             fixture = 'tests/fixtures/bike_snap_placement.cpp'
             for index, source in enumerate((BIKE, COLLISION, wrecker, constraint, str(pair), fixture)):

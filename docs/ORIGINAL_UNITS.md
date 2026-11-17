@@ -71,3 +71,4 @@ behaviour tests use it to link one function of a unit against retail.
 | `gameobj.cpp` | `src/reconstructed/gameobj.cpp` | Renamed from `GameObject.cpp` (the class header stays `GameObject.h`); 43 cases exact. |
 | `Texmap.cpp` | `src/reconstructed/Texmap.cpp` | Renamed from `TextureMap.cpp`; 13 cases exact. |
 | `trkgame.cpp` | `src/reconstructed/trkgame.cpp` | Renamed from `TrackGame.cpp`; 19 cases exact. |
+| `wrecker.cpp` | `src/reconstructed/wrecker.cpp` | All 30 retail functions in order (renamed from `Wrecker.cpp`); `SprayContactParticles` and `PushProbesOutOfBox` moved in from `samples/race/WreckerNearMisses.cpp` and not exact. Both agree with retail under `tools/emu_diff.py` (400 runs each). |

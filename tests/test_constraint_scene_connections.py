@@ -24,7 +24,7 @@ SAMPLE = 'samples/physics/constraint/ConstraintMethodCollisionModelNearMisses.cp
 TREE = 'src/krusty2/soultree/soultree.cpp'
 MATRIX = 'src/krusty2/collision/CollisionObject.cpp'
 BIKE = 'src/krusty2/vehicle/Bike.cpp'
-WRECKER = 'src/reconstructed/Wrecker.cpp'
+WRECKER = 'src/reconstructed/wrecker.cpp'
 BODIES = (
     ('void SoultreeObject::UpdateWorldMatrix(', '?UpdateWorldMatrix@SoultreeObject@@QAEXXZ', 0x4fb4f0, 858),
     ('void SoultreeObject::InvalidateWorldMatrix(', '?InvalidateWorldMatrix@SoultreeObject@@QAEXXZ', 0x4fb850, 45),

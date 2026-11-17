@@ -14,7 +14,7 @@
 #define SELECTIVE_GRAVITY_MODEL_H
 
 // Relative includes: Wrecker.h (src/reconstructed) includes this header for the model
-// Wrecker creates at +0x3c, and Wrecker.cpp is compiled without src/krusty2 on the path.
+// Wrecker creates at +0x3c, and wrecker.cpp is compiled without src/krusty2 on the path.
 // math/Math3D.h is included by SelectiveGravityModel.cpp, not here: its per-TU constant
 // vectors would clash with the Vector3 set wrecker.cpp defines for itself.
 #include "../core/GameObject.h"

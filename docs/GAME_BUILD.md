@@ -787,10 +787,9 @@ clearly more faithful, the game now links the sample's text:
   - `samples/track/SceneManagerNearMisses.cpp`
   - `samples/race/Krusty3DObjectsNearMisses.cpp`
   - `samples/render/Grid1NearMisses.cpp`
-  - `samples/race/WreckerNearMisses.cpp`
 
-  The Wrecker file includes `src/reconstructed/Wrecker.cpp` (an
-  `included_sources` entry). Its canonical functions score as before.
+  The two Wrecker near misses that were linked the same way now sit in their
+  retail positions in `src/reconstructed/wrecker.cpp` (docs/ORIGINAL_UNITS.md).
 - The following bring-up files were deleted:
   - `Group4_SceneRead.cpp`, `Group4_SceneBridges.cpp` and
     `Group4_SceneEmitters.cpp`

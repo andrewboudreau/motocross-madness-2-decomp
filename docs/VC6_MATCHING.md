@@ -115,7 +115,7 @@ and exact functions kept for the canonical unit:
 |---|---|---|---|---|---|
 | GR_BitString.cpp (9) | `0x00423b70` | 41/387, 9/9 | 10/204, 5/9 | 10/204, 5/9 | 41/387, 9/9 |
 | FileStream.cpp (13) | Seek `0x00461340` | 57/343, 13/13 | 15/265, 8/13 | 57/343, 11/13 | 57/343, 13/13 |
-| Wrecker.cpp (31) | `0x005329e0` | 1/1200, 31/31 | 37/95, 17/31 | 1/1200, 22/31 | 94/55, 18/31 |
+| wrecker.cpp (31) | `0x005329e0` | 1/1200, 31/31 | 37/95, 17/31 | 1/1200, 22/31 | 94/55, 18/31 |
 
 The mirror shift `0x004239c0` goes from 21 to 85 diffs under `/Oa` or `/Ow`.
 Wrecker's lead gain (189 -> 161) is in the unmasked frame-displacement count of

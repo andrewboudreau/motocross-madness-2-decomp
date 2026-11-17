@@ -20,7 +20,7 @@ class CollisionLinkTests(unittest.TestCase):
             objects = {}
             for source in ('src/krusty2/collision/CollisionObject.cpp',
                            'src/reconstructed/CarProcedural.cpp',
-                           'src/reconstructed/Wrecker.cpp',
+                           'src/reconstructed/wrecker.cpp',
                            'src/reconstructed/ObjectPicker.cpp',
                            'src/reconstructed/FileStream.cpp',
                            'samples/io/FileStream.cpp',
@@ -69,7 +69,7 @@ class CollisionLinkTests(unittest.TestCase):
                 '?UpdatePlacement@CollisionObject@@QAEXXZ',
                 '?QueryCollisions@CollisionObject@@QAEHXZ',
             }
-            for caller, names in (('CarProcedural', car), ('Wrecker', wrecker),
+            for caller, names in (('CarProcedural', car), ('wrecker', wrecker),
                                   ('ObjectPicker', picker)):
                 self.assertTrue(names <= imports(objects[caller]))
                 self.assertTrue(names <= providers)
@@ -101,8 +101,8 @@ class CollisionLinkTests(unittest.TestCase):
                 ('SoulTreePhysics', 'ResourceManager', '?g_ResourceManager@@3PAVResourceManager@@A'),
                 ('CollisionObject', 'StreamCandidate', '?Read@FileStream@@QAEHPAXHH@Z'),
                 ('CollisionObject', 'ResourceManager', '?g_ResourceManager@@3PAVResourceManager@@A'),
-                ('Wrecker', 'Quadtree', '?Remove@QuadTree@@QAEXPAVQuadTreeObject@@I@Z'),
-                ('Wrecker', 'VisibilityQuadTree', '?g_collisionQuadTree@@3PAVQuadTree@@A'),
+                ('wrecker', 'Quadtree', '?Remove@QuadTree@@QAEXPAVQuadTreeObject@@I@Z'),
+                ('wrecker', 'VisibilityQuadTree', '?g_collisionQuadTree@@3PAVQuadTree@@A'),
             ):
                 self.assertIn(symbol, imports(objects[caller]))
                 self.assertIn(symbol, source_definitions[provider])

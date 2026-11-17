@@ -1,6 +1,6 @@
 """Wrecker::PushProbesOutOfBox 0x005329e0 (tools/emu_diff.py case).
 
-The linked body is the samples/race/WreckerNearMisses.cpp candidate. Offsets from the
+The linked body is the src/reconstructed/wrecker.cpp near miss. Offsets from the
 retail body: +0x38 the collision model (+0x100 probe count, +0x104 probes of 0x20 bytes, the
 local point at +0 and the node at +0xc), +0x100 the box frame, +0x104 the probe position
 array (12-byte stride), +0xe8 box centre, +0xf4 half extents, +0x118 push scale and +0x10c
@@ -17,7 +17,7 @@ import struct
 
 RETAIL_VA = 0x005329e0
 SYMBOL = '?PushProbesOutOfBox@Wrecker@@QAEXM@Z'
-SOURCE = 'samples/race/WreckerNearMisses.cpp'
+SOURCE = 'src/reconstructed/wrecker.cpp'
 PROBES = {0x00532b10: 'probe', 0x00532e39: 'mean'}
 
 

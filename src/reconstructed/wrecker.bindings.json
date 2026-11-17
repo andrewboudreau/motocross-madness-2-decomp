@@ -122,5 +122,14 @@
   "_kVec3YAxis": "0x0068ad20",
   "_kVec3ZAxis": "0x0068acf0",
   "_kVec3Zero": "0x0068ad00",
-  "_rand": "0x00534c1b"
+  "_rand": "0x00534c1b",
+  "??0WreckerVec3Call@@QAE@MMM@Z": "0x00404e60",
+  "?FastInvSqrt@@YAMM@Z": "0x00460c00",
+  "?WorldToLocalPoint@SoultreeObject@@QAE?AUVec3@@ABU2@@Z": "0x004fd7f0",
+  "?Vec3ScaleCall@@YA?AUVector3@@ABU1@M@Z": "0x005015b0",
+  "?WreckerAddCall@@YAPAUVector3@@PAU1@PBU1@1@Z": "0x00421cb0",
+  "?WreckerDotCall@@YAMPBUVector3@@0@Z": "0x0040ae30",
+  "__real@4@3ffc99999a0000000000": "0x00554478",
+  "__real@4@3ffd99999a0000000000": "0x00550bac",
+  "__real@4@4006c800000000000000": "0x00550770"
 }

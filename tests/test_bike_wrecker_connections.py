@@ -53,7 +53,7 @@ class BikeWreckerConnectionTests(unittest.TestCase):
         sources = {
             'Bike': 'src/krusty2/vehicle/Bike.cpp',
             'KrustyBike': 'src/krusty2/vehicle/KrustyBike.cpp',
-            'Wrecker': 'src/reconstructed/Wrecker.cpp',
+            'Wrecker': 'src/reconstructed/wrecker.cpp',
             'layout': 'tests/fixtures/bike_wrecker_connections.cpp',
         }
         with tempfile.TemporaryDirectory(prefix='mcm2-bike-wrecker-') as directory:
@@ -84,7 +84,7 @@ class BikeWreckerConnectionTests(unittest.TestCase):
                 symbol = entries[0].name
                 self.assertIn(symbol, callers)
                 proof = compare(retail, provider, symbol, address, size,
-                                ROOT / 'src/reconstructed/Wrecker.bindings.json')
+                                ROOT / 'src/reconstructed/wrecker.bindings.json')
                 self.assertTrue(proof['strict_exact'], proof)
             for name, symbol, address, size in (
                 ('Bike', '?CreateWrecker@Bike@@UAEXXZ', 0x409420, 1516),

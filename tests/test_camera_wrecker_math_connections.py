@@ -30,9 +30,8 @@ class CameraWreckerMathConnections(unittest.TestCase):
         self.assertEqual(sha256_file(EXE), expected['mcm2_sha256'])
         retail = PEImage(EXE)
         sources = {name: 'src/reconstructed/' + name + '.cpp'
-                   for name in ('FollowCamera', 'Wrecker', 'CrossProduct', 'Math3D')}
+                   for name in ('FollowCamera', 'wrecker', 'CrossProduct', 'Math3D')}
         sources['layout'] = 'tests/fixtures/camera_wrecker_math_layout.cpp'
-        sources['WreckerSample'] = 'samples/race/WreckerNearMisses.cpp'
         with tempfile.TemporaryDirectory(prefix='mcm2-camera-wrecker-math-') as directory:
             objects = {}
             for name, source in sources.items():
@@ -51,7 +50,7 @@ class CameraWreckerMathConnections(unittest.TestCase):
             for name, symbol, va, size in (
                 ('CrossProduct', CROSS, 0x515600, 91),
                 ('Math3D', NORMALIZE, 0x5087b0, 150),
-                ('Wrecker', CTOR, 0x404e60, 25),
+                ('wrecker', CTOR, 0x404e60, 25),
             ):
                 obj = objects[name]
                 entry = obj.find_symbol(symbol)
@@ -72,15 +71,19 @@ class CameraWreckerMathConnections(unittest.TestCase):
 
             self.assertIn(CROSS, calls('FollowCamera',
                 '?BuildOrientationBasis@FollowCamera@@UAEXPAUVector3@@0@Z'))
-            self.assertTrue({CROSS, NORMALIZE, CTOR} <= calls('Wrecker', '?Tick@Wrecker@@UAEHM@Z'))
+            self.assertTrue({CROSS, NORMALIZE, CTOR} <= calls('wrecker', '?Tick@Wrecker@@UAEHM@Z'))
             former = {'?CrossProduct@@YA?AUVector3@@ABU1@0@Z',
                       '?WreckerCrossCall@@YA?AUVector3@@ABU1@0@Z',
-                      '?WreckerNormalizeCall@@YA?AUVector3@@ABU1@@Z',
-                      '??0WreckerVec3Call@@QAE@MMM@Z'}
-            for name in ('FollowCamera', 'Wrecker'):
+                      '?WreckerNormalizeCall@@YA?AUVector3@@ABU1@@Z'}
+            for name in ('FollowCamera', 'wrecker'):
                 self.assertFalse(former & {s.name for s in objects[name].symbols})
+            # Tick uses the shared constructor; only the two near misses keep
+            # their own call-only constructor view.
+            view = '??0WreckerVec3Call@@QAE@MMM@Z'
+            self.assertNotIn(view, calls('wrecker', '?Tick@Wrecker@@UAEHM@Z'))
+            self.assertIn(view, calls('wrecker', '?SprayContactParticles@Wrecker@@QAEXUVector3@@00M@Z'))
 
-            counts = {'FollowCamera': 0, 'Wrecker': 0}
+            counts = {'FollowCamera': 0, 'wrecker': 0}
             for case in CASES:
                 name = Path(case['source']).stem
                 if name not in counts or case['source'] != sources[name]:
@@ -90,16 +93,15 @@ class CameraWreckerMathConnections(unittest.TestCase):
                 self.assertTrue(proof['strict_exact'], proof)
                 counts[name] += 1
             self.assertGreaterEqual(counts['FollowCamera'], 38)
-            self.assertGreaterEqual(counts['Wrecker'], 28)
+            self.assertGreaterEqual(counts['wrecker'], 28)
 
-            # The sample includes Wrecker.cpp, but still needs its own call-only
-            # constructor view. Preserve both partial comparisons honestly.
+            # The unit's two near misses. Preserve both partial comparisons honestly.
             for symbol, va, size, positions in (
                 ('?PushProbesOutOfBox@Wrecker@@', 0x5329e0, 1312, 1200),
                 ('?SprayContactParticles@Wrecker@@', 0x531740, 1624, 1606),
             ):
-                proof = compare(retail, objects['WreckerSample'], symbol, va, size,
-                                ROOT / 'samples/race/WreckerNearMisses.bindings.json')
+                proof = compare(retail, objects['wrecker'], symbol, va, size,
+                                ROOT / 'src/reconstructed/wrecker.bindings.json')
                 self.assertEqual(proof['candidate_size'], size)
                 self.assertFalse(proof['strict_exact'])
                 self.assertEqual(proof['strict_match']['matching_positions'], positions)

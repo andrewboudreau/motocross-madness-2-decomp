@@ -1,10 +1,11 @@
 # wrecker.cpp (Wrecker)
 
-`src/reconstructed/Wrecker.h` / `Wrecker.cpp` / `Wrecker.bindings.json`
-reconstruct part of `D:\aardvark\VC\krusty2\wrecker.cpp`: 30 functions are
-strict exact under `vc6_o2_mt` (VC6 SP3 `/O2 /GR /GX /MT`), with every
-relocation resolved by the bindings. Two near misses are parked in
-`samples/race/WreckerNearMisses.cpp`.
+`src/reconstructed/Wrecker.h` / `wrecker.cpp` / `wrecker.bindings.json`
+reconstruct `D:\aardvark\VC\krusty2\wrecker.cpp` in retail order: 30 functions
+are strict exact under `vc6_o2_mt` (VC6 SP3 `/O2 /GR /GX /MT`), with every
+relocation resolved by the bindings. The two near misses,
+`SprayContactParticles` (`0x00531740`) and `PushProbesOutOfBox`
+(`0x005329e0`), sit in their retail positions with a status comment.
 
 ## Evidence
 
@@ -24,7 +25,7 @@ relocation resolved by the bindings. Two near misses are parked in
 - Slot 10 (`0x005306e0`) calls slot 11 of the gravity model, the rigid body
   and the collision model's GraphicsTest subobject (`lea ecx,[eax+0xc]`
   without a null check) with the sub-step length: the per-step update
-  `Step(float dt)` of the shared GameObject declaration. Wrecker.cpp calls it
+  `Step(float dt)` of the shared GameObject declaration. wrecker.cpp calls it
   through two inline helpers, `WreckerStep` (a `GameObject*`) and
   `WreckerStepModel` (the collision model, whose `Step` resolves to the `+0xc`
   subobject without a null check); their parameters are part of the
@@ -76,9 +77,8 @@ definitions. No new wrapper, alias implementation or link substitution is used.
 This connects three formerly missing names while preserving the complete
 4178-byte Tick and all 29 Wrecker calibration cases. The focused native check
 `tests/test_camera_wrecker_math_connections.py` verifies those callers, actual
-call relocations, provider bytes and vector/matrix layouts. The two unfinished
-sample bodies retain identical bytes and relocations, including their separate
-constructor call view now declared only in `WreckerNearMisses.cpp`; their
+call relocations, provider bytes and vector/matrix layouts. The two near-miss
+bodies keep their separate constructor call view (`WreckerVec3Call`); their
 1200/1312 and 1606/1624 comparisons remain partial. Other vector call views
 remain unresolved, and these connections do not establish a running wreck or
 camera path. Original math type names and header ownership remain provisional.
@@ -120,7 +120,7 @@ WorldToLocalDirection (`0x004fd710`) methods. SetMatrixIn has separate
 [reviewed nonexact functional admission](SOULTREE_TRANSFORMS.md) and remains in
 samples; WorldToLocalDirection is strict exact in `src/krusty2/soultree/soultree.cpp`.
 The alias connection itself added no implementation.
-The retained PushProbesOutOfBox sample
+PushProbesOutOfBox
 also calls the shared WorldToLocalPoint declaration.
 
 Wrecker retains its local Vector3 and row-oriented frame/matrix views.
@@ -233,12 +233,76 @@ python -m unittest discover -s tests -p test_wrecker_model_connections.py -v
   bit 0 of its rigid body's `+0x25` byte (bitfield code: `and cl, 0xfe` and
   `or cl, bl`).
 
-## Near misses (`samples/race/WreckerNearMisses.cpp`)
+## Near misses (in `src/reconstructed/wrecker.cpp`)
 
 | VA | Size | Score | Remaining difference |
 |---|---:|---|---|
-| `0x005329e0` | 1312 | 1200/1312 | compiled inside Wrecker.cpp; frame 0x94 (retail's) with the scaled temporary passed straight to the out-of-line scale `0x005015b0`; the clip sums written `out = out + (extent - p)` (with `+=` the probe-array address is formed base first) and the mean through the unit's inline `operator/` give every retail instruction. Only the slot order differs (retail: `push`, the y and x extent copies, `p`, the z extent copy, `previousPush`, `sum`) |
+| `0x005329e0` | 1312 | 1200/1312 | compiled inside wrecker.cpp; frame 0x94 (retail's) with the scaled temporary passed straight to the out-of-line scale `0x005015b0`; the clip sums written `out = out + (extent - p)` (with `+=` the probe-array address is formed base first) and the mean through the unit's inline `operator/` give every retail instruction. Only the slot order differs (retail: `push`, the y and x extent copies, `p`, the z extent copy, `previousPush`, `sum`) |
 | `0x00531740` | 1624 | 1606/1624 | contact particle spray; frame 0xc4 and slot order match with the two normalisations written as nested expressions (`WreckerNormalizeFirst(velocity) * (speed + 2.0f)`, `WreckerNormalizeTail(WreckerCross(...))`) and the per-particle gravity drift as the nested out-of-line scale. Left: the argument push of two constructor calls in the loop comes one load earlier (before the particle-pointer load and before `along.y` is copied), which changes two registers; not sensitive to the declaration count |
+
+### Forms tried
+
+The two near misses keep a short status comment in the unit; the search
+history is here. Scores are bytes in place of 1312 and 1624.
+
+PushProbesOutOfBox (0x005329e0, 1312 bytes; 1200/1312 inside
+wrecker.cpp): pushes probes back out of the box boxCenter/boxHalfExtents
+and turns the mean push into the impulse pushImpulse. Every block matches
+in shape, including the per-axis clip (an inline helper with by-value
+parameters, which explains the local copies of the extent and the
+previous position) and the retail use of the previous position's y for
+the x axis. Retail runs out of inline budget at the end
+(docs/VC6_INLINE_BUDGET.md): it expands `sum * pushScale` but calls the
+Vector3 constructor inside it (0x00404e60), then calls the out-of-line
+`operator*` (0x005015b0) for `* frameTime`; the scaled temporary is
+passed straight through, which gives retail's 0x94 frame. The clip sums
+written `out = out + (extent - p)` and the mean through the inline
+`operator/` give retail's instructions. Compiled inside wrecker.cpp every
+instruction is equal (compiled on its own with copies of the unit's
+helpers, VC6 merged the z clip's two `outPrevious` updates and scored
+763). Left: the slot order (retail, nearest esp first: push, the y and x
+extent copies, p, the z extent copy, previousPush, sum, a zero temporary,
+hits, the three previous copies, previousSum; here p, previousPush, sum,
+push, a zero temporary, then the six copies and hits as one group).
+Tried without a change: every order of the clip's five parameters (120),
+`else if`, an early return, the clip returning `out` by value, pointer
+outputs, a macro with block locals, the clip written out with named
+locals, push/previousPush declared at function or loop scope (also inside
+wrecker.cpp), `sum = sum + push`, an empty block before p; previousPush
+declared before push keeps the slots (1203). Worse inside wrecker.cpp:
+direct-initialised push (370), push and previousPush (113), sum (124)
+or previousSum (117), a component-wise sum (216), `sum = sum + push`
+(259) and `hits++` before the sum (929); a direct-initialised p is
+unchanged. The extent and previous copies have four accesses each in both
+builds (the z extent five in retail), so the per-byte use count does not
+explain retail ranking the extent copies among the vectors.
+Also worse (s17): separate world and local probe vectors (320), assigning
+probePositions[i] directly and reading it back (212), previousPush or
+previousSum copied from the other zero vector (208, 85).
+Also unchanged (s18, 1200): `const` by-value clip parameters, a
+non-static `inline` clip, push and previousPush in one declaration. Worse:
+a `const Vector3& previous = probePositions[i]` alias for the previous
+reads (391).
+
+SprayContactParticles (0x00531740, 1624 bytes; 1606/1624): the contact
+particle spray. Frame, slot order and every instruction but two match
+with the normalisations written as nested expressions (their temporaries
+share slots as retail's do) and the per-particle gravity drift built
+from the nested out-of-line scale. Left: the argument push of two
+out-of-line constructor calls in the loop comes one load earlier here
+(`push ecx` before the particle-pointer load, and before the copy of
+`along`'s y), which also changes two registers. Tried without a change:
+a float copy of the index, a particle pointer local, `along` declared
+at loop or function scope or assigned, reusing `delta`/`step` for
+`along`, by-value or derived-type returning helpers, `from + along`;
+prepending 0..63 typedefs (tools/decl_shift_scan.py) never changes it.
+
+Also (2026-11): the next-particle macro as inline accessors (pointer,
+reference, index or count forms) exhausts the inline budget (303-318);
+nested Add(Scale()) 441; the position through a named Vector3 917; a
+`Vector3* at` 1535; the age store after `along` 943; the constructor
+written out for `along` 1533 or for the position 1572; assign after
+declare 917; a comma-expression age store and a float index local 1606.
 
 ## Naming
 
@@ -290,9 +354,9 @@ does, not a reconstruction error.
 
 ```bash
 python tools/compile.py --compiler vc6 --vc6-root "$VC6_ROOT" --profile vc6_o2_mt \
-  src/reconstructed/Wrecker.cpp -o work/wrecker.obj --include src/krusty2
+  src/reconstructed/wrecker.cpp -o work/wrecker.obj --include src/krusty2
 python tools/match.py --exe "$MCM2_EXE" --target-va 0x005301c0 --target-size 995 \
   --obj work/wrecker.obj \
   --symbol '?CreateBodies@Wrecker@@QAEXPAVD3DIMSoultreeCharacter@@PBD@Z' \
-  --bindings src/reconstructed/Wrecker.bindings.json --json
+  --bindings src/reconstructed/wrecker.bindings.json --json
 ```

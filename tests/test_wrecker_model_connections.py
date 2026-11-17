@@ -35,7 +35,7 @@ class WreckerModelConnections(unittest.TestCase):
                          '31fde4cc686a5ee89ef9095b90235325b195596867ecacefe511263e1509b874')
         image = PEImage(EXE)
         sources = {
-            'wrecker': 'src/reconstructed/Wrecker.cpp',
+            'wrecker': 'src/reconstructed/wrecker.cpp',
             'soultree': 'src/krusty2/soultree/soultree.cpp',
             'motion': 'src/krusty2/motion/Motnctrl.cpp',
             'layout': 'tests/fixtures/wrecker_model_layout.cpp',
@@ -62,7 +62,7 @@ class WreckerModelConnections(unittest.TestCase):
                 self.assertTrue(result['strict_exact'], result)
             folded = compare(image, objects['wrecker'],
                              '?Render3D@Wrecker@@UAEHXZ', 0x4de400, 5,
-                             ROOT / 'src/reconstructed/Wrecker.bindings.json')
+                             ROOT / 'src/reconstructed/wrecker.bindings.json')
             self.assertTrue(folded['strict_exact'], folded)
 
             caller = objects['wrecker']

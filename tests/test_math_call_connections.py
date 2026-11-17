@@ -22,7 +22,7 @@ SCALE = '?Vec3ScaleCall@@YAPAUVec3@@PAU1@PBU1@M@Z'
 SUBTRACT = '?Vec3SubtractCall@@YAPAUVec3@@PAU1@PBU1@1@Z'
 SOURCES = (
     'src/reconstructed/Camera.cpp', 'src/reconstructed/FollowCamera.cpp',
-    'src/reconstructed/MatrixUtil.cpp', 'src/reconstructed/Wrecker.cpp',
+    'src/reconstructed/MatrixUtil.cpp', 'src/reconstructed/wrecker.cpp',
     'src/krusty2/vehicle/Bike.cpp', 'src/krusty2/bvh/BoundingBoxTreeQuery.cpp',
 )
 # Complete relocation-resolved candidate hashes captured before the connections.
@@ -35,8 +35,8 @@ PARTIAL = [
     ('src/krusty2/vehicle/Bike.cpp', 'ComputeSlideAngle@Bike', 4243456, 1015, 1069, 154, 'c219454774f219d02b41449ceb143d1e05c68b7487c52611b82aee0a712ad48b'),
     ('src/krusty2/vehicle/Bike.cpp', 'IntegrateSteerTorque@Bike', 4236576, 2272, 2272, 2084, '3cf3ebbf965fecf2b9f005b5b4d620860be4b78c96f426345cc8b16ef5bb5036'),
     ('src/krusty2/vehicle/Bike.cpp', 'LoadBike@Bike', 4225472, 6745, 6745, 6428, '9bcbfd9d8f540b6e0d5940830d4fc4450dd15d499a5018587c34c76ff10e393e'),
-    ('samples/race/WreckerNearMisses.cpp', '?PushProbesOutOfBox@Wrecker@@', 5450208, 1312, 1312, 1200, 'ee990cbeffbb403f2238ce88038c256717237b874c57444ad28b5ed7ff53e2cb'),
-    ('samples/race/WreckerNearMisses.cpp', '?SprayContactParticles@Wrecker@@', 5445440, 1624, 1624, 1606, '439fd80876fa804dde2e6522a6deaae3048455a89c2d1074ae21263310e408d6'),
+    ('src/reconstructed/wrecker.cpp', '?PushProbesOutOfBox@Wrecker@@', 5450208, 1312, 1312, 1200, 'ee990cbeffbb403f2238ce88038c256717237b874c57444ad28b5ed7ff53e2cb'),
+    ('src/reconstructed/wrecker.cpp', '?SprayContactParticles@Wrecker@@', 5445440, 1624, 1624, 1606, '439fd80876fa804dde2e6522a6deaae3048455a89c2d1074ae21263310e408d6'),
 ]
 
 
@@ -48,8 +48,7 @@ class MathCallConnectionsTests(unittest.TestCase):
         expected = json.loads((ROOT / 'config/private_bundle_expected.json').read_text())
         self.assertEqual(hashlib.sha256(retail_path.read_bytes()).hexdigest(), expected['mcm2_sha256'])
         retail = PEImage(retail_path)
-        sources = (*SOURCES, 'samples/race/WreckerNearMisses.cpp',
-                   'src/reconstructed/VectorCalls.cpp', 'tests/fixtures/camera_wrecker_math_layout.cpp')
+        sources = (*SOURCES, 'src/reconstructed/VectorCalls.cpp', 'tests/fixtures/camera_wrecker_math_layout.cpp')
         with tempfile.TemporaryDirectory(prefix='mcm2-math-call-connections-') as directory:
             objects = {}
             for source in sources:
@@ -86,12 +85,27 @@ class MathCallConnectionsTests(unittest.TestCase):
                        '?Vec3Dot@@YAMABUVec3@@0@Z',
                        '?BikeVec3Sub@@YA?AUVec3@@ABU1@0@Z',
                        '?BikeVec3Scale@@YA?AUVec3@@ABU1@M@Z'}
+            # wrecker.cpp's two near misses keep their by-value scale view;
+            # no other function of the unit calls it.
+            by_value_scale = '?Vec3ScaleCall@@YA?AUVector3@@ABU1@M@Z'
+            near_misses = {'?PushProbesOutOfBox@Wrecker@@QAEXM@Z',
+                           '?SprayContactParticles@Wrecker@@QAEXUVector3@@00M@Z'}
+            wrecker = objects[SOURCES[3]]
+            callers = set()
+            for symbol in wrecker.symbols:
+                if symbol.storage_class != 2 or symbol.section_number <= 0 or not symbol.function_size:
+                    continue
+                _, _, relocs = wrecker.symbol_extent(symbol)
+                if any(wrecker.symbol_by_index[r.symbol_index].name == by_value_scale for r in relocs):
+                    callers.add(symbol.name)
+            self.assertEqual(callers, near_misses)
             for source, wanted in expected_imports.items():
                 obj = objects[source]
                 imports = {symbol.name for symbol in obj.symbols
                            if symbol.storage_class == 2 and symbol.section_number == 0}
                 self.assertTrue(wanted <= imports, (source, wanted - imports))
-                self.assertFalse(retired & imports, (source, retired & imports))
+                allowed = {by_value_scale} if source == SOURCES[3] else set()
+                self.assertFalse((retired - allowed) & imports, (source, retired & imports))
                 calls = {obj.symbol_by_index[r.symbol_index].name
                          for r in obj.relocations if r.type == 0x14}
                 self.assertTrue(wanted <= calls)

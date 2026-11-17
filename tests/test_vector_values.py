@@ -25,7 +25,7 @@ CALLERS = (
     ('src/krusty2/collision/CollisionObject.cpp', '?SegmentTouchesObject@@YAHPBUCollisionVec3@@PAVCollisionObject@@PAU1@2@Z', 0x439820, 1493, 1309,
      [(0x33, 1), (0x56, 1), (0xf7, 0), (0x106, 1), (0x30a, 0)],
      [(0x43984f, 0x421d00), (0x439872, 0x421d00), (0x439916, 0x421cb0), (0x439925, 0x421d00), (0x439b29, 0x421cb0)]),
-    ('src/reconstructed/Wrecker.cpp', '?Tick@Wrecker@@UAEHM@Z', 0x5306e0, 4178, 4174,
+    ('src/reconstructed/wrecker.cpp', '?Tick@Wrecker@@UAEHM@Z', 0x5306e0, 4178, 4174,
      [(0xff8, 2)], [(0x5316d7, 0x421d00)]),
 )
 

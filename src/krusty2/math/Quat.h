@@ -1,6 +1,6 @@
 // Quat.h -- the quaternion storage type, split out of Math3D.h so that
 // rigidbody/PhysicsBody.h can declare its derivative arrays without pulling in
-// Math3D.h's per-TU constant vectors (Wrecker.cpp, which includes PhysicsBody.h
+// Math3D.h's per-TU constant vectors (wrecker.cpp, which includes PhysicsBody.h
 // through Wrecker.h, defines its own set). Math3D.h includes this header.
 #ifndef MCM2_PHYSICS_COMMON_QUAT_H
 #define MCM2_PHYSICS_COMMON_QUAT_H
