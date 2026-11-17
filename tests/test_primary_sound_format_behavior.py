@@ -10,6 +10,7 @@ from mcm2tool.coff import CoffObject
 from mcm2tool.pe import PEImage
 from mcm2tool.toolchain import find_child_ci, find_vc6_bin, infer_vc98_root, sha256_file
 from tools.match import compare
+from tools.unit_source import standalone_source
 
 ROOT = Path(__file__).resolve().parents[1]
 SYMBOL = '?SetPrimaryFormat@PCSoundInterface@@QAEHHHH@Z'
@@ -44,7 +45,12 @@ class PrimarySoundFormatBehaviorTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix='mcm2-primary-format-') as directory:
             output = Path(directory)
             objects = []
-            for source in ('samples/audio/PrimarySoundFormat.cpp', 'tests/fixtures/primary_sound_format_compare.cpp'):
+            # SetPrimaryFormat lives in PCAudio.cpp; link a validation unit
+            # holding only its definition (tools/unit_source.py).
+            unit = output / 'primary_format_unit.cpp'
+            unit.write_text(standalone_source(ROOT / 'src/reconstructed/PCAudio.cpp',
+                                              ['PCSoundInterface::SetPrimaryFormat']), encoding='latin-1')
+            for source in (str(unit), 'tests/fixtures/primary_sound_format_compare.cpp'):
                 obj = output / (Path(source).stem + '.obj')
                 result = subprocess.run([sys.executable, str(ROOT / 'tools/compile.py'), str(ROOT / source),
                     '-o', str(obj), '--vc6-root', str(compiler), '--profile', 'vc6_o2_mt'],
@@ -52,7 +58,7 @@ class PrimarySoundFormatBehaviorTests(unittest.TestCase):
                     env={**os.environ, 'PYTHONPATH': str(ROOT)})
                 self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
                 objects.append(str(obj))
-                if source.startswith('samples/'):
+                if source == str(unit):
                     candidate = CoffObject(obj)
                     self.assertEqual({s.name for s in candidate.symbols
                                       if s.storage_class == 2 and s.section_number > 0}, {SYMBOL})
@@ -60,7 +66,7 @@ class PrimarySoundFormatBehaviorTests(unittest.TestCase):
                     self.assertEqual(entry.extent_source, 'coff_function_aux')
                     self.assertEqual(entry.function_size, 158)
                     report = compare(retail, candidate, SYMBOL, 0x4be910, 158,
-                                     ROOT / 'samples/audio/PrimarySoundFormat.bindings.json')
+                                     ROOT / 'src/reconstructed/PCAudio.bindings.json')
                     self.assertEqual(report['strict_match']['matching_positions'], 108)
             executable = output / 'format.exe'
             result = subprocess.run([str(linker), '/nologo', '/subsystem:console', '/base:0x100000',

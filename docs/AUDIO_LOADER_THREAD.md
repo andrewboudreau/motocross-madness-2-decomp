@@ -1,12 +1,11 @@
 # Streamed audio loader thread
 
-`samples/audio/AudioLoaderThread.cpp` contains the complete existing
-`SoundMemoryManager::LoaderThreadProc(void*)` candidate, extracted without
-body changes from `PCAudioNearMisses.cpp`. The aggregate includes the standalone
-file. This method is the callback passed by the canonical manager's
+[PCAudio.cpp](../src/reconstructed/PCAudio.cpp) (retail `PCAudio.cpp`) holds the
+complete `SoundMemoryManager::LoaderThreadProc(void*)` body at `0x004bdc00`,
+after `CompareSounds` `0x004bdbd0` as in retail; it is not exact. The test
+links a validation unit holding only this definition. This method is the callback passed by the canonical manager's
 `StartLoaderThread` to `_beginthreadex`; it is distinct from the notification
-helper's refill thread. The class name and original translation-unit ownership
-remain provisional.
+helper's refill thread. The class name remains provisional.
 
 The hash-pinned retail function starts at `0x004bdc00`. Complete decoding reaches
 `ret 4` at `0x004bdde0`, ending at `0x004bdde3`: **483 bytes**, followed by 13

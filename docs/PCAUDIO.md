@@ -66,7 +66,7 @@ Source shapes:
 - `0x004beb10` declares the buffer pointer before the description, which is
   both `= {0}`-initialised and `memset`, as retail clears it twice.
 
-Near miss (`samples/audio/PCAudioNearMisses.cpp`): `0x004be910`, which sets
+Not exact, in retail order: `0x004be910`, which sets
 the primary format (108 of 158 bytes; only the zeroing stores are scheduled
 differently against the argument loads).
 
@@ -167,9 +167,8 @@ own epilogue (returning Play's zero from eax) and the `& 5` one falls into
 `failed`, like retail. It needs PCAudio.cpp's notifier constructor to drop
 the EH frame of `new SoundRefillNotifier`.
 
-Near misses (`samples/audio/PCAudioNearMisses.cpp`, notes there):
-`0x004be910` and the manager's thread `0x004bdc00`.
-The aggregate includes their standalone candidates. The manager's complete
+Not exact, in retail order in PCAudio.cpp: `0x004be910` and the manager's
+thread `0x004bdc00` (forms tried below). The manager's complete
 loader-thread review and native boundary tests are documented in
 [AUDIO_LOADER_THREAD.md](AUDIO_LOADER_THREAD.md#functional-build-review).
 
@@ -180,12 +179,11 @@ mid-instruction (`lea eax, [esi + 0x90]` at `0x004be32d`) inside
 
 ## Functional build review
 
-`samples/audio/PrimarySoundFormat.cpp` extracts the unchanged complete
-`PCSoundInterface::SetPrimaryFormat` candidate at `0x004be910`. The original
-aggregate sample includes it. The full retail extent is 158 bytes, ending
+`PCSoundInterface::SetPrimaryFormat` at `0x004be910` sits between `0x004be8b0`
+and `SetPrimaryVolume` `0x004be9b0`; its test links a validation unit holding
+only that definition. The full retail extent is 158 bytes, ending
 with `ret 12` at `0x004be9ab`, followed by two padding bytes. The candidate
-also emits 158 bytes, with 108 matching positions. It remains nonexact and
-does not claim ownership of the complete original audio translation unit.
+also emits 158 bytes, with 108 matching positions; it is not exact.
 
 The method returns zero when the audio-started bit is clear. Otherwise it
 initializes the first 16 bytes of a PCM format, truncates sample bits to
@@ -216,3 +214,43 @@ $env:VC6_ROOT = (Resolve-Path work/vc6sp3-disc).Path
 $env:MCM2_EXE = (Resolve-Path work/game/mcm2.exe).Path
 python -m unittest discover -s tests -p test_primary_sound_format_behavior.py -v
 ```
+
+## Forms tried
+
+Near-miss PCAudio.cpp candidates, kept out of src/reconstructed until they
+match. See docs/PCAUDIO.md. Each differs only in branch layout or register
+choice:
+
+SetPrimaryFormat (0x004be910, 158 bytes): sets the primary buffer's
+PCM format. The 0x14-byte frame (a WAVEFORMATEX-sized local with only the
+first 16 bytes cleared), the arithmetic and the call match (108 of 158
+bytes); only the scheduling of the zeroing stores against the argument
+loads differs. Retail clears all 16 bytes first and keeps `rate` in esi;
+every order of the four field assignments, a channel temporary, `?:` and
+an if/else body leave VC6 loading `stereo` into esi first; so do all 24
+assignment orders x five channel-count spellings, memset sizes 16 and
+sizeof - 4, a derived struct clearing in its constructor, unsigned/short
+parameter types (bool or unsigned char `stereo`: 38) and blockAlign
+first; avgBytesPerSec from `rate` or as a product scores lower.
+Session 10, no gain: `1 + (stereo != 0)`, `!!stereo + 1` and
+`(stereo ? 1 : 0) + 1` give the same 108; `channels = 1; if (stereo)
+channels = 2;` (34), an inline SetPcmFormat(format*, channels, rate, bits)
+helper (51) and rate first with (unsigned short) casts (68) are worse.
+
+SoundMemoryManager 0x004bdc00 (the loader thread; retail extent is 483
+bytes, 0x4bdc00..0x4bdde3): spelling the inner queue loop `while (1)`
+instead of `for (;;)` keeps it top-tested like retail (instruction count
+155 = retail, candidate 478 bytes; `for (;;)` is rotated, 162
+instructions and 491 bytes, though it scores 95 strict bytes against 91
+here). Left: register allocation. Retail keeps ebp = audio,
+ebx = &audio->queueLock then `loaded`, edi = &sound->bufferLock, and
+spills `ready`/`bytes` to one frame slot (frame 0xc); VC6 here caches the
+EnterCriticalSection pointer in ebx, spills `loaded` (frame 8). Tried
+without gain: context macro instead of the `audio` local, `loaded = 0`
+before the lock, function-scope ready/bytes/loaded, one shared variable
+for ready and bytes, a CRITICAL_SECTION* local, inline Lock/Unlock
+helpers, `loaded = 1` after Play (same strict score), swapped bitfield
+stores, `if (!loaded) continue;`, if-wrapping instead of `continue`, the
+ready test inline in the if.
+
+Later `SetPrimaryFormat` notes: 0x004be910: sets the primary buffer's PCM format (108/158). Retail keeps `rate` in esi from the entry and loads `stereo` late into edx; VC6 here does the reverse. Unchanged or worse: all 24 orders of the f

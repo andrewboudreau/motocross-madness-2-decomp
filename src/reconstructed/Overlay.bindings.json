@@ -32,5 +32,6 @@
   "__real@4@3ff5cccccd0000000000": "0x005550c4",
   "__real@4@3ff68888890000000000": "0x00555a94",
   "__real@4@3fff8000000000000000": "0x00550748",
-  "_g_UnknownOverlayTexture689110": "0x00689110"
+  "_g_UnknownOverlayTexture689110": "0x00689110",
+  "?RestoreRect@Overlay@@QAEHPBUOverlayRect@@@Z": "0x004b6710"
 }

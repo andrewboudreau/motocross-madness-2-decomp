@@ -15,6 +15,7 @@ from mcm2tool.pe import PEImage
 from mcm2tool.rtti import parse_rtti
 from mcm2tool.toolchain import find_child_ci, find_vc6_bin, infer_vc98_root
 from tools.match import compare
+from tools.unit_source import standalone_source
 from tools.build_game import compile_source as game_compile
 from test_edit_box_on_char import extract
 from test_edit_box_draw import signature
@@ -181,9 +182,11 @@ class StatsStandingsTests(unittest.TestCase):
             for unit,symbol,va,size in PRODUCERS:
                 report=compare(image,canonical[unit],symbol,va,size,ROOT/f'src/reconstructed/{unit}.bindings.json')
                 self.assertTrue(report['strict_exact'],report);strict+=1
-            restore_path,restore=compile_source(ROOT/'samples/render/OverlayNearMisses.cpp','restore')
+            restore_unit=output/'restore_rect_unit.cpp'
+            restore_unit.write_text(standalone_source(ROOT/'src/reconstructed/Overlay.cpp',['Overlay::RestoreRect']),encoding='latin1')
+            restore_path,restore=compile_source(restore_unit,'restore')
             report=compare(image,restore,'?RestoreRect@Overlay@@',0x4b6710,365,
-                           ROOT/'samples/render/OverlayNearMisses.bindings.json')
+                           ROOT/'src/reconstructed/Overlay.bindings.json')
             self.assertEqual((report['candidate_size'],report['strict_match']['matching_positions']), (365,105))
             # The source graph uses this already-reviewed nonexact helper. Both
             # whole-method runs share it; its own larger regression is separate.

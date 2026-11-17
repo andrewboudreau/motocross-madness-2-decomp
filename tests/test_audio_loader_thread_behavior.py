@@ -12,6 +12,7 @@ from mcm2tool.coff import CoffObject
 from mcm2tool.pe import PEImage
 from mcm2tool.toolchain import find_child_ci, find_vc6_bin, infer_vc98_root, sha256_file
 from tools.match import compare
+from tools.unit_source import standalone_source
 
 ROOT = Path(__file__).resolve().parents[1]
 SYMBOL = '?LoaderThreadProc@SoundMemoryManager@@SGIPAX@Z'
@@ -85,8 +86,13 @@ class AudioLoaderThreadBehaviorTests(unittest.TestCase):
                 self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
                 return obj, CoffObject(obj)
 
-            candidate_path, candidate = compile_source('samples/audio/AudioLoaderThread.cpp')
-            _, aggregate = compile_source('samples/audio/PCAudioNearMisses.cpp')
+            # The loader lives in PCAudio.cpp; the oracle links a validation
+            # unit holding only its definition (tools/unit_source.py).
+            unit = output / 'audio_loader_unit.cpp'
+            unit.write_text(standalone_source(ROOT / 'src/reconstructed/PCAudio.cpp',
+                                              ['SoundMemoryManager::LoaderThreadProc']), encoding='latin-1')
+            candidate_path, candidate = compile_source(str(unit))
+            _, aggregate = compile_source('src/reconstructed/PCAudio.cpp')
             self.assertEqual(signature(candidate, SYMBOL), signature(aggregate, SYMBOL))
             entry = candidate.find_symbol(SYMBOL)
             self.assertEqual(entry.extent_source, 'coff_function_aux')
@@ -95,7 +101,7 @@ class AudioLoaderThreadBehaviorTests(unittest.TestCase):
             self.assertEqual({s.name for s in candidate.symbols if s.section_number == 0 and s.storage_class == 2},
                              set(HELPERS) | set(IMPORTS) | {'__endthreadex'})
             report = compare(image, candidate, SYMBOL, 0x4bdc00, 483,
-                             ROOT / 'samples/audio/AudioLoaderThread.bindings.json')
+                             ROOT / 'src/reconstructed/PCAudio.bindings.json')
             self.assertFalse(report['strict_exact'])
             self.assertEqual(report['strict_match']['matching_positions'], 91)
             body, size, relocations = candidate.symbol_extent(entry)
@@ -115,7 +121,7 @@ class AudioLoaderThreadBehaviorTests(unittest.TestCase):
             self.assertEqual(len(patches), 21)
             # Every game boundary exists in the actual canonical TU. The
             # differential fixture substitutes their behavior, not the loader.
-            _, providers = compile_source('src/reconstructed/PCAudio.cpp')
+            providers = aggregate
             bindings = json.loads((ROOT / 'src/reconstructed/PCAudio.bindings.json').read_text())
             for symbol, address in HELPERS.items():
                 self.assertGreater(providers.find_symbol(symbol).function_size, 0)

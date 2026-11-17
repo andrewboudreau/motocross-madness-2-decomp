@@ -2,13 +2,14 @@
 
 ## Functional build review
 
-`samples/camera/CameraNearMisses.cpp` contains the complete nonexact
-`Camera::UpdateMatrices` body at `0x0042ee30`. Its full 492-byte extent ends
+[Camera.cpp](../src/reconstructed/Camera.cpp) holds the complete nonexact
+`Camera::UpdateMatrices` body at `0x0042ee30`, between `0x0042eb10` and
+`0x0042f090` as in retail. Its full 492-byte extent ends
 at `0x0042f01b`, before four padding bytes. VC6 emits 492 bytes with 487
 matching positions: one stack-allocation instruction is scheduled on the
 other side of a projection-matrix copy. The source body is unchanged.
-The semantic name is inferred from behavior; this standalone candidate does
-not establish original translation-unit ownership.
+The semantic name is inferred from behavior. The test links a validation unit
+holding only this definition (`tools/unit_source.py`).
 
 The five direct calls use the existing `ViewMatrix`, `ProjectionMatrix`,
 `IdentityMatrix` and `MatrixMult` providers. Hidden result buffers and by-value
@@ -39,7 +40,40 @@ constitutes rendering or gameplay testing.
 
 Only the private validation fixture maps retail bytes and redirects decoded
 calls. The production build uses the C++ candidate and existing C++ providers.
-The candidate remains explicitly nonexact in `config/game_build.json`.
+Camera.cpp carries a `// Not exact` status comment on it.
+
+## Forms tried
+
+Camera::UpdateMatrices (0x0042ee30, 492 bytes, 487/492): one
+scheduling difference: retail emits `sub esp, 0x40` before the `rep movsd`
+that copies the projection matrix (MatrixMult's second argument), VC6 after.
+Assigning through a named product, a nested assignment, m[][] stores, the
+viewport built by an inline helper and the store order do not move it.
+Also unchanged (487): a projection copy (local, Matrix4(...) temporary,
+through a pointer or this->), a viewport temporary, `Matrix4 viewport;`
+declared apart or at the top, the stores through a float pointer or a
+reference, a named 0.5f constant, -viewport(0, 0) for the -0.5 and a block
+around the viewport. Chained stores, a projection local assigned after
+the viewport, the view matrix built after it and the products nested into
+the second MatrixMult call are worse.
+The half field of view needs the (float) cast: without it VC6 folds
+0.5f * 0.01745329f into one constant, while retail multiplies twice.
+0..15 dead initialised int locals at the top of the function leave the `sub esp, 0x40` in place.
+In the second MatrixMult both compilers hoist the `sub esp, 0x40` over the
+copy of `b`, whose space is left over from the first call; in the first
+call `b`'s space comes from `sub esp, 0x28` plus deferred argument pops, and
+only retail hoists there. Also worse: building the viewport (identity, or
+identity and stores) before the projection (29-40 of 492) and /G6
+(42 of 492); a `projection` copy right before the product is inert (487).
+Session 18: `Matrix4 viewportScale(IdentityMatrix());` is inert (487) and a
+named `Matrix4& screen = screenMatrix[1]` for the second product is worse (350).
+2026-11-14: the slot between `mov edi, esp` and `rep movsd` is the address
+register's delay slot, and VC6 fills it with a nearby independent
+instruction: with a single viewport store left before the product, that
+store lands there instead of the `sub esp, 0x40`. Not moved (487 or worse):
+dropping the viewport stores, `viewMatrix` as the second operand, one to
+eight member stores before, between or after the two products, the product
+declared and then assigned, and a named result.
 
 ```powershell
 $env:VC6_ROOT = (Resolve-Path work/vc6sp3-disc).Path

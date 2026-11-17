@@ -1,7 +1,7 @@
 """SoundMemoryManager::LoaderThreadProc 0x004bdc00, the streamed-sound loader thread
 (tools/emu_diff.py case).
 
-The linked body is samples/audio/AudioLoaderThread.cpp. Offsets from the retail body (see
+The linked body is in src/reconstructed/PCAudio.cpp. Offsets from the retail body (see
 docs/AUDIO_LOADER_THREAD.md): the audio object's stop event +0x04, queued event +0x08, queue lock
 +0x0c and queued sounds (count +0x2c, data +0x30); a sound's pending buffers +0x18/+0x1c, buffer
 lock +0x48, byte count +0x198, flags +0x1e8 (4: streamed), state bytes +0x1f4 (bit 7 cleared on
@@ -14,7 +14,7 @@ RecordLoadedSound and _endthreadex are stubs; the sounds' fields are compared as
 """
 RETAIL_VA = 0x004bdc00
 SYMBOL = '?LoaderThreadProc@SoundMemoryManager@@SGIPAX@Z'
-SOURCE = 'samples/audio/AudioLoaderThread.cpp'
+SOURCE = 'src/reconstructed/PCAudio.cpp'
 PROBES = {0x004bdcb1: 'streamed', 0x004bdcdb: 'not ready', 0x004bdd21: 'created', 0x004bdd6f: 'play',
           0x004bdd89: 'record', 0x004bddb3: 'other wait result'}
 

@@ -15,7 +15,6 @@ extern "C" __declspec(noreturn) void FixtureUnvisited() {
 // their vtable slots explicit and fail immediately if the tested domain grows.
 bool FollowCamera::ProcessCameraInput(bool,float) { FixtureUnvisited(); }
 int FollowCamera::Tick(float) { FixtureUnvisited(); }
-void Camera::UpdateMatrices() { FixtureUnvisited(); }
 
 #include <malloc.h>
 struct HeapBlock {void*pointer;unsigned requested,actual;int alive;};

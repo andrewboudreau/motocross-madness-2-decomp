@@ -35,7 +35,7 @@ Overlay.h changes:
 - `0x004b6880` takes its colour as `unsigned short`: ChatOverlay `0x0051e910`
   builds the 4444 grey in 16-bit registers and pushes it unextended.
 
-Near miss (`samples/render/OverlayNearMisses.cpp`): `0x004b6710`. Its
+Not exact, in retail order in `Overlay.cpp`: `0x004b6710`. Its
 instructions are the same, but the registers are allocated differently.
 
 ## Camera.cpp, the remaining functions
@@ -72,7 +72,7 @@ forward × right. The first cross product's fld/fmul operand order needs an
 first argument, with z stored through the member (all three stores through
 the reference give 675/690, none 659/690).
 
-Slot 28 is a near miss in `samples/camera/CameraNearMisses.cpp`:
+Slot 28 sits in `Camera.cpp` between `0x0042eb10` and `0x0042f090` and is not exact:
 
 - Slot 28 `0x0042ee30` (492 bytes, 487/492) rebuilds the matrices: view =
   `ViewMatrix(+0x170, +0x17c, +0x188, +0x194)`, projection =

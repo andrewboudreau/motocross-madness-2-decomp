@@ -1109,6 +1109,74 @@ static int __cdecl CompareSounds(const void* a, const void* b) {
     return first->lastPlayTime != second->lastPlayTime;
 }
 
+// 0x004bdc00: loads queued streamed sounds until the stop event: makes room
+// within the budget, creates and fills the buffer, and plays the sound
+// unless it was stopped meanwhile.
+// Not exact (91 of 483 bytes, 478 compiled: retail keeps `audio` in ebp and
+// the queue lock then `loaded` in ebx; docs/AUDIO_LOADER_THREAD.md).
+unsigned __stdcall SoundMemoryManager::LoaderThreadProc(void* context) {
+    SoundMemoryManager* audio = (SoundMemoryManager*)context;
+    HANDLE events[2];
+    unsigned long result;
+
+    events[0] = audio->queuedEvent;
+    events[1] = audio->stopEvent;
+    while ((result = WaitForMultipleObjects(2, events, FALSE, INFINITE)) != WAIT_FAILED) {
+        switch (result) {
+        case 0:
+            while (1) {
+                EnterCriticalSection(&audio->queueLock);
+                if (audio->queuedSounds.m_count <= 0) {
+                    LeaveCriticalSection(&audio->queueLock);
+                    break;
+                }
+                Sound* sound = audio->queuedSounds.Get(0);
+                audio->queuedSounds.Remove(sound);
+                LeaveCriticalSection(&audio->queueLock);
+                if (!(sound->soundFlags & 4))
+                    continue;
+                EnterCriticalSection(&sound->bufferLock);
+                int ready = sound->bufferReady;
+                LeaveCriticalSection(&sound->bufferLock);
+                if (ready)
+                    continue;
+                EnterCriticalSection(&sound->bufferLock);
+                unsigned long bytes = sound->bufferBytes;
+                LeaveCriticalSection(&sound->bufferLock);
+                EnterCriticalSection(&audio->queueLock);
+                audio->MakeRoomForSound(bytes);
+                LeaveCriticalSection(&audio->queueLock);
+                EnterCriticalSection(&sound->bufferLock);
+                int loaded = 0;
+                if (sound->CreatePendingBuffer()) {
+                    sound->FillBufferFromFile(&sound->pendingBuffer);
+                    sound->loadQueued = 0;
+                    sound->bufferReady = 1;
+                    sound->dsBuffer = sound->pendingBuffer;
+                    sound->dsBuffer3D = sound->pendingBuffer3D;
+                    sound->pendingBuffer = 0;
+                    sound->pendingBuffer3D = 0;
+                    loaded = 1;
+                    if (!sound->isStopped)
+                        sound->Play();
+                }
+                LeaveCriticalSection(&sound->bufferLock);
+                if (loaded) {
+                    EnterCriticalSection(&audio->queueLock);
+                    audio->RecordLoadedSound(sound, bytes);
+                    LeaveCriticalSection(&audio->queueLock);
+                }
+            }
+            break;
+        case 1:
+            goto stopped;
+        }
+    }
+stopped:
+    _endthreadex(0);
+    return 0;
+}
+
 // 0x004bddf0
 SoundMemoryManager::SoundMemoryManager() {
     loaderThread = 0;
@@ -1392,6 +1460,23 @@ void PCSoundInterface::FormatSoundCapsReport() {
                 caps.freeHw3DStaticBuffers, caps.maxHw3DStaticBuffers - caps.freeHw3DStaticBuffers,
                 caps.freeHwMemBytes, caps.totalHwMemBytes - caps.freeHwMemBytes);
     }
+}
+
+// 0x004be910: sets the primary buffer's PCM format.
+// Not exact (108 of 158 bytes: retail keeps `rate` in esi from the entry and
+// loads `stereo` late into edx; docs/PCAUDIO.md lists the forms tried).
+int PCSoundInterface::SetPrimaryFormat(int rate, int stereo, int bits) {
+    if (!audioStarted)
+        return 0;
+    WaveFormatEx format;
+    memset(&format, 0, 16); // the PCM part only; extraSize is left as is
+    format.formatTag = 1;
+    format.bitsPerSample = bits;
+    format.channels = (stereo != 0) + 1;
+    format.samplesPerSec = rate;
+    format.avgBytesPerSec = format.channels * format.bitsPerSample * format.samplesPerSec / 8;
+    format.blockAlign = format.channels * format.bitsPerSample / 8;
+    return primaryBuffer->SetFormat(&format) >= 0;
 }
 
 // 0x004be9b0: sets the primary buffer's volume.

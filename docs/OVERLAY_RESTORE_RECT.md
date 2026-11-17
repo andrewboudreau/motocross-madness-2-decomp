@@ -2,9 +2,10 @@
 
 `Overlay::RestoreRect` copies a rectangle from the texture at receiver `+0x30`
 into the texture at `+0x2c`. Stats and chat HUD drawing use it before redrawing
-content. The readable candidate remains in
-`samples/render/OverlayNearMisses.cpp`; original translation-unit ownership and
-semantic field names are not established by this implementation.
+content. It sits in [Overlay.cpp](../src/reconstructed/Overlay.cpp) (retail
+`overlay.cpp`) between `0x004b6380` and `0x004b6880`, not exact; its tests link
+a validation unit holding only this definition. Semantic field names are not
+established by this implementation.
 
 ## Complete target and access-order repair
 

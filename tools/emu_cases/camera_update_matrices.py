@@ -14,7 +14,7 @@ import struct
 
 RETAIL_VA = 0x0042ee30
 SYMBOL = '?UpdateMatrices@Camera@@UAEXXZ'
-SOURCE = 'samples/camera/CameraNearMisses.cpp'
+SOURCE = 'src/reconstructed/Camera.cpp'
 
 
 def unit(rng):

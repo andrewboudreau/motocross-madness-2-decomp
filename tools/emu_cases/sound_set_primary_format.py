@@ -8,7 +8,7 @@ bytes per second, block align, bits). The result is S_OK, S_FALSE or an error.
 """
 RETAIL_VA = 0x004be910
 SYMBOL = '?SetPrimaryFormat@PCSoundInterface@@QAEHHHH@Z'
-SOURCE = 'samples/audio/PrimarySoundFormat.cpp'
+SOURCE = 'src/reconstructed/PCAudio.cpp'
 REPLAY = dict()
 
 

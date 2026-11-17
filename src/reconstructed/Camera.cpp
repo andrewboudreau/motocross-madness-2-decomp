@@ -328,6 +328,27 @@ int Camera::OnActivate() {
     return 1;
 }
 
+// 0x0042ee30: rebuilds the view and projection matrices from the camera
+// frame, the field of view (degrees) and the viewport, the viewport-scaled
+// projection (+0x12c), its product with the view (+0xec) and the projection
+// scale +0x198.
+// Not exact (487 of 492 bytes: retail emits `sub esp, 0x40` before the
+// `rep movsd` that copies the projection for the first MatrixMult, VC6 after;
+// docs/CAMERA_UPDATE.md lists the forms tried).
+void Camera::UpdateMatrices() {
+    viewMatrix = ViewMatrix(eyePosition, viewDirection, upDirection, roll);
+    projectionMatrix = ProjectionMatrix(nearPlane, farPlane, fieldOfView * 0.017453290f,
+                                        (float)(unsigned int)viewport[2] / (unsigned int)viewport[3]);
+    Matrix4 viewportScale = IdentityMatrix();
+    viewportScale(0, 0) = 0.5f;
+    viewportScale(1, 1) = -0.5f;
+    viewportScale(3, 0) = 0.5f;
+    viewportScale(3, 1) = 0.5f;
+    screenMatrix[1] = MatrixMult(viewportScale, projectionMatrix);
+    screenMatrix[0] = MatrixMult(screenMatrix[1], viewMatrix);
+    focalLength = (float)(unsigned int)viewport[2] * 0.5f / (float)tan((float)(fieldOfView * 0.5f) * 0.017453290f);
+}
+
 // 0x0042f090: only when no child handled the GameObject search does it
 // consult 0x0043caa0; a nonzero answer runs slot 27.
 int Camera::OnControlPress(ControlEvent* event, InputButtonState* entry) {

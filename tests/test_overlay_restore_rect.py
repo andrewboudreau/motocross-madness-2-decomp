@@ -15,11 +15,15 @@ from mcm2tool.rtti import parse_rtti
 from mcm2tool.toolchain import find_child_ci, find_vc6_bin, infer_vc98_root
 from tools.match import compare
 from tools.build_game import compile_source as game_compile
+from tools.unit_source import standalone_source
 from test_edit_box_on_char import extract
-from test_edit_box_draw import complete_object, signature
+from test_edit_box_draw import signature
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCE = ROOT/'samples/render/OverlayNearMisses.cpp'
+# RestoreRect lives in Overlay.cpp (retail overlay.cpp); the native oracle
+# links a validation unit holding only its definition (tools/unit_source.py).
+CANONICAL = ROOT/'src/reconstructed/Overlay.cpp'
+BINDINGS = ROOT/'src/reconstructed/Overlay.bindings.json'
 SYMBOL = '?RestoreRect@Overlay@@QAEHPBUOverlayRect@@@Z'
 HELPERS = [('PCTextureMap','void* PCTextureMap::LockSurface(',0x4c79e0,99),
            ('PCTextureMap','int PCTextureMap::UnlockSurface(',0x4c7a50,25),
@@ -98,8 +102,10 @@ class OverlayRestoreTests(unittest.TestCase):
                 result=subprocess.run([sys.executable,str(ROOT/'tools/compile.py'),str(source),'-o',str(path),'--vc6-root',str(compiler),'--profile','vc6_o2_mt',*includes,*(['--extra','/Od'] if fixture else [])],cwd=ROOT,capture_output=True,text=True,encoding='latin1',env={**os.environ,'PYTHONPATH':str(ROOT)})
                 self.assertEqual(result.returncode,0,result.stdout+result.stderr)
                 return path,CoffObject(path)
+            SOURCE=output/'restore_rect_unit.cpp'
+            SOURCE.write_text(standalone_source(CANONICAL,['Overlay::RestoreRect']),encoding='latin1')
             candidate_path,candidate=compile_source(SOURCE,'candidate')
-            result=compare(image,candidate,SYMBOL,0x4b6710,365,SOURCE.with_suffix('.bindings.json'))
+            result=compare(image,candidate,SYMBOL,0x4b6710,365,BINDINGS)
             self.assertEqual((result['candidate_size'],result['strict_match']['matching_positions'],result['strict_exact']),(365,105,False))
             self.assertEqual(hashlib.sha256(signature(candidate,SYMBOL)[0]).hexdigest(),'4e1a5be860f09530e028f97f7612e950583d8d806ad7077c6f0f2bc96cdc221b')
             self.assertEqual([(s.name,s.raw_size,s.characteristics) for s in candidate.sections if not s.name.startswith('.debug')],[('.drectve',40,0x100a00),('.text',368,0x60501020)])
@@ -107,9 +113,9 @@ class OverlayRestoreTests(unittest.TestCase):
             self.assertEqual([s.name for s in candidate.symbols if s.storage_class==2 and s.section_number>0],[SYMBOL])
             # Ordinary sequenced locals are optimized back into the old fault order.
             ordinary=output/'ordinary.cpp'
-            ordinary.write_text(SOURCE.read_text().replace('const volatile OverlayRect* view','const OverlayRect* view').replace('../../src/reconstructed/',''))
+            ordinary.write_text(SOURCE.read_text().replace('const volatile OverlayRect* view','const OverlayRect* view'))
             old_path,old=compile_source(ordinary,'ordinary')
-            old_result=compare(image,old,SYMBOL,0x4b6710,365,SOURCE.with_suffix('.bindings.json'))
+            old_result=compare(image,old,SYMBOL,0x4b6710,365,BINDINGS)
             self.assertEqual((old_result['candidate_size'],old_result['strict_match']['matching_positions']),(350,58))
             self.assertEqual(hashlib.sha256(signature(old,SYMBOL)[0]).hexdigest(),'e8cbbc2537ccb3e743524165750725804db88b8bab7110e4cc6266274641d31e')
             self.assertEqual([(r[0],r[1],r[2]) for r in signature(old,SYMBOL)[2]],[(49,20,'?PixelFormatBytesPerPixel@@YAHH@Z'),(80,20,'?PixelFormatBytesPerPixel@@YAHH@Z'),(218,20,'?PixelFormatBytesPerPixel@@YAHH@Z')])
@@ -143,9 +149,10 @@ class OverlayRestoreTests(unittest.TestCase):
                 'offsetof(PCTextureMap,systemSurface)==0x70 && sizeof(DDSurfaceDesc2)==124)?1:-1];\n')
             compile_source(layout,'layout')
             spec=json.loads((ROOT/'config/game_build.json').read_text())
-            built=game_compile(SOURCE,output/'game-command',compiler,[ROOT/p for p in spec['includes']],spec['profile'],{**os.environ,'PYTHONPATH':str(ROOT)})
+            # The game build compiles the whole unit; its RestoreRect equals the validation unit's.
+            built=game_compile(CANONICAL,output/'game-command',compiler,[ROOT/p for p in spec['includes']],spec['profile'],{**os.environ,'PYTHONPATH':str(ROOT)})
             self.assertTrue(built['compiled'],built)
-            self.assertEqual(complete_object(candidate),complete_object(CoffObject(Path(built['object']))))
+            self.assertEqual(signature(candidate,SYMBOL),signature(CoffObject(Path(built['object'])),SYMBOL))
             fixture_path,_=compile_source(ROOT/'tests/fixtures/overlay_restore_rect_compare.cpp','fixture',True)
             executable=output/'overlay.exe'
             result=subprocess.run([str(linker),'/nologo','/subsystem:console','/base:0x100000','/fixed','/opt:ref',f'/out:{executable}',f'/libpath:{libraries}',str(candidate_path),str(helper_path),str(fixture_path),'kernel32.lib'],cwd=ROOT,capture_output=True,text=True,encoding='latin1')

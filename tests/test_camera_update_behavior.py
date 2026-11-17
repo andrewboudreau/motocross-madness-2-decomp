@@ -10,9 +10,13 @@ from mcm2tool.coff import CoffObject
 from mcm2tool.pe import PEImage
 from mcm2tool.toolchain import find_child_ci, find_vc6_bin, infer_vc98_root, sha256_file
 from tools.match import compare
+from tools.unit_source import standalone_source
 
 ROOT = Path(__file__).resolve().parents[1]
 SYMBOL = '?UpdateMatrices@Camera@@UAEXXZ'
+# UpdateMatrices lives in Camera.cpp; the native oracle links a validation
+# unit holding only its definition (tools/unit_source.py).
+CANONICAL = ROOT / 'src/reconstructed/Camera.cpp'
 
 
 @unittest.skipUnless(os.name == 'nt' and os.environ.get('VC6_ROOT') and os.environ.get('MCM2_EXE'),
@@ -46,7 +50,9 @@ class CameraUpdateBehaviorTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix='mcm2-camera-update-') as directory:
             output = Path(directory)
             objects = []
-            sources = ['samples/camera/CameraNearMisses.cpp', 'tests/fixtures/camera_update_compare.cpp']
+            unit = output / 'camera_update_unit.cpp'
+            unit.write_text(standalone_source(CANONICAL, ['Camera::UpdateMatrices']), encoding='latin-1')
+            sources = [str(unit), 'tests/fixtures/camera_update_compare.cpp']
             if real:
                 sources += ['src/reconstructed/MatrixUtil.cpp', 'src/reconstructed/VectorCalls.cpp',
                             'src/reconstructed/FastMath.cpp']
@@ -59,7 +65,7 @@ class CameraUpdateBehaviorTests(unittest.TestCase):
                     env={**os.environ, 'PYTHONPATH': str(ROOT)})
                 self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
                 objects.append(str(obj))
-                if source.startswith('samples/'):
+                if source == str(unit):
                     candidate = CoffObject(obj)
                     self.assertEqual({s.name for s in candidate.symbols
                                       if s.storage_class == 2 and s.section_number > 0 and s.type == 0x20}, {SYMBOL})
@@ -67,7 +73,7 @@ class CameraUpdateBehaviorTests(unittest.TestCase):
                     self.assertEqual(entry.extent_source, 'coff_function_aux')
                     self.assertEqual(entry.function_size, 492)
                     report = compare(retail, candidate, SYMBOL, 0x42ee30, 492,
-                                     ROOT / 'samples/camera/CameraNearMisses.bindings.json')
+                                     ROOT / 'src/reconstructed/Camera.bindings.json')
                     self.assertEqual(report['strict_match']['matching_positions'], 487)
             executable = output / 'camera.exe'
             mapping = output / 'camera.map'

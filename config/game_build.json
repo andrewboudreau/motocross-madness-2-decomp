@@ -165,12 +165,6 @@
       "evidence": "docs/MULTI_STATE_DRAW.md#functional-build-review"
     },
     {
-      "path": "samples/render/OverlayNearMisses.cpp",
-      "status": "reviewed-nonexact",
-      "reason": "Complete HUD rectangle restoration checked in 12970 finite native scenarios with actual strict texture-lock and pixel-format helpers. Explicit ordered reads preserve decoded fault behavior. VC6 emits 365 bytes against 365 retail bytes, with 77 resolved matching positions.",
-      "evidence": "docs/OVERLAY_RESTORE_RECT.md#functional-build-review"
-    },
-    {
       "path": "samples/ui/EditBoxDraw.cpp",
       "status": "reviewed-nonexact",
       "reason": "Complete edit-box text, image, caret and IME drawing candidate passes 14793 native scenarios with thirteen actual strict helpers and independent layout, callback, fault and held-DC checks. VC6 emits 975 bytes against 973 retail bytes, with 206 resolved matching positions; extraction preserves all 733 aggregate sections and 3912 relocations. Background GetDc and COM/GDI/IME boundaries remain scripted; integrated menu rendering is unverified.",
@@ -289,12 +283,6 @@
       "evidence": "docs/FOLLOW_CAMERA_TICK.md#functional-build-review"
     },
     {
-      "path": "samples/audio/AudioLoaderThread.cpp",
-      "status": "reviewed-nonexact",
-      "reason": "Complete streamed-audio loader passes 37387 native queue, ownership, lock, callback, exception and fault comparisons. VC6 emits 478 bytes versus 483 retail bytes; the five game helpers and synchronization boundaries are scripted, so real scheduling and audio playback remain untested.",
-      "evidence": "docs/AUDIO_LOADER_THREAD.md#functional-build-review"
-    },
-    {
       "path": "samples/ui/GuiPointerHelpers.cpp",
       "status": "reviewed-nonexact",
       "reason": "Complete pointer ownership helper passes, with the exact tooltip placement, 19606 native state, coordinate, callback, exception and fault comparisons. VC6 emits the full 52-byte extent with 46 matching positions; ShowText and real input devices remain outside this scripted boundary test.",
@@ -305,18 +293,6 @@
       "status": "reviewed-nonexact",
       "reason": "Complete defaults reset and data-file lookup pass 21332 native scripted comparisons and 192 actual VC6 CRT file searches. Full retail extents are 427/355 bytes; VC6 emits 427/357 bytes. CD discovery and prompts remain scripted.",
       "evidence": "docs/UIINFO.md#functional-build-review"
-    },
-    {
-      "path": "samples/audio/PrimarySoundFormat.cpp",
-      "status": "reviewed-nonexact",
-      "reason": "Complete 158-byte primary-buffer PCM format setup passes 172032 native state, initialized-payload, callback, exception and fault cases. VC6 retains 108 matching positions; trailing uninitialized format bytes and real sound-device behavior are not established.",
-      "evidence": "docs/PCAUDIO.md#functional-build-review"
-    },
-    {
-      "path": "samples/camera/CameraNearMisses.cpp",
-      "status": "reviewed-nonexact",
-      "reason": "Complete 492-byte matrix update passes 76288 native scripted state/argument/exception cases and 9216 cases with initialized source math providers. VC6 retains 487 matching positions; real rendering remains untested.",
-      "evidence": "docs/CAMERA_UPDATE.md#functional-build-review"
     },
     {
       "path": "samples/render/NonLocalTextureMemory.cpp",
