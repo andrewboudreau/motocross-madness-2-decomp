@@ -8,10 +8,10 @@
 // 0x004986b0..0x004987eb, after the last method): 0x0067c3c8, 0x0067c3d8,
 // 0x0067c3e8 and 0x0067c3b8. Slot 10 passes the y axis to FollowCamera
 // slot 46.
-static const Vector3 kVec3Zero = Vector3(0.0f, 0.0f, 0.0f);
-static const Vector3 kVec3XAxis = Vector3(1.0f, 0.0f, 0.0f);
-static const Vector3 kVec3YAxis = Vector3(0.0f, 1.0f, 0.0f);
-static const Vector3 kVec3ZAxis = Vector3(0.0f, 0.0f, 1.0f);
+static Vector3 kVec3Zero = Vector3(0.0f, 0.0f, 0.0f);
+static Vector3 kVec3XAxis = Vector3(1.0f, 0.0f, 0.0f);
+static Vector3 kVec3YAxis = Vector3(0.0f, 1.0f, 0.0f);
+static Vector3 kVec3ZAxis = Vector3(0.0f, 0.0f, 1.0f);
 
 // By-value read of a vector's x; slot 34's dot product needs it for retail's
 // load order, as in BikeCamera.cpp.
@@ -54,6 +54,62 @@ int KrustyBikeCamera::OnControlPress(ControlEvent* event, InputButtonState* entr
     if (g_TrackGame->uiInteractionBlocked)
         return 0;
     return BikeCamera::OnControlPress(event, entry);
+}
+
+// 0x0067c3f4 (.bss byte): set while the network start view is active.
+static bool s_networkStartViewActive;
+
+// 0x00497e20: picks the view by the global event type on first use. While the view has its
+// network start pending it drives FollowCamera slots 46 (once, with the y axis) and 47 from
+// it; otherwise it leaves that mode, restoring the state, and runs FollowCamera slot 10.
+// Not exact (register rotation from the second 0x004210f0 call on; docs/FOLLOW_CAMERA.md).
+// Everything up to that call matches. From there to the end VC6 rotates the scratch
+// registers: retail builds the arguments in ecx/eax/edx exactly like the first call
+// (and uses edx, ecx, eax in the tail); VC6 uses ecx/eax/edx/ecx (eax, eax, edx in the
+// tail). A virtual view of the first call fixes every later register, so retail has
+// exactly one more live temporary at that direct call. The forms tried are listed in
+// docs/FOLLOW_CAMERA.md.
+int KrustyBikeCamera::Tick(float frameTime) {
+    if (!raceView) {
+        switch (g_TrackGame->mode.raceSettings.eventType) {
+            case 2:
+                raceView = g_TrackGame->nationalEvent->raceView;
+                break;
+            case 3:
+                raceView = g_TrackGame->supercrossEvent->raceView;
+                break;
+            case 0:
+                raceView = g_TrackGame->quarryEvent->raceView;
+                break;
+            case 1:
+            case 5:
+                raceView = g_TrackGame->bajaEnduroEvent->raceView;
+                break;
+            case 4:
+                raceView = g_TrackGame->tagEvent->raceView;
+                break;
+        }
+    }
+    if (raceView->networkStartPending) {
+        Vector3 first;
+        Vector3 second;
+        if (!s_networkStartViewActive) {
+            s_networkStartViewActive = true;
+            raceView->WriteRelativePositions(&second, &first, g_TrackGame->bajaEnduroEvent, 0);
+            FollowCamera::BuildOrientationBasis(&first, &kVec3YAxis);
+        }
+        raceView->WriteRelativePositions(&first, &second, g_TrackGame->bajaEnduroEvent, 0);
+        first.y = raceView->localRacer->position.y + 2.0f;
+        FollowCamera::PlayRecordedFrame(frameTime, &first);
+        return 1;
+    }
+    if (s_networkStartViewActive) {
+        s_networkStartViewActive = false;
+        RestoreCameraState();
+        SetCameraState(cameraState);
+    }
+    FollowCamera::Tick(frameTime);
+    return 1;
 }
 
 // 0x00497fa0: keeps the point at least 3.5 above the subject's ground height

@@ -166,6 +166,7 @@ class WreckerConstraintConnections(unittest.TestCase):
                 self.assertTrue(compare(image,objects['caller'],case['symbol'],int(case['target_va'],0),case['target_size'],merged)['strict_exact'],case)
                 strict+=1
             for case in json.loads((ROOT/'src/krusty2/constraint/targets.json').read_text()):
+                if case.get('expect')=='partial':continue
                 self.assertTrue(compare(image,objects['provider'],case['candidate_symbol_contains'],int(case['target_va'],0),case['target_size'],(ROOT/PROVIDER).with_suffix('.bindings.json'))['strict_exact'],case);strict+=1
             for symbol,va,size,score,digest in (
                 ('?PushProbesOutOfBox@Wrecker@@',0x5329e0,1312,1200,'ee990cbeffbb403f2238ce88038c256717237b874c57444ad28b5ed7ff53e2cb'),

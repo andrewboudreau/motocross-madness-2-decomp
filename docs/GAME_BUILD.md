@@ -652,7 +652,7 @@ per-function checks on random and edge inputs.
 | `BoundingBoxTreeQueryNearMisses.cpp` | `box_triangle_query` | 0x426be0 | 180 |
 | `BoundingBoxTreeQueryNearMisses.cpp` | `tree_tree_query` | 0x4280e0 | 150 |
 | `BoundingBoxTreeQueryNearMisses.cpp` | `box_overlap` | 0x424ab0 | 94 |
-| `ConstraintMethodCollisionModelNearMisses.cpp` | `constraint_contact_impulse` | 0x43bdb0 | 120 |
+| `ConstraintMethodCollisionModel.cpp` | `constraint_contact_impulse` | 0x43bdb0 | 120 |
 | `ContactImpulse.cpp` | `contact_solve_impulse` | 0x5004a0 | 120 |
 | `GraphicsTestNearMisses.cpp` | `graphics_test_draw_circle` | 0x47bd10 | 120 |
 | `D3DIMSoultreeShadowNearMisses.cpp` | `d3dim_shadow_slot30` | 0x446f40 | 400 |
@@ -692,10 +692,9 @@ near-miss bodies from `samples/` instead:
   its file statics: the vertex array, relative frames, motion matrix and axis
   scratch. It adds the five near-miss bodies and defines the never-written
   0x00579668 flag. The bring-up copy `Group0_BvhQuery.cpp` was deleted.
-- `samples/physics/contact/ContactImpulse.cpp` and
-  `samples/physics/constraint/ConstraintMethodCollisionModelNearMisses.cpp`
-  are reviewed candidate sources. The second file includes
-  `ConstraintMethodCollisionModel.cpp` (an `included_sources` entry).
+- `samples/physics/contact/ContactImpulse.cpp` is a reviewed candidate
+  source. ApplyContactImpulse, once a second candidate, now sits in its retail
+  position in `src/krusty2/constraint/ConstraintMethodCollisionModel.cpp`.
 - `Group0_ContactImpulse.cpp` and `Group3_ConstraintCollision.cpp` were
   deleted.
 - The bodies call retail's out-of-line vector helpers under view-specific
@@ -807,7 +806,6 @@ clearly more faithful, the game now links the sample's text:
   - `BoundingBoxTreeBuildNearMisses`
   - `EcoSystemNearMisses`
   - `KrustyBikeNearMisses`
-  - `KrustyBikeCameraNearMisses` (see below)
 
   Their bring-up copies now use the sample's text for the functions listed
   below.
@@ -896,9 +894,9 @@ Not switched, and why:
   see [Shadow slot 30 rounding](#shadow-slot-30-rounding).
 - ProjectedShadow is now linked from the whole sample file; see
   [ProjectedShadow near-miss bodies](#projectedshadow-near-miss-bodies).
-- `KrustyBikeCamera::Tick`: the bring-up copy now has the sample's shape, but
-  the sample file is not linked. Its slot 46 vector is a zero-initialised
-  static, where retail's 0x0067c3e8 is (0, 1, 0).
+- `KrustyBikeCamera::Tick` now sits in `src/reconstructed/KrustyBikeCamera.cpp`
+  and passes the unit's own y axis (0x0067c3e8) to slot 46; the bring-up copy
+  and the sample are gone.
 - `KrustyBike::FindPlacement` (0x00491d10) and the Recorder worker
   (0x004e6f80): the samples score below the linked bodies.
 - `FollowCamera`'s constructor (0x00462ee0, 0.932 against 0.955): the

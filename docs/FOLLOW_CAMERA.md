@@ -360,7 +360,7 @@ Slot 58's frame holds a 0x8c-byte message object and a `char[260]` text
 buffer (MAX_PATH), although it asks for at most 0x80 characters.
 
 Slot 10 (`0x00497e20`, 352 bytes plus a 6-entry jump table) is a near miss in
-`samples/camera/KrustyBikeCameraNearMisses.cpp` (337 of 376 bytes with the 2.0 constant bound to its retail `0x0055074c`). It picks
+`src/reconstructed/KrustyBikeCamera.cpp` (313 of 376 bytes with the jump table). It picks
 its view from the global's +0x558..+0x568 objects by +0x2d74 (case order 2, 3,
 0, 1/5, 4 in the code). While the view is available it drives FollowCamera
 slots 46 and 47 from it; slot 46's up vector is the unit's y axis
@@ -371,6 +371,51 @@ scratch registers (edx/ecx/eax in retail).
 The KrustyBikeCamera code runs `0x00497cb0..0x004987ec`; its vector set closes
 the unit, and KrustyBike.cpp's own set (`.CRT$XCU` 155-158, `0x00491190`) is a
 separate one, so the two are different translation units.
+
+### Slot 10: forms tried
+
+The byte counts below are those measured in the former sample (with the
+2.0 constant bound); none moved the register rotation.
+
+Declaring the locals at the top, in the block, in either order or as an
+array, an else form, a named bool for the +0x18e test, a local for
++0x560 and a named int switch value all leave it unchanged.
+Also unchanged: 0..15 dead locals, 0..12 file-scope declarations (prototypes,
+structs, statics, inline functions) before the function, a Vector3 pointer for
+slot 47, a float local for the height, `2.0f + y`, explicit this-> calls, a
+local for cameraState, `== false`, and the tail nested in an else. A view
+local for the second call and setting the flag last are worse.
+Session 14 (all 337): `= 1` for the flag, casts on the slot 46/47 vector
+arguments, `!= 0` and `== 0` tests, `== false`, an empty-then-else form,
+a `starting` bool local, and dead statements (a discarded load, an unused
+int, a scoped pointer) ahead of the second call. The rotation also
+reaches the restore tail in the other branch.
+Session 25 (all 337): pointer, reference and up-axis locals for the
+vector arguments, event/view/game locals, float and reference locals in
+the tail, a comma return, `BikeCamera::` on the three direct calls,
+inline wrappers for them and a local for the static flag. Clue: with the
+0x004210f0 call made virtual (380 bytes, so not retail's direct call)
+every later register matches and only that call and the last Tick's
+`mov ecx, [frameTime] ; push ecx ; mov ecx, esi` differ, so retail has
+exactly one more live temporary at that direct call.
+Tick, argument-order sweep of 2026-11 (all 337): the event, racer,
+position, height and pending-view reads through inline accessors (by
+reference and by value), inline wrappers around WriteRelativePositions,
+an int-returning view of 0x004210f0 with the result in a dead local or
+tested in an empty if, every order of the flag store, the first call and
+BuildOrientationBasis, the PlayRecordedFrame result in a bool local,
+through this->, as a comma return or tested, and an `int result = 1`
+local. Probe only: a virtual view of the FIRST 0x004210f0 call fixes
+every later register (14 instruction diffs, sizes shift); virtual at the
+second call does not (19).
+Wave 26 (33 renderings, all 313 of 376 with the table, the same code):
+the static flag copied into a bool or int local (declared with the copy
+or assigned inside the test) and that known-zero local passed as the
+first call's last argument, stored back negated, or selected through a
+ternary. The call ahead of the flag store is far worse (150).
+Wave 32 (337): a Vector3-derived local type with its own empty constructor
+for either or both vectors, in either declaration order; with a destructor
+as well the function gets an EH frame (412 bytes).
 
 ## FollowCam.cpp extent and the second wave
 

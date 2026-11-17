@@ -47,5 +47,5 @@ Source forms needed:
 `0x004e5ca0` re-reads `*list` for each access instead of keeping the node in
 a local (GameObject.h grants it friend access to the +0x25 bits).
 
-Near misses (`samples/race/RaceStatusNearMisses.cpp`, notes there):
+Near misses (in `src/reconstructed/RaceStatus.cpp`, with a status comment):
 - The builder `0x004e5d00`: register allocation only.

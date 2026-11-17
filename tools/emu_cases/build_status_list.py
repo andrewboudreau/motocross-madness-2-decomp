@@ -1,6 +1,6 @@
 """BuildStatusList 0x004e5d00, the race status list (tools/emu_diff.py case).
 
-The linked body is the Group 6 bring-up copy (src/bringup/Group6_BuildStatusList.cpp), cdecl
+The linked body is src/reconstructed/RaceStatus.cpp's, cdecl
 (list, view). Offsets from the retail body: view +0x38 local racer, +0x3c racer slots, +0x40
 AI racers, +0xc8 gate list, +0x158 racer count; racer +0x0c position, +0x744 status node;
 status node 0x54 bytes (+0 creation order, +4 racer, +0x28 position, +0x34 next gate, +0x50
@@ -14,7 +14,7 @@ import struct
 
 RETAIL_VA = 0x004e5d00
 SYMBOL = '?BuildStatusList@@YAHPAPAURaceStatusNode@@PAUEventBikeRaceView@@@Z'
-SOURCE = 'src/bringup/Group6_BuildStatusList.cpp'
+SOURCE = 'src/reconstructed/RaceStatus.cpp'
 TRACK_GAME = 0x0056e26c
 PROBES = {0x004e5d9e: 'AI loop', 0x004e5dd3: 'AI node', 0x004e5e5e: 'slot loop', 0x004e5e90: 'slot node',
           0x004e5d3b: 'failed'}

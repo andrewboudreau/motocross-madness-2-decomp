@@ -1,6 +1,6 @@
 """KrustyBikeCamera::Tick 0x00497e20, slot 10 of the bike camera (tools/emu_diff.py case).
 
-The linked body is the bring-up copy (src/bringup/Group2_KrustyBikeCameraTick.cpp). Offsets from
+The linked body is src/reconstructed/KrustyBikeCamera.cpp's. Offsets from
 the retail body: raceView +0x3b8 (set on first use from g_TrackGame (0x0056e26c) +0x2d74 event
 type through the jump table to +0x55c/+0x560/+0x564/+0x558/+0x568/+0x560, each event's view at
 +0x34; event type 7 leaves it unset only when one is already present), the view's
@@ -19,9 +19,9 @@ import random
 
 RETAIL_VA = 0x00497e20
 SYMBOL = '?Tick@KrustyBikeCamera@@UAEHM@Z'
-SOURCE = 'src/bringup/Group2_KrustyBikeCameraTick.cpp'
+SOURCE = 'src/reconstructed/KrustyBikeCamera.cpp'
 TRACK_GAME = 0x0056e26c
-BINDINGS = {'_s_networkStartViewActive': 0x0067c3f4, '_s_upAxis': 0x0067c3e8}
+BINDINGS = {'_s_networkStartViewActive': 0x0067c3f4, '_kVec3YAxis': 0x0067c3e8}
 EVENTS = {0: 0x55c, 1: 0x560, 2: 0x564, 3: 0x558, 4: 0x568, 5: 0x560}
 PROBES = {0x00497e41: 'pick view', 0x00497eaf: 'enter start view', 0x00497eeb: 'start view',
           0x00497f46: 'leave start view', 0x00497f68: 'follow tick'}

@@ -20,7 +20,6 @@ from test_garage_shadow_connections import function_text
 
 ROOT = Path(__file__).resolve().parents[1]
 CALLER = 'src/krusty2/constraint/ConstraintMethodCollisionModel.cpp'
-SAMPLE = 'samples/physics/constraint/ConstraintMethodCollisionModelNearMisses.cpp'
 TREE = 'src/krusty2/soultree/soultree.cpp'
 MATRIX = 'src/krusty2/collision/CollisionObject.cpp'
 BIKE = 'src/krusty2/vehicle/Bike.cpp'
@@ -90,7 +89,7 @@ class ConstraintSceneConnectionsTests(unittest.TestCase):
                               'void CollisionMatrixMultiply('))
             fixture = 'tests/fixtures/constraint_scene_routes.cpp'
             objects, paths = {}, {}
-            for index, source in enumerate((CALLER, SAMPLE, TREE, MATRIX, BIKE, WRECKER, str(node), str(matrix), fixture)):
+            for index, source in enumerate((CALLER, TREE, MATRIX, BIKE, WRECKER, str(node), str(matrix), fixture)):
                 obj = output / ('unit%d.obj' % index)
                 result = subprocess.run([sys.executable, str(ROOT / 'tools/compile.py'), str(ROOT / source),
                     '-o', str(obj), '--vc6-root', os.environ['VC6_ROOT'], '--profile', 'vc6_o2_mt',
@@ -109,11 +108,12 @@ class ConstraintSceneConnectionsTests(unittest.TestCase):
             strict = 0
             manifest = ROOT / 'src/krusty2/constraint/targets.json'
             for target in json.loads(manifest.read_text()):
-                for source in (CALLER, SAMPLE):
-                    binding = (ROOT / source).with_suffix('.bindings.json')
-                    self.assertTrue(compare(retail, objects[source], target['candidate_symbol_contains'],
-                        int(target['target_va'], 0), target['target_size'], binding)['strict_exact'], (source, target))
-                    strict += 1
+                if target.get('expect') == 'partial':
+                    continue
+                binding = (ROOT / CALLER).with_suffix('.bindings.json')
+                self.assertTrue(compare(retail, objects[CALLER], target['candidate_symbol_contains'],
+                    int(target['target_va'], 0), target['target_size'], binding)['strict_exact'], target)
+                strict += 1
             for source, symbol, va, size in ((BIKE, '?CreateWrecker@Bike@@UAEXXZ', 0x409420, 1516),
                 (WRECKER, '?CreateBodies@Wrecker@@QAEXPAVD3DIMSoultreeCharacter@@PBD@Z', 0x5301c0, 995),
                 (WRECKER, '?AddProbe@Wrecker@@QAEXUVector3@@H@Z', 0x532900, 210)):
@@ -122,22 +122,30 @@ class ConstraintSceneConnectionsTests(unittest.TestCase):
                 strict += 1
             original = Counter(i.operands[0].imm for i in decode(0x43ba70, 829)
                                if i.mnemonic == 'call' and i.operands[0].type == capstone.x86.X86_OP_IMM)
-            for source in (CALLER, SAMPLE):
+            for source in (CALLER,):
                 obj = objects[source]
                 _, _, relocs = obj.symbol_extent(obj.find_symbol('Step@ConstraintMethodCollisionModel'))
                 actual = Counter(obj.symbol_by_index[r.symbol_index].name for r in relocs if r.type == 0x14)
                 for _, symbol, va, _ in CONNECTED:
                     self.assertEqual(actual[symbol], 1 if va == 0x4fd660 else 2)
                     self.assertEqual(actual[symbol], original[va])
-            imports = {s.name for s in objects[CALLER].symbols if s.section_number == 0}
-            self.assertFalse(any('@ConNode@@' in name for name in imports))
-            binding = (ROOT / SAMPLE).with_suffix('.bindings.json')
+            # Only the near miss ApplyContactImpulse still calls the ConNode views;
+            # every exact body uses the connected SoultreeObject providers.
+            caller = objects[CALLER]
+            for entry in caller.symbols:
+                if entry.storage_class != 2 or entry.section_number <= 0 or not entry.function_size:
+                    continue
+                if 'ApplyContactImpulse' in entry.name:
+                    continue
+                _, _, relocs = caller.symbol_extent(entry)
+                self.assertFalse(any('@ConNode@@' in caller.symbol_by_index[r.symbol_index].name for r in relocs), entry.name)
+            binding = (ROOT / CALLER).with_suffix('.bindings.json')
             symbol = '?ApplyContactImpulse@ConstraintMethodCollisionModel@@QAEXPAVConBody@@MUConVec3@@11@Z'
-            result = compare(retail, objects[SAMPLE], symbol, 0x43bdb0, 2619, binding)
+            result = compare(retail, objects[CALLER], symbol, 0x43bdb0, 2619, binding)
             self.assertEqual((result['candidate_size'], result['strict_match']['matching_positions']), (2619, 2515))
             with patch('mcm2tool.resolved_match.compare_bytes',
                        lambda original, candidate: {'digest': hashlib.sha256(candidate).hexdigest()}):
-                resolved = match_object(objects[SAMPLE], symbol, 0x43bdb0, b'',
+                resolved = match_object(objects[CALLER], symbol, 0x43bdb0, b'',
                     {k: int(v, 0) for k, v in json.loads(binding.read_text()).items()})
             self.assertEqual(resolved['digest'], 'e327806177915bc7daeae9317786dbc3412127b9be00c3474b12a7c0e2629b06')
             compiler = Path(os.environ['VC6_ROOT'])

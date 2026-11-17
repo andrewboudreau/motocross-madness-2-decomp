@@ -41,7 +41,7 @@ public:
                                             float initialFollowHeight, float initialYawOffset, int capacity, int count,
                                             const int* list);
 
-    virtual int Tick(float frameTime);                 // 0x00497e20 (near miss: samples/camera)
+    virtual int Tick(float frameTime);                 // 0x00497e20 (near miss)
 
     virtual int OnControlPress(ControlEvent* event, InputButtonState* entry);
     virtual Vector3 GetStateFiveFollowPoint(float dt);

@@ -118,11 +118,6 @@
       "reason": "BoxCapsuleOverlap, BoxTriangleQuery, SegmentTriangleQuery, TreeTreeQueryNodes and SegmentSegmentDistance read the unit's file statics (vertex array, relative frames, motion matrix, axis scratch); the near-miss file includes the canonical unit and adds those five bodies beside it. The canonical file stays a standalone calibration case (docs/GAME_BUILD.md#collision-and-contact-near-miss-bodies)."
     },
     {
-      "path": "src/krusty2/constraint/ConstraintMethodCollisionModel.cpp",
-      "included_by": "samples/physics/constraint/ConstraintMethodCollisionModelNearMisses.cpp",
-      "reason": "The near-miss file includes the canonical unit (TU-local zero vector and helpers) and adds ApplyContactImpulse 0x0043bdb0; the canonical file stays a standalone calibration case (docs/GAME_BUILD.md#collision-and-contact-near-miss-bodies)."
-    },
-    {
       "path": "src/krusty2/shadow/ProjectedShadow.cpp",
       "included_by": "samples/physics/shadow/ProjectedShadowNearMisses.cpp",
       "reason": "The near-miss file includes the canonical unit (the class, its vector constants and the exact functions) and adds Init, ComputeBounds, RenderShadow, Present and TintCasterVertices; the canonical file stays a standalone calibration case (docs/GAME_BUILD.md#projectedshadow-near-miss-bodies)."
@@ -524,12 +519,6 @@
       "path": "samples/physics/contact/ContactImpulse.cpp",
       "status": "reviewed-nonexact",
       "reason": "ContactSolveImpulse 0x005004a0: 1062-byte near miss (size exact, 940/1062 strict, retail's out-of-line call sequence) replacing the inline-arithmetic bring-up stand-in. Same formula and update order; not differentially tested. Differential review against retail (tools/emu_diff.py, re-run 2026-11-16): contact_solve_impulse 0x5004a0 0 of 120 runs differ. Bytes nonexact.",
-      "evidence": "docs/GAME_BUILD.md#collision-and-contact-near-miss-bodies"
-    },
-    {
-      "path": "samples/physics/constraint/ConstraintMethodCollisionModelNearMisses.cpp",
-      "status": "reviewed-nonexact",
-      "reason": "ConstraintMethodCollisionModel::ApplyContactImpulse 0x0043bdb0: 2619-byte near miss (size exact, 2515/2619 strict, call sequence and operands as retail) replacing the inline-arithmetic bring-up stand-in; includes the canonical unit (included_sources). Same formula; not differentially tested. Differential review against retail (tools/emu_diff.py, re-run 2026-11-16): constraint_contact_impulse 0x43bdb0 0 of 120 runs differ. Bytes nonexact.",
       "evidence": "docs/GAME_BUILD.md#collision-and-contact-near-miss-bodies"
     },
     {

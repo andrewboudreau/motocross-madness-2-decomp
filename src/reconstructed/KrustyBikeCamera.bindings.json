@@ -47,5 +47,12 @@
   "_kVec3ZAxis": "0x0067c3b8",
   "_kVec3Zero": "0x0067c3c8",
   "?QueryGround@Terrain@@QAEXPAUTerrainVec3@@0HPAE@Z": "0x00507c10",
-  "?IsSubjectCrashed@VehicleCamera@@UAE_NXZ": "0x00417490"
+  "?IsSubjectCrashed@VehicleCamera@@UAE_NXZ": "0x00417490",
+  "?WriteRelativePositions@EventBikeRaceView@@QAEXPAUVector3@@0PAXH@Z": "0x004210f0",
+  "?Tick@FollowCamera@@UAEHM@Z": "0x00465c20",
+  "?BuildOrientationBasis@FollowCamera@@UAEXPAUVector3@@0@Z": "0x004654e0",
+  "?PlayRecordedFrame@FollowCamera@@UAE_NMPBUVector3@@@Z": "0x00465720",
+  "__real@4@40008000000000000000": "0x0055074c",
+  "?Tick@KrustyBikeCamera@@UAEHM@Z": "0x00497e20",
+  "_s_networkStartViewActive": "0x0067c3f4"
 }

@@ -53,5 +53,7 @@
   "_rand": "0x00534c1b",
   "?UpdateGateRace@@YAHPAPAURaceStatusNode@@PAURaceGate@@MHH@Z": "0x004e6a50",
   "?SelectLapGates@TrackGameViewOwner@@QAEXHHPAX@Z": "0x00404df0",
-  "?FastSqrt@@YAMM@Z": "0x00460b50"
+  "?FastSqrt@@YAMM@Z": "0x00460b50",
+  "?NextBike@EventBikeRaceView@@QAEPAUEventKrustyBikeView@@PAH@Z": "0x004204e0",
+  "?BuildStatusList@@YAHPAPAURaceStatusNode@@PAUEventBikeRaceView@@@Z": "0x004e5d00"
 }

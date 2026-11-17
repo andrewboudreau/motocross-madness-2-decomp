@@ -72,3 +72,6 @@ behaviour tests use it to link one function of a unit against retail.
 | `Texmap.cpp` | `src/reconstructed/Texmap.cpp` | Renamed from `TextureMap.cpp`; 13 cases exact. |
 | `trkgame.cpp` | `src/reconstructed/trkgame.cpp` | Renamed from `TrackGame.cpp`; 19 cases exact. |
 | `wrecker.cpp` | `src/reconstructed/wrecker.cpp` | All 30 retail functions in order (renamed from `Wrecker.cpp`); `SprayContactParticles` and `PushProbesOutOfBox` moved in from `samples/race/WreckerNearMisses.cpp` and not exact. Both agree with retail under `tools/emu_diff.py` (400 runs each). |
+| `ConstraintMethodCollisionModel.cpp` | `src/krusty2/constraint/ConstraintMethodCollisionModel.cpp` | Retail order from the contact callback `0x0043b800`; 19 targets exact. `ApplyContactImpulse` moved in from its sample and is not exact (2515/2619); its forms tried are in the directory README. |
+| `RaceStatus.cpp` | `src/reconstructed/RaceStatus.cpp` | `BuildStatusList` (it loads this unit's `__FILE__`) moved in from its sample and a bring-up copy; not exact. 21 cases exact. |
+| unnamed (`0x00497cb0..0x004987ec`) | `src/reconstructed/KrustyBikeCamera.cpp` | No `__FILE__` anchor; the file is named for its class (provisional). `Tick` moved in from its sample and a bring-up copy and now passes the unit's own y axis; not exact. 24 cases exact. |
