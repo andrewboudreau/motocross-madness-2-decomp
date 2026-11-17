@@ -1,6 +1,6 @@
 // Bring-up definition of SPBikeRiderDlg::Tick (retail 0x0044fae0, DlgProcs.cpp).
 //
-// Status: best-guess-unreviewed bring-up body, extracted from the near miss in
+// Status: reviewed-nonexact bring-up body, extracted from the near miss in
 // samples/ui/DlgProcsNearMisses.cpp (1181 of 1235 bytes matching; only the
 // scheduling of the by-value Vector3 copy passed to the camera's LookAt
 // differs). Not a strict match; it exists so the source-built game links.

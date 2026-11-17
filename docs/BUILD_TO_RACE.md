@@ -64,8 +64,8 @@ Score is the masked linked score from `linked_accuracy.py`. "Emu" means a
 | `ResourceManager::AddArchive`, `FileStream::Read` | 0x4e9030, 0x461640 | near miss (0.931) | Emu cases `resource_add_archive` and `filestream_read` agree with retail (800 runs each). Every asset goes through these. |
 | `KrustyUI::Create`, `UIDialog::Tick` | 0x4988a0, 0x46ef00 | exact | |
 | `ReadDialogResource` | 0x46a920 | bring-up 0.967 (16,120 B) | Every menu screen. Emu: 0 mismatches. |
-| `MainDlg::HandleEvent` | 0x44b200 | bring-up 0.992 | No emu case. |
-| `SPRaceInfoDlg::HandleEvent`, rider dialogs | 0x4507a0, 0x4d72c0, 0x4f8820, 0x44fae0 | bring-up 0.966-0.994 | Emu for 0x4507a0 only. |
+| `MainDlg::HandleEvent` | 0x44b200 | bring-up 0.992 | No emu case; the instruction review finds only stack layout and register differences (bring-up review). |
+| `SPRaceInfoDlg::HandleEvent`, rider dialogs | 0x4507a0, 0x4d72c0, 0x4f8820, 0x44fae0 | bring-up 0.966-0.994 | Emu for 0x4507a0; the three rider `Tick`s pass the instruction review (bring-up review). |
 | `LeaveMenusForRace`, `LoadingDlg::HandleEvent` | 0x4536e0, 0x451020 | exact | |
 | `EventManager::LoadEvent` | 0x45cb70 | exact | |
 | `LoadEventObjects` | 0x4de590 | bring-up 0.985 | Emu: 0 mismatches. |
@@ -84,9 +84,9 @@ Score is the masked linked score from `linked_accuracy.py`. "Emu" means a
 | `LightVertices`, `TransformPoints` | 0x49e4a0, 0x4a1b00 | bring-up 0.754, 0.336 | Low scores come mostly from inline-asm retail bodies. Emu cases agree with retail on every reached branch (item 9). |
 | `DrawCurrentLod` | 0x440f30 | bring-up 0.901 (7,851 B) | Reads a local retail leaves uninitialised; source sets it to 0. |
 | Particles, projected shadow | 0x4bac60, 0x4db8c0, 0x4dbd30, 0x4dc2b0 | bring-up 0.712; near miss 0.738-0.837 | |
-| Texture creation and copies | 0x4c69c0, 0x4c7b40, 0x486170, 0x50c960, 0x50dad0 | near miss 0.867-0.957 | No emu cases. |
+| Texture creation and copies | 0x4c69c0, 0x4c7b40, 0x486170, 0x50c960, 0x50dad0 | near miss 0.867-0.957 | Emu cases for creation and copies (item 7). The two repacks (0x50c960, 0x50dad0) pass the instruction review (bring-up review); they have no emu case. |
 | Pixel converters | 0x4d0d40, 0x4cea10, 0x4ce5f0 | bring-up 0.418-0.715 | 8-bit and half-size texture paths. |
-| HUD, radar, scoreboard | 0x51c720, 0x48d1e0 | bring-up 0.867-0.973 | |
+| HUD, radar, scoreboard | 0x51c720, 0x48d1e0 | bring-up 0.867-0.973 | `DrawTrackOutline` (0x51c720): emu case `radar_draw_track_outline`, 600 of 600 runs agree. |
 | `PCRenderTarget::Clear`, `AdvanceFrame`, `RenderPost3D` | 0x4c5510, 0x4e8cc0, 0x46f320 | exact | |
 | Podium, last-race dialog, replay | | bring-up 0.967-0.986 | Never exercised live. |
 | Multiplayer dialogs and session | | bring-up 0.964-0.997 | Never exercised live; lobby is stubbed by the shim. |
@@ -95,16 +95,56 @@ No step is missing. Bring-up units cover 129 scored functions (223,846 B, of
 which 33,566 B are identical). 117 non-identical functions (135,862 B) come
 from reviewed near-miss sources outside `src/bringup`.
 
+## Bring-up review
+
+On 2026-11-16 build `build-kjdvaspt` linked 232 bring-up symbols
+(`src/bringup`, by binding). 159 had a clean differential case or a calibration
+case. The other 73 were checked:
+
+- **16 bodies with their own logic** are reviewed below: 7 by new differential
+  cases (0 of 4,200 runs differ, every probe reached), 1 strict exact and 8
+  by reading the instruction diff against retail.
+- **46 forwarders** call a canonical or retail body (checked in the linked
+  exe: each built body calls out). Their only risk is argument order and
+  type conversion. One (`TireNode::LocalToWorldDirection`) has a case; the
+  rest are not reviewed one by one.
+- **11 aliases** are folded by the linker onto one of those forwarders.
+
+| Body | Retail | Review |
+|---|---|---|
+| `RadarOverlay::DrawTrackOutline` | 0x51c720 | Case `radar_draw_track_outline`: random track graphs (rings, open chains, links, pre-flagged nodes), modes 0-3; 600 runs. |
+| `InlineShock::ClampAndStep` (`BikeQ::ClampAndStepAlong`) | 0x4fa090 | Case `shock_inline_clamp_and_step`; 800 runs. |
+| `RotatingShock::ClampAndStep` (`BikeQ::ClampAndStep`) | 0x4fa8b0 | Case `shock_rotating_clamp_and_step`, non-finite angles included; 800 runs. |
+| `Vec3Normalize` (CollisionVec3) | 0x5087b0 | Case `collision_vec3_normalize`, unit and zero vectors; 800 runs. |
+| `TireCross`, `ShockScaleCall` | 0x515600, 0x5015b0 | Cases `tire_cross`, `shock_scale_call` (forwarders; a swapped operand order is caught in 63 of 100 runs); 400 runs each. |
+| `LocalToWorldDirection` (two views) | 0x4fd5c0 | Cases `soultree_local_to_world_direction`, `tire_node_local_to_world_direction`; 400 runs each. |
+| `Vec3::operator-=` | 0x413160 | Strict exact (33 of 33 bytes). |
+| `MainDlg::HandleEvent` | 0x44b200 | Instruction review: retail overlaps the two `connections[5]` arrays (frame 0x6c4 against 0xc64), keeps the constant 1 in `edi`, and swaps the operands of one 16-byte `repe cmpsd` equality test. |
+| `MPRaceInfoDlg::HandleEvent` | 0x4513a0 | Instruction review: register choice, and one reload of `g_TrackGame+0x570` with no store or call in between. |
+| `PCCentralBikeRiderDlg::Tick`, `MPBikeRiderDlg::Tick`, `SPBikeRiderDlg::Tick` | 0x4d72c0, 0x4f8820, 0x44fae0 | Instruction review: in the by-value `Vector3` copy to the camera, one store to the outgoing argument area moves past a load from the source vector. |
+| `EcoSystem::WriteListing` | 0x458da0 | Instruction review: base and index swapped in four address operands. |
+| `ManagedTextureGroup::RepackWholePages` | 0x50c960 | Instruction review: stack slots (frame 0x78 against 0x80); register choice in the `Contains` loop; the `plannedLevel` store moves past two loads from `groupManager`; the levels loop rereads its bound, while retail loads it once (the loop writes only the stack). |
+| `ManagedTextureGroup::RepackWithPartialBlits` | 0x50dad0 | Instruction review: the dead `dropped = 0` store sits before the empty-list return; two `+0x38` loads and one argument push are reordered. |
+
+Planted bugs are caught: `>=` in the shock's `extending` test (40 and 46 of
+200 runs), the wrong hit coordinate when the outline re-enters the map (62 of
+200), swapped cross-product operands (63 of 100).
+
+Instruction review covers the aligned code only. Switch tables are unresolved
+relocations in the candidate, so their targets were not compared. The cases
+check one function at a time on random and edge inputs, not integrated play.
+
 ## Blockers and risks, ranked
 
 1. **The current exe has never been run** (C). The only live proof is ten
    days and about 560 commits old. Until it runs, every claim about booting
    is inference.
-2. **Bring-up bodies on the load and race path are unreviewed
-   approximations** (C for the scores, P for behaviour). The large ones:
-   `ReadDialogResource`, `LoadEventObjects`, `LoadBike`, the
-   KrustyBike and bike-AI units, `DrawCurrentLod`. The best-guess candidate
-   sources are reviewed (item 14); the bring-up bodies are not.
+2. **Bring-up bodies are approximations** (C for the scores and the per-function
+   checks, P for integrated behaviour). Every bring-up body now has a
+   differential or calibration case or an instruction review, or is a
+   forwarder (see [Bring-up review](#bring-up-review)). The best-guess candidate
+   sources are reviewed too (item 14). What is untested is how they behave
+   together over real races.
 3. **Near misses without a differential case** (C): of 189 non-identical
    bodies, 34 (53,289 B) had none at the review; since then
    `FileStream::Read`, `AddArchive`, `CreateRacers`, `ProfileDisplays`,
@@ -159,6 +199,7 @@ from reviewed near-miss sources outside `src/bringup`.
 | 17 | Done: VC6 LIB writes no import by undecorated name from a `.def`, but VC6 LINK reads one (WINNT.H `IMPORT_OBJECT_NAME_UNDECORATE`), as in the SDK's import libraries. `build_game.py` sets that name type on the `.def` entries given as `name@N @hint` without NONAME; the hint stays. `DirectInputCreateEx` and both `blade.dll` imports are now by name with retail's hints; the whole import table equals retail. Built and audited, not yet run. | - | Removes a machine-specific ordinal. |
 | 18 | Done (not yet run): the shim turns its hooks on for a source build when the `mcm2.map` beside it carries the exe's PE link timestamp (`Timestamp is` line; equal in the last three builds, retail differs). A stale map does not count. `MCM2_FORCE_RUNTIME` stays as an override. | - | Drops `MCM2_FORCE_RUNTIME` from every run. |
 | 19 | Exercise podium, replay and return-to-menu with `MCM2_AUTORACE_EXIT`, then a full lap by hand. | 30 min of user time | These paths have never run in a source build. |
+| 21 | Done: every bring-up body without a case was reviewed: 7 new emu cases, 1 strict exact, 8 instruction reviews, 46 forwarders (one with a case) and 11 folded aliases (see Bring-up review). | - | Closes the per-function part of blocker 2. |
 | 20 | Done: whole-program emulation is out of scope (see Out of scope). | - | `blade.dll`, DirectDraw and COM make a unicorn boot impractical; per-function replay cases give the coverage. |
 
 ## Out of scope

@@ -1,4 +1,4 @@
-// Bring-up (best-guess-unreviewed) RadarOverlay methods for the source-built game link.
+// Bring-up (reviewed-nonexact) RadarOverlay methods for the source-built game link.
 //
 // RadarOverlay::DrawRacers (0x0051bed0) is unresolved from TrackOverlay.cpp; it calls
 // RadarOverlay::DrawTrackOutline (0x0051c720), which calls

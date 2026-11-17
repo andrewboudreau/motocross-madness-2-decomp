@@ -4,11 +4,11 @@
 // ManagedTextureGroup::RepackWithPartialBlits (0x0050dad0), both chosen by
 // ManagedTextureGroup::RepackPages (src/reconstructed/ManagedTextureGroup.cpp).
 //
-// Status: best-guess-unreviewed. The bodies are copied unchanged from the
-// near-miss file samples/render/ManagedTextureGroupNearMisses.cpp, whose
+// Status: reviewed-nonexact, no differential case. The bodies are copied
+// unchanged from samples/render/ManagedTextureGroupNearMisses.cpp, whose
 // header documents the remaining (stack-slot / register / scheduling only)
-// differences against retail; see docs/TEXTUREMAPMANAGER.md. Not
-// differentially tested.
+// differences against retail; docs/BUILD_TO_RACE.md#bring-up-review checks
+// them instruction by instruction.
 //
 // Also defined here because nothing in src/ provides them and only these
 // bodies call them: UnknownTimer::LargestRecentSample (0x004cb690) and

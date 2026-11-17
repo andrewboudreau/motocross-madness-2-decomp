@@ -1,7 +1,7 @@
 // Bring-up definition of PCCentralBikeRiderDlg::Tick (retail 0x004d72c0,
 // ProCircuitProcs.cpp).
 //
-// Status: best-guess-unreviewed bring-up body, extracted from the near miss in
+// Status: reviewed-nonexact bring-up body, extracted from the near miss in
 // samples/ui/ProCircuitProcsNearMisses.cpp (1237 of 1291 bytes matching; only
 // the scheduling of the by-value Vector3 copy for the camera's LookAt differs).
 // Not a strict match; it exists so the source-built game links. The TU-local

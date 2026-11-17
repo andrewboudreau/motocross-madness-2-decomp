@@ -1,4 +1,4 @@
-// Bring-up definition (best-guess-unreviewed) for MainDlg::HandleEvent
+// Bring-up definition (reviewed-nonexact) for MainDlg::HandleEvent
 // (retail 0x0044b200), the main menu's event handler. Extracted from the
 // near-miss candidate in samples/ui/DlgProcsNearMisses.cpp (which compiles
 // it inside a copy of DlgProcs.cpp); the remaining differences there are
