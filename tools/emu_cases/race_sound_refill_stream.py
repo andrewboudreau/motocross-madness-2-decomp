@@ -1,7 +1,7 @@
 """RaceSound::RefillStream 0x004e4d10, the engine stream's half-buffer refill (tools/emu_diff.py
 case, call-record/replay mode).
 
-The linked body is samples/race/RaceSoundRefill.cpp. Its calls are replayed: Sound's
+The linked body is RefillStream in src/reconstructed/racesnd.cpp. Its calls are replayed: Sound's
 GetBufferPosition 0x004bcd40 (an effect writes the play and write cursors), LockBuffer
 0x004bd020 (an effect hands out a fresh 44100-byte lock region), UnlockBuffer 0x004bd080 and
 rand 0x00534c1b (0..32767). memcpy is inline in both bodies.
@@ -14,7 +14,7 @@ filled with seeded bytes, so every copy's source, length and destination is comp
 """
 RETAIL_VA = 0x004e4d10
 SYMBOL = '?RefillStream@RaceSound@@QAEXXZ'
-SOURCE = 'samples/race/RaceSoundRefill.cpp'
+SOURCE = 'src/reconstructed/racesnd.cpp'
 GET_POSITION = 0x004bcd40
 LOCK = 0x004bd020
 RAND = 0x00534c1b

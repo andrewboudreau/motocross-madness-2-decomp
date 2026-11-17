@@ -86,7 +86,7 @@ Unregistered `.CRT$XCU` entries are not listed.
 | 240-243 | 4da3e0-4da51b | 689af8 | ProCircuitProcs | ProCircuitProcs.cpp | consistent |
 | 244-247 | 4dc4d0-4dc60b | 689b38 | ProjectedShadow | ProjectedShadow.cpp | **fixed** (was Quadtree.cpp) |
 | 248-251 | 4e1b80-4e1cbb | 689b80 | none | QuarryStuntEvent.cpp | consistent by position |
-| 252-255 | 4e48f0-4e4a2b | 689bc0 | none | RaceSound.cpp | consistent (mid-file) |
+| 252-255 | 4e48f0-4e4a2b | 689bc0 | none | racesnd.cpp | consistent (mid-file) |
 | 256-260 | 4e58a0-4e6f7b | 689c00 | none | RaceStatus.cpp | consistent (RACESTATUS.md) |
 | 261 | 4e8d30-4e8d5b | 689c78 | none | ResourceManager.cpp | own static at the top of the unit |
 | 262-265 | 4ecb70-4ecd5b | 689c98 | none | SceneManager.cpp | consistent (mid-file) |

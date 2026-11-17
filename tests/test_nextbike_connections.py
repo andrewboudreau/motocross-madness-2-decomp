@@ -21,7 +21,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SYMBOL = '?NextBike@BikeRace@@QAEPAVBikeRaceKrustyBikeView@@PAH@Z'
 SOURCES = (
     'src/reconstructed/EventManager.cpp', 'src/reconstructed/FollowRacer.cpp',
-    'src/reconstructed/RaceSound.cpp', 'src/reconstructed/RaceStatus.cpp',
+    'src/reconstructed/racesnd.cpp', 'src/reconstructed/RaceStatus.cpp',
     'src/reconstructed/TrackOverlay.cpp', 'src/reconstructed/Krusty3DObjects.cpp',
     'src/krusty2/vehicle/KrustyBike.cpp', 'src/reconstructed/BikeRace.cpp',
 )

@@ -29,7 +29,9 @@ Start with `make status`, [setup](docs/TOOLCHAIN.md) and
    `vtable_write_xrefs.json` and `source_xrefs.json`.
 3. Keep uncertain candidates in `samples/`. Reconstructed class source belongs
    in `src/reconstructed/`; use original TU paths only with strong ownership
-   evidence. Filename-only skeletons belong in ignored `generated/`.
+   evidence. Once a unit is established, nonexact bodies move into it in
+   retail order with a status comment ([ORIGINAL_UNITS.md](docs/ORIGINAL_UNITS.md)).
+   Filename-only skeletons belong in ignored `generated/`.
 4. Compile with authentic VC6 SP3 and compare all bytes with relocations resolved.
    Clang is an ABI/code-shape check, not the historical compiler authority.
 5. Calibrate flags before distorting readable source. No inline assembly, naked

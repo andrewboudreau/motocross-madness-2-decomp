@@ -246,7 +246,7 @@ xrefs, else the name match.
 | 73 | `Quadtree.cpp` | `0x004dc729..0x004ddce7` (xref) | 5 | src | `krusty2/broadphase/Quadtree.cpp` |
 | 74 | `Quantize.cpp` | `0x004dde47..0x004de12f` (xref) | 3 | src | `reconstructed/Quantize.cpp` |
 | 75 | `QuarryStuntEvent.cpp` | `0x004de2a0..0x004e1fa8` (doc) | 27 | src | `reconstructed/QuarryStuntEvent.cpp` |
-| 76 | `racesnd.cpp` | `0x004e20ad..0x004e5694` (xref) | 32 | src | `reconstructed/RaceSound.cpp` |
+| 76 | `racesnd.cpp` | `0x004e20ad..0x004e5694` (xref) | 32 | src | `reconstructed/racesnd.cpp` |
 | 77 | `RaceStatus.cpp` | `0x004e58a0..0x004e6f80` (doc) | 5 | src | `reconstructed/RaceStatus.cpp` |
 | 78 | `recorder.cpp` | `0x004e79cb..0x004e7cec` (xref) | 3 | src | `reconstructed/Recorder.cpp` |
 | 79 | `ResourceManager.cpp` | `0x004e8de6..0x004e9760` (xref) | 17 | src | `reconstructed/ResourceManager.cpp` |
@@ -298,7 +298,7 @@ address (possible original units, e.g. `BaseObject.cpp`, `Camera.cpp`,
 (`DirectoryList.cpp` in dirlist.cpp, `FollowCamera.cpp` in FollowCam.cpp,
 `GameObject.cpp` in gameobj.cpp, `PCJoystickDevice`/`PCKeyboardDevice`/
 `PCMouseDevice.cpp` in PCInputDeviceType.cpp, `PCTextureMap.cpp` in
-PCTexMap.cpp, `RaceSound.cpp` in racesnd.cpp) and 19 cannot be original names
+PCTexMap.cpp; RaceSound.cpp in racesnd.cpp, since renamed to its unit) and 19 cannot be original names
 under alphabetical linking (e.g. `TrackGame.cpp` after trkgame.cpp,
 `TextureMap.cpp` before Texmap.cpp, `ManagedTexture`/`ManagedTextureGroup`/
 `CacheTexture.cpp` in the TextureCache.cpp bracket, `GR_BitString.cpp`

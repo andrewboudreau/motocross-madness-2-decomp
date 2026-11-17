@@ -16,11 +16,15 @@ from mcm2tool.pe import PEImage
 from mcm2tool.toolchain import find_child_ci, find_vc6_bin, infer_vc98_root
 from tools.match import compare
 from tools.build_game import compile_source as build_compile_source
+from tools.unit_source import standalone_source
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCE = 'samples/race/RaceSoundRefill.cpp'
-AGGREGATE = 'samples/race/RaceSoundNearMisses.cpp'
-CANONICAL = 'src/reconstructed/RaceSound.cpp'
+# RefillStream lives in its original unit with the rest of racesnd.cpp; the
+# native oracle links a validation unit holding only its definition.
+CANONICAL = 'src/reconstructed/racesnd.cpp'
+QUALIFIED = 'RaceSound::RefillStream'
+UNIT_ROWS = (107, 580)
+UNIT_DIGEST = '95e376e6456772383f2f5b5842c20a2a96208c50ce85aed0f4074e1a49880566'
 SYMBOL = '?RefillStream@RaceSound@@QAEXXZ'
 HELPERS = (
     ('GetBufferPosition', '?GetBufferPosition@Sound@@QAEHPAK0@Z', 0x4bcd40, 57, 0x10),
@@ -148,32 +152,32 @@ class RaceSoundRefillTests(unittest.TestCase):
                     env={**os.environ, 'PYTHONPATH': str(ROOT)})
                 self.assertEqual(result.returncode, 0, result.stdout+result.stderr)
                 return obj, CoffObject(obj)
-            candidate_path, candidate = compile_source(ROOT/SOURCE, 'candidate')
+            refill_source = output/'refill.cpp'
+            refill_source.write_text(standalone_source(ROOT/CANONICAL, [QUALIFIED]), encoding='latin1')
+            candidate_path, candidate = compile_source(refill_source, 'candidate')
+            _, canonical = compile_source(ROOT/CANONICAL, 'canonical')
             spec = json.loads((ROOT/'config/game_build.json').read_text())
-            built = build_compile_source(ROOT/SOURCE, output/'game-command', compiler,
+            built = build_compile_source(ROOT/CANONICAL, output/'game-command', compiler,
                 [ROOT/p for p in spec['includes']], spec['profile'], {**os.environ, 'PYTHONPATH': str(ROOT)})
             self.assertTrue(built['compiled'], Path(built['log']).read_text())
-            self.assertEqual(complete_object(candidate), complete_object(CoffObject(Path(built['object']))))
-            _, aggregate = compile_source(ROOT/AGGREGATE, 'aggregate')
-            _, canonical = compile_source(ROOT/CANONICAL, 'canonical')
-            self.assertEqual(signature(candidate, SYMBOL), signature(aggregate, SYMBOL))
+            self.assertEqual(complete_object(canonical), complete_object(CoffObject(Path(built['object']))))
+            self.assertEqual(signature(candidate, SYMBOL), signature(canonical, SYMBOL))
             entry = candidate.find_symbol(SYMBOL)
             self.assertEqual((entry.function_size, entry.extent_source), (2038, 'coff_function_aux'))
             self.assertEqual({s.name for s in candidate.symbols if s.storage_class == 2 and s.section_number > 0}, {SYMBOL})
             self.assertEqual({s.name for s in candidate.symbols if s.storage_class == 2 and s.section_number == 0},
                              {h[1] for h in HELPERS} | {'_rand'})
-            report = compare(retail, candidate, SYMBOL, 0x4e4d10, 2032, ROOT/'samples/race/RaceSoundRefill.bindings.json')
+            report = compare(retail, candidate, SYMBOL, 0x4e4d10, 2032, ROOT/'src/reconstructed/racesnd.bindings.json')
             self.assertFalse(report['strict_exact'])
             self.assertEqual(report['strict_match']['matching_positions'], 806)
-            rows = complete_object(aggregate)
-            self.assertEqual((len(rows), sum(len(row[3]) for row in rows)), (107, 580))
-            self.assertEqual(hashlib.sha256(json.dumps(rows).encode()).hexdigest(), 'a21181882e525b3b275458f3979ebc43dd971acf591820effd221021ec3e80b6')
+            rows = complete_object(canonical)
+            self.assertEqual((len(rows), sum(len(row[3]) for row in rows)), UNIT_ROWS)
+            self.assertEqual(hashlib.sha256(json.dumps(rows).encode()).hexdigest(), UNIT_DIGEST)
             cases = [c for c in CASES if c['source'] == CANONICAL]
             self.assertEqual(len(cases), 26)
             for case in cases:
-                for obj in (canonical, aggregate):
-                    result = compare(retail, obj, case['symbol'], int(case['target_va'], 0), case['target_size'], ROOT/case['bindings'])
-                    self.assertTrue(result['strict_exact'], result)
+                result = compare(retail, canonical, case['symbol'], int(case['target_va'], 0), case['target_size'], ROOT/case['bindings'])
+                self.assertTrue(result['strict_exact'], result)
             # Extract actual source definitions only into a private validation TU.
             # Each is independently strict against retail and the complete canonical object.
             audio_source = (ROOT/'src/reconstructed/PCAudio.cpp').read_text()

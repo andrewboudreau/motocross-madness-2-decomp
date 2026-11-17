@@ -1,6 +1,6 @@
 # racesnd.cpp
 
-`src/reconstructed/RaceSound.h` / `RaceSound.cpp`. Evidence: the `__FILE__`
+`src/reconstructed/racesnd.cpp` (class declaration in `RaceSound.h`). Evidence: the `__FILE__`
 literal `D:\aardvark\VC\krusty2\racesnd.cpp` (`0x005726b8`; DebugMalloc line
 77, deletes at lines 128–156 and 177, `new` at 1630/1678, DebugMalloc 1652)
 and RTTI `RaceSound : GameObject` (vtable `0x00557710`, 27 slots, overriding
@@ -46,9 +46,8 @@ resets are written `if (sampleKind != 6) ... else ...` with identical
 arms, which reproduces retail's dead `cmp ecx, 6`; the source comments
 this. The wreck and fall cues use `if (!index) f(); else if (!playing) f();`.
 
-The complete half-buffer refill `0x004e4d10` remains nonexact in
-`samples/race/RaceSoundRefill.cpp`, included by the original near-miss aggregate.
-Its unchanged 2,038-byte candidate is independently reviewed against the complete
+The complete half-buffer refill `0x004e4d10` is in the unit in retail order
+(after `StartStream`) with a status comment; it is not exact. Its unchanged 2,038-byte candidate is independently reviewed against the complete
 2,032-byte retail body using actual strict Sound helpers and 4,782 bounded native
 scenarios. See [the functional review](RACE_SOUND_REFILL.md#functional-build-review)
 for preservation evidence, independent buffer oracles, scripted COM/random

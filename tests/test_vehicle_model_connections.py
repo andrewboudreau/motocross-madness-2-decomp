@@ -29,7 +29,7 @@ PROVIDERS = {
 FOLLOWING = ('?CreateFollowing@SoultreeSoundEmitter@@QAEPAV1@PAXPBD1'
              'PAVSoultreeObject@@UDS3DBuffer@@KMMHH@Z')
 CALLERS = ('VehicleCamera', 'BikeCamera', 'KrustyBikeCamera', 'AuralScape',
-           'RaceSound', 'TrackOverlay')
+           'racesnd', 'TrackOverlay')
 
 
 @unittest.skipUnless(os.environ.get('VC6_ROOT') and EXE.is_file(),

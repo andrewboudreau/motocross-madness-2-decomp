@@ -1,15 +1,15 @@
 # RaceSound stream refill
 
-`samples/race/RaceSoundRefill.cpp` supplies the complete inferred
-`RaceSound::RefillStream` operation at `0x004e4d10`. It fills the engine stream's
-previously played half from the current sample, looping that sample or choosing
-the next idle, power-band or sputter sample. The source remains nonexact and in
-`samples/`; the standalone file does not establish original translation-unit
-ownership.
+`RaceSound::RefillStream` (`0x004e4d10`) is defined in its original unit,
+`src/reconstructed/racesnd.cpp`, between `StartStream` and `ReadSample` as in
+retail. It fills the engine stream's previously played half from the current
+sample, looping that sample or choosing the next idle, power-band or sputter
+sample. Ownership is confirmed by layout: the function lies between
+`racesnd.cpp` `__FILE__` references (`StartStream` at `0x004e4a30` and
+`ReadSample` at `0x004e5500` are in the same retail span).
 
-The original aggregate `samples/race/RaceSoundNearMisses.cpp` includes this one
-body. The body itself is unchanged. Its complete VC6 `/O2 /GR /GX /MT` function
-is **2,038 bytes**, with **806 matching positions** against the complete
+The body is not exact. Its complete VC6 `/O2 /GR /GX /MT` function is
+**2,038 bytes**, with **806 matching positions** against the complete
 **2,032-byte** retail function. No additional compiler flag is required.
 
 ## Identity, extent and dependencies
@@ -52,28 +52,25 @@ are ignored by the caller, as in retail.
 
 ## Preservation
 
-A same-path aggregate object was captured before extraction. After replacing
-only the definition with its include, all **106 nondebug sections and 579
-relocations** are unchanged: complete bytes, section flags, initializer data,
-relocation types, destinations and addends. There are no exclusions or filename
-exceptions in that private before/after comparison. The private evidence is
-`work/race-refill42/aggregate-proof.json`, reproduced by
-`work/race-refill42/prove.py` from `before.obj` and `after.obj`.
+Merging the body into the unit left every calibrated racesnd.cpp function
+strict (all 26, including the 4,153-byte `Create`) and the refill's complete
+body and relocations unchanged (the race-event fingerprint is the same as the
+former near-miss aggregate's). The unit object has **107 nondebug sections and
+580 relocations**.
 
-The retained regression pins that complete aggregate object. For portability,
-its fingerprint can replace only the checkout prefix of the recognized
-`src/reconstructed/RaceSound.cpp` filename literal; it does not normalize code
-or other payload. All 26 existing canonical calibration functions are checked
-strict in both canonical and aggregate objects. The standalone refill's whole
-function and relocations equal the aggregate's definition. A separate compile
-through `tools.build_game.compile_source`, using the current game profile and
-include inventory, must preserve every nondebug section of the standalone
-object too.
+The retained regression pins that complete unit object. For portability, its
+fingerprint replaces only the checkout prefix of the recognized
+`src/reconstructed/racesnd.cpp` filename literal; it does not normalize code or
+other payload. All 26 calibration functions are checked strict in it. A compile
+through `tools.build_game.compile_source`, using the game profile and include
+inventory, must produce the same nondebug sections.
 
 ## Functional build review
 
-`tests/test_race_sound_refill.py` compiles the actual standalone candidate as a
-separate object and executes it against the hash-pinned retail function. The
+`tests/test_race_sound_refill.py` extracts the definition from the unit
+(`tools/unit_source.py`: the unit's includes plus that one definition) into a
+private validation unit, requires its function and relocations to equal the
+unit object's, and executes it against the hash-pinned retail function. The
 fixture is `tests/fixtures/race_sound_refill_compare.cpp`. The three Sound
 methods are extracted verbatim from canonical source into a temporary validation
 translation unit; each complete body is strict against retail and identical to
