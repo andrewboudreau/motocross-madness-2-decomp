@@ -1,20 +1,9 @@
 {
-  "baseline_commit": "22979f9e",
-  "scope": "Only two DrawStandings iterator references change; same-path full-object proof in live-extraction.json. No filename exclusions.",
+  "scope": "The candidate is the validation unit sliced from TrackOverlay.cpp (tests/track_overlay_unit.py); its object equals the former sample object.",
   "canonical": {
-    "sections": 215,
-    "relocations": 920,
-    "sha256": "0c27e11e5f32a10b1e7a7644e1210d475de18f0453dab5a64959dbd70c7f640d"
-  },
-  "aggregate_before": {
-    "sections": 37,
-    "relocations": 162,
-    "sha256": "3d1651fd1daa40bb9cd96170f11279b8e3181c640b427022170aeec2f3a9dffb"
-  },
-  "aggregate": {
-    "sections": 27,
-    "relocations": 111,
-    "sha256": "46aa7491074ba4b7bce794703af4e8fe27231d53c107647fe48d6be9ef2d1de4"
+    "sections": 231,
+    "relocations": 1031,
+    "sha256": "8feea513a1712d313df3910b6936e17f7b802718d2bd7f79634d3c4cff5bc49e"
   },
   "candidate": {
     "sections": 5,

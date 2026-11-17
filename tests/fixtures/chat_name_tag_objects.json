@@ -1,14 +1,8 @@
 {
-  "baseline_commit": "ed3d06ce",
   "canonical": {
-    "sections": 215,
-    "relocations": 920,
-    "sha256": "0c27e11e5f32a10b1e7a7644e1210d475de18f0453dab5a64959dbd70c7f640d"
+    "sections": 231,
+    "relocations": 1031,
+    "sha256": "8feea513a1712d313df3910b6936e17f7b802718d2bd7f79634d3c4cff5bc49e"
   },
-  "aggregate": {
-    "sections": 27,
-    "relocations": 111,
-    "sha256": "46aa7491074ba4b7bce794703af4e8fe27231d53c107647fe48d6be9ef2d1de4"
-  },
-  "baseline": "Published ed3d06ce source baseline; round50 flag exposure is documented separately. Round51 StatsOverlay::DrawStandings extraction: the published old aggregate pin was independently reproduced; all 37 sections and 162 relocations preserve exactly under only its two iterator-call targets (function offsets 172 and 220) joining existing BikeRace::NextBike. Other aggregate functions and the canonical TrackOverlay record are unchanged."
+  "note": "Complete TrackOverlay.cpp object after the TrackOverlay near misses (DrawStandings, DrawRacers, IntersectLineCircle, DrawTrackOutline, CollectRacers, DrawNameTag) moved into it in retail order; TrackOverlay.cpp literals named by path."
 }

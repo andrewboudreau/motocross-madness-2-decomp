@@ -73,7 +73,6 @@
   "?AddRef@BaseObject@@UAEHXZ": "0x00405160",
   "?GetRefCount@BaseObject@@UAEHXZ": "0x00401940",
   "?Release@GameObject@@UAEHXZ": "0x004696c0",
-  "?NextBike@ChatBikeRaceView@@QAEPAUChatKrustyBikeView@@PAH@Z": "0x004204e0",
   "?NextBike@BikeRace@@QAEPAVBikeRaceKrustyBikeView@@PAH@Z": "0x004204e0",
   "?TestInputEvent@@YAHHHPBUControlEvent@@H@Z": "0x0043caa0",
   "?FastSqrt@@YAMM@Z": "0x00460b50",
@@ -228,5 +227,17 @@
   "??_C@_0P@DMMM@Lucida?5Console?$AA@": "0x00575324",
   "?Setup@ChatOverlay@@QAEPAV1@PAVRenderTarget@@PAVTextureMapManager@@PAXUOverlayRect@@3@Z": "0x0051cf80",
   "?Setup@ChatOverlay@@QAEPAV1@PAVRenderTarget@@PAVTextureMapManager@@PAXUOverlayRect@@3@Z$ehhandler": "0x0054ed34",
-  "__imp__CreatePen@12": "0x00550044"
+  "__imp__CreatePen@12": "0x00550044",
+  "?CollectRacers@ChatOverlay@@QAEHPAUChatBikeRaceView@@@Z": "0x0051d730",
+  "?CollectRacers@ChatOverlay@@QAEHPAUChatBikeRaceView@@@Z$ehhandler": "0x0054ed6e",
+  "?DebugCalloc@@YAPAXIIPBDH@Z": "0x004a2fc0",
+  "?DebugFree@@YAXPAXPBDH@Z": "0x004a2e60",
+  "?DrawTrackOutline@RadarOverlay@@QAEXH@Z": "0x0051c720",
+  "?IntersectLineCircle@RadarOverlay@@QAEHPBM00PAM1@Z": "0x0051c4f0",
+  "?NextBike@EventBikeRaceView@@QAEPAUEventKrustyBikeView@@PAH@Z": "0x004204e0",
+  "?SetCueRacer@ChatOverlay@@QAEXMPBD@Z": "0x0051d9c0",
+  "?SetRadarAnchor@NameOverlay@@QAEXUVector3@@HH@Z": "0x005190a0",
+  "__real@4@40008000000000000000": "0x0055074c",
+  "__real@4@4000c000000000000000": "0x00550774",
+  "__real@4@4001cccccd0000000000": "0x00558844"
 }

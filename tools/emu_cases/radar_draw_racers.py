@@ -1,6 +1,6 @@
 """RadarOverlay::DrawRacers 0x0051bed0, the radar map's racer dots and name-tag anchors.
 
-tools/emu_diff.py case; linked from src/bringup/Group3_RadarOverlay.cpp. Offsets are retail's
+tools/emu_diff.py case; linked from src/reconstructed/TrackOverlay.cpp. Offsets are retail's
 (0x0051bed0 disassembly): render target +0x18, radarView +0x12c (chatOverlay +0x19c, whose
 name tags sit at +0x2d8 + 4k with trackedRacer +0x11c), radarCamera +0x130 (followedRacer
 +0x3b0), racers +0x134 (count +0x160), cueIndex +0x16c, followedIndex +0x170, cueShown
@@ -26,7 +26,7 @@ import struct
 
 RETAIL_VA = 0x0051bed0
 SYMBOL = '?DrawRacers@RadarOverlay@@QAEXH@Z'
-SOURCE = 'src/bringup/Group3_RadarOverlay.cpp'
+SOURCE = 'src/reconstructed/TrackOverlay.cpp'
 TRACK_GAME = 0x0056e26c
 PROBES = {0x0051bf48: 'crashed: held angle', 0x0051c061: 'SetCueRacer', 0x0051c07f: 'hidden cue',
           0x0051c0be: 'rim y', 0x0051c13f: 'cue anchor', 0x0051c1d1: 'outside dot',

@@ -1,11 +1,11 @@
 # StatsOverlay standings drawing
 
-`samples/track/StatsStandingsDraw.cpp` supplies the complete
-`StatsOverlay::DrawStandings` operation used by the race standings overlay.
-It remains a reviewed **nonexact** candidate: authentic VC6 SP3 emits 1,004
-bytes against the complete 1,002-byte retail function at `0x00519a20`, with
-605 relocation-resolved matching positions. Original translation-unit
-ownership and the semantic member names remain provisional.
+`StatsOverlay::DrawStandings`, the race standings overlay row drawing, is in
+[TrackOverlay.cpp](../src/reconstructed/TrackOverlay.cpp) (retail `TrackOverlay.cpp`), in retail order after the score comparator `0x005199f0`,
+with a `// Not exact` status comment: authentic VC6 SP3 emits 1,004 bytes
+against the complete 1,002-byte retail function at `0x00519a20`, with 605
+relocation-resolved matching positions. The semantic member names remain
+provisional.
 
 ## Identity and complete extent
 
@@ -35,37 +35,27 @@ KrustyBike constructor stores, the `0x005546ec` virtual-base table
 The prepared native racer windows reproduce that layout. This is not a
 claim of complete equivalence between all racer view declarations.
 
-## Extraction and object preservation
+## Validation unit and object preservation
 
-The old aggregate includes the standalone body at its original position.
-Same-path before/after compilation preserves all **37 sections and 162
-relocations**, allowing only the two iterator targets at candidate offsets
-172 and 220 to change from `EventBikeRaceView::NextBike` to
-`BikeRace::NextBike`. Every other function, static initializer, section
-attribute, storage byte and relocation is retained. The separate
-`ChatBikeRaceView::NextBike` call in the aggregate remains unchanged.
-Canonical `TrackOverlay.cpp` is unchanged and its complete object is also
-pinned by the regression.
+The behaviour test links a validation unit sliced from the canonical file
+(`tests/track_overlay_unit.py`): the unit includes, its GDI import
+declarations and `DrawStandings`. Both iterator calls (body offsets 172 and
+220) go to the existing `BikeRace::NextBike`; CollectRacers, in the same
+unit, casts to `BikeRace` at its call too.
 
-The new standalone object has five nondebug sections and 27 relocations:
+The validation object has five nondebug sections and 27 relocations:
 40 bytes of compiler directives, a 1,008-byte code section containing the
 1,004-byte body plus padding, two writable string sections of 14 and three
 bytes, and a four-byte read-only `60.0f` constant. It introduces no BSS,
-CRT initializer or duplicate runtime state. The test compiles both the
-standalone and aggregate without project include paths, then compares the
-standalone object with the actual game-build command output.
-
-Existing NameTag, visibility and clipper aggregate pins were updated only
-after independently reproducing their published old pins and proving the
-same two relocation changes. Their canonical and camera records remain
-unchanged. Private reproduction evidence is in
-`work/connections51/stats/live-extraction.json` and
-`integration-pin-proof.json`; retained pins are in
-`tests/fixtures/stats_standings_objects.json`.
+CRT initializer or duplicate runtime state, and its function has the same
+bytes and named relocations as the canonical unit. The canonical unit
+complete object (231 nondebug sections, 1031 relocations) is pinned in
+`tests/fixtures/stats_standings_objects.json` and reproduced by the game
+compile command.
 
 ## Executed helper graph
 
-The fixture executes the actual standalone candidate and these source
+The fixture executes the validation unit body and these source
 helpers. Each extracted helper is compared against both its complete
 retail extent and its canonical source object, including named relocation
 targets and addends.
@@ -166,15 +156,9 @@ font and DC state, not arbitrary register context or resumption.
 
 ## Functional build review
 
-The standalone remains in `samples/` and is explicitly admitted as a
-reviewed nonexact candidate. Isolated source build `build-tvjli7lk`
-compiled **259/259 translation units**, reducing unresolved names from
-**227 to 226**: only `StatsOverlay::DrawStandings` disappeared, with none
-added. Independent game-command recompilation reproduces the new object's
-five sections and 27 relocations. All 258 prior game objects preserve
-10,685 sections and 45,748 relocations under the separately verified
-camera and collision-zero connections. This supplies a missing source
-operation; the game still does not link and no playable-race claim follows.
+DrawStandings compiles as part of TrackOverlay.cpp in the functional
+build; it agrees with retail under `tools/emu_diff.py stats_draw_standings`
+(400 runs). No playable-race claim follows.
 
 Reproduce on Windows with the private toolchain and retail image:
 

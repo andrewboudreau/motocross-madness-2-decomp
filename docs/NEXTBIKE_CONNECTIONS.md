@@ -10,11 +10,9 @@ this call boundary. There is no forwarding implementation or linker alias.
 | --- | --- |
 | `EventBikeRaceView::NextBike` | EventManager, FollowRacer, RaceSound, RaceStatus, TrackOverlay |
 | `StatsBikeRaceView::NextBike` | TrackOverlay |
+| `ChatBikeRaceView::NextBike` | TrackOverlay (CollectRacers) |
 | `VisualCueBikeRaceView::NextBike` | Krusty3DObjects |
 | `KbRace::NextBike` | KrustyBike |
-
-`ChatBikeRaceView::NextBike` remains a sample-only declaration and is not counted
-as a removed production dependency.
 
 ## Receiver and result evidence
 
@@ -101,7 +99,4 @@ not claim that arbitrary invalid cursor or array pointers are safe.
 
 The isolated real source build compiled **195/195** translation units and
 reduced unresolved names **558 to 554**, exactly the four names above, with
-none added. Link, startup, menus and racing remain unfinished. The unrelated
-TrackOverlayNearMisses sample already failed compilation before this slice
-because its GUIManager declaration was incomplete; it is not included in the
-successful caller-compilation claim.
+none added. Link, startup, menus and racing remain unfinished.

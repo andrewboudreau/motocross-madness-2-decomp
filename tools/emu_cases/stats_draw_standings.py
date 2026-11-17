@@ -1,6 +1,6 @@
 """StatsOverlay::DrawStandings 0x00519a20, the in-race standings rows (tools/emu_diff.py case).
 
-Linked from samples/track/StatsStandingsDraw.cpp. Offsets are retail's (0x00519a20
+Linked from src/reconstructed/TrackOverlay.cpp. Offsets are retail's (0x00519a20
 disassembly): g_TrackGame (0x0056e26c) +0x55c the event (raceView +0x34, elapsed minutes
 and seconds +0x70/+0x74), +0x2d70 the race mode (0 and 4 have no time row), +0x2eb0 the
 time limit in minutes; the view's local racer +0x38; a racer's score +0x768, name +0x5e0
@@ -28,7 +28,7 @@ import struct
 
 RETAIL_VA = 0x00519a20
 SYMBOL = '?DrawStandings@StatsOverlay@@QAEHXZ'
-SOURCE = 'samples/track/StatsStandingsDraw.cpp'
+SOURCE = 'src/reconstructed/TrackOverlay.cpp'
 TRACK_GAME = 0x0056e26c
 IAT = {0x00550070: ('SetBkColor', 8), 0x00550074: ('SetBkMode', 8), 0x00550080: ('SetTextColor', 8),
        0x00550078: ('SelectObject', 8), 0x00550084: ('GetTextExtentPoint32A', 16),

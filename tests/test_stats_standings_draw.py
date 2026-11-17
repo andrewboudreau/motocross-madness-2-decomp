@@ -1,4 +1,8 @@
-"""Complete standings body, real source/CRT helpers, and finite surface contracts."""
+"""Complete standings body, real source/CRT helpers, and finite surface contracts.
+
+StatsOverlay::DrawStandings is in src/reconstructed/TrackOverlay.cpp; the behaviour
+run links a validation unit sliced from it (tests/track_overlay_unit.py).
+"""
 import hashlib
 import json
 import os
@@ -20,10 +24,9 @@ from tools.build_game import compile_source as game_compile
 from test_edit_box_on_char import extract
 from test_edit_box_draw import signature
 from test_chat_name_tag_draw import object_view
+from track_overlay_unit import write_unit
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCE = ROOT/'samples/track/StatsStandingsDraw.cpp'
-AGGREGATE = ROOT/'samples/track/TrackOverlayNearMisses.cpp'
 SYMBOL = '?DrawStandings@StatsOverlay@@QAEHXZ'
 ITERATOR = '?NextBike@BikeRace@@QAEPAVBikeRaceKrustyBikeView@@PAH@Z'
 OLD_ITERATOR = '?NextBike@EventBikeRaceView@@QAEPAUEventKrustyBikeView@@PAH@Z'
@@ -138,7 +141,7 @@ class StatsStandingsTests(unittest.TestCase):
             output=Path(directory)
             def compile_source(source,name,fixture=False):
                 path=output/(name+'.obj')
-                includes=[] if name in ('candidate','aggregate','restore') else [
+                includes=[] if name in ('candidate','restore') else [
                     '--include',str(ROOT/'src/reconstructed'),'--include',str(ROOT/'src/krusty2')]
                 result=subprocess.run([sys.executable,str(ROOT/'tools/compile.py'),str(source),'-o',str(path),
                     '--vc6-root',str(compiler),'--profile','vc6_o2_mt',*includes,
@@ -146,16 +149,14 @@ class StatsStandingsTests(unittest.TestCase):
                     text=True,encoding='latin1',env={**os.environ,'PYTHONPATH':str(ROOT)})
                 self.assertEqual(result.returncode,0,result.stdout+result.stderr)
                 return path,CoffObject(path)
-            candidate_path,candidate=compile_source(SOURCE,'candidate')
-            _,aggregate=compile_source(AGGREGATE,'aggregate')
+            candidate_path,candidate=compile_source(write_unit(output/'unit','StatsOverlay::DrawStandings'),'candidate')
             units={unit for _,_,items in HELPER_GROUPS for unit,_,_,_ in items}
             canonical={unit:compile_source(ROOT/f'src/reconstructed/{unit}.cpp',unit)[1] for unit in units}
             pins=json.loads((ROOT/'tests/fixtures/stats_standings_objects.json').read_text())
             self.assertEqual(record(candidate),pins['candidate'])
-            self.assertEqual(record(aggregate,True),pins['aggregate'])
             self.assertEqual(record(canonical['TrackOverlay'],True),pins['canonical'])
-            self.assertEqual(signature(candidate,SYMBOL),signature(aggregate,SYMBOL))
-            result=compare(image,candidate,SYMBOL,0x519a20,1002,SOURCE.with_suffix('.bindings.json'))
+            self.assertEqual(signature(candidate,SYMBOL),signature(canonical['TrackOverlay'],SYMBOL))
+            result=compare(image,candidate,SYMBOL,0x519a20,1002,ROOT/'src/reconstructed/TrackOverlay.bindings.json')
             self.assertEqual((result['candidate_size'],result['strict_match']['matching_positions'],result['strict_exact']),
                              (1004,605,False))
             entry=candidate.find_symbol(SYMBOL)
@@ -163,9 +164,9 @@ class StatsStandingsTests(unittest.TestCase):
             self.assertEqual([r.virtual_address-entry.value for r in relocs
                               if candidate.symbol_by_index[r.symbol_index].name==ITERATOR],[172,220])
             self.assertNotIn(OLD_ITERATOR,[s.name for s in candidate.symbols])
-            # The other aggregate caller keeps its independently provisional view.
-            self.assertIn('?NextBike@ChatBikeRaceView@@QAEPAUChatKrustyBikeView@@PAH@Z',
-                          [s.name for s in aggregate.symbols])
+            # CollectRacers, in the same unit, now casts to BikeRace at its call too.
+            self.assertNotIn('?NextBike@ChatBikeRaceView@@QAEPAUChatKrustyBikeView@@PAH@Z',
+                             [s.name for s in canonical['TrackOverlay'].symbols])
             helper_paths=[];strict=0
             for name,header,items in HELPER_GROUPS:
                 source=output/(name+'.cpp')
@@ -222,10 +223,10 @@ class StatsStandingsTests(unittest.TestCase):
             layout.write_text('#include "EventManager.h"\n'+layout.read_text())
             compile_source(layout,'layout')
             spec=json.loads((ROOT/'config/game_build.json').read_text())
-            built=game_compile(SOURCE,output/'game-command',compiler,[ROOT/p for p in spec['includes']],
+            built=game_compile(ROOT/'src/reconstructed/TrackOverlay.cpp',output/'game-command',compiler,[ROOT/p for p in spec['includes']],
                                spec['profile'],{**os.environ,'PYTHONPATH':str(ROOT)})
             self.assertTrue(built['compiled'],built)
-            self.assertEqual(object_view(candidate),object_view(CoffObject(Path(built['object']))))
+            self.assertEqual(object_view(canonical['TrackOverlay'],True),object_view(CoffObject(Path(built['object'])),True))
             fixture_path,_=compile_source(ROOT/'tests/fixtures/stats_standings_compare.cpp','fixture',True)
             executable=output/'stats.exe'
             result=subprocess.run([str(linker),'/nologo','/subsystem:console','/base:0x100000','/fixed',
@@ -237,7 +238,7 @@ class StatsStandingsTests(unittest.TestCase):
             self.assertEqual(result.returncode,0,result.stdout+result.stderr)
             self.assertIn('Stats DrawStandings: 3228 cases match, 78 AV, 26 throws',result.stdout)
             self.assertEqual(strict,30)
-            print(f'Stats DrawStandings: {strict} strict game/CRT comparisons; full aggregate and canonical pins; '+result.stdout.strip())
+            print(f'Stats DrawStandings: {strict} strict game/CRT comparisons; full candidate and canonical pins; '+result.stdout.strip())
 
 
 if __name__=='__main__':

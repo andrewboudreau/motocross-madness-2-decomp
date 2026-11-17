@@ -19,14 +19,9 @@
       "sha256": "60017c261f46e2b03660e26151a58f20347a9186e49c082974f49f3a27464e3b"
     },
     "src/reconstructed/TrackOverlay.cpp": {
-      "sections": 215,
-      "relocations": 920,
-      "sha256": "90f38277f0c888ebcb484b4abb1a0da627db5a063ebd10b60b49154076d48534"
-    },
-    "samples/track/TrackOverlayNearMisses.cpp": {
-      "sections": 27,
-      "relocations": 111,
-      "sha256": "9d0b41b6733941ce0498e6f119efe17d27edffcb269c69d67f36e988701a1176"
+      "sections": 231,
+      "relocations": 1031,
+      "sha256": "eb345f241b3bf7b52f52c9f1a898c4fad3377e95355b23557e7f4ff484db2ad2"
     },
     "src/krusty2/visibility/VisibilityQuadTree.cpp": {
       "sections": 88,

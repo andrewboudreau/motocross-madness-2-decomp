@@ -12,7 +12,7 @@ import math
 
 RETAIL_VA = 0x0051c4f0
 SYMBOL = '?IntersectLineCircle@RadarOverlay@@QAEHPBM00PAM1@Z'
-SOURCE = 'src/bringup/Group3_RadarOverlay.cpp'
+SOURCE = 'src/reconstructed/TrackOverlay.cpp'
 PROBES = {0x0051c614: 'tangent', 0x0051c642: 'two hits'}
 
 

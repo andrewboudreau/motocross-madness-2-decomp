@@ -939,6 +939,97 @@ int CompareScoresDescending(const void* a, const void* b)
     return 1;
 }
 
+// 0x00519a20. Not exact (605 of 1002 bytes, 1004 compiled: retail keeps `this` in edi
+// and the view in ebp, here swapped, with the row index in edx;
+// docs/TRACKOVERLAY.md forms tried)
+// The standings, best score first: the time left (as a label), then a row
+// per racer that is shown, ending with the player's own row. Draws only
+// when a row changed.
+int StatsOverlay::DrawStandings()
+{
+    RacerScoreRank scores[11];
+    char time[0x80];
+    char label[0x80];
+    int iterator;
+    int own;
+    void* dc;
+    void* font;
+    int i;
+    int count = 0;
+    EventBikeRaceView* view = g_TrackGame->quarryEvent->raceView;
+    if (g_TrackGame->mode.raceSettings.raceMode != 0 && g_TrackGame->mode.raceSettings.raceMode != 4) {
+        g_TrackGame->LoadResourceString(0x943, label, 0x80);
+        TrackGameViewOwner* owner = g_TrackGame->quarryEvent;
+        float limit = g_TrackGame->mode.raceSettings.timeLimitMinutes * 60.0f;
+        FormatMinutesSeconds(time, limit - (owner->elapsedMinutes * 60.0f + owner->elapsedSeconds));
+        sprintf(rowText[0], "%s", label);
+    }
+    iterator = 0;
+    EventKrustyBikeView* racer;
+    while ((racer = reinterpret_cast<EventKrustyBikeView*>(reinterpret_cast<BikeRace*>(view)->NextBike(&iterator))) != 0) {
+        if (racer->isEnabled) {
+            scores[count].value = racer->score;
+            scores[count].racer = racer;
+            count++;
+        }
+    }
+    qsort(scores, count, sizeof(RacerScoreRank), CompareScoresDescending);
+    for (i = 0; i < count; i++) {
+        if (scores[i].racer == view->localRacer) {
+            own = i;
+            break;
+        }
+    }
+    int first = 1;
+    if (g_TrackGame->mode.raceSettings.raceMode != 0 && g_TrackGame->mode.raceSettings.raceMode != 4)
+        count++;
+    else
+        first = 0;
+    if (count >= 6)
+        count = 6;
+    int row;
+    int shown = 0;
+    for (row = first; row < count - 1; row++) {
+        sprintf(rowText[row], "%d) %s : %.0f", shown + 1, scores[shown].racer->racerName,
+                scores[shown].racer->score);
+        shown++;
+    }
+    if (own >= shown)
+        sprintf(rowText[row], "%d) %s : %.0f", own + 1, scores[own].racer->racerName,
+                scores[own].racer->score);
+    else
+        sprintf(rowText[row], "%d) %s : %.0f", shown + 1, scores[shown].racer->racerName,
+                scores[shown].racer->score);
+    for (i = 0; i <= row; i++) {
+        if (strcmp(rowText[i], drawnRowText[i]) != 0)
+            break;
+    }
+    if (row < i)
+        return 1;
+    RestoreRect(&sourceRect);
+    PCTextureMap* texture = (PCTextureMap*)sharedTexture;
+    if (texture->systemSurface->GetDC(&dc) != 0)
+        goto fail;
+    SetBkColor(dc, 1);
+    SetBkMode(dc, 1);
+    SetTextColor(dc, 0xffffff);
+    font = SelectObject(dc, largeFont);
+    for (i = 0; i <= row; i++) {
+        if (i == 0)
+            GetTextExtentPoint32A(dc, rowText[0], strlen(rowText[0]), &rowExtent);
+        DrawTextA(dc, rowText[i], strlen(rowText[i]), &rowRects[i], 0x120);
+        strcpy(drawnRowText[i], rowText[i]);
+    }
+    SelectObject(dc, font);
+    if (texture->systemSurface->ReleaseDC(dc) != 0) {
+fail:
+        return 0;
+    }
+    TintRows(0, 0x80, 0xffff);
+    overlayTexture->Upload(0, -1);
+    return 1;
+}
+
 // 0x0051ae80
 DropTextOverlay::DropTextOverlay(int flags) : GameObject(flags)
 {
@@ -1349,6 +1440,104 @@ void RadarOverlay::DrawFrameRate()
     frameTimeSum = 0.0f;
     frameCount = 0.0f;
 }
+// 0x0051bed0. Not exact (1129 of 1160 bytes: retail puts the int-to-float slot of `outside`
+// above `x` and schedules the distance products before the name and the pushes;
+// docs/TRACKOVERLAY.md forms tried)
+// Places the name tags and draws the map dots.
+void RadarOverlay::DrawRacers(int mode)
+{
+    int i;
+    int x;
+    int y;
+    int outside;
+    Vector3 rim;
+    Vector3 point;
+    for (i = 0; i < racerCount; i++) {
+        if (racers[i] == radarCamera->followedRacer) {
+            mapOrigin = racers[i]->position;
+            mapAngle = -racers[i]->heading;
+            if (racers[i]->crashState)
+                mapAngle = heldMapAngle;
+            else
+                heldMapAngle = mapAngle;
+            followedIndex = i;
+            break;
+        }
+    }
+    mapAngleCos = cos(mapAngle);
+    mapAngleSin = sin(mapAngle);
+    for (i = 0; i < racerCount; i++) {
+        if (i != followedIndex && racers[i]->isEnabled) {
+            outside = WorldToMap(racers[i]->position, &x, &y, &rim.x, &rim.y);
+            if (cueShown && cueIndex == i) {
+                if (radarView->chatOverlay) {
+                    Vector3& own = racers[followedIndex]->position;
+                    float dx = racers[i]->position.x - own.x;
+                    float dz = racers[i]->position.z - own.z;
+                    float distance = dz * dz + dx * dx;
+                    radarView->chatOverlay->SetCueRacer(distance, racers[i]->racerName);
+                }
+                if (outside && (g_TrackGame->mode.raceSettings.eventType == 3 ||
+                                g_TrackGame->mode.raceSettings.eventType == 2)) {
+                    point.x = -1.0f;
+                    point.y = -1.0f;
+                } else {
+                    // Retail converts `outside` with fild and compares it with 0.0f.
+                    point.x = (outside != 0.0f) ? rim.x : (float)x;
+                    // Retail really tests the sum of the dword at +0x1fc (mapRect.top) and
+                    // `outside` here (mov edx,[ebp+0x1fc]; add edx,esi; je) before
+                    // subtracting 6.4 and truncating.
+                    point.y = (float)(int)(((mapRect.top + outside) ? rim.y : (float)y) - 6.4f);
+                }
+                for (int k = 0; k < racerCount; k++) {
+                    NameOverlay* tag = radarView->chatOverlay->nameTags[k];
+                    if (tag->trackedRacer == racers[i])
+                        tag->SetRadarAnchor(point, x - mapCenterX > 0, outside);
+                }
+            } else {
+                point.x = -1.0f;
+                point.y = -1.0f;
+                if (radarView->chatOverlay)
+                    radarView->chatOverlay->nameTags[i]->SetRadarAnchor(point, 0, outside);
+            }
+            if (outside) {
+                if (g_TrackGame->mode.raceSettings.eventType == 3 ||
+                    g_TrackGame->mode.raceSettings.eventType == 2)
+                    continue;
+                lineStart.color = 0x28aa28;
+                lineEnd.color = 0x28aa28;
+                lineStart.sx = rim.x;
+                lineStart.sy = rim.y;
+            } else {
+                lineStart.color = 0x50e650;
+                lineEnd.color = 0x50e650;
+                lineStart.sx = (float)x;
+                lineStart.sy = (float)y;
+            }
+            lineEnd = lineStart;
+            lineEnd.sx += 3.0f;
+            Target()->DrawPrimitive(D3DPT_LINESTRIP, D3DFVF_TLVERTEX, (int)&lineStart, 2, 0);
+            lineStart.sy += 1.0f;
+            lineEnd.sy += 1.0f;
+            Target()->DrawPrimitive(D3DPT_LINESTRIP, D3DFVF_TLVERTEX, (int)&lineStart, 2, 0);
+            lineStart.sy -= 2.0f;
+            lineEnd.sy -= 2.0f;
+            Target()->DrawPrimitive(D3DPT_LINESTRIP, D3DFVF_TLVERTEX, (int)&lineStart, 2, 0);
+        } else {
+            point.x = -1.0f;
+            point.y = -1.0f;
+            if (radarView->chatOverlay)
+                radarView->chatOverlay->nameTags[i]->SetRadarAnchor(point, 0, 1);
+        }
+    }
+    if (mode == 2 || mode == 3) {
+        DrawTrackOutline(1);
+        DrawTrackOutline(2);
+    }
+    if (mode == 1 || mode == 5)
+        DrawGates();
+}
+
 // 0x0051c360
 int RadarOverlay::WorldToMap(Vector3 point, int* x, int* y, float* rimX, float* rimY)
 {
@@ -1397,6 +1586,179 @@ static inline Vector3 RadarCross(const Vector3& a, const Vector3& b)
     r.y = ((a.z * b.x) - (a.x * b.z));
     r.z = ((a.x * b.y) - (a.y * b.x));
     return r;
+}
+
+// 0x0051c4f0. Not exact (404 of 560 bytes: VC6 assigns the scale, discriminant and
+// intersection temporaries other frame slots and adds proj + q with fxch/fadd;
+// docs/TRACKOVERLAY.md forms tried)
+int RadarOverlay::IntersectLineCircle(const float* a, const float* b, const float* circle, float* reference, float* point)
+{
+    float nx;
+    float ny;
+    float lineOffset;
+    if (LineThrough(a, b, &nx, &ny, &lineOffset))
+        return -1;
+    float scale = 1.0f / (nx * nx + ny * ny);
+    float t = -(scale * lineOffset);
+    float px = t * nx;
+    float py = t * ny;
+    float root = FastSqrt(scale);
+    float dx = root * ny;
+    float dy = -(root * nx);
+    float lengthSquared = dy * dy + dx * dx;
+    if (lengthSquared < 1e-14f)
+        return 3;
+    float ex = circle[0] - px;
+    float ey = circle[1] - py;
+    float cross = ey * dx - ex * dy;
+    float radius = circle[2];
+    float disc = radius * radius * lengthSquared - cross * cross;
+    if (disc < -1e-14f)
+        return -1;
+    float proj = (ex * dx) + ey * dy;
+    if (disc < 1e-14f) {
+        float along = proj / lengthSquared;
+        point[0] = along * dx + px;
+        point[1] = along * dy + py;
+        return 1;
+    }
+    float halfChord = FastSqrt(disc);
+    float inverse = 1.0f / lengthSquared;
+    float k1 = (proj - halfChord) * inverse;
+    float k2 = (proj + halfChord) * inverse;
+    float x1 = k1 * dx + px;
+    float y1 = k1 * dy + py;
+    float x2 = k2 * dx + px;
+    float y2 = k2 * dy + py;
+    float ay = reference[1] - y1;
+    float ax = reference[0] - x1;
+    float by = reference[1] - y2;
+    float bx = reference[0] - x2;
+    if (ax * ax + ay * ay < (by * by) + bx * bx) {
+        point[0] = x1;
+        point[1] = y1;
+    } else {
+        point[0] = x2;
+        point[1] = y2;
+    }
+    return 2;
+}
+
+// The view RadarOverlay draws (+0x12c) holds its track at +0x48.
+struct RadarBikeRaceView {
+    unsigned char field_0x00[0x48];
+    Track* track;                              // +0x48
+};
+
+// 0x0051c720. Not exact (254 of 1016 bytes, 1002 compiled: frame 0x74 against
+// retail's 0x8c, the entering clip's hit-point store order and the child loop;
+// docs/TRACKOVERLAY.md forms tried)
+// Draws the track outline (mode 1: the +0x18 edge of every segment, 2: the
+// +0x0c edge), clipped to the map circle, walking every node once through a
+// work list.
+void RadarOverlay::DrawTrackOutline(int mode)
+{
+    TrackListItem* list = 0;
+    TrackListItem* item = (TrackListItem*)DebugCalloc(1, sizeof(TrackListItem), __FILE__, 1992);
+    item->node = ((RadarBikeRaceView*)radarView)->track->startNode;
+    item->next = list;
+    list = item;
+    while (list) {
+        TrackNode*& node = list->node;
+        if (node->flags & 4) {
+            node->flags &= ~4;
+            item = list;
+            list = list->next;
+            DebugFree(item, __FILE__, 2001);
+        } else {
+        node->flags |= 4;
+        TrackSegment* first = node->firstSegment;
+        Vector3 point;
+        if (mode == 1)
+            point = *(Vector3*)&first->edgeBX;
+        else if (mode == 2)
+            point = *(Vector3*)&first->edgeAX;
+        int startX;
+        int startY;
+        float rim[2];
+        int outside = WorldToMap(point, &startX, &startY, &rim[0], &rim[1]);
+        lineStart.sx = (float)startX;
+        lineStart.sy = (float)startY;
+        lineStart.color = 0xedea5e;
+        lineEnd.color = 0xedea5e;
+        int x = startX;
+        int y = startY;
+        TrackSegment* segment = first->next;
+        if (segment) do {
+            if (mode == 1)
+                point = *(Vector3*)&segment->edgeBX;
+            else if (mode == 2)
+                point = *(Vector3*)&segment->edgeAX;
+            int wasOutside = outside;
+            float from[2];
+            from[0] = (float)x;
+            from[1] = (float)y;
+            outside = WorldToMap(point, &x, &y, &rim[0], &rim[1]);
+            if (outside) {
+                if (wasOutside) {
+                    lineStart.sx = (float)x;
+                    lineStart.sy = (float)y;
+                } else {
+                    float to[2];
+                    float circle[3];
+                    float hit[2];
+                    to[0] = (float)x;
+                    to[1] = (float)y;
+                    circle[2] = mapRadius;
+                    circle[0] = (float)mapCenterX;
+                    circle[1] = (float)mapCenterY;
+                    if (IntersectLineCircle(from, to, circle, rim, hit) != -1) {
+                        lineEnd.sx = hit[0];
+                        lineEnd.sy = hit[1];
+                        Target()->DrawPrimitive(D3DPT_LINESTRIP, D3DFVF_TLVERTEX, (int)&lineStart, 2, 0);
+                        lineStart = lineEnd;
+                    }
+                }
+            } else if (wasOutside) {
+                float to[2];
+                float circle[3];
+                float hit[2];
+                to[0] = (float)x;
+                to[1] = (float)y;
+                circle[2] = mapRadius;
+                circle[0] = (float)mapCenterX;
+                circle[1] = (float)mapCenterY;
+                if (IntersectLineCircle(from, to, circle, rim, hit) != -1) {
+                    lineStart.sy = hit[1];
+                    lineEnd.sy = (float)y;
+                    lineEnd.sx = (float)x;
+                    lineStart.sx = hit[0];
+                    Target()->DrawPrimitive(D3DPT_LINESTRIP, D3DFVF_TLVERTEX, (int)&lineStart, 2, 0);
+                    lineStart = lineEnd;
+                }
+            } else {
+                lineEnd.sx = (float)x;
+                lineEnd.sy = (float)y;
+                Target()->DrawPrimitive(D3DPT_LINESTRIP, D3DFVF_TLVERTEX, (int)&lineStart, 2, 0);
+                lineStart = lineEnd;
+            }
+            segment = segment->next;
+            if (segment == node->firstSegment) {
+                lineEnd.sx = (float)startX;
+                lineEnd.sy = (float)startY;
+                break;
+            }
+        } while (segment);
+        for (int i = 0; i < node->linkCount; i++) {
+            if (!(node->links[i]->flags & 4)) {
+                item = (TrackListItem*)DebugCalloc(1, sizeof(TrackListItem), __FILE__, 2094);
+                item->node = node->links[i];
+                item->next = list;
+                list = item;
+            }
+        }
+        }
+    }
 }
 
 // 0x0051cb20
@@ -1584,6 +1946,44 @@ ChatOverlay* ChatOverlay::Setup(RenderTarget* target, TextureMapManager* manager
     return this;
 }
 
+// 0x0051d730: both Create calls read `renderContext` in the argument list;
+// through the inline Target() accessor VC6 loads it ahead of the other
+// arguments (587 bytes).
+int ChatOverlay::CollectRacers(ChatBikeRaceView* view)
+{
+    int iterator;
+    ChatKrustyBikeView* racer;
+    racerCount = 0;
+    iterator = 0;
+    chatView = view;
+    while ((racer = reinterpret_cast<ChatKrustyBikeView*>(reinterpret_cast<BikeRace*>(chatView)->NextBike(&iterator))) != 0) {
+        racers[racerCount] = racer;
+        racerCount++;
+    }
+    for (int i = 0; i < racerCount; i++) {
+        nameTags[i] = (new(__FILE__, 2369) NameOverlay(1))->Create(
+            (RenderTarget*)renderContext, overlayTexture, &nameTagRects[i], 0, &nameTagRects[i],
+            (EventKrustyBikeView*)racers[i],
+            (NameOverlayEventView*)chatView, i);
+        AppendChild(nameTags[i], -1);
+    }
+    if (g_TrackGame->mode.raceSettings.eventType == 0) {
+        nameTags[racerCount] = (new(__FILE__, 2376) NameOverlay(1))->Create(
+            (RenderTarget*)renderContext, overlayTexture, &nameTagRects[racerCount], 0,
+            &nameTagRects[racerCount], 0,
+            (NameOverlayEventView*)chatView, i);
+        AppendChild(nameTags[racerCount], -1);
+        if (nameTags[racerCount]) {
+            nameTags[racerCount]->SetFixedPosition(Vector3(cueRect.left, cueRect.top, 0));
+            nameTags[racerCount]->Disable();
+            nameLineRight = nameTagRects[racerCount].right;
+            nameTags[racerCount]->drawWidth = 0;
+        }
+    }
+    RedrawNameTags(-1);
+    return 1;
+}
+
 // 0x0051d980
 void ChatOverlay::ShowCueTag(int show)
 {
@@ -1743,6 +2143,87 @@ int ChatOverlay::Render3D()
     if (g_TrackGame->mode.showRiderNames || g_TrackGame->mode.showRiderPositions)
         GameObject::Render3D();
     return 1;
+}
+
+// 0x0051e3f0: draws name tag `index` into `dc`: the name line for the
+// player's own tag, otherwise the position and the racer's name (or the
+// value at +0x4a4), centred, and sizes the tag to the text.
+// Two source shapes carry the scratch-register naming (each alone leaves 964-966):
+// - the growing arm of the width test ends with its own `SelectObject(dc, font);
+//   return;` and the clamp store follows the `if`. VC6 tail-merges the duplicate
+//   epilogue, so the branch bytes are the same as with if/else, but the growing
+//   arm is no longer the last block before the "%.3f"/positions branch and the
+//   scratch rotation enters that branch one register later (racer eax, buffer
+//   ecx, game edx);
+// - the positions block reads `racers[index]->position` twice instead of through
+//   a block-local racer pointer.
+// Forms that did not move it while the if/else was in place (966): rect.left =
+// rect.left + ..., a per-branch length, a racer local in the "%.3f" branch, a (double)
+// cast, `!= 0`, dead int locals in the cue or the else branch, the scale through an
+// inline accessor, a float or double local, `(*racers[index]).`, `this->racers`, a
+// `char*` alias of `text`, `&text[0]`, the format in a local, a TrackGame local in the
+// positions block, a tag or width local in the width test and reordered operands of
+// the sourceRect.right sum; dropping the inner `size` shadow is worse (933), swapping
+// the arms of the s_UnknownGlobal68a444 test changes the block layout (503).
+void ChatOverlay::DrawNameTag(void* dc, int index)
+{
+    char text[0x80];
+    char name[0x80];
+    int length;
+    Win32Size size;
+    void* font = SelectObject(dc, nameTagFont);
+    if (index == racerCount) {
+        sprintf(text, "%s", cueRacerName);
+        length = strlen(text);
+        OverlayRect rect = nameTagRects[index];
+        rect.left += nameTags[index]->drawWidth;
+        DrawTextA(dc, text, length, &rect, 0x8124);
+        Win32Size size;
+        GetTextExtentPoint32A(dc, text, length, &size);
+        nameTags[index]->drawWidth += size.cx;
+        nameTags[index]->sourceRect = nameTagRects[index];
+        if (nameTags[index]->drawWidth + 4 < nameTags[index]->sourceWidth) {
+            nameTags[index]->drawWidth += 4;
+            nameTags[index]->sourceRect.right = nameTags[index]->drawWidth + nameTags[index]->sourceRect.left - 1;
+            SelectObject(dc, font);
+            return;
+        }
+        nameTags[index]->drawWidth = nameTags[index]->sourceWidth;
+    } else {
+        if (s_UnknownGlobal68a444) {
+            sprintf(text, "%.3f", racers[index]->driveForceScale);
+        } else {
+            if (g_TrackGame->mode.showRiderPositions) {
+                if (racers[index]->position > 0)
+                    sprintf(text, "%d", racers[index]->position);
+                else
+                    strcpy(text, "--");
+            } else {
+                strcpy(text, "");
+            }
+            if (g_TrackGame->mode.showRiderNames)
+                strcpy(name, racers[index]->name);
+            else
+                strcpy(name, "");
+            if (g_TrackGame->mode.showRiderPositions && g_TrackGame->mode.showRiderNames)
+                strcat(text, " : ");
+            strcat(text, name);
+        }
+        length = strlen(text);
+        GetTextExtentPoint32A(dc, text, length, &size);
+        nameTags[index]->drawWidth = size.cx;
+        DrawTextA(dc, text, length, &nameTagRects[index], 0x8125);
+        nameTags[index]->sourceRect = nameTagRects[index];
+        if (nameTags[index]->drawWidth + 4 < nameTags[index]->sourceWidth) {
+            nameTags[index]->drawWidth += 4;
+            int margin = (nameTags[index]->sourceWidth - nameTags[index]->drawWidth) >> 1;
+            nameTags[index]->sourceRect.left += margin;
+            nameTags[index]->sourceRect.right += 1 - margin;
+        } else {
+            nameTags[index]->drawWidth = nameTags[index]->sourceWidth;
+        }
+    }
+    SelectObject(dc, font);
 }
 
 // 0x0051de10

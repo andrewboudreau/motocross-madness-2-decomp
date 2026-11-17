@@ -1,11 +1,10 @@
 # ChatOverlay name-tag drawing
 
-`ChatOverlay::DrawNameTag(void*, int)` is complete readable C++ in
-`samples/track/ChatNameTagDraw.cpp`. It draws the cue/racer text and updates the
-corresponding `NameOverlay` width and source rectangle. The unchanged source
-emits **974 bytes**, all **974 matching retail** with relocations resolved.
-It remains a sample; matching bytes, declarations and behavioral evidence do
-not establish original translation-unit ownership.
+`ChatOverlay::DrawNameTag(void*, int)` is in [TrackOverlay.cpp](../src/reconstructed/TrackOverlay.cpp) (retail `TrackOverlay.cpp`), in retail
+order after `0x0051e390`, and is a calibration case. It draws the
+cue/racer text and updates the corresponding
+`NameOverlay` width and source rectangle. The source emits **974 bytes**,
+all **974 matching retail** with relocations resolved.
 
 ## Complete extent and receiver
 
@@ -34,8 +33,8 @@ constructor and 242-byte `Create` method are strict. The decoded
 `CollectRacers` producer allocates `0x174`, calls those methods, and stores the
 returned primary pointer into `nameTags`, starting at `ChatOverlay+0x2d8`.
 The extra cue-tag chain stores the same kind of pointer at the count index.
-`CollectRacers` is a strict-exact sample (586 bytes); it stays in the near-miss
-file and these instruction/producer facts are checked independently of it.
+`CollectRacers` (586 bytes) is exact in TrackOverlay.cpp too; these
+instruction/producer facts are checked independently of it.
 Field names and the partial racer view remain provisional; the regression
 pins the actual used layouts independently.
 
@@ -56,27 +55,17 @@ flags `0xc0400080`. Only the visibility and decorated name change, from local
 `_s_UnknownGlobal68a444` to external `?s_UnknownGlobal68a444@@3HA`. It remains
 writable storage, not a constant false branch or a new duplicate flag.
 
-The standalone imports that actual canonical definition. The unadmitted
-aggregate retains its preceding static declaration; ordinary C++ linkage rules
-make the later `extern` declaration refer to that same existing aggregate-local
-measurement view. There are no include-context macros or linker aliases.
-The aggregate is not a game input and does not introduce another runtime flag.
+The behaviour test links a validation unit sliced from the canonical file
+(`tests/track_overlay_unit.py`): the unit's includes, its GDI import
+declarations, this flag definition and `DrawNameTag`. The unit therefore
+carries the flag as four private zeroed `.bss` bytes; there are no
+include-context macros or linker aliases.
 
-Fresh same-path before/after compilation preserves all **207 canonical
-nondebug sections and 863 relocations**, under exactly that one symbol's
-visibility/name change. It preserves all **37 aggregate sections and 162
-relocations without any exclusions or name changes**. Function bodies, all
-other public symbol offsets, section flags, storage bytes, initializer/CRT
-records and defined relocation destinations remain intact. COFF section
-numbers reorder after making the scalar public; the proof compares actual
-section identities and destinations, not arbitrary section indices.
-
-The retained portable pins normalize only the two explicitly enumerated source
-filename literals. The private same-path proof does not normalize filenames.
-The standalone function and included aggregate function have identical complete
-bytes and named relocations under the single flag-name difference. Both compile
-without project include paths. The standalone also reproduces the complete
-object emitted by the actual game compilation command.
+The validation unit's `DrawNameTag` has the same complete bytes and named
+relocations as the canonical unit's. The canonical unit's complete object
+(**231 nondebug sections, 1031 relocations**, with `TrackOverlay.cpp`
+literals named by path) is pinned and reproduced by the game compile
+command.
 
 ## Actual CRT and platform boundaries
 
@@ -107,8 +96,8 @@ unwritten Win32 failure outputs, real glyph measurement or real GDI handles.
 
 ## Native validation
 
-`tests/test_chat_name_tag_draw.py` protects **94 strict game cases**, the
-additional strict CRT wrapper, both whole objects and **5,864 native scenarios**.
+`tests/test_chat_name_tag_draw.py` protects **97 strict game cases**, the
+additional strict CRT wrapper, the canonical object and **5,864 native scenarios**.
 The matrix includes 64 access-violation outcomes and eight scripted exceptions:
 
 | Cases | Contract |
@@ -152,10 +141,9 @@ the full prepared `TrackGame` buffers, the declared partial racer views, both
 guard pages, global game pointer/flag, and selected-font state at callbacks and
 completion. The actual used sizes/offsets are separately compiled against the
 real headers. Raw prepared storage does not establish constructors, lifetimes
-or full class equivalence for provisional views. A validation-only storage TU
-uses the exact canonical scalar-definition text; its zeroed writable 4-byte
-BSS and absence of imports/initializers are checked. Actual game storage
-ownership is independently covered by the canonical-object proof above.
+or full class equivalence for provisional views. The validation unit's copy
+of the canonical flag definition is checked as zeroed writable 4-byte BSS.
+Actual game storage ownership is covered by the canonical-object pin above.
 
 All local strings stay within the two 128-byte method buffers; the longer cue
 member does not justify unbounded formatting. Access-fault cases stop at guarded
@@ -166,17 +154,10 @@ prepared state do not demonstrate integrated HUD rendering, startup or racing.
 
 ## Functional build review
 
-This standalone is a complete individually reviewed candidate, byte-exact since the
-width test's growing arm returns on its own (see the sample header). Its
-existing game dependencies are the canonical flag and `g_TrackGame`; the other
-imports are the actual CRT and OS functions listed above. The candidate is explicitly admitted by `config/game_build.json`. The isolated
-real build `build-ixxvm39u` compiles 258/258 translation units and removes only
-`DrawNameTag`, reducing unresolved names from 236 to 235 with none added.
-All 256 prior game objects preserve 10,675 nondebug sections and 45,728
-relocations under exactly the flag visibility/name change, without filename
-exclusions. Independent recompilation reproduces all eight new candidate
-sections and 20 relocations using its actual game command. The game still
-does not link; this is not integrated HUD or racing validation.
+DrawNameTag is exact and compiles as part of TrackOverlay.cpp in the
+functional build. Its game dependencies are the canonical flag and
+`g_TrackGame`; the other imports are the actual CRT and OS functions listed
+above. This is not integrated HUD or racing validation.
 
 ```powershell
 $env:PYTHONPATH='.;tests'
@@ -185,7 +166,5 @@ $env:MCM2_EXE=(Resolve-Path work/game/mcm2.exe).Path
 python -m unittest test_chat_name_tag_draw -v
 ```
 
-Private same-path and source-extraction evidence is in
-`work/connections50/nametag/live-preservation.json` and its before/after objects.
 No private objects, retail bytes, compiler libraries or native executables are
 part of the source distribution.

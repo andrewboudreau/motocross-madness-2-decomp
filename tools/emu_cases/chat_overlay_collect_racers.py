@@ -1,7 +1,7 @@
 """ChatOverlay::CollectRacers 0x0051d730, the overlay's racer name tags (tools/emu_diff.py case,
 call-record/replay mode).
 
-The linked body is src/bringup/Group3_RadarOverlay.cpp. Offsets from the retail body: the
+The linked body is src/reconstructed/TrackOverlay.cpp. Offsets from the retail body: the
 overlay's target +0x18, overlay texture +0x2c, chat view +0x12c, cue rectangle +0x150 (left,
 top), name line right +0x160, racers +0x16c (eleven), racer count +0x198, name tags +0x2d8 and
 their rectangles +0x30c (16 bytes; right at +8); g_TrackGame (0x0056e26c) +0x2d74 the event
@@ -16,7 +16,7 @@ import random
 
 RETAIL_VA = 0x0051d730
 SYMBOL = '?CollectRacers@ChatOverlay@@QAEHPAUChatBikeRaceView@@@Z'
-SOURCE = 'src/bringup/Group3_RadarOverlay.cpp'
+SOURCE = 'src/reconstructed/TrackOverlay.cpp'
 PROBES = {0x0051d7bc: 'tag loop', 0x0051d84a: 'extra tag', 0x0051d8e6: 'fixed tag', 0x0051d7ee: 'new failed'}
 
 TRACK_GAME = 0x0056e26c

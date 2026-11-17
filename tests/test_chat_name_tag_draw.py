@@ -1,4 +1,9 @@
-"""Complete name-tag drawing and a shared existing scalar, with finite GDI contracts."""
+"""Complete name-tag drawing and a shared existing scalar, with finite GDI contracts.
+
+ChatOverlay::DrawNameTag is in src/reconstructed/TrackOverlay.cpp. The behaviour
+run links a validation unit sliced from it (tests/track_overlay_unit.py): the
+unit's includes, the GDI imports, the 0x0068a444 flag definition and the body.
+"""
 import hashlib
 import json
 import os
@@ -18,25 +23,23 @@ from tools.match import compare
 from tools.run_calibration import CASES
 from tools.build_game import compile_source as game_compile
 from test_edit_box_draw import signature
+from track_overlay_unit import write_unit
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCE = ROOT/'samples/track/ChatNameTagDraw.cpp'
 CANONICAL = ROOT/'src/reconstructed/TrackOverlay.cpp'
-AGGREGATE = ROOT/'samples/track/TrackOverlayNearMisses.cpp'
 SYMBOL = '?DrawNameTag@ChatOverlay@@QAEXPAXH@Z'
 FLAG = '?s_UnknownGlobal68a444@@3HA'
-OLD_FLAG = '_s_UnknownGlobal68a444'
 DIRECT = {0x51e439:0x534aaf, 0x51e568:0x534aaf, 0x51e5a1:0x534aaf}
 INDIRECT = {0x51e40b:'dword ptr [0x550078]', 0x51e4a4:'dword ptr [0x5502e8]',
             0x51e4ba:'dword ptr [0x550084]', 0x51e6df:'dword ptr [0x550084]',
             0x51e713:'dword ptr [0x5502e8]', 0x51e7ab:'dword ptr [0x550078]'}
 
 
-def object_view(obj, expose_flag=False, portable=False):
-    """All nondebug contents; optional one evidenced flag visibility/name change."""
+def object_view(obj, portable=False):
+    """All nondebug contents; ``portable`` names TrackOverlay.cpp literals by path."""
     files = {}
     if portable:
-        allowed = {'src/reconstructed/TrackOverlay.cpp', 'samples/track/TrackOverlayNearMisses.cpp'}
+        allowed = {'src/reconstructed/TrackOverlay.cpp'}
         for symbol in obj.symbols:
             if symbol.name.startswith('??_C@') and symbol.section_number > 0:
                 section = obj.section(symbol.section_number)
@@ -48,14 +51,7 @@ def object_view(obj, expose_flag=False, portable=False):
                     continue
                 if sep and relative in allowed:
                     files[section.index] = (relative, b'filename:'+relative.encode()+sep+tail)
-    if expose_flag:
-        flag = obj.find_symbol(OLD_FLAG)
-        assert flag.storage_class == 3 and flag.value == 0x40
-        section = obj.section(flag.section_number)
-        assert (section.name, section.raw_size, section.characteristics) == ('.bss',72,0xc0400080)
     def name(symbol):
-        if expose_flag and symbol.name == OLD_FLAG:
-            return FLAG
         if symbol.name.startswith('??_C@') and symbol.section_number in files:
             return 'filename:'+files[symbol.section_number][0]
         return symbol.name
@@ -64,7 +60,7 @@ def object_view(obj, expose_flag=False, portable=False):
     for section in sections:
         labels = tuple(sorted((name(s),s.value) for s in obj.symbols
                               if s.section_number==section.index and
-                              (s.storage_class==2 or s.type==32 or (expose_flag and s.name==OLD_FLAG))))
+                              (s.storage_class==2 or s.type==32)))
         if labels:
             keys[section.index] = ('named',labels)
         else:
@@ -187,31 +183,25 @@ class ChatNameTagTests(unittest.TestCase):
             crt_bindings=output/'sprintf.bindings.json'
             crt_bindings.write_text(json.dumps({'__output':'0x00539359','__flsbuf':'0x00539241'}))
             self.assertTrue(compare(image,crt_obj,'_sprintf',0x534aaf,82,crt_bindings)['strict_exact'])
-            candidate_path,candidate = compile_source(SOURCE,'candidate')
+            source=write_unit(output/'unit','ChatOverlay::DrawNameTag')
+            candidate_path,candidate = compile_source(source,'candidate')
             _,canonical = compile_source(CANONICAL,'canonical')
-            _,aggregate = compile_source(AGGREGATE,'aggregate')
-            result=compare(image,candidate,SYMBOL,0x51e3f0,974,SOURCE.with_suffix('.bindings.json'))
+            result=compare(image,candidate,SYMBOL,0x51e3f0,974,CANONICAL.with_suffix('.bindings.json'))
             self.assertEqual((result['candidate_size'],result['strict_match']['matching_positions'],result['strict_exact']),(974,974,True))
             pin=json.loads((ROOT/'tests/fixtures/chat_name_tag_objects.json').read_text())
-            for name,obj in [('canonical',canonical),('aggregate',aggregate)]:
-                view=object_view(obj,portable=True);record=pin[name]
-                self.assertEqual((len(view),sum(len(r[3]) for r in view)),(record['sections'],record['relocations']))
-                self.assertEqual(hashlib.sha256(json.dumps(view,separators=(',',':')).encode()).hexdigest(),record['sha256'])
-            # Aggregate retains its old private measurement view; standalone has one real import.
-            self.assertEqual(aggregate.find_symbol(OLD_FLAG).storage_class,3)
-            aggregate.find_symbol(OLD_FLAG).name=FLAG
-            self.assertEqual(signature(candidate,SYMBOL),signature(aggregate,SYMBOL))
-            aggregate.find_symbol(FLAG).name=OLD_FLAG
+            view=object_view(canonical,portable=True);record=pin['canonical']
+            self.assertEqual((len(view),sum(len(r[3]) for r in view)),(record['sections'],record['relocations']))
+            self.assertEqual(hashlib.sha256(json.dumps(view,separators=(',',':')).encode()).hexdigest(),record['sha256'])
+            self.assertEqual(signature(candidate,SYMBOL),signature(canonical,SYMBOL))
             flag=canonical.find_symbol(FLAG);self.assertEqual((flag.storage_class,flag.value),(2,0x40))
             flags=canonical.section(flag.section_number)
             self.assertEqual((flags.name,flags.raw_size,flags.raw_ptr,flags.characteristics),('.bss',72,0,0xc0400080))
-            self.assertFalse(any(s.name==OLD_FLAG for s in canonical.symbols))
             self.assertEqual({s.name for s in candidate.symbols if s.storage_class==2 and s.section_number==0},
-                             {FLAG,'?g_TrackGame@@3PAVTrackGame@@A','_sprintf','__fltused',
+                             {'?g_TrackGame@@3PAVTrackGame@@A','_sprintf','__fltused',
                               '__imp__SelectObject@8','__imp__DrawTextA@20','__imp__GetTextExtentPoint32A@16'})
             self.assertFalse(any(s.name.startswith('.CRT') for s in candidate.sections))
             sections=[(s.name,s.raw_size,s.characteristics) for s in candidate.sections if not s.name.startswith('.debug')]
-            self.assertEqual(sections,[('.drectve',40,0x100a00),('.text',976,0x60501020),
+            self.assertEqual(sections,[('.drectve',40,0x100a00),('.bss',4,0xc0300080),('.text',976,0x60501020),
                                       ('.data',4,0xc0301040),('.bss',1,0xc0301080),
                                       ('.data',3,0xc0301040),('.data',3,0xc0301040),
                                       ('.data',5,0xc0301040),('.data',3,0xc0301040)])
@@ -236,31 +226,25 @@ class ChatNameTagTests(unittest.TestCase):
             text+='typedef char GamePositions[offsetof(TrackGame,mode)+offsetof(TrackGameMode,showRiderPositions)==0xc38?1:-1];\n'
             text+='typedef char Method[sizeof(void(ChatOverlay::*)(void*,int))==4?1:-1];\n'
             layout.write_text(text);compile_source(layout,'layout')
-            # Exact existing definition text; standalone validation storage, not a game replacement.
-            definition='int s_UnknownGlobal68a444;'
-            self.assertEqual(CANONICAL.read_text().count(definition),1)
-            storage=output/'storage.cpp';storage.write_text(definition+'\n')
-            storage_path,storage_obj=compile_source(storage,'storage')
-            self.assertEqual({s.name for s in storage_obj.symbols if s.storage_class==2 and s.section_number>0},{FLAG})
-            self.assertFalse(any(s.section_number==0 and s.storage_class==2 for s in storage_obj.symbols))
-            storage_flag=storage_obj.find_symbol(FLAG);storage_section=storage_obj.section(storage_flag.section_number)
-            self.assertEqual((storage_flag.value,storage_section.name,storage_section.raw_size,storage_section.raw_ptr,storage_section.characteristics),(0,'.bss',4,0,0xc0300080))
-            self.assertFalse(any(s.name.startswith('.CRT') for s in storage_obj.sections))
+            # The unit carries the canonical flag definition: four private zeroed bytes.
+            self.assertEqual(CANONICAL.read_text().count('int s_UnknownGlobal68a444;'),1)
+            unit_flag=candidate.find_symbol(FLAG);unit_section=candidate.section(unit_flag.section_number)
+            self.assertEqual((unit_flag.storage_class,unit_flag.value,unit_section.name,unit_section.raw_size,unit_section.raw_ptr,unit_section.characteristics),(2,0,'.bss',4,0,0xc0300080))
             spec=json.loads((ROOT/'config/game_build.json').read_text())
-            built=game_compile(SOURCE,output/'game-command',compiler,[ROOT/p for p in spec['includes']],spec['profile'],{**os.environ,'PYTHONPATH':str(ROOT)})
+            built=game_compile(CANONICAL,output/'game-command',compiler,[ROOT/p for p in spec['includes']],spec['profile'],{**os.environ,'PYTHONPATH':str(ROOT)})
             self.assertTrue(built['compiled'],built)
-            self.assertEqual(object_view(candidate),object_view(CoffObject(Path(built['object']))))
+            self.assertEqual(object_view(canonical,portable=True),object_view(CoffObject(Path(built['object'])),portable=True))
             fixture_path,_=compile_source(ROOT/'tests/fixtures/chat_name_tag_compare.cpp','fixture',True)
             executable=output/'name-tag.exe'
             result=subprocess.run([str(linker),'/nologo','/subsystem:console','/base:0x100000','/fixed','/opt:ref',
-                                   f'/out:{executable}',f'/libpath:{libraries}',str(candidate_path),str(storage_path),str(fixture_path),
+                                   f'/out:{executable}',f'/libpath:{libraries}',str(candidate_path),str(fixture_path),
                                    'kernel32.lib','user32.lib','gdi32.lib'],cwd=ROOT,capture_output=True,text=True,encoding='latin1')
             self.assertEqual(result.returncode,0,result.stdout+result.stderr)
             result=subprocess.run([str(executable),str(image_path)],cwd=ROOT,capture_output=True,text=True,timeout=180)
             self.assertEqual(result.returncode,0,result.stdout+result.stderr)
             self.assertIn('NameTagDraw: 5864 scenarios match, actual sprintf and scripted GDI; 64 AV, 8 throws',result.stdout)
-            self.assertEqual(strict,95)
-            print(f'NameTagDraw: {strict} game strict + 1 CRT strict;244 sections/1025 relocations; '+result.stdout.strip())
+            self.assertEqual(strict,97)
+            print(f'NameTagDraw: {strict} game strict + 1 CRT strict; canonical 231 sections/1031 relocations; '+result.stdout.strip())
 
 
 if __name__=='__main__':

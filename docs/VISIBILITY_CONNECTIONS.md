@@ -62,19 +62,19 @@ conversion, hidden result argument, or pointer adjustment was introduced.
 ## Complete-object preservation
 
 The retained baseline fingerprints cover every nondebug section byte, flags,
-relocation kind/addend and resolved section/offset destination in five objects
+relocation kind/addend and resolved section/offset destination in four objects
 (current pins; the CubeDrawNearMisses object went away when BuildFaceGeometry
-moved into CubeDraw.cpp, and FollowCameraNearMisses when its four bodies moved
-into FollowCamera.cpp):
+moved into CubeDraw.cpp, FollowCameraNearMisses when its four bodies moved
+into FollowCamera.cpp, and TrackOverlayNearMisses when its bodies moved into
+TrackOverlay.cpp; eleven duplicate COMDATs went away with it):
 
 | Object | Sections | Relocations |
 | --- | ---: | ---: |
 | CubeDraw | 52 | 224 |
 | FollowCamera | 120 | 469 |
-| TrackOverlay | 215 | 920 |
-| TrackOverlayNearMisses | 27 | 111 |
+| TrackOverlay | 231 | 1031 |
 | VisibilityQuadTree | 88 | 342 |
-| Total | 502 | 2,066 |
+| Total | 491 | 2,066 |
 
 The same-path private before/after comparison allows exactly the five decorated
 method-name substitutions recorded in
@@ -83,13 +83,6 @@ initializer, exception metadata or partial function. The portable retained pins
 make only recognized complete source filenames relative to the checkout; local
 symbols resolve to actual section identities and offsets. The included
 FollowCameraTick source filename is explicitly covered.
-
-There is one prerequisite baseline repair: the original TrackOverlayNearMisses
-source does not compile because GUIManager is incomplete at its tooltip font
-accesses. Adding the genuine `GUIManagerCore.h` include fixes that omission. The
-sample's complete-object comparison starts from this repaired baseline, before
-any visibility changes; it is not a claim of equality with a compilable original
-HEAD sample object. The other before objects needed no baseline repair.
 
 The isolated game link removed exactly these five missing names, with no added
 undefined symbols. Parent integration checks cover all existing game objects

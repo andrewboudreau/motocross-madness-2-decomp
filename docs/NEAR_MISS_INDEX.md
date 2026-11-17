@@ -169,8 +169,8 @@ src/krusty2/collision/CollisionObject.cpp: the contact normal is copied by value
 leaf age and the register base. A sweep of initialised-local counts (k = 0..15) across
 about 90 physics, race and camera rows is flat for most; where it varies it is mostly
 period 8 and never fixes scheduling (push order, `sub esp`, store placement).
-ChatOverlay::CollectRacers `0x0051d730` (class b, 214/510 masked) is exact in its
-samples/track sample: both `NameOverlay::Create` calls read the render context in place
+ChatOverlay::CollectRacers `0x0051d730` (class b, 214/510 masked) is exact in
+TrackOverlay.cpp: both `NameOverlay::Create` calls read the render context in place
 (`(RenderTarget*)renderContext`). An inline accessor in an argument list is loaded ahead
 of the other arguments; the member read gives the natural right-to-left interleaving.
 The same session took UIDropDownList::LayoutParts `0x0047a400` to 887/962 (use the shared
@@ -230,7 +230,7 @@ fixes the reload order in GatherModelTriangles `0x0042c260`. When an integer
 `[base + index]` or add has its operands the other way round, give the younger local an
 early assignment at the top of the function (docs/VC6_OPERAND_ORDER.md 1.2).
 ChatOverlay::DrawNameTag `0x0051e3f0` (class b, 966/974) is exact too, in
-samples/track/ChatNameTagDraw.cpp: the growing arm of the width test ends with its own
+TrackOverlay.cpp: the growing arm of the width test ends with its own
 `SelectObject(dc, font); return;` and the clamp store follows the `if`. VC6 tail-merges
 the duplicated epilogue, so that branch's bytes do not change, but the arm is no longer
 the last block in source order before the next branch, and the scratch-register rotation

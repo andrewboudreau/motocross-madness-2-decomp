@@ -24,7 +24,6 @@ SOURCES = (
     'src/reconstructed/Griddraw.cpp',
     'src/krusty2/shadow/D3DIMSoultreeShadow.cpp',
     'src/krusty2/visibility/VisibilityQuadTree.cpp',
-    'samples/track/TrackOverlayNearMisses.cpp',
     'samples/render/GriddrawNearMisses.cpp',
     'samples/physics/shadow/D3DIMSoultreeShadowNearMisses.cpp',
     'samples/physics/visibility/VisibilityQuadTreeTraversal.cpp',
@@ -187,7 +186,10 @@ class ClipperGlobalConnectionsTests(unittest.TestCase):
             # The FollowCamera near misses move from their sample (66 sections, 337
             # relocations) into FollowCamera.cpp (98 -> 120 sections, 250 -> 469
             # relocations); the sample's duplicate COMDATs disappear.
-            self.assertEqual(sum(row['sections'] for row in pins['objects'].values()), 957)
+            # The TrackOverlay near misses move from their sample (27 sections, 111
+            # relocations) into TrackOverlay.cpp (215 -> 231 sections, 920 -> 1031
+            # relocations); eleven duplicate COMDATs disappear.
+            self.assertEqual(sum(row['sections'] for row in pins['objects'].values()), 946)
             # The corrected camera loader adds its explicit first-cross call relocation.
             # QueryGround's emulation-found normal/height repairs drop one Terrain relocation.
             # The D3DIMSoultreeShadow slot 30 frame pragma takes ebp, so the shadow-point
@@ -196,7 +198,7 @@ class ClipperGlobalConnectionsTests(unittest.TestCase):
             # and the rewritten BuildFaceGeometry differs: three more relocations.
             # BuildFaceGeometry's own promotion keeps all 41 of its relocations.
             self.assertEqual(sum(row['relocations'] for row in pins['objects'].values()), 4589)
-        print('Clipper global:', strict, 'strict checks; 13 whole objects; 46 retail pointer loads; storage remains unresolved')
+        print('Clipper global:', strict, 'strict checks; 11 whole objects; 46 retail pointer loads; storage remains unresolved')
 
 
 if __name__ == '__main__': unittest.main()

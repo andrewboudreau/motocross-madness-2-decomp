@@ -1,6 +1,6 @@
 """RadarOverlay::DrawTrackOutline 0x0051c720, the radar map's track edge lines (tools/emu_diff.py case).
 
-Linked from src/bringup/Group3_RadarOverlay.cpp. Offsets are retail's (0x0051c720 disassembly):
+Linked from src/reconstructed/TrackOverlay.cpp. Offsets are retail's (0x0051c720 disassembly):
 radarView +0x12c, its track +0x48 whose first dword is the start node; the render target +0x18
 (DrawPrimitive at vtable +0x40); map radius +0x19c (float), centre x/y +0x1a0/+0x1a4 (ints);
 the two TL line vertices +0x1b8/+0x1d8 (colour +0x10 each). A track node has its visit flag in
@@ -24,7 +24,7 @@ import struct
 
 RETAIL_VA = 0x0051c720
 SYMBOL = '?DrawTrackOutline@RadarOverlay@@QAEXH@Z'
-SOURCE = 'src/bringup/Group3_RadarOverlay.cpp'
+SOURCE = 'src/reconstructed/TrackOverlay.cpp'
 PROBES = {0x0051c775: 'flagged pop', 0x0051c7b2: 'mode 1', 0x0051c7d1: 'mode 2',
           0x0051c959: 'exit rim', 0x0051c9f6: 'enter rim', 0x0051ca6a: 'inside line',
           0x0051cad9: 'push link'}
