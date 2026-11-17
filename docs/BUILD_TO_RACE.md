@@ -134,6 +134,30 @@ Instruction review covers the aligned code only. Switch tables are unresolved
 relocations in the candidate, so their targets were not compared. The cases
 check one function at a time on random and edge inputs, not integrated play.
 
+### Near misses without an emu case
+
+`linked_accuracy.py` on `build-kjdvaspt` finds 189 non-identical bodies; 21
+(29,020 B) have no `tools/emu_cases` module. Each is accounted for:
+
+- 8 are reviewed above or in item 14: `MainDlg` and `MPRaceInfoDlg`
+  `HandleEvent`, the three rider `Tick`s, both repacks and
+  `BaseQuarryEvent::PrepareGeometry`.
+- 10 have native tests that run the candidate against the retail body
+  (`VC6_ROOT` and `MCM2_EXE` required; all 10 pass, none skipped):
+  `BackgroundImage::GetDc` (`test_background_dc_behavior`), `GetDXVersion`
+  (`test_device_setup_behavior`), `UIEditBox::Draw` and `OnChar`,
+  `GUIUser::SetPointerDevice`, `UIListBox::ButtonDown`,
+  `MediaControl::Open`, `UIMultiState::Draw`, `Overlay::RestoreRect`,
+  `RecordExceptionInfo`.
+- `CollisionObject::~CollisionObject` (0x432000) matches all 218 retail
+  bytes when compiled alone. The `KrustyBike` vtordisp thunk (0x497c30)
+  matches its 8 bytes; retail's 67-byte extent runs on into the padding and
+  the deleting destructor after it.
+- `HiResMeter::SetRenderContext` (0x488440) differs on purpose. Retail reads
+  RDTSC, which VC6 C++ cannot emit, so the build calibrates against
+  QueryPerformanceCounter for both stamps (`GAME_TICK.md`). It only scales
+  the profiling display.
+
 ## Blockers and risks, ranked
 
 1. **The current exe has never been run** (C). The only live proof is ten
@@ -145,13 +169,10 @@ check one function at a time on random and edge inputs, not integrated play.
    forwarder (see [Bring-up review](#bring-up-review)). The best-guess candidate
    sources are reviewed too (item 14). What is untested is how they behave
    together over real races.
-3. **Near misses without a differential case** (C): of 189 non-identical
-   bodies, 34 (53,289 B) had none at the review; since then
-   `FileStream::Read`, `AddArchive`, `CreateRacers`, `ProfileDisplays`,
-   `CreateModeSurfaces`, both texture probes and the five texture bodies
-   (`PCTextureMap::CreateSurface`, `CopyRectTo`, `Clone`,
-   `CacheTexture::CopyMipLevels`, `GUIManager::CopyScreenToTexture`) have
-   gained cases.
+3. **Near misses without an emu case** (C): of 189 non-identical bodies, 21
+   have no `tools/emu_cases` module. Each has a native retail test, an
+   instruction review or a byte match, or is a documented adaptation (see
+   [Near misses without an emu case](#near-misses-without-an-emu-case)).
 4. **Low-score render bodies** (C for scores): the visibility walk, particles,
    projected shadow. The pixel halvers, `TransformPoints`, `LightVertices` and
    `TestBox` agree with retail in differential cases (items 8 and 9). A wrong result here shows as missing or miscoloured geometry, not
