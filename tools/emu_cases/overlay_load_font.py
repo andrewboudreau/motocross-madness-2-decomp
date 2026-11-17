@@ -1,7 +1,7 @@
 """DebugOverlay::LoadFont 0x00447a00, the GDI font-atlas builder (tools/emu_diff.py case,
 call-record/replay mode).
 
-The linked body is samples/render/DebugOverlayNearMisses.cpp. TerrainLoadTexture 0x0050a590
+The linked body is in src/reconstructed/DebugOverlay.cpp. TerrainLoadTexture 0x0050a590
 answers a loaded texture (straight to CreateTextureSurface, vtable +0x20) or null, which builds
 the atlas: operator new 0x004a3010 (unlogged, its __FILE__ tag is the unit's own; noted by
 size and line), the PCTextureMap ctor 0x004c5f00 (fills the object: fake vtable, map format
@@ -20,7 +20,7 @@ import struct
 
 RETAIL_VA = 0x00447a00
 SYMBOL = '?LoadFont@DebugOverlay@@QAEHXZ'
-SOURCE = 'samples/render/DebugOverlayNearMisses.cpp'
+SOURCE = 'src/reconstructed/DebugOverlay.cpp'
 PROBES = {0x00447a64: 'build', 0x00447bac: 'no font', 0x00447c75: 'row', 0x00447d17: 'textout',
           0x00447d9e: 'create surface'}
 

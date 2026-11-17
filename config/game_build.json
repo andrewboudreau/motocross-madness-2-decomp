@@ -283,12 +283,6 @@
       "evidence": "docs/GAME_BUILD.md#best-guess-review"
     },
     {
-      "path": "samples/render/DebugOverlayNearMisses.cpp",
-      "status": "reviewed-nonexact",
-      "reason": "Near-miss body admitted so the source build can link and run; defines DebugOverlay::LoadFont. Differential review against retail (tools/emu_diff.py, re-run 2026-11-16): overlay_load_font 0x447a00 0 of 200 runs differ. Bytes nonexact.",
-      "evidence": "docs/GAME_BUILD.md#best-guess-review"
-    },
-    {
       "path": "samples/render/GridNodeNearMisses.cpp",
       "status": "reviewed-nonexact",
       "reason": "Defines GridNode::IntersectSegment (0x00483d40, 4140 retail bytes). Differential emulation (unicorn, retail LinePlaneIntersection and __ftol, recursion through a stub vtable slot) over random 1- to 3-level grid trees, lattice and tie segments and all x87 rounding/precision modes found no difference in 6000 cases (return, out point, node, rounded hit, FPU status). Directed rounding can index past the row tables; retail and the candidate then both fault (505 cases, none under round-to-nearest). Bytes nonexact: a per-function #pragma optimize(\"y\", off) gives retail's ebp frame (which retail's inline-asm fistp helper forces), but the four fistp sites are calls here.",

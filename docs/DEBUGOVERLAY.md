@@ -31,10 +31,14 @@ including the 748-byte text drawer `0x00448200` and slot 14.
 3): Shadow's `$E` pairs end the previous unit, and its global follows
 Shadow's data.
 
-Near miss (`samples/render/DebugOverlayNearMisses.cpp`): the GDI glyph
-builder `0x00447a00` (`LoadFont`), whose body matches; only the return
-epilogues differ (VC6 copies the epilogue into the returns, retail shares one). The
-set-up `0x00447de0` matches once `i` is initialised before `y = e`.
+Near miss: the GDI glyph builder `0x00447a00` (`LoadFont`), in DebugOverlay.cpp
+in retail order with a `// Not exact` status comment. Its body matches; in the
+unit (with the includes the font builder needs) VC6 keeps one shared epilogue
+and emits retail's 980 bytes, but places that epilogue after the first failure
+return instead of at the end (463 of 980). The standalone sample copied the
+epilogue into the returns (999 bytes, 460). See
+[LoadFont: forms tried](#loadfont-forms-tried). The set-up `0x00447de0`
+matches once `i` is initialised before `y = e`.
 
 Not attributed: `0x00448560..0x00449e5f` has no source literal and no RTTI.
 It includes the TrackGame+0x33fc constructor `0x00448960` and the
@@ -79,3 +83,40 @@ preserves all 72 strict cases across the three consumer units; Terrain's two
 partial cases are unchanged. Ten formerly missing symbol spellings now reach
 existing providers. This establishes these profiling connections, not complete
 scene rendering or a linked game.
+
+## LoadFont: forms tried
+
+Carried over from the header of the former `samples/render` near-miss
+file, which compiled LoadFont alone (999 bytes):
+
+DebugOverlay::LoadFont (0x00447a00, 980 bytes; ours 999):
+the GDI font builder. The glyph loop is a top-tested `while (c < 256)`
+(a do-while lets VC6 peel the first u0 = 0 and reuse u1 as the next u0),
+and the GetDC/ReleaseDC/Slot8 failures share one `failed: return 0`.
+Zero in ebx, the run length in ebp and the glyph pointer in edi match.
+Computing v0 and v1 before the row pointer (any order with `row` after
+v0) lets the row pointer share the v0 temporary's slot, so ebp is saved
+only around the GDI section as in retail and `c` is read into eax once:
+strict 79 -> 460, 28 -> 17 differing instructions, all of them in the
+returns. `if (CreateTextureSurface) return 1;` cross-jumps the last
+failure into the CreateFontIndirect failure, but VC6 then copies the
+epilogue into that block and the success path; retail keeps one
+epilogue that both `xor eax, eax; jmp` blocks and `mov eax, 1` reach.
+goto/result-variable/if-else forms of the tail compile identically.
+Synthetic VC6 tests (2026-10-20): the EH epilogue is copied into
+constant-return blocks when it is short (frame below 0x80, so disp8
+operands, and a bare `ret`) and shared with a larger frame or `ret N`;
+a register saved only around a region (ebp here, as in retail) brings
+the copies back even with the 0x278 frame. Unchanged here: the `!Create
+goto` tail (retail's block order, three copies), `?:`, `!= 0`, Release
+via goto, `return (int)handle`, an else arm for the Release block, the
+GDI section in its own scope or behind `if (handle)`. A returned
+variable (not a constant) keeps one epilogue but loads it from a register.
+Early-failure forms (s14, the ConnectUsingLobby lever): the GetDC and
+ReleaseDC failures as their own `return 0` with the tail written
+`if (!Create) return 0; return 1;`, `if (Create) return 1; return 0;` or
+`?:` give 33, and also testing a loaded texture first gives 43.
+
+k-scan (s22): compiled behind 0..63 prepended typedefs, 0x00447a00 has the
+same code at every count, so its difference is not a declaration-count
+effect (docs/VC6_OPERAND_ORDER.md section 2).
