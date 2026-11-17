@@ -1,7 +1,7 @@
 """TextService::DrawTextInto 0x0050b080, the font blitter into a locked texture
 (tools/emu_diff.py case, call-record/replay mode).
 
-The linked body is src/bringup/Group2_OverlayText.cpp. The overlay's font (+0x00) answers
+The linked body is in src/reconstructed/TextService.cpp. The overlay's font (+0x00) answers
 GetTexture 0x004673c0 (a font texture of random size with random 32- or 16-bit texels) and
 FindCell 0x00467340 (a CharacterCell per character, or NULL for characters the font lacks).
 Each cell holds a real Rectangle2D at +8 whose texture coordinates land on texel edges or
@@ -19,7 +19,7 @@ import struct
 
 RETAIL_VA = 0x0050b080
 SYMBOL = '?DrawTextInto@TextService@@QAEHPAVTextureMap@@HHPBDH@Z'
-SOURCE = 'src/bringup/Group2_OverlayText.cpp'
+SOURCE = 'src/reconstructed/TextService.cpp'
 PROBES = {0x0050b0bd: '1555', 0x0050b0fb: '4444', 0x0050b2b6: 'wrap', 0x0050b338: 'blend',
           0x0050b395: 'next char'}
 

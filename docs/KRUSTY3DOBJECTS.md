@@ -4,8 +4,9 @@
 `Krusty3DObjects.bindings.json` reconstruct part of
 `D:\aardvark\VC\krusty2\Krusty3DObjects.cpp`: 37 of the unit's 39
 functions are strict exact under `vc6_o2_mt` (VC6 SP3 `/O2 /GR /GX /MT`),
-with every relocation resolved by the bindings. One near miss is parked
-in `samples/race/Krusty3DObjectsNearMisses.cpp`.
+with every relocation resolved by the bindings. The near miss
+`VisualCue::Tick` (`0x0048b100`) sits in the unit in retail order with a
+`// Not exact` status comment; see [VisualCue::Tick: forms tried](#visualcuetick-forms-tried).
 
 ## Evidence
 
@@ -93,7 +94,7 @@ in `samples/race/Krusty3DObjectsNearMisses.cpp`.
 
 | VA | Size | Status |
 |---|---:|---|
-| `0x0048b100` | 2796 | VisualCue slot 10 (jump table `0x0048bbec` on TrackGame `+0x2d74`). Data flow decoded in the samples file; retail expands the placement block and all its Vector3 operators in the four modes. The block as a macro reproduces that (retail's 16 calls in order, 604 of 748 instructions aligned); an inline member function leaves the constructor and `operator*` out of line. Every hide path written as an explicit `isVisible = 0; return 1;` makes VC6 cache 0 in a register like retail (strict 172 -> 254 of 2820), in `ebx` rather than retail's `edi`. One function-scope `direction`, filled by the block and overwritten by each mode, gives retail's integer-move copy of the third camera column (254 -> 401). Left: that zero register and the early returns' own epilogues |
+| `0x0048b100` | 2796 | VisualCue slot 10 (jump table `0x0048bbec` on TrackGame `+0x2d74`). Data flow decoded in tools/emu_cases/visual_cue_tick.py; retail expands the placement block and all its Vector3 operators in the four modes. The block as a macro reproduces that (retail's 16 calls in order, 604 of 748 instructions aligned); an inline member function leaves the constructor and `operator*` out of line. Every hide path written as an explicit `isVisible = 0; return 1;` makes VC6 cache 0 in a register like retail (strict 172 -> 254 of 2820), in `ebx` rather than retail's `edi`. One function-scope `direction`, filled by the block and overwritten by each mode, gives retail's integer-move copy of the third camera column (254 -> 401). Left: that zero register and the early returns' own epilogues |
 | `0x0048d1e0` | 864 | BonusObjectManager value display: rounds with the `fld; fistp [mem]` inline-assembly helper the project rules exclude |
 
 ## Remaining uncertainty
@@ -129,3 +130,42 @@ floats. Those are stored at +0x48/+0x4c, which are now float. `0x00401520`
 and D3DIMSoultreeObject's `0x004fbd70` take two axes by pointer, then two
 ints. Each function has a single declaration; ArcadeObject.cpp stays
 exact, and its binding keys and calibration symbols use the new names.
+
+## VisualCue::Tick: forms tried
+
+Carried over from the header of the former `samples/race` near-miss file:
+
+VisualCue::Tick (0x0048b100, 2796 bytes, jump table at
+0x0048bbec): places the cue in front of the camera by camera mode
+(TrackGame +0x2d74) and turns it toward the followed racer, the next
+gate, the selected racer or the free camera's target. Retail expands the
+placement block and every Vector3 operator in it in all four modes (its
+16 calls are the ones below, in the same order). An inline member
+function for the block makes VC6 call the Vector3 constructor and
+operator* (0x00404e60, 0x005015b0) out of line; the block written as a
+macro (UNKNOWN_PLACE_CUE) expands everything as retail does (aligned
+instructions 299 -> 604 of 748). Retail copies the camera's third
+matrix column with integer moves into a stack vector: one function-scope
+`direction` that the placement block fills and each mode then overwrites
+with the direction to its target gives that copy (254 -> 401 of 2820);
+a separate local per block keeps two components on the x87 stack
+(member-wise copies in either order, a by-value column helper: same).
+Every hide path is written as an explicit `isVisible = 0; return 1;`:
+VC6 then caches 0 in a register as retail does (172 -> 254), but picks
+ebx (the `finished` byte test becomes `cmp byte, bl`, retail loads cl
+and keeps 0 in edi, pushing ebp) and still merges the hide blocks into
+one return where retail gives the two early ones their own epilogues.
+Retail's layout: the first hide, case 2/3's onTrack hide and case 4's
+hide fall through into their own epilogues, and only the raceTrack and
+case 0 hides jump into case 4's; VC6 here moves one merged hide after the
+final epilogue. Still 401: `return isVisible = 0, 1;` for the early
+hides, `finished` tested as `*(bool*)&`, `!= 0` or `(unsigned char)`, and
+`scale` initialised (0, 1 or modelScale) before the switch.
+Retail computes `0.5f - screenY` as `fld 0.5; fsub [esi+0x4c]`; reading
+the field directly (not through ScreenYFraction) gives that order but
+changes the `position +=` x87 sequence (fxch/fadd/fstp), 401 -> 383; a
+screenY local: 401. The half field of view goes through a macro: as an
+inline function, VC6 folded `* 0.5f * 0.01745329f` into one 0.0087266f
+multiply, where retail keeps both (fmul 0x005507f4, fmul 0x00550480); the
+macro restores retail's two constants (candidate 2784 -> 2808 bytes of
+2796, same-mnemonic alignment 653 -> 657 of 752 instructions).

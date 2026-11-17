@@ -9482,9 +9482,9 @@ CASES = [
         'reason': 'TrackOverlay callers; RenderTarget slots 6/7/8/16/18',
     },
     {
-        'name': 'TextService.cpp sample CharacterCell rect copy 0x50beb0',
-        'bindings': 'samples/render/TextServiceNearMisses.bindings.json',
-        'source': 'samples/render/TextServiceNearMisses.cpp',
+        'name': 'TextService.cpp CharacterCell rect copy 0x50beb0',
+        'bindings': 'src/reconstructed/TextService.bindings.json',
+        'source': 'src/reconstructed/TextService.cpp',
         'symbol': '?GetRect@CharacterCell@@QAE?AVRectangle2D@@XZ',
         'target_va': '0x0050beb0',
         'target_size': 32,

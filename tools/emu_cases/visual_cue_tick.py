@@ -1,6 +1,6 @@
 """VisualCue::Tick 0x0048b100, the camera-relative cue arrow (tools/emu_diff.py case).
 
-The candidate is samples/race/Krusty3DObjectsNearMisses.cpp (its bindings file binds kVec3Zero
+The candidate is in src/reconstructed/Krusty3DObjects.cpp (its bindings file binds kVec3Zero
 / kVec3YAxis to retail's 0x0067c308 / 0x0067c328, which the setup fills, since both are
 dynamically initialised). Offsets from the retail body: cue +0x18 owner (+0x08 current camera),
 +0x2c model, +0x30 isVisible, +0x34 modelScale, +0x38 target pixels, +0x3c model size, +0x40
@@ -22,7 +22,7 @@ import struct
 
 RETAIL_VA = 0x0048b100
 SYMBOL = '?Tick@VisualCue@@UAEHM@Z'
-SOURCE = 'samples/race/Krusty3DObjectsNearMisses.cpp'
+SOURCE = 'src/reconstructed/Krusty3DObjects.cpp'
 BINDINGS = {'_kVec3Zero': 0x0067c308, '_kVec3YAxis': 0x0067c328}
 TRACK_GAME = 0x0056e26c
 PROBES = {0x0048b155: 'not own camera', 0x0048b1ac: 'mode 2/3', 0x0048b38a: 'point at',

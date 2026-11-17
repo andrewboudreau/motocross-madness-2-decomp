@@ -1,7 +1,7 @@
 """TextService::LayoutText 0x0050ba00, the textured-quad text layout (tools/emu_diff.py
 case, call-record/replay mode).
 
-The linked body is src/bringup/Group2_OverlayText.cpp. The font (+0x00) answers FindCell
+The linked body is in src/reconstructed/TextService.cpp. The font (+0x00) answers FindCell
 0x00467340 with a CharacterCell (a real Rectangle2D at +8) or NULL for characters it lacks;
 CharacterCell::GetRect and the Rectangle2D constructor, assignment and destructor run
 natively. Cell rectangles are random texture coordinates (on 1/255 steps, arbitrary, empty or
@@ -15,7 +15,7 @@ import struct
 
 RETAIL_VA = 0x0050ba00
 SYMBOL = '?LayoutText@TextService@@QAEPAXPBUOverlayRect@@PBDIPAH@Z'
-SOURCE = 'src/bringup/Group2_OverlayText.cpp'
+SOURCE = 'src/reconstructed/TextService.cpp'
 PROBES = {0x0050ba67: 'left clamp', 0x0050baeb: 'cell'}
 
 FIND_CELL = 0x00467340

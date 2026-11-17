@@ -1,11 +1,12 @@
-#include "../krusty2/broadphase/Terrain.h"
-#include "BikeRaceCore.h"
 // Krusty3DObjects.cpp -- reconstruction of part of
 // D:\aardvark\VC\krusty2\Krusty3DObjects.cpp. See Krusty3DObjects.h and
 // docs/KRUSTY3DOBJECTS.md.
 
+#include "../krusty2/broadphase/Terrain.h"
+#include "BikeRaceCore.h"
 #include "Krusty3DObjects.h"
 
+#include <math.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -241,6 +242,142 @@ int VisualCue::OnControlPress(ControlEvent* event, InputButtonState* entry) {
         return 1;
     }
     return 0;
+}
+
+#define UNKNOWN_DEGREES_TO_RADIANS(degrees) ((degrees) * 0.01745329f)
+
+// The owner a VisualCue compares its camera with (its +0x18).
+struct VisualCueRenderTargetView {
+    unsigned char field_0x00[0x08];
+    ArcadeCameraView* currentCamera;          // +0x08
+};
+
+// Places the cue at its screen position in front of the camera, rebuilding
+// the screen offsets when the field of view changed. The view direction goes
+// into the caller's `direction`, which then holds the direction to the target.
+#define UNKNOWN_PLACE_CUE() \
+    { \
+    direction.x = arcadeView->cameraMatrix[0][2]; \
+    direction.y = arcadeView->cameraMatrix[1][2]; \
+    direction.z = arcadeView->cameraMatrix[2][2]; \
+    Vector3 up = Vector3(arcadeView->cameraMatrix[0][1], arcadeView->cameraMatrix[1][1], arcadeView->cameraMatrix[2][1]); \
+    Vector3 right = Vector3(arcadeView->cameraMatrix[0][0], arcadeView->cameraMatrix[1][0], arcadeView->cameraMatrix[2][0]); \
+    if (arcadeView->fieldOfView != builtFieldOfView) { \
+        builtFieldOfView = arcadeView->fieldOfView; \
+        float half = (float)tan(UNKNOWN_DEGREES_TO_RADIANS(builtFieldOfView * 0.5f)) * viewDistance; \
+        screenOffsetX = (ScreenXFraction() - 0.5f) * half * 2.0f; \
+        screenOffsetY = (0.5f - ScreenYFraction()) * arcadeView->aspectRatio * half * 2.0f; \
+        modelScale = targetPixels * viewDistance / (arcadeView->focalLength * modelSize); \
+    } \
+    Vector3 position = arcadeView->cameraPosition; \
+    position += direction * viewDistance; \
+    position += right * screenOffsetX; \
+    position += up * screenOffsetY; \
+    SetPosition(&position); \
+    }
+
+// 0x0048b100. Not exact (390 of 2796 bytes, 2816 compiled: VC6 caches 0 in
+// ebx where retail uses edi and merges the hide paths into one return where
+// retail gives the early ones their own epilogues;
+// docs/KRUSTY3DOBJECTS.md forms tried)
+// Places the cue in front of the camera by camera mode (TrackGame +0x2d74,
+// jump table 0x0048bbec) and turns it toward the followed racer, the next
+// gate, the selected racer or the free camera's target.
+int VisualCue::Tick(float frameTime) {
+    float scale;
+    Vector3 direction;
+
+    if (!ArcadeObject::Tick(frameTime))
+        return 1;
+    if (!cycleCues) {
+        if (((VisualCueRenderTargetView*)renderContext)->currentCamera != arcadeView ||
+            cueView->raceCamera->followedBike != cueView->ownRacer || !cueView->ownRacer ||
+            cueView->ownRacer->finished) {
+            isVisible = 0;
+            return 1;
+        }
+    }
+    switch (reinterpret_cast<CueTrackGameView*>(g_TrackGame)->cameraMode) {
+    case 2:
+    case 3: {
+        if (!cueView->raceTrack)
+            { isVisible = 0; return 1; }
+        if (cueView->ownRacer->onTrack) {
+            isVisible = 0;
+            return 1;
+        }
+        isVisible = 1;
+        UNKNOWN_PLACE_CUE();
+        Vector3 target;
+        if (cueView->raceTrack)
+            cueView->raceTrack->PointAt(cueView->ownRacer->statusNode->progressPos, &target);
+        else
+            target = cueView->ownRacer->trackPoint;
+        groundTerrain->QueryGround(&target, 0, 0, 0);
+        direction = target - arcadeView->cameraPosition;
+        SetAxes(&direction, &kVec3YAxis, 1, 1);
+        scale = modelScale;
+        arcadeModel->Scale(scale, scale, scale);
+        return 1;
+    }
+    case 1:
+    case 5: {
+        UNKNOWN_PLACE_CUE();
+        CueGateKrustyBikeView* ref = reinterpret_cast<CueTrackGameView*>(g_TrackGame)->bajaEnduroEvent->raceView->raceCamera->followedRacer;
+        if (!ref)
+            return 1;
+        direction =
+            reinterpret_cast<CueTrackGameView*>(g_TrackGame)->bajaEnduroEvent->gates[ref->gateIndex].position - arcadeView->cameraPosition;
+        SetAxes(&direction, &kVec3YAxis, 1, 1);
+        scale = modelScale;
+        break;
+    }
+    case 0: {
+        if (!cycleCues || cueRacerCount <= 1)
+            { isVisible = 0; return 1; }
+        isVisible = 1;
+        UNKNOWN_PLACE_CUE();
+        Vector3 target = kVec3Zero;
+        for (int i = 0; i < cueRacerCount; i++) {
+            if (currentRacer == i) {
+                target = cueRacers[i]->position;
+                break;
+            }
+        }
+        direction = target - arcadeView->cameraPosition;
+        SetAxes(&direction, &kVec3YAxis, 1, 1);
+        scale = modelScale;
+        arcadeModel->Scale(scale, scale, scale);
+        return 1;
+    }
+    case 4: {
+        UNKNOWN_PLACE_CUE();
+        if (reinterpret_cast<CueTrackGameView*>(g_TrackGame)->tagBall) {
+            Vector3 target;
+            reinterpret_cast<CueTrackGameView*>(g_TrackGame)->tagEvent->ball->sceneObject.GetPosition(&target);
+            direction = target - arcadeView->cameraPosition;
+            SetAxes(&direction, &kVec3YAxis, 1, 1);
+            scale = modelScale;
+        } else {
+            VisualCueKrustyBikeView* followed = 0;
+            if (reinterpret_cast<CueTrackGameView*>(g_TrackGame)->tagEvent->raceCamera->statusFlags & 1)
+                followed = reinterpret_cast<CueTrackGameView*>(g_TrackGame)->tagEvent->raceCamera->followedRacer;
+            if (!reinterpret_cast<CueTrackGameView*>(g_TrackGame)->tagEvent->followedRacer)
+                return 1;
+            if (followed == reinterpret_cast<CueTrackGameView*>(g_TrackGame)->tagEvent->followedRacer)
+                { isVisible = 0; return 1; }
+            direction = reinterpret_cast<CueTrackGameView*>(g_TrackGame)->tagEvent->followedRacer->position - arcadeView->cameraPosition;
+            SetAxes(&direction, &kVec3YAxis, 1, 1);
+            scale = modelScale;
+        }
+        break;
+    }
+    default:
+        return 1;
+    }
+    arcadeModel->Scale(scale, scale, scale);
+    isVisible = 1;
+    return 1;
 }
 
 // 0x0048bc10

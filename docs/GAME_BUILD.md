@@ -784,11 +784,11 @@ clearly more faithful, the game now links the sample's text:
 - Whole near-miss files are now candidate sources with status
   `reviewed-nonexact`:
   - `samples/track/SceneManagerNearMisses.cpp`
-  - `samples/race/Krusty3DObjectsNearMisses.cpp`
   - `samples/render/Grid1NearMisses.cpp`
 
   The two Wrecker near misses that were linked the same way now sit in their
-  retail positions in `src/reconstructed/wrecker.cpp` (docs/ORIGINAL_UNITS.md).
+  retail positions in `src/reconstructed/wrecker.cpp`, and VisualCue::Tick in
+  `src/reconstructed/Krusty3DObjects.cpp` (docs/ORIGINAL_UNITS.md).
 - The following bring-up files were deleted:
   - `Group4_SceneRead.cpp`, `Group4_SceneBridges.cpp` and
     `Group4_SceneEmitters.cpp`
@@ -955,7 +955,6 @@ body was unregistered:
     identity: 0x00464e90, 0x00478fe0, 0x004624d0, 0x004de270, 0x004500d0,
     0x00499ae0 and 0x00523c80;
   - bodies in files covered by other work:
-    - `Group2_OverlayText.cpp` (`CharacterCell::GetRect`);
     - `ManagedTextureGroup.cpp` (the `UnknownTimer` pair, linked to
       PeakHold.cpp's `Peak`/`Record` through aliases, and
       `ContainerList::Reserve`);
