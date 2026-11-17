@@ -21,7 +21,7 @@ import struct
 
 RETAIL_VA = 0x0042fd80
 SYMBOL = '?Tick@CarProcedural@@UAEHM@Z'
-SOURCE = 'src/bringup/Group2_CarProcedural.cpp'
+SOURCE = 'src/reconstructed/CarProcedural.cpp'
 PROBES = {0x004302a9: 'steering clamp', 0x004305f3: 'clamped low'}
 
 

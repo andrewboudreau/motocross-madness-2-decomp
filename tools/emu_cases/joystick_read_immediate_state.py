@@ -1,6 +1,6 @@
 """PCJoystickDevice::ReadImmediateState 0x004c3790, polled DirectInput joystick state (emu_diff case).
 
-The candidate is samples/inputdevice/JoystickImmediateState.cpp. Offsets from the retail body:
+The candidate is src/reconstructed/PCJoystickDevice.cpp. Offsets from the retail body:
 the IDirectInputDevice2 pointer +0x25c (null returns 0), joystickIndex +0x260, the 32 button
 records (0x14 bytes from +0x264: state, the release arm clears +4/+0xc, the press arm +8/+0x10),
 the device subtype byte +0x3d (4 = gamepad: no axes fed), axisValues +0x4e4, axisMaximums
@@ -18,7 +18,7 @@ import struct
 
 RETAIL_VA = 0x004c3790
 SYMBOL = '?ReadImmediateState@PCJoystickDevice@@QAEHH@Z'
-SOURCE = 'samples/inputdevice/JoystickImmediateState.cpp'
+SOURCE = 'src/reconstructed/PCJoystickDevice.cpp'
 TRACK_GAME = 0x0056e26c
 PROBES = {0x004c37be: 'state failed', 0x004c37d5: 'feed axes', 0x004c38e1: 'release',
           0x004c38fd: 'press', 0x004c3926: 'povs'}

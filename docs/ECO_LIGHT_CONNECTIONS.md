@@ -61,8 +61,9 @@ pins were reproduced first, then all complete object rows agreed across the
 two roots under that one additional filename spelling. No code, arbitrary
 string, relocation target or region is discarded.
 
-The objects include all three direct EcoSystem.h source consumers:
-EcoSystem.cpp, EcoSystemNearMisses.cpp and VegetationCollisionObject.cpp, plus
+The objects include both direct EcoSystem.h source consumers, EcoSystem.cpp
+and VegetationCollisionObject.cpp (EcoSystemNearMisses.cpp, a third when this
+was written, has since been folded into EcoSystem.cpp), plus
 ten related light, scene, rendering and Quarry sources. A common declaration
 header extraction was tested and rejected because it changed the complete
 strict Scene::ReadLight body. This change keeps the existing declaration

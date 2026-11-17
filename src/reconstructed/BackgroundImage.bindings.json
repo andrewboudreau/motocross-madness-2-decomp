@@ -61,5 +61,8 @@
   "?g_DrawImageRectDrawnRect@@3UCameraRect@@A": "0x005777e8",
   "?g_DrawImageSourceRect@@3UCameraRect@@A": "0x00577808",
   "__FILE__": "0x00566978",
-  "__except_list": "0x00000000"
+  "__except_list": "0x00000000",
+  "?GetDc@BackgroundImage@@QAEHPAPAXPAUCameraRect@@HHPAH21@Z": "0x004049d0",
+  "?g_GetDcRegionIndex@@3HA": "0x005777a0",
+  "?g_GetDcClipRect@@3UCameraRect@@A": "0x005777a8"
 }

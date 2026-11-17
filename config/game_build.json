@@ -67,7 +67,6 @@
     "?SetCapsuleShape@CollisionObject@@QAEXUVector3@@0M@Z": "?SetCapsuleShape@CollisionObject@@QAEXUCollisionVec3@@0M@Z",
     "?SetSphereShape@CollisionObject@@QAEXUVector3@@M@Z": "?SetSphereShape@CollisionObject@@QAEXUCollisionVec3@@M@Z",
     "?SetTriangleMeshHullShape@CollisionObject@@QAEXPBUVector3@@PBHHH@Z": "?SetTriangleMeshHullShape@CollisionObject@@QAEXPBUCollisionVec3@@PBHHH@Z",
-    "?QueryGround@EcoTerrainView@@QAEXPAUVector3@@0HPAE@Z": "?QueryGround@Terrain@@QAEXPAUTerrainVec3@@0HPAE@Z",
     "?GetHeightRange@EcoTerrainView@@QAEXPAM0@Z": "?GetHeightRange@Terrain@@QAEXPAM0@Z",
     "?OrientationAxesFromAngles@@YAXPAUVec3@@0MMM@Z": "?OrientationAxesFromAngles@@YAHPAUVector3@@0MMM@Z",
     "?SelectLapGates@KbTrack@@QAEXHHPAVKrustyBike@@@Z": "?SelectLapGates@TrackGameViewOwner@@QAEXHHPAX@Z",
@@ -86,6 +85,7 @@
     "?CarCrossCall@@YA?AUVector3@@ABU1@0@Z": "?CrossProductCall@@YA?AUVec3@@ABU1@0@Z",
     "?CarNormalizeCall@@YA?AUVector3@@ABU1@@Z": "?Vec3Normalize@@YA?AUVec3@@ABU1@@Z",
     "?QueryGround@CarProceduralTerrain@@QAEXPAUVector3@@0HH@Z": "?QueryGround@Terrain@@QAEXPAUTerrainVec3@@0HPAE@Z",
+    "?SetMotionByName@SelectGameD3DIMSoultreeCharacterView@@QAEXPBD@Z": "?SetMotionByName@Character@@QAEXPBD@Z",
     "?GetPositionIn@CarProceduralNode@@QAEXPAV1@PAUVector3@@@Z": "?GetPositionIn@SoultreeObject@@QAEXPAV1@PAUVec3@@@Z",
     "?SetPositionInFrame@CarProceduralNode@@QAEXPAV1@PAUVector3@@@Z": "?SetPositionInFrame@SoultreeObject@@QAEXPAV1@PBUVec3@@@Z",
     "?WorldToLocalDirection@CarProceduralNode@@QAE?AUVector3@@ABU2@@Z": "?WorldToLocalDirection@SoultreeObject@@QAE?AUVec3@@ABU2@@Z",
@@ -97,6 +97,10 @@
     "?CrossProduct@@YA?AUVector3@@PBU1@0@Z": "?CrossProductCall@@YA?AUVec3@@ABU1@0@Z",
     "?AxisAngleMatrix@@YAXPAUMatrix4@@MMMM@Z": "?AxisAngleMatrix@@YAXPAUTreeMatrix4@@MMMM@Z",
     "??0MbVector3Call@@QAE@MMM@Z": "??0Vec3Call@@QAE@MMM@Z",
+    "?LoadParameterFile@KbMorphMod@@QAEPAU1@PAXPBDPAVSoultreeObject@@@Z": "?LoadParameterFile@MorphBastardModifier@@QAEPAV1@PAXPBDPAVSoultreeObject@@@Z",
+    "?LargestRecentSample@UnknownTimer@@QAEHXZ": "?Peak@PeakHold@@QAEHXZ",
+    "?RecordSample@UnknownTimer@@QAEXH@Z": "?Record@PeakHold@@QAEXH@Z",
+    "?ShadowTransformPointsProjective@@YAXPAUShadowVec3@@PBXPBUShadowMatrix@@HHH@Z": "?ProjectPoints@@YAXPAXPBXPBUMatrix4@@HHH@Z",
     "?TransformVertexGroups@D3DIMShadowCasterView@@QAEXH@Z": "?TransformVertexGroups@D3DIMSoultreeObject@@QAEXH@Z",
     "?g_d3dimShadowVertexArray@@3PAUD3DIMShadowVertexView@@A": "?g_d3dimShadowVertices@@3PAUD3DIMShadowVertex@@A",
     "?SphereInFrustum@EcoVisibilityClipperView@@QAEHPBVEcoCameraView@@PBXPBUVector3@@MPAH@Z": "?SphereInFrustum@VisibilityClipper@@QAEHPBUVisibilityCamera@@PBUVisibilityMatrix@@PBUVisibilityBoxVec@@MPAH@Z"
@@ -225,12 +229,6 @@
       "evidence": "docs/GAME_BUILD.md#four-pose-motion-blend"
     },
     {
-      "path": "samples/render/BackgroundImageNearMisses.cpp",
-      "status": "reviewed-nonexact",
-      "reason": "Complete background drawing-context selection passes 21611 native region, cache, actual-helper, COM, alias and fault comparisons. The unchanged 678-byte body has 115 matching positions against 678 retail bytes; all three source helpers and the full dialog caller remain strict. Scratch globals have independently checked writable zero storage. COM DC acquisition/release are scripted; real DirectDraw/GDI and integrated menus remain untested.",
-      "evidence": "docs/BACKGROUND_DC.md#functional-build-review"
-    },
-    {
       "path": "samples/ui/ListBoxButtonDown.cpp",
       "status": "reviewed-nonexact",
       "reason": "Complete list-box mouse selection passes 8707 native row, real-height-helper, Windows hit-test, callback and fault scenarios. The 342-byte candidate has 320 matching positions against 342 retail bytes; an evidenced Y-before-X point-read correction changes the former 322-position partial. Selection, base dispatch and click reporting are scripted boundaries; integrated menu navigation remains untested.",
@@ -247,18 +245,6 @@
       "status": "reviewed-nonexact",
       "reason": "Complete UIButton and UIMultiState pixel hit tests pass 2780 native pixel, real-helper, callback, floating-point, fault and held-lock comparisons. Unchanged VC6 candidates emit 328/303 bytes with 256/231 matching positions against complete 354/329-byte retail bodies. Four actual helpers and the CRT conversion remain strict; DirectDraw surfaces are scripted and menu navigation remains untested.",
       "evidence": "docs/CONTROL_HIT_TEST.md#functional-build-review"
-    },
-    {
-      "path": "samples/inputdevice/JoystickBufferedState.cpp",
-      "status": "reviewed-nonexact",
-      "reason": "Complete default buffered joystick reader passes 4520 native record, axis, binding, button, timestamp, queue, retry, callback and fault scenarios with actual strict input helpers and the independently byte-verified VC6 conversion routine. The unchanged 1641-byte candidate has 128 matching positions against the complete 1665-byte retail extent including all switch tables. Successful COM calls fully initialize bounded records; diagnostic filenames intentionally differ. Physical devices, real acquisition, scheduling and integrated input remain untested.",
-      "evidence": "docs/JOYSTICK_BUFFERED_STATE.md#functional-build-review"
-    },
-    {
-      "path": "samples/inputdevice/JoystickImmediateState.cpp",
-      "status": "reviewed-nonexact",
-      "reason": "Complete immediate joystick reader passes 5014 native axis, binding, button, queue, POV, floating-point, callback and fault scenarios with the real strict input helpers. The unchanged 453-byte candidate has 373 matching positions against the corrected complete 454-byte retail extent. COM success writes the full 80-byte state; binding lists and queues are bounded. Physical controllers, scheduling and the separate default buffered-input path remain untested.",
-      "evidence": "docs/JOYSTICK_IMMEDIATE_STATE.md#functional-build-review"
     },
     {
       "path": "samples/render/TextureRectCopy.cpp",
@@ -301,18 +287,6 @@
       "status": "reviewed-nonexact",
       "reason": "Complete MediaControl Open passes 11125 native scripted COM, OS and helper scenarios including output aliasing, callback mutations, failures and faults. VC6 emits 656 bytes against the complete 646-byte retail body with 53 matching positions. Actual SDK and canonical GUID providers are checked; live DirectShow decoding, DirectDraw drivers and downstream Release cleanup remain untested.",
       "evidence": "docs/MEDIA_CONTROL_OPEN.md#functional-build-review"
-    },
-    {
-      "path": "samples/race/RecorderWorker.cpp",
-      "status": "reviewed-nonexact",
-      "reason": "Complete replay worker passes 24595 native event, payload, whole-state, lock, failure, mutation and termination scenarios. Both complete extents are 2148 bytes, with 2100 matching positions. Twenty existing ring/file helpers, synchronization APIs and thread exit are scripted; actual scheduling, file I/O and integrated recording/playback remain untested.",
-      "evidence": "docs/RECORDER_WORKER.md#functional-build-review"
-    },
-    {
-      "path": "samples/race/RecorderTick.cpp",
-      "status": "reviewed-nonexact",
-      "reason": "Complete VCRInterface replay tick passes 147749 native whole-state, callback, lock, exception, fault and floating-point scenarios with the real VC6 conversion helper. VC6 emits 2448 bytes against 2412 retail bytes, retaining 276 matching positions. Seven game helpers and synchronization boundaries are scripted; actual worker scheduling and replay-file playback remain untested.",
-      "evidence": "docs/RECORDER_TICK.md#functional-build-review"
     },
     {
       "path": "samples/camera/FollowCameraControls.cpp",
@@ -492,12 +466,6 @@
       "path": "samples/render/PixtransNearMisses.cpp",
       "status": "reviewed-nonexact",
       "reason": "Near-miss body admitted so the source build can link and run; defines DitherConvert, Halve1555, Halve8, Halve8888. Halve8888 and Halve1555 pass the native retail differential test (tests/test_pixtrans_halve_behavior.py) and the emu_diff cases halve8888/halve1555; DitherConvert agrees with retail in the dither_convert emu_diff case; Halve8 is checked against the retail disassembly only; bytes nonexact. Differential review against retail (tools/emu_diff.py, re-run 2026-11-16): halve8888 0x4cdf10 0 of 60 runs differ; halve1555 0x4ce420 0 of 60 runs differ; halve8 0x4cee30 0 of 100 runs differ; dither_convert 0x4cf2a0 0 of 60 runs differ. Bytes nonexact.",
-      "evidence": "docs/GAME_BUILD.md#best-guess-review"
-    },
-    {
-      "path": "samples/render/TgafileNearMisses.cpp",
-      "status": "reviewed-nonexact",
-      "reason": "Near-miss body admitted so the source build can link and run; defines WriteTga. Differential review against retail (tools/emu_diff.py, re-run 2026-11-16): tga_write 0x512990 0 of 200 runs differ. Bytes nonexact.",
       "evidence": "docs/GAME_BUILD.md#best-guess-review"
     },
     {

@@ -1,6 +1,6 @@
 """MultiPlayerDlg::SendStartMessage 0x004f2340, the lobby start message (tools/emu_diff.py case).
 
-The linked body is src/bringup/Group5_MultiPlayerDlg.cpp. Offsets from the retail body:
+The linked body is src/reconstructed/SelectGamePicProcs.cpp. Offsets from the retail body:
 g_TrackGame (0x0056e26c) +8 the network (local player +0xc), +0x18 playerCount, +0x56c the
 KrustyUI (manufacturers +0x48, 200-byte records, model name +0x40; bikes +0x50, 0x94-byte
 records: model +0, texture +0x48, engine size +0x8c, four-stroke +0x90; riders +0x58, 200-byte
@@ -28,7 +28,7 @@ import struct
 
 RETAIL_VA = 0x004f2340
 SYMBOL = '?SendStartMessage@MultiPlayerDlg@@QAEXF@Z'
-SOURCE = 'src/bringup/Group5_MultiPlayerDlg.cpp'
+SOURCE = 'src/reconstructed/SelectGamePicProcs.cpp'
 PROBES = {0x004f23e2: 'clamp AI', 0x004f2506: 'slot racers', 0x004f27aa: 'grid by points',
           0x004f2819: 'grid at random', 0x004f2958: 'start fields', 0x004f2b76: 'fill slots'}
 

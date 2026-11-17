@@ -9,8 +9,10 @@ Canonical source is `src/reconstructed/InputDevice`, `PCInputDevice`,
 and the template header `ContainerList.h`. Translation units are not
 established, apart from ContainerList.h, which retail names through
 `__FILE__`. Names are provisional. All functions listed are strict exact under
-the default profile, except two near misses in
-`samples/inputdevice/PCJoystickDeviceNearMisses.cpp`.
+the default profile, except the two readers `ReadBufferedState` `0x004c3100` and
+`ReadImmediateState` `0x004c3790`, which sit in `PCJoystickDevice.cpp` in
+retail order and are not exact. Their `__FILE__` makes that file retail's
+`PCInputDeviceType.cpp`.
 
 ## Readable member names
 

@@ -23,5 +23,9 @@
   "?FillTgaHeader16@@YAXPAUTgaFile@@PAXHH@Z": "0x00512940",
   "?WriteTga@@YAHPAUTgaFile@@IHH@Z": "0x00512990",
   "??_C@_00A@?$AA@": "0x00577738",
-  "__FILE__": "0x00574fc8"
+  "__FILE__": "0x00574fc8",
+  "??_C@_02NGAF@wb?$AA@": "0x005682b4",
+  "_fclose": "0x00534c3d",
+  "_fopen": "0x00534ceb",
+  "_fwrite": "0x005350b7"
 }

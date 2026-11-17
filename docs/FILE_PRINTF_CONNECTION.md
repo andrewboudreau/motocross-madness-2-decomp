@@ -45,7 +45,8 @@ positions out of 461**, and is not admitted by this connection.
 
 The same-path before/after trial preserves all **300 nondebug sections and
 1,464 relocations** across FileStream, ManagedTextureGroup, EcoSystem and
-EcoSystemNearMisses, under exactly the one external-name substitution. It
+EcoSystemNearMisses (since folded into EcoSystem.cpp, whose pin now covers
+`WriteListing`), under exactly the one external-name substitution. It
 retains complete payloads, section flags, relocation types/addends, public
 offsets and defined section/offset destinations. No filename exception is
 needed for that private comparison. The retained whole-object pins make only

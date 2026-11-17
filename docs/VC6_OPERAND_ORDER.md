@@ -518,8 +518,8 @@ python3 tools/decl_shift_scan.py src/reconstructed/trkgame.cpp \
 A near miss (no window, same score at every k):
 
 ```bash
-python3 tools/decl_shift_scan.py samples/render/MatrixUtilNearMisses.cpp \
-    samples/render/MatrixUtilNearMisses.bindings.json --include src/reconstructed \
+python3 tools/decl_shift_scan.py src/reconstructed/MatrixUtil.cpp \
+    src/reconstructed/MatrixUtil.bindings.json --include src/reconstructed \
     --fn 0x4a1a50:ProjectPoints
 ```
 

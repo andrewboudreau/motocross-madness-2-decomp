@@ -1,9 +1,10 @@
 # Replay recorder worker
 
-`samples/race/RecorderWorker.cpp` maintains the complete readable worker
-candidate; `RecorderNearMisses.cpp` includes it. The body is unchanged from
-the earlier aggregate. Its semantic name and this source grouping remain
-provisional; extraction does not establish an original translation unit.
+The complete readable worker is the first function of
+`src/reconstructed/Recorder.cpp` (retail `recorder.cpp`, which starts at
+`0x004e6f80`); it moved in unchanged from its sample. Its semantic name
+remains provisional. `tests/test_recorder_worker_behavior.py` compiles a
+validation unit holding only its definition (`tools/unit_source.py`).
 
 ## Entry, extent and dependency evidence
 
@@ -28,16 +29,17 @@ checks their complete strict bytes, plus the complete 716-byte Start caller.
 This proves provider closure separately from the scripted behavioral tests.
 
 VC6 SP3 `/O2` emits **2,148 bytes**, with **2,100 matching positions** after
-resolving every relocation. It remains nonexact. The standalone declaration
-context changes register/stack allocation and shared-tail scheduling relative
-to the older aggregate, which remains **2,124 bytes / 652 matching positions**.
-Neither body is trimmed. The new object defines only the worker, has no CRT
+resolving every relocation. It remains nonexact. The unit and the validation unit emit identical bytes and relocations. The
+former aggregate sample, which included `Recorder.cpp` before the worker, gave
+**2,124 bytes / 652 matching positions**: the declaration context changes
+register/stack allocation and shared-tail scheduling. The body is not trimmed.
+The validation object defines only the worker, has no CRT
 initializer, and imports only the twenty existing helpers, five Win32 APIs
 and `_endthreadex`. Its thirteen string literals retain their complete
 retail bytes including terminators, and writable data storage in both COFF
 and PE; no readonly-storage claim is made for these VC6 literals.
 
-An independent extraction check against `67edacf0` preserves all **13 emitted
+Before the move, an independent extraction check against `67edacf0` preserved all **13 emitted
 aggregate functions** and all **45 nondebug sections**, including bytes,
 relocation types/destinations/addends, jump tables, EH data and storage.
 Only compiler-generated local symbol names are represented by their actual
@@ -45,7 +47,7 @@ section/offset destinations; no filename bytes required normalization.
 The ignored reproduction script/report are
 `work/game-build/check_recorder_worker_extraction.py` and
 `work/game-build/recorder-worker-extraction-proof.json`. The persistent test
-also pins the complete aggregate worker bytes and relocation fingerprint.
+now requires the unit's worker to equal the validation unit's.
 
 ## Functional build review
 

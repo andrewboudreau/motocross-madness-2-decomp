@@ -1,7 +1,7 @@
 """MorphBastardModifier::ControllerAngles 0x004a3c80, a morph channel's controller rotation as
 three angles (tools/emu_diff.py case, call-record/replay mode).
 
-The linked body is the Group 3 bring-up copy (src/bringup/Group3_MorphBastard.cpp). The only
+The linked body is src/reconstructed/MorphBastardModifier.cpp. The only
 call that leaves the math is SoultreeObject::GetMatrixIn 0x004fca80 on the channel's
 controller; it is replayed and writes the controller's world matrix. Every other callee is
 pure math and runs as retail code: the dot product 0x0040ae30, the cross product 0x00515600,
@@ -20,7 +20,7 @@ import struct
 
 RETAIL_VA = 0x004a3c80
 SYMBOL = '?ControllerAngles@MorphBastardModifier@@QAEXPAUMorphBastardChannel@@UMatrix4@@@Z'
-SOURCE = 'src/bringup/Group3_MorphBastard.cpp'
+SOURCE = 'src/reconstructed/MorphBastardModifier.cpp'
 FAST_TABLE_INITS = (0x00460ae0, 0x00460bb0)
 GET_MATRIX_IN = 0x004fca80
 # The bring-up's out-of-line Vector3 constructor view (link_aliases: Vec3Call 0x00404e60).

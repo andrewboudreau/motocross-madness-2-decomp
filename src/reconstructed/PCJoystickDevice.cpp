@@ -270,6 +270,194 @@ int PCJoystickDevice::ApplyAxisDeadZone(int axis, int value) {
     return (int)AxisMin(AxisMax(scaled, 0.0f), 65535.0f);
 }
 
+static inline int AxisAbs(int value) {
+    return value < 0 ? -value : value;
+}
+
+inline int PCJoystickDevice::FilterAxisSpike(int axis, unsigned long value) {
+    if (joystickFilter) {
+        int current = (int)axisValues[axis];
+        if (AxisAbs(current - (int)value) > 10000 && (int)previousRawAxes[axis] == current)
+            return current;
+    }
+    return value;
+}
+
+// 0x004c3100: reads up to 16 buffered events (re-acquiring a lost device).
+// Buttons are queued on the ControlInterface; gamepads store raw axes,
+// other joysticks filter spikes, apply the X/Y dead zone and feed the
+// bindings; POV values are kept.
+// Not exact (128 of 1665 bytes in place, 1641 compiled; docs/JOYSTICK_BUFFERED_STATE.md).
+int PCJoystickDevice::ReadBufferedState(int) {
+    DIDeviceObjectData events[16];
+    long count;
+    int i;
+    unsigned long value;
+    float axis;
+    if (!device)
+        return 0;
+    count = 16;
+    long result = device->GetDeviceData(sizeof(DIDeviceObjectData), events, &count, 0);
+    if (result == (long)0x8007001e || result == (long)0x8007000c) {
+        if (device->Acquire() < 0) {
+            ReportDirectInputError(result, __FILE__, 317);
+            return 0;
+        }
+        result = device->GetDeviceData(sizeof(DIDeviceObjectData), events, &count, 0);
+    }
+    if (result < 0)
+        return 0;
+    for (i = 0; i < count; i++) {
+        int button = ButtonIndexFromOffset(events[i].offset);
+        if (button != -1) {
+            if (events[i].data & 0x80) {
+                buttonStates[button].state = 1;
+                buttonStates[button].previousPressTime = buttonStates[button].pressTime;
+                buttonStates[button].pressTime = events[i].timeStamp;
+                g_TrackGame->controlInterface->QueueEvent(button, 2, 1, joystickIndex);
+            } else {
+                buttonStates[button].state = 0;
+                buttonStates[button].previousReleaseTime = buttonStates[button].releaseTime;
+                buttonStates[button].releaseTime = events[i].timeStamp;
+                g_TrackGame->controlInterface->QueueEvent(button, 2, 0, joystickIndex);
+            }
+            continue;
+        }
+        if (DEVICE_SUBTYPE(deviceInfo.deviceType) == 4) {
+            switch (events[i].offset) {
+            case 0:
+                axisValues[0] = (float)events[i].data;
+                break;
+            case 4:
+                axisValues[1] = (float)events[i].data;
+                break;
+            case 8:
+                axisValues[2] = (float)events[i].data;
+                break;
+            case 12:
+                axisValues[3] = (float)events[i].data;
+                break;
+            case 16:
+                axisValues[4] = (float)events[i].data;
+                break;
+            case 20:
+                axisValues[5] = (float)events[i].data;
+                break;
+            }
+        } else {
+            switch (events[i].offset) {
+            case 0:
+                value = ApplyAxisDeadZone(0, FilterAxisSpike(0, events[i].data));
+                axis = axisValues[0] = (float)value;
+                previousRawAxes[0] = (float)events[i].data;
+                FeedAxis(0, axis, axisMaximums[0]);
+                break;
+            case 4:
+                value = ApplyAxisDeadZone(1, FilterAxisSpike(1, events[i].data));
+                axis = axisValues[1] = (float)value;
+                previousRawAxes[1] = (float)events[i].data;
+                if (directionFlipped)
+                    axis = axisMaximums[1] - axis;
+                FeedAxis(1, axis, axisMaximums[1]);
+                break;
+            case 8:
+                value = FilterAxisSpike(2, events[i].data);
+                axis = axisValues[2] = (float)value;
+                previousRawAxes[2] = (float)events[i].data;
+                FeedAxis(2, axisMaximums[2] - axis, axisMaximums[2]);
+                break;
+            case 12:
+                value = FilterAxisSpike(3, events[i].data);
+                axis = axisValues[3] = (float)value;
+                previousRawAxes[3] = (float)events[i].data;
+                FeedAxis(3, axis, axisMaximums[3]);
+                break;
+            case 16:
+                value = FilterAxisSpike(4, events[i].data);
+                axis = axisValues[4] = (float)value;
+                previousRawAxes[4] = (float)events[i].data;
+                FeedAxis(4, axis, axisMaximums[4]);
+                break;
+            case 20:
+                value = FilterAxisSpike(5, events[i].data);
+                axis = axisValues[5] = (float)value;
+                previousRawAxes[5] = (float)events[i].data;
+                FeedAxis(5, axis, axisMaximums[5]);
+                break;
+            }
+        }
+        switch (events[i].offset) {
+        case 0x20:
+            povValues[0] = events[i].data;
+            break;
+        case 0x24:
+            povValues[1] = events[i].data;
+            break;
+        case 0x28:
+            povValues[2] = events[i].data;
+            break;
+        case 0x2c:
+            povValues[3] = events[i].data;
+            break;
+        }
+    }
+    return 1;
+}
+
+// 0x004c3790: reads the immediate state. Non-gamepads feed the six axes to
+// their bindings (axis 1 flipped by the JoyDirectionFlipped bit, axis 2
+// always); button changes are queued as events, and the POV values kept.
+// Not exact (453 of 454 bytes: retail pushes the zero register for the
+// release arm's argument where this pushes eax; docs/JOYSTICK_IMMEDIATE_STATE.md
+// lists the forms tried).
+int PCJoystickDevice::ReadImmediateState(int value) {
+    DIJoyState state;
+    if (!device)
+        return 0;
+    if (device->GetDeviceState(sizeof(state), &state) < 0)
+        return 0;
+    if (DEVICE_SUBTYPE(deviceInfo.deviceType) != 4) {
+        float axis;
+        axis = (float)state.axes[0];
+        axisValues[0] = axis;
+        FeedAxis(0, axis, axisMaximums[0]);
+        axis = axisValues[1] = (float)state.axes[1];
+        if (directionFlipped)
+            axis = axisMaximums[1] - axis;
+        FeedAxis(1, axis, axisMaximums[1]);
+        axis = (float)state.axes[2];
+        axisValues[2] = axis;
+        FeedAxis(2, axisMaximums[2] - axis, axisMaximums[2]);
+        axis = (float)state.axes[3];
+        axisValues[3] = axis;
+        FeedAxis(3, axis, axisMaximums[3]);
+        axis = (float)state.axes[4];
+        axisValues[4] = axis;
+        FeedAxis(4, axis, axisMaximums[4]);
+        axis = (float)state.axes[5];
+        axisValues[5] = axis;
+        FeedAxis(5, axis, axisMaximums[5]);
+    }
+    for (int i = 0; i < 32; i++) {
+        int previous = buttonStates[i].state;
+        int pressed = buttonStates[i].state = state.buttons[i] >> 7;
+        if (pressed != previous) {
+            if (pressed == 0) {
+                buttonStates[i].previousReleaseTime = 0;
+                buttonStates[i].releaseTime = 0;
+                g_TrackGame->controlInterface->QueueEvent(i, 2, pressed, joystickIndex);
+            } else {
+                buttonStates[i].previousPressTime = 0;
+                buttonStates[i].pressTime = 0;
+                g_TrackGame->controlInterface->QueueEvent(i, 2, 1, joystickIndex);
+            }
+        }
+    }
+    for (int j = 0; j < 4; j++)
+        povValues[j] = state.pov[j];
+    return 1;
+}
+
 // 0x004c3b20: POV index in hundredths of a degree, as radians; -1 when
 // centred (-1 or 0xffff) or out of range.
 int PCJoystickDevice::GetPovAngle(int index, float* angle) {

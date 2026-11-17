@@ -18,14 +18,16 @@ at `0x00404c36` and `0x00404c57`, invoke surface GetDC slot 17.
 
 ## Functional build review
 
-`samples/render/BackgroundImageNearMisses.cpp` is already a standalone complete
-candidate. Its algorithm is unchanged. VC6 SP3 `/O2 /GR /GX /MT` emits
+GetDc sits in its unit, `src/reconstructed/BackgroundImage.cpp`, in retail
+order (it moved in from its standalone sample).
+`tests/test_background_dc_behavior.py` compiles a validation unit holding only
+its definition and its two scratch globals (`tools/unit_source.py`). Its algorithm is unchanged. VC6 SP3 `/O2 /GR /GX /MT` emits
 **678 bytes with 115 matching positions** after binding both scratch globals.
 It remains nonexact, with zero-register allocation and return-block placement
 differences. The old 108/606 masked-byte figure was a different metric; it is
 not the complete relocation-resolved score.
 
-A saved same-path object from baseline `938c7031` and the final object have
+Before the move, a saved same-path object from baseline `938c7031` and the sample's object had
 identical **three nondebug sections and 18 relocations**, including the full
 function, data and scratch storage. There are no filename exceptions. The
 private reproduction is `work/background-dc36/check_preservation.py`,

@@ -21,6 +21,11 @@ CameraRect g_DrawImageRectClipRect;
 Win32Rect g_DrawImageRectSourceRect;
 // 0x005777e8: the drawn rectangle 0x00404700 records for its region.
 CameraRect g_DrawImageRectDrawnRect;
+// 0x005777a0 / 0x005777a8: GetDc's dirty-region index and clipped rectangle;
+// decoded direct DWORD references lie within GetDc. Both retail ranges start
+// at raw-backed zero bytes in writable .data; original COFF placement is unknown.
+int g_GetDcRegionIndex;
+CameraRect g_GetDcClipRect;
 
 // 0x00403d50
 BackgroundImage::BackgroundImage(int flags) : GameObject(flags) {
@@ -366,6 +371,91 @@ int BackgroundImage::DrawImageRect(PCTextureMap* image, int x, int y, CameraRect
     }
     *frames = Target()->frameModulus;
     return 1;
+}
+
+// 0x004049d0: a DC for drawing `rect`: the back buffer, or with the copy
+// current the surfaces in turn (`more` set when the copy is returned), clipped
+// to the next dirty region in `clip`.
+// Not exact (115 of 678 bytes, equal size: the zero register and the place of
+// the DC return block differ; docs/BACKGROUND_DC.md).
+int BackgroundImage::GetDc(void** dc, CameraRect* rect, int index, int dirty, int* frames, int* more,
+                           CameraRect* clip) {
+    DirectDrawSurface* surface;
+    *dc = 0;
+    *more = 0;
+    surface = 0;
+    if (dirty) {
+        if (copyValid) {
+            if (*frames) {
+                if (copyDcNext) {
+                    surface = offscreenCopy;
+                    *more = 1;
+                    copyDcNext = 0;
+                } else {
+                    surface = Target()->renderSurface;
+                    copyDcNext = 1;
+                    (*frames)--;
+                }
+            } else {
+                copyDcNext = 1;
+                for (g_GetDcRegionIndex = 0; g_GetDcRegionIndex < regionCapacity; g_GetDcRegionIndex++) {
+                    if (regionTable[g_GetDcRegionIndex].lastFrameCount != Target()->frameCount)
+                        continue;
+                    g_GetDcClipRect.left = CurrentRegionRect(g_GetDcRegionIndex).left > rect->left ? CurrentRegionRect(g_GetDcRegionIndex).left : rect->left;
+                    g_GetDcClipRect.right = CurrentRegionRect(g_GetDcRegionIndex).right < rect->right ? CurrentRegionRect(g_GetDcRegionIndex).right : rect->right;
+                    g_GetDcClipRect.top = CurrentRegionRect(g_GetDcRegionIndex).top > rect->top ? CurrentRegionRect(g_GetDcRegionIndex).top : rect->top;
+                    g_GetDcClipRect.bottom = CurrentRegionRect(g_GetDcRegionIndex).bottom < rect->bottom ? CurrentRegionRect(g_GetDcRegionIndex).bottom : rect->bottom;
+                    if (g_GetDcClipRect.left < g_GetDcClipRect.right &&
+                        g_GetDcClipRect.top < g_GetDcClipRect.bottom) {
+                        if (lastDcRegionCopied && g_GetDcRegionIndex > lastDcRegion) {
+                            surface = Target()->renderSurface;
+                            lastDcRegionCopied = 0;
+                        } else if (!lastDcRegionCopied && g_GetDcRegionIndex == lastDcRegion) {
+                            surface = offscreenCopy;
+                            lastDcRegionCopied = 1;
+                        } else {
+                            continue;
+                        }
+                        *more = 1;
+                        *clip = g_GetDcClipRect;
+                        lastDcRegion = g_GetDcRegionIndex;
+                        break;
+                    }
+                }
+                if (g_GetDcRegionIndex == regionCapacity) {
+                    lastDcRegionCopied = 1;
+                    lastDcRegion = -1;
+                }
+            }
+        } else {
+            surface = Target()->renderSurface;
+            *frames = Target()->frameModulus;
+        }
+        if (index >= 0)
+            MarkRegionPending(index);
+    } else {
+        if (index >= 0)
+            SetRegionRect(index, rect);
+        surface = Target()->renderSurface;
+        *frames = Target()->frameModulus;
+    }
+    if (surface) {
+        if (heldDcSurface) {
+            if (surface != heldDcSurface) {
+                ReleaseDc();
+                heldDcSurface = surface;
+                surface->GetDC(&heldDc);
+                *dc = heldDc;
+                return 1;
+            }
+        } else {
+            heldDcSurface = surface;
+            surface->GetDC(&heldDc);
+        }
+        *dc = heldDc;
+        return 1;
+    }
+    return 0;
 }
 
 // 0x00404c80

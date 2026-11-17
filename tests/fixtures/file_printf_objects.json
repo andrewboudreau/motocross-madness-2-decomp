@@ -1,5 +1,5 @@
 {
-  "baseline": "Published f6c22865 before declaration correction; each same-path complete object preserves all nondebug bytes, flags and relocation targets under only the FilePrintf void-to-int external-name substitution. Only enumerated full source filenames are checkout-relative. EcoSystem QuadTree correction: published ed3d06ce old EcoSystem pins reproduced independently; both complete objects preserve all bytes and destinations under only the six tree interface names, with no exclusions or score changes. Round57 light lookup: published dfdf9823 canonical EcoSystem pin independently reproduced, then complete132 sections/720 relocations preserved under only the EcoLightEmitterView*-to-LightEmitter* method-return spelling. All other records unchanged.",
+  "baseline": "Published f6c22865 before declaration correction; each same-path complete object preserves all nondebug bytes, flags and relocation targets under only the FilePrintf void-to-int external-name substitution. Only enumerated full source filenames are checkout-relative. EcoSystem QuadTree correction: published ed3d06ce old EcoSystem pins reproduced independently; both complete objects preserve all bytes and destinations under only the six tree interface names, with no exclusions or score changes. Round57 light lookup: published dfdf9823 canonical EcoSystem pin independently reproduced, then complete132 sections/720 relocations preserved under only the EcoLightEmitterView*-to-LightEmitter* method-return spelling. All other records unchanged. EcoSystem near-miss merge: the sample EcoSystemNearMisses.cpp and the Group4/Group5 bring-ups were folded into EcoSystem.cpp (six near-miss bodies and their helpers); the canonical object is repinned at 207 sections/1143 relocations and the sample pin removed. Every calibration case stays exact. ManagedTextureGroup near-miss merge: both repacks moved into ManagedTextureGroup.cpp from their sample and bring-up; its pin is renewed and every calibration case stays exact.",
   "rename": {
     "?FilePrintf@@YAXPAU_iobuf@@PBDZZ": "?FilePrintf@@YAHPAU_iobuf@@PBDZZ"
   },
@@ -10,19 +10,14 @@
       "sha256": "6a5bc7317cab0b8c2ea493d8d2c4643551dcb7777ddd0fdf034addd560187750"
     },
     "src/reconstructed/ManagedTextureGroup.cpp": {
-      "sections": 50,
-      "relocations": 239,
-      "sha256": "2e95e5b7f2f5e290592ecdaa7d535bd0c5754319c353835a8c846a6673469784"
+      "sections": 83,
+      "relocations": 511,
+      "sha256": "6ed43b4166a74045f95fb5602a7962de9670a260f1af1f1918652dec67635051"
     },
     "src/reconstructed/EcoSystem.cpp": {
-      "sections": 132,
-      "relocations": 720,
-      "sha256": "9a4570d2a2a51e62f4c966bff35d859b23a9f3e853d26717e8ef620eca987cbf"
-    },
-    "samples/ecosystem/EcoSystemNearMisses.cpp": {
-      "sections": 98,
-      "relocations": 444,
-      "sha256": "839298b5e1730727a9613695241c72ae7f6c873834a478532f496edce417a0c0"
+      "sections": 207,
+      "relocations": 1143,
+      "sha256": "766f194379cdbfc3292a3055f22bd19f4b2c8a21cbc22d06887a86d66a73ecc6"
     }
   }
 }

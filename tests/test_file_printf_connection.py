@@ -19,8 +19,7 @@ from test_edit_box_on_char import extract
 ROOT = Path(__file__).resolve().parents[1]
 SOURCES = ('src/reconstructed/FileStream.cpp',
            'src/reconstructed/ManagedTextureGroup.cpp',
-           'src/reconstructed/EcoSystem.cpp',
-           'samples/ecosystem/EcoSystemNearMisses.cpp')
+           'src/reconstructed/EcoSystem.cpp')
 FILENAMES = SOURCES + ('src/reconstructed/ContainerList.h',)
 PROVIDER = '?FilePrintf@@YAHPAU_iobuf@@PBDZZ'
 RETIRED = '?FilePrintf@@YAXPAU_iobuf@@PBDZZ'
@@ -103,7 +102,7 @@ class FilePrintfConnectionTests(unittest.TestCase):
         call_sites = (
             (SOURCES[1], '?WriteDebugReport@ManagedTextureGroup@@', 0x50c7e0, 224,
              [0x50c808, 0x50c81f, 0x50c85a, 0x50c88f, 0x50c89d]),
-            (SOURCES[3], '?WriteListing@EcoSystem@@', 0x458da0, 461,
+            (SOURCES[2], '?WriteListing@EcoSystem@@', 0x458da0, 461,
              [0x458e3d, 0x458f35]),
         )
         for source, symbol, va, size, sites in call_sites:
@@ -162,8 +161,8 @@ class FilePrintfConnectionTests(unittest.TestCase):
                 self.assertEqual([(r.virtual_address-entry.value, r.type) for r in relocations
                                   if obj.symbol_by_index[r.symbol_index].name == PROVIDER],
                                  [(site + 1 - va, 20) for site in sites])
-            partial = compare(image, objects[SOURCES[3]], '?WriteListing@EcoSystem@@', 0x458da0, 461,
-                              ROOT/'samples/ecosystem/EcoSystemNearMisses.bindings.json')
+            partial = compare(image, objects[SOURCES[2]], '?WriteListing@EcoSystem@@', 0x458da0, 461,
+                              ROOT/'src/reconstructed/EcoSystem.bindings.json')
             self.assertEqual((partial['candidate_size'], partial['strict_match']['matching_positions']), (461, 457))
             self.assertFalse(partial['strict_exact'])
 

@@ -1,6 +1,6 @@
 """EcoSystem::BuildCollisionObjects 0x00457ed0 (tools/emu_diff.py case).
 
-The linked body is src/bringup/Group4_EcoSystem.cpp. Offsets from the retail body: the
+The linked body is src/reconstructed/EcoSystem.cpp. Offsets from the retail body: the
 definition's +0x204 collision count, +0x208 the 0x24-byte collision definitions (+0x00 type,
 +0x04 start, +0x10 end, +0x1c radius, +0x20 height), +0x20c the object table it allocates,
 and model LOD 0's +0x1e8 indices (unsigned shorts), +0x1ec vertices (0x20-byte, position
@@ -25,7 +25,7 @@ from tools.emu_cases.kb_simulate_frame import install_seh_segment
 
 RETAIL_VA = 0x00457ed0
 SYMBOL = '?BuildCollisionObjects@EcoSystem@@QAEXPAVVegetationDefinition@@@Z'
-SOURCE = 'src/bringup/Group4_EcoSystem.cpp'
+SOURCE = 'src/reconstructed/EcoSystem.cpp'
 TRACK_GAME = 0x0056e26c
 MEM_TAG_STACK = 0x0056df04
 PROBES = {0x00457f06: 'empty', 0x00458004: 'model hull', 0x0045816d: 'sphere', 0x004581a1: 'capsule',

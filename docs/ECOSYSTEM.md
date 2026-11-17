@@ -4,8 +4,9 @@ Source: `D:\aardvark\VC\krusty2\EcoSystem.cpp` (literal `0x0056a130`; 35
 `.text` xrefs `0x00455ee6..0x0045c509` and nine in the unit's EH funclets
 `0x0054a880..0x0054aa32`). Canonical reconstruction:
 `src/reconstructed/EcoSystem.h` / `EcoSystem.cpp` /
-`EcoSystem.bindings.json`; near misses in
-`samples/ecosystem/EcoSystemNearMisses.cpp`. Names are provisional unless a
+`EcoSystem.bindings.json`. The near misses sit in the unit in retail order,
+each with a `// Not exact` status comment; `0x004570a0` stays in
+`samples/ecosystem/VegetationCollisionObject.cpp`. Names are provisional unless a
 literal names them (the .est keys: `NumberOfLOD`, `MeanHeight`, ... ).
 
 ## Extent
@@ -178,10 +179,12 @@ Source forms that mattered:
   *data = x;`): that is what gives `mov cl, al; add al, dl; xor cl, dl`
   with the key pointer in `ebx`.
 
-## Near misses (`samples/ecosystem/EcoSystemNearMisses.cpp`)
+## Near misses
 
 Scores are matching / compared bytes with every relocation bound (the
-sample's bindings file; `$ehhandler` keys for the EH prologues).
+unit's bindings file; `$ehhandler` keys for the EH prologues). All but
+`0x004570a0` are compiled inside `EcoSystem.cpp`, so the game build links
+the same bodies these scores describe.
 
 | VA | Function | State |
 |---|---|---|
@@ -190,11 +193,231 @@ sample's bindings file; `$ehhandler` keys for the EH prologues).
 | `0x00457480` | .est reader (2629 bytes) | 561/2629 compiled in the unit (587/2648 in the sample, whose out-of-unit definition constructor adds an EH state the unit does not need), three instructions short of exact: VC6 keeps the constant 1 of `method = 1` and `i = 1` in `edi` where retail stores both immediates. The probe stream lives in `esi` as well as its EH slot only with a plain `delete probe;` (the `if (probe)` guard keeps it in memory), which also puts `total`, `i` and the loop pointer in retail's slots; the "VTop" key is read into the field the constructor and `WriteEsb` call `uCenter` and "UCenter" into `vTop` (retail's order). Forms that leave the constant register: `total` / `i` at function or block scope, `i = 1` before or after `total = 0.0f`, `for (int i = 1 ...)`, `float total = 0.0f` at the declaration, an `if / else { }` method chain, `? 1 : 0` flag conversions, nested `if`s and named temporaries for the `strstr` / `_stricmp` / open results; also `unsigned int method` in the class, `long i` / `unsigned int i`, `method = true`, an `else { if (...) return 0; method = 2; }` chain and a separate `int j` for the first loop (all 561/2629 with the same three instructions; the `j` loop scores lower). The constant's registerization is not driven by the variables' types or the statement shape. The manifest's 2646 bytes include eleven `nop`s of padding. |
 | `0x00457ed0` | collision objects (1150 bytes) | 1105/1153: the cylinder height load `mov edx, [edi+0x20]` is scheduled before the cosine in retail (every placement of the `.y` store scores lower). The offset is `operator+` shaped (`Vector3(a.x + b.x, ...)`, `EcoSum(shape->start, vertices[j])`; the named-result form scores less); its z component is summed vertex-first as in retail only when the vertex's z is read through a by-value accessor. Retail reads the height right after the `fild` of the angle and `fmul`s the step constant after the `cmp ecx, 0x10`, but stores it through an integer register after the sine; here the load sits right before its store. Local-array store order follows statement order: the `.y` store first (816/1156), `vertices[j + 16].y = 0.0f` first (817/1156), between x and z (1103/1153), and a `float height = shape->height` local (840/1163, goes through the FPU) all score lower. |
 | `0x00458da0` | .txt listing | 457/461: four SIB operands are `[esi + eax]` instead of retail's `[eax + esi]` (array base / induction order); no source form found yet (`i[vegetation]`, an `int index = i` copy and `(vegetation + i)->` compile to the same bytes; a `Vegetation* object = &vegetation[i]` local scores 145/461). |
-| `0x00459ce0` | Auto-method generator (3257 bytes) | 323/3300: the control flow and every expression match; the frame (0xe14) is the same size and the arrays (`tgas`, `cumulative`, the rings) sit at retail's offsets, but the scalar slots differ. Retail's slot order by use count is reproduced except for how VC6's slot sharing groups the temporaries: retail shares the int-to-float conversion temporaries (`fild [esp+0x10]`) with the first loops' 256 count-down and the placement loop's `j` (34 uses at `[esp+0x10]`), `i` of the ring loops with `probability` (28 uses at `+0x14`), and the `fimul` products with their `(int)` results (`+0x28`, 12 uses); here the conversion temporaries share with the `fimul` products (36 uses), `i` with `clusterCount` (27) and `probability` stands alone (11), so `tga`, `heightParameter`, `radius` / `threshold` and the four-use scalars shift by one or two slots. Source forms that mattered: the two `rand()` scales stay separate only through a named local (`random = EcoRandomUnit(); threshold = random * 3.0f`); the draw is `rand() * (100.0f / 32767.0f)` (RAND_MAX), the position `rand() * (1 / 32768.0f) * range`; the TGA sampler divides by a local copy of the QuadTree extent (`x / worldX * width` gives retail's `fld; fdivr`); the ring tables are `Vector3(i * spacing, 0, (mode - 1) * spacing)` constructor temporaries; `tga = 0` precedes the `memset`; the registry query is Game slot 20, not slot 22. |
-| `0x0045b060` | slot 14, the draw (3967 bytes) | 3714/3967, same size and frame (1024/1045 instructions aligned; the Group4 bring-up links the same body). Logic fix: the billboard width scale is `(radius + radius) / (uRight - uLeft)` (retail's `fdivp st(1), st` divides the doubled radius by the span); the earlier sample divided the other way and drew near-zero-width billboards. Shape levers: `vTop` / `uLeft` / `uRight` read into locals in that order (vertex count in `ebp`, `definition` in memory, `edi` / `ebp` / `ebx` popped before the overlay rows as retail does); the alpha test as `isBillboard >= lodCount`; `next++` in the for increment; the page store through a local (`int page = overlay->nextPage++; s_debugPage = page;`); and the lean as `EcoLean(&side, EcoScaleXZ(back, 0.1f))` per side, a returned vector passed by value, which reproduces retail's duplicated x product, the twice-copied z temporary and the 0xf0 frame (a named `Vector3` lean, `back * 0.1f`, float or reference helpers and `-=` keep the lean in registers). The clamps are conditional expressions, the intensities three floats, the dot products `z + (x + y)`. Left: the first loop guard compares `remaining` with the zero register before the offset stores, x87 scheduling in the lit-face block (`+0x8d4`..`+0x931`) and the alpha / leftColor load order at `+0xc1c`. |
+| `0x00459ce0` | Auto-method generator (3257 bytes) | 366/3257 in the unit. The definition TGA is weighted in retail's order, `(channel * probability) * 1/255` (see the source comment: at 24-bit precision the other order differs by one ulp for 20333 of 65025 pairs); the earlier sample form, with the other order, scored 323/3300. The control flow and every expression match; the frame (0xe14) is the same size and the arrays (`tgas`, `cumulative`, the rings) sit at retail's offsets, but the scalar slots differ. Retail's slot order by use count is reproduced except for how VC6's slot sharing groups the temporaries: retail shares the int-to-float conversion temporaries (`fild [esp+0x10]`) with the first loops' 256 count-down and the placement loop's `j` (34 uses at `[esp+0x10]`), `i` of the ring loops with `probability` (28 uses at `+0x14`), and the `fimul` products with their `(int)` results (`+0x28`, 12 uses); here the conversion temporaries share with the `fimul` products (36 uses), `i` with `clusterCount` (27) and `probability` stands alone (11), so `tga`, `heightParameter`, `radius` / `threshold` and the four-use scalars shift by one or two slots. Source forms that mattered: the two `rand()` scales stay separate only through a named local (`random = EcoRandomUnit(); threshold = random * 3.0f`); the draw is `rand() * (100.0f / 32767.0f)` (RAND_MAX), the position `rand() * (1 / 32768.0f) * range`; the TGA sampler divides by a local copy of the QuadTree extent (`x / worldX * width` gives retail's `fld; fdivr`); the ring tables are `Vector3(i * spacing, 0, (mode - 1) * spacing)` constructor temporaries; `tga = 0` precedes the `memset`; the registry query is Game slot 20, not slot 22. |
+| `0x0045b060` | slot 14, the draw (3967 bytes) | 3714/3967, same size and frame (1024/1045 instructions aligned). Logic fix: the billboard width scale is `(radius + radius) / (uRight - uLeft)` (retail's `fdivp st(1), st` divides the doubled radius by the span); the earlier sample divided the other way and drew near-zero-width billboards. Shape levers: `vTop` / `uLeft` / `uRight` read into locals in that order (vertex count in `ebp`, `definition` in memory, `edi` / `ebp` / `ebx` popped before the overlay rows as retail does); the alpha test as `isBillboard >= lodCount`; `next++` in the for increment; the page store through a local (`int page = overlay->nextPage++; s_debugPage = page;`); and the lean as `EcoLean(&side, EcoScaleXZ(back, 0.1f))` per side, a returned vector passed by value, which reproduces retail's duplicated x product, the twice-copied z temporary and the 0xf0 frame (a named `Vector3` lean, `back * 0.1f`, float or reference helpers and `-=` keep the lean in registers). The clamps are conditional expressions, the intensities three floats, the dot products `z + (x + y)`. Left: the first loop guard compares `remaining` with the zero register before the offset stores, x87 scheduling in the lit-face block (`+0x8d4`..`+0x931`) and the alpha / leftColor load order at `+0xc1c`. |
 
 With the three large functions decoded there are no unattempted functions
 left in the unit.
+
+### Forms tried
+
+The list kept with the near misses while they lived in a separate sample
+(Git history has the file). Session numbers refer to earlier matching rounds.
+
+```text
+  0x00456890  the camera pointer and the z store are scheduled before the
+              first fmul in retail (13 bytes); the block compiles the same
+              under every data-flow-equivalent spelling tried (locals
+              before/after the camera load, no camera local, the view as
+              a local, one declaration per statement, a position
+              reference, the products before the camera, `-=`, int
+              locals/casts, a Vector3 for the position, z first, a delta
+              vector), and every statement reordering only moves further
+              away; helper boundaries do not move it either (inline and
+              static accessors for the eye and the scaled coordinate,
+              pointer/reference/by-value helpers, a struct copy, the
+              difference as a Vector3: identical bytes or worse), and
+              /G6 scores lower (267); redundant parentheses on the
+              differences, the products and the detail-band casts (225
+              combinations) do not move it either (356/369)
+              nor 1..33 prepended typedefs (session 14, all 356);
+              session 17: all 40 valid orders of the definition, camera,
+              dx, dz and `*billboard = 0` statements, a render-target
+              local, `-(q * u) + eye` and `this->` reads stay at 356 or below
+  0x004570a0  retail loads the definition-table entry once into edi before
+              the position conversions and picks other registers for the
+              shape store blocks (103/386); retail reloads the index
+              byte at +0x12 for the definition while keeping the global
+              in eax, VC6 here reuses the first table entry. A `table`
+              local, direct reads, `(int)` casts, a `first` definition
+              local and an inline definition accessor for either read
+              (12 forms) all compile to one load
+  0x00457480  three instructions: VC6 keeps the constant 1 of `method = 1`
+              and `i = 1` in edi where retail stores immediates (561/2629
+              compiled inside the unit; the sample TU adds an EH state for
+              the definition `new` because the ctor is out of unit).
+              `delete probe;` without the `if` keeps the probe in esi as
+              retail does; "VTop" is read into uCenter and "UCenter" into
+              vTop (retail's order); scope/order/if-shape variants of
+              total, i and method did not move the constant, nor did
+              unsigned/long types, `true`, a nested else chain or a
+              separate loop variable, nor did `for (i = 0; ++i < 256;)`
+              or a `while` loop (s14)
+  0x00457ed0  one scheduled load (the cylinder height) in the vertex loop
+              (1105/1153): retail reads it right after the fild, before
+              the `j` spill store; parentheses on the angle, the cos/sin
+              casts and products and the height (216 combinations), a
+              `(float)j`, every order of the five loop statements and
+              split cos/sin locals give 1105 or (mostly much) worse.
+              s22: retail holds the height in edx from the top of the
+              body to the store after the z stores, so it is read early
+              and carried in an integer register. A float local read at
+              the top of the body (block or function scope, register,
+              const, a one-member struct, a Vector3 member or a
+              one-element array) is carried on the x87 stack instead
+              (`fld` before the fild, `fstp` for the store; same size);
+              read after the angle it spills the angle (10 bytes
+              longer). Inline helpers do the same or worse: a y setter
+              (reference or pointer), a top/bottom y setter, a rim
+              helper taking the angle, the radius or the shape and the
+              height by value in every parameter order (48 forms), one
+              taking x, y and z by value in every order (24 forms; the
+              height then goes through an integer register and a frame
+              slot, 10 to 22 bytes longer), Vector3 constructor forms
+              (62 bytes longer) and a height accessor. An int-typed
+              carrier (evidence only) reproduces this loop but flips
+              `start.x + vertices[j].x` in the next loop, so the two
+              loops are coupled through the age of their leaves.
+              2026-11-14: that flip is a local-definition count. The
+              int carrier (`int h = *(int*)&shape->height;` first in
+              the body, `*(int*)&vertices[j].y = h;` for the store)
+              with k more dead initialised int locals at function
+              scope is byte exact for k = 2..7 and has the flipped
+              x sum for k = 0, 1 and 8; the spelling of the sum (EcoSum
+              either way round, a plain constructor sum in four operand
+              orders) does not matter under the carrier. So retail's
+              body has the height in an integer temporary before the
+              angle and at least two more local definitions than this
+              source. Evidence only, not applied: no readable form
+              gives the integer temporary. Also measured: the y store
+              written first or second (the store is not sunk and the
+              induction pointer changes base, 3 bytes longer), a
+              `const float&` height, a Vector3 local's y, a double
+              angle with a float height (x87 carry again), two Vector3
+              locals copied out (46 bytes longer). Stores placed before
+              the loop do not move the schedule (the loop body is its
+              own block), so this is not the scheduling-window effect
+              of the CollisionObject family.
+  0x00458da0  four `[eax + esi]` operands come out as `[esi + eax]`
+              (457/461). Also unchanged: inline helpers for the
+              terminator, the clamped copy, the length clamp or the
+              extension; the name head in its own block; `file` and `i`
+              declared at the top or at first use (a single reassigned
+              `length` local gives 442).
+              The `name[length] = 0` byte store decides it:
+              without it (or without the whole name head) the loop gets
+              retail's `[veg + i]` order, and each further byte store at
+              a variable index toggles it back (parity-like; int/short/
+              float stores, constant-index stores and loads do not).
+              No code-neutral form moved it (~60 tried): loop shapes
+              (for/while, pre-increment, unsigned i: 455), `this->`,
+              dead/top/loop-scope locals, parentheses on the coordinate
+              products (27 combinations) and on the zero store's index,
+              array and value, `'\0'`/`(char)0`/`*(name + length)`/
+              `length[name]`/end-pointer spellings, clamp spellings
+              (if/ternary, <, <=, >=), `sizeof`, pointer arithmetic, a
+              reference, split file/strrchr forms, and 0..40 prepended
+              typedefs (no arena window). Also unchanged: a `char*`
+              alias of `name` in any subset of the four head uses
+              and `(vegetation + i)->`; an element pointer/reference
+              (180), a vegetation base local (205) and index or
+              byte-offset element helpers (257) are far worse. Session
+              15, also 457: the discarded RadiusForParameter call (or
+              both discarded calls) as a bare statement instead of a
+              named local, and `i` declared in the for statement
+              Session 18: the toggle is per function, not per TU
+              (one to three variable-index byte stores in a function
+              placed before this one: 457). A variable-index byte read
+              that is used (`if (name[length]) return;`) flips the
+              order like a store; discarded reads (`(void)name[length]`,
+              a dead char local, `if (0) name[length] = 1;`) are
+              optimized away and stay 457, as do an `unsigned char`/
+              `signed char` cast on the store, an unsigned `length`, a
+              dead `name[length] = 1;` before the store and an
+              end-pointer spelling. `name[0x103] = 0;` after the
+              extension copy (73-129) and memcpy for strncpy (41) lose.
+              Round 10: the toggle is not the byte access. Any test of
+              a non-const local holding a known value, written before
+              the loop, gives retail's 461/461: VC6 folds it late
+              (constant propagation in the optimiser) and emits the
+              same instructions with the address sums the other way
+              round. `if (name[length]) return;` after the store is
+              one such test (store forwarded, test folded). Others, all
+              461: `int flag = 1; if (!flag) return;` at the top, after
+              the name head, after the fopen guard or after the count
+              line; `if (!file || !flag) return;`; `if (flag)
+              FilePrintf(count)`; `fopen(name, flag ? "a" : "w")` with
+              flag 0; `i = 0; if (i == 0) FilePrintf(count)`; an error
+              flag set from `!file`. None is applied: each is dead code
+              with no evidence for its wording, so the row stays 457
+              until retail's actual test is identified. Tests the front
+              end folds do not flip (457): literal `if (1)`, const or
+              enum flags at file or function scope, a constant argument
+              of an inline head helper (`if (size <= 0) return;`), an
+              inline helper returning 1, a repeated `if (!file)`,
+              `if (file)` wrappers, `do {} while (0)`, empty ifs, a
+              `max` local in the clamp. A folded test inside or after
+              the loop does not flip either, and one that emits code
+              (`if (!path) return;`, `if (placedCount > 0)` around the
+              loop: 452) flips the order but changes bytes. Also 457:
+              `i = 0` or `file = 0` early (five places each), a `type`
+              local for the definition index, `while`/`do` loops;
+              `int length = 0x103; if (pathLength <= length) ..` is 47.
+  0x00459ce0  the frame slots: same size, the locals and temporaries
+              are assigned in a different order (323/3300); retail
+              keeps the first sample's TGA in ebx and reloads
+              g_collisionQuadTree after its first __ftol, where VC6
+              here caches the tree in ebx (the s15 reference diff's
+              missing load)
+              Big-gap pass, first divergences in order (not applied:
+              this object is pinned by six fixtures and the gains are
+              small):
+              0xaa  retail zeroes `attempt` (frame slot 0x6c, the
+                    loop's `inc edi`) between the argument pushes of
+                    GetHeightRange, so `attempt = 0` precedes that
+                    call in the source; moved there the store is
+                    retail's (331 strict, 696 aligned; `failures`
+                    moved instead scores the same but is slot 0x54,
+                    zeroed after the call in retail; total first 267).
+              0x173 retail's mode 5 block ends `jmp` to the
+                    `test ebx, ebx` of `if (mode)` and the mode 6
+                    block falls into it; VC6 here threads both past
+                    the test (one extra jmp, so the equal size is a
+                    coincidence). A switch (sub/dec dispatch, 888
+                    strict only by position), two separate ifs,
+                    `!= 0`, `> 0`, a goto around the ring block, k
+                    declared or zeroed earlier and kept zeroed inside
+                    do not stop it; `int k = 0` hoisted out of the if
+                    does (712 aligned, 366 strict, 3298 bytes) but
+                    emits its xor before the test, where retail has
+                    it after.
+              0x3ef retail keeps attempt in edi and clusterCount in
+                    eax across the draw; here both live in the frame.
+                    Six orders of the clusterCount/cluster/position.y
+                    initialisations: 310-381 strict, 684-696 aligned.
+  0x0045b060  3714/3967, same size and frame (1024/1045 aligned). Logic
+              fix (session 16): the billboard width scale is
+              2r / (uRight - uLeft); the sample had the quotient upside
+              down (retail's fdivp st(1),st divides the doubled radius
+              by the span), which drew near-zero-width billboards.
+              Shape levers found the same session: vTop/uLeft/uRight
+              read into locals in that order (flips the allocation:
+              vertexCount in ebp, `definition` in memory, edi/ebp/ebx
+              popped before the overlay rows as in retail); the alpha
+              test as `isBillboard >= lodCount` (0xff000000 first);
+              `next++` in the for increment; verticesBefore, camera,
+              trianglesBefore declaration order; the page store through
+              a local; and the lean as EcoLean(&side,
+              EcoScaleXZ(back, 0.1f)) per side, a returned
+              vector passed by value, which gives retail's duplicated
+              x product and the twice-copied z temporary (and the
+              0xf0 frame). Remaining: the first loop guard compares
+              `remaining` with the zero register before the offset
+              stores (ours tests it after them: `i = 0` before or after
+              the zero locals, `i = vertexCount`, a chained zeroing,
+              `remaining > i` and `if (i >= 120) break` do not move it),
+              x87 scheduling in the lit-face block (+0x8d4..+0x931) and
+              the alpha|leftColor load order at +0xc1c. Ruled out for
+              the lean: float/reference helpers, a named Vector3 lean
+              (with or without a copy), `back * 0.1f`, `-=`, `0.1f * x`
+              and a double factor. Other permutations of the three
+              field locals, dropping uRight or vTop and removing the
+              offset1/2/3/5 locals are all worse.
+k-scan (s22): compiled behind 0..63 prepended typedefs, 0x00456890,
+0x004570a0, 0x00457480, 0x00457ed0, 0x00458da0, 0x00459ce0, 0x0045b060
+have the same code at every count, so their differences are not a
+declaration-count effect (docs/VC6_OPERAND_ORDER.md section 2).
+```
 
 ## Evidence notes
 

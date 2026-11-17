@@ -1,10 +1,11 @@
 # Replay playback tick
 
-`samples/race/RecorderTick.cpp` contains the unchanged complete
-`VCRInterface::Tick(float)` candidate. `RecorderNearMisses.cpp` includes that
-source so there is one maintained body. The class identity comes from RTTI;
-the replay field and helper names remain provisional. This extraction does
-not establish an original translation-unit boundary.
+The complete `VCRInterface::Tick(float)` candidate sits in
+`src/reconstructed/Recorder.cpp` (retail `recorder.cpp`) between `0x004e7a90`
+and `0x004e86d0`; it moved in unchanged from its sample. The class identity
+comes from RTTI; the replay field and helper names remain provisional.
+`tests/test_recorder_tick_behavior.py` compiles a validation unit holding only
+its definition (`tools/unit_source.py`).
 
 ## Retail extent and source preservation
 
@@ -23,14 +24,14 @@ local EH registration or cleanup funclet. Its seven game helper dependencies
 already have canonical definitions in `Recorder.cpp` and `VCR.cpp`.
 
 Authentic VC6 SP3 `/O2` emits **2,448 bytes**, with **276 matching positions**
-against the full retail extent. This is explicitly nonexact. The standalone
-and aggregate candidates have identical complete function bytes and
+against the full retail extent. This is explicitly nonexact. The validation unit
+and the unit have identical complete function bytes and
 relocations, with generated labels resolved to their actual local offsets.
 The standalone defines only Tick, has no CRT initializer, and introduces no
 new missing dependency. Its sole floating constant, 1000, is checked against
 the retail readonly value at `0x00550f44`.
 
-A private extraction check against `8d7abb93` preserves all **13 emitted
+Before the move, a private extraction check against `8d7abb93` preserved all **13 emitted
 aggregate functions** and all **45 nondebug sections**, including EH, CRT,
 constants, jump tables and storage. Generated labels are compared by their
 section/offset destinations; no filename storage needed normalization in
@@ -50,8 +51,7 @@ retained record positions and end markers in the observed order. The supplied
 frame-time argument is unused; all normal exits return one.
 
 `tests/test_recorder_tick_behavior.py` runs **147,749 native scenarios**
-against the hash-pinned complete retail body. The actual standalone candidate
-and the aggregate compile with `/O2`; the independent fixture uses `/Od`.
+against the hash-pinned complete retail body. The validation unit and the unit compile with `/O2`; the independent fixture uses `/Od`.
 Only external dependency calls and import operands are redirected in the
 private executable. The candidate object is not rewritten. The actual linked
 VC6 CRT `__ftol` runs for both paths; its arithmetic is not modeled by a test

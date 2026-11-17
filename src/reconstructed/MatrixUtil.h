@@ -66,7 +66,7 @@ Matrix4 MatrixMult(Matrix4 a, Matrix4 b);      // 0x004a1860
 // fourth row and column of the result are left unset.
 Matrix4 MatrixInverse(Matrix4 m);
 // 0x004a1a50: transforms `count` points by `matrix` with the perspective
-// divide; `sourceStride` 0 means `targetStride`. Near miss (one fld/fmul
-// operand pair): samples/render/MatrixUtilNearMisses.cpp.
+// divide; `sourceStride` 0 means `targetStride`. Not exact (one fld/fmul
+// operand pair).
 void ProjectPoints(void* target, const void* source, const Matrix4* matrix, int count,
-                           int targetStride, int sourceStride);
+                   int targetStride, int sourceStride);

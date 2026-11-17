@@ -15,7 +15,7 @@ from mcm2tool.toolchain import find_child_ci,find_vc6_bin,infer_vc98_root
 from tools.match import compare
 from tools.run_calibration import CASES
 ROOT=Path(__file__).resolve().parents[1]
-SOURCES=('src/reconstructed/EcoSystem.cpp','samples/ecosystem/EcoSystemNearMisses.cpp',
+SOURCES=('src/reconstructed/EcoSystem.cpp',
          'src/krusty2/broadphase/Quadtree.cpp','src/krusty2/visibility/VisibilityQuadTree.cpp')
 FILENAMES=SOURCES
 ALLOCATOR='src/reconstructed/BlockAllocator.cpp'
@@ -159,11 +159,11 @@ class EcoQuadTreeConnectionsTests(unittest.TestCase):
             self.assertEqual(len(cases),120)
             for source,symbol,va,size,bindings in cases:
                 self.assertTrue(compare(image,objects[source],symbol,va,size,bindings)['strict_exact'],(source,symbol))
-            result=compare(image,objects[SOURCES[2]],INSERT,0x4dcac0,627,ROOT/'src/krusty2/broadphase/Quadtree.bindings.json')
+            result=compare(image,objects[SOURCES[1]],INSERT,0x4dcac0,627,ROOT/'src/krusty2/broadphase/Quadtree.bindings.json')
             self.assertEqual((result['candidate_size'],result['strict_exact'],result['strict_match']['matching_positions']),(627,False,620))
             self.assertEqual([m['offset']for m in result['strict_match']['mismatches']],[99,103,513,515,517,519,521])
             inventory=[]
-            for source in SOURCES[:2]:
+            for source in SOURCES[:1]:
                 obj=objects[source]
                 for r in obj.relocations:
                     if obj.section(r.section_number).name.startswith('.debug'):continue
@@ -197,7 +197,7 @@ class EcoQuadTreeConnectionsTests(unittest.TestCase):
             executable=output/'tree.exe'
             r=subprocess.run([str(link),'/nologo','/subsystem:console','/base:0x100000','/fixed','/opt:ref',
                               f'/out:{executable}',f'/libpath:{find_child_ci(infer_vc98_root(vc),"lib")}',
-                              str(paths[SOURCES[2]]),str(paths[ALLOCATOR]),str(fixture),'kernel32.lib'],capture_output=True,text=True,encoding='latin1')
+                              str(paths[SOURCES[1]]),str(paths[ALLOCATOR]),str(fixture),'kernel32.lib'],capture_output=True,text=True,encoding='latin1')
             self.assertEqual(r.returncode,0,r.stdout+r.stderr)
             r=subprocess.run([str(executable),str(exe)],capture_output=True,text=True,timeout=120)
             self.assertEqual(r.returncode,0,r.stdout+r.stderr)

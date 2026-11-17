@@ -26,12 +26,15 @@ reader at `0x004c3790`. The former **1,652-byte** extent stopped at
 from the decoded bounds and table references, not from candidate length.
 There is no SEH registration, owned allocation or cleanup funclet.
 
-The unchanged [standalone candidate](../samples/inputdevice/JoystickBufferedState.cpp)
+The reader (with its `AxisAbs` and inline `FilterAxisSpike` helpers) sits in
+[PCJoystickDevice.cpp](../src/reconstructed/PCJoystickDevice.cpp) after
+`ApplyAxisDeadZone` `0x004c3090`, in retail order. It loads
+`D:\aardvark\VC\krusty2\PCInputDeviceType.cpp` as its `__FILE__`, so that file is
+retail's `PCInputDeviceType.cpp` ([ORIGINAL_UNITS.md](ORIGINAL_UNITS.md)). It
 emits **1,641 bytes with 128 matching positions against 1,665 retail bytes**
 under authentic VC6 SP3 `vc6_o2_mt`. Comparing against the former truncated
 1,652-byte range also gave 128 positions; that old result is not a complete
-function comparison. The source remains a nonexact candidate in samples.
-Its original translation-unit ownership is unproven.
+function comparison. It is not exact.
 
 ## Behavior and dependency closure
 
@@ -119,13 +122,18 @@ queue overflow, physical DirectInput devices, real acquisition or concurrent
 scheduling. Callback changes establish sequencing at explicit boundaries only.
 
 The diagnostic filename differs intentionally. Retail passes
-`D:\aardvark\VC\krusty2\PCInputDeviceType.cpp`; standalone source passes its
-actual build path ending in `JoystickBufferedState.cpp`. The fixture validates
+`D:\aardvark\VC\krusty2\PCInputDeviceType.cpp`; the test's validation unit
+(`tools/unit_source.py`) passes its temporary build path. The fixture validates
 each complete expected path before normalizing that one argument in the
 transcript, then executes the real reporter, which formats a local diagnostic
 buffer. It does not claim that those diagnostic strings are byte-identical.
 
 ## Aggregate preservation and reproduction
+
+The test builds a validation unit holding only `AxisAbs`, `FilterAxisSpike`
+and the reader, and requires its body and named relocations to equal the
+whole unit's compile; only the `__FILE__` literal's mangled name differs.
+The extraction history below predates the move into the unit.
 
 Private `work/joystick31/check_extraction.py` and `extraction-proof.json`
 compare against commit `6503e588`: both complete aggregate functions (immediate

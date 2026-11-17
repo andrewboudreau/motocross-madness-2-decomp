@@ -1,7 +1,7 @@
 """EcoSystem::Render3D 0x0045b060, the vegetation draw (tools/emu_diff.py case, call-record/replay
 mode).
 
-The linked body is src/bringup/Group4_EcoSystem.cpp. FastInvSqrt 0x00460c00, its estimate
+The linked body is src/reconstructed/EcoSystem.cpp. FastInvSqrt 0x00460c00, its estimate
 0x00460c70 (tables built by 0x00460ae0/0x00460bb0) and __ftol run natively; every other call is
 replayed. The render target (+0x18) has a fake vtable whose GetRenderState (+0x24) writes the
 state's value, and whose DrawIndexedPrimitive (+0x3c) notes the vertex and index buffers it is
@@ -18,7 +18,7 @@ import random
 
 RETAIL_VA = 0x0045b060
 SYMBOL = '?Render3D@EcoSystem@@UAEHXZ'
-SOURCE = 'src/bringup/Group4_EcoSystem.cpp'
+SOURCE = 'src/reconstructed/EcoSystem.cpp'
 FAST_TABLE_INITS = (0x00460ae0, 0x00460bb0)
 TRACK_GAME = 0x0056e26c
 MEM_TAGS = 0x0056df04

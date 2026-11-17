@@ -29,6 +29,16 @@ static inline Vector3 operator-(const Vector3& a, const Vector3& b)
 {
     return Vector3(a.x - b.x, a.y - b.y, a.z - b.z);
 }
+// The sum without the constructor: in the constructor form (as operator-
+// above) PositionAtTime calls the Vector3 constructor out of line.
+static inline Vector3 operator+(const Vector3& a, const Vector3& b)
+{
+    Vector3 r;
+    r.x = a.x + b.x;
+    r.y = a.y + b.y;
+    r.z = a.z + b.z;
+    return r;
+}
 // |v|, exact for unit vectors.
 static inline float Length(Vector3 v)
 {
@@ -222,6 +232,213 @@ void CarProcedural::ReadPath(const char* pathFile, const char* name)
     delete stream;
 }
 
+// Slot 10's helpers and views (0x0042fd80 below).
+
+// 0x004b5d00 (cdecl, OrientationAxes.cpp): the look and up vectors of a
+// heading, pitch and roll.
+int OrientationAxesFromAngles(Vector3* look, Vector3* up, float heading, float pitch, float roll);
+
+// Out-of-line call views (docs/VC6_INLINE_BUDGET.md): the orthonormalisation
+// of the collider frame calls the COMDAT cross product and normalisation.
+Vector3 CarCrossCall(const Vector3& a, const Vector3& b);                 // 0x00515600
+Vector3 CarNormalizeCall(const Vector3& v);                               // 0x005087b0
+
+static inline Vector3 CarCross(const Vector3& a, const Vector3& b)
+{
+    Vector3 r;
+    r.x = a.y * b.z - a.z * b.y;
+    r.y = a.z * b.x - a.x * b.z;
+    r.z = a.x * b.y - a.y * b.x;
+    return r;
+}
+static inline float CarDot(const Vector3& a, const Vector3& b)
+{
+    return a.z * b.z + (a.x * b.x + a.y * b.y);
+}
+// |v| as 0x005087b0 reads its components (y, x, z), exact for unit vectors.
+static inline float CarLength(const Vector3& v)
+{
+    float y = v.y, x = v.x, z = v.z;
+    float squared = z * z + (x * x + y * y);
+    if (squared == 1.0f)
+        return 1.0f;
+    return FastSqrt(squared);
+}
+// v / |v| in place; the zero vector stays zero.
+static inline void CarNormalizeInPlace(Vector3& v)
+{
+    float squared = v.z * v.z + (v.y * v.y + v.x * v.x);
+    if (squared == 0.0f) {
+        v = kVec3Zero;
+    } else {
+        float inv = FastInvSqrt(squared);
+        v.x *= inv;
+        v.y *= inv;
+        v.z *= inv;
+    }
+}
+static inline Vector3& operator-=(Vector3& a, const Vector3& b)
+{
+    a.x -= b.x;
+    a.y -= b.y;
+    a.z -= b.z;
+    return a;
+}
+
+// The orthonormal frame of a forward and an up direction at a position.
+static inline void CarFrame(Matrix4* m, Vector3 forwardAxis, Vector3 upAxis, const Vector3& position)
+{
+    Vector3 rightAxis = CarCross(upAxis, forwardAxis);
+    upAxis = CarCrossCall(forwardAxis, rightAxis);
+    upAxis = CarNormalizeCall(upAxis);
+    forwardAxis = CarNormalizeCall(forwardAxis);
+    rightAxis = CarCrossCall(upAxis, forwardAxis);
+    (*m)(0, 0) = rightAxis.x;
+    (*m)(0, 1) = rightAxis.y;
+    (*m)(0, 2) = rightAxis.z;
+    (*m)(0, 3) = 0.0f;
+    (*m)(1, 0) = upAxis.x;
+    (*m)(1, 1) = upAxis.y;
+    (*m)(1, 2) = upAxis.z;
+    (*m)(1, 3) = 0.0f;
+    (*m)(2, 0) = forwardAxis.x;
+    (*m)(2, 1) = forwardAxis.y;
+    (*m)(2, 2) = forwardAxis.z;
+    (*m)(2, 3) = 0.0f;
+    (*m)(3, 0) = position.x;
+    (*m)(3, 1) = position.y;
+    (*m)(3, 2) = position.z;
+    (*m)(3, 3) = 1.0f;
+}
+
+// The sensor collider's contact record: the penetration depth at +0 and
+// the surface normal at +0x08 (tier 3 roles).
+struct CarProceduralSensorContact {
+    float fraction;   // +0x00 CollisionBoxResult fraction
+    float point;      // +0x04 CollisionBoxResult point
+    Vector3 normal;
+};
+
+// v limited to [lo, hi].
+static inline float CarClamp(float v, float lo, float hi)
+{
+    return v > lo ? (v < hi ? v : hi) : lo;
+}
+
+// 0x0042fd80: slot 10, the per-frame update along the path.
+// Not exact (604 of 2909 bytes in place, 2880 compiled: the frame layout
+// differs; docs/CARPROCEDURAL.md).
+int CarProcedural::Tick(float frameTime)
+{
+    Vector3 axisA;
+    int result = GameObject::Tick(frameTime);
+    if (frameTime <= 0.0)
+        return result;
+    if (!started) {
+        // First update: a two-point mesh for the sensor collider, and the
+        // wheels' height from the first wheel above the origin.
+        Vector3 box[2];
+        box[0] = kVec3Zero;
+        box[0].y += sensorHalfHeight;
+        box[1] = kVec3Zero;
+        box[1].y -= sensorHalfHeight;
+        sensorCollider->SetMeshShape(1, box);
+        for (unsigned int i = 0; i < numWheels; i++) {
+            Vector3 position;
+            reinterpret_cast<SoultreeObject*>(wheelNodes[i])->GetPosition(reinterpret_cast<Vec3*>(&position));
+            if (position.z > 0.0)
+                frontWheelZ = position.z;
+        }
+        started = 1;
+    }
+    pathTime = (float)fmod(frameTime + pathTime, pathKeys[pathKeyCount - 1].time * inversePathSpeed);
+    float t;
+    if (trailDistance > 0.0) {
+        trailTimeOffset = FindOffsetAtDistance(pathTime, trailDistance);
+        t = pathTime - trailTimeOffset;
+        pathPosition = PositionAtTime(t);
+    } else {
+        trailTimeOffset = 0.0f;
+        t = pathTime;
+        pathPosition = PositionAtTime(t);
+    }
+    Vector3 ahead = PositionAtTime(t + lookAheadTime);
+    Vector3 forward = ahead - pathPosition;
+    forward.y = 0.0f;
+    pathVelocity = forward * velocityScale;
+    groundSpeed = CarLength(pathVelocity);
+    Vector3 local = carModel->WorldToLocalDirection(forward);
+    if (numWheels > 0)
+        wheelSpinAngle = (float)fmod(inverseWheelRadius * velocityScale * local.z * frameTime + wheelSpinAngle, 6.2831855f);
+    float behind = FindOffsetAtDistance(t, -1.0f);
+    Vector3 back = PositionAtTime(t - behind) - pathPosition;
+    CarNormalizeInPlace(back);
+    if (skipSmoothing)
+        smoothedBack = back;
+    else
+        smoothedBack = smoothedBack * backBlend + back * (1.0f - backBlend);
+    if (steersFrontWheels && numWheels > 0) {
+        float wheelbase = FindOffsetAtDistance(t, -frontWheelZ);
+        Vector3 side = PositionAtTime(t - wheelbase) - pathPosition;
+        Vector3 steer = carModel->WorldToLocalDirection(side);
+        steeringAngle = (float)atan2(steer.x, steer.z);
+        steeringAngle = CarClamp(steeringAngle, -0.52359873f, 0.52359873f);
+    }
+    Vector3 position;
+    carModel->GetPositionIn(0, &position);
+    Vector3 ground = position;
+    Vector3 normal;
+    ((CarProceduralTerrain*)groundProvider)->QueryGround(&ground, &normal, 0, 0);
+    // The sensor collider's frame: the world axes orthonormalised.
+    Matrix4 transform;
+    CarFrame(&transform, kVec3ZAxis, kVec3YAxis, position);
+    sensorCollider->SetTransform(&transform);
+    sensorCollider->QueryCollisions();
+    if (sensorCollider->hasContact) {
+        CarProceduralContact* contact = (CarProceduralContact*)sensorCollider->contactRecord;
+        Vector3 lifted = kVec3YAxis * ((1.0f - contact->contactOffset.x) * sensorHalfHeight * 2.0f - sensorHalfHeight) + position;
+        if (lifted.y > ground.y) {
+            ground = lifted;
+            normal = ((CarProceduralSensorContact*)contact)->normal;
+        }
+    }
+    if (skipSmoothing)
+        smoothedNormal = normal;
+    else
+        smoothedNormal = smoothedNormal * normalBlend + normal * (1.0f - normalBlend);
+    Vector3 flat = smoothedBack - smoothedNormal * CarDot(smoothedBack, smoothedNormal);
+    carModel->SetAxesPtr(&flat, &smoothedNormal, 0, 1);
+    Vector3 target(pathOffset.x + pathPosition.x, ground.y, pathOffset.z + pathPosition.z);
+    Vector3 offset = carModel->LocalToWorldDirection(bodyOffset);
+    Vector3 placement = target - offset;
+    carModel->SetPositionInFrame(0, &placement);
+    for (unsigned int i = 0; i < numWheels; i++) {
+        Vector3 axisB;
+        if (steersFrontWheels && i < 2) {
+            OrientationAxesFromAngles(&axisA, &axisB, steeringAngle, -wheelSpinAngle, 0.0f);
+        } else {
+            axisA.x = 0.0f;
+            axisA.y = (float)sin(-wheelSpinAngle);
+            axisA.z = (float)cos(-wheelSpinAngle);
+            axisB.x = 0.0f;
+            axisB.y = axisA.z;
+            axisB.z = -axisA.y;
+        }
+        wheelNodes[i]->SetAxesPtr(&axisA, &axisB, 0, 1);
+    }
+    bodyCollider->UpdatePlacement();
+    if (bodyCollider->QueryCollisions()) {
+        CarProceduralContact* contact = (CarProceduralContact*)bodyCollider->contactRecord;
+        bodyContactPoint = contact->contactPoint;
+        bodyContactNormal = contact->contactNormal;
+        CarProceduralBody* body = (CarProceduralBody*)bodyCollider->shape;
+        body->position.x -= contact->contactOffset.x * 1.005f;
+        body->position.y -= contact->contactOffset.y * 1.005f;
+        body->position.z -= contact->contactOffset.z * 1.005f;
+    }
+    return result;
+}
+
 // 0x004308e0: searches, by bisection on the path parameter, for the offset
 // before `time` at which the path is `distance` long (at most 200 steps).
 float CarProcedural::FindOffsetAtDistance(float time, float distance)
@@ -259,4 +476,58 @@ float CarProcedural::FindOffsetAtDistance(float time, float distance)
         }
     }
     return result;
+}
+
+// 0x00430b10: the path position at `time` (wrapped to the path's period):
+// a cubic Hermite segment between the keys around it, whose tangents are
+// the neighbouring chords scaled by the key spacing.
+// Not exact (299 of 843 bytes in place: `this` in edi rather than esi and
+// the slots differ; docs/CARPROCEDURAL.md).
+Vector3 CarProcedural::PositionAtTime(float time)
+{
+    unsigned int count = pathKeyCount;
+    CarProceduralKey* keys = pathKeys;
+    float period = keys[count - 1].time * inversePathSpeed;
+    float t = fmod(time, period);
+    if (t < 0.0)
+        t += period;
+    if (count > 0) {
+        t *= pathSpeed;
+        unsigned int next = currentPathKey + 1;
+        while (next < count && t > keys[next].time) {
+            currentPathKey++;
+            next++;
+        }
+        while (currentPathKey > 0 && t < keys[currentPathKey].time) {
+            currentPathKey--;
+            next--;
+        }
+        // The fourth weight is written over `time`.
+        float h0, h1, h2;
+        HermiteWeights((t - keys[currentPathKey].time) / (keys[next].time - keys[currentPathKey].time),
+                       &h0, &h1, &h2, &time);
+
+        CarProceduralKey* fromKey = &pathKeys[currentPathKey];
+        CarProceduralKey* toKey = &pathKeys[next];
+        Vector3 chord;
+        chord.x = toKey->position.x - fromKey->position.x;
+        chord.y = toKey->position.y - fromKey->position.y;
+        chord.z = toKey->position.z - fromKey->position.z;
+        Vector3 t0;
+        if (currentPathKey == 0) {
+            t0 = chord;
+        } else {
+            float spacing = (toKey->time - fromKey->time) / (toKey->time - fromKey[-1].time);
+            t0 = ((fromKey->position - fromKey[-1].position) + chord) * spacing;
+        }
+        Vector3 t1;
+        if (next == pathKeyCount - 1) {
+            t1 = chord;
+        } else {
+            float spacing = (toKey->time - fromKey->time) / (toKey[1].time - fromKey->time);
+            t1 = ((toKey[1].position - toKey->position) + chord) * spacing;
+        }
+        return h0 * fromKey->position + h1 * toKey->position + t0 * h2 + t1 * time;
+    }
+    return kVec3Zero;
 }

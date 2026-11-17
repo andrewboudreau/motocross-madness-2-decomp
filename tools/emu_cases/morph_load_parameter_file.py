@@ -1,7 +1,7 @@
 """MorphBastardModifier::LoadParameterFile 0x004a33b0, the rider morph (.mbf) loader
 (tools/emu_diff.py case, call-record/replay mode).
 
-The linked body is src/bringup/Group0_KbMorphMod.cpp. The .mbf file is a parameter-block file
+The linked body is src/reconstructed/MorphBastardModifier.cpp. The .mbf file is a parameter-block file
 read through ParameterBlock: SelectSection 0x004b78f0, GetInt 0x004b7f10, ReadString
 0x004b7b30, ReadFloat 0x004b7e70 (answers whether the key exists), BeginRows 0x004b7f70,
 ReadRow 0x004b8010, GetRowInt 0x004b8180 and GetRowFloat 0x004b81c0. Each run builds a synthetic
@@ -21,7 +21,7 @@ import struct
 
 RETAIL_VA = 0x004a33b0
 SYMBOL = '?LoadParameterFile@MorphBastardModifier@@QAEPAV1@PAXPBDPAVSoultreeObject@@@Z'
-SOURCE = 'src/bringup/Group0_KbMorphMod.cpp'
+SOURCE = 'src/reconstructed/MorphBastardModifier.cpp'
 PROBES = {0x004a34f4: 'object', 0x004a36ef: 'merge', 0x004a376e: 'new channel',
           0x004a3a7d: 'row', 0x004a3b15: 'qsort'}
 

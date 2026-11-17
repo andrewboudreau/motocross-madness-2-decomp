@@ -1,14 +1,9 @@
 {
   "objects": {
     "src/reconstructed/ManagedTextureGroup.cpp": {
-      "sections": 50,
-      "relocations": 239,
-      "sha256": "ce45226c039e8c05866714fbc977a944fe84062bde148fcbdda64db2713d9ecb"
-    },
-    "samples/render/ManagedTextureGroupNearMisses.cpp": {
-      "sections": 36,
-      "relocations": 275,
-      "sha256": "6f99e99e0b72131c16b66cef94cece8d71d325c02264e30712fa598be514e66e"
+      "sections": 83,
+      "relocations": 511,
+      "sha256": "6635829131acb5c050ff57a48183725a85cf72a6880d4102c70fa95b45559004"
     },
     "src/reconstructed/SceneManager.cpp": {
       "sections": 272,
@@ -21,5 +16,5 @@
       "sha256": "1d0091200814b30faaa0f33239aa25be191a3742e40cfe9dc413b6d5b44484cb"
     }
   },
-  "note": "Four same-path old objects independently preserved with no symbol joins. Portable pins normalize only these four source filenames and the two exact canonical/sample-relative ContainerList.h spellings; old private pins were reproduced before the exact header-filename portability repair, and all four live-root objects equal the private mirror under this normalization."
+  "note": "Four same-path old objects independently preserved with no symbol joins. Portable pins normalize only these four source filenames and the two exact canonical/sample-relative ContainerList.h spellings; old private pins were reproduced before the exact header-filename portability repair, and all four live-root objects equal the private mirror under this normalization. ManagedTextureGroup near-miss merge: the sample and its bring-up were folded into ManagedTextureGroup.cpp (both repacks, in retail order), whose pin is renewed; the sample pin is removed. Every calibration case stays exact."
 }

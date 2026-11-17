@@ -137,7 +137,7 @@ def setup(ctx, case):
 
     # cdecl helpers: ECX at the call is scratch, so these log their arguments themselves. The
     # __FILE__ argument is left out: it is the compile path of each object (retail's
-    # D:ardvark\VC\krusty2\D3DIMSoultreeShadow.cpp, the near-miss file's path here).
+    # D:\aardvark\VC\krusty2\D3DIMSoultreeShadow.cpp, the near-miss file's path here).
     def fill(ctx, ecx, a):
         ctx.note('ShadowFillTriangle', a[0], a[1], a[2] & 0xffff, a[4], ctx.unpack(a[3], '6i'))
 

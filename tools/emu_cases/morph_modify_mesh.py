@@ -1,7 +1,7 @@
 """MorphBastardModifier::ModifyMesh 0x004a4c60, slot 27: blends every channel's morph-target
 deltas into a copy of the mesh (tools/emu_diff.py case, call-record/replay mode).
 
-The linked body is the Group 3 bring-up copy (src/bringup/Group3_MorphBastard.cpp). Its calls
+The linked body is src/reconstructed/MorphBastardModifier.cpp. Its calls
 are replayed: CopyMesh 0x004a5290 (the effect allocates ``meshCopy`` with its own drawn
 vertices, as the real one does on first use), UpdateChannels 0x004a4bb0 (the channel values
 are inputs here), the empty stub 0x00464e80 and the debug ``operator new`` 0x004a3010 (fresh
@@ -19,7 +19,7 @@ import struct
 RETAIL_VA = 0x004a4c60
 SYMBOL = ('?ModifyMesh@MorphBastardModifier@@UAEXPAVD3DIMSoultreeObject@@PAUModifierSoultreeSurfaceView@@'
           'PAPAU3@@Z')
-SOURCE = 'src/bringup/Group3_MorphBastard.cpp'
+SOURCE = 'src/reconstructed/MorphBastardModifier.cpp'
 COPY_MESH = 0x004a5290
 UPDATE_CHANNELS = 0x004a4bb0
 STUB = 0x00464e80

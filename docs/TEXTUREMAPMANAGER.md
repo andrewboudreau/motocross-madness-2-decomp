@@ -125,7 +125,9 @@ single `return 1` keeps the late ebx/esi pushes, and the outline reads
 its offsets and scales through fresh locals, which VC6 loads as the newer
 x87 leaf (`fld [field]; fmul st(1)`).
 
-Near misses (`samples/render/ManagedTextureGroupNearMisses.cpp`):
+Near misses (in the unit in retail order, each with a `// Not exact` status
+comment; they moved in from a sample and a bring-up copy, whose copies of
+PeakHold's `0x004cb690`/`0x004cb6b0` gave way to link aliases to PeakHold.cpp):
 - `0x0050c960` (3742 bytes), the repack: plans each used texture's level from
   its recorded use (at least 5), drops unused ones, empties the pages the
   planned textures want least until the textures that need a place fit,
@@ -166,6 +168,64 @@ the manager's memory count `0x00511580` is `CountTextureMemory`, and its
 grow-only scratch buffers `0x00511310`/`0x00511370` are `GrowScratchBuffer`
 and `GrowSecondScratchBuffer`. `0x0050c6c0` (adds a texture) keeps its
 address name because Cube.cpp, SoultreeMaterial.cpp and Texmap.cpp call it.
+
+### Forms tried
+
+The notes the near-miss sample carried before both repacks moved into the unit:
+
+```text
+ManagedTextureGroup::RepackWholePages (0x0050c960, 3742 bytes): the
+repack. The control flow, every call and the inlining pattern line up:
+VC6 inlines ContainerList::Reserve only in the last two Add calls, as
+retail does, once the TexMem figures go through TexelMegabytes and
+PageMegabytes and the page search through LeastWantedPage (VC6's inline
+budget scales with the function's size, so without those helpers it
+inlines every Reserve). The helpers take their counts by const reference:
+retail multiplies straight from the fields (`fimul [ebx+0x244]`), which
+a by-value parameter turns into a stack copy (304 -> 158 differing
+instructions). What remains is stack-slot packing: retail has two scalar
+slots fewer (frame 0x78 against 0x80), puts the 12-byte format buffer
+over the dead `i`/`smallest` slots and `filled` over `texels`, keeps
+`now` in ebp through the overlay block and hoists the level-count loop's
+bound. Its "ManagedTextures:%d" row prints a `managedCount` local, as
+RepackWithPartialBlits' does, which gives retail's load order for that
+row (tools/rank_near_misses.py: 145 -> 94 differing instructions, size
+3757 -> 3754 against 3742); the rest is almost all slot or register
+choice. Tried without effect: block scopes around the emptying
+section, the first pass (`requested`), the levels loop and the
+refill+overlay section; a hoisted count (frame shrinks by 4 but the loop
+registers rotate); an `elapsed` local for `now - blitStartTime` (worse);
+one block from `int i` through the spare-texel refill, with the levels
+loop on its own counter, so `format` could reuse `i`/`smallest`: VC6
+already overlaps `smallest`/`now` and `i`/`filled` and still gives
+`format` its own 12 bytes (code unchanged, 120 strict).
+
+ManagedTextureGroup::RepackWithPartialBlits (0x0050dad0, 5020 bytes): the
+repack with partial texture blits, chosen by 0x0050c8c0. Control flow,
+calls, inlining and the scalar stack slots line up (the slots only once
+one `managed` variable serves every loop, and the blit-pass loop only as
+`while (pass < 3 && ...)`). The `levels`/`spare` arrays take retail's
+slots (0x8c/0xb0) once the dropped branch of the 9-entry loop reads
+`levels[i]` into `n` itself; the two usedTextures sorts go through a small
+SortTextures helper (retail reads the count through the list pointer);
+and the excess clamp loops store `pages` before `spare`/`unused`. Left:
+retail stores `dropped = 0` after the empty-list return (every placement
+there spills `managed` and costs about 140 more differences). The
+"ManagedTextures:%d" row prints a `managedCount` local read just before
+it: VC6 then loads the count, debugPage and g_TrackGame in retail's order
+and the later rows keep retail's registers (passing the field directly
+loads g_TrackGame second and every later row inherits the rotation).
+Also left: the Managed/Ideal rows issue the fmul after the overlay load
+(retail: before; `9.5e-07f * x`, an implicit conversion and `/ 1048576.0f`
+change nothing) and the " 32:" row loads its second count
+after `add esp`. 11 of 1597 instructions differ (tools/rank_near_misses.py,
+was 206); the size is 5020 as retail's. Declaration order,
+block scopes around the arrays and the memset order do not move the
+arrays; computing `managedTexels` at its row is worse.
+k-scan (s22): compiled behind 0..63 prepended typedefs, 0x0050c960,
+0x0050dad0 have the same code at every count, so their differences are not
+a declaration-count effect (docs/VC6_OPERAND_ORDER.md section 2).
+```
 
 ## CacheTexture
 

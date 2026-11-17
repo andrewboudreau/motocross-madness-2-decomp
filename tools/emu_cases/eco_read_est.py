@@ -1,7 +1,7 @@
 """EcoSystem::ReadEst 0x00457480, the .est vegetation file parser (tools/emu_diff.py case,
 call-record/replay mode).
 
-The linked body is src/bringup/Group4_EcoSystem.cpp. The .est file is an INI file read through
+The linked body is src/reconstructed/EcoSystem.cpp. The .est file is an INI file read through
 GetPrivateProfileStringA/IntA (IAT 0x00550204/0x00550208, the Int one also through a register)
 and ReadIniFloat 0x0047b8a0; each run builds a synthetic INI: Method (NONE, Authored, AUTO,
 unknown, missing), TotalObjects, a random set of Vegetation_N sections (names, NONE names,
@@ -21,7 +21,7 @@ import struct
 
 RETAIL_VA = 0x00457480
 SYMBOL = '?ReadEst@EcoSystem@@QAEHPADPAVFileStream@@@Z'
-SOURCE = 'src/bringup/Group4_EcoSystem.cpp'
+SOURCE = 'src/reconstructed/EcoSystem.cpp'
 PROBES = {0x00457605: 'est', 0x00457762: 'definition', 0x00457a84: 'normalise', 0x00457b85: 'auto',
           0x00457e82: 'esb', 0x0045759c: 'probe'}
 

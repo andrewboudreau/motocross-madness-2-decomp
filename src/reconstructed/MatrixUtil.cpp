@@ -228,8 +228,31 @@ Matrix4 MatrixInverse(Matrix4 m) {
     return result;
 }
 
-// 0x004a1a50 (the strided perspective transform) is a near miss:
-// samples/render/MatrixUtilNearMisses.cpp.
+// 0x004a1a50: `count` points transformed by `matrix` with the perspective
+// divide; a zero `sourceStride` means `targetStride`.
+// Not exact (171 of 175 bytes: only the z term of the last row loads the
+// point before the matrix element; docs/MATRIX_UTIL.md lists the forms tried).
+void ProjectPoints(void* target, const void* source, const Matrix4* matrix, int count,
+                   int targetStride, int sourceStride)
+{
+    const Vector3* srcPoint = (const Vector3*)source;
+    Vector3* dstPoint = (Vector3*)target;
+    if (!sourceStride)
+        sourceStride = targetStride;
+    while (count > 0) {
+        float w = 1.0f / (srcPoint->x * matrix->m[0][3] + srcPoint->y * matrix->m[1][3]
+                          + srcPoint->z * matrix->m[2][3] + matrix->m[3][3]);
+        dstPoint->x = (srcPoint->x * matrix->m[0][0] + srcPoint->y * matrix->m[1][0]
+                       + srcPoint->z * matrix->m[2][0] + matrix->m[3][0]) * w;
+        dstPoint->y = (srcPoint->x * matrix->m[0][1] + srcPoint->y * matrix->m[1][1]
+                       + srcPoint->z * matrix->m[2][1] + matrix->m[3][1]) * w;
+        dstPoint->z = (srcPoint->x * matrix->m[0][2] + srcPoint->y * matrix->m[1][2]
+                       + srcPoint->z * matrix->m[2][2] + matrix->m[3][2]) * w;
+        srcPoint = (const Vector3*)((const char*)srcPoint + sourceStride);
+        dstPoint = (Vector3*)((char*)dstPoint + targetStride);
+        count--;
+    }
+}
 
 // 0x004a1b00 is hand-scheduled x87 code (an ebp frame, fxch pairing and a
 // negative-index loop ending in `cmp edx, 0`): inline assembly in the

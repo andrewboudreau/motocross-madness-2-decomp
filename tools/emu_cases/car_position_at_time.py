@@ -13,7 +13,7 @@ import struct
 
 RETAIL_VA = 0x00430b10
 SYMBOL = '?PositionAtTime@CarProcedural@@QAE?AUVector3@@M@Z'
-SOURCE = 'src/bringup/Group2_CarProcedural.cpp'
+SOURCE = 'src/reconstructed/CarProcedural.cpp'
 
 
 def f32(x):

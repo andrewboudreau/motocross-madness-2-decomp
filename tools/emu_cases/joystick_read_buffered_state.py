@@ -1,6 +1,6 @@
 """PCJoystickDevice::ReadBufferedState 0x004c3100, buffered DirectInput joystick events (emu_diff case).
 
-The candidate is samples/inputdevice/JoystickBufferedState.cpp. Offsets from the retail body:
+The candidate is src/reconstructed/PCJoystickDevice.cpp. Offsets from the retail body:
 the IDirectInputDevice2 pointer +0x25c (null returns 0 at once), joystickIndex +0x260, the
 button records (0x14 bytes from +0x264: state, then the two time pairs the press/release arms
 shift at +0x26c/+0x274 and +0x268/+0x270), the device subtype byte +0x3d (4 = gamepad, raw axes
@@ -27,7 +27,7 @@ import struct
 
 RETAIL_VA = 0x004c3100
 SYMBOL = '?ReadBufferedState@PCJoystickDevice@@QAEHH@Z'
-SOURCE = 'samples/inputdevice/JoystickBufferedState.cpp'
+SOURCE = 'src/reconstructed/PCJoystickDevice.cpp'
 TRACK_GAME = 0x0056e26c
 LOST = (0x8007001e, 0x8007000c)
 PROBES = {0x004c3150: 'input lost', 0x004c3160: 'acquire failed', 0x004c31ec: 'button press',

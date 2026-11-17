@@ -1,6 +1,6 @@
 """Vegetation::TestDistance 0x00456890 (tools/emu_diff.py case).
 
-The linked body is src/bringup/Group5_Vegetation.cpp. Offsets from the retail body: the
+The linked body is src/reconstructed/EcoSystem.cpp. Offsets from the retail body: the
 vegetation's quantized x/z (+0x0c/+0x10, unsigned shorts) and definition index (+0x12 byte);
 g_EcoSystem 0x0059aebc with +0x18 render context (+0x08 camera, position x/z at
 +0x170/+0x178), +0x58 definition table (definition +0x1fc blendLods), +0x5a8 units per
@@ -20,7 +20,7 @@ import struct
 
 RETAIL_VA = 0x00456890
 SYMBOL = '?TestDistance@Vegetation@@QAEXPAH0@Z'
-SOURCE = 'src/bringup/Group5_Vegetation.cpp'
+SOURCE = 'src/reconstructed/EcoSystem.cpp'
 PROBES = {0x00456952: 'sqrt', 0x00456969: 'far', 0x0045698b: 'blend', 0x004569ac: 'fade',
           0x004569d7: 'no blend'}
 G_ECOSYSTEM = 0x0059aebc

@@ -1,7 +1,7 @@
 """MPBikeRiderDlg::FillBikeRiderLists 0x004f8220, the multiplayer bike and rider list filler
 (tools/emu_diff.py case, call-record/replay mode).
 
-The linked body is src/bringup/Group2_MPBikeRiderDlg.cpp. g_TrackGame (0x0056e26c) carries the
+The linked body is src/reconstructed/SelectGamePicProcs.cpp. g_TrackGame (0x0056e26c) carries the
 KrustyUI at +0x56c (manufacturers +0x48, 200-byte records with the kind at +0xc4; bikes +0x50,
 0x94-byte records: model +0, name +4, engine-size-selectable +0x88, engine size +0x8c; bike count
 +0x54; riders +0x58, 200-byte records: name +0, model name +0x40, UI model +0xc0, kind +0xc4;
@@ -17,7 +17,7 @@ import random
 
 RETAIL_VA = 0x004f8220
 SYMBOL = '?FillBikeRiderLists@MPBikeRiderDlg@@QAEXXZ'
-SOURCE = 'src/bringup/Group2_MPBikeRiderDlg.cpp'
+SOURCE = 'src/reconstructed/SelectGamePicProcs.cpp'
 PROBES = {0x004f82c6: 'plain', 0x004f830e: 'by model', 0x004f8399: 'by class', 0x004f8429: 'refused',
           0x004f845a: 'select bike', 0x004f8529: 'rider match'}
 

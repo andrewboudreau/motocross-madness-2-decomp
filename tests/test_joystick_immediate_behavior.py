@@ -12,8 +12,13 @@ from mcm2tool.pe import PEImage
 from mcm2tool.rtti import parse_rtti
 from mcm2tool.toolchain import find_child_ci, find_vc6_bin, infer_vc98_root, sha256_file
 from tools.match import compare
+from tools.unit_source import standalone_source
 
 ROOT = Path(__file__).resolve().parents[1]
+# The reader lives in src/reconstructed/PCJoystickDevice.cpp (retail
+# PCInputDeviceType.cpp); the native oracle links a validation unit holding
+# only its definition (tools/unit_source.py).
+CANONICAL = ROOT / 'src/reconstructed/PCJoystickDevice.cpp'
 SYMBOL = '?ReadImmediateState@PCJoystickDevice@@QAEHH@Z'
 DIRECT = {0x4c37f2: 0x489c00, 0x4c382c: 0x489c00, 0x4c3854: 0x489c00,
           0x4c3877: 0x489c00, 0x4c389a: 0x489c00, 0x4c38bd: 0x489c00, 0x4c3918: 0x43cea0}
@@ -72,17 +77,19 @@ class JoystickImmediateBehaviorTests(unittest.TestCase):
                 self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
                 return obj, CoffObject(obj)
 
-            candidate_path, candidate = compile_source(ROOT / 'samples/inputdevice/JoystickImmediateState.cpp', 'candidate')
+            unit_file = output / 'joystick_immediate_unit.cpp'
+            unit_file.write_text(standalone_source(CANONICAL, ['PCJoystickDevice::ReadImmediateState']), encoding='latin1')
+            candidate_path, candidate = compile_source(unit_file, 'candidate')
             fixture_path, _ = compile_source(ROOT / 'tests/fixtures/joystick_immediate_compare.cpp', 'fixture', True)
             self.assertEqual(candidate.find_symbol(SYMBOL).function_size, 454)
             self.assertEqual({s.name for s in candidate.symbols if s.storage_class == 2 and s.section_number > 0 and s.type == 0x20}, {SYMBOL})
             self.assertEqual({s.name for s in candidate.symbols if s.storage_class == 2 and s.section_number == 0},
                 {'?FeedAxis@JoystickDevice@@QAEXHMM@Z', '?QueueEvent@ControlInterface@@QAEXHHHH@Z', '?g_TrackGame@@3PAVTrackGame@@A', '__fltused'})
             self.assertFalse(any(s.name.startswith(('.CRT', '.text$x', '.xdata')) for s in candidate.sections))
-            report = compare(image, candidate, SYMBOL, 0x4c3790, 454, ROOT / 'samples/inputdevice/JoystickImmediateState.bindings.json')
+            report = compare(image, candidate, SYMBOL, 0x4c3790, 454, ROOT / 'src/reconstructed/PCJoystickDevice.bindings.json')
             self.assertFalse(report['strict_exact'])
             self.assertEqual(report['strict_match']['matching_positions'], 453)
-            _, aggregate = compile_source(ROOT / 'samples/inputdevice/PCJoystickDeviceNearMisses.cpp', 'aggregate')
+            _, aggregate = compile_source(CANONICAL, 'aggregate')
 
             def fingerprint(obj):
                 symbol = obj.find_symbol(SYMBOL)

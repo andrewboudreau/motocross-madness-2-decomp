@@ -675,7 +675,7 @@ per-function checks on random and edge inputs.
 | `PixtransNearMisses.cpp` | `halve1555` | 0x4ce420 | 60 |
 | `PixtransNearMisses.cpp` | `halve8` | 0x4cee30 | 100 |
 | `PixtransNearMisses.cpp` | `dither_convert` | 0x4cf2a0 | 60 |
-| `TgafileNearMisses.cpp` | `tga_write` | 0x512990 | 200 |
+| `Tgafile.cpp` | `tga_write` | 0x512990 | 200 |
 | `DropTextOverlaySetup.cpp` | `drop_text_setup` | 0x51af00 | 800 |
 | `TrackNearMisses.cpp` | `track_place_near` | 0x517340 | 400 |
 
@@ -804,7 +804,6 @@ clearly more faithful, the game now links the sample's text:
   so they cannot be linked whole:
   - `BikeRaceNearMisses`
   - `BoundingBoxTreeBuildNearMisses`
-  - `EcoSystemNearMisses`
   - `KrustyBikeNearMisses`
 
   Their bring-up copies now use the sample's text for the functions listed
@@ -867,12 +866,12 @@ The sample column is the standalone object's score.
 | 0x0048ccc0 | `BonusObjectManager::Tick` | 0.952 | 1.000 | 1.000 | canonical src (exact since) |
 | 0x0048b100 | `VisualCue::Tick` | 0.932 | 0.932 | 0.932 | sample file |
 | 0x0047caa0 | `DrawableGridNodeSharedTextures::SelectTexture` | 0.967 | 0.981 | 0.981 | sample file |
-| 0x005329e0 | `Wrecker::PushProbesOutOfBox` | 0.922 | 1.000 | 1.000 | sample file |
-| 0x00531740 | `Wrecker::SprayContactParticles` | 0.923 | 0.995 | 0.995 | sample file |
-| 0x00457ed0 | `EcoSystem::BuildCollisionObjects` | 0.888 | 0.994 | 0.994 | bring-up copy |
-| 0x00459ce0 | `EcoSystem::GenerateObjects` | 0.899 | 0.918 | 0.918 | bring-up copy |
-| 0x00456890 | `Vegetation::TestDistance` | 0.953 | 0.991 | 0.991 | bring-up copy |
-| 0x00497e20 | `KrustyBikeCamera::Tick` | 0.938 | 0.979 | 0.979 | bring-up copy |
+| 0x005329e0 | `Wrecker::PushProbesOutOfBox` | 0.922 | 1.000 | 1.000 | sample file (wrecker.cpp since) |
+| 0x00531740 | `Wrecker::SprayContactParticles` | 0.923 | 0.995 | 0.995 | sample file (wrecker.cpp since) |
+| 0x00457ed0 | `EcoSystem::BuildCollisionObjects` | 0.888 | 0.994 | 0.994 | bring-up copy (EcoSystem.cpp since) |
+| 0x00459ce0 | `EcoSystem::GenerateObjects` | 0.899 | 0.918 | 0.918 | bring-up copy (EcoSystem.cpp since) |
+| 0x00456890 | `Vegetation::TestDistance` | 0.953 | 0.991 | 0.991 | bring-up copy (EcoSystem.cpp since) |
+| 0x00497e20 | `KrustyBikeCamera::Tick` | 0.938 | 0.979 | 0.979 | bring-up copy (KrustyBikeCamera.cpp since) |
 | 0x0048eea0 | `KrustyBike::UpdateRiderPose` | 0.958 | 0.971 | 0.971 | bring-up copy |
 | 0x00493660 | `KrustyBike::InterpolateNetworkState` | 0.987 | 0.989 | 0.989 | bring-up copy |
 | 0x004da7b0 | `ProjectedShadow::Init` | 0.892 | 0.992 | 0.992 | bring-up copy (sample file since) |
@@ -957,7 +956,8 @@ body was unregistered:
     0x00499ae0 and 0x00523c80;
   - bodies in files covered by other work:
     - `Group2_OverlayText.cpp` (`CharacterCell::GetRect`);
-    - `Group2_ManagedTextureGroup.cpp` (the `PeakHold` pair and
+    - `ManagedTextureGroup.cpp` (the `UnknownTimer` pair, linked to
+      PeakHold.cpp's `Peak`/`Record` through aliases, and
       `ContainerList::Reserve`);
     - the `Vec3` helpers in `Group3_KrustyBikeAI.cpp`.
 
@@ -1443,9 +1443,8 @@ in the linked Group 3 copy were found and fixed:
 With both fixes `morph_controller_angles` agrees in 1000 of 1000 runs. Both
 pre-fix shapes are negative controls in `tests/test_emu_diff.py`. The
 `match_one` alignment drops from 812 to 803 of 896, with 84 to 93 differing
-instructions; the function was not exact before.
-`samples/render/MorphBastardModifierNearMisses.cpp` keeps the old form for its
-score.
+instructions; the function was not exact before. The unit
+(`src/reconstructed/MorphBastardModifier.cpp`) now carries both fixes.
 
 `ModifyMesh` replays CopyMesh 0x004a5290, whose effect allocates the copy
 with its own vertices, and UpdateChannels 0x004a4bb0, so the channel values
@@ -1705,8 +1704,7 @@ forward 0x004079c0), `overlay_load_font` (0x00447a00), `mp_fill_bike_rider_lists
   retail passes the third argument, the load-children flag that `ReadNode` tests (0x0050614c).
   This was latent, because the only caller passes 1.
 - **LoadParameterFile's channel inverse** summed the y translation's x product first. Retail
-  (0x004a3846..0x004a3859) sums it last, which differs by 1 or 2 ulp at 24-bit only; the unlinked
-  copy in `MorphBastardModifierNearMisses.cpp` now matches it.
+  (0x004a3846..0x004a3859) sums it last, which differs by 1 or 2 ulp at 24-bit only.
 
 `Scene::ReadAnimations` and `LoadEventObjects` were reviewed by disassembly, which showed register
 and scheduling differences only. `GetDXVersion` is covered by `test_device_setup_behavior.py`.

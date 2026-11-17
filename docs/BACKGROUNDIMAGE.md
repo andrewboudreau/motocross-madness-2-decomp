@@ -50,8 +50,9 @@ first body statement, before the zeros, the two -1 stores and the other
 two 1 stores. With the 1 stores last VC6 materialises 1 in eax after the
 -1 stores and stores the vptr first.
 
-The complete DC lookup at `0x004049d0` remains nonexact in
-`samples/render/BackgroundImageNearMisses.cpp`: both bodies are 678 bytes,
+The complete DC lookup at `0x004049d0` remains nonexact; it sits in the unit
+between `0x00404700` and `0x00404c80` with a `// Not exact` comment (it moved in
+from its sample): both bodies are 678 bytes,
 with 115 matching positions after binding its two scratch globals. Its algorithm
 is unchanged. [DC-selection evidence](BACKGROUND_DC.md) records complete object
 preservation, the writable zero-storage distinction, actual strict helper

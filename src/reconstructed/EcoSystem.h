@@ -56,8 +56,6 @@ public:
 // src/krusty2/broadphase/Terrain.h: Terrain.
 class EcoTerrainView {
 public:
-    // 0x00507c10: snaps position->y to the ground under (x, z).
-    void QueryGround(Vector3* position, Vector3* normal, int flatShaded, unsigned char* surface);
     void GetHeightRange(float* outMin, float* outMax); // 0x00508970
 };
 

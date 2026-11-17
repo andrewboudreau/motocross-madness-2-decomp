@@ -1,6 +1,6 @@
 """EcoSystem::GenerateObjects 0x00459ce0, the Auto placement loop (tools/emu_diff.py case).
 
-The linked body is src/bringup/Group4_EcoSystem.cpp. Offsets from the retail body: the
+The linked body is src/reconstructed/EcoSystem.cpp. Offsets from the retail body: the
 ecosystem's +0x34 TotalObjects, +0x38 vegetation array (0x1c-byte records), +0x44 ground
 terrain, +0x48 texture manager, +0x58 definition table (256), +0x4dc probability TGA name,
 +0x55c placed count; a definition's +0x100 TGA name, +0x198/+0x19c slope mean/deviation,
@@ -27,7 +27,7 @@ import struct
 
 RETAIL_VA = 0x00459ce0
 SYMBOL = '?GenerateObjects@EcoSystem@@QAEHH@Z'
-SOURCE = 'src/bringup/Group4_EcoSystem.cpp'
+SOURCE = 'src/reconstructed/EcoSystem.cpp'
 QUADTREE = 0x0068aba4
 TRACK_GAME = 0x0056e26c
 NORMAL_DIST = 0x0056ece0

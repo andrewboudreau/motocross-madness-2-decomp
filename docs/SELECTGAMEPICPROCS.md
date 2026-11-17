@@ -76,17 +76,20 @@ Also exact: MPBikeRiderDlg `0x004f8d20`, MPBikeRiderDlg slot 29
   Without the lobby message structs (player left, start, grid entry)
   above it, the file's own count falls into that window.
 
-Near misses (`samples/ui/SelectGamePicProcsNearMisses.cpp`):
-- The bike and rider lists `0x004f8220`: registers differ.
-- MPBikeRiderDlg slot 10 `0x004f8820`: only the scheduling of the by-value
+Near misses, in the unit in retail order with a `// Not exact` status comment
+(they moved in from a sample and two bring-up copies; all three agree with
+retail under `tools/emu_diff.py`, 400 runs each where a case exists):
+- The bike and rider lists `0x004f8220` (110/840): registers differ.
+- MPBikeRiderDlg slot 10 `0x004f8820` (1214/1268): only the scheduling of the by-value
   vector copies for the camera call differs.
-- The lobby start message `0x004f2340` (2120 bytes): the same flow,
+- The lobby start message `0x004f2340` (933/2120, 2148 compiled): the same flow,
   calls and frame size. Registers differ: retail keeps the racer total in
   memory and the bike, rider and name arrays in registers. VC6 here keeps
   the total in a register instead.
-- MultiPlayerDlg slot 24 `0x004f3a70`, 2714 of 2729 bytes: only the order
-  of two instructions in the arrival-delay conversion differs (operand
-  types, locals and the comparison direction do not move them).
+
+MultiPlayerDlg slot 24 `0x004f3a70` (2729 bytes) is exact. MPBikeRiderDlg's
+`ApplyChosenRider` is folded with `SPBikeRiderDlg::ApplyChosenRider`
+(`0x004500d0`, dlgprocs.cpp) and sits with the unit's other folded bodies.
 
 Every other start in the extent is a jump table or a branch target inside
 one of these functions.

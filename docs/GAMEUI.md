@@ -285,7 +285,7 @@ in dead code get no slot).
 ## Functional build review
 
 The strict BeginControlDraw caller reaches the complete nonexact background
-DC-selection candidate in `samples/render/BackgroundImageNearMisses.cpp`.
+DC-selection candidate in `src/reconstructed/BackgroundImage.cpp`.
 [Background DC evidence](BACKGROUND_DC.md) records the unchanged 678-byte
 body, three actual strict helpers, scratch state and 21,611-case bounded
 COM/alias/fault proof. Real DirectDraw rendering remains outside that fixture.

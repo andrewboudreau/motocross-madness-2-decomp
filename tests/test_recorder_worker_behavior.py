@@ -1,5 +1,4 @@
 """Complete recorder worker CFG and standalone native boundary comparison."""
-import hashlib
 import json
 import os
 from pathlib import Path
@@ -13,8 +12,12 @@ from mcm2tool.coff import CoffObject
 from mcm2tool.pe import PEImage
 from mcm2tool.toolchain import find_child_ci, find_vc6_bin, infer_vc98_root, sha256_file
 from tools.match import compare
+from tools.unit_source import standalone_source
 
 ROOT = Path(__file__).resolve().parents[1]
+# The body lives in its original unit, recorder.cpp (src/reconstructed/Recorder.cpp);
+# the native oracle links a validation unit holding only its definition.
+CANONICAL = 'src/reconstructed/Recorder.cpp'
 SYMBOL = '?RecorderWorkerThread@@YGIPAX@Z'
 HELPERS = {
     '?HasSlotToWrite@VCR@@QAEHXZ': 0x524350,
@@ -104,7 +107,7 @@ class RecorderWorkerBehaviorTests(unittest.TestCase):
         compiler = Path(os.environ['VC6_ROOT']).resolve()
         linker = find_child_ci(find_vc6_bin(compiler), 'link.exe')
         libraries = find_child_ci(infer_vc98_root(compiler), 'lib')
-        binding_path = ROOT / 'samples/race/RecorderWorker.bindings.json'
+        binding_path = ROOT / 'src/reconstructed/Recorder.bindings.json'
         bindings = json.loads(binding_path.read_text())
         with tempfile.TemporaryDirectory(prefix='mcm2-recorder-worker-') as directory:
             output = Path(directory)
@@ -119,8 +122,10 @@ class RecorderWorkerBehaviorTests(unittest.TestCase):
                 self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
                 return obj, CoffObject(obj)
 
-            candidate_path, candidate = compile_source('samples/race/RecorderWorker.cpp')
-            _, aggregate = compile_source('samples/race/RecorderNearMisses.cpp')
+            unit_file = output / 'recorder_worker_unit.cpp'
+            unit_file.write_text(standalone_source(ROOT / CANONICAL, ['RecorderWorkerThread']), encoding='latin-1')
+            candidate_path, candidate = compile_source(str(unit_file))
+            _, aggregate = compile_source(CANONICAL)
             symbol = candidate.find_symbol(SYMBOL)
             self.assertEqual(symbol.function_size, 2148)
             self.assertEqual({s.name for s in candidate.symbols if s.section_number > 0 and s.storage_class == 2 and s.type == 0x20}, {SYMBOL})
@@ -140,14 +145,10 @@ class RecorderWorkerBehaviorTests(unittest.TestCase):
                     rows.append((r.virtual_address-entry.value, r.type, name))
                 return data, size, rows
 
-            # Including the unchanged body preserves the old aggregate context;
-            # the standalone TU has a different, independently checked code shape.
-            aggregate_body, aggregate_size, aggregate_relocs = normalized(aggregate)
-            self.assertEqual(aggregate_size, 2124)
-            self.assertEqual(hashlib.sha256(aggregate_body).hexdigest(),
-                             '30028ed354faec404948fa17993859d2ff64bdee9592ea9fba9567ee9db09612')
-            self.assertEqual(hashlib.sha256(json.dumps(aggregate_relocs).encode()).hexdigest(),
-                             '5e495bb02e9d6337d788bc828b081660fb88f109e26f5870c21b877b47ab1512')
+            # In retail order (first in the unit) the worker compiles exactly as the
+            # validation unit does. Behind the unit's other bodies (the former
+            # sample included Recorder.cpp first) VC6 emitted a 2124-byte variant.
+            self.assertEqual(normalized(candidate), normalized(aggregate))
             report = compare(image, candidate, SYMBOL, 0x4e6f80, 2148, binding_path)
             self.assertFalse(report['strict_exact'])
             self.assertEqual(report['strict_match']['matching_positions'], 2100)

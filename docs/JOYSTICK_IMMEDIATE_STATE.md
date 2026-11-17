@@ -17,10 +17,11 @@ InputDevice with zero-offset, nonvirtual PMDs. The source's inherited helper
 calls therefore use the same primary pointer. This does not establish original
 translation-unit ownership.
 
-The standalone [candidate](../samples/inputdevice/JoystickImmediateState.cpp)
-is the body PCJoystickDeviceNearMisses.cpp includes. Authentic VC6 SP3
-`vc6_o2_mt` emits **454 bytes, 453 matching positions** against the complete
-454-byte reference. It remains nonexact source in samples.
+The reader sits in [PCJoystickDevice.cpp](../src/reconstructed/PCJoystickDevice.cpp)
+after the buffered reader, in retail order (retail `PCInputDeviceType.cpp`).
+Authentic VC6 SP3 `vc6_o2_mt` emits **454 bytes, 453 matching positions**
+against the complete 454-byte reference; it is not exact. The forms tried
+are listed under [Forms tried](#forms-tried).
 
 The one differing instruction is the release block's `pressed` argument:
 retail pushes the zero register (`push ebp`), the candidate pushes eax. The
@@ -60,6 +61,59 @@ Before the chained copy, none of these forms moved the register cycle:
   block passing `pressed` (433 bytes, one merged call); zero stores from an
   `int time = 0` local, chained, or storing `pressed` (452 matching); a
   ControlInterface* local at loop, changed-block or arm scope.
+
+## Forms tried
+
+453 of 454 (454 bytes): the new state is assigned and copied in one
+statement (`int pressed = buttonStates[i].state = ...`) and the release
+arm passes that copy, which keeps eax busy while the arguments are
+loaded and gives retail's ecx/edx, eax/ecx rotation through the loop and
+the POV copy. Left: retail pushes the zero register (`push ebp`) for that
+argument where this pushes eax. A plain `pressed` local stored by its own
+statement is replaced by 0 after the `== 0` test, so eax is free again
+(373, whether the argument is `pressed` or 0); the chained copy is not.
+Unchanged or worse (2026-11-13): a result local, a subtype local, the
+previous/pressed order and either inlined, an unsigned char pressed
+(309), joystick index and ControlInterface locals (function, loop or
+arm scope), explicit POV stores (460 bytes), a shared loop index,
+chained zero stores (369), swapped branches (356), `!pressed` and a
+button pointer; and with the chained copy: the release test or the
+changed test on `buttonStates[i].state`, `!pressed`, `pressed < 1`,
+`pressed != 1`, a `switch`, `if (previous)`, `continue` on no change, a
+`changed` local (`!=` or `^`), the argument as `pressed != 0`,
+`pressed ? 1 : 0`, `!!pressed`, `pressed & 1` (457), `pressed == 1`
+(461) or `buttonStates[i].state`, the press arm passing `pressed` (433,
+one merged call), zero stores from an `int time = 0` local, chained, or
+storing `pressed` (452).
+Round 9 (2026-11-14): the scratch rotation runs on from the axis block
+(its last temporary is edx) into the loop. Retail's release arm loads its
+arguments into ecx, edx and the press arm into eax, ecx; with a literal 0
+VC6 gives eax, ecx and edx, eax, one turn early (373). So retail spends
+one more turn before the release arm, and the chained copy only imitates
+that. All 373 or worse: the chained copy with a literal 0, the assignment
+inside the condition, store then test the member, an empty else, the
+subtype test inverted (`== 4`) or a goto around the axis block, `i` or
+`axis` at function scope, static inline QueueButton helpers (three
+shapes), inline ButtonDown helpers, a `continue` loop body, re-testing
+`(state.buttons[i] >> 7) == 0` or `& 0x80` (321-326), a `changed` local
+first (328), `if (previous)` (370), pressed before previous (372) and
+the member as the argument (348).
+Round 15, all 453 or worse (retail's rotation is ecx, edx in the release
+arm, eax, ecx in the press arm and edx, eax, ecx, edx for the POV copies):
+dead statements take no turn (dead int, member, global or parameter reads
+before the loop, in it or in the release arm: 373); the axis block and/or
+the button loop as static inline helpers 373; the tail duplicated with a
+return in the subtype arm 16 (602 bytes); the two release-time stores
+chained, the stored zero as the argument (`releaseTime = 0` or an `int
+time` chain) and the times stored from `pressed` 371-372 (451 with
+`pressed` as the argument); `pressed` spelled `(b & 0x80) >> 7`, `/ 128`,
+through casts or a byte/unsigned/int temporary, reassigned, declared
+before `previous` or with the declaration split 373; `previous != pressed`
+372, xor/sub compares 332, a `changed` local 328; argument expressions on
+the chained copy: `-pressed` 354, `<< 1`/`* 2` 348, `pressed | 0`/`+ 0`
+453, `pressed - pressed`, `^` or a comparison 373; release tests `<= 0`
+372/452, `< 1` 400/337, `0 == pressed`, `!(pressed != 0)`, `== false`
+373/453, `(pressed & 1) == 0` 371/451.
 
 ## Behavior and existing providers
 

@@ -12,7 +12,7 @@ from tools.match import compare
 from tools.run_calibration import CASES
 import test_eco_quadtree_connections as object_view
 SOURCES=('src/krusty2/collision/CollisionObject.cpp',
-         'src/reconstructed/EcoSystem.cpp','samples/ecosystem/EcoSystemNearMisses.cpp')
+         'src/reconstructed/EcoSystem.cpp')
 RENAMES={'?GetObjectCount@CollisionVegetation@@QAEHXZ':'?GetCollisionCount@Vegetation@@QAEHXZ',
          '?GetRadius@CollisionVegetation@@QAEMXZ':'?GetRadius@Vegetation@@QAEMXZ',
          '?g_vegetationGrid@@3PAUCollisionVegetationGrid@@A':'?g_EcoSystem@@3PAVEcoSystem@@A'}

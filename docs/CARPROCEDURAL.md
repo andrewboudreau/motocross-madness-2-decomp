@@ -26,8 +26,9 @@ Source forms needed:
 - The parser keeps its sscanf buffers block-scoped.
 - The distance search writes `z*z + (x*x + y*y)`.
 
-Near miss (`samples/race/CarProceduralNearMisses.cpp`): the path evaluation
-`0x00430b10`. Retail inlines all 14 vector operators, but VC6 runs out of
+Near misses (in the unit in retail order, each with a `// Not exact` status
+comment; they moved in from a sample and a bring-up copy): the path evaluation
+`0x00430b10` (299/843). Retail inlines all 14 vector operators, but VC6 runs out of
 inline budget ([VC6_INLINE_BUDGET](VC6_INLINE_BUDGET.md)). Retail's final
 sum evaluates `t1 * time` first, then `t0 * h2`, `h1 * b`, `h0 * a`
 (VC6's right-to-left argument order through the nested `operator+`). The
@@ -36,8 +37,9 @@ the operator forms, about 30 extra trivial statements (dead code counts,
 `;` does not) make every site inline, and the first 0x19b bytes then match
 retail (ratio 0.78; the tangent temporaries' slots differ). So the original
 caller was about 15% larger in front-end nodes than the decoded code shows,
-or its helpers cheaper; no padded source is kept. Slot 10 `0x0042fd80` (2909 bytes) is written
-in the same sample and linked by the game build (580/2909 strict, 719 of
+or its helpers cheaper; no padded source is kept. Slot 10 `0x0042fd80` (2909 bytes) is the
+other (604/2909 strict in the unit, 580 in the former sample, whose own
+constructor-free `operator-` the unit's constructor form replaces; there 719 of
 retail's 782 instructions aligned, frame 0xdc like retail's): the first update sets
 a two-point mesh on the sensor collider and the wheel height; each frame it
 wraps `pathTime` with `fmod`, evaluates the path at the look-ahead

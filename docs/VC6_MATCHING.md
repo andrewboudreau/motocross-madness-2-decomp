@@ -524,7 +524,7 @@ After the quick wins, close EcoSystem's record helper `0x00456890` (356/369:
 its thirteen-byte scheduling block is invariant under every data-flow-equivalent
 spelling and every helper boundary tried, and `/G6` scores lower, so it needs
 new evidence rather than another spelling), a reconstructed near miss in
-`samples/ecosystem/EcoSystemNearMisses.cpp` (see [ECOSYSTEM](ECOSYSTEM.md)).
+`src/reconstructed/EcoSystem.cpp` (see [ECOSYSTEM](ECOSYSTEM.md)).
 `0x00456a10` is exact: its remaining differences were the colour and ambient
 locals (six scalars, not two `Vector3`s, interleave with the other slots),
 the planar length as `x*x` then `+= z*z`, the x coordinate through a float

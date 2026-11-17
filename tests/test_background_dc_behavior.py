@@ -10,7 +10,12 @@ from mcm2tool.coff import CoffObject
 from mcm2tool.pe import PEImage
 from mcm2tool.toolchain import find_child_ci, find_vc6_bin, infer_vc98_root, sha256_file
 from tools.match import compare
+from tools.unit_source import standalone_source
 ROOT=Path(__file__).resolve().parents[1]
+# GetDc lives in its original unit, BackgroundImage.cpp; the native oracle
+# links a validation unit holding only its definition and its two globals.
+CANONICAL='src/reconstructed/BackgroundImage.cpp'
+PRELUDE='#define Target() ((PCRenderTarget*)renderContext)\nint g_GetDcRegionIndex;\nCameraRect g_GetDcClipRect;\n'
 SYMBOL='?GetDc@BackgroundImage@@QAEHPAPAXPAUCameraRect@@HHPAH21@Z'
 GLOBALS={'?g_GetDcRegionIndex@@3HA':(0x5777a0,4),'?g_GetDcClipRect@@3UCameraRect@@A':(0x5777a8,16)}
 HELPERS=[('?MarkRegionPending@BackgroundImage@@QAEXH@Z',0x404cb0,23),('?SetRegionRect@BackgroundImage@@QAEXHPAUCameraRect@@@Z',0x404240,158),('?ReleaseDc@BackgroundImage@@QAEHXZ',0x404c80,41)]
@@ -54,10 +59,11 @@ class BackgroundDcBehaviorTests(unittest.TestCase):
                     cwd=ROOT,capture_output=True,text=True,encoding='latin1',env={**os.environ,'PYTHONPATH':str(ROOT)})
                 self.assertEqual(result.returncode,0,result.stdout+result.stderr)
                 return obj,CoffObject(obj)
-            candidate_path,candidate=compile_source(ROOT/'samples/render/BackgroundImageNearMisses.cpp','candidate')
+            unit_file=output/'getdc.cpp';unit_file.write_text(standalone_source(ROOT/CANONICAL,['BackgroundImage::GetDc'],PRELUDE),encoding='latin1')
+            candidate_path,candidate=compile_source(unit_file,'candidate')
             fixture_path,_=compile_source(ROOT/'tests/fixtures/background_dc_compare.cpp','fixture',True)
             self.assertEqual(candidate.symbol_extent(candidate.find_symbol(SYMBOL))[1],678)
-            report=compare(image,candidate,SYMBOL,0x4049d0,678,ROOT/'samples/render/BackgroundImageNearMisses.bindings.json')
+            report=compare(image,candidate,SYMBOL,0x4049d0,678,ROOT/'src/reconstructed/BackgroundImage.bindings.json')
             self.assertFalse(report['strict_exact']);self.assertEqual(report['strict_match']['matching_positions'],115)
             self.assertEqual({s.name for s in candidate.symbols if s.storage_class==2 and s.section_number>0 and s.type==0x20},{SYMBOL})
             self.assertEqual({s.name for s in candidate.symbols if s.storage_class==2 and s.section_number==0},{s for s,_,_ in HELPERS})

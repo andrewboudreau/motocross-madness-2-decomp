@@ -1,5 +1,5 @@
 {
-  "baseline": "Published ed3d06ce same-path complete objects; all nondebug bytes and relocation destinations preserved under exactly these six interface names. Only enumerated complete source paths are portable. Insert remains complete627/620 nonexact. The frozen visibility camera now uses actual PCCamera storage: its old complete pin was independently reproduced first; three names join the same lifecycle/storage, with one exact implicit destructor COMDAT (5 code bytes plus 11 alignment NOPs) and the cleanup reference resolving to that definition. All 87 old sections and 341 relocations otherwise preserve their bytes and destinations. Round57 light lookup: published dfdf9823 canonical EcoSystem pin independently reproduced, then complete132 sections/720 relocations preserved under only the EcoLightEmitterView*-to-LightEmitter* method-return spelling. All other records unchanged.",
+  "baseline": "Published ed3d06ce same-path complete objects; all nondebug bytes and relocation destinations preserved under exactly these six interface names. Only enumerated complete source paths are portable. Insert remains complete627/620 nonexact. The frozen visibility camera now uses actual PCCamera storage: its old complete pin was independently reproduced first; three names join the same lifecycle/storage, with one exact implicit destructor COMDAT (5 code bytes plus 11 alignment NOPs) and the cleanup reference resolving to that definition. All 87 old sections and 341 relocations otherwise preserve their bytes and destinations. Round57 light lookup: published dfdf9823 canonical EcoSystem pin independently reproduced, then complete132 sections/720 relocations preserved under only the EcoLightEmitterView*-to-LightEmitter* method-return spelling. All other records unchanged. EcoSystem near-miss merge: the sample EcoSystemNearMisses.cpp and the Group4/Group5 bring-ups were folded into EcoSystem.cpp (six near-miss bodies and their helpers); the canonical object is repinned at 207 sections/1143 relocations and the sample pin removed. Every calibration case stays exact.",
   "renames": {
     "?ComputeCode@EcoQuadTreeView@@QAEIMMMM@Z": "?ComputeCode@QuadTree@@QAEIMMMM@Z",
     "?Insert@EcoQuadTreeView@@QAEXPAVUnknownEcoQuadTreeObject@@IMM@Z": "?Insert@QuadTree@@QAEXPAVQuadTreeObject@@IMM@Z",
@@ -10,14 +10,9 @@
   },
   "objects": {
     "src/reconstructed/EcoSystem.cpp": {
-      "sections": 132,
-      "relocations": 720,
-      "sha256": "5f5d0e10cc34940857e18492facac40020207319087003065d6726874cde7066"
-    },
-    "samples/ecosystem/EcoSystemNearMisses.cpp": {
-      "sections": 98,
-      "relocations": 444,
-      "sha256": "2949e44c3c5dc84e5e6d568500eb64c8a8264e60c0f48ac31ad93ff33e124e00"
+      "sections": 207,
+      "relocations": 1143,
+      "sha256": "bc20be893900fcc890690d22ebbde7ebc85bd88177bb530ac2383393a5483418"
     },
     "src/krusty2/broadphase/Quadtree.cpp": {
       "sections": 51,
@@ -47,9 +42,121 @@
     ],
     [
       "src/reconstructed/EcoSystem.cpp",
-      "?PlaceStoredObjects@EcoSystem@@QAEHXZ",
+      "?GenerateObjects@EcoSystem@@QAEHH@Z",
+      "?ComputeCode@QuadTree@@QAEIMMMM@Z",
+      1609,
+      20
+    ],
+    [
+      "src/reconstructed/EcoSystem.cpp",
+      "?GenerateObjects@EcoSystem@@QAEHH@Z",
+      "?ComputeCode@QuadTree@@QAEIMMMM@Z",
+      3055,
+      20
+    ],
+    [
+      "src/reconstructed/EcoSystem.cpp",
+      "?GenerateObjects@EcoSystem@@QAEHH@Z",
+      "?Insert@QuadTree@@QAEXPAVQuadTreeObject@@IMM@Z",
+      3180,
+      20
+    ],
+    [
+      "src/reconstructed/EcoSystem.cpp",
+      "?GenerateObjects@EcoSystem@@QAEHH@Z",
+      "?IsValidCode@QuadTree@@QAEHI@Z",
+      1632,
+      20
+    ],
+    [
+      "src/reconstructed/EcoSystem.cpp",
+      "?GenerateObjects@EcoSystem@@QAEHH@Z",
       "?g_collisionQuadTree@@3PAVQuadTree@@A",
-      285,
+      282,
+      6
+    ],
+    [
+      "src/reconstructed/EcoSystem.cpp",
+      "?GenerateObjects@EcoSystem@@QAEHH@Z",
+      "?g_collisionQuadTree@@3PAVQuadTree@@A",
+      1601,
+      6
+    ],
+    [
+      "src/reconstructed/EcoSystem.cpp",
+      "?GenerateObjects@EcoSystem@@QAEHH@Z",
+      "?g_collisionQuadTree@@3PAVQuadTree@@A",
+      1626,
+      6
+    ],
+    [
+      "src/reconstructed/EcoSystem.cpp",
+      "?GenerateObjects@EcoSystem@@QAEHH@Z",
+      "?g_collisionQuadTree@@3PAVQuadTree@@A",
+      1663,
+      6
+    ],
+    [
+      "src/reconstructed/EcoSystem.cpp",
+      "?GenerateObjects@EcoSystem@@QAEHH@Z",
+      "?g_collisionQuadTree@@3PAVQuadTree@@A",
+      1933,
+      6
+    ],
+    [
+      "src/reconstructed/EcoSystem.cpp",
+      "?GenerateObjects@EcoSystem@@QAEHH@Z",
+      "?g_collisionQuadTree@@3PAVQuadTree@@A",
+      1964,
+      6
+    ],
+    [
+      "src/reconstructed/EcoSystem.cpp",
+      "?GenerateObjects@EcoSystem@@QAEHH@Z",
+      "?g_collisionQuadTree@@3PAVQuadTree@@A",
+      2463,
+      6
+    ],
+    [
+      "src/reconstructed/EcoSystem.cpp",
+      "?GenerateObjects@EcoSystem@@QAEHH@Z",
+      "?g_collisionQuadTree@@3PAVQuadTree@@A",
+      2493,
+      6
+    ],
+    [
+      "src/reconstructed/EcoSystem.cpp",
+      "?GenerateObjects@EcoSystem@@QAEHH@Z",
+      "?g_collisionQuadTree@@3PAVQuadTree@@A",
+      2652,
+      6
+    ],
+    [
+      "src/reconstructed/EcoSystem.cpp",
+      "?GenerateObjects@EcoSystem@@QAEHH@Z",
+      "?g_collisionQuadTree@@3PAVQuadTree@@A",
+      2682,
+      6
+    ],
+    [
+      "src/reconstructed/EcoSystem.cpp",
+      "?GenerateObjects@EcoSystem@@QAEHH@Z",
+      "?g_collisionQuadTree@@3PAVQuadTree@@A",
+      3047,
+      6
+    ],
+    [
+      "src/reconstructed/EcoSystem.cpp",
+      "?GenerateObjects@EcoSystem@@QAEHH@Z",
+      "?g_collisionQuadTree@@3PAVQuadTree@@A",
+      3175,
+      6
+    ],
+    [
+      "src/reconstructed/EcoSystem.cpp",
+      "?PlaceAuthoredObjects@EcoSystem@@QAEHXZ",
+      "?g_collisionQuadTree@@3PAVQuadTree@@A",
+      59,
       6
     ],
     [
@@ -62,43 +169,22 @@
     [
       "src/reconstructed/EcoSystem.cpp",
       "?PlaceStoredObjects@EcoSystem@@QAEHXZ",
-      "?g_collisionQuadTree@@3PAVQuadTree@@A",
-      345,
-      6
-    ],
-    [
-      "src/reconstructed/EcoSystem.cpp",
-      "?PlaceStoredObjects@EcoSystem@@QAEHXZ",
       "?Insert@QuadTree@@QAEXPAVQuadTreeObject@@IMM@Z",
       350,
       20
     ],
     [
       "src/reconstructed/EcoSystem.cpp",
-      "?PlaceAuthoredObjects@EcoSystem@@QAEHXZ",
+      "?PlaceStoredObjects@EcoSystem@@QAEHXZ",
       "?g_collisionQuadTree@@3PAVQuadTree@@A",
-      59,
+      285,
       6
     ],
     [
       "src/reconstructed/EcoSystem.cpp",
-      "?PrepareGeometry@EcoSystem@@UAEHXZ",
+      "?PlaceStoredObjects@EcoSystem@@QAEHXZ",
       "?g_collisionQuadTree@@3PAVQuadTree@@A",
-      214,
-      6
-    ],
-    [
-      "src/reconstructed/EcoSystem.cpp",
-      "?PrepareGeometry@EcoSystem@@UAEHXZ",
-      "?RestartQuery@QuadTree@@QAEXXZ",
-      219,
-      20
-    ],
-    [
-      "src/reconstructed/EcoSystem.cpp",
-      "?PrepareGeometry@EcoSystem@@UAEHXZ",
-      "?g_collisionQuadTree@@3PAVQuadTree@@A",
-      225,
+      345,
       6
     ],
     [
@@ -111,128 +197,37 @@
     [
       "src/reconstructed/EcoSystem.cpp",
       "?PrepareGeometry@EcoSystem@@UAEHXZ",
-      "?g_collisionQuadTree@@3PAVQuadTree@@A",
-      707,
-      6
-    ],
-    [
-      "src/reconstructed/EcoSystem.cpp",
-      "?PrepareGeometry@EcoSystem@@UAEHXZ",
       "?NextObjectSorted@QuadTree@@QAEPAVQuadTreeObject@@XZ",
       712,
       20
     ],
     [
-      "samples/ecosystem/EcoSystemNearMisses.cpp",
-      "?GenerateObjects@EcoSystem@@QAEHH@Z",
-      "?g_collisionQuadTree@@3PAVQuadTree@@A",
-      283,
-      6
-    ],
-    [
-      "samples/ecosystem/EcoSystemNearMisses.cpp",
-      "?GenerateObjects@EcoSystem@@QAEHH@Z",
-      "?g_collisionQuadTree@@3PAVQuadTree@@A",
-      1597,
-      6
-    ],
-    [
-      "samples/ecosystem/EcoSystemNearMisses.cpp",
-      "?GenerateObjects@EcoSystem@@QAEHH@Z",
-      "?ComputeCode@QuadTree@@QAEIMMMM@Z",
-      1605,
+      "src/reconstructed/EcoSystem.cpp",
+      "?PrepareGeometry@EcoSystem@@UAEHXZ",
+      "?RestartQuery@QuadTree@@QAEXXZ",
+      219,
       20
     ],
     [
-      "samples/ecosystem/EcoSystemNearMisses.cpp",
-      "?GenerateObjects@EcoSystem@@QAEHH@Z",
+      "src/reconstructed/EcoSystem.cpp",
+      "?PrepareGeometry@EcoSystem@@UAEHXZ",
       "?g_collisionQuadTree@@3PAVQuadTree@@A",
-      1622,
+      214,
       6
     ],
     [
-      "samples/ecosystem/EcoSystemNearMisses.cpp",
-      "?GenerateObjects@EcoSystem@@QAEHH@Z",
-      "?IsValidCode@QuadTree@@QAEHI@Z",
-      1628,
-      20
-    ],
-    [
-      "samples/ecosystem/EcoSystemNearMisses.cpp",
-      "?GenerateObjects@EcoSystem@@QAEHH@Z",
+      "src/reconstructed/EcoSystem.cpp",
+      "?PrepareGeometry@EcoSystem@@UAEHXZ",
       "?g_collisionQuadTree@@3PAVQuadTree@@A",
-      1659,
+      225,
       6
     ],
     [
-      "samples/ecosystem/EcoSystemNearMisses.cpp",
-      "?GenerateObjects@EcoSystem@@QAEHH@Z",
+      "src/reconstructed/EcoSystem.cpp",
+      "?PrepareGeometry@EcoSystem@@UAEHXZ",
       "?g_collisionQuadTree@@3PAVQuadTree@@A",
-      1928,
+      707,
       6
-    ],
-    [
-      "samples/ecosystem/EcoSystemNearMisses.cpp",
-      "?GenerateObjects@EcoSystem@@QAEHH@Z",
-      "?g_collisionQuadTree@@3PAVQuadTree@@A",
-      1958,
-      6
-    ],
-    [
-      "samples/ecosystem/EcoSystemNearMisses.cpp",
-      "?GenerateObjects@EcoSystem@@QAEHH@Z",
-      "?g_collisionQuadTree@@3PAVQuadTree@@A",
-      2447,
-      6
-    ],
-    [
-      "samples/ecosystem/EcoSystemNearMisses.cpp",
-      "?GenerateObjects@EcoSystem@@QAEHH@Z",
-      "?g_collisionQuadTree@@3PAVQuadTree@@A",
-      2477,
-      6
-    ],
-    [
-      "samples/ecosystem/EcoSystemNearMisses.cpp",
-      "?GenerateObjects@EcoSystem@@QAEHH@Z",
-      "?g_collisionQuadTree@@3PAVQuadTree@@A",
-      2636,
-      6
-    ],
-    [
-      "samples/ecosystem/EcoSystemNearMisses.cpp",
-      "?GenerateObjects@EcoSystem@@QAEHH@Z",
-      "?g_collisionQuadTree@@3PAVQuadTree@@A",
-      2666,
-      6
-    ],
-    [
-      "samples/ecosystem/EcoSystemNearMisses.cpp",
-      "?GenerateObjects@EcoSystem@@QAEHH@Z",
-      "?g_collisionQuadTree@@3PAVQuadTree@@A",
-      3031,
-      6
-    ],
-    [
-      "samples/ecosystem/EcoSystemNearMisses.cpp",
-      "?GenerateObjects@EcoSystem@@QAEHH@Z",
-      "?ComputeCode@QuadTree@@QAEIMMMM@Z",
-      3039,
-      20
-    ],
-    [
-      "samples/ecosystem/EcoSystemNearMisses.cpp",
-      "?GenerateObjects@EcoSystem@@QAEHH@Z",
-      "?g_collisionQuadTree@@3PAVQuadTree@@A",
-      3159,
-      6
-    ],
-    [
-      "samples/ecosystem/EcoSystemNearMisses.cpp",
-      "?GenerateObjects@EcoSystem@@QAEHH@Z",
-      "?Insert@QuadTree@@QAEXPAVQuadTreeObject@@IMM@Z",
-      3164,
-      20
     ]
   ]
 }

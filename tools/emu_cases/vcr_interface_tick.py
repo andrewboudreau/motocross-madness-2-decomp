@@ -1,6 +1,6 @@
 """VCRInterface::Tick 0x004e7d60, slot 10 (shared by KrustyVCR): the playback step (emu_diff case).
 
-The candidate is samples/race/RecorderTick.cpp. Offsets from the retail body: the critical
+The candidate is VCRInterface::Tick in src/reconstructed/Recorder.cpp. Offsets from the retail body: the critical
 section +0x60 (Enter/LeaveCriticalSection through their IAT slots 0x0055025c/0x00550284, which
 point at stubs noting the section pointer), recordMode +0x78 (1 = playback), the record buffer
 +0x7c (time float, a word, count), the cdecl callback +0x80 (kind, data, flag, id, &keep,
@@ -26,7 +26,7 @@ from tools.emu_diff import _frame_token
 
 RETAIL_VA = 0x004e7d60
 SYMBOL = '?Tick@VCRInterface@@UAEHM@Z'
-SOURCE = 'samples/race/RecorderTick.cpp'
+SOURCE = 'src/reconstructed/Recorder.cpp'
 ENTER_CS_IAT, LEAVE_CS_IAT = 0x0055025c, 0x00550284
 PROBES = {0x004e7d80: 'file not ready', 0x004e7dd0: 'restart reverse', 0x004e7e01: 'reverse loop',
           0x004e7f19: 'forward', 0x004e8190: 'answer switch', 0x004e84b8: 'answer 1', 0x004e81b0: 'answer 2',

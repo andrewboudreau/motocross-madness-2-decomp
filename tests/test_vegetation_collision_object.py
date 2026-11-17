@@ -140,11 +140,10 @@ class VegetationCollisionTests(unittest.TestCase):
             objects, paths = {}, {}
             sources = [CANDIDATE, ECO, COLLISION, QUERY,
                        'src/reconstructed/CollisionTransforms.cpp', 'src/reconstructed/VectorCalls.cpp',
-                       'src/reconstructed/FastMath.cpp',
-                       'samples/ecosystem/EcoSystemNearMisses.cpp']
+                       'src/reconstructed/FastMath.cpp']
             for index, source in enumerate(sources):
                 paths[source], objects[source] = compile_source(ROOT/source, 'unit%d'%index,
-                                                               source not in (CANDIDATE, ECO, sources[-1]))
+                                                               source not in (CANDIDATE, ECO))
                 if source in pins['objects']:
                     rows, exceptions = view(objects[source], [ROOT])
                     pin = pins['objects'][source]
@@ -152,7 +151,6 @@ class VegetationCollisionTests(unittest.TestCase):
                     self.assertEqual((len(rows), sum(len(r[3]) for r in rows)),
                                      (pin['sections'], pin['relocations']))
                     self.assertEqual(hashlib.sha256(json.dumps(rows).encode()).hexdigest(), pin['sha256'])
-            self.assertEqual(function(objects[CANDIDATE], SYMBOL), function(objects[sources[-1]], SYMBOL))
             query = objects[COLLISION].find_symbol('QueryCollisions@CollisionObject')
             _, _, query_relocations = objects[COLLISION].symbol_extent(query)
             self.assertEqual([(r.virtual_address-query.value, r.type) for r in query_relocations

@@ -1,7 +1,7 @@
 """RecorderWorkerThread 0x004e6f80, the VCR (replay) tape worker thread (tools/emu_diff.py
 case, call-record/replay mode).
 
-The linked body is samples/race/RecorderWorker.cpp. The parameter block holds the header,
+The linked body is RecorderWorkerThread in src/reconstructed/Recorder.cpp. The parameter block holds the header,
 its size, the tape file name and the VCRInterface, whose +0x30..+0x58 are the eleven events,
 +0x60 the lock, +0xac the tape file, +0xb0 the frame ring and +0xb8 the busy flag (set in
 some runs). Each run plays a random script
@@ -21,7 +21,7 @@ import random
 
 RETAIL_VA = 0x004e6f80
 SYMBOL = '?RecorderWorkerThread@@YGIPAX@Z'
-SOURCE = 'samples/race/RecorderWorker.cpp'
+SOURCE = 'src/reconstructed/Recorder.cpp'
 PROBES = {0x004e7055: 'write', 0x004e70f3: 'create', 0x004e7148: 'reopen', 0x004e71f9: 'read forward',
           0x004e7327: 'open playback', 0x004e73f9: 'read reverse', 0x004e757e: 'seek',
           0x004e75eb: 'rewind', 0x004e7650: 'stop reading', 0x004e7686: 'close', 0x004e774b: 'kill'}

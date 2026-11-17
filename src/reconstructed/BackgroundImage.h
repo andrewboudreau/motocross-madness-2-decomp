@@ -56,8 +56,7 @@ public:
     // 0x00404700: copies `rect` of `image` to (x, y) (GameCursor slot 15).
     int DrawImageRect(PCTextureMap* image, int x, int y, CameraRect* rect, int flags, int index,
                               int dirty, int* frames, unsigned char* table);
-    // 0x004049d0: a DC clipped to `rect` (gameui.cpp 0x0046ed70; near miss in
-    // samples/render/BackgroundImageNearMisses.cpp).
+    // 0x004049d0: a DC clipped to `rect` (gameui.cpp 0x0046ed70; not exact).
     int GetDc(void** dc, CameraRect* rect, int index, int dirty, int* frames, int* more,
                               CameraRect* clip);
     // Region `index`'s rectangle for the target's current frame.

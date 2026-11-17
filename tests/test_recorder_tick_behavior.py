@@ -12,8 +12,12 @@ from mcm2tool.coff import CoffObject
 from mcm2tool.pe import PEImage
 from mcm2tool.toolchain import find_child_ci, find_vc6_bin, infer_vc98_root, sha256_file
 from tools.match import compare
+from tools.unit_source import standalone_source
 
 ROOT = Path(__file__).resolve().parents[1]
+# The body lives in its original unit, recorder.cpp (src/reconstructed/Recorder.cpp);
+# the native oracle links a validation unit holding only its definition.
+CANONICAL = 'src/reconstructed/Recorder.cpp'
 SYMBOL = '?Tick@VCRInterface@@UAEHM@Z'
 HELPERS = {
     '?TakeRecord@VCRInterface@@QAEHPAH00PAXPAIH@Z': 0x4e8810,
@@ -97,7 +101,7 @@ class RecorderTickBehaviorTests(unittest.TestCase):
         compiler = Path(os.environ['VC6_ROOT']).resolve()
         linker = find_child_ci(find_vc6_bin(compiler), 'link.exe')
         libraries = find_child_ci(infer_vc98_root(compiler), 'lib')
-        binding_path = ROOT / 'samples/race/RecorderTick.bindings.json'
+        binding_path = ROOT / 'src/reconstructed/Recorder.bindings.json'
         with tempfile.TemporaryDirectory(prefix='mcm2-recorder-tick-') as directory:
             output = Path(directory)
 
@@ -111,8 +115,10 @@ class RecorderTickBehaviorTests(unittest.TestCase):
                 self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
                 return obj, CoffObject(obj)
 
-            candidate_path, candidate = compile_source('samples/race/RecorderTick.cpp')
-            _, aggregate = compile_source('samples/race/RecorderNearMisses.cpp')
+            unit_file = output / 'recorder_tick_unit.cpp'
+            unit_file.write_text(standalone_source(ROOT / CANONICAL, ['VCRInterface::Tick']), encoding='latin-1')
+            candidate_path, candidate = compile_source(str(unit_file))
+            _, aggregate = compile_source(CANONICAL)
             symbol = candidate.find_symbol(SYMBOL)
             self.assertEqual(symbol.function_size, 2448)
             self.assertEqual({s.name for s in candidate.symbols if s.section_number > 0 and s.storage_class == 2 and s.type == 0x20}, {SYMBOL})

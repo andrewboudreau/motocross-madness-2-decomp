@@ -1,5 +1,5 @@
 {
-  "baseline": "Private round54 same-path four complete objects; all bytes/flags/addends/destinations preserved under only these three names. Only exact enumerated source filename prefixes are portable. Refresh published baseline before admission. Round56 private composition independently reproduces these old pins; one GetObject-to-GetCollisionObject primary call rename and the independently validated complete SetTransform arithmetic repair are then applied. All other sections and relocation destinations remain preserved. Round57 light lookup: published dfdf9823 canonical EcoSystem pin independently reproduced, then complete132 sections/720 relocations preserved under only the EcoLightEmitterView*-to-LightEmitter* method-return spelling. All other records unchanged.",
+  "baseline": "Private round54 same-path four complete objects; all bytes/flags/addends/destinations preserved under only these three names. Only exact enumerated source filename prefixes are portable. Refresh published baseline before admission. Round56 private composition independently reproduces these old pins; one GetObject-to-GetCollisionObject primary call rename and the independently validated complete SetTransform arithmetic repair are then applied. All other sections and relocation destinations remain preserved. Round57 light lookup: published dfdf9823 canonical EcoSystem pin independently reproduced, then complete132 sections/720 relocations preserved under only the EcoLightEmitterView*-to-LightEmitter* method-return spelling. All other records unchanged. EcoSystem near-miss merge: the sample EcoSystemNearMisses.cpp and the Group4/Group5 bring-ups were folded into EcoSystem.cpp (six near-miss bodies and their helpers); the canonical object is repinned at 207 sections/1143 relocations and the sample pin removed. Every calibration case stays exact.",
   "renames": {
     "?GetObjectCount@CollisionVegetation@@QAEHXZ": "?GetCollisionCount@Vegetation@@QAEHXZ",
     "?GetRadius@CollisionVegetation@@QAEMXZ": "?GetRadius@Vegetation@@QAEMXZ",
@@ -12,14 +12,9 @@
       "sha256": "19bb8de22243c06c7950fa73aa3afd53489b0110508c5c764343c9c63b31f333"
     },
     "src/reconstructed/EcoSystem.cpp": {
-      "sections": 132,
-      "relocations": 720,
-      "sha256": "5f5d0e10cc34940857e18492facac40020207319087003065d6726874cde7066"
-    },
-    "samples/ecosystem/EcoSystemNearMisses.cpp": {
-      "sections": 98,
-      "relocations": 444,
-      "sha256": "2949e44c3c5dc84e5e6d568500eb64c8a8264e60c0f48ac31ad93ff33e124e00"
+      "sections": 207,
+      "relocations": 1143,
+      "sha256": "bc20be893900fcc890690d22ebbde7ebc85bd88177bb530ac2383393a5483418"
     }
   }
 }

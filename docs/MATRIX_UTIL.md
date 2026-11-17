@@ -27,7 +27,7 @@ SDK where noted.
 | `RotateZMatrix` | `0x004a17f0` | 106 | strict exact | |
 | `MatrixMult` | `0x004a1860` | 123 | strict exact | Both matrices by value; `result(i, j) += a(k, j) * b(i, k)` |
 | `MatrixInverse` | `0x004a18e0` | 362 | strict exact | Upper 3x3 by cofactors, `inverse * (...)`; `ZeroMatrix` when the determinant is zero |
-| `ProjectPoints` (strided perspective transform) | `0x004a1a50` | 175 | near miss (97.66%) | `samples/render/MatrixUtilNearMisses.cpp`; one `fld`/`fmul` operand pair in the last row |
+| `ProjectPoints` (strided perspective transform) | `0x004a1a50` | 175 | not exact (171/175) | In the unit with a status comment; one `fld`/`fmul` operand pair in the last row |
 | (hand-scheduled x87) | `0x004a1b00` | 196 | inline assembly | ebp frame, `fxch` pairing, negative-index loop; not reconstructed |
 | `kVec3` set `_$E1`..`_$E11` | `0x004a1bd0..0x004a1d0b` | | strict exact | 8 initializers, globals `0x685030..0x685068` |
 
@@ -52,6 +52,72 @@ Codegen evidence for the types (`Matrix4`, `Vector3`):
 - `0x004a1a50` keeps typed `Vector3` cursors stepped by the strides in a
   count-down loop; VC6 reorders the sums itself (retail sums z, y, x for w and
   y, z, x / y, x, z for the rows), so the written term order does not matter.
+
+## ProjectPoints forms tried
+
+The notes the near-miss sample carried before `0x004a1a50` moved into
+`src/reconstructed/MatrixUtil.cpp` (it is also the shadow code's
+`ShadowTransformPointsProjective`, bound by a link alias):
+
+```text
+0x004a1a50 (strided perspective transform, 175 bytes): 171/175; only the z
+  term of the last row loads the vector before the matrix element (retail
+  loads m[2][2] first). The typed cursors with a count-down loop are what
+  give the retail +4/+8 pointer bias and the register use; VC6 reorders the
+  sums itself (retail sums z, y, x for w and y, z, x / y, x, z for the
+  rows), so the written term order does not matter.
+  Also tried without gain: for/while/guarded do-while and count-up loops,
+  the increments in the for header or reordered, float*/char* cursors, the
+  point copied into locals or a Vector3, a stride or matrix-reference local,
+  an inline point-transform helper (pointer, reference or by-value point),
+  the rows computed into x/y/z/w locals and the divide written as `/ w`.
+  Every extra live local (stride, counter, reference) reorders many products
+  at once. Redundant parentheses (docs/VC6_OPERAND_ORDER.md section 3): all
+  2112 bracketings, term orders and parenthesised products of the z row,
+  and all 4096 combinations of parenthesised products over the four sums,
+  in this file and inside src/reconstructed/MatrixUtil.cpp, give 171 at
+  best. The Matrix4 operator()(row, col) and Vector3 operator[] accessors
+  (which decide MatrixMult's operand order) change nothing either, used
+  for every element or only for the z row / its z term. A second matrix or
+  point alias (reference/pointer) used in only one or two terms gives
+  126..171.
+  0..33 dead initialised int locals at the top give 171 at every count
+  (unlike the live locals above, they do not reorder it).
+  A D3DMATRIX-style matrix (a union of `_11`..`_44` members and m[4][4])
+  as the parameter type gives 171 with every operand order of the
+  x/z terms (512 forms); reached through a cast local it gives 121.
+  One term per statement (`float z = a; z += b; ...`): the z row alone in
+  all 24 term orders, with `dstPoint->z = z * w` or `z *= w`, gives 164 at best;
+  all four rows accumulated, products in each of their 6 orders and the
+  translation last (1296 forms), give 164 at best.
+  The operand order inside each of the twelve products (all 4096
+  combinations, session 14) gives 171 every time: VC6 canonicalises it.
+  Dead reads of matrix->m[2][2] (a dead local before the loop, a dead
+  z * m[2][2] product before w or after the z row) give 171: unlike frame
+  locals (SoultreeObject::WorldToLocalDirection), these indirect operands
+  are not aged by code that VC6 removes (session 18).
+
+  Leaf-age copies (s22, the form that made Griddraw 0x0047e600 exact): one
+  operand of a z-row product copied into a float local just before the
+  row is a live local here, not a folded one: m[2][2] 147, srcPoint->z
+  121, both 115, the x or y operands or the translation 113..142, and
+  m[2][2] copied at the loop top or before the loop 53 and 39.
+  Round 9 (2026-11-14), loop and cursor shapes: the parameters themselves
+  as cursors (43), loop-local cursors read from the parameters (40, 51
+  with only the source one), an index loop with `i * stride` (171), the
+  target cursor stepped first (171), `while (count-- > 0)` (24) and
+  `for (i = count; i > 0; i--)` (122).
+  Round 15, all 171: the source and target cursors typed apart (Vector3,
+  float* or char* each, eight pairings), the last z read through
+  `(&srcPoint->x)[2]` or a float cast (alone or in every row), the cursor
+  declarations or increments swapped, the source increment commuted,
+  through `&srcPoint->x` or as int arithmetic. Retail schedules `add ecx,
+  edi` right after the product that differs, as the candidate does.
+
+k-scan (s22): compiled behind 0..63 prepended typedefs, 0x004a1a50 has the
+same code at every count, so its difference is not a declaration-count
+effect (docs/VC6_OPERAND_ORDER.md section 2).
+```
 
 ## ViewMatrix
 

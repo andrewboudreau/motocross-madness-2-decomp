@@ -385,5 +385,16 @@
   "??_C@_0L@OMKC@?$HO1?$CFs?3?5?$HO0?$CFs?$AA@": "0x00573d0c",
   "??_C@_0N@LLLF@?$HO?$CF1d?$CFs?3?5?$HO0?$CFs?$AA@": "0x00573cf0",
   "?RemoveRow@UIListBox@@QAEHH@Z": "0x00477490",
-  "?ScrollToRow@UIListBox@@QAEHHH@Z": "0x00476860"
+  "?ScrollToRow@UIListBox@@QAEHHH@Z": "0x00476860",
+  "?DebugCalloc@@YAPAXIIPBDH@Z": "0x004a2fc0",
+  "?DebugFree@@YAXPAXPBDH@Z": "0x004a2e60",
+  "?DebugMalloc@@YAPAXIPBDH@Z": "0x004a2e20",
+  "?PaintNumber@BikeNumberPainter@@QAEXPAXH@Z": "0x00417670",
+  "?MakeRandomNames@KrustyUI@@QAEXPAPBDH@Z": "0x0049b020",
+  "?PickRandomRacers@KrustyUI@@QAEXPAHH0@Z": "0x0049b0d0",
+  "?ResetSettingsEntries@TrackGameMode@@QAEXXZ": "0x00522cd0",
+  "?HandleEvent@OptionsDlg@@UAEXPAUDialogEvent@@@Z": "0x004b4280",
+  "__real@4@3ff08000000000000000": "0x005505f0",
+  "__real@4@c008e0c0000000000000": "0x005578e4",
+  "?Tick@MPBikeRiderDlg@@UAEHM@Z": "0x004f8820"
 }

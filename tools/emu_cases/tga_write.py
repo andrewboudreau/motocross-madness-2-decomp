@@ -1,7 +1,7 @@
 """WriteTga 0x00512990, the TGA screenshot/texture writer (tools/emu_diff.py case,
 call-record/replay mode).
 
-The linked body is samples/render/TgafileNearMisses.cpp. fopen 0x00534ceb answers a handle or
+The linked body is WriteTga in src/reconstructed/Tgafile.cpp. fopen 0x00534ceb answers a handle or
 NULL, fwrite 0x005350b7 notes (bytes, size, count) and answers the full count or, at a chosen
 call, a short count, so every header field and early exit is compared; fclose 0x00534c3d is
 logged. Images are 24, 32, 16 (555 when greenMask is 0x3e0, else 565) or other bit depths, with
@@ -12,7 +12,7 @@ import random
 
 RETAIL_VA = 0x00512990
 SYMBOL = '?WriteTga@@YAHPAUTgaFile@@IHH@Z'
-SOURCE = 'samples/render/TgafileNearMisses.cpp'
+SOURCE = 'src/reconstructed/Tgafile.cpp'
 PROBES = {0x00512af0: '24', 0x00512bb6: '32', 0x00512cab: '555', 0x00512d1c: '565', 0x00512dba: 'fail'}
 
 FOPEN, FWRITE, FCLOSE = 0x00534ceb, 0x005350b7, 0x00534c3d

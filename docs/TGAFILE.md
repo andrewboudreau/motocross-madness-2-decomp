@@ -53,8 +53,8 @@ unpacked, the pixels at +0x14 and the name at +0x1c), copy the path in and
 return the result of `0x00512990`. The value PCTextureMap's level dump
 passes as 32 is the header's descriptor byte (top-left origin).
 
-Near miss (`samples/render/TgafileNearMisses.cpp`): the
-writer `0x00512990` (1074 bytes). It opens the file "wb", writes the header field
+Near miss (in the unit before `0x00512dd0`, with a `// Not exact` comment;
+it moved in from its sample): the writer `0x00512990` (1074 bytes). It opens the file "wb", writes the header field
 by field and the pixels: 24-bit one by one with red and blue swapped,
 32-bit swapped in place then in blocks, 16-bit rows as they are for 555
 (green mask 0x3e0) or pixel by pixel converted from 565. The 16-bit
@@ -113,7 +113,7 @@ replace are in Git history. Tier 3 unless the entry says otherwise.
 - `0x005127a0` `FillTgaHeader24`
 - `0x005127f0` `WriteTga32`
 - `0x00512870` `FillTgaHeader32`
-- `0x00512990` `WriteTga` (near-miss sample)
+- `0x00512990` `WriteTga` (not exact)
 - `0x005119c0` `FillPixelFormat`; the other pixel-format and whole-file
   helpers keep address names because UI, TextureMap and SoultreeMaterial
   code reaches them through this header

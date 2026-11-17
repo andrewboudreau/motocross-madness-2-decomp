@@ -11,8 +11,13 @@ from mcm2tool.pe import PEImage
 from mcm2tool.rtti import parse_rtti
 from mcm2tool.toolchain import find_child_ci, find_vc6_bin, infer_vc98_root, sha256_file
 from tools.match import compare
+from tools.unit_source import standalone_source
 
 ROOT = Path(__file__).resolve().parents[1]
+# The reader lives in src/reconstructed/PCJoystickDevice.cpp (retail
+# PCInputDeviceType.cpp); the native oracle links a validation unit holding
+# only its definition (tools/unit_source.py).
+CANONICAL = ROOT / 'src/reconstructed/PCJoystickDevice.cpp'
 SYMBOL = '?ReadBufferedState@PCJoystickDevice@@QAEHH@Z'
 DIRECT = {0x4c316b:0x4bf6a0,0x4c31d3:0x4c2ef0,0x4c3222:0x43cea0,0x4c3260:0x43cea0,
           0x4c33b6:0x4c3090,0x4c3439:0x4c3090,0x4c3686:0x489c00,
@@ -90,24 +95,30 @@ class JoystickBufferedBehaviorTests(unittest.TestCase):
                 self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
                 return obj, CoffObject(obj)
 
-            candidate_path, candidate = compile_source(ROOT / 'samples/inputdevice/JoystickBufferedState.cpp', 'candidate')
+            unit_file = output / 'joystick_buffered_unit.cpp'
+            unit_file.write_text(standalone_source(CANONICAL, ['AxisAbs', 'PCJoystickDevice::FilterAxisSpike', 'PCJoystickDevice::ReadBufferedState']), encoding='latin1')
+            candidate_path, candidate = compile_source(unit_file, 'candidate')
             fixture_path, _ = compile_source(ROOT / 'tests/fixtures/joystick_buffered_compare.cpp', 'fixture', True)
             self.assertEqual(candidate.find_symbol(SYMBOL).function_size, 1641)
             self.assertEqual({s.name for s in candidate.symbols if s.storage_class == 2 and s.section_number > 0 and s.type == 0x20}, {SYMBOL})
             self.assertEqual({s.name for s in candidate.symbols if s.storage_class == 2 and s.section_number == 0},
                 {'?FeedAxis@JoystickDevice@@QAEXHMM@Z', '?QueueEvent@ControlInterface@@QAEXHHHH@Z', '?g_TrackGame@@3PAVTrackGame@@A', '__fltused', '__ftol', '?ApplyAxisDeadZone@PCJoystickDevice@@QAEHHH@Z', '?ButtonIndexFromOffset@PCJoystickDevice@@QAEHH@Z', '?ReportDirectInputError@@YAXJPBDH@Z'})
             self.assertFalse(any(s.name.startswith(('.CRT', '.text$x', '.xdata')) for s in candidate.sections))
-            report = compare(image, candidate, SYMBOL, 0x4c3100, 1665, ROOT / 'samples/inputdevice/JoystickBufferedState.bindings.json')
+            report = compare(image, candidate, SYMBOL, 0x4c3100, 1665, ROOT / 'src/reconstructed/PCJoystickDevice.bindings.json')
             self.assertFalse(report['strict_exact'])
             self.assertEqual(report['strict_match']['matching_positions'], 128)
-            _, aggregate = compile_source(ROOT / 'samples/inputdevice/PCJoystickDeviceNearMisses.cpp', 'aggregate')
+            _, aggregate = compile_source(CANONICAL, 'aggregate')
 
             def fingerprint(obj):
                 symbol = obj.find_symbol(SYMBOL)
                 body, size, relocations = obj.symbol_extent(symbol)
                 def destination(r):
                     target = obj.symbol_by_index[r.symbol_index]
-                    return f'local+{target.value-symbol.value}' if target.section_number == symbol.section_number else target.name
+                    if target.section_number == symbol.section_number:
+                        return f'local+{target.value-symbol.value}'
+                    # The validation unit is compiled from a temporary file,
+                    # so its __FILE__ literal carries another mangled name.
+                    return '__FILE__ literal' if target.name.startswith('??_C@') else target.name
                 return body, size, [(r.virtual_address-symbol.value, r.type, destination(r)) for r in relocations]
 
             self.assertEqual(fingerprint(candidate), fingerprint(aggregate))
@@ -173,7 +184,7 @@ class JoystickBufferedBehaviorTests(unittest.TestCase):
                 f'/out:{executable}', f'/libpath:{libraries}', str(candidate_path), str(fixture_path), str(helper_path), 'kernel32.lib'],
                 cwd=ROOT, capture_output=True, text=True, encoding='latin1')
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-            result = subprocess.run([str(executable), str(reference), str(patch_file), str(ROOT / 'samples/inputdevice/JoystickBufferedState.cpp')], capture_output=True, text=True, timeout=180)
+            result = subprocess.run([str(executable), str(reference), str(patch_file), str(unit_file)], capture_output=True, text=True, timeout=180)
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             self.assertIn('JoystickBuffered: 4520 complete records, axes, timestamps, queues, retry, FP and fault scenarios match', result.stdout)
             print(result.stdout.strip())

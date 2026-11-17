@@ -1,14 +1,15 @@
-"""ShadowTransformPointsProjective 0x004a1a50, strided projective transform (tools/emu_diff.py case).
+"""ProjectPoints 0x004a1a50, strided projective transform (tools/emu_diff.py case).
 
-Linked from src/bringup/Group5_ShadowBridges.cpp. Each point is divided by its w row
+The body is src/reconstructed/MatrixUtil.cpp's ProjectPoints; the shadow code reaches it as
+ShadowTransformPointsProjective through a link alias. Each point is divided by its w row
 (fdivr by 1.0) and the three coordinate rows are scaled by that reciprocal, all on the x87
 stack; retail sums each row in its own order (w: (z y) x + t; x: (y z) x + t; y and z:
 (y x) z + t). Cases: random projective matrices (w row near zero in some), random points,
 strides 12, 16 and 0x20, a zero source stride (destination stride reused), counts 0..17.
 """
 RETAIL_VA = 0x004a1a50
-SYMBOL = '?ShadowTransformPointsProjective@@YAXPAUShadowVec3@@PBXPBUShadowMatrix@@HHH@Z'
-SOURCE = 'src/bringup/Group5_ShadowBridges.cpp'
+SYMBOL = '?ProjectPoints@@YAXPAXPBXPBUMatrix4@@HHH@Z'
+SOURCE = 'src/reconstructed/MatrixUtil.cpp'
 
 
 def cases(rng, n):

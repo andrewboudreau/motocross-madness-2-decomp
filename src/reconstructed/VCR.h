@@ -8,8 +8,8 @@
 //
 // The object is a ring of 256 16-byte buffer slots with three cursors, plus
 // a chained list of 0x804-byte blocks of (file position, time) pairs. The
-// member names describe how recorder.cpp's thread (samples/race/
-// RecorderNearMisses.cpp) uses them: recording fills slots that the thread
+// member names describe how recorder.cpp's thread (0x004e6f80, Recorder.cpp)
+// uses them: recording fills slots that the thread
 // writes to the VCRtape file; playback has the thread read records from the
 // file into slots that the game takes. Slot states: 0 free, 1 filled, 2 end
 // of the file reached forward, 3 no earlier position (reverse playback).

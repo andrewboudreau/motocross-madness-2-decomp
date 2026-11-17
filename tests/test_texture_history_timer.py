@@ -11,11 +11,9 @@ from tools.match import compare
 ROOT=Path(__file__).resolve().parents[1]
 FILENAMES=(
  'src/reconstructed/ManagedTextureGroup.cpp',
- 'samples/render/ManagedTextureGroupNearMisses.cpp',
  'src/reconstructed/SceneManager.cpp',
  'src/reconstructed/ProCircuitProcs.cpp',
  'src/reconstructed/ContainerList.h',
- 'samples/render/../../src/reconstructed/ContainerList.h',
 )
 @unittest.skipUnless(os.name=='nt' and os.environ.get('VC6_ROOT') and os.environ.get('MCM2_EXE'),'authentic VC6/private retail required')
 class TextureHistoryTimerTests(unittest.TestCase):
@@ -70,6 +68,6 @@ class TextureHistoryTimerTests(unittest.TestCase):
     with patch.object(views,'FILENAMES',FILENAMES):rows=views.whole_object(CoffObject(objpath),(ROOT,))
     actual=dict(sections=len(rows),relocations=sum(len(z[-1])for z in rows),sha256=hashlib.sha256(json.dumps(rows,separators=(',',':')).encode()).hexdigest())
     self.assertEqual(actual,pins[source])
-   print('8 complete strict checks; four old objects; real WinMM and controlled platform boundaries')
+   print('8 complete strict checks; three old objects; real WinMM and controlled platform boundaries')
 
 if __name__=="__main__":unittest.main()

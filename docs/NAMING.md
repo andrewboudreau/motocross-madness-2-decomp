@@ -3311,8 +3311,8 @@ tools/static_check.py passes.
 | `UnknownCursorPosition` | `CursorPixelPosition` | 2 | GameCursor.h: {x, y} in pixels returned by GameCursor::CursorPosition 0x0043f100 |
 | `UnknownDialogImage` | `DialogUIAnimView` | 2 | GameUi.h: "DlgProcs.h's UnknownDialogImage is the same object" as UIAnim; GetCurrentTexture 0x00472f90 joined to UIAnim::GetCurrentTexture (tests/fixtures/uianim_connection_objects.json) |
 | `UnknownEcoCoordinates` | `EcoQuantizedPosition` | 2 | EcoCoordinates.h {x,y,z} ushorts: Vegetation::quantizedPosition (unitsPerCoordinate units), the 6-byte record EcoSystem::PlaceStoredObjects reads |
-| `UnknownEcoSampleTga` | `SampleEcoProbabilityTga` | 2 | Group4_EcoSystem.cpp static inline: the green channel of a probability TGA at terrain (x,z), scaled 0..1 |
-| `UnknownEcoSampleTgaWeighted` | `SampleEcoProbabilityTgaWeighted` | 2 | Group4_EcoSystem.cpp static inline: the same sample times `weight` in retail's multiply order |
+| `UnknownEcoSampleTga` | `SampleEcoProbabilityTga` | 2 | EcoSystem.cpp static inline: the green channel of a probability TGA at terrain (x,z), scaled 0..1 |
+| `UnknownEcoSampleTgaWeighted` | `SampleEcoProbabilityTgaWeighted` | 2 | EcoSystem.cpp static inline: the same sample times `weight` in retail's multiply order |
 | `UnknownEulaProc` | `EulaEntryProc` | 2 | typedef of EBUEula.dll's entry point (TrackGame.cpp) |
 | `UnknownFollowCameraPoint` | `FollowCameraPoint` | 2 | FollowCamera.h: element of the points table at FollowCamera+0x2e4 |
 | `UnknownFollowCameraProjector` | `FollowCameraVisibilityClipperView` | 2 | FollowCamera.h ProjectPoint 0x0052f340 = VisibilityClipper::ProjectPoint; object at 0x00575a98 |

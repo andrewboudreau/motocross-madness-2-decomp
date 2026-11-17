@@ -112,9 +112,9 @@ public:
     int ApplyAxisDeadZone(int axis, int value);
     // 0x004c2ef0: button index for a joystick state offset, or -1.
     int ButtonIndexFromOffset(int offset);
-    int ReadBufferedState(int value);                   // near miss in samples/inputdevice
-    int FilterAxisSpike(int axis, unsigned long value); // inline (near miss sample)
-    int ReadImmediateState(int value);                  // near miss in samples/inputdevice
+    int ReadBufferedState(int value);                   // not exact
+    int FilterAxisSpike(int axis, unsigned long value); // inline, with ReadBufferedState
+    int ReadImmediateState(int value);                  // not exact
     int SetBufferedInput(int buffered);
     int CheckPollResult(long result);              // inline
     void SetJoystickFilter(unsigned char value);    // 0x004c3ae0: KrustyUI / OptionProcs pass the "JoystickFilter" registry flag

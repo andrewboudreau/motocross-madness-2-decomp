@@ -84,30 +84,8 @@ void ShadowTransformPointsOrtho(ShadowVec3* dst, const void* src, const ShadowMa
     TransformPoints(dst, const_cast<void*>(src), reinterpret_cast<const Matrix4*>(m), count, dstStride, srcStride);
 }
 
-// 0x004a1a50: `count` points transformed by `m` with the perspective divide;
-// a zero `srcStride` means `dstStride` (body as in
-// samples/render/MatrixUtilNearMisses.cpp's ProjectPoints).
-void ShadowTransformPointsProjective(ShadowVec3* dst, const void* src, const ShadowMatrix* m, int count,
-                                    int dstStride, int srcStride)
-{
-    const ShadowVec3* srcPoint = (const ShadowVec3*)src;
-    ShadowVec3* dstPoint = dst;
-    if (!srcStride)
-        srcStride = dstStride;
-    while (count > 0) {
-        float w = 1.0f / (srcPoint->x * m->m[0][3] + srcPoint->y * m->m[1][3] + srcPoint->z * m->m[2][3] +
-                          m->m[3][3]);
-        dstPoint->x = (srcPoint->x * m->m[0][0] + srcPoint->y * m->m[1][0] + srcPoint->z * m->m[2][0] +
-                       m->m[3][0]) * w;
-        dstPoint->y = (srcPoint->x * m->m[0][1] + srcPoint->y * m->m[1][1] + srcPoint->z * m->m[2][1] +
-                       m->m[3][1]) * w;
-        dstPoint->z = (srcPoint->x * m->m[0][2] + srcPoint->y * m->m[1][2] + srcPoint->z * m->m[2][2] +
-                       m->m[3][2]) * w;
-        srcPoint = (const ShadowVec3*)((const char*)srcPoint + srcStride);
-        dstPoint = (ShadowVec3*)((char*)dstPoint + dstStride);
-        count--;
-    }
-}
+// 0x004a1a50 (ShadowTransformPointsProjective) is MatrixUtil.cpp's
+// ProjectPoints, bound through a link alias (config/game_build.json).
 
 // 0x00461d60 (thiscall, ret 0xc): one edge of the triangle, stepped one row
 // at a time with an integer error term (0x1c bytes).
