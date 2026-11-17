@@ -1,10 +1,9 @@
 # Non-local texture memory probe
 
-`PCVideoCard::ProbeNonLocalTextureMemory` at `0x004ca5a0` is a complete,
-readable candidate in `samples/render/NonLocalTextureMemory.cpp`. It remains
-**nonexact**: authentic VC6 SP3 `/O2 /GR /GX /MT /Z7` emits 490 bytes versus
+`PCVideoCard::ProbeNonLocalTextureMemory` at `0x004ca5a0` is complete and
+readable in [PCVideoCard.cpp](../src/reconstructed/PCVideoCard.cpp), between
+`CreateModeSurfaces` and `CreateWindowedSurfaces`. It remains **nonexact**: authentic VC6 SP3 `/O2 /GR /GX /MT /Z7` emits 490 bytes versus
 486 retail bytes, with 66 matching positions after resolving relocations.
-The original `PCVideoCardNearMisses.cpp` includes the extracted body.
 
 ## Extent and source evidence
 
@@ -18,9 +17,9 @@ trimmed to obtain a match.
 
 The debug allocation records line 1185 and the literal retail path
 `D:\aardvark\VC\krusty2\PCVideoCard.cpp` at `0x005714f4`. This supports the
-original source context; the new filename is an organizational extraction.
-The rebuilt diagnostic filename is `NonLocalTextureMemory.cpp`; the private
-comparison checks and normalizes this known diagnostic difference. Method
+file the body now sits in. The test's validation unit is named
+`PCVideoCard.cpp`, and the private comparison checks that file name before
+normalizing the path. Method
 and field names remain reconstructed names.
 
 ## Decoded behavior

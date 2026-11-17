@@ -10,6 +10,7 @@ from mcm2tool.coff import CoffObject
 from mcm2tool.pe import PEImage
 from mcm2tool.toolchain import find_child_ci, find_vc6_bin, infer_vc98_root, sha256_file
 from tools.match import compare
+from tools.unit_source import standalone_source
 
 ROOT = Path(__file__).resolve().parents[1]
 SYMBOL = '?CreateModeSurfaces@PCVideoCard@@QAEHH@Z'
@@ -41,7 +42,11 @@ class ModeSurfacesBehaviorTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix='mcm2-mode-surfaces-') as directory:
             output = Path(directory)
             objects = []
-            for source in ('samples/render/ModeSurfaces.cpp', 'tests/fixtures/mode_surfaces_compare.cpp'):
+            # The body lives in PCVideoCard.cpp; the oracle links a validation unit of
+            # the same name holding only its definition (tools/unit_source.py).
+            unit = output / 'PCVideoCard.cpp'
+            unit.write_text(standalone_source(ROOT / 'src/reconstructed/PCVideoCard.cpp', ['PCVideoCard::CreateModeSurfaces']), encoding='latin-1')
+            for source in (str(unit), 'tests/fixtures/mode_surfaces_compare.cpp'):
                 obj = output / (Path(source).stem + '.obj')
                 result = subprocess.run([sys.executable, str(ROOT / 'tools/compile.py'), str(ROOT / source),
                     '-o', str(obj), '--vc6-root', str(compiler), '--profile', 'vc6_o2_mt'],
@@ -49,7 +54,7 @@ class ModeSurfacesBehaviorTests(unittest.TestCase):
                     env={**os.environ, 'PYTHONPATH': str(ROOT)})
                 self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
                 objects.append(str(obj))
-                if source.startswith('samples/'):
+                if source == str(unit):
                     candidate = CoffObject(obj)
                     self.assertEqual({s.name for s in candidate.symbols
                                       if s.storage_class == 2 and s.section_number > 0}, {SYMBOL})
@@ -57,7 +62,7 @@ class ModeSurfacesBehaviorTests(unittest.TestCase):
                     self.assertEqual(entry.extent_source, 'coff_function_aux')
                     self.assertEqual(entry.function_size, 124)
                     report = compare(retail, candidate, SYMBOL, 0x4ca520, 116,
-                                     ROOT / 'samples/render/ModeSurfaces.bindings.json')
+                                     ROOT / 'src/reconstructed/PCVideoCard.bindings.json')
                     self.assertEqual(report['strict_match']['matching_positions'], 26)
             executable = output / 'modes.exe'
             result = subprocess.run([str(linker), '/nologo', '/subsystem:console', '/base:0x100000',

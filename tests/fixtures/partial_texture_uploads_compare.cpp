@@ -61,7 +61,7 @@ template<class T>static DWORD Address(T p) {
 }
 static int SourceFile(const char* p) {
     const char* n=strrchr(p,'\\'),*s=strrchr(p,'/');if(!n||(s&&s>n))n=s;n=n?n+1:p;
-    if(strcmp(n,"PCVideoCard.cpp")&&strcmp(n,"PartialTextureUploads.cpp"))Fail(82);return 1;
+    if(strcmp(n,"PCVideoCard.cpp"))Fail(82);return 1;
 }
 void* operator new(unsigned int size,const char* path,int line) {
     Event(1,size,SourceFile(path),line,++allocations);

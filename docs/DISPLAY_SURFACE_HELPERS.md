@@ -1,14 +1,15 @@
 # Display surface setup and pixel comparison
 
-Two complete, nonexact helpers are extracted from PCVideoCardNearMisses.cpp.
-The aggregate sample includes their standalone sources; declarations and bodies
-are unchanged. Semantic names remain provisional. The new files organize the
-reconstruction and do not assert original translation-unit ownership.
+Two complete, nonexact helpers are in
+[PCVideoCard.cpp](../src/reconstructed/PCVideoCard.cpp) (retail
+`PCVideoCard.cpp`) in retail order, each with a `// Not exact` status comment.
+Their tests link a validation unit named `PCVideoCard.cpp` holding only the
+tested definition. Semantic names remain provisional.
 
-| Standalone candidate | Retail address | Full retail / VC6 bytes | Matching positions |
+| Function | Retail address | Full retail / VC6 bytes | Matching positions |
 |---|---|---:|---:|
-| `ModeSurfaces.cpp`: `PCVideoCard::CreateModeSurfaces` | `0x004ca520` | 116 / 124 | 26 |
-| `TextureChannelDifference.cpp`: `MeanTextureChannelDifference` | `0x004cb330` | 629 / 620 | 35 |
+| `PCVideoCard::CreateModeSurfaces` | `0x004ca520` | 116 / 124 | 26 |
+| `MeanTextureChannelDifference` | `0x004cb330` | 629 / 620 | 35 |
 
 The channel comparison's old 628-byte range ended inside a jump. Its complete
 reachable CFG includes `fstp st(0)` at `0x004cb5a1` and the two-byte jump at
@@ -66,3 +67,11 @@ $env:MCM2_EXE = (Resolve-Path work/game/mcm2.exe).Path
 python -m unittest discover -s tests -p test_mode_surfaces_behavior.py -v
 python -m unittest discover -s tests -p test_texture_channel_difference_behavior.py -v
 ```
+
+## Forms tried
+
+`CreateModeSurfaces` Session 19 (26 of 116 kept; retail keeps every mode field and the budget
+load in the entry block, VC6 sinks the single-use locals): `if (!..) return
+0; return 1` 21, a goto to a failure return 22, an `ok` result local 22 or
+14, a budget local (first or top), split declarations, a mode pointer and
+extra parentheses 26, a w * h local 6, the sum form 16.

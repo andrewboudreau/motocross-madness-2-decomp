@@ -1,7 +1,8 @@
 # Partial texture upload probe
 
-`samples/render/PartialTextureUploads.cpp` contains the complete provisional
-`int PCVideoCard::ProbePartialTextureUploads(RenderTarget*)` body. The `int`
+[PCVideoCard.cpp](../src/reconstructed/PCVideoCard.cpp) holds the complete
+provisional `int PCVideoCard::ProbePartialTextureUploads(RenderTarget*)` body,
+between `0x004ca9f0` and `0x004caf70`; it is not exact. The `int`
 return is confirmed by the epilogue: retail loads `result` into eax before the
 `+0x5bc` store and the single `ret 4`. The
 declaration in `PCVideoCard.h` and its caller in `PCGame::ProfileDisplays` use the
@@ -116,3 +117,27 @@ $env:VC6_ROOT = (Resolve-Path work/vc6sp3-disc).Path
 $env:MCM2_EXE = (Resolve-Path work/game/mcm2.exe).Path
 python -m unittest discover -s tests -p test_partial_texture_uploads.py -v
 ```
+
+## Forms tried
+
+Standalone VC6 SP3 vc6_o2_mt: 423 of 1129 strict positions (candidate 1120
+bytes; was 140 of 1145). Matches retail instruction for instruction up to
+0x004cac5c. What moved codegen:
+- The method returns `result`. Retail leaves it in eax at the single
+  `ret 4` (`mov eax, [esp+0x10]` before the +0x5bc store). As `void`,
+  VC6 duplicated the epilogue for each jump to the final store.
+- `render = 0` with the supplied target taken in the then-arm, and the
+  created target assigned straight to `render`. The created target, `render`
+  and the mode index then share esi as in retail, and the exhausted loop
+  jumps directly to the final store.
+- The temporary-target cleanup sits after the `if (render)` block.
+Left: retail keeps `this` at [esp+0x14] and `image` only in memory at
+[esp+0x18], with ebx as the zero register throughout. Ours swaps the two
+slots and caches `image` in ebx. Retail also places the CreateTextureSurface
+success arm after the `ret`.
+Ruled out on this form (s21): permuting the image/expected/rendered
+declarations, or declaring `image` at its assignment (both unchanged);
+swapped CreateTextureSurface arms (150, size 1129); FreeFile once after a
+named CreateTextureSurface result (397); braces on the -2 arm (unchanged).
+Earlier: `render = 0` inside `if (!render)` (unchanged); an early store and
+return on exhaustion (324, adds a return retail lacks).

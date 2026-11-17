@@ -8,7 +8,7 @@ import struct
 
 RETAIL_VA = 0x004cb330
 SYMBOL = '?MeanTextureChannelDifference@@YAMPAVTextureMap@@0@Z'
-SOURCE = 'samples/render/TextureChannelDifference.cpp'
+SOURCE = 'src/reconstructed/PCVideoCard.cpp'
 
 
 def cases(rng, n):

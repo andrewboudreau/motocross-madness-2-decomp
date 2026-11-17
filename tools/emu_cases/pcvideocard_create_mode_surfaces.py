@@ -4,7 +4,7 @@ The surfaces for the current display mode. Full screen first checks the video me
 budget: the whole chain (w * h * bpp / 8 per buffer, signed division) must fit in the
 budget (+0x74) less one 16-bit frame (w * h * 2); then CreateFlipChain (0x004c9f30) gets
 bufferCount - 1 back buffers. Windowed goes to CreateSystemRenderSurface (0x004ca130).
-The linked body is samples/render/ModeSurfaces.cpp.
+The linked body is in src/reconstructed/PCVideoCard.cpp.
 
 Layout (src/reconstructed/PCVideoCard.h, DisplayMode.h): +0x0c the current mode index,
 +0x10 the 36-byte mode table (+0 width, +4 height, +8 bit depth, +0x10 buffer count), +0x74
@@ -16,7 +16,7 @@ import struct
 
 RETAIL_VA = 0x004ca520
 SYMBOL = '?CreateModeSurfaces@PCVideoCard@@QAEHH@Z'
-SOURCE = 'samples/render/ModeSurfaces.cpp'
+SOURCE = 'src/reconstructed/PCVideoCard.cpp'
 FLIP_CHAIN, SYSTEM_SURFACE = 0x004c9f30, 0x004ca130
 PROBES = {0x004ca569: 'budget fits', 0x004ca58b: 'failure', 0x004ca580: 'windowed'}
 

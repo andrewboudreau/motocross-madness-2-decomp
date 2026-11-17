@@ -12,6 +12,7 @@ from mcm2tool.coff import CoffObject
 from mcm2tool.pe import PEImage
 from mcm2tool.toolchain import find_child_ci, find_vc6_bin, infer_vc98_root
 from tools.match import compare
+from tools.unit_source import standalone_source
 
 ROOT = Path(__file__).resolve().parents[1]
 SYMBOL = '?ProbeNonLocalTextureMemory@PCVideoCard@@QAEHPAHPAVRenderTarget@@@Z'
@@ -95,7 +96,11 @@ class NonLocalTextureMemoryBehaviorTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix='mcm2-nonlocal-texture-') as directory:
             output = Path(directory)
             objects = []
-            for source in ('samples/render/NonLocalTextureMemory.cpp', 'tests/fixtures/nonlocal_texture_memory_compare.cpp'):
+            # The body lives in PCVideoCard.cpp; the oracle links a validation unit of
+            # the same name holding only its definition (tools/unit_source.py).
+            unit = output / 'PCVideoCard.cpp'
+            unit.write_text(standalone_source(ROOT / 'src/reconstructed/PCVideoCard.cpp', ['PCVideoCard::ProbeNonLocalTextureMemory']), encoding='latin-1')
+            for source in (str(unit), 'tests/fixtures/nonlocal_texture_memory_compare.cpp'):
                 obj = output / (Path(source).stem + '.obj')
                 result = subprocess.run([sys.executable, str(ROOT / 'tools/compile.py'), str(ROOT / source),
                     '-o', str(obj), '--vc6-root', str(compiler), '--profile', 'vc6_o2_mt',
@@ -106,7 +111,7 @@ class NonLocalTextureMemoryBehaviorTests(unittest.TestCase):
                     text=True, encoding='latin-1', env={**os.environ, 'PYTHONPATH': str(ROOT)})
                 self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
                 objects.append(str(obj))
-                if source.startswith('samples/'):
+                if source == str(unit):
                     candidate = CoffObject(obj)
                     methods = {s.name for s in candidate.symbols
                                if s.storage_class == 2 and s.section_number > 0 and s.type == 0x20}
@@ -144,7 +149,7 @@ class NonLocalTextureMemoryBehaviorTests(unittest.TestCase):
                     cleanup = relocated(action.section_number, action.value + 18)
                     self.assertEqual(cleanup.name, '??3@YAXPAXPBDH@Z')
                     report = compare(image, candidate, SYMBOL, 0x4ca5a0, 486,
-                                     ROOT / 'samples/render/NonLocalTextureMemory.bindings.json')
+                                     ROOT / 'src/reconstructed/PCVideoCard.bindings.json')
                     self.assertFalse(report['strict_match']['strict_exact'])
                     self.assertEqual(report['strict_match']['matching_positions'], 66)
             patch_file = output / 'calls.bin'

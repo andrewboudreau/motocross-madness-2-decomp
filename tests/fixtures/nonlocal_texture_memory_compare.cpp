@@ -61,7 +61,7 @@ static void Callback(int op){
 static int SourceFile(const char* file){
     const char* name=strrchr(file,'\\'),*slash=strrchr(file,'/');
     if(!name ||(slash&&slash>name))name=slash;name=name?name+1:file;
-    if(strcmp(name,"PCVideoCard.cpp")&&strcmp(name,"NonLocalTextureMemory.cpp"))Fail(83);return 1;
+    if(strcmp(name,"PCVideoCard.cpp"))Fail(83);return 1;
 }
 int PCVideoCard::SetFullscreenDisplayMode(int index,int flag){
     if(this!=Display() ||index<0||index>=5)Fail(84);

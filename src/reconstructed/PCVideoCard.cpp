@@ -432,6 +432,84 @@ void PCVideoCard::RetryFlip(int value) {
         RecordFrameTime();
 }
 
+// 0x004ca520: the surfaces for the current mode; full screen needs the
+// whole chain plus two 16-bit frames' worth of video memory.
+// Not exact (26 of 116 bytes, 124 compiled: retail loads every mode field and
+// the budget before the test and forms width * height once; VC6 sinks the
+// single-use locals; docs/DISPLAY_SURFACE_HELPERS.md lists the forms tried).
+int PCVideoCard::CreateModeSurfaces(int fullScreen) {
+    int width = displayModes[currentDisplayMode].width;
+    int height = displayModes[currentDisplayMode].height;
+    int bitDepth = displayModes[currentDisplayMode].bitDepth;
+    int buffers = displayModes[currentDisplayMode].bufferCount;
+    if (fullScreen) {
+        if (width * height * bitDepth / 8 * buffers > videoMemoryBudget - width * height * 2)
+            return 0;
+        if (CreateFlipChain(buffers - 1))
+            return 1;
+    } else if (CreateSystemRenderSurface(buffers - 1)) {
+        return 1;
+    }
+    return 0;
+}
+
+// 0x004ca5a0: whether a 128 x 128 texture of the target's format can be
+// created (with a temporary 640 x 480 x 16 target when `target` is 0).
+// Not exact (66 of 486 bytes, 490 compiled: retail keeps `target` in ebp
+// outside the mode loop and 480 in it; docs/NONLOCAL_TEXTURE_MEMORY.md).
+int PCVideoCard::ProbeNonLocalTextureMemory(int* value, RenderTarget* target) {
+    RenderTarget* render = 0;
+    DirectDrawSurface* surface;
+    DDSCaps2 caps;
+    DDSurfaceDesc2 desc;
+    int result;
+
+    *value = 0;
+    if (target) {
+        render = target;
+    } else {
+        for (int i = 0; i < displayModeCount; i++) {
+            if (displayModes[i].width == 640 && displayModes[i].height == 480 && displayModes[i].bitDepth == 16) {
+                if (SetFullscreenDisplayMode(i, 1)) {
+                    render = (new (__FILE__, 1185) PCRenderTarget)
+                                 ->InitializeRenderTarget(this, &IID_IDirect3DHALDevice, backBuffer, 1,
+                                                         frameBufferCount);
+                    if (!render)
+                        goto failed;
+                }
+                break;
+            }
+        }
+    }
+    memset(&desc, 0, sizeof(desc));
+    desc.size = sizeof(desc);
+    FillPixelFormat(render->surfacePixelFormat, &desc.pixelFormat);
+    desc.width = 128;
+    desc.height = 128;
+    desc.flags = 0x1007;                          // caps, height, width, pixel format
+    desc.caps[0] = 0x20005000;
+    if (directDraw->CreateSurface(&desc, &surface, 0) == 0) {
+        if (surface->GetCaps(&caps)) {
+            *value = 0;
+            result = 0;
+        } else if (caps.caps & 0x20000000) {
+            result = 1;
+        } else {
+            *value = 0;
+            result = 0;
+        }
+        surface->Release();
+        if (!target && render)
+            delete render;
+        return result;
+    }
+    if (!target && render)
+        delete render;
+failed:
+    *value = 0;
+    return 0;
+}
+
 // 0x004ca790: windowed surfaces: a primary clipped to the window and a
 // `width` x `height` render surface (video memory when `windowed`).
 int PCVideoCard::CreateWindowedSurfaces(int width, int height, int windowed) {
@@ -549,6 +627,107 @@ struct D3DViewport7 {
     float maxZ;
 };
 
+// 0x004cab00: the "PartialTexBlt" test (+0x5bc): uploads 64 x 64 tiles of
+// partblt.tga through a texture and compares the drawn result. 1: works;
+// 0: wrong; -1: the full upload failed; -2: no image or texture; -3: no
+// 640 x 480 x 16 target; -4: no texture surface.
+// Not exact (423 of 1129 bytes, 1120 compiled: the same up to 0x004cac5c,
+// then retail's `this` and image frame slots are swapped and ebx stays the
+// zero register; docs/PARTIAL_TEXTURE_UPLOADS.md lists the forms tried).
+int PCVideoCard::ProbePartialTextureUploads(RenderTarget* target) {
+    int result = 1;
+    Win32Rect area;
+    Win32Rect tile;
+    PCTextureMap* image;
+    PCTextureMap* expected;
+    PCTextureMap* rendered;
+
+    area.left = 0;
+    area.top = 0;
+    area.right = 256;
+    area.bottom = 256;
+    rendered = 0;
+    expected = 0;
+    TgaFile* file = LoadFile("partblt.tga", 0, 0);
+    RenderTarget* render = 0;
+    if (target)
+        render = target;
+    else {
+        for (int i = 0; i < displayModeCount; i++) {
+            if (displayModes[i].width == 640 && displayModes[i].height == 480 && displayModes[i].bitDepth == 16) {
+                if (!SetFullscreenDisplayMode(i, 1)) {
+                    result = -3;
+                } else {
+                    render = (new (__FILE__, 2053) PCRenderTarget)
+                                 ->InitializeRenderTarget(this, &IID_IDirect3DHALDevice, backBuffer, 1, frameBufferCount);
+                    if (render) {
+                        result = 1;
+                        g_TrackGame->renderTarget = render;
+                        g_TrackGame->display = this;
+                        break;
+                    }
+                    result = -3;
+                }
+            }
+        }
+    }
+    if (render) {
+        if (file) {
+            image = new (__FILE__, 2078) PCTextureMap(0, 0);
+            if (!image->CreateSurface(file->bits, file->width, file->height, file->width, file->width,
+                                      file->bitsPerPixel == 16 ? 0x22b : 0x378, render->surfacePixelFormat, 0, 0,
+                                      render->targetDisplay->surfacePalette, 0, 0, 2, 1, 0, 0x80, 0xff00ff)) {
+                FreeFile(file);
+                result = -2;
+            } else {
+                expected = new (__FILE__, 2097) PCTextureMap(0, 0);
+                expected->CreateSurface(0, file->width, file->height, file->width, file->width,
+                                        render->surfacePixelFormat, render->surfacePixelFormat, 0, 0,
+                                        render->targetDisplay->surfacePalette, 0, 0, 2, 1, 0, 0x80, 0xff00ff);
+                rendered = new (__FILE__, 2110) PCTextureMap(0, 0);
+                rendered->CreateSurface(0, file->width, file->height, file->width, file->width,
+                                        render->surfacePixelFormat, render->surfacePixelFormat, 0, 0,
+                                        render->targetDisplay->surfacePalette, 0, 0, 2, 1, 0, 0x80, 0xff00ff);
+                if (!rendered->CreateTextureSurface(1, 0, 1)) {
+                    FreeFile(file);
+                    result = -4;
+                } else {
+                    FreeFile(file);
+                    if (TestPartialTextureUpload((PCRenderTarget*)render, &area, image, expected, rendered, this, 1) != 1) {
+                        result = -1;
+                    } else {
+                        for (int y = 0; result == 1 && y < 256; y += 64) {
+                            tile.top = y;
+                            tile.bottom = y + 64;
+                            for (int x = 0; result == 1 && x < 256; x += 64) {
+                                tile.left = x;
+                                tile.right = x + 64;
+                                if (!TestPartialTextureUpload((PCRenderTarget*)render, &tile, image, expected, rendered,
+                                                           this, 1))
+                                    result = 0;
+                            }
+                        }
+                    }
+                }
+            }
+            if (image)
+                image->Release();
+            if (rendered)
+                rendered->Release();
+            if (expected)
+                expected->Release();
+        } else
+            result = -2;
+    }
+    if (!target && render) {
+        delete render;
+        g_TrackGame->renderTarget = 0;
+        g_TrackGame->display = 0;
+    }
+    partialTextureUploadResult = result;
+    return result;
+}
+
 // 0x004caf70: one partial-upload test: clears `rendered` and `expected`,
 // uploads `area` of `image` into `rendered`'s texture (slot 9) and blits
 // the same area into `expected`, draws `rendered` full screen and reads
@@ -645,6 +824,60 @@ int TestPartialTextureUpload(PCRenderTarget* target, Win32Rect* area, PCTextureM
     if (difference > 0.05f)
         return 0;
     return 1;
+}
+
+// Expands 16-bit 5:5:5 and 5:6:5 pixels to 0xRRGGBB (low bits zero).
+#define UNKNOWN_EXPAND_555(c) (((((c) & 0x7c00) << 3 | ((c) & 0x3e0)) << 3 | ((c) & 0x1f)) << 3)
+#define UNKNOWN_EXPAND_565(c) (((((c) & 0xf800) << 3 | ((c) & 0x7e0)) << 2 | ((c) & 0x1f)) << 3)
+
+// 0x004cb330: the mean absolute channel difference (1/256 units) of two
+// 16-bit textures of `first`'s size, or -1 when one cannot be locked.
+// Not exact (35 of 629 bytes, 620 compiled: register allocation and the x87
+// order of the three channel sums differ; docs/DISPLAY_SURFACE_HELPERS.md).
+float MeanTextureChannelDifference(TextureMap* first, TextureMap* second) {
+    long firstPitch;
+    long secondPitch;
+    unsigned short* a = (unsigned short*)first->LockSurface(0, &firstPitch, 0x811);
+    if (!a)
+        return -1.0f;
+    unsigned short* b = (unsigned short*)second->LockSurface(0, &secondPitch, 0x811);
+    if (!b) {
+        second->UnlockSurface(0);
+        return -1.0f;
+    }
+    int width = first->textureWidth;
+    int is555 = first->mapFormat == 0x22b;
+    float total = 0.0f;
+    int firstSkip = firstPitch / sizeof(unsigned short) - width;
+    int secondSkip = secondPitch / sizeof(unsigned short) - width;
+    int count = 0;
+    for (int rows = first->textureHeight; rows--;) {
+        for (int columns = width; columns--;) {
+            int pixelA;
+            int pixelB;
+            count++;
+            if (is555) {
+                pixelA = UNKNOWN_EXPAND_555(*a);
+                pixelB = UNKNOWN_EXPAND_555(*b);
+            } else {
+                pixelA = UNKNOWN_EXPAND_565(*a);
+                pixelB = UNKNOWN_EXPAND_565(*b);
+            }
+            a++;
+            b++;
+            float difference = (float)fabs(((pixelB >> 16) & 0xff) * 0.00390625f - ((pixelA >> 16) & 0xff) * 0.00390625f);
+            total += difference;
+            difference = (float)fabs(((pixelB >> 8) & 0xff) * 0.00390625f - ((pixelA >> 8) & 0xff) * 0.00390625f);
+            total += difference;
+            difference = (float)fabs((pixelB & 0xff) * 0.00390625f - (pixelA & 0xff) * 0.00390625f);
+            total += difference;
+        }
+        a += firstSkip;
+        b += secondSkip;
+    }
+    first->UnlockSurface(0);
+    second->UnlockSurface(0);
+    return total / (count * 3);
 }
 
 // 0x004cb5b0: with `enable`, flips until the GDI surface is the primary (at

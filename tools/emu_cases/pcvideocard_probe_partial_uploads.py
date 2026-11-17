@@ -5,8 +5,7 @@ The "PartialTexBlt" test (+0x5bc): loads partblt.tga, uploads it whole and then 
 0 (a tile was wrong), -1 (the full upload failed), -2 (no image or texture), -3 (no
 640 x 480 x 16 target) or -4 (no texture surface). With no target it switches to the
 640 x 480 x 16 mode, builds a temporary PCRenderTarget, publishes it in g_TrackGame
-(+0x10 the target, +0x0c the display) and deletes it again at the end. The linked body is
-samples/render/PartialTextureUploads.cpp.
+(+0x10 the target, +0x0c the display) and deletes it again at the end. The linked body is in src/reconstructed/PCVideoCard.cpp.
 
 Modelled from the case: LoadFile (0x005125c0, a TgaFile or 0), SetFullscreenDisplayMode
 (0x004ca900), new, the PCRenderTarget constructor and InitializeRenderTarget (0x004c4f80,
@@ -25,7 +24,7 @@ import struct
 
 RETAIL_VA = 0x004cab00
 SYMBOL = '?ProbePartialTextureUploads@PCVideoCard@@QAEHPAVRenderTarget@@@Z'
-SOURCE = 'samples/render/PartialTextureUploads.cpp'
+SOURCE = 'src/reconstructed/PCVideoCard.cpp'
 LOAD_FILE, FREE_FILE, SET_MODE, NEW = 0x005125c0, 0x00512dd0, 0x004ca900, 0x004a3010
 TARGET_CTOR, INIT_TARGET, TEXTURE_CTOR, TEST_UPLOAD = 0x004c4ee0, 0x004c4f80, 0x004c5f00, 0x004caf70
 TRACK_GAME = 0x0056e26c

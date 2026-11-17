@@ -10,6 +10,7 @@ from mcm2tool.coff import CoffObject
 from mcm2tool.pe import PEImage
 from mcm2tool.toolchain import find_child_ci, find_vc6_bin, infer_vc98_root, sha256_file
 from tools.match import compare
+from tools.unit_source import standalone_source
 
 ROOT = Path(__file__).resolve().parents[1]
 SYMBOL = '?MeanTextureChannelDifference@@YAMPAVTextureMap@@0@Z'
@@ -58,7 +59,14 @@ class TextureChannelDifferenceBehaviorTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix='mcm2-channel-difference-') as directory:
             output = Path(directory)
             objects = []
-            for source in ('samples/render/TextureChannelDifference.cpp', 'tests/fixtures/texture_channel_difference_compare.cpp'):
+            # The body lives in PCVideoCard.cpp; the oracle links a validation unit of
+            # the same name holding only its definition (tools/unit_source.py).
+            # The unit's 16-bit pixel expansion macros precede the definition.
+            text = (ROOT / 'src/reconstructed/PCVideoCard.cpp').read_text(encoding='latin-1')
+            macros = text[text.index('#define UNKNOWN_EXPAND_555'):text.index('// 0x004cb330')]
+            unit = output / 'PCVideoCard.cpp'
+            unit.write_text(standalone_source(ROOT / 'src/reconstructed/PCVideoCard.cpp', ['MeanTextureChannelDifference'], macros), encoding='latin-1')
+            for source in (str(unit), 'tests/fixtures/texture_channel_difference_compare.cpp'):
                 obj = output / (Path(source).stem + '.obj')
                 result = subprocess.run([sys.executable, str(ROOT / 'tools/compile.py'), str(ROOT / source),
                     '-o', str(obj), '--vc6-root', str(compiler), '--profile', 'vc6_o2_mt'],
@@ -66,7 +74,7 @@ class TextureChannelDifferenceBehaviorTests(unittest.TestCase):
                     env={**os.environ, 'PYTHONPATH': str(ROOT)})
                 self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
                 objects.append(str(obj))
-                if source.startswith('samples/'):
+                if source == str(unit):
                     candidate = CoffObject(obj)
                     self.assertEqual({s.name for s in candidate.symbols
                                       if s.storage_class == 2 and s.section_number > 0 and s.type == 0x20}, {SYMBOL})
@@ -74,7 +82,7 @@ class TextureChannelDifferenceBehaviorTests(unittest.TestCase):
                     self.assertEqual(entry.extent_source, 'coff_function_aux')
                     self.assertEqual(entry.function_size, 620)
                     report = compare(retail, candidate, SYMBOL, 0x4cb330, 629,
-                                     ROOT / 'samples/render/TextureChannelDifference.bindings.json')
+                                     ROOT / 'src/reconstructed/PCVideoCard.bindings.json')
                     self.assertEqual(report['strict_match']['matching_positions'], 35)
             executable = output / 'channels.exe'
             result = subprocess.run([str(linker), '/nologo', '/subsystem:console', '/base:0x100000',

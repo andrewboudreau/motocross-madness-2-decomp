@@ -13,6 +13,7 @@ from mcm2tool.pe import PEImage
 from mcm2tool.toolchain import find_child_ci, find_vc6_bin, infer_vc98_root
 from tools.eh_funcinfo import candidate, retail, shape
 from tools.match import compare
+from tools.unit_source import standalone_source
 
 ROOT = Path(__file__).resolve().parents[1]
 SYMBOL = '?ProbePartialTextureUploads@PCVideoCard@@QAEHPAVRenderTarget@@@Z'
@@ -66,7 +67,11 @@ class PartialTextureUploadsTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix='mcm2-partial-upload-') as directory:
             output = Path(directory)
             objects = []
-            for source in ('samples/render/PartialTextureUploads.cpp',
+            # The body lives in PCVideoCard.cpp; the oracle links a validation unit of
+            # the same name holding only its definition (tools/unit_source.py).
+            unit = output / 'PCVideoCard.cpp'
+            unit.write_text(standalone_source(ROOT / 'src/reconstructed/PCVideoCard.cpp', ['PCVideoCard::ProbePartialTextureUploads']), encoding='latin-1')
+            for source in (str(unit),
                            'tests/fixtures/partial_texture_uploads_compare.cpp'):
                 obj = output / (Path(source).stem + '.obj')
                 result = subprocess.run([sys.executable, str(ROOT / 'tools/compile.py'), str(ROOT / source),
@@ -77,7 +82,7 @@ class PartialTextureUploadsTests(unittest.TestCase):
                     env={**os.environ, 'PYTHONPATH': str(ROOT)})
                 self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
                 objects.append(str(obj))
-                if source.startswith('samples/'):
+                if source == str(unit):
                     compiled = CoffObject(obj)
                     methods = {s.name for s in compiled.symbols
                                if s.storage_class == 2 and s.section_number > 0 and s.type == 0x20}
@@ -89,7 +94,7 @@ class PartialTextureUploadsTests(unittest.TestCase):
                     self.assertEqual(eh['max_state'], 4)
                     self.assertEqual(shape(candidate(obj, SYMBOL)), eh)
                     report = compare(image, compiled, SYMBOL, 0x4cab00, 1129,
-                                     ROOT / 'samples/render/PartialTextureUploads.bindings.json')
+                                     ROOT / 'src/reconstructed/PCVideoCard.bindings.json')
                     self.assertEqual(report['strict_match']['matching_positions'], 423)
             patch_file = output / 'calls.bin'
             patch_file.write_bytes(b''.join(patches))

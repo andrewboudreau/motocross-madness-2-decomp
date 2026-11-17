@@ -146,8 +146,7 @@ int EnumerateDisplays(void* window);
 int CopyRenderSurfaceToTexture(PCRenderTarget* target, TextureMap* texture);
 
 // 0x004cb330: the mean absolute channel difference (1/256 units) of two
-// 16-bit textures, or -1 when one cannot be locked (near miss,
-// samples/render/PCVideoCardNearMisses.cpp).
+// 16-bit textures, or -1 when one cannot be locked.
 float MeanTextureChannelDifference(TextureMap* first, TextureMap* second);
 
 // 0x004caf70: one PartialTexBlt pass over `area` (see PCVideoCard.cpp).

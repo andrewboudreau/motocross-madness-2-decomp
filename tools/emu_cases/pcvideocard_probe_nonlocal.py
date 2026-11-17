@@ -4,7 +4,7 @@ Whether a 128 x 128 texture of the target's pixel format can be created in non-l
 memory: with no target it first switches to the 640 x 480 x 16 mode and builds a temporary
 PCRenderTarget, then asks IDirectDraw7::CreateSurface for the texture and reads its caps
 (DDSCAPS_NONLOCALVIDMEM, 0x20000000). `*value` is cleared on every failure; the result is 1
-only when the caps carry the flag. The linked body is samples/render/NonLocalTextureMemory.cpp.
+only when the caps carry the flag. The linked body is in src/reconstructed/PCVideoCard.cpp.
 
 Fake COM objects: the card's IDirectDraw7 (+0x190) answers CreateSurface (slot 6) with a
 case-chosen HRESULT and writes a fake surface whose GetCaps (slot 14) returns a case-chosen
@@ -24,7 +24,7 @@ import struct
 
 RETAIL_VA = 0x004ca5a0
 SYMBOL = '?ProbeNonLocalTextureMemory@PCVideoCard@@QAEHPAHPAVRenderTarget@@@Z'
-SOURCE = 'samples/render/NonLocalTextureMemory.cpp'
+SOURCE = 'src/reconstructed/PCVideoCard.cpp'
 SET_MODE, NEW, TARGET_CTOR, INIT_TARGET = 0x004ca900, 0x004a3010, 0x004c4ee0, 0x004c4f80
 PROBES = {0x004ca616: 'set 640x480x16', 0x004ca674: 'temporary target', 0x004ca6f8: 'GetCaps',
           0x004ca718: 'non-local', 0x004ca746: 'delete temporary', 0x004ca75a: 'delete after failure'}
