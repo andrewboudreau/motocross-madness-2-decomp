@@ -1,6 +1,6 @@
 """DrawableGridNode::WalkVisibilityQuadrants 0x00481de0 (tools/emu_diff.py case).
 
-Linked from samples/render/GriddrawNearMisses.cpp. A root node (layout from
+Linked from src/reconstructed/Griddraw.cpp. A root node (layout from
 src/reconstructed/Griddraw.h: children +0x04, parent +0x08, terrain +0x34, data +0x38,
 childMask +0x40, centre +0x44, extent +0x50; data flags b0/b1 at +0x121) with a 16 x 16
 child table at a random density. Children carry a random childMask (0, full 0x1fffff or
@@ -19,7 +19,7 @@ import struct
 
 RETAIL_VA = 0x00481de0
 SYMBOL = '?WalkVisibilityQuadrants@DrawableGridNode@@QAEHPAX0PAM1HHHHHH@Z'
-SOURCE = 'samples/render/GriddrawNearMisses.cpp'
+SOURCE = 'src/reconstructed/Griddraw.cpp'
 CLIPPER = 0x00575a98
 PROBES = {0x00481e76: 'size16 LOD', 0x0048202e: 'quadrant recursion', 0x004821ba: 'all-corners LOD',
           0x00482271: 'child walk', 0x00482311: 'leaf TestBox', 0x00482366: 'leaf release',

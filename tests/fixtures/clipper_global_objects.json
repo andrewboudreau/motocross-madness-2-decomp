@@ -35,9 +35,9 @@
       "sha256": "766f194379cdbfc3292a3055f22bd19f4b2c8a21cbc22d06887a86d66a73ecc6"
     },
     "src/reconstructed/Griddraw.cpp": {
-      "sections": 89,
-      "relocations": 503,
-      "sha256": "a69b80d34a2077c7af4a26514649e052eee259d74529341f39f7d3f53300b0c1"
+      "sections": 99,
+      "relocations": 615,
+      "sha256": "42b3553c8d71132b9c9ef26dcc1b4679f219b8e6f7bac8b9467d112540857088"
     },
     "src/krusty2/shadow/D3DIMSoultreeShadow.cpp": {
       "sections": 47,
@@ -48,11 +48,6 @@
       "sections": 88,
       "relocations": 342,
       "sha256": "f24a24b36685a81b28078f57a1c2f31715fe3273b66329c57adfd9e92b6bfa32"
-    },
-    "samples/render/GriddrawNearMisses.cpp": {
-      "sections": 16,
-      "relocations": 112,
-      "sha256": "fc35d329805cb3005782232c9b478e877dfe37d6ebd7d712d5eda27a5b17a38c"
     },
     "samples/physics/shadow/D3DIMSoultreeShadowNearMisses.cpp": {
       "sections": 7,
@@ -75,10 +70,9 @@
     "src/reconstructed/FollowCamera.cpp": 1,
     "src/reconstructed/TrackOverlay.cpp": 1,
     "src/reconstructed/EcoSystem.cpp": 1,
-    "src/reconstructed/Griddraw.cpp": 1,
+    "src/reconstructed/Griddraw.cpp": 3,
     "src/krusty2/shadow/D3DIMSoultreeShadow.cpp": 1,
     "src/krusty2/visibility/VisibilityQuadTree.cpp": 16,
-    "samples/render/GriddrawNearMisses.cpp": 2,
     "samples/physics/shadow/D3DIMSoultreeShadowNearMisses.cpp": 1,
     "samples/physics/visibility/VisibilityQuadTreeTraversal.cpp": 16,
     "src/krusty2/broadphase/Terrain.cpp": 0

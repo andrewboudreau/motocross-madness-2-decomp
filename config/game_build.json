@@ -295,12 +295,6 @@
       "evidence": "docs/GAME_BUILD.md#collision-and-terrain-bodies-checked-by-emulation"
     },
     {
-      "path": "samples/render/GriddrawNearMisses.cpp",
-      "status": "reviewed-nonexact",
-      "reason": "Near-miss body admitted so the source build can link and run; defines DrawableGridNode::ComputeViewerDetail, DrawableGridNode::RebuildBlockBuffers, DrawableGridNode::WalkVisibilityQuadrants, GridVertexCache::GetVertex. Differential review against retail (tools/emu_diff.py, re-run 2026-11-16): grid_viewer_detail 0x4815e0 0 of 200 runs differ; grid_walk_visibility 0x481de0 0 of 80 runs differ; grid_vertex_cache_get_vertex 0x47de90 0 of 300 runs differ; grid_rebuild_block_buffers 0x47f210 0 of 120 runs differ. Bytes nonexact.",
-      "evidence": "docs/GAME_BUILD.md#best-guess-review"
-    },
-    {
       "path": "samples/render/PixtransNearMisses.cpp",
       "status": "reviewed-nonexact",
       "reason": "Near-miss body admitted so the source build can link and run; defines DitherConvert, Halve1555, Halve8, Halve8888. Halve8888 and Halve1555 pass the native retail differential test (tests/test_pixtrans_halve_behavior.py) and the emu_diff cases halve8888/halve1555; DitherConvert agrees with retail in the dither_convert emu_diff case; Halve8 is checked against the retail disassembly only; bytes nonexact. Differential review against retail (tools/emu_diff.py, re-run 2026-11-16): halve8888 0x4cdf10 0 of 60 runs differ; halve1555 0x4ce420 0 of 60 runs differ; halve8 0x4cee30 0 of 100 runs differ; dither_convert 0x4cf2a0 0 of 60 runs differ. Bytes nonexact.",

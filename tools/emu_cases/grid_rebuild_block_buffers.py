@@ -1,7 +1,7 @@
 """DrawableGridNode::RebuildBlockBuffers 0x0047f210, the per-block vertex and index buffer
 rebuild (tools/emu_diff.py case, call-record/replay mode).
 
-The linked body is samples/render/GriddrawNearMisses.cpp. For each of the sixteen 4 x 4 blocks
+The linked body is in src/reconstructed/Griddraw.cpp. For each of the sixteen 4 x 4 blocks
 the node's GetBlockTextureSize (slot 8, answering 0x40 or not, which scales the texture step by
 4) is asked, the vertex cache 0x00677910 is reset (Reset 0x0047de20: count 0, an empty height
 range) and EmitDiagonalTriangles 0x0047fce0 and AppendCornerTriangle 0x00480700 are replayed:
@@ -21,7 +21,7 @@ import struct
 
 RETAIL_VA = 0x0047f210
 SYMBOL = '?RebuildBlockBuffers@DrawableGridNode@@QAEHXZ'
-SOURCE = 'samples/render/GriddrawNearMisses.cpp'
+SOURCE = 'src/reconstructed/Griddraw.cpp'
 PROBES = {0x0047f32d: 'corner 1', 0x0047f38c: 'corner 2', 0x0047f4b4: 'vertex grow', 0x0047f4f7: 'vertex free',
           0x0047f590: 'index grow', 0x0047f5d3: 'index free', 0x0047f600: 'copy', 0x0047f6eb: 'register'}
 

@@ -61,9 +61,9 @@ undefined external in every affected object.
 `tests/test_clipper_global_connections.py` compiles the actual sources with
 authentic VC6 SP3 and checks:
 
-- 351 complete strict calibration/physics comparisons.
-- Fourteen complete canonical and sample objects: 1,024 nondebug sections and
-  4,728 relocations, including Terrain's 87 sections and 528 relocations.
+- 353 complete strict calibration/physics comparisons.
+- Ten complete canonical and sample objects: 940 nondebug sections and
+  4,589 relocations, including Terrain's 87 sections and 528 relocations.
 - All section flags, complete payloads, relocation types/addends and defined
   target section/offset identities. External identities change only under the
   six enumerated pointer-name substitutions.

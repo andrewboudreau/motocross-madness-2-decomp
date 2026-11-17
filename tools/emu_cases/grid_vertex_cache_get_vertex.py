@@ -1,6 +1,6 @@
 """GridVertexCache::GetVertex 0x0047de90 (tools/emu_diff.py case).
 
-Linked from samples/render/GriddrawNearMisses.cpp. The cache (layout in
+Linked from src/reconstructed/Griddraw.cpp. The cache (layout in
 src/reconstructed/Griddraw.h: node +0, stamp +4, slots +8, vertices +0x910, count +0x2d30 and
 the latched parameters up to +0x2d70) is a fresh heap copy with random slot stamps below,
 at and above the frame stamp, a count of 0 (the first vertex latches the node) or a few, and
@@ -16,7 +16,7 @@ import struct
 
 RETAIL_VA = 0x0047de90
 SYMBOL = '?GetVertex@GridVertexCache@@QAEHHH@Z'
-SOURCE = 'samples/render/GriddrawNearMisses.cpp'
+SOURCE = 'src/reconstructed/Griddraw.cpp'
 NORMAL_SCALE = 0x0056c204
 ORIGIN_X = 0x006754dc
 ORIGIN_Z = 0x0067a688

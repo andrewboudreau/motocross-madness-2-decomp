@@ -78,7 +78,7 @@ The existing behavior is retained, including its accounting details:
 ## Validation
 
 `tests/test_age_manager_connections.py` compiles the affected canonical and
-sample translation units and retains **175 complete strict comparisons**.
+sample translation units and retains **179 complete strict comparisons**.
 It checks actual COFF imports/definitions, the shared layouts, the two callback
 signatures and the retail indirect callback sequence. Reconstructed consumers
 compile without an added physics include path; TerrainShadow uses its normal
@@ -103,7 +103,8 @@ The reports are `work/game-build/age-object-preservation.json` and
 `age-renames.json`. Separate checks preserve all 20 complete function bodies
 and relocation records across EcoSystemNearMisses, GridNodeNearMisses and
 GridNode (`age-extra-preservation.json`). The baseline is `364d4e27`.
-EcoSystemNearMisses has since been folded into EcoSystem.cpp.
+EcoSystemNearMisses has since been folded into EcoSystem.cpp, and
+GriddrawNearMisses into Griddraw.cpp.
 
 The isolated source build `build-ev5772um` compiles all 201 translation units
 and reduces unresolved symbols from 515 to 509, with six missing names

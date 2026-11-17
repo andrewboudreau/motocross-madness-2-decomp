@@ -55,6 +55,7 @@ int g_gridQuadOrder[16] = {
 extern int g_gridDrawMemory;      // bytes held by node vertex buffers
 extern int g_gridDrawFrameCount;  // top-level node visits
 extern int g_gridDrawMemoryPeak;  // 0x0068a2fc, high-water mark of g_gridDrawMemory
+extern int g_gridBoxTests;        // 0x0068a084, box tests this frame
 float FastSqrt(float x);         // 0x00460b50
 
 int g_gridSize = 1 << (g_gridLevels - 1);               // 0x0067a684 ($E 0x0047ddb0)
@@ -85,6 +86,74 @@ void GridVertexCache::Reset(DrawableGridNode* newNode)
     }
     if (node == 0)
         memset(vertices, 0, sizeof(vertices));
+}
+
+// 0x0047de90. Not exact (1069 of 1194 bytes, 1187 compiled: VC6 keeps x, z and the
+// slot index in esi, ebp and edi where retail has ebp, edi and esi;
+// docs/GRIDDRAW.md forms tried)
+// Index of vertex (x, z) of the current node in the vertex list, appending
+// it on first use this frame. The first vertex of a node latches the
+// node's parameters.
+int GridVertexCache::GetVertex(int x, int z)
+{
+    int i = g_gridRow17[z] + x;
+    if (slots[i].stamp < stamp) {
+        if (count == 0) {
+            originX = node->gridX;
+            originZ = node->gridZ;
+            shift = node->shift;
+            cells = node->block->cells;
+            reliefScale = node->reliefScale;
+            texOriginV = node->data->texOriginV;
+            texOriginU = node->data->texOriginU;
+            texStep = node->data->texStep;
+            field_0x2d54 = count;
+            scale = node->terrain->gridCellSize;
+            minY = FLT_MAX;
+            maxY = -FLT_MAX;
+            lowestQualityOverride = node->terrain->lowestQualityOverride;
+            unlitColor = node->terrain->field_0xc9c;
+            unlitSpecular = node->terrain->field_0xca0;
+            detailTexScale = g_gridDrawNormalScale;
+            if (node->level == 1)
+                detailTexScale = g_gridDrawNormalScale * 16.0f;
+        }
+        vertices[count].x = (float)((originX + x) << shift) * scale;
+        vertices[count].z = (float)((originZ + z) << shift) * scale;
+        int base = node->block->baseHeight;
+        vertices[count].y = ((float)(cells[i].height - base) * node->reliefScale + base) * node->heightScale * scale;
+        if (vertices[count].y < minY)
+            minY = vertices[count].y;
+        if (vertices[count].y > maxY)
+            maxY = vertices[count].y;
+        if (node->data->b2) {
+            if (node->reliefScale < 0.0) {
+                vertices[count].nx = -cells[i].normal[0] * (1.0f / 127.0f);
+                vertices[count].ny = cells[i].normal[1] * (1.0f / 127.0f);
+                vertices[count].nz = -cells[i].normal[2] * (1.0f / 127.0f);
+            } else {
+                vertices[count].nx = cells[i].normal[0] * (1.0f / 127.0f);
+                vertices[count].ny = cells[i].normal[1] * (1.0f / 127.0f);
+                vertices[count].nz = cells[i].normal[2] * (1.0f / 127.0f);
+            }
+        } else if (lowestQualityOverride) {
+            vertices[count].packed = 0;
+            vertices[count].u = ((x - g_gridOriginX) * texStep + texOriginU) * 0.9375f + 0.03125f;
+            vertices[count].v = ((z - g_gridOriginZ) * texStep + texOriginV) * 0.9375f + 0.03125f;
+            vertices[count].ny = (x - g_gridOriginX) * detailTexScale;
+            vertices[count].nz = (z - g_gridOriginZ) * detailTexScale;
+        } else {
+            vertices[count].ny = unlitColor;
+            vertices[count].nz = unlitSpecular;
+            vertices[count].u = ((x - g_gridOriginX) * texStep + texOriginU) * 0.9375f + 0.03125f;
+            vertices[count].v = ((z - g_gridOriginZ) * texStep + texOriginV) * 0.9375f + 0.03125f;
+            vertices[count].packed = ((x - g_gridOriginX) << 16) + (z - g_gridOriginZ);
+        }
+        slots[i].index = count;
+        slots[i].stamp = stamp;
+        count++;
+    }
+    return slots[i].index;
 }
 
 // 0x0047e340: the two neighbours (x0, z0) and (x1, z1) a vertex at (x, z)
@@ -476,6 +545,135 @@ int DrawableGridNode::WalkVisibleQuadrants(int x, int z, int size, int quad)
     }
     if (parent)
         ((DrawableGridNode*)parent)->data->childTriangleCount += data->childTriangleCount + data->triangleCount;
+    return 1;
+}
+
+// 0x0047f210. Not exact (426 of 1576 bytes, 1586 compiled: x and the triangle-count
+// copy swap edi/esi, two pairs of frame slots swap, minY loads before maxY and
+// a dead vertexStart * 32 is stored;
+// docs/GRIDDRAW.md forms tried)
+// Rebuilds the node's vertex and index buffers block by block, recording
+// each 4 x 4 block's vertex and index range, and sets the texture origin.
+// Returns 0 when an allocation fails.
+int DrawableGridNode::RebuildBlockBuffers()
+{
+    int x;
+    int z = 0;
+    int indexTotal = 0;
+    int before = data->triangleCount;
+    terrain->bufferRebuilds++;
+    int block = 0;
+    int vertexTotal = 0;
+    int bz;
+    float saved = data->texStep;
+    for (bz = 0; bz < 16; bz += 4) {
+        x = 0;
+        for (int bx = 0; bx < 16; bx += 4) {
+            int closed;
+            int triangles;
+            int prevTriangles;
+            int size = GetBlockTextureSize(block);
+            data->texStep = saved;
+            if (size == 0x40)
+                data->texStep *= 4.0f;
+            g_gridVertexCache.Reset(this);
+            g_gridOriginX = bx;
+            g_gridOriginZ = bz;
+            int vertexStart = vertexTotal;
+            int indexStart = indexTotal;
+            triangles = 0;
+            prevTriangles = triangles;
+            triangles = EmitDiagonalTriangles(4, triangles, x, z + 4, 2, -2, &closed);
+            if (triangles == prevTriangles && (data->b0 ? 0 : data->childTriangleCount) == 0 && parent &&
+                ((DrawableGridNode*)parent)->extra->texture == 0)
+                triangles = AppendCornerTriangle(triangles, x, z + 4, 4, -4);
+            prevTriangles = triangles;
+            x += 4;
+            triangles = EmitDiagonalTriangles(4, triangles, x, z, -2, 2, &closed);
+            if (triangles == prevTriangles && (data->b0 ? 0 : data->childTriangleCount) == 0 && parent &&
+                ((DrawableGridNode*)parent)->extra->texture == 0)
+                triangles = AppendCornerTriangle(triangles, x, z, -4, 4);
+            vertexTotal += g_gridVertexCache.count;
+            indexTotal += triangles * 3;
+            ((GridBlockRange*)data->blockRanges)[block].centerY =
+                (g_gridVertexCache.maxY + g_gridVertexCache.minY) * 0.5f;
+            ((GridBlockRange*)data->blockRanges)[block].extentY =
+                (g_gridVertexCache.maxY - g_gridVertexCache.minY) * terrain->gridCellSize * 0.5f;
+            ((GridBlockRange*)data->blockRanges)[block].end = vertexTotal;
+            ((GridBlockRange*)data->blockRanges)[block].indexEnd = indexTotal;
+            extra->blockRecords[block].mappingScale = 1.0f;
+            extra->blockRecords[block].mappingOffsetU = 0;
+            extra->blockRecords[block].mappingOffsetV = 0;
+            if (triangles != 0) {
+                int vertexBytes = vertexTotal * 32;
+                int indexBytes = (indexTotal + vertexTotal) * 2;
+                if (data->vertexBuffer == 0 || vertexBytes > data->vertexBufferBytes) {
+                    g_gridDrawMemory -= data->vertexBufferBytes;
+                    void* old = data->vertexBuffer;
+                    int oldSize = data->vertexBufferBytes;
+                    data->vertexBufferBytes = vertexBytes + 0x80;
+                    data->vertexBuffer = DebugMalloc(data->vertexBufferBytes, __FILE__, 1077);
+                    if (data->vertexBuffer == 0) {
+                        data->vertexBufferBytes = 0;
+                        data->vertexCount = 0;
+                        data->indexCount = 0;
+                        return 0;
+                    }
+                    if (old) {
+                        memcpy(data->vertexBuffer, old, oldSize);
+                        DebugFree(old, __FILE__, 1085);
+                    }
+                    g_gridDrawMemory += data->vertexBufferBytes;
+                    if (g_gridDrawMemory > g_gridDrawMemoryPeak)
+                        g_gridDrawMemoryPeak = g_gridDrawMemory;
+                }
+                if (data->indexBuffer == 0 || indexBytes > data->indexBufferBytes) {
+                    g_gridDrawMemory -= data->indexBufferBytes;
+                    void* old = data->indexBuffer;
+                    int oldSize = data->indexBufferBytes;
+                    data->indexBufferBytes = indexBytes + 0x20;
+                    data->indexBuffer = DebugMalloc(data->indexBufferBytes, __FILE__, 1098);
+                    if (data->indexBuffer == 0) {
+                        data->indexBuffer = 0;
+                        data->indexBufferBytes = 0;
+                        data->vertexCount = 0;
+                        data->indexCount = 0;
+                        return 0;
+                    }
+                    if (old) {
+                        memcpy(data->indexBuffer, old, oldSize);
+                        DebugFree(old, __FILE__, 1107);
+                    }
+                    g_gridDrawMemory += data->indexBufferBytes;
+                    if (g_gridDrawMemory > g_gridDrawMemoryPeak)
+                        g_gridDrawMemoryPeak = g_gridDrawMemory;
+                }
+                memcpy((GridVertex*)data->vertexBuffer + vertexStart, g_gridVertexCache.vertices,
+                       (vertexTotal - vertexStart) * 32);
+                memcpy((unsigned short*)data->indexBuffer + indexStart, g_gridIndices,
+                       (indexTotal - indexStart) * 2);
+            }
+            block++;
+        }
+        z += 4;
+    }
+    if (data->ageEntry.size == 0)
+        terrain->ageManager->Register(&data->ageEntry, EvictNodeBuffers, this, 0,
+                                                   data->indexBufferBytes + data->vertexBufferBytes);
+    else if (data->ageEntry.size != data->indexBufferBytes + data->vertexBufferBytes)
+        data->ageEntry.size = data->indexBufferBytes + data->vertexBufferBytes;
+    data->vertexCount = vertexTotal;
+    data->indexCount = indexTotal;
+    data->triangleCount = indexTotal / 3;
+    if ((data->triangleCount == 0 || before == 0) && data->triangleCount != before && parent)
+        ((DrawableGridNode*)parent)->data->b1 = 1;
+    if ((data->triangleCount == 0 || before == 0) && data->triangleCount != before && parent)
+        ((DrawableGridNode*)parent)->data->b1 = 1;
+    if (data->triangleCount == 0) {
+        data->vertexCount = 0;
+        data->indexCount = 0;
+    }
+    data->texStep = saved;
     return 1;
 }
 
@@ -1153,6 +1351,366 @@ void DrawableGridNode::TestDroppableVertices()
     }
 }
 
+// 0x004815e0. Not exact (64 of 1082 bytes, 1083 compiled: retail keeps the two axis
+// deltas on the x87 stack across the three-way branch; VC6 stores and reloads
+// them, which shifts the frame;
+// docs/GRIDDRAW.md forms tried)
+// The squared near and far distances of the viewer to the node's x and z
+// range, the y delta and the distance (FastSqrt); the two 16-bit detail
+// words are (dy * dy / nearest + nearest) * +0x174 * +0x74, nearest being
+// the closest of the three distances, clamped to 65535.
+float DrawableGridNode::ComputeViewerDetail(int coarse)
+{
+    float nearX;
+    float farX;
+    float nearZ;
+    float farZ;
+    GridTerrain* grid = terrain;
+    GridNodeDrawData* drawData = data;
+    float ax = grid->viewerX - drawData->gridMinX;
+    float bx = grid->viewerX - drawData->gridMaxX;
+    if (ax < 0.0f) {
+        nearX = ax * ax;
+        farX = bx * bx;
+    } else if (bx > 0.0f) {
+        nearX = bx * bx;
+        farX = ax * ax;
+    } else {
+        nearX = 0.0f;
+        float farOffset =
+            ((grid->viewerX + grid->viewerX < drawData->gridMinX + drawData->gridMaxX)
+                 ? drawData->gridMaxX : drawData->gridMinX) - grid->viewerX;
+        farX = farOffset * farOffset;
+    }
+    float az = grid->viewerZ - drawData->gridMinZ;
+    float bz = grid->viewerZ - drawData->gridMaxZ;
+    if (az < 0.0f) {
+        nearZ = az * az;
+        farZ = bz * bz;
+    } else if (bz > 0.0f) {
+        nearZ = bz * bz;
+        farZ = az * az;
+    } else {
+        nearZ = 0.0f;
+        float farOffset =
+            ((grid->viewerZ + grid->viewerZ < drawData->gridMaxZ + drawData->gridMinZ)
+                 ? drawData->gridMaxZ : drawData->gridMinZ) - grid->viewerZ;
+        farZ = farOffset * farOffset;
+    }
+    float near2 = nearZ + nearX;
+    float far2 = farZ + farX;
+    float dyLo = grid->viewerY - minHeight;
+    float dyHi = grid->viewerY - maxHeight;
+    float dy;
+    float dySq;
+    if (dyLo < 0.0f) {
+        dy = dyLo;
+        dySq = dyLo * dyLo;
+    } else if (dyHi > 0.0f) {
+        dy = dyHi;
+        dySq = dyHi * dyHi;
+    } else {
+        dySq = 0.0f;
+        dy = 0.0f;
+    }
+    float distance = FastSqrt(dySq + near2);
+    if (coarse)
+        return distance;
+    terrain->detailUpdates++;
+    data->previousLowerErrorLimit = data->lowerErrorLimit;
+    data->previousUpperErrorLimit = data->upperErrorLimit;
+    if (terrain->appliedDrawDistance == 0) {
+        data->upperErrorLimit = 0;
+    } else if (near2 == 0.0f) {
+        data->upperErrorLimit = 0xffff;
+    } else if (far2 == 0.0f) {
+        data->upperErrorLimit = 0xffff;
+    } else {
+        float nearDist = FastSqrt(near2);
+        float farDist = FastSqrt(far2);
+        float nearest;
+        if (dySq < near2)
+            nearest = nearDist;
+        else if (dySq > far2)
+            nearest = farDist;
+        else
+            nearest = dy;
+        float lowerError = (dySq / nearest + nearest) * data->inverseErrorScale * terrain->drawDistanceRatio;
+        data->lowerErrorLimit = (lowerError >= 65535.0f) ? 0xffff : (unsigned short)(int)lowerError;
+        if (dyLo < 0.0f)
+            dyLo = -dyLo;
+        if (dyHi < 0.0f)
+            dyHi = -dyHi;
+        float maxDy = (dyLo > dyHi) ? dyLo : dyHi;
+        maxDy = maxDy * maxDy;
+        float ratioNear = (maxDy + near2) / nearDist;
+        float ratioFar = (maxDy + far2) / farDist;
+        float upperError = ((ratioNear > ratioFar) ? ratioNear : ratioFar)
+            * (data->inverseErrorScale * terrain->drawDistanceRatio);
+        data->upperErrorLimit = (upperError >= 65535.0f) ? 0xffff : (unsigned short)(int)upperError;
+        return distance;
+    }
+    float nearest;
+    if (dySq < near2)
+        nearest = FastSqrt(near2);
+    else if (dySq > far2)
+        nearest = FastSqrt(far2);
+    else
+        nearest = dy;
+    data->lowerErrorLimit =
+        (unsigned short)(int)((dySq / nearest + nearest) * data->inverseErrorScale
+                              * terrain->drawDistanceRatio);
+    if (data->lowerErrorLimit > 0xffff)
+        data->lowerErrorLimit = 0xffff;
+    return distance;
+}
+
+// 0x00481a20: frustum test of 4 x 4 block `block` (Z order); records the
+// result in bit `block` of the draw data's +0x178 mask.
+int DrawableGridNode::TestBlockFrustum(int block)
+{
+    float boxExtent[3];
+    float boxCenter[3];
+    float size = (data->gridMaxX - data->gridMinX) * terrain->gridCellSize * 0.25f;
+    float half = size * 0.5f;
+    boxExtent[0] = half;
+    boxExtent[2] = half;
+    boxExtent[1] = ((GridBlockRange*)data->blockRanges)[block].extentY;
+    boxCenter[0] = (block % 4) * size + data->gridMinX * terrain->gridCellSize + half;
+    boxCenter[2] = (block / 4) * size + data->gridMinZ * terrain->gridCellSize + half;
+    boxCenter[1] = ((GridBlockRange*)data->blockRanges)[block].centerY;
+    int visible = reinterpret_cast<GridVisibilityClipper*>(g_visibilityClipper)->TestBox(terrain->camera, terrain->camera->matrix,
+                                               boxCenter, boxExtent, 0, 0, 0);
+    if (visible)
+        data->visibleBlockMask |= 1 << block;
+    else
+        data->visibleBlockMask &= ~(1 << block);
+    return visible;
+}
+
+// 0x00481b30: distance from the viewer to a 4 x 4 block's box.
+float DrawableGridNode::BlockDistance(int block)
+{
+    float ex = terrain->viewerX;
+    float ey = terrain->viewerY;
+    float ez = terrain->viewerZ;
+    float size = (data->gridMaxX - data->gridMinX) * 0.25f;
+    float minX = (block % 4) * size + data->gridMinX;
+    float maxX = minX + size;
+    float minZ = (block / 4) * size + data->gridMinZ;
+    float maxZ = minZ + size;
+    // Squared distances from the viewer to the block's x and z ranges; each
+    // bound is replaced by the viewer's offset from it. (With separate delta
+    // locals VC6 folds the single-use maxX into minX + size; retail stores it.)
+    float distX;
+    if ((minX = ex - minX) < 0.0f)
+        distX = minX * minX;
+    else if ((maxX = ex - maxX) > 0.0f)
+        distX = maxX * maxX;
+    else
+        distX = 0.0f;
+    float distZ;
+    if ((minZ = ez - minZ) < 0.0f)
+        distZ = minZ * minZ;
+    else if ((maxZ = ez - maxZ) > 0.0f)
+        distZ = maxZ * maxZ;
+    else
+        distZ = 0.0f;
+    float dist = distX + distZ;
+    float distY;
+    float below = ey - minHeight;
+    float above = ey - maxHeight;
+    if (below < 0.0f)
+        distY = below * below;
+    else if (above > 0.0f)
+        distY = above * above;
+    else
+        distY = 0.0f;
+    return FastSqrt(distY + dist);
+}
+
+// 0x00481cc0: screen-space error test of vertex (x, z): returns 1 when the
+// vertex's curve error, seen from the viewer, is small enough to drop it.
+int DrawableGridNode::CanDropVertex(int x, int z)
+{
+    GridBaseCell* cell = &block->cells[g_gridRow17[z] + x];
+    float error = (float)g_gridBaseCurve[cell->errorIndex] * heightScale * reliefScale;
+    float dx = terrain->viewerX - (float)((gridX + x) << shift);
+    float dz = terrain->viewerZ - (float)((gridZ + z) << shift);
+    float dy = terrain->viewerY -
+               ((float)(cell->height - block->baseHeight) * reliefScale + block->baseHeight) * heightScale;
+    float horizontal = dx * dx + dz * dz;
+    float distance = dy * dy + horizontal;
+    float limit = distance * terrain->drawDistanceRatioSquared * distance;
+    terrain->vertexErrorTests++;
+    if (horizontal * error * error <= limit)
+        return 1;
+    return 0;
+}
+
+// 0x00481db0: the root call of the visibility walk 0x00481de0 with the
+// node's bounding box (+0x44 centre, +0x50 half extents).
+int DrawableGridNode::TestVisibility(void* stream, void* screenMatrix)
+{
+    return WalkVisibilityQuadrants(stream, screenMatrix, &center.x, &extent.x, 0, 0, 16, 0, 0, 0);
+}
+
+// 0x00481de0. Not exact (73 of 1750 bytes, 1712 compiled: VC6 keeps extent in
+// ebp and screenMatrix in ebx where retail keeps size in ebx and screenMatrix in
+// ebp, and places the subdivision block after the general tests;
+// docs/GRIDDRAW.md forms tried)
+// Tests the node's box (or the four quadrant boxes, recursively, down to
+// the child blocks) against the clipper and updates the child mask. `depth`
+// is the recursion level and `path` the quadrant path; the child blocks'
+// masks are set to 0x3fffff (all visible), 0x1fffff (leaf) or cleared with
+// 0x00464e90. On the size 16 path with data->b0 set retail carries
+// coarse = 1 (ebx, 0x00481e8a) into every later call.
+int DrawableGridNode::WalkVisibilityQuadrants(void* stream, void* screenMatrix, float* center, float* extent, int x, int z,
+                                            int size, int depth, int path, int coarse)
+{
+    int count = 0;
+    int changed = 0;
+    int oldMask = childMask;
+    int visible;
+    int corners;
+    int i;
+    int j;
+    if (size > 1) {
+        g_gridBoxTests++;
+        visible = reinterpret_cast<GridVisibilityClipper*>(g_visibilityClipper)->TestBox(terrain->renderer->camera, (float*)screenMatrix, center, extent, 0, &corners, 0);
+        if (corners != 8)
+            corners = 0;
+        if (size == 16) {
+            if (visible) {
+                UpdateLevelOfDetail((FileStream*)stream, screenMatrix, 0, coarse);
+                if (data->b0) {
+                    coarse = 1;
+                    count = 1;
+                    if (childMask == 0) {
+                        childMask = 1;
+                        changed = 1;
+                    }
+                } else {
+                    childMask = 0;
+                }
+            } else {
+                childMask = 0;
+            }
+        }
+    } else {
+        visible = 1;
+        corners = 0;
+    }
+    if (visible) {
+        if (corners != 0) {
+            for (j = 0; j < size; j++) {
+                for (i = 0; i < size; i++) {
+                    DrawableGridNode* child = (DrawableGridNode*)children[g_gridRow16[z + j] + i + x];
+                    if (child) {
+                        if (child->childMask != 0x3fffff) {
+                            child->childMask = 0x3fffff;
+                            changed = 1;
+                            if (child->children)
+                                child->data->b1 = 1;
+                        }
+                        child->UpdateLevelOfDetail((FileStream*)stream, screenMatrix, 1, coarse);
+                        count++;
+                    }
+                }
+            }
+            switch (depth) {
+            case 0:
+                childMask = 0x1fffff;
+                break;
+            case 1:
+                childMask |= 0x1e0 << (path * 4);
+                break;
+            }
+        } else {
+            size >>= 1;
+            if (size) {
+                GridVec3 childExtent = GridVec3(extent[0] * 0.5f, extent[1], extent[2] * 0.5f);
+                GridVec3 c1 = GridVec3(center[0] - childExtent.x, center[1], center[2] - childExtent.z);
+                GridVec3 c2 = GridVec3(childExtent.x + center[0], center[1], center[2] - childExtent.z);
+                GridVec3 c3 = GridVec3(center[0] - childExtent.x, center[1], childExtent.z + center[2]);
+                GridVec3 c4 = GridVec3(childExtent.x + center[0], center[1], childExtent.z + center[2]);
+                count += WalkVisibilityQuadrants(stream, screenMatrix, &c1.x, &childExtent.x, x, z, size, depth + 1, path * 4, coarse);
+                count += WalkVisibilityQuadrants(stream, screenMatrix, &c2.x, &childExtent.x, x + size, z, size, depth + 1, path * 4 + 1, coarse);
+                count += WalkVisibilityQuadrants(stream, screenMatrix, &c3.x, &childExtent.x, x, z + size, size, depth + 1, path * 4 + 2, coarse);
+                count += WalkVisibilityQuadrants(stream, screenMatrix, &c4.x, &childExtent.x, x + size, z + size, size, depth + 1, path * 4 + 3, coarse);
+            } else {
+                DrawableGridNode* child = (DrawableGridNode*)children[g_gridRow16[z] + x];
+                if (child) {
+                    if (child->children) {
+                        count += child->WalkVisibilityQuadrants(stream, screenMatrix, &child->center.x, &child->extent.x, 0, 0, 16, 0, 0, coarse);
+                        child->data->b1 = 1;
+                    } else {
+                        int dummy;
+                        g_gridBoxTests++;
+                        if (reinterpret_cast<GridVisibilityClipper*>(g_visibilityClipper)->TestBox(terrain->renderer->camera, (float*)screenMatrix, &child->center.x,
+                                                         &child->extent.x, 0, 0, &dummy)) {
+                            if (child->childMask != 0x1fffff) {
+                                child->childMask = 0x1fffff;
+                                changed = 1;
+                            }
+                            child->UpdateLevelOfDetail((FileStream*)stream, screenMatrix, 0, coarse);
+                            count++;
+                        } else if (child->childMask) {
+                            child->childMask = 0;
+                            changed = 1;
+                            child->OnMaskCleared();
+                        }
+                    }
+                }
+            }
+        }
+        if ((corners == 0 && size == 8) || size == 16) {
+            if (count == 0)
+                childMask = 0;
+            else if (childMask == 0)
+                changed = 1;
+        }
+    } else {
+        for (j = 0; j < size; j++) {
+            for (i = 0; i < size; i++) {
+                DrawableGridNode* child = (DrawableGridNode*)children[g_gridRow16[z + j] + i + x];
+                if (child && child->childMask) {
+                    child->childMask = 0;
+                    changed = 1;
+                    child->OnMaskCleared();
+                }
+            }
+        }
+    }
+    if (visible) {
+        switch (depth) {
+        case 0:
+            childMask |= 1;
+            break;
+        case 1:
+            childMask |= 2 << path;
+            return count;
+        case 2:
+            childMask |= 0x20 << path;
+            return count;
+        }
+    }
+    if (depth != 0)
+        return count;
+    if (count == 0x100)
+        childMask |= 0x200000;
+    if (changed || oldMask != childMask) {
+        DrawableGridNode* node = this;
+        do {
+            node->data->b1 = 1;
+            node = (DrawableGridNode*)node->parent;
+        } while (node);
+    }
+    if (oldMask != 0 && childMask == 0)
+        OnMaskCleared();
+    return count;
+}
+
 // 0x004824c0: updates the node's level of detail; nodes that stay coarse
 // release their children's buffers, finer ones load their child nodes from
 // the stream on first use (the same layout 0x0047e600 reads).
@@ -1693,94 +2251,4 @@ void DrawableGridNode::PropagateBorderChange(DrawableGridNode* child, int x, int
                                                         child->level);
         }
     }
-}
-
-// 0x00481a20: frustum test of 4 x 4 block `block` (Z order); records the
-// result in bit `block` of the draw data's +0x178 mask.
-int DrawableGridNode::TestBlockFrustum(int block)
-{
-    float boxExtent[3];
-    float boxCenter[3];
-    float size = (data->gridMaxX - data->gridMinX) * terrain->gridCellSize * 0.25f;
-    float half = size * 0.5f;
-    boxExtent[0] = half;
-    boxExtent[2] = half;
-    boxExtent[1] = ((GridBlockRange*)data->blockRanges)[block].extentY;
-    boxCenter[0] = (block % 4) * size + data->gridMinX * terrain->gridCellSize + half;
-    boxCenter[2] = (block / 4) * size + data->gridMinZ * terrain->gridCellSize + half;
-    boxCenter[1] = ((GridBlockRange*)data->blockRanges)[block].centerY;
-    int visible = reinterpret_cast<GridVisibilityClipper*>(g_visibilityClipper)->TestBox(terrain->camera, terrain->camera->matrix,
-                                               boxCenter, boxExtent, 0, 0, 0);
-    if (visible)
-        data->visibleBlockMask |= 1 << block;
-    else
-        data->visibleBlockMask &= ~(1 << block);
-    return visible;
-}
-
-// 0x00481b30: distance from the viewer to a 4 x 4 block's box.
-float DrawableGridNode::BlockDistance(int block)
-{
-    float ex = terrain->viewerX;
-    float ey = terrain->viewerY;
-    float ez = terrain->viewerZ;
-    float size = (data->gridMaxX - data->gridMinX) * 0.25f;
-    float minX = (block % 4) * size + data->gridMinX;
-    float maxX = minX + size;
-    float minZ = (block / 4) * size + data->gridMinZ;
-    float maxZ = minZ + size;
-    // Squared distances from the viewer to the block's x and z ranges; each
-    // bound is replaced by the viewer's offset from it. (With separate delta
-    // locals VC6 folds the single-use maxX into minX + size; retail stores it.)
-    float distX;
-    if ((minX = ex - minX) < 0.0f)
-        distX = minX * minX;
-    else if ((maxX = ex - maxX) > 0.0f)
-        distX = maxX * maxX;
-    else
-        distX = 0.0f;
-    float distZ;
-    if ((minZ = ez - minZ) < 0.0f)
-        distZ = minZ * minZ;
-    else if ((maxZ = ez - maxZ) > 0.0f)
-        distZ = maxZ * maxZ;
-    else
-        distZ = 0.0f;
-    float dist = distX + distZ;
-    float distY;
-    float below = ey - minHeight;
-    float above = ey - maxHeight;
-    if (below < 0.0f)
-        distY = below * below;
-    else if (above > 0.0f)
-        distY = above * above;
-    else
-        distY = 0.0f;
-    return FastSqrt(distY + dist);
-}
-
-// 0x00481db0: the root call of the visibility walk 0x00481de0 with the
-// node's bounding box (+0x44 centre, +0x50 half extents).
-int DrawableGridNode::TestVisibility(void* stream, void* screenMatrix)
-{
-    return WalkVisibilityQuadrants(stream, screenMatrix, &center.x, &extent.x, 0, 0, 16, 0, 0, 0);
-}
-
-// 0x00481cc0: screen-space error test of vertex (x, z): returns 1 when the
-// vertex's curve error, seen from the viewer, is small enough to drop it.
-int DrawableGridNode::CanDropVertex(int x, int z)
-{
-    GridBaseCell* cell = &block->cells[g_gridRow17[z] + x];
-    float error = (float)g_gridBaseCurve[cell->errorIndex] * heightScale * reliefScale;
-    float dx = terrain->viewerX - (float)((gridX + x) << shift);
-    float dz = terrain->viewerZ - (float)((gridZ + z) << shift);
-    float dy = terrain->viewerY -
-               ((float)(cell->height - block->baseHeight) * reliefScale + block->baseHeight) * heightScale;
-    float horizontal = dx * dx + dz * dz;
-    float distance = dy * dy + horizontal;
-    float limit = distance * terrain->drawDistanceRatioSquared * distance;
-    terrain->vertexErrorTests++;
-    if (horizontal * error * error <= limit)
-        return 1;
-    return 0;
 }

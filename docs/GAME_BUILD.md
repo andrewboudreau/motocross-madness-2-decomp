@@ -667,10 +667,10 @@ per-function checks on random and edge inputs.
 | `TerrainShadow.cpp` | `terrain_shadow_slot27` | 0x508bc0 | 200 |
 | `VisibilityQuadTreeTraversal.cpp` | `visibility_traverse` | 0x52d610 | 300 |
 | `DebugOverlayNearMisses.cpp` | `overlay_load_font` | 0x447a00 | 200 |
-| `GriddrawNearMisses.cpp` | `grid_viewer_detail` | 0x4815e0 | 200 |
-| `GriddrawNearMisses.cpp` | `grid_walk_visibility` | 0x481de0 | 80 |
-| `GriddrawNearMisses.cpp` | `grid_vertex_cache_get_vertex` | 0x47de90 | 300 |
-| `GriddrawNearMisses.cpp` | `grid_rebuild_block_buffers` | 0x47f210 | 120 |
+| `Griddraw.cpp` | `grid_viewer_detail` | 0x4815e0 | 200 |
+| `Griddraw.cpp` | `grid_walk_visibility` | 0x481de0 | 80 |
+| `Griddraw.cpp` | `grid_vertex_cache_get_vertex` | 0x47de90 | 300 |
+| `Griddraw.cpp` | `grid_rebuild_block_buffers` | 0x47f210 | 120 |
 | `PixtransNearMisses.cpp` | `halve8888` | 0x4cdf10 | 60 |
 | `PixtransNearMisses.cpp` | `halve1555` | 0x4ce420 | 60 |
 | `PixtransNearMisses.cpp` | `halve8` | 0x4cee30 | 100 |
@@ -968,7 +968,7 @@ masked scores from `linked_accuracy.py`, before and after.
 
 | VA | Function | Provider | Before | After | Built/retail insns |
 |---|---|---|---|---|---|
-| 0x00481de0 | `DrawableGridNode::WalkVisibilityQuadrants` | GriddrawNearMisses | 0.725 | 0.733 | 499/500 |
+| 0x00481de0 | `DrawableGridNode::WalkVisibilityQuadrants` | Griddraw | 0.725 | 0.733 | 499/500 |
 | 0x004a9e80 | `KbPlayer::SetFollowedRacer` | Group3_FollowedRacer | 0.735 | 0.987 | 78/78 |
 | 0x00423ef0 | `GR_BitString::ReadBits` | BitStringRead | 0.218 | 0.505 | 50/45 |
 | 0x004a1b00 | `TransformPoints` | Group0_Math | 0.275 | 0.336 | 67/76 |

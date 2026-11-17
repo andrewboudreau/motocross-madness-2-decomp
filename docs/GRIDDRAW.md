@@ -1,8 +1,9 @@
 # Griddraw.cpp and Gridbase.cpp: the terrain height-field nodes
 
 `src/reconstructed/Griddraw.cpp` with `Griddraw.h`, and
-`src/reconstructed/Gridbase.cpp` with `Gridbase.h`. Near misses are in
-`samples/render/GriddrawNearMisses.cpp`.
+`src/reconstructed/Gridbase.cpp` with `Gridbase.h`. Griddraw.cpp holds every
+function of the unit in retail order; four are near misses with `// Not exact`
+status comments.
 
 Terrain's surface loader now writes the existing `g_gridSize` and `g_gridLevels`
 definitions from Griddraw.cpp. The decoded stores target `0x0067a684` and
@@ -164,14 +165,20 @@ Then the block distance `0x00481b30` and the direction-bit update
 
 ## Near misses
 
-See the notes at the top of `samples/render/GriddrawNearMisses.cpp`:
+These four sit in [Griddraw.cpp](../src/reconstructed/Griddraw.cpp) in retail order, each with a
+`// Not exact` status comment; the forms tried are in
+[Near misses: forms tried](#near-misses-forms-tried).
 
 | Function | Bytes | What differs |
 |---|---:|---|
-| `GridVertexCache::GetVertex` `0x0047de90` | 1069/1187 | x/z/index register assignment; the packed-word expression |
-| `0x0047f210` (per-block rebuild) | 426/1586 | x/count-copy registers, frame slots, minY/maxY load order |
-| `0x004815e0` (detail update) | 64/1083 | the two axis deltas stay on the x87 stack across the branch in retail; VC6 stores them, which shifts the frame and keeps `push edi` in the prologue |
-| `0x00481de0` (visibility walk) | 143/1712 | `extent`/`a1` in ebp/ebx where retail keeps `size`, `a9` and `a1`; the subdivision block's placement |
+| `GridVertexCache::GetVertex` `0x0047de90` | 1069/1194 (1187 compiled) | x/z/index register assignment; the packed-word expression |
+| `RebuildBlockBuffers` `0x0047f210` | 426/1576 (1586 compiled) | x/count-copy registers, frame slots, minY/maxY load order |
+| `ComputeViewerDetail` `0x004815e0` | 64/1082 (1083 compiled) | the two axis deltas stay on the x87 stack across the branch in retail; VC6 stores them, which shifts the frame and keeps `push edi` in the prologue |
+| `WalkVisibilityQuadrants` `0x00481de0` | 73/1750 (1712 compiled) | `extent`/`screenMatrix` in ebp/ebx where retail keeps `size` in ebx and `screenMatrix` in ebp; the subdivision block's placement |
+
+All four agree with retail under `tools/emu_diff.py`
+(`grid_vertex_cache_get_vertex`, `grid_rebuild_block_buffers`,
+`grid_viewer_detail`, `grid_walk_visibility`).
 
 ## Not reconstructed
 
@@ -304,3 +311,142 @@ replace are in Git history. Tier 3 unless the entry says otherwise.
 - `0x00484d70` `GridNode::FindLeaf` (GridNode.cpp)
 - `0x0047e600` `ReadNode`, `0x0047ef80` `WalkVisibleQuadrants`, `0x00480940`
   `DrawVisibleQuadrants` and `0x004826d0` `PropagateFullMask` (near-miss sample)
+
+## Near misses: forms tried
+
+Carried over from the header of the former `samples/render` aggregate when
+its bodies moved into Griddraw.cpp. In the visibility-walk notes `a7`, `a8`
+and `a9` are the parameter names of that time.
+
+k-scan (s22): compiled behind 0..63 prepended typedefs, 0x0047de90,
+0x0047f210, 0x004815e0, 0x00481de0 have the same code at every
+count, so their differences are not a declaration-count effect
+(docs/VC6_OPERAND_ORDER.md section 2).
+
+### GetVertex `0x0047de90`
+
+GridVertexCache::GetVertex (0x0047de90, 1194 bytes; 1069 of 1187): control
+flow, the x87 sequences and all stores match. VC6 keeps x in esi, z in ebp
+and the slot index in edi; retail keeps x in ebp, z in edi and the index
+in esi, and computes the packed (dx << 16) + dz word as
+((gx * 0xffff + x) << 16) - gz + z. Index expression forms, a split
+declaration and seven spellings of the packed word leave both unchanged. Also
+unchanged or worse: `* 65536`/`* 0x10000` of the x difference, the shifts
+distributed over x and the origin, unsigned short casts, and `|` instead of
+`+` (the `|` form gives z retail's edi but not the x/index registers, 1084).
+dx/dz locals shared by the u, ny and packed terms give 744; the operand
+order of the index and origin sums, and ten more packed-word spellings
+(`* 65536` distributed or not, `- gz + z`, `x + -gx`), leave 1069.
+
+### RebuildBlockBuffers `0x0047f210`
+
+DrawableGridNode 0x0047f210 (per-block buffer rebuild, 1576 bytes; 426 of
+1586): the calls, reallocations, copies and the bookkeeping after the loops
+match in shape. VC6 here gives x edi and the triangle-count copy esi
+(retail: esi and edi), swaps the frame slots of z and indexTotal and of bx
+and the two strength-reduced block offsets, loads minY before maxY for the
+box centre, re-reads indexTotal for the index byte count and stores a dead
+vertexStart * 32 (10 bytes longer). Tried: all 24 declaration orders of
+x, z, indexTotal and bx (no effect), x and bx as one variable (VC6 merges
+them; retail keeps both, so x steps inside the body), three
+triangles/prevTriangles initialisations and the origin taken from x/z.
+
+### ComputeViewerDetail `0x004815e0`
+
+DrawableGridNode 0x004815e0 (detail update, 1082 bytes; candidate 1083):
+computes the squared near and far distances of the viewer to the node's
+x and z range, the y delta, the distance (FastSqrt), and the two
+16-bit detail words from (dyÂ² / nearest + nearest) * +0x174 * +0x74,
+nearest being the closest of the three distances. Control flow, calls and clamps match
+(the 65535 clamps are ternaries; `0xffff` immediates stay immediates
+once they are). Retail keeps the two axis deltas on the x87 stack across
+the three-way branch (fcom on the first, the second loaded before the
+fnstsw, spilled ad hoc in the arms); VC6 here stores both and reloads
+them, which shifts the frame slots, keeps `push edi` in the prologue
+instead of after the early return and tail-merges the early return.
+Tried: locals, block scopes, const/register, repeated expressions, an
+inline helper with reference, pointer or by-value arguments, and an
+accumulating form (which enregisters only the first delta).
+The two 65535 clamps are written `upperError >= 65535.0f ? 0xffff : ...`, which
+gives retail's branch polarity (64 of 1083; the `<` form 60). Also tried for the
+deltas: no named deltas (expressions throughout), only one of them named,
+the delta assigned inside the test (`(ax = ...) < 0`, comma forms), copies
+of the bounds overwritten by the deltas (the form that made 0x00481b30
+exact), and the far term written before the near term; none keeps both on
+the x87 stack, and small probes never do either. Also inert or worse: the
+second delta assigned in the else-if test (1067 bytes, strict 49), the
+grid/data locals swapped or dropped, the far offset without a local, and
+the early return as `coarse != 0`, a goto past it or with `distance`
+declared first (the return still merges with the final epilogue).
+
+### WalkVisibilityQuadrants `0x00481de0`
+
+DrawableGridNode 0x00481de0 (visibility walk, 1750 bytes; candidate
+1712): tests the node's box (or the four quadrant boxes, recursively,
+down to the child blocks) against the clipper and updates the child
+mask; `a7` is the recursion level, `a8` the quadrant path and the
+child blocks' masks are set to 0x3fffff (all visible), 0x1fffff (leaf)
+or cleared with 0x00464e90. Structure and calls match; the frame is
+the same size. VC6 here keeps `extent` in ebp and `screenMatrix` in ebx where
+retail keeps `size` then `a9` in ebx and `screenMatrix` in ebp, and lays out the
+subdivision block after the general tests rather than as the
+fall-through of the `size <= 1` branch, so the body differs throughout.
+Retail's order is: the size > 1 tests, the size <= 1 block falling into
+the subdivision, then the visible/corners tests, the all-visible loops,
+the size == 0 child case, a second `visible` test before the a7 switch
+(`childMask |= 1`, `2 << a8`, `0x20 << a8`; cases 1 and 2 return through
+the `a7 != 0` exit). Writing that switch after the if/else under its own
+`if (visible)`, `if (visible && corners == 0) ... else if (visible)`, and
+the size branches swapped (`size <= 1` first) do not move the subdivision
+block ahead of the tests.
+Session 25 (masked linked-style 0.675 -> 0.711, strict 143 -> 81/1750):
+- logic fix: on the size == 16 path with data->b0 set retail loads ebx = 1
+  (0x481e8a), stores it to count/childMask/changed and then pushes ebx as
+  the `coarse` argument of every later UpdateLevelOfDetail and recursive
+  call (0x481eec, 0x4821b5, 0x48225a, 0x482335) without reloading it, so
+  the walk continues with coarse = 1 there; the source now says so.
+- the corners test is `if (corners) { loops } else { subdivide }` (retail
+  falls into the loops and jumps back to the subdivision, 0x482144), the
+  depth switch sits under its own `if (visible)` after the if/else, and
+  the parent walk is a do/while (no null test of `this`, 0x482448).
+- ruled out here: center/extent through `const GridVec3&` vs indexed
+  (0.710 vs 0.711), `size <= 1` first (0.563), visible/corners initialised
+  at the declaration instead of the else block (0.631).
+Linked-accuracy audit (masked 0.725 -> 0.719, 500/500 instructions):
+- logic fix: the count test after the four recursive calls compared
+  `depth + 1 == 8`; retail reloads esi from the halved `size` slot at
+  0x4820fe (`mov esi,[esp+0x8c]` with three pushes outstanding) and tests
+  `cmp esi,8` at 0x482370, so the condition is `size == 8 || size == 16`.
+- retail shares one `count == 0 / childMask == 0` block (0x482370) between
+  the all-visible path (reached only for size 16) and the subdivision path
+  (size 8 or 16); the source writes it once after the corners if/else as
+  `(corners == 0 && size == 8) || size == 16`. That is behaviourally the
+  same: the child case reaches it with size 0. Two separate tests scored
+  0.632; ordering `size == 16 ||` first 0.721 (larger body); a split or
+  goto form 0.620-0.638.
+Big-gap pass (73 of 1750 strict, candidate 1712, same frame 0x54): the
+first divergence is at offset 4, register choice. Retail loads `size`
+into ebx, screenMatrix into ebp and center into esi between the pushes
+and compares `cmp ebx, 1`; VC6 here loads size (edx), extent (ebp),
+center (esi) and screenMatrix (ebx) up front and keeps the constant 1
+in ecx (`cmp edx, ecx`), then pushes TestBox's arguments from the
+registers where retail reloads extent from the frame. Unchanged
+(186 of 500 aligned): `count = 1` before `coarse = 1`, the 1s chained
+through coarse (`count = coarse` ..., 69), `visible`/`corners` order
+in the else block, oldMask declared last; `size >= 2` 101 strict by
+position only (185 aligned), oldMask declared first 174 aligned.
+Dropping `coarse = 1` (a probe, not retail's logic) does not free the
+constant register either.
+
+### Node loader `0x0047e600` (exact)
+
+DrawableGridNode 0x0047e600 (node loader) is exact and lives in
+src/reconstructed/Griddraw.cpp. Its last difference was the operand order
+of the extent.x/extent.y products (`fld cell; fmul min` against retail's
+`fld min; fmul cell`, 1605 of 1617). Copying the two minimums into float
+locals just before the products makes them the newer leaves (1617; one
+local alone gives 1613 for x, 1609 for y). Forms that did not move it:
+either operand order, the sum order of the centre terms, a `cell` local,
+inline multiply helpers, a GridVec3 constructor for the centre, 432
+centre/extent spellings, references or pointer aliases to either operand
+(216 forms), 0..33 dead locals and 0..63 prepended typedefs.

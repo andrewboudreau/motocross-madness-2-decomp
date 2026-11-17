@@ -13,7 +13,7 @@ short lower limit (0x004818c3).
 """
 RETAIL_VA = 0x004815e0
 SYMBOL = '?ComputeViewerDetail@DrawableGridNode@@QAEMH@Z'
-SOURCE = 'samples/render/GriddrawNearMisses.cpp'
+SOURCE = 'src/reconstructed/Griddraw.cpp'
 PROBES = {0x004817fd: 'draw distance off', 0x0048181c: 'near 0', 0x00481941: 'lower clamp',
           0x004818d4: 'error limits'}
 
