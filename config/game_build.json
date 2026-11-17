@@ -259,12 +259,6 @@
       "evidence": "docs/TEXTURE_SURFACE_CREATE.md#functional-build-review"
     },
     {
-      "path": "samples/ui/GuiScreenTexture.cpp",
-      "status": "reviewed-nonexact",
-      "reason": "Complete menu screen capture passes 8237 native pixel, state, callback, allocation, fault and unwind scenarios. VC6 emits 888 bytes against the complete 896-byte retail body with 284 matching positions. Rendering, surfaces, format lookup, allocation and texture creation are scripted; real DirectDraw capture and modal menus remain untested.",
-      "evidence": "docs/GUI_SCREEN_TEXTURE.md#functional-build-review"
-    },
-    {
       "path": "samples/gameui/MediaControlNearMisses.cpp",
       "status": "reviewed-nonexact",
       "reason": "Complete MediaControl Open passes 11125 native scripted COM, OS and helper scenarios including output aliasing, callback mutations, failures and faults. VC6 emits 656 bytes against the complete 646-byte retail body with 53 matching positions. Actual SDK and canonical GUID providers are checked; live DirectShow decoding, DirectDraw drivers and downstream Release cleanup remain untested.",
@@ -281,12 +275,6 @@
       "status": "reviewed-nonexact",
       "reason": "Complete FollowCamera Tick passes 674335 native full-state, callback, allocation, fault and floating-point comparisons with actual initialized strict FastSqrt. VC6 retains 3659 of 3672 matching positions; axis initializers are strict. Terrain, rotation, other camera methods and input callbacks are scripted, so rendered-camera behavior remains untested.",
       "evidence": "docs/FOLLOW_CAMERA_TICK.md#functional-build-review"
-    },
-    {
-      "path": "samples/ui/GuiPointerHelpers.cpp",
-      "status": "reviewed-nonexact",
-      "reason": "Complete pointer ownership helper passes, with the exact tooltip placement, 19606 native state, coordinate, callback, exception and fault comparisons. VC6 emits the full 52-byte extent with 46 matching positions; ShowText and real input devices remain outside this scripted boundary test.",
-      "evidence": "docs/GUI_POINTER_HELPERS.md#functional-build-review"
     },
     {
       "path": "samples/game/UiInfoNearMisses.cpp",

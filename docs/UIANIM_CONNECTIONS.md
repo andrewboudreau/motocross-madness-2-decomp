@@ -61,11 +61,16 @@ these two method-name substitutions:
 | DlgProcsNearMisses | 557 | 4,152 |
 | Total | 1,387 | 8,896 |
 
+GUIManager.cpp has since absorbed the aggregate's two near misses; the
+current pins are GUIManager 208/871, DlgProcs 421/3,043 and
+DlgProcsNearMisses 558/4,155 (1,187 sections, 8,069 relocations).
+
 Both published aggregates compile without prerequisite fixes. No function
 extent or partial score changes. All seven existing DlgProcs partial pins
 remain unchanged. The complete-object retained pins normalize only the
 checkout prefix and lexical path separators of the four named source paths,
-`ContainerList.h`, and included `GuiScreenTexture.cpp`; no section is omitted.
+`ContainerList.h` (and, while it existed, the aggregate's included
+`GuiScreenTexture.cpp`); no section is omitted.
 The independent same-path proof requires no filename normalization.
 
 `tests/test_uianim_connections.py` performs **199 strict comparisons**:

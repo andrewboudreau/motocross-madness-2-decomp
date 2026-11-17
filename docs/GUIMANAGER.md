@@ -50,9 +50,10 @@ expression is CSE'd as `add eax, -2`) and the padded width and height are
 written back into the `SIZE` (`size.cx = width; size.cy += 2;`), two dead
 stores retail keeps.
 The dialog is a plain `UIDialog*` everywhere (the former `UnknownGuiDialog`
-view is gone; `FindSectionObject` returns the dialog's `Sound*`). Near misses
-(`samples/ui/GUIManagerNearMisses.cpp`, notes there): the screen grab `0x00486170` and
-`0x00488120`. The tool-tip placement `0x00486b10` is exact: its pointer branch is a
+view is gone; `FindSectionObject` returns the dialog's `Sound*`). Not exact, in
+retail order in GUIManager.cpp: the screen grab `0x00486170`
+([GUI_SCREEN_TEXTURE.md](GUI_SCREEN_TEXTURE.md)) and `0x00488120`
+([GUI_POINTER_HELPERS.md](GUI_POINTER_HELPERS.md)). The tool-tip placement `0x00486b10` is exact: its pointer branch is a
 `POINT` copy followed by `position.y += 16`. HiResMeter slot 8
 `0x00488440` uses `rdtsc` in retail. A complete [functional candidate](GAME_TICK.md)
 retains its calibration algorithm with QPC replacing the profiling counter;

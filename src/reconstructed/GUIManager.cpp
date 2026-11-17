@@ -527,6 +527,108 @@ void GUIManager::SetGuiPalette(Palette8* palette) {
     guiPalette = palette;
 }
 
+// 0x00486170: copies the screen (or `rect` of it) into a new texture,
+// dimmed when `dim` is set.
+// Not exact (284 of 896 bytes, 888 compiled: retail keeps three more stack
+// locals and returns the new texture from edi; docs/GUI_SCREEN_TEXTURE.md
+// lists the forms tried).
+PCTextureMap* GUIManager::CopyScreenToTexture(int dim, CameraRect* rect) {
+    DDSurfaceDesc2 desc;
+    DirectDrawSurface* surface;
+    PCVideoCard* display;
+    PCTextureMap* texture = 0;
+    unsigned char* bits;
+    unsigned char* row;
+    unsigned char* pixel;
+    unsigned short* pixel16;
+    unsigned short mask;
+    int format;
+    int bytesPerPixel;
+    int left;
+    int top;
+    int right;
+    int bottom;
+    int width;
+    int height;
+    int pixels;
+    int y;
+    unsigned int line;
+    unsigned int x;
+
+    format = g_TrackGame->renderTarget->surfacePixelFormat;
+    bytesPerPixel = PixelFormatBytesPerPixel(format);
+    if (guiBackground)
+        guiBackground->ReleaseDc();
+    g_TrackGame->childRoot->DisableByClassName("GUICursor");
+    g_TrackGame->childRoot->DisableByClassName("ToolTip");
+    g_TrackGame->RenderFrame();
+    g_TrackGame->PresentFrame();
+    g_TrackGame->renderTarget->AdvanceFrame();
+    g_TrackGame->childRoot->EnableByClassName("GUICursor");
+    g_TrackGame->childRoot->EnableByClassName("ToolTip");
+    memset(&desc, 0, sizeof(desc));
+    desc.size = sizeof(desc);
+    display = g_TrackGame->display;
+    if (display->renderSurface)
+        surface = display->renderSurface;
+    else
+        surface = display->primarySurface;
+    if (!surface->Lock(0, &desc, 0x811, 0)) {
+        if (rect) {
+            right = rect->right;
+            left = rect->left;
+            top = rect->top;
+            bottom = rect->bottom;
+        } else {
+            left = 0;
+            top = 0;
+            right = desc.width;
+            bottom = desc.height;
+        }
+        width = right - left;
+        height = bottom - top;
+        pixels = width * height;
+        bits = (unsigned char*)DebugMalloc(pixels * bytesPerPixel, __FILE__, 849);
+        row = bits;
+        for (y = 0; y < height; y++) {
+            memcpy(row, (unsigned char*)desc.surface + (y + top) * desc.pitch + left * bytesPerPixel,
+                   width * bytesPerPixel);
+            row += width * bytesPerPixel;
+        }
+        surface->Unlock(0);
+        if (dim) {
+            if (bytesPerPixel == 1) {
+                for (line = 0; line < (unsigned int)height; line++) {
+                    for (x = line * width + (line & 1); x < line * width + width; x += 2)
+                        bits[x] = 0;
+                }
+            } else if (bytesPerPixel == 2) {
+                mask = format == 0x22b ? 0x7bde : 0xf7de;
+                pixel16 = (unsigned short*)bits;
+                for (; pixels > 0; pixels--, pixel16++)
+                    *pixel16 = (*pixel16 >> 1) & (mask >> 1);
+            } else if (bytesPerPixel == 3) {
+                for (pixel = bits; pixels > 0; pixels--, pixel += 3) {
+                    pixel[0] >>= 1;
+                    pixel[1] >>= 1;
+                    pixel[2] >>= 1;
+                }
+            } else if (bytesPerPixel == 4) {
+                for (pixel = bits; pixels > 0; pixels--, pixel += 4) {
+                    pixel[0] >>= 1;
+                    pixel[1] >>= 1;
+                    pixel[2] >>= 1;
+                }
+            }
+        }
+        texture = new(__FILE__, 916) PCTextureMap(guiTextures, 1);
+        texture->CreateSurface(bits, width, height, width, width, format, format, 0, 4, 0, 0, 0, 2, 1, 0, 0x80,
+                               0xff00ff);
+        DebugFree(bits, __FILE__, 921);
+    }
+    return texture;
+}
+
 // 0x004864f0
 int GUIManager::IsPaletteLocked() {
     return paletteLocked;
@@ -1276,6 +1378,23 @@ void GUIUser::ReleaseCursor() {
 
 // 0x00488110
 UIDlgContainer::~UIDlgContainer() {
+}
+
+// 0x00488120: hands the pointer to `device` unless another user owns it.
+// Not exact (46 of 52 bytes: retail materialises `device ? owner : 0` before
+// the zero test, VC6 threads its null arm; docs/GUI_POINTER_HELPERS.md lists
+// the forms tried).
+int GUIUser::SetPointerDevice(GUIInputDevice* device) {
+    GUIUser* owner = device ? device->ownerUser : 0;
+
+    if (owner == this)
+        return 1;
+    if (owner)
+        return 0;
+    pointerDevice = device;
+    if (device)
+        device->ownerUser = this;
+    return 1;
 }
 
 // 0x00488160

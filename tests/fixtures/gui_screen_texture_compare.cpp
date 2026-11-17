@@ -36,7 +36,7 @@ static void Finish(){Event& e=observed.events[observed.count-1];Snapshot(e.state
  case 3:At(world.displays[0],0x1a8)=(DWORD)world.source[1];At(world.displays[0],0x19c)=(DWORD)world.source[1];for(int j=0;j<8192;++j)world.capture[j]^=0x95;for(j=0;j<32768;++j)world.source[0][j]^=0x63;At(world.source[0],0)=(DWORD)surfaceTable;break;
  }}if(scenario.throwAt==observed.count)throw 0x771;
 }
-static int SourceFile(const char* p){const char* a=strrchr(p,'\\'),*b=strrchr(p,'/');if(!a||(b&&b>a))a=b;a=a?a+1:p;if(strcmp(a,"GUIManager.cpp")&&strcmp(a,"GuiScreenTexture.cpp"))Fail(82);return 1;}
+static int SourceFile(const char* p){const char* a=strrchr(p,'\\'),*b=strrchr(p,'/');if(!a||(b&&b>a))a=b;a=a?a+1:p;if(strcmp(a,"GUIManager.cpp"))Fail(82);return 1;}
 int PixelFormatBytesPerPixel(int format){Begin(1,0,format);Finish();return scenario.bpp;}
 int BackgroundImage::ReleaseDc(){Begin(2,this);Finish();return scenario.callbackReturn;}
 void GameObject::DisableByClassName(const char* s){Event& e=Begin(3,this);if(strlen(s)>31)Fail(83);strcpy(e.text,s);Finish();}

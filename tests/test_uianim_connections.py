@@ -21,8 +21,8 @@ from test_edit_box_draw import signature
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCES = ('src/reconstructed/GUIManager.cpp', 'src/reconstructed/DlgProcs.cpp',
-           'samples/ui/GUIManagerNearMisses.cpp', 'samples/ui/DlgProcsNearMisses.cpp')
-FILENAMES = SOURCES + ('src/reconstructed/ContainerList.h', 'samples/ui/GuiScreenTexture.cpp')
+           'samples/ui/DlgProcsNearMisses.cpp')
+FILENAMES = SOURCES + ('src/reconstructed/ContainerList.h',)
 GETTER = '?GetCurrentTexture@UIAnim@@QAEPAVTextureMap@@XZ'
 ADVANCE = '?AdvancePastSounds@UIAnim@@QAEPAVTextureMap@@XZ'
 RENAMES = {'?GetCurrentTexture@DialogUIAnimView@@QAEHXZ': GETTER,
@@ -174,17 +174,18 @@ class UIAnimConnectionsTests(unittest.TestCase):
                                      case['target_size'], ROOT/Path(source).with_suffix('.bindings.json'))
                     self.assertTrue(result['strict_exact'], result)
                     strict += 1
-                wanted = ADVANCE if n in (0, 2) else GETTER
+                cursor = source == 'src/reconstructed/GUIManager.cpp'
+                wanted = ADVANCE if cursor else GETTER
                 imports = {s.name for s in obj.symbols if s.storage_class == 2 and s.section_number == 0}
                 self.assertIn(wanted, imports)
                 self.assertFalse(imports & set(RENAMES))
-                caller = '?RenderPost3D@GUICursor@@UAEHXZ' if n in (0, 2) else '?HandleEvent@LoadingDlg@@UAEXPAUDialogEvent@@@Z'
+                caller = '?RenderPost3D@GUICursor@@UAEHXZ' if cursor else '?HandleEvent@LoadingDlg@@UAEXPAUDialogEvent@@@Z'
                 entry = obj.find_symbol(caller)
                 _, _, calls = obj.symbol_extent(entry)
                 self.assertEqual([(r.virtual_address-entry.value, r.type) for r in calls
                                   if obj.symbol_by_index[r.symbol_index].name == wanted],
-                                 [(11 if n in (0, 2) else 416, 20)])
-            self.assertEqual((strict, sections, relocations), (194, 1390, 8903))
+                                 [(11 if cursor else 416, 20)])
+            self.assertEqual((strict, sections, relocations), (194, 1187, 8069))
             _, provider = compile_source(ROOT/'src/reconstructed/GameUi.cpp', 'provider')
             for symbol, address, size in (
                 ('??0UIAnim@@QAE@PAX0@Z', 0x472e30, 82),

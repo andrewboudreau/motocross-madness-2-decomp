@@ -10,6 +10,7 @@ from mcm2tool.coff import CoffObject
 from mcm2tool.pe import PEImage
 from mcm2tool.toolchain import find_child_ci, find_vc6_bin, infer_vc98_root, sha256_file
 from tools.match import compare
+from tools.unit_source import standalone_source
 ROOT=Path(__file__).resolve().parents[1]
 SYMBOL='?CopyScreenToTexture@GUIManager@@QAEPAVPCTextureMap@@HPAUCameraRect@@@Z'
 RANGES={0x486170:896,0x54b870:26,0x54b88a:10}
@@ -53,21 +54,26 @@ class GuiScreenTextureBehaviorTests(unittest.TestCase):
     obj=output/(name+'.obj')
     result=subprocess.run([sys.executable,str(ROOT/'tools/compile.py'),str(ROOT/source),'-o',str(obj),'--vc6-root',str(compiler),'--profile','vc6_o2_mt','--include',str(ROOT/'src/krusty2'),*(['--extra','/Od'] if source.startswith('tests/') else [])],cwd=ROOT,capture_output=True,text=True,encoding='latin1',env={**os.environ,'PYTHONPATH':str(ROOT)})
     self.assertEqual(result.returncode,0,result.stdout+result.stderr);return obj,CoffObject(obj)
-   candidate_path,candidate=compile_source('samples/ui/GuiScreenTexture.cpp','candidate')
+   # The grab lives in GUIManager.cpp; the oracle links a validation unit of the
+   # same name holding only its definition (tools/unit_source.py).
+   unit=output/'GUIManager.cpp'
+   unit.write_text(standalone_source(ROOT/'src/reconstructed/GUIManager.cpp',['GUIManager::CopyScreenToTexture']),encoding='latin-1')
+   candidate_path,candidate=compile_source(str(unit),'candidate')
    fixture_path,_=compile_source('tests/fixtures/gui_screen_texture_compare.cpp','fixture')
-   _,aggregate=compile_source('samples/ui/GUIManagerNearMisses.cpp','aggregate')
+   _,aggregate=compile_source('src/reconstructed/GUIManager.cpp','aggregate')
    self.assertEqual(candidate.find_symbol(SYMBOL).function_size,888)
    self.assertEqual({s.name for s in candidate.symbols if s.storage_class==2 and s.section_number>0 and s.type==0x20},{SYMBOL})
    self.assertEqual({s.name for s in candidate.symbols if s.storage_class==2 and s.section_number==0},IMPORTS)
    self.assertFalse(any(s.name.startswith('.CRT') for s in candidate.sections))
-   for coff,binding in [(candidate,'GuiScreenTexture'),(aggregate,'GUIManagerNearMisses')]:
-    report=compare(image,coff,SYMBOL,0x486170,896,ROOT/f'samples/ui/{binding}.bindings.json')
+   for coff in (candidate,aggregate):
+    report=compare(image,coff,SYMBOL,0x486170,896,ROOT/'src/reconstructed/GUIManager.bindings.json')
     self.assertFalse(report['strict_exact']);self.assertEqual(report['strict_match']['matching_positions'],284)
    def normalized(coff):
     symbol=coff.find_symbol(SYMBOL);body,size,relocs=coff.symbol_extent(symbol);rows=[]
     for r in relocs:
      target=coff.symbol_by_index[r.symbol_index];key=target.name
      if key.startswith(('$L','$T')):key=f'{coff.section(target.section_number).name}+{target.value}'
+     if key.startswith('??_C@'):key='__FILE__ literal'  # the two units' paths differ
      rows.append((r.virtual_address-symbol.value,r.type,key))
     return body,size,rows
    self.assertEqual(normalized(candidate),normalized(aggregate))

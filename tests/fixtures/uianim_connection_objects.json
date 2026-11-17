@@ -1,24 +1,19 @@
 {
-  "baseline": "Published 7ecf5ff4 same-path old/current objects preserve every nondebug byte and resolved destination under exactly two method-name joins. Portable pins normalize only the checkout prefix and lexical spelling of the four source paths, ContainerList.h and GuiScreenTexture.cpp; no section is excluded. DlgProcs canonical and aggregate pins were independently reproduced from published round52 before objects, then advanced under only the verified DialogSoultreeObjectView to D3DIMSoultreeObject ReplaceMaterialTexture external-name join; all section bytes, flags and destination offsets remain identical.",
+  "baseline": "Published 7ecf5ff4 same-path old/current objects preserve every nondebug byte and resolved destination under exactly two method-name joins. Portable pins normalize only the checkout prefix and lexical spelling of the four source paths, ContainerList.h and GuiScreenTexture.cpp; no section is excluded. DlgProcs canonical and aggregate pins were independently reproduced from published round52 before objects, then advanced under only the verified DialogSoultreeObjectView to D3DIMSoultreeObject ReplaceMaterialTexture external-name join; all section bytes, flags and destination offsets remain identical. GUIManager.cpp now holds the former aggregate (CopyScreenToTexture and SetPointerDevice moved in): 208 sections, the aggregate's 209 less its second __FILE__ literal, and the same 871 relocations.",
   "renames": {
     "?GetCurrentTexture@DialogUIAnimView@@QAEHXZ": "?GetCurrentTexture@UIAnim@@QAEPAVTextureMap@@XZ",
     "?AdvancePastSounds@CursorUIAnimView@@QAEHXZ": "?AdvancePastSounds@UIAnim@@QAEPAVTextureMap@@XZ"
   },
   "objects": {
     "src/reconstructed/GUIManager.cpp": {
-      "sections": 202,
-      "relocations": 834,
-      "sha256": "60e195f694003f57603a9aa883e5bee2a4274596ed47183f6f52e68a9a908d6f"
+      "sections": 208,
+      "relocations": 871,
+      "sha256": "6ce942b8c989ad89656e10983d3eaee85324c4b70c2604ab8b2368a6e22d1419"
     },
     "src/reconstructed/DlgProcs.cpp": {
       "sections": 421,
       "relocations": 3043,
       "sha256": "b84edf7d9db30dc84b12e3aaf68339aca17c6c087e75ba6d78af44a33cce2e51"
-    },
-    "samples/ui/GUIManagerNearMisses.cpp": {
-      "sections": 209,
-      "relocations": 871,
-      "sha256": "06e27190847707f9c74aefcf748aab82b52b2d20d76afe2cec097565fbf2f019"
     },
     "samples/ui/DlgProcsNearMisses.cpp": {
       "sections": 558,

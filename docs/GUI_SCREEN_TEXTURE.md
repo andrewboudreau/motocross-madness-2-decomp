@@ -1,11 +1,11 @@
 # Capturing the menu background
 
-`samples/ui/GuiScreenTexture.cpp` contains the complete readable
-`GUIManager::CopyScreenToTexture` candidate demanded by GameUi's background
-grab path. Its body is extracted unchanged from `GUIManagerNearMisses.cpp`,
-which now includes the standalone file. The class is identified by RTTI;
-the semantic method name remains provisional. This is a nonexact candidate,
-not a claim that an entire original translation unit has been recovered.
+`GUIManager::CopyScreenToTexture` `0x00486170`, demanded by GameUi's background
+grab path, is in [GUIManager.cpp](../src/reconstructed/GUIManager.cpp) between
+`SetGuiPalette` `0x00486150` and `0x004864f0`, with a `// Not exact` status
+comment. The class is identified by RTTI; the semantic method name remains
+provisional. The behaviour test links a validation unit named `GUIManager.cpp`
+holding only this definition, so the fixture checks retail's file name.
 
 ## Extent and preservation
 
@@ -17,27 +17,11 @@ to the complete 26-byte allocation cleanup at `0x0054b870`; the 10-byte
 handler at `0x0054b88a` uses FuncInfo `0x00561878`.
 
 VC6 SP3 `/O2` emits **888 bytes**, with **284 matching positions** after
-relocation resolution. No extent is shortened. The standalone object defines
-only this public function and its exception metadata, with no CRT initializer.
-The regression checks its complete emitted body and relocation roles against
-the included aggregate form.
-
-Private baseline/current comparison against `bbac412d` preserves all **105
-functions** and **208 nondebug sections**, including relocation names, types
-and addends. The only excluded storage is the independently checked diagnostic
-filename: the original aggregate filename is replaced by `GuiScreenTexture.cpp`.
-The native boundary validates the known filename before normalizing it. See
-`work/game-build/check_gui_screen_extraction.py` and
-`work/game-build/gui-screen-extraction-proof.json`.
+relocation resolution. No extent is shortened. The regression checks the
+validation unit's complete emitted body and relocation roles against the
+canonical unit's.
 
 ## Functional build review
-
-The functional build explicitly admits this standalone source as
-`reviewed-nonexact`. Fresh build `build-2utwbyvo` compiles **212/212** source
-units and reduces unresolved names from **421 to 420** against
-`build-dvd5g4zh`: only `GUIManager::CopyScreenToTexture` is removed, with
-no new missing names. The game still does not link or run. The isolated
-comparison is recorded in `work/game-build/gui-screen-link-delta.json`.
 
 The function releases a held background DC, hides the cursor and tooltip,
 renders/presents a frame, advances its index, then shows those objects again.
@@ -111,3 +95,28 @@ $env:VC6_ROOT = (Resolve-Path work/vc6sp3-disc).Path
 $env:MCM2_EXE = (Resolve-Path work/game/mcm2.exe).Path
 python -m unittest discover -s tests -p test_gui_screen_texture_behavior.py -v
 ```
+
+## Forms tried
+
+0x00486170 (896 bytes): same logic; retail keeps three more stack locals
+  (frame 0xb0 against 0xa4) and allocates registers differently around
+  the row copy and the 8-bit dim loop. Retail has two return tails
+  (`mov eax, edi` for the new texture, `mov eax, ebx` with ebx cleared
+  at the top for the Lock failure) and never uses that zero for the
+  null tests or `push 0`; VC6 here caches 0 in ebx for both. A
+  `return texture` in the success branch gives the two tails (304, 73
+  instruction diffs) but folds the failure return to `xor eax, eax`;
+  the texture's zero assigned at its declaration, after the format
+  read or just before the Lock test does not change that; an early
+  `return texture` or `return 0` on a Lock failure gives 294. The row
+  copy written without the row pointer (`memcpy(bits + y * width *
+  bytesPerPixel, ...)`) reproduces retail's copy loop instruction for
+  instruction (38 instruction diffs against 70) but scores 249/901;
+  the 8-bit dim loop as `for (x = line & 1; x < width; x += 2)
+  bits[line * width + x] = 0;` gives 68.
+  Session 14: `texture = 0` after the bytes-per-pixel read puts the
+  `xor` after that call as retail does (strict 300, same hunks), but the
+  zero still serves the null tests. Retail returns the new texture from
+  edi, which it zeroes before the new-result test and shares with the EH
+  state store; here ebx holds the texture and the null arm is
+  `xor ebx, ebx` after the branch.

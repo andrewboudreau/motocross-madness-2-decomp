@@ -4,8 +4,8 @@ The menu screen grab: hides the cursor and tool tips, renders and presents a fra
 locks the display's render surface (else the primary), copies `rect` (or the whole
 surface) into a DebugMalloc buffer, optionally dims it (1 byte: every other pixel
 cleared in a checkerboard; 2 bytes: halved under the 555/565 mask; 3 and 4 bytes: the
-first three channels halved), and builds a PCTextureMap from it. The linked body is
-samples/ui/GuiScreenTexture.cpp.
+first three channels halved), and builds a PCTextureMap from it. The linked body is in
+src/reconstructed/GUIManager.cpp.
 
 Modelled: PixelFormatBytesPerPixel (0x00511970, case-chosen 1..4), the surface's Lock
 (+0x64, COM: height, width, pitch and real pixels) and Unlock (+0x80), DebugMalloc (a
@@ -26,7 +26,7 @@ from tools.emu_cases import bike_race_create as base
 
 RETAIL_VA = 0x00486170
 SYMBOL = '?CopyScreenToTexture@GUIManager@@'
-SOURCE = 'samples/ui/GuiScreenTexture.cpp'
+SOURCE = 'src/reconstructed/GUIManager.cpp'
 BYTES_PER_PIXEL, RELEASE_DC, DISABLE, ENABLE, ADVANCE = 0x00511970, 0x00404c80, 0x00468dd0, 0x00468f10, 0x004e8cc0
 MALLOC, FREE, NEW, TEXTURE_CTOR = 0x004a2e20, 0x004a2e60, 0x004a3010, 0x004c5f00
 TRACK_GAME = 0x0056e26c

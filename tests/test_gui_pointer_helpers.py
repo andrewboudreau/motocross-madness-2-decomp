@@ -1,4 +1,4 @@
-"""Complete GUI pointer candidates and unchanged aggregate extraction."""
+"""Complete GUI pointer bodies from GUIManager.cpp, linked through a validation unit."""
 import os
 from pathlib import Path
 import subprocess
@@ -10,12 +10,11 @@ from mcm2tool.coff import CoffObject
 from mcm2tool.pe import PEImage
 from mcm2tool.toolchain import find_child_ci, find_vc6_bin, infer_vc98_root, sha256_file
 from tools.match import compare
-from test_edit_box_on_char import extract
+from tools.unit_source import standalone_source
 
 ROOT = Path(__file__).resolve().parents[1]
-# ShowControlToolTip is exact now: its body is taken from the canonical unit and
-# compiled with the remaining candidate.
-PROMOTED = 'void ToolTip::ShowControlToolTip('
+# Both bodies live in GUIManager.cpp (ShowControlToolTip exact, SetPointerDevice
+# not); the oracle links a validation unit holding only those two definitions.
 CASES = (('?ShowControlToolTip@ToolTip@@QAEXPAVGuiControlView@@@Z', 0x486b10, 106, 106),
          ('?SetPointerDevice@GUIUser@@QAEHPAVGUIInputDevice@@@Z', 0x488120, 52, 46))
 
@@ -50,9 +49,8 @@ class GuiPointerHelpersTests(unittest.TestCase):
             output = Path(directory)
             objects = []
             candidates = output / 'GuiPointerCandidates.cpp'
-            candidates.write_text(
-                '#include "%s"\n' % (ROOT / 'samples/ui/GuiPointerHelpers.cpp').as_posix()
-                + extract((ROOT / 'src/reconstructed/GUIManager.cpp').read_text(), PROMOTED) + '\n')
+            candidates.write_text(standalone_source(ROOT / 'src/reconstructed/GUIManager.cpp',
+                ['ToolTip::ShowControlToolTip', 'GUIUser::SetPointerDevice']), encoding='latin-1')
             for source in (candidates, ROOT / 'tests/fixtures/gui_pointer_compare.cpp'):
                 obj = output / (Path(source).stem + '.obj')
                 result = subprocess.run([sys.executable, str(ROOT / 'tools/compile.py'), str(source),
@@ -75,11 +73,11 @@ class GuiPointerHelpersTests(unittest.TestCase):
                         report = compare(retail, candidate, symbol, va, size,
                                          ROOT / 'src/reconstructed/GUIManager.bindings.json')
                         self.assertEqual(report['strict_match']['matching_positions'], matching)
-            # The aggregate (canonical unit plus candidate) holds the same bodies; compare every
-            # byte and relocation operand against the separately compiled candidate.
+            # The canonical unit holds the same bodies; compare every byte and
+            # relocation operand against the validation unit.
             aggregate = output / 'aggregate.obj'
             result = subprocess.run([sys.executable, str(ROOT / 'tools/compile.py'),
-                str(ROOT / 'samples/ui/GUIManagerNearMisses.cpp'), '-o', str(aggregate),
+                str(ROOT / 'src/reconstructed/GUIManager.cpp'), '-o', str(aggregate),
                 '--vc6-root', str(compiler), '--profile', 'vc6_o2_mt'], cwd=ROOT,
                 capture_output=True, text=True, encoding='latin-1',
                 env={**os.environ, 'PYTHONPATH': str(ROOT)})
