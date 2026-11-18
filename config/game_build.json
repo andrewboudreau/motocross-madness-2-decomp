@@ -211,12 +211,6 @@
       "evidence": "docs/FOLLOWED_RACER_PICKER.md#functional-build-review"
     },
     {
-      "path": "samples/gameui/MediaControlNearMisses.cpp",
-      "status": "reviewed-nonexact",
-      "reason": "Complete MediaControl Open passes 11125 native scripted COM, OS and helper scenarios including output aliasing, callback mutations, failures and faults. VC6 emits 656 bytes against the complete 646-byte retail body with 53 matching positions. Actual SDK and canonical GUID providers are checked; live DirectShow decoding, DirectDraw drivers and downstream Release cleanup remain untested.",
-      "evidence": "docs/MEDIA_CONTROL_OPEN.md#functional-build-review"
-    },
-    {
       "path": "samples/physics/motion/Motnctrl.cpp",
       "status": "reviewed-nonexact",
       "reason": "Complete Character playback and pose helpers pass 835584 native state/pose comparisons; LoadVue passes 33280 parse/ownership/unwind scenarios. Playback uses the canonical vector-call providers and preserves retail x87 frame-rate precision. Candidate playback is 3333 bytes versus 3327 retail; three existing helper matches remain strict.",
@@ -269,18 +263,6 @@
       "status": "reviewed-nonexact",
       "reason": "Near-miss body admitted so the source build can link and run; defines BaseQuarryEvent::PrepareGeometry. BaseQuarryEvent::PrepareGeometry 0x004e14a0 (the debug Atmosphere page) was reviewed instruction by instruction against retail: 506 of 529 normalised instructions align; the rest is register choice in the page prologue (retail rereads TrackGame+0x38, which nothing stores between the two loads), one independent mov reordered after a ControlInterface call, and jump-table entries shifted by the 2-byte prologue difference. No behaviour difference.",
       "evidence": "docs/GAME_BUILD.md#best-guess-review"
-    },
-    {
-      "path": "samples/physics/helpers/GraphicsTestNearMisses.cpp",
-      "status": "reviewed-nonexact",
-      "reason": "Near-miss body admitted so the source build can link and run; defines GraphicsTest::DrawCircle. Differential review against retail (tools/emu_diff.py, re-run 2026-11-16): graphics_test_draw_circle 0x47bd10 0 of 120 runs differ. Bytes nonexact.",
-      "evidence": "docs/GAME_BUILD.md#best-guess-review"
-    },
-    {
-      "path": "samples/render/GridNodeNearMisses.cpp",
-      "status": "reviewed-nonexact",
-      "reason": "Defines GridNode::IntersectSegment (0x00483d40, 4140 retail bytes). Differential emulation (unicorn, retail LinePlaneIntersection and __ftol, recursion through a stub vtable slot) over random 1- to 3-level grid trees, lattice and tie segments and all x87 rounding/precision modes found no difference in 6000 cases (return, out point, node, rounded hit, FPU status). Directed rounding can index past the row tables; retail and the candidate then both fault (505 cases, none under round-to-nearest). Bytes nonexact: a per-function #pragma optimize(\"y\", off) gives retail's ebp frame (which retail's inline-asm fistp helper forces), but the four fistp sites are calls here.",
-      "evidence": "docs/GAME_BUILD.md#collision-and-terrain-bodies-checked-by-emulation"
     },
     {
       "path": "samples/render/PixtransNearMisses.cpp",

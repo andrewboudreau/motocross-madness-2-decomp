@@ -6,6 +6,8 @@
 // 0x0065b658, no readers) that closes the unit.  It sits after the GhostMod1 code and before
 // Grid1.cpp (first xref 0x0047c97a).  No __FILE__ literal: the file name is ours (tier 3);
 // the class is RTTI-confirmed (tier 1) and the helpers are tier 2 by position and callers.
+#include <math.h>
+
 #include "core/GraphicsTest.h"
 #include "core/DebugAlloc.h"
 #include "math/Math3D.h"
@@ -48,8 +50,6 @@ inline void GraphicsTestTransform(Vec3* out, Vec3 v, const Matrix4* m)
     out->z = v.x * m->_13 + v.y * m->_23 + v.z * m->_33 + m->_43;
 }
 
-// The circle 0x0047bd10 is a near miss: samples/physics/helpers/GraphicsTestNearMisses.cpp.
-
 // 0x0047bc70
 GraphicsTest::GraphicsTest(int flags)
     : GameObject(flags)
@@ -61,6 +61,86 @@ GraphicsTest::GraphicsTest(int flags)
 // 0x0047bd00 (deleting wrapper 0x0047bce0)
 GraphicsTest::~GraphicsTest()
 {
+}
+
+// 0x0047bd10. Not exact (836 of 917 bytes, 268 of 273 instructions: five x87
+// operand orders; the x component of the first inline cross product, the x row of
+// the transform, where retail loads the matrix element first, and the x centre sum,
+// where retail loads the point first. Rows y and z match).
+// A circle of `segments` line segments (at most 64) around `axis` (the circle's
+// normal; null draws it in the xz plane). Storing the point as x, z, y (the
+// constant y last) puts the `[eax - 4]` store where retail has it, and passing
+// `points[i]` rather than `*point` as the transform's by-value argument gives
+// retail's z centre sum.
+// Forms tried, all 836 unless noted: matrix by reference, the three other
+// parameter orders, a caller-side Vec3 copy, parenthesised or regrouped row sums,
+// matrix-first products in the source (`m->_11 * v.x`), a transform that copies
+// `*out` itself (pointer or reference), a component-wise centre sum. Worse:
+// `const Vec3* c = center; *point += *c` 834 (fixes the x sum, flips the y sum),
+// `const Vec3& in` copied inside the helper 834, float locals for the components
+// 832, a `const Matrix4* m = &basis` local 828, `points[i] += *center` 828,
+// `&points[i]` as the output argument 828, a Vec3-returning helper 528,
+// `*point = *point + *center` 500. Before: y stored second with `*point` as the
+// argument 818; the pointer local also used for the cos/sin stores 799 (the same
+// pointer local made DrawBox exact).
+void GraphicsTest::DrawCircle(const Vec3* center, float radius, const Vec3* axis, int segments)
+{
+    Matrix4 basis;
+    Vec3 points[64];
+    GraphicsTestVertex vertices[64];
+    int i;
+
+    if (segments > 64) {
+        segments = 64;
+    }
+    if (axis) {
+        Vec3 u = CrossProduct(*axis, Vec3(axis->z, axis->x, axis->y));
+        Vec3 n = *axis;
+        Vec3 v = CrossProduct(n, u);
+        n = CrossProductCall(u, v);
+        n = Vec3Normalize(n);
+        u = Vec3Normalize(u);
+        v = CrossProductCall(n, u);
+        basis._11 = v.x;
+        basis._12 = v.y;
+        basis._13 = v.z;
+        basis._21 = n.x;
+        basis._22 = n.y;
+        basis._23 = n.z;
+        basis._31 = u.x;
+        basis._32 = u.y;
+        basis._33 = u.z;
+        basis._41 = 0;
+        basis._42 = 0;
+        basis._43 = 0;
+    }
+    for (i = 0; i < segments; i++) {
+        float angle = i * (6.2831855f / segments);
+        points[i].x = cos(angle) * radius;
+        points[i].z = sin(angle) * radius;
+        points[i].y = 0;
+        Vec3* point = &points[i];
+        if (axis) {
+            GraphicsTestTransform(point, points[i], &basis);
+        }
+        *point += *center;
+    }
+    points[segments] = points[0];
+    for (i = 0; i < segments * 2; i++) {
+        vertices[i].color = drawColor;
+        vertices[i].specular = specularColor;
+        vertices[i].tu = 0;
+        vertices[i].tv = 0;
+    }
+    for (i = 0; i < segments; i++) {
+        vertices[i * 2].x = points[i].x;
+        vertices[i * 2].y = points[i].y;
+        vertices[i * 2].z = points[i].z;
+        vertices[i * 2 + 1].x = points[i + 1].x;
+        vertices[i * 2 + 1].y = points[i + 1].y;
+        vertices[i * 2 + 1].z = points[i + 1].z;
+    }
+    RENDERER()->DrawPrimitive(2, 0x1e2, vertices, segments * 2, 0);
 }
 
 // 0x0047c0b0: a wire sphere: `segments` circles about the y axis, then about the z axis.

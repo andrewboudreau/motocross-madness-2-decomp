@@ -1,8 +1,10 @@
 # Opening a movie stream
 
-`samples/gameui/MediaControlNearMisses.cpp` contains the complete readable
-`MediaControl::Open` candidate. The source and bindings are unchanged from
-`883a92cc`; the file already contains only this operation. `GameUi.cpp`
+`src/reconstructed/MediaControl.cpp` contains the complete readable
+`MediaControl::Open` candidate, in retail order between the destructor and
+`Tick`. It moved there unchanged from its sample (`883a92cc` source and
+bindings); the native test links it through a validation unit extracted with
+`tools/unit_source.py` and checks the bytes equal the whole unit's. `GameUi.cpp`
 needs this missing provider for video controls. `MediaControl` is an RTTI
 class; the method name and original translation-unit ownership remain
 provisional.

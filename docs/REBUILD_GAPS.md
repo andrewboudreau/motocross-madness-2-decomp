@@ -408,7 +408,7 @@ that `tools/build_game.py` links. This was checked on 2026-11-10 against
 |---|---:|---|---|
 | `0x00406ae0`, `0x0040c000` | 3, 1 | `src/krusty2/vehicle/Bike.cpp` (`SelectRiderPose`, `ComputeSlideAngle`) | `BikeFloatToInt` |
 | `0x00446f40` | 6 | `samples/physics/shadow/D3DIMSoultreeShadowNearMisses.cpp` (`/QIfist`) | `FistpFloatToInt` (`samples/common/FistpFloatToInt.h`) |
-| `0x00483d40` | 4 | `samples/render/GridNodeNearMisses.cpp` (`GridRoundToInt`) | `X87FloatToInt`; its 4 other casts are retail `__ftol` calls; the whole body matches retail in 6000 emulated cases ([GAME_BUILD](GAME_BUILD.md#collision-and-terrain-bodies-checked-by-emulation)) |
+| `0x00483d40` | 4 | `src/reconstructed/GridNode.cpp` (`GridRoundToInt`) | `X87FloatToInt`; its 4 other casts are retail `__ftol` calls; the whole body matches retail in 6000 emulated cases ([GAME_BUILD](GAME_BUILD.md#collision-and-terrain-bodies-checked-by-emulation)) |
 | `0x0048d1e0` | 2 | `src/bringup/Group4_ScoreBoard.cpp` (`/QIfist` bring-up) | `FistpFloatToInt` |
 | `0x0048d780` | 1 | `samples/physics/bikeai/KrustyBikeTrickPick.cpp` (`/QIfist`) | `FistpFloatToInt` |
 | `0x0048e3e0` | 3 | `samples/physics/krustybike/KrustyBikeSelectRiderPose.cpp` (`/QIfist`) | `FistpFloatToIntChecked` (the steer value is unbounded) |

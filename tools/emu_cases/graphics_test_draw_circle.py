@@ -1,6 +1,6 @@
 """GraphicsTest::DrawCircle 0x0047bd10, the debug circle of line segments (tools/emu_diff.py case).
 
-The linked body is samples/physics/helpers/GraphicsTestNearMisses.cpp. CrossProductCall
+The linked body is src/krusty2/core/GraphicsTest.cpp. CrossProductCall
 0x00515600 and Vec3Normalize 0x005087b0 run natively (retail's). The circle has 0..32 segments
 (above 32 both bodies write 2 * segments vertices past the 64-entry array, into the caller's
 frame), no axis (the xz plane) or a random, axis-aligned, diagonal or zero axis, random centres
@@ -11,7 +11,7 @@ import random
 
 RETAIL_VA = 0x0047bd10
 SYMBOL = '?DrawCircle@GraphicsTest@@QAEXPBUVec3@@M0H@Z'
-SOURCE = 'samples/physics/helpers/GraphicsTestNearMisses.cpp'
+SOURCE = 'src/krusty2/core/GraphicsTest.cpp'
 PROBES = {0x0047be11: 'axis basis', 0x0047c096: 'draw'}
 
 

@@ -1,5 +1,5 @@
 // Native execution of the complete production GridNode corner sampler.
-// No sampler dependency is scripted; only its unused segment virtual fails fast.
+// No sampler dependency is scripted; only the unused segment virtual's plane helper fails fast.
 #include <windows.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -32,7 +32,8 @@ static unsigned checks;
 static unsigned scaleChecks;
 static GridNode* Node(int index){return (GridNode*)state.nodes[index];}
 static GridBaseBlock* Block(int index){return (GridBaseBlock*)state.blocks[index];}
-int GridNode::IntersectSegment(const GridVec3*,const GridVec3*,GridVec3*,GridNode**,int*,int*){ExitProcess(81);return 0;}
+// GridNode.cpp's segment virtual (0x00483d40) is never called here; its plane helper fails fast.
+void LinePlaneIntersection(const Vector3*,const Vector3*,const Vector3*,const Vector3*,const Vector3*,Vector3*){ExitProcess(81);}
 
 static int Map(const char* path){
     BYTE* mapped=(BYTE*)0x400000;DWORD old;

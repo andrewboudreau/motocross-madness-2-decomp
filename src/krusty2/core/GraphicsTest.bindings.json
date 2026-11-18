@@ -57,5 +57,8 @@
   "_kVec3XAxis": "0x0065b640",
   "_kVec3YAxis": "0x0065b650",
   "_kVec3ZAxis": "0x0065b620",
-  "_kVec3Zero": "0x0065b630"
+  "_kVec3Zero": "0x0065b630",
+  "?CrossProductCall@@YA?AUVec3@@ABU1@0@Z": "0x00515600",
+  "?Vec3Normalize@@YA?AUVec3@@ABU1@@Z": "0x005087b0",
+  "__real@4@4001c90fdb0000000000": "0x00550488"
 }

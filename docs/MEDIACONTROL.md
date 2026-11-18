@@ -40,14 +40,45 @@ Member names are ours: `Open` (`0x004a2560`), `IsDirectShowInstalled`
   while (0)` body. That form places the shared `return 0` before `return 1`
   (`jl` to it, then `jge` over it). The `&&`, nested-if, early-return,
   `goto`, ternary and result-flag forms all put `return 1` first.
-- Near miss: `0x004a2560` (open, 646 bytes) in
-  `samples/gameui/MediaControlNearMisses.cpp`. Every call, argument and
+- Near miss: `0x004a2560` (open, 646 bytes) in `MediaControl.cpp`, in
+  retail order with a `// Not exact` status comment. Every call, argument and
   branch target matches. Retail allocates one more callee-saved register
   (a zero in `ebx`, `&videoDrawStream` in `ebp`), which shifts every frame
   offset by four.
   The [functional build review](MEDIA_CONTROL_OPEN.md#functional-build-review)
   records the complete-body native COM/output/alias/failure comparison and
   the remaining real-device and decoder limits.
+
+## Open `0x004a2560`: forms tried
+
+Carried over from the header of the former `samples/gameui/MediaControlNearMisses.cpp` when Open moved into MediaControl.cpp.
+
+```text
+0x004a2560 (open, 646 bytes; 9% masked): every call, argument, GUID and
+branch target matches. Retail keeps a zero in ebx and &videoDrawStream in ebp
+after the QueryInterface for the DirectDraw stream and pushes ebx for the
+later zero arguments; VC6 here pushes immediates and uses one register
+fewer, so the frame offsets differ by one dword. Neither local order nor
+moving the `surface = 0` store before the memset changes it. Retail's ebx
+holds &videoStream and then videoStream itself (the QueryInterface `this`)
+before the zero; VC6 here reloads it into eax.
+
+The zero register itself is reachable: `DirectDrawSurface* surface
+= 0;` as a declaration initialiser (with the later `surface = 0` kept)
+makes VC6 keep the zero in a register and reproduces retail's frame (637
+bytes). But retail births the `xor ebx, ebx` inside the inlined memset
+after that QueryInterface and keeps &videoDrawStream in ebp and videoStream in
+ebx; VC6 hoists the xor to entry and swaps ebx/ebp, so the score stays.
+Zeroing `surface` both before the memset and after frameHeight gives 11%
+with two stores. Session 14: the initialiser in a block opened after the
+videoDrawStream QueryInterface (later `surface = 0` kept) scores 73 of 646
+strict against 53, but VC6 still births the zero at entry (in ebp,
+&videoDrawStream in ebx) and adds a store, so it is not adopted. A bare
+block (53) or the rest nested under `>= 0` instead of the goto (50; 64
+with the initialiser) do not help.
+Retail's second memset fills with eax, the zero the DirectDraw
+QueryInterface's `jne failed` test leaves there.
+```
 
 ## Reproduce
 

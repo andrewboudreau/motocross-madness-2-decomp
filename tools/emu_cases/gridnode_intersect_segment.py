@@ -26,7 +26,7 @@ import struct
 
 RETAIL_VA = 0x00483d40
 SYMBOL = '?IntersectSegment@GridNode@@UAEHPBUGridVec3@@0PAU2@PAPAV1@PAH3@Z'
-SOURCE = 'samples/render/GridNodeNearMisses.cpp'
+SOURCE = 'src/reconstructed/GridNode.cpp'
 BINDINGS = {'_g_gridRow16': 0x0056c2ac, '_g_gridRow17': 0x0056c2f0}
 PROBES = {0x004845f2: 'child call', 0x004a1300: 'LinePlaneIntersection'}
 FPCWS = (0x027f, 0x007f, 0x037f)

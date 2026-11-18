@@ -50,5 +50,14 @@
   "_CLSID_FilterGraph": "0x00558ee0",
   "_IID_IGraphBuilder": "0x00558ef0",
   "__except_list": "0x00000000",
-  "__imp__CoCreateInstance@20": "0x005503fc"
+  "__imp__CoCreateInstance@20": "0x005503fc",
+  "?Open@MediaControl@@QAEPAV1@PAXPBDP6AXPAVUIDialog@@@Z2@Z": "0x004a2560",
+  "_CLSID_AMMultiMediaStream": "0x00558ec0",
+  "_IID_IAMMultiMediaStream": "0x00558ed0",
+  "_IID_IDirectDraw": "0x00556080",
+  "_IID_IDirectDrawMediaStream": "0x00558e90",
+  "_IID_IDirectDrawSurface4": "0x005560f0",
+  "_MSPID_PrimaryAudio": "0x00558ea0",
+  "_MSPID_PrimaryVideo": "0x00558eb0",
+  "__imp__MultiByteToWideChar@24": "0x005501a0"
 }

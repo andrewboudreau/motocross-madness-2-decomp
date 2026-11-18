@@ -239,7 +239,7 @@ sampler `0x00483910` `GetCellCorners` (1067 bytes, in GridNode.cpp: reading
 cell coordinates `cx`/`cz`), and the leaf lookup `0x00484d70` `FindLeaf`
 (90 bytes, a tail call into the child through an index local with the
 child slot read twice; VC6 eliminates the tail call into retail's loop).
-Near miss (`samples/render/GridNodeNearMisses.cpp`):
+Near miss (in GridNode.cpp, in retail order with a `// Not exact` status comment):
 
 | Function | Bytes | What differs |
 |---|---:|---|
@@ -437,6 +437,55 @@ in the else block, oldMask declared last; `size >= 2` 101 strict by
 position only (185 aligned), oldMask declared first 174 aligned.
 Dropping `coarse = 1` (a probe, not retail's logic) does not free the
 constant register either.
+
+### IntersectSegment `0x00483d40`
+
+Carried over from the header of the former `samples/render/GridNodeNearMisses.cpp` when its body moved into GridNode.cpp.
+
+```text
+0x00483d40 (GridNode slot 1, 4140 bytes): linked masked 0.920, strict 0.520
+(1369/1387 insns; was 0.832/0.449 without the frame pragma, 0.602 before). Readable reconstruction of the decoded control flow
+(grid-line crossings, merge, child recursion, leaf triangles).
+Retail has an ebp frame (`sub esp, 0x43c`) and rounds the cell indices with four
+bare `fistp dword ptr [eax]` (0x4844aa, 0x4844be, 0x484670, 0x484687; the
+`fstp [ebp+8] ; fld [ebp+8] ; mov eax, [ebp+0xc] ; fistp [eax]` pattern of an
+inlined `__asm { fld f ; mov eax, out ; fistp [eax] }` helper) while `__ftol` is
+still called for the other casts (0x483dd2, 0x483f96, 0x484d40, 0x484d57), so
+/QIfist is excluded and the match is out of reach under the no-inline-asm rule.
+GridRoundToInt rounds them with src/bringup/X87FloatToInt.h (fistp's ties-to-even).
+Retail has no range test on the rounded cell indices (only the child loop's
+`== 16 -> 15` clamp, 0x4844c3/0x4844d3).
+Differential emulation against retail (unicorn: random 1- to 3-level grid trees, lattice,
+tie and axis-aligned segments, every x87 rounding and precision mode) finds no behaviour
+difference in 6000 cases; see docs/GAME_BUILD.md (bodies checked by emulation).
+
+Logic fixes from the retail branches (session 25):
+- merge dedupe: after taking an x crossing, retail drops the next y crossing when
+  x OR y is equal (0x4842a5/0x484305 jump on the x compare alone); it was `&&`.
+  The tail arms keep `&& k != 0`.
+- leaf distance tests are `A <= B` (`test ah, 1 ; je found`), not `!(B < A)`, and
+  the height max is a `>` ternary (`GridMax`): both differ only for NaN inputs.
+Shape levers that moved the masked score: the crossing loops split by the sign of
+dx/dy with `step` set by an if/else, member-wise stores with `nx = 1` placed between
+them, i/j/k at function scope, the y midpoint computed before the x rounding,
+`goto found` with the label after the loop's `return 0`, `v0 = Vector3(...)`
+temporaries, nested GridMin/GridMax (retail evaluates Min(h01, h11) first).
+Ruled out: `twoCells` spelled cellSize + cellSize / * 2 / 2.0f (identical); a
+GridCopy(dst, src) pointer helper (one strength-reduced pointer instead of the
+per-member ones retail has); a struct-copy loop (becomes rep movsd); an inline
+rounding helper (VC6 inlines the long X87FloatToInt body at some sites).
+Frame: `#pragma optimize("y", off)` on this function alone gives the EBP frame retail's
+inline-asm helper forces (docs/GAME_BUILD.md#frame-pointer-units; the unit's other
+functions are unchanged). With it the leaf cell is an index into block->cells (retail
+addresses `[cells + idx*8 + disp]` per corner; a cell pointer became `lea` + offsets)
+and out->y is stored before out->z, as retail does (0x484fa4..0x485029).
+Remaining: retail keeps p1 in its argument slot (`mov edx, [ebp+0xc] ; fld st(0) ;
+fcomp [edx]`, the asm helper's register cost) and nx/ny in ebx/edi, and its four
+fistp sites are inline where GridRoundToInt is a call.
+k-scan (s22): compiled behind 0..63 prepended typedefs, 0x00483d40 has the
+same code at every count, so its difference is not a declaration-count
+effect (docs/VC6_OPERAND_ORDER.md section 2).
+```
 
 ### Node loader `0x0047e600` (exact)
 

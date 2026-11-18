@@ -1,15 +1,25 @@
 // MediaControl.cpp -- see MediaControl.h for the evidence.
 
 #include <windows.h>
+#include <string.h>
 
 #include "MediaControl.h"
 
 #include "DebugAlloc.h"
+#include "PCVideoCard.h"
+#include "PCRenderTarget.h"
 
 extern "C" const Guid CLSID_FilterGraph;           // 0x00558ee0
 extern "C" const Guid IID_IGraphBuilder;           // 0x00558ef0
+extern "C" const Guid CLSID_AMMultiMediaStream;    // 0x00558ec0
+extern "C" const Guid IID_IAMMultiMediaStream;     // 0x00558ed0
+extern "C" const Guid MSPID_PrimaryVideo;          // 0x00558eb0
+extern "C" const Guid MSPID_PrimaryAudio;          // 0x00558ea0
+extern "C" const Guid IID_IDirectDrawMediaStream;  // 0x00558e90
+extern "C" const Guid IID_IDirectDraw;             // 0x00556080
+extern "C" const Guid IID_IDirectDrawSurface4;     // 0x005560f0
 
-// 0x004a2560 (open) is a near miss: samples/gameui/MediaControlNearMisses.cpp.
+#define TARGET() ((PCRenderTarget*)renderContext)
 
 // 0x004a23d0
 int MediaControl::IsDirectShowInstalled()
@@ -81,6 +91,95 @@ MediaControl::~MediaControl()
         directDraw->Release();
         directDraw = 0;
     }
+}
+
+// 0x004a2560. Not exact (53 of 646 bytes, 656 compiled: retail keeps a zero in
+// ebx and &videoDrawStream in ebp after the DirectDraw stream QueryInterface and
+// pushes ebx for the later zero arguments; VC6 pushes immediates and uses one
+// register fewer, so the frame offsets differ by one dword;
+// docs/MEDIACONTROL.md forms tried)
+MediaControl* MediaControl::Open(void* target, const char* file,
+                                                  void (*done)(UIDialog* dialog), UIDialog* owner)
+{
+    DirectDrawSurface* surface;
+    DDSurfaceDesc2 frameDesc;
+    DDSurfaceDesc format;
+    unsigned short path[MAX_PATH];
+    long result;
+
+    GameObject::SetRenderContext(target);
+    if (!IsDirectShowInstalled()) {
+        goto failed;
+    }
+    displayDirectDraw = ((PCRenderTarget*)target)->targetDisplay->directDraw;
+    doneCallback = done;
+    doneOwner = owner;
+    if (CoCreateInstance(*(const GUID*)&CLSID_AMMultiMediaStream, 0, CLSCTX_INPROC_SERVER,
+                         *(const GUID*)&IID_IAMMultiMediaStream, (void**)&multiMediaStream)) {
+        goto failed;
+    }
+    if (multiMediaStream->Initialize(0, 0, 0) < 0) {
+        goto failed;
+    }
+    if (multiMediaStream->AddMediaStream(displayDirectDraw, &MSPID_PrimaryVideo, 0, 0) < 0) {
+        goto failed;
+    }
+    result = multiMediaStream->AddMediaStream(0, &MSPID_PrimaryAudio, 1, 0);
+    if (result != 0x80040256 && result < 0) {
+        goto failed;
+    }
+    multiMediaStream->AddRef();
+    MultiByteToWideChar(CP_ACP, 0, file, -1, path, MAX_PATH);
+    if (multiMediaStream->OpenFile(path, 0) < 0) {
+        goto failed;
+    }
+    if (multiMediaStream->GetMediaStream(&MSPID_PrimaryVideo, &videoStream) < 0) {
+        goto failed;
+    }
+    if (videoStream->QueryInterface(&IID_IDirectDrawMediaStream, (void**)&videoDrawStream) < 0) {
+        goto failed;
+    }
+    memset(&format, 0, sizeof(format));
+    format.size = sizeof(format);
+    if (videoDrawStream->GetFormat(&format, 0, 0, 0) < 0) {
+        goto failed;
+    }
+    frameWidth = format.width;
+    frameHeight = format.height;
+    surface = 0;
+    if (TARGET()->targetDisplay->directDraw->QueryInterface(&IID_IDirectDraw, (void**)&directDraw)) {
+        goto failed;
+    }
+    if (directDraw->CreateSurface((DDSurfaceDesc2*)&format, &surface, 0)) {
+        goto failed;
+    }
+    if (videoDrawStream->CreateSample(surface, 0, 1, &videoSample) < 0) {
+        goto failed;
+    }
+    if (surface->QueryInterface(&IID_IDirectDrawSurface4, (void**)&sampleSurface)) {
+        goto failed;
+    }
+    memset(&frameDesc, 0, sizeof(frameDesc));
+    frameDesc.size = sizeof(frameDesc);
+    if (TARGET()->renderSurface->GetSurfaceDesc(&frameDesc)) {
+        goto failed;
+    }
+    frameDesc.height = frameHeight;
+    frameDesc.width = frameWidth;
+    frameDesc.flags = 0x1007;
+    frameDesc.caps[0] = 0x2800;
+    if (displayDirectDraw->CreateSurface(&frameDesc, &frameSurface, 0)) {
+        goto failed;
+    }
+    frameRect[2] = frameWidth;
+    frameRect[1] = 0;
+    frameRect[0] = 0;
+    frameRect[3] = frameHeight;
+    return this;
+
+failed:
+    Release();
+    return 0;
 }
 
 // 0x00401e20 (folded with SoundGroup::Disable)

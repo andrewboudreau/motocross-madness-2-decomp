@@ -12,6 +12,7 @@ from mcm2tool.coff import CoffObject
 from mcm2tool.pe import PEImage
 from mcm2tool.toolchain import find_child_ci, find_vc6_bin, infer_vc98_root, sha256_file
 from tools.match import compare
+from tools.unit_source import standalone_source
 
 ROOT = Path(__file__).resolve().parents[1]
 SYMBOL = '?Open@MediaControl@@QAEPAV1@PAXPBDP6AXPAVUIDialog@@@Z2@Z'
@@ -83,15 +84,29 @@ class MediaControlOpenBehaviorTests(unittest.TestCase):
                     encoding='latin-1',env={**os.environ,'PYTHONPATH':str(ROOT)})
                 self.assertEqual(result.returncode,0,result.stdout+result.stderr)
                 return obj,CoffObject(obj)
-            candidate_path,candidate=compile_source('samples/gameui/MediaControlNearMisses.cpp')
+            # Open lives in MediaControl.cpp; the candidate is a validation unit holding
+            # it and the unit's GUID declarations, the aggregate the canonical unit.
+            canonical=ROOT/'src/reconstructed/MediaControl.cpp'
+            text=canonical.read_text(encoding='latin-1')
+            start=text.index('extern "C" const Guid CLSID_AMMultiMediaStream;')
+            prelude=text[start:text.index('\n',text.index('#define TARGET()'))+1]
+            unit=output/'MediaControlOpen.cpp'
+            unit.write_text(standalone_source(canonical,['MediaControl::Open'],prelude),encoding='latin-1')
+            candidate_path,candidate=compile_source(str(unit))
+            _,aggregate=compile_source('src/reconstructed/MediaControl.cpp')
             entry=candidate.find_symbol(SYMBOL)
             self.assertEqual(entry.function_size,656)
             self.assertEqual({s.name for s in candidate.symbols if s.storage_class==2 and s.section_number>0 and s.type==0x20},{SYMBOL})
             self.assertEqual({s.name for s in candidate.symbols if s.storage_class==2 and s.section_number==0},{*HELPERS,*GUIDS,*IMPORTS})
             self.assertFalse(any(s.name.startswith('.CRT') for s in candidate.sections))
-            report=compare(image,candidate,SYMBOL,0x4a2560,646,ROOT/'samples/gameui/MediaControlNearMisses.bindings.json')
-            self.assertFalse(report['strict_exact'])
-            self.assertEqual(report['strict_match']['matching_positions'],53)
+            for coff in (candidate,aggregate):
+                report=compare(image,coff,SYMBOL,0x4a2560,646,ROOT/'src/reconstructed/MediaControl.bindings.json')
+                self.assertFalse(report['strict_exact'])
+                self.assertEqual(report['strict_match']['matching_positions'],53)
+            def normalized(coff):
+                entry=coff.find_symbol(SYMBOL);body,size,relocations=coff.symbol_extent(entry)
+                return body,size,[(r.virtual_address-entry.value,r.type,coff.symbol_by_index[r.symbol_index].name) for r in relocations]
+            self.assertEqual(normalized(candidate),normalized(aggregate))
             body,size,relocations=candidate.symbol_extent(entry)
             for r in relocations:
                 name=candidate.symbol_by_index[r.symbol_index].name

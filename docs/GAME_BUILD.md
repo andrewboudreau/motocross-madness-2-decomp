@@ -654,7 +654,7 @@ per-function checks on random and edge inputs.
 | `BoundingBoxTreeQueryNearMisses.cpp` | `box_overlap` | 0x424ab0 | 94 |
 | `ConstraintMethodCollisionModel.cpp` | `constraint_contact_impulse` | 0x43bdb0 | 120 |
 | `ContactImpulse.cpp` | `contact_solve_impulse` | 0x5004a0 | 120 |
-| `GraphicsTestNearMisses.cpp` | `graphics_test_draw_circle` | 0x47bd10 | 120 |
+| `GraphicsTest.cpp` | `graphics_test_draw_circle` | 0x47bd10 | 120 |
 | `D3DIMSoultreeShadowNearMisses.cpp` | `d3dim_shadow_slot30` | 0x446f40 | 400 |
 | `D3DIMSoultreeShadowNearMisses.cpp` | `d3dim_shadow_slot29` | 0x446c30 | 200 |
 | `ProjectedShadowNearMisses.cpp` | `projected_shadow_render` | 0x4db8c0 | 400 |
@@ -1220,7 +1220,7 @@ Left alone:
   file has 18 truncating `__ftol` casts in other functions, and calibration
   compiles it without `/QIfist`. Its `fadeTime` could be zero, so it would
   need the checked helper. It keeps `X87FloatToInt`.
-- `GridNode::IntersectSegment` (0x00483d40, `GridNodeNearMisses.cpp`) calls
+- `GridNode::IntersectSegment` (0x00483d40, `GridNode.cpp`) calls
   `__ftol` four times next to its four fistp sites, as retail does. The
   sample would need the rounding moved to another unit, for little gain
   (0.832). It keeps `X87FloatToInt`; differential emulation later found it
@@ -2029,7 +2029,7 @@ configured flags.
 | `TerrainShadow.cpp` (sample) | slot 30 0x00509aa0 | pragma; then per-use reloads instead of cached locals | 0.718 -> 0.736 -> 0.875 | 0.442 -> 0.450 -> 0.702 | 0 / 2000 |
 | `D3DIMSoultreeShadowNearMisses.cpp` (sample) | slot 30 0x00446f40 | pragma | 0.862 -> 0.891 | 0.598 -> 0.665 | 0 / 2000 |
 | `ProjectedShadowNearMisses.cpp` (sample) | TintCasterVertices 0x004dc2b0 | pragma | 0.759 -> 0.774 | 0.330 -> 0.346 | 0 / 2000 |
-| `GridNodeNearMisses.cpp` (sample) | GridNode::IntersectSegment 0x00483d40 (no `/QIfist`: retail keeps four truncating `__ftol` casts) | pragma; then the leaf cell as an index and out->y stored before out->z | 0.832 -> 0.903 -> 0.916 | 0.449 -> 0.493 -> 0.520 | 0 / 3000 (three round-to-nearest control words; at -n 2000 one input faults in both bodies, as before) |
+| `GridNode.cpp` (was `GridNodeNearMisses.cpp`) | GridNode::IntersectSegment 0x00483d40 (no `/QIfist`: retail keeps four truncating `__ftol` casts) | pragma; then the leaf cell as an index and out->y stored before out->z | 0.832 -> 0.903 -> 0.916 | 0.449 -> 0.493 -> 0.520 | 0 / 3000 (three round-to-nearest control words; at -n 2000 one input faults in both bodies, as before) |
 | `ProjectedShadowNearMisses.cpp` (sample) | RenderShadow 0x004db8c0 (framed in retail) | none: the pragma lowers both scores | 0.738 (0.733 with it) | 0.452 (0.340 with it) | 0 / 2000 |
 | `TrackOverlay.cpp` (was `Group4_Overlay.cpp`) | ChatOverlay::Setup 0x0051cf80 (frameless) | no flags, no pragma; then the panel bottom as `source.top + height` | 1.000 | 0.964 -> 1.000 | n/a |
 
