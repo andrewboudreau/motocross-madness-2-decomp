@@ -25,8 +25,7 @@
 // __FILE__ at 0x00572154): BaseQuarryEvent, 0x004de2a0..0x004e1fa7, between
 // Quantize.cpp (ends 0x004de29f) and racesnd.cpp (RaceSound's constructor
 // 0x004e1fb0). Names are provisional. Not here: the loader 0x004de590
-// (about 7.9 KB, not reconstructed) and the near miss slot 12 (0x004e14a0),
-// kept in samples/game/QuarryStuntEventNearMisses.cpp.
+// (about 7.9 KB, not reconstructed). Slot 12 (0x004e14a0) is not exact.
 
 #define SoundSystem() ((PCSoundInterface*)g_TrackGame->soundInterface)
 
@@ -460,6 +459,195 @@ int BaseQuarryEvent::OnControlPress(ControlEvent* event, InputButtonState* entry
             s_DebugRow++;
             if (s_DebugRow > 10)
                 s_DebugRow = 0;
+        }
+    }
+    return 0;
+}
+
+// 0x004e14a0. Not exact (166 of 1756 bytes, 1760 compiled: the prologue
+// keeps the page in edx where retail reloads TrackGame+0x38 into ecx, and
+// the rest shifts by that one reload; docs/QUARRYSTUNTEVENT.md forms tried).
+int BaseQuarryEvent::PrepareGeometry() {
+    GameObject::PrepareGeometry();
+    if (g_TrackGame->testKey && g_TrackGame->debugOverlay) {
+        if (s_DebugPage < 0)
+            s_DebugPage = g_TrackGame->debugOverlay->NewPage();
+        if (g_TrackGame->debugOverlay->shownPage == s_DebugPage) {
+            char atmosphere[0x40];
+            int down = g_TrackGame->controlInterface->IsDeviceButtonDown(0xd0, 0, 0x80, 0);
+            int up = g_TrackGame->controlInterface->IsDeviceButtonDown(0xc8, 0, 0x80, 0);
+            if (up || down) {
+                unsigned int sun = sunLight->PackedColor();
+                unsigned int ambient = ambientLight->PackedColor();
+                Fog* fog = eventFog;
+                float visibility;
+                float haziness;
+                unsigned int color;
+                int value;
+                if (fog) {
+                    visibility = fog->fogVisibility;
+                    haziness = fog->fogHaziness;
+                    color = fog->fogColor;
+                } else {
+                    visibility = 0.0f;
+                    haziness = 0.0f;
+                    color = 0;
+                }
+                switch (s_DebugRow) {
+                case 0:
+                    if (up) {
+                        visibility += 0.05f;
+                        if (visibility > 1.0f)
+                            visibility = 1.0f;
+                    } else if (down) {
+                        visibility -= 0.05f;
+                        if (visibility < 0.0f)
+                            visibility = 0.0f;
+                    }
+                    break;
+                case 1:
+                    if (up) {
+                        haziness -= 0.05f;
+                        if (haziness < 0.0f)
+                            haziness = 0.0f;
+                    } else if (down) {
+                        haziness += 0.05f;
+                        if (haziness > 1.0f)
+                            haziness = 1.0f;
+                    }
+                    break;
+                case 2:
+                    value = (color >> 16) & 0xff;
+                    if (up) {
+                        if (++value > 0xff)
+                            value = 0xff;
+                    } else if (down) {
+                        if (--value < 0)
+                            value = 0;
+                    }
+                    color = (color & 0xff00ffff) | (value << 16);
+                    break;
+                case 3:
+                    value = (color >> 8) & 0xff;
+                    if (up) {
+                        if (++value > 0xff)
+                            value = 0xff;
+                    } else if (down) {
+                        if (--value < 0)
+                            value = 0;
+                    }
+                    color = (color & 0xffff00ff) | (value << 8);
+                    break;
+                case 4:
+                    value = color & 0xff;
+                    if (up) {
+                        if (++value > 0xff)
+                            value = 0xff;
+                    } else if (down) {
+                        if (--value < 0)
+                            value = 0;
+                    }
+                    color = (color & 0xffffff00) | value;
+                    break;
+                case 5:
+                    value = (sun >> 16) & 0xff;
+                    if (up) {
+                        if (++value > 0xff)
+                            value = 0xff;
+                    } else if (down) {
+                        if (--value < 0)
+                            value = 0;
+                    }
+                    sun = (sun & 0xff00ffff) | (value << 16);
+                    break;
+                case 6:
+                    value = (sun >> 8) & 0xff;
+                    if (up) {
+                        if (++value > 0xff)
+                            value = 0xff;
+                    } else if (down) {
+                        if (--value < 0)
+                            value = 0;
+                    }
+                    sun = (sun & 0xffff00ff) | (value << 8);
+                    break;
+                case 7:
+                    value = sun & 0xff;
+                    if (up) {
+                        if (++value > 0xff)
+                            value = 0xff;
+                    } else if (down) {
+                        if (--value < 0)
+                            value = 0;
+                    }
+                    sun = (sun & 0xffffff00) | value;
+                    break;
+                case 8:
+                    value = (ambient >> 16) & 0xff;
+                    if (up) {
+                        if (++value > 0xff)
+                            value = 0xff;
+                    } else if (down) {
+                        if (--value < 0)
+                            value = 0;
+                    }
+                    ambient = (ambient & 0xff00ffff) | (value << 16);
+                    break;
+                case 9:
+                    value = (ambient >> 8) & 0xff;
+                    if (up) {
+                        if (++value > 0xff)
+                            value = 0xff;
+                    } else if (down) {
+                        if (--value < 0)
+                            value = 0;
+                    }
+                    ambient = (ambient & 0xffff00ff) | (value << 8);
+                    break;
+                case 10:
+                    value = ambient & 0xff;
+                    if (up) {
+                        if (++value > 0xff)
+                            value = 0xff;
+                    } else if (down) {
+                        if (--value < 0)
+                            value = 0;
+                    }
+                    ambient = (ambient & 0xffffff00) | value;
+                    break;
+                }
+                if (fog)
+                    fog->SetParameters(color, visibility, haziness);
+                sunLight->SetColor(sun);
+                ambientLight->SetColor(ambient);
+                if (ecoSystem)
+                    ecoSystem->LightingChanged();
+            }
+            if (eventFog) {
+                if (eventFog->fogKind == 0x100)
+                    strcpy(atmosphere, "(Table Fog)");
+                else if (eventFog->fogKind == 0x80)
+                    strcpy(atmosphere, "(Vertex Fog)");
+                else if (eventFog->fogKind == 0x10000)
+                    strcpy(atmosphere, "(Range Fog)");
+            } else {
+                strcpy(atmosphere, "(No Fog)");
+            }
+            g_TrackGame->debugOverlay->Title(s_DebugPage, "Atmosphere %s", atmosphere);
+            if (eventFog) {
+                g_TrackGame->debugOverlay->Print(s_DebugPage, "Visibility %f", eventFog->fogVisibility);
+                g_TrackGame->debugOverlay->Print(s_DebugPage, "Haziness %f", eventFog->fogHaziness);
+                g_TrackGame->debugOverlay->Print(s_DebugPage, "Fog R      %d", (eventFog->fogColor >> 16) & 0xff);
+                g_TrackGame->debugOverlay->Print(s_DebugPage, "Fog G      %d", (eventFog->fogColor >> 8) & 0xff);
+                g_TrackGame->debugOverlay->Print(s_DebugPage, "Fog B      %d", eventFog->fogColor & 0xff);
+            }
+            g_TrackGame->debugOverlay->Print(s_DebugPage, "SunLight R %d", (sunLight->PackedColor() >> 16) & 0xff);
+            g_TrackGame->debugOverlay->Print(s_DebugPage, "SunLight G %d", (sunLight->PackedColor() >> 8) & 0xff);
+            g_TrackGame->debugOverlay->Print(s_DebugPage, "SunLight B %d", sunLight->PackedColor() & 0xff);
+            g_TrackGame->debugOverlay->Print(s_DebugPage, "Ambient  R %d", (ambientLight->PackedColor() >> 16) & 0xff);
+            g_TrackGame->debugOverlay->Print(s_DebugPage, "Ambient  G %d", (ambientLight->PackedColor() >> 8) & 0xff);
+            g_TrackGame->debugOverlay->Print(s_DebugPage, "Ambient  B %d", ambientLight->PackedColor() & 0xff);
+            g_TrackGame->debugOverlay->SetRowHighlight(s_DebugPage, s_DebugRow + 1, 1);
         }
     }
     return 0;

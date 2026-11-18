@@ -22,7 +22,6 @@ import test_eco_quadtree_connections as whole
 
 ROOT=Path(__file__).resolve().parents[1]
 CALLER='src/reconstructed/QuarryStuntEvent.cpp'
-SAMPLE='samples/game/QuarryStuntEventNearMisses.cpp'
 RACE='src/reconstructed/BikeRace.cpp'
 MODEL='src/reconstructed/D3DIMSoulTree.cpp'
 STATE='src/reconstructed/GraphicsState.cpp'
@@ -32,7 +31,7 @@ PROVIDERS=((RACE,NEW,0x423790,240,'void BikeRace::SetDetailLevel('),
  (MODEL,'?ApplyLodSettings@D3DIMSoultreeObject@@QAEXH@Z',0x4451e0,81,'void D3DIMSoultreeObject::ApplyLodSettings('),
  (MODEL,'?SetLodThreshold@D3DIMSoultreeObject@@QAEXM@Z',0x444d60,19,'void D3DIMSoultreeObject::SetLodThreshold('),
  (MODEL,'?SetUseLighting@D3DIMSoultreeObject@@QAEXH@Z',0x4444c0,23,'void D3DIMSoultreeObject::SetUseLighting('))
-FILENAMES=(CALLER,SAMPLE)
+FILENAMES=(CALLER,)
 
 def object_pin(obj):
  with patch.object(whole,'FILENAMES',FILENAMES):rows=whole.whole_object(obj,(ROOT,))
@@ -79,10 +78,10 @@ class RaceDetailConnections(unittest.TestCase):
     if includes:args+=['--include',str(ROOT/'src/krusty2'),'--include',str(ROOT/'src/reconstructed')]
     run=subprocess.run(args,cwd=TOOL_ROOT,capture_output=True,text=True,env={**os.environ,'PYTHONPATH':str(TOOL_ROOT)})
     self.assertEqual(run.returncode,0,run.stdout+run.stderr);objects[label]=CoffObject(dest);paths[label]=dest;return objects[label]
-   for source in (CALLER,SAMPLE,RACE,MODEL,STATE):compile(source,source.replace('/','_'),source not in (CALLER,SAMPLE))
+   for source in (CALLER,RACE,MODEL,STATE):compile(source,source.replace('/','_'),source!=CALLER)
    def obj(source):return objects[source.replace('/','_')]
    pins=json.loads((ROOT/'tests/fixtures/race_detail_objects.json').read_text())['objects']
-   for source in (CALLER,SAMPLE):self.assertEqual(object_pin(obj(source)),pins[source])
+   self.assertEqual(object_pin(obj(CALLER)),pins[CALLER])
    strict=0
    for c in CASES:
     if c['source']!=CALLER:continue
@@ -116,6 +115,6 @@ class RaceDetailConnections(unittest.TestCase):
    run=subprocess.run([str(binary)],capture_output=True,text=True,timeout=30);self.assertEqual(run.returncode,0,run.stdout+run.stderr)
    self.assertEqual(run.stdout.strip(),'Race detail: 4520 cases, 200 independently modeled write faults')
    self.assertEqual(strict,35)
-   print('%d strict checks; two whole objects; %s'%(strict,run.stdout.strip()))
+   print('%d strict checks; one whole object; %s'%(strict,run.stdout.strip()))
 
 if __name__=='__main__':unittest.main()

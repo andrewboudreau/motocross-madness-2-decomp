@@ -1,15 +1,10 @@
 {
-  "baseline": "Complete published-before objects normalized under the single SetDetailLevel method name. All bytes, flags and relocation destinations remain identical; the standalone sample has no such calls.",
+  "baseline": "Complete published-before objects normalized under the single SetDetailLevel method name. All bytes, flags and relocation destinations remain identical; the standalone sample has no such calls. QuarryStuntEvent near-miss merge: slot 12 (0x004e14a0) moved from its sample into QuarryStuntEvent.cpp in retail order (104 sections, 488 relocations); the sample pin is removed and every calibration case stays exact.",
   "objects": {
     "src/reconstructed/QuarryStuntEvent.cpp": {
-      "sections": 86,
-      "relocations": 393,
-      "sha256": "6978c516b78e864f8c2f3bc618cabddcca59c1584d3ce87f0a031efb219cf0af"
-    },
-    "samples/game/QuarryStuntEventNearMisses.cpp": {
-      "sections": 23,
-      "relocations": 95,
-      "sha256": "2424e484c913dbfbb28a6ee2e5770287610a9ca2d9996a341cf879f3e2327e27"
+      "sections": 104,
+      "relocations": 488,
+      "sha256": "2055e738cd98355e16901c1b7aea52aea3c03400a584ba08edecb7e10866a2ec"
     }
   }
 }

@@ -1,5 +1,5 @@
 {
-  "baseline": "Published dfdf98230fff5c3ccead8e21a82acc4eebc5b3b9: complete same-path before/after objects preserve all payloads, flags, addends and destinations under precisely one return-type symbol mapping. Only enumerated filenames are normalized in these portable retained pins. Explicit ContainerList.h filename normalization repairs the sole cross-root SceneManager pin difference; all thirteen original private pins were reproduced before repair, and complete cross-root rows then match. QuarryStuntEvent preserves every nondebug section and relocation under only the verified SetDetailLevel method-name join; its standalone sample is unchanged. EcoSystem near-miss merge: the sample EcoSystemNearMisses.cpp and the Group4/Group5 bring-ups were folded into EcoSystem.cpp (six near-miss bodies and their helpers); the canonical object is repinned at 207 sections/1143 relocations and the sample pin removed. Every calibration case stays exact.",
+  "baseline": "Published dfdf98230fff5c3ccead8e21a82acc4eebc5b3b9: complete same-path before/after objects preserve all payloads, flags, addends and destinations under precisely one return-type symbol mapping. Only enumerated filenames are normalized in these portable retained pins. Explicit ContainerList.h filename normalization repairs the sole cross-root SceneManager pin difference; all thirteen original private pins were reproduced before repair, and complete cross-root rows then match. QuarryStuntEvent preserves every nondebug section and relocation under only the verified SetDetailLevel method-name join; its standalone sample is unchanged. EcoSystem near-miss merge: the sample EcoSystemNearMisses.cpp and the Group4/Group5 bring-ups were folded into EcoSystem.cpp (six near-miss bodies and their helpers); the canonical object is repinned at 207 sections/1143 relocations and the sample pin removed. Every calibration case stays exact. QuarryStuntEvent near-miss merge: slot 12 (0x004e14a0) moved from its sample into QuarryStuntEvent.cpp in retail order (104 sections, 488 relocations); the sample pin is removed and every calibration case stays exact.",
   "renames": {
     "?FindLightOfType@LightManager@@QAEPAVEcoLightEmitterView@@H@Z": "?FindLightOfType@LightManager@@QAEPAVLightEmitter@@H@Z"
   },
@@ -25,9 +25,9 @@
       "sha256": "0d64d4ff6f6fee96b4579461d9e0a99f4357e7f0092b6f3ce87b43a9b91096dc"
     },
     "src/reconstructed/QuarryStuntEvent.cpp": {
-      "sections": 86,
-      "relocations": 393,
-      "sha256": "6978c516b78e864f8c2f3bc618cabddcca59c1584d3ce87f0a031efb219cf0af"
+      "sections": 104,
+      "relocations": 488,
+      "sha256": "2055e738cd98355e16901c1b7aea52aea3c03400a584ba08edecb7e10866a2ec"
     },
     "src/reconstructed/ArcadeObject.cpp": {
       "sections": 32,
@@ -53,11 +53,6 @@
       "sections": 29,
       "relocations": 148,
       "sha256": "4253d8de080af600ebd528efc965bed0c3b4cca769eda75bbd3514dcce3d2c0d"
-    },
-    "samples/game/QuarryStuntEventNearMisses.cpp": {
-      "sections": 23,
-      "relocations": 95,
-      "sha256": "2424e484c913dbfbb28a6ee2e5770287610a9ca2d9996a341cf879f3e2327e27"
     },
     "samples/game/QuarryStuntEventLoaderNearMiss.cpp": {
       "sections": 50,

@@ -34,10 +34,11 @@ Source forms needed:
   g_TrackGame in a register across the first loop and spills a count
   (frame 0xc against retail's `push ecx`, 22 of 331).
 
-Near miss (`samples/game/QuarryStuntEventNearMisses.cpp`): slot 12
+Near miss, in `QuarryStuntEvent.cpp` in retail order with a `// Not exact`
+status comment ([forms tried](#slot-12-0x004e14a0-forms-tried)): slot 12
 `0x004e14a0` (166 of 1756; the prologue's register choice shifts the
-rest). The score is the same with HEAD's
-headers.
+rest). It was a whole candidate source of the game build; the unit now
+provides it.
 
 The loader `0x004de590` (7952 bytes) is a near miss in
 `samples/game/QuarryStuntEventLoaderNearMiss.cpp`, which carries its own
@@ -82,3 +83,37 @@ QuarryEvent.h now types BaseQuarryEvent's fields (size still 0xa4).
 TrackOverlay.h, SceneManager.h, RaceView.h and TrackGame.h gained members.
 SceneManager.h names CollisionCharacter +0x210 and CarProcedural
 +0x38/+0x3c for the loader's collision links.
+
+## Slot 12 `0x004e14a0`: forms tried
+
+Carried over from the header of the former `samples/game/QuarryStuntEventNearMisses.cpp` when its body moved into QuarryStuntEvent.cpp.
+
+```text
+// Near-miss QuarryStuntEvent.cpp candidates (BaseQuarryEvent), kept out of
+// src/reconstructed/QuarryStuntEvent.cpp until they match.
+//
+// BaseQuarryEvent::PrepareGeometry (0x004e14a0, 1756 bytes): the
+// "Atmosphere" debug page (fog and light colours with the up/down keys). The
+// switch, its jump table, the fog-kind strcpy chain and all prints match;
+// the prologue differs: retail loads s_DebugPage into ecx and reloads
+// TrackGame+0x38 for NewPage (VC6 here reuses ecx from the null test and
+// puts the page in edx), and after the first ControlInterface call retail
+// loads the global before moving the result to edi. Comparison order, a
+// local page, nested/early-return tests, an inline overlay accessor and
+// declaration placement do not change it; nor do `nextPage++` written
+// out, `!= 0`, a ternary or inline predicate for the overlay test, a
+// reversed page compare, an early return before the page block, a local
+// overlay pointer, or s_DebugPage non-static or address-taken. Retail
+// does not keep the overlay pointer from the null test (the sibling
+// BikeRace 0x0041f5e0 does), which frees ecx for the page.
+// Session 25: 0..5 dead initialised locals and `down`/`up` declared at
+// the top (either order) and assigned later are unchanged; 6 or more dead
+// locals grow the frame.
+// Big-gap pass (166 of 1760 strict, 507 of 531 aligned, first divergence
+// the register choice at offset 0x29, everything after it is shifted by
+// that one reload): NewPage as an inline taking the overlay or the game,
+// with or without a page local, and no-argument overlay/game accessors
+// are unchanged; `nextPage++; return nextPage - 1` aligns 500, the
+// increment stored to s_DebugPage directly or store-then-increment 510
+// (1768 bytes).
+```

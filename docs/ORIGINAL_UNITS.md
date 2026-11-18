@@ -65,6 +65,7 @@ behaviour tests use it to link one function of a unit against retail.
 
 | Unit | File | Notes |
 |---|---|---|
+| `QuarryStuntEvent.cpp` | `src/reconstructed/QuarryStuntEvent.cpp` | `D:\aardvark\VC\krusty2\QuarryStuntEvent.cpp` (`0x00572154`). Slot 12 `0x004e14a0` moved in from its sample in retail order; not exact. The loader `0x004de590` stays in `samples/game/QuarryStuntEventLoaderNearMiss.cpp`. 26 cases exact. |
 | `racesnd.cpp` | `src/reconstructed/racesnd.cpp` | All 16 retail functions; `RefillStream` not exact. `0x004e57d0` is still also reached through the `Group5_KbRaceHandler` bring-up wrapper (the handler's class is unproven: its other method `0x004de580` lies in QuarryStuntEvent.cpp's span). |
 | `cursor.cpp` | `src/reconstructed/cursor.cpp` | Renamed from `GameCursor.cpp`; 8 calibration cases exact. |
 | `dirlist.cpp` | `src/reconstructed/dirlist.cpp` | Renamed from `DirectoryList.cpp`; 27 cases exact. |

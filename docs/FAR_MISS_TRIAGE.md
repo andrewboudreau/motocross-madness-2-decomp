@@ -69,7 +69,7 @@ the function were wrong, not a finding that it is.
 |---|---|---|---|---|---|---|---|---|---|
 | 1 | `0x00493660` | KrustyBike::InterpolateNetworkState | samples/physics/krustybike/KrustyBikeNearMisses.cpp:409 | 2305/8558; index 2305/8545 | R | low | yes, src/bringup/Group3_KrustyBike.cpp (0.989) | 625 | 2260/2260 insns, frame and slots exact, same 53 calls and 235 stores; 44 masked diffs (`c` widened through its stack home, `(len+50)^2` store order, fld/fmul order). |
 | 2 | `0x00492ad0` | KrustyBike::SendStateDelta | samples/physics/krustybike/KrustyBikeNearMisses.cpp:185 | 192/2315 | R | low | yes, src/bringup/Group3_KrustyBike.cpp (0.992) | 531 | 640/642 insns, frame 0x34 exact, 5 hunks: the record-interval test is `je end` where retail has `jne deltas ; push 0 ; jmp end+1`, and the push order of the final call. |
-| 3 | `0x004e14a0` | BaseQuarryEvent::PrepareGeometry | samples/game/QuarryStuntEventNearMisses.cpp:43 | 139/1756; index 166/1760 | R | low, no emu case | yes, same file (0.994) | 485 | 511/512 insns, 7 masked diffs: which register holds the g_TrackGame load and one `mov edi, eax` placed three instructions later; everything after is positional fallout. |
+| 3 | `0x004e14a0` | BaseQuarryEvent::PrepareGeometry | src/reconstructed/QuarryStuntEvent.cpp | 139/1756; index 166/1760 | R | low, no emu case | yes, same file (0.994) | 485 | 511/512 insns, 7 masked diffs: which register holds the g_TrackGame load and one `mov edi, eax` placed three instructions later; everything after is positional fallout. |
 | 4 | `0x0040eca0` | SimulateLookAhead | samples/physics/bikeai/BikeAINearMisses.cpp:720 | 1542/17585 | S | med | yes, src/bringup/Group3_KrustyBikeAI.cpp (0.957) | 481 | 3931/3966 insns, frame 0x968 vs 0x93c, 133 calls vs 132, retail has 6 more fmul and 9 more fsub. At 0x40f5fb retail computes the accelerations with real subtractions (`fld 0.0 ; fld force.x ; fsub`, `fld -32.0 ; fsub [zero temp]`) where the candidate folds them to two `mov [..], 0xc2000000`. |
 | 5 | `0x00417ed0` | BikeRace::Create | samples/race/BikeRaceNearMisses.cpp:632 | 2822/6760; index 2828/6768 | R | low | yes, src/bringup/Group3_QuarryLoad.cpp (0.998) | 473 | 1813/1813 insns, frame 0x4e8 equal, 4 hunks: at two vector-length sites retail has `fstp [t] ; faddp ; fadd [t]` where the candidate keeps z*z on the x87 stack; one store scheduled two instructions later. |
 | 6 | `0x004db0d0` | ProjectedShadow::ComputeBounds | samples/physics/shadow/ProjectedShadowNearMisses.cpp:238 | 211/2020 | R | low | yes, same file (0.996) | 452 | 560/560 insns, identical mnemonics, 3 masked diffs (one load schedule). The whole gap is frame-slot order: disp8 against disp32 makes the candidate 1975 B against 2020. |
@@ -199,7 +199,7 @@ would plausibly write, singled out by the bytes).
    three instructions later. Everything after is positional fallout, which is
    why the strict score is so low for so small a difference. Next: try a local
    for the game pointer (or for `debugOverlay`) across the first two tests at
-   samples/game/QuarryStuntEventNearMisses.cpp:45-48, which is what retail's
+   the top of PrepareGeometry in src/reconstructed/QuarryStuntEvent.cpp, which is what retail's
    register lifetime suggests (strong inference). Also add an emu case.
 
 4. **0x0040eca0 SimulateLookAhead** (1542/17585, medium risk).

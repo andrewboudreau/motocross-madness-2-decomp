@@ -259,12 +259,6 @@
       "evidence": "docs/FILESTREAM.md#functional-build-review"
     },
     {
-      "path": "samples/game/QuarryStuntEventNearMisses.cpp",
-      "status": "reviewed-nonexact",
-      "reason": "Near-miss body admitted so the source build can link and run; defines BaseQuarryEvent::PrepareGeometry. BaseQuarryEvent::PrepareGeometry 0x004e14a0 (the debug Atmosphere page) was reviewed instruction by instruction against retail: 506 of 529 normalised instructions align; the rest is register choice in the page prologue (retail rereads TrackGame+0x38, which nothing stores between the two loads), one independent mov reordered after a ControlInterface call, and jump-table entries shifted by the 2-byte prologue difference. No behaviour difference.",
-      "evidence": "docs/GAME_BUILD.md#best-guess-review"
-    },
-    {
       "path": "samples/render/PixtransNearMisses.cpp",
       "status": "reviewed-nonexact",
       "reason": "Near-miss body admitted so the source build can link and run; defines DitherConvert, Halve1555, Halve8, Halve8888. Halve8888 and Halve1555 pass the native retail differential test (tests/test_pixtrans_halve_behavior.py) and the emu_diff cases halve8888/halve1555; DitherConvert agrees with retail in the dither_convert emu_diff case; Halve8 is checked against the retail disassembly only; bytes nonexact. Differential review against retail (tools/emu_diff.py, re-run 2026-11-16): halve8888 0x4cdf10 0 of 60 runs differ; halve1555 0x4ce420 0 of 60 runs differ; halve8 0x4cee30 0 of 100 runs differ; dither_convert 0x4cf2a0 0 of 60 runs differ. Bytes nonexact.",

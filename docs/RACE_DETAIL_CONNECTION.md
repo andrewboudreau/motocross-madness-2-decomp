@@ -40,14 +40,12 @@ under exactly one external name replacement:
 ?SetDetailLevel@BikeRace@@QAEXH@Z
 ```
 
-The standalone `QuarryStuntEventNearMisses.cpp` sample preserves all 23 sections
-and 95 relocations without a mapping. It does not include the canonical source
-and has no changed calls. All bytes, section flags, relocation kinds, addends and
-destinations are retained. No filename regions are excluded. The retained
-whole-object pins enumerate only these two source filename spellings and were
-checked against fresh actual-root compilation as well as the private mirror.
-Both callers are compiled without project include paths in the retained test,
-as required by standalone calibration.
+The standalone `QuarryStuntEventNearMisses.cpp` sample, pinned here until its
+slot 12 body moved into `QuarryStuntEvent.cpp`, had no changed calls; its pin
+is gone and the unit's pin was renewed for the merge. No filename regions are
+excluded. The retained whole-object pin enumerates only the unit's source
+filename spelling. The caller is compiled without project include paths in the
+retained test, as required by standalone calibration.
 
 The existing Eco light test's canonical QuarryStuntEvent pin is updated only
 after reproducing the published old pin and applying the exact method-name

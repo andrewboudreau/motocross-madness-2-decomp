@@ -153,7 +153,7 @@ class EcoLightConnections(unittest.TestCase):
             self.assertEqual(result.returncode,0,result.stdout+result.stderr)
             self.assertEqual(result.stdout.strip(),'Eco light: 4480 cases, 192 independently modeled AV')
             self.assertEqual(strict,75)
-        print('75 strict checks; 13 complete objects; three calls; '+result.stdout.strip())
+        print('75 strict checks; %d complete objects; three calls; ' % len(pins['objects'])+result.stdout.strip())
 
 
 if __name__=='__main__':
