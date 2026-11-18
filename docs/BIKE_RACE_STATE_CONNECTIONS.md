@@ -94,6 +94,11 @@ Removing the no-op `*(float*)&screenX`/`screenY` casts from the VisualCue access
 Krusty3DObjects.h (included by the sample) moved the window again: the sample is now 13,394
 (XOR EDI/MOV EBX at +538 swapped). Forms that only shift this count are not applied.
 
+Dropping the `QueryGround` forwarder from Krusty3DObjects.h's `RunwayTerrainView` (VisualCue::Tick
+and the runway lights call Terrain::QueryGround directly, which test_terrain_query_connections
+requires) moved it back: the sample is 13,400 again with retail's XOR EDI/MOV EBX order. That change
+was made for the call graph, not for this count, and the window can move with the next header edit.
+
 | Complete CreateRacers fingerprint | Before | After |
 |---|---|---|
 | Raw body SHA-256 | `1a2b16687fa89e9a0ed33dba31a1e46452caaaefa3ad73ce630b317a32bf07c4` | `9c7483a4d5ff8514f8a350f528dbe11d8d82d4d694439f87d069fd6fbf9e748b` |

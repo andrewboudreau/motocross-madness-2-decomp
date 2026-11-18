@@ -179,10 +179,10 @@
 // the second rand() and adds base to it; with a returned value VC6 homes the
 // pro circuit's offset in the riders/circuit slot, which then ranks too
 // high). That puts every scalar and bikeTexture/riderTexture at retail's
-// offset, so 13394 of 13428 bytes match. XOR EDI/MOV EBX at +538 are
-// swapped; a TU-wide count gives retail's order (13400) with one more
-// inline-bearing class declared or the old no-op `*(float*)&` casts in
-// Krusty3DObjects.h, neither of which is applied (see
+// offset, so 13400 of 13428 bytes match. XOR EDI/MOV EBX at +538 are in
+// retail's order at the unit's current declaration count, a TU-wide effect
+// that the next header edit can undo (13394 in the other window, as when
+// Krusty3DObjects.h declared RunwayTerrainView::QueryGround; see
 // BIKE_RACE_STATE_CONNECTIONS.md). Left: the three register choices
 // near the start (0x419b0d, 0x419b39, 0x419bf0), the first two stores of
 // the prologue in the other order (0x4199ad), the SIB order of one curve

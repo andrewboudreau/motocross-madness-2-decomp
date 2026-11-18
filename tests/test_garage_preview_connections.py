@@ -59,16 +59,16 @@ PARTIAL = [['samples/race/BikeRaceNearMisses.cpp',
   6760,
   2821,
   '59d5d6fed62ff5b907d3df81802c39f84c8feeede5d33f5cde930089545f8c90'],
- # Nonexact score 13394: XOR EDI/MOV EBX at +538..545 are exchanged (13400 with the
- # no-op `*(float*)&` cast that Krusty3DObjects.h's VisualCue accessors used to have, a
- # TU-wide count effect; not applied). BIKE_RACE_STATE_CONNECTIONS.md.
+ # Nonexact score 13400: XOR EDI/MOV EBX at +538..545 in retail's order since
+ # Krusty3DObjects.h declares RunwayTerrainView without the QueryGround forwarder
+ # (a TU-wide count effect; 13394 before). BIKE_RACE_STATE_CONNECTIONS.md.
  ['samples/race/BikeRaceNearMisses.cpp',
   '?CreateRacers@BikeRace@@',
   4299120,
   13428,
   13428,
-  13394,
-  '0d1c681ea02fca8595769e383bb8c26b54766961c5e0f091988b367da388d9ad']]
+  13400,
+  '2da850db52316df8731a83fbd44bed12c4aed598cba48e96e19bc22ce3f63d08']]
 
 
 @unittest.skipUnless(os.name == 'nt' and os.environ.get('VC6_ROOT') and os.environ.get('MCM2_EXE'),
