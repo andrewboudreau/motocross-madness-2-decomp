@@ -27,6 +27,11 @@ static inline int LevelArea(int level) {
     return side * side;
 }
 
+// 0x00464e90 (one empty body the linker folds with others): called when a
+// texture finds no page space.
+void ManagedTextureGroup::OnOutOfPageSpace() {
+}
+
 // 0x0050bed0
 ManagedTextureGroup::ManagedTextureGroup(TextureMapManager* manager, int format, int addressU, int addressV)
     : texelsBlittedHistory(5000), blitTimeHistory(5000), texturesBlittedHistory(5000) {
@@ -1010,9 +1015,4 @@ int ManagedTextureGroup::DrawSelection(PCRenderTarget* target) {
         }
     }
     return 1;
-}
-
-// 0x00464e90 (one empty body the linker folds with others): called when a
-// texture finds no page space.
-void ManagedTextureGroup::OnOutOfPageSpace() {
 }

@@ -305,6 +305,11 @@ int PCGame::OnControlPress(ControlEvent* event, InputButtonState* entry) {
     return 0;
 }
 
+// 0x004c0470
+void PCGame::SetWindowRect(const Win32Rect* rect) {
+    windowRect = *rect;
+}
+
 // 0x004c04a0: switches to display mode `mode` (full screen) or back to
 // 640x480 (windowed), recreating the render target through slot 33, then
 // reattaches the camera.
@@ -337,11 +342,6 @@ int PCGame::SwitchDisplayMode(int mode) {
         renderTarget->SetViewport(camera->viewport);
     }
     return 1;
-}
-
-// 0x004c0470
-void PCGame::SetWindowRect(const Win32Rect* rect) {
-    windowRect = *rect;
 }
 
 // 0x004c05a0: in full screen, drops duplicate modes ("HighestRefreshOnly"
@@ -386,6 +386,18 @@ int PCGame::FilterDisplayModes(PCVideoCard* display) {
                 display->totalVideoMemory < display->displayModes[i].bitDepth / 8 *
                     display->displayModes[i].height * display->displayModes[i].width * 2)
                 display->displayModes[i].bladeUsable = 0;
+        }
+    }
+    return 1;
+}
+
+// 0x004c0760
+int PCGame::LimitDisplayModes(PCVideoCard* display, int width, int height) {
+    if (fullScreen && !display->keepAllDisplayModes) {
+        for (int i = 0; i < display->displayModeCount; i++) {
+            DisplayMode* mode = &display->displayModes[i];
+            if (mode->width > width || mode->height > height)
+                mode->hardwareUsable = 0;
         }
     }
     return 1;
@@ -443,18 +455,6 @@ int PCGame::SetRenderStates() {
     PCTarget()->device->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
     renderTarget->SetRenderState(D3DRENDERSTATE_LIGHTING, 0, 1);
     renderTarget->SetRenderState(D3DRENDERSTATE_ZFUNC, D3DCMP_LESSEQUAL, 1);
-    return 1;
-}
-
-// 0x004c0760
-int PCGame::LimitDisplayModes(PCVideoCard* display, int width, int height) {
-    if (fullScreen && !display->keepAllDisplayModes) {
-        for (int i = 0; i < display->displayModeCount; i++) {
-            DisplayMode* mode = &display->displayModes[i];
-            if (mode->width > width || mode->height > height)
-                mode->hardwareUsable = 0;
-        }
-    }
     return 1;
 }
 
@@ -668,19 +668,6 @@ int PCGame::ProfileDisplays() {
     return 1;
 }
 
-// 0x004c1610: records the display's identifier under "DriverInfo\\<name>"
-// and marks it profiled (version 7).
-int PCGame::SaveDisplayProfile(PCVideoCard* display) {
-    char name[256];
-    sprintf(name, "DriverInfo\\%s\\DeviceIdentifier", display->driverGuidText);
-    SetRegistryBinary(name, &display->deviceIdentifier, sizeof(display->deviceIdentifier));
-    sprintf(name, "DriverInfo\\%s\\ProfiledCard", display->driverGuidText);
-    SetRegistryFlag(name, 0);
-    sprintf(name, "DriverInfo\\%s\\ProfileVersion", display->driverGuidText);
-    SetRegistryInt(name, 7);
-    return 1;
-}
-
 // 0x004c1410: whether any display lacks a current profile (version 7 with
 // an identical saved identifier).
 int PCGame::IsAnyProfileStale() {
@@ -707,6 +694,19 @@ int PCGame::IsAnyProfileStale() {
             return 1;
     }
     return 0;
+}
+
+// 0x004c1610: records the display's identifier under "DriverInfo\\<name>"
+// and marks it profiled (version 7).
+int PCGame::SaveDisplayProfile(PCVideoCard* display) {
+    char name[256];
+    sprintf(name, "DriverInfo\\%s\\DeviceIdentifier", display->driverGuidText);
+    SetRegistryBinary(name, &display->deviceIdentifier, sizeof(display->deviceIdentifier));
+    sprintf(name, "DriverInfo\\%s\\ProfiledCard", display->driverGuidText);
+    SetRegistryFlag(name, 0);
+    sprintf(name, "DriverInfo\\%s\\ProfileVersion", display->driverGuidText);
+    SetRegistryInt(name, 7);
+    return 1;
 }
 
 // 0x004c16b0

@@ -51,6 +51,55 @@ GameObject::~GameObject() {
         DebugFree(classNames, __FILE__, 40);
 }
 
+// 0x00468dd0: calls slot 4 on every descendant (skipping bit 3) whose name
+// list or RTTI class name starts with or contains "<name>,".
+void GameObject::DisableByClassName(const char* name) {
+    char className[128];
+    char pattern[128];
+    GameObject* child = firstChild;
+    sprintf(pattern, "%s,", name);
+    int length = strlen(pattern) - 1;
+    for (; child; child = child->nextSibling) {
+        if (child->pendingRelease)
+            continue;
+        if (strstr(child->classNames, pattern)) {
+            child->Disable();
+        } else {
+            strcpy(className, typeid(*child).name());
+            if (strlen(className) > 6 && !strncmp(className + 6, pattern, length) &&
+                strstr(className, "class ") == className)
+                child->Disable();
+            if (!strncmp(className, pattern, length))
+                child->Disable();
+        }
+        child->DisableByClassName(name);
+    }
+}
+
+// 0x00468f10: the same walk calling slot 5.
+void GameObject::EnableByClassName(const char* name) {
+    char className[128];
+    char pattern[128];
+    GameObject* child = firstChild;
+    sprintf(pattern, "%s,", name);
+    int length = strlen(pattern) - 1;
+    for (; child; child = child->nextSibling) {
+        if (child->pendingRelease)
+            continue;
+        if (strstr(child->classNames, pattern)) {
+            child->Enable();
+        } else {
+            strcpy(className, typeid(*child).name());
+            if (strlen(className) > 6 && !strncmp(className + 6, pattern, length) &&
+                strstr(className, "class ") == className)
+                child->Enable();
+            if (!strncmp(className, pattern, length))
+                child->Enable();
+        }
+        child->EnableByClassName(name);
+    }
+}
+
 // 0x00469050
 void GameObject::OnDisable() {
     for (GameObject* child = firstChild; child; child = child->nextSibling) {
@@ -79,6 +128,106 @@ void GameObject::Enable() {
     isEnabled = 1;
     receivesNetworkMessages = 1;
     OnEnable();
+}
+
+// 0x004690c0
+void GameObject::AddFlags(unsigned int flags) {
+    GameObject* object = this;
+    unsigned int combined = object->childFlags |= flags;
+    while (object->parent) {
+        unsigned int own = object->ownFlags;
+        object = object->parent;
+        combined = object->childFlags |= own | combined;
+    }
+}
+
+// 0x00469100
+unsigned int GameObject::RecomputeFlags() {
+    unsigned int flags = 0;
+    for (GameObject* child = firstChild; child; child = child->nextSibling)
+        flags |= child->RecomputeFlags();
+    childFlags = flags;
+    return ownFlags | flags;
+}
+
+// 0x00469130: appends `object` (and its later siblings) after this object's
+// last sibling, under the same parent; returns `object`.
+int GameObject::AppendSibling(GameObject* object, int value) {
+    if (g_ActiveGameObjectIterators)
+        return 0;
+    if (object) {
+        GameObject* last = this;
+        while (last->nextSibling)
+            last = last->nextSibling;
+        last->nextSibling = object;
+        object->prevSibling = last;
+        for (GameObject* sibling = object; sibling; sibling = sibling->nextSibling)
+            sibling->parent = parent;
+        object->ownFlags = value;
+        object->AddFlags(object->childFlags);
+    }
+    return (int)object;
+}
+
+// 0x00469190: appends `child` (and its later siblings) to the children;
+// returns `child`.
+int GameObject::AppendChild(GameObject* child, int value) {
+    if (g_ActiveGameObjectIterators)
+        return 0;
+    if (child) {
+        if (!firstChild) {
+            firstChild = child;
+            child->prevSibling = 0;
+        } else {
+            GameObject* last = firstChild;
+            while (last->nextSibling)
+                last = last->nextSibling;
+            last->nextSibling = child;
+            child->prevSibling = last;
+        }
+        for (GameObject* sibling = child; sibling; sibling = sibling->nextSibling)
+            sibling->parent = this;
+        child->ownFlags = value;
+        child->AddFlags(child->childFlags);
+    }
+    return (int)child;
+}
+
+// 0x004691f0
+int GameObject::Unlink() {
+    if (g_ActiveGameObjectIterators)
+        return 0;
+    if (prevSibling)
+        prevSibling->nextSibling = nextSibling;
+    if (nextSibling)
+        nextSibling->prevSibling = prevSibling;
+    if (parent && parent->firstChild == this)
+        parent->firstChild = nextSibling;
+    GameObject* root = this;
+    while (root->parent)
+        root = root->parent;
+    root->RecomputeFlags();
+    parent = 0;
+    nextSibling = 0;
+    prevSibling = 0;
+    return 1;
+}
+
+// 0x00469260: unlinks this object and inserts it before `next`.
+int GameObject::InsertBefore(GameObject* next, int value) {
+    if (g_ActiveGameObjectIterators)
+        return 0;
+    Unlink();
+    prevSibling = next->prevSibling;
+    nextSibling = next;
+    if (prevSibling)
+        prevSibling->nextSibling = this;
+    nextSibling->prevSibling = this;
+    if (next->parent && next->parent->firstChild == next)
+        next->parent->firstChild = this;
+    ownFlags = value;
+    AddFlags(childFlags);
+    return 1;
 }
 
 // 0x004692c0: visits every child, then sets bit 3 on itself.
@@ -298,218 +447,6 @@ int GameObject::AttachRenderContext(void* context) {
     return 1;
 }
 
-// 0x00469c00: unlike slots 19/22/23, not gated by childFlags.
-int GameObject::OnChar(int character) {
-    for (GameObject* child = firstChild; child; child = child->nextSibling) {
-        if (child->isEnabled && !child->pendingRelease) {
-            if (child->OnChar(character))
-                return 1;
-        }
-    }
-    return 0;
-}
-
-// 0x00469c40: like slot 20, not gated by childFlags.
-int GameObject::OnKeyDown(int key) {
-    for (GameObject* child = firstChild; child; child = child->nextSibling) {
-        if (child->isEnabled && !child->pendingRelease) {
-            if (child->OnKeyDown(key))
-                return 1;
-        }
-    }
-    return 0;
-}
-
-// 0x00469ce0: appends the RTTI name of `object`, without its "class " prefix,
-// and a comma to classNames (+0x28). The constructor passes `this`, so each
-// constructor in a hierarchy contributes its own class name.
-void GameObject::AppendClassName(GameObject* object) {
-    const char* name = typeid(*object).name();
-    int length = strlen(name);
-    if (strstr(name, "class ") == name) {
-        length -= 6;
-        name += 6;
-    }
-    classNames = static_cast<char*>(
-        DebugRealloc(classNames, strlen(classNames) + length + 2, __FILE__, 1163));
-    if (classNames) {
-        strcat(classNames, name);
-        strcat(classNames, ",");
-    }
-}
-
-// 0x004da540: shared by many classes (identical-code folding).
-int GameObject::Step(float) {
-    return 1;
-}
-
-// 0x004690c0
-void GameObject::AddFlags(unsigned int flags) {
-    GameObject* object = this;
-    unsigned int combined = object->childFlags |= flags;
-    while (object->parent) {
-        unsigned int own = object->ownFlags;
-        object = object->parent;
-        combined = object->childFlags |= own | combined;
-    }
-}
-
-// 0x00469100
-unsigned int GameObject::RecomputeFlags() {
-    unsigned int flags = 0;
-    for (GameObject* child = firstChild; child; child = child->nextSibling)
-        flags |= child->RecomputeFlags();
-    childFlags = flags;
-    return ownFlags | flags;
-}
-
-// 0x00469130: appends `object` (and its later siblings) after this object's
-// last sibling, under the same parent; returns `object`.
-int GameObject::AppendSibling(GameObject* object, int value) {
-    if (g_ActiveGameObjectIterators)
-        return 0;
-    if (object) {
-        GameObject* last = this;
-        while (last->nextSibling)
-            last = last->nextSibling;
-        last->nextSibling = object;
-        object->prevSibling = last;
-        for (GameObject* sibling = object; sibling; sibling = sibling->nextSibling)
-            sibling->parent = parent;
-        object->ownFlags = value;
-        object->AddFlags(object->childFlags);
-    }
-    return (int)object;
-}
-
-// 0x00469190: appends `child` (and its later siblings) to the children;
-// returns `child`.
-int GameObject::AppendChild(GameObject* child, int value) {
-    if (g_ActiveGameObjectIterators)
-        return 0;
-    if (child) {
-        if (!firstChild) {
-            firstChild = child;
-            child->prevSibling = 0;
-        } else {
-            GameObject* last = firstChild;
-            while (last->nextSibling)
-                last = last->nextSibling;
-            last->nextSibling = child;
-            child->prevSibling = last;
-        }
-        for (GameObject* sibling = child; sibling; sibling = sibling->nextSibling)
-            sibling->parent = this;
-        child->ownFlags = value;
-        child->AddFlags(child->childFlags);
-    }
-    return (int)child;
-}
-
-// 0x004691f0
-int GameObject::Unlink() {
-    if (g_ActiveGameObjectIterators)
-        return 0;
-    if (prevSibling)
-        prevSibling->nextSibling = nextSibling;
-    if (nextSibling)
-        nextSibling->prevSibling = prevSibling;
-    if (parent && parent->firstChild == this)
-        parent->firstChild = nextSibling;
-    GameObject* root = this;
-    while (root->parent)
-        root = root->parent;
-    root->RecomputeFlags();
-    parent = 0;
-    nextSibling = 0;
-    prevSibling = 0;
-    return 1;
-}
-
-// 0x00469260: unlinks this object and inserts it before `next`.
-int GameObject::InsertBefore(GameObject* next, int value) {
-    if (g_ActiveGameObjectIterators)
-        return 0;
-    Unlink();
-    prevSibling = next->prevSibling;
-    nextSibling = next;
-    if (prevSibling)
-        prevSibling->nextSibling = this;
-    nextSibling->prevSibling = this;
-    if (next->parent && next->parent->firstChild == next)
-        next->parent->firstChild = this;
-    ownFlags = value;
-    AddFlags(childFlags);
-    return 1;
-}
-
-// 0x00469c80
-void GameObject::ReleaseDetached() {
-    GameObject* child = firstChild;
-    while (child) {
-        if (child->pendingRelease) {
-            int previous = g_MemTagStack->Push("UI");
-            child->Unlink();
-            GameObject* removed = child;
-            child = child->nextSibling;
-            removed->Release();
-            g_MemTagStack->Pop(previous);
-        } else {
-            child->ReleaseDetached();
-            child = child->nextSibling;
-        }
-    }
-}
-
-// 0x00468dd0: calls slot 4 on every descendant (skipping bit 3) whose name
-// list or RTTI class name starts with or contains "<name>,".
-void GameObject::DisableByClassName(const char* name) {
-    char className[128];
-    char pattern[128];
-    GameObject* child = firstChild;
-    sprintf(pattern, "%s,", name);
-    int length = strlen(pattern) - 1;
-    for (; child; child = child->nextSibling) {
-        if (child->pendingRelease)
-            continue;
-        if (strstr(child->classNames, pattern)) {
-            child->Disable();
-        } else {
-            strcpy(className, typeid(*child).name());
-            if (strlen(className) > 6 && !strncmp(className + 6, pattern, length) &&
-                strstr(className, "class ") == className)
-                child->Disable();
-            if (!strncmp(className, pattern, length))
-                child->Disable();
-        }
-        child->DisableByClassName(name);
-    }
-}
-
-// 0x00468f10: the same walk calling slot 5.
-void GameObject::EnableByClassName(const char* name) {
-    char className[128];
-    char pattern[128];
-    GameObject* child = firstChild;
-    sprintf(pattern, "%s,", name);
-    int length = strlen(pattern) - 1;
-    for (; child; child = child->nextSibling) {
-        if (child->pendingRelease)
-            continue;
-        if (strstr(child->classNames, pattern)) {
-            child->Enable();
-        } else {
-            strcpy(className, typeid(*child).name());
-            if (strlen(className) > 6 && !strncmp(className + 6, pattern, length) &&
-                strstr(className, "class ") == className)
-                child->Enable();
-            if (!strncmp(className, pattern, length))
-                child->Enable();
-        }
-        child->EnableByClassName(name);
-    }
-}
-
 // 0x00469770: finds an object whose name list or RTTI class name matches
 // "<name>," (any object when `name` is 0). Modes: 0 the children, 1 all
 // descendants (depth first), 2 the other siblings, 3 the parent, 4 the
@@ -693,4 +630,67 @@ GameObject* GameObjectIterator::Next() {
         exhausted = 1;
     }
     return found;
+}
+
+// 0x00469c00: unlike slots 19/22/23, not gated by childFlags.
+int GameObject::OnChar(int character) {
+    for (GameObject* child = firstChild; child; child = child->nextSibling) {
+        if (child->isEnabled && !child->pendingRelease) {
+            if (child->OnChar(character))
+                return 1;
+        }
+    }
+    return 0;
+}
+
+// 0x00469c40: like slot 20, not gated by childFlags.
+int GameObject::OnKeyDown(int key) {
+    for (GameObject* child = firstChild; child; child = child->nextSibling) {
+        if (child->isEnabled && !child->pendingRelease) {
+            if (child->OnKeyDown(key))
+                return 1;
+        }
+    }
+    return 0;
+}
+
+// 0x00469c80
+void GameObject::ReleaseDetached() {
+    GameObject* child = firstChild;
+    while (child) {
+        if (child->pendingRelease) {
+            int previous = g_MemTagStack->Push("UI");
+            child->Unlink();
+            GameObject* removed = child;
+            child = child->nextSibling;
+            removed->Release();
+            g_MemTagStack->Pop(previous);
+        } else {
+            child->ReleaseDetached();
+            child = child->nextSibling;
+        }
+    }
+}
+
+// 0x00469ce0: appends the RTTI name of `object`, without its "class " prefix,
+// and a comma to classNames (+0x28). The constructor passes `this`, so each
+// constructor in a hierarchy contributes its own class name.
+void GameObject::AppendClassName(GameObject* object) {
+    const char* name = typeid(*object).name();
+    int length = strlen(name);
+    if (strstr(name, "class ") == name) {
+        length -= 6;
+        name += 6;
+    }
+    classNames = static_cast<char*>(
+        DebugRealloc(classNames, strlen(classNames) + length + 2, __FILE__, 1163));
+    if (classNames) {
+        strcat(classNames, name);
+        strcat(classNames, ",");
+    }
+}
+
+// 0x004da540: shared by many classes (identical-code folding).
+int GameObject::Step(float) {
+    return 1;
 }

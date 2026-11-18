@@ -177,6 +177,18 @@ GUIManager::GUIManager(int flags) : GameObject(flags) {
     drawGrabFirst = 0;
 }
 
+// 0x00485320
+GUIManager::~GUIManager() {
+    ReleaseCursors();
+    if (openedDialog)
+        openedDialog->Release();
+    ReleaseBackgroundGrab();
+    if (toolTipFont)
+        DeleteObject((HGDIOBJ)toolTipFont);
+    if (windowClipper)
+        windowClipper->Release();
+}
+
 // 0x004853b0.  `fontSize` is a short: VC6 copies a sub-int parameter at entry, so its
 // slot is the second dead argument slot handed out (after `target`'s) and the
 // ControlInterface pointer lands there; with an int parameter the slot frees only at
@@ -251,18 +263,6 @@ GUIManager* GUIManager::SetUp(void* target, Palette8* palette, TextureMapManager
     users[0]->EnableImeInput(0);
     languageModule = LoadLibraryA("uilang.dll");
     return this;
-}
-
-// 0x00485320
-GUIManager::~GUIManager() {
-    ReleaseCursors();
-    if (openedDialog)
-        openedDialog->Release();
-    ReleaseBackgroundGrab();
-    if (toolTipFont)
-        DeleteObject((HGDIOBJ)toolTipFont);
-    if (windowClipper)
-        windowClipper->Release();
 }
 
 // 0x004857f0

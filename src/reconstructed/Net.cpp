@@ -71,7 +71,6 @@ int __stdcall EnumSessionsCallback(const NetSessionDesc* desc, unsigned long* ti
 int __stdcall EnumPlayersCallback(unsigned long id, unsigned long type, const NetName* name,
                                     unsigned long flags, void* context);
 
-
 // 0x004aac40: EnumAddress callback; copies the INet address string.
 int __stdcall EnumAddressCallback(const GUID& type, unsigned long size, const void* data,
                                     void* context)
@@ -1626,6 +1625,23 @@ void ReportDirectPlayError(long result, const char* file, int line)
     sprintf(message, "\nERROR: DirectPlay (%s) in file %s at line %d\n", name, file, line);
 }
 
+// 0x004adc90
+void SessionInfoType::Clear()
+{
+    name[0] = 0;
+    if (instance) {
+        DebugFree(instance, __FILE__, 2472);
+        instance = 0;
+    }
+}
+
+// 0x004add00
+void PlayerInfoType::Clear()
+{
+    id = 0;
+    name[0] = 0;
+}
+
 // 0x004add10 (out of line: code at 0x0044b634 and 0x0044c0f5 passes its
 // address to the vector constructor)
 ConnectionInfoType::ConnectionInfoType()
@@ -1780,21 +1796,4 @@ int __stdcall EnumPlayersCallback(unsigned long id, unsigned long, const NetName
     strncpy(players[g_EnumPlayerCount].name, name->shortName, count);
     players[g_EnumPlayerCount].name[count] = 0;
     return ++g_EnumPlayerCount < 7;
-}
-
-// 0x004add00
-void PlayerInfoType::Clear()
-{
-    id = 0;
-    name[0] = 0;
-}
-
-// 0x004adc90
-void SessionInfoType::Clear()
-{
-    name[0] = 0;
-    if (instance) {
-        DebugFree(instance, __FILE__, 2472);
-        instance = 0;
-    }
 }

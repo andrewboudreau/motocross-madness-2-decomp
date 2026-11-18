@@ -18,6 +18,12 @@
 
 #define SoundSystem() ((PCSoundInterface*)g_TrackGame->soundInterface)
 
+// 0x00499af0 (folded with KrustyUI::OnActivate)
+int RaceSound::OnActivate() {
+    GameObject::OnActivate();
+    return 1;
+}
+
 // 0x004e1fb0
 RaceSound::RaceSound(int flags) : GameObject(flags) {
     int i;
@@ -800,10 +806,57 @@ int RaceSound::UpdateRacerSounds(float frameTime) {
     return 1;
 }
 
-// 0x00499af0 (folded with KrustyUI::OnActivate)
-int RaceSound::OnActivate() {
-    GameObject::OnActivate();
-    return 1;
+// 0x004e42e0: plays one of the six wreck sounds that is not playing (at most
+// ten random picks) at the racer's position; returns its index, 0 when
+// none was free.
+int RaceSound::PlayWreckSound(EventKrustyBikeView* racer) {
+    Vector3 position;
+    int tries = 0;
+    int index = rand() % 6;
+
+    while (wreckSounds[index]->IsPlaying()) {
+        if (++tries >= 10)
+            return 0;
+        index = rand() % 6;
+    }
+    racer->vehicleModel->GetPosition(reinterpret_cast<Vec3*>(&position));
+    wreckSounds[index]->Set3DPosition(position, 0);
+    PlayIfEnabled(wreckSounds[index], 0, 0, 0, 0);
+    return index;
+}
+
+// 0x004e43a0: plays one of the six fall sounds that is not playing (at most
+// ten random picks) at the racer's position; returns its index, 0 when
+// none was free.
+int RaceSound::PlayFallSound(EventKrustyBikeView* racer) {
+    Vector3 position;
+    int tries = 0;
+    int index = rand() % 6;
+
+    while (fallSounds[index]->IsPlaying()) {
+        if (++tries >= 10)
+            return 0;
+        index = rand() % 6;
+    }
+    racer->vehicleModel->GetPosition(reinterpret_cast<Vec3*>(&position));
+    fallSounds[index]->Set3DPosition(position, 0);
+    PlayIfEnabled(fallSounds[index], 0, 0, 0, 0);
+    return index;
+}
+
+// 0x004e4460
+float RaceSound::GroundDistance(Vector3* a, Vector3* b) {
+    float dx = a->x - b->x;
+    float dz;
+
+    if (dx < 0.0f)
+        dx = -dx;
+    dz = a->z - b->z;
+    if (dz < 0.0f)
+        dz = -dz;
+    if (dx <= 500.0f && dz <= 500.0f)
+        return FastSqrt(dz * dz + dx * dx);
+    return 500.0f;
 }
 
 // 0x004e44e0: Ctrl+V toggles the EAX environment, Ctrl+C cycles the music
@@ -906,59 +959,6 @@ int RaceSound::OnControlPress(ControlEvent* event, InputButtonState* entry) {
         }
     }
     return 0;
-}
-
-// 0x004e42e0: plays one of the six wreck sounds that is not playing (at most
-// ten random picks) at the racer's position; returns its index, 0 when
-// none was free.
-int RaceSound::PlayWreckSound(EventKrustyBikeView* racer) {
-    Vector3 position;
-    int tries = 0;
-    int index = rand() % 6;
-
-    while (wreckSounds[index]->IsPlaying()) {
-        if (++tries >= 10)
-            return 0;
-        index = rand() % 6;
-    }
-    racer->vehicleModel->GetPosition(reinterpret_cast<Vec3*>(&position));
-    wreckSounds[index]->Set3DPosition(position, 0);
-    PlayIfEnabled(wreckSounds[index], 0, 0, 0, 0);
-    return index;
-}
-
-// 0x004e43a0: plays one of the six fall sounds that is not playing (at most
-// ten random picks) at the racer's position; returns its index, 0 when
-// none was free.
-int RaceSound::PlayFallSound(EventKrustyBikeView* racer) {
-    Vector3 position;
-    int tries = 0;
-    int index = rand() % 6;
-
-    while (fallSounds[index]->IsPlaying()) {
-        if (++tries >= 10)
-            return 0;
-        index = rand() % 6;
-    }
-    racer->vehicleModel->GetPosition(reinterpret_cast<Vec3*>(&position));
-    fallSounds[index]->Set3DPosition(position, 0);
-    PlayIfEnabled(fallSounds[index], 0, 0, 0, 0);
-    return index;
-}
-
-// 0x004e4460
-float RaceSound::GroundDistance(Vector3* a, Vector3* b) {
-    float dx = a->x - b->x;
-    float dz;
-
-    if (dx < 0.0f)
-        dx = -dx;
-    dz = a->z - b->z;
-    if (dz < 0.0f)
-        dz = -dz;
-    if (dx <= 500.0f && dz <= 500.0f)
-        return FastSqrt(dz * dz + dx * dx);
-    return 500.0f;
 }
 
 // 0x004e4a30: fills the streamed channel's buffer from its sample, starting

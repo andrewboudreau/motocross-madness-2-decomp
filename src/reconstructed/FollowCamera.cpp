@@ -111,80 +111,6 @@ FollowCamera::FollowCamera(int flags) : PCCamera(flags) {
     distanceForMaximumFov = 20.0f;
 }
 
-// 0x00463350 (scalar deleting wrapper 0x00463120): frees the owned values,
-// then the Camera destructor (PCCamera's is implicit).
-FollowCamera::~FollowCamera() {
-    if (points)
-        delete[] points;
-    if (targetEaseX)
-        delete targetEaseX;
-    if (targetEaseY)
-        delete targetEaseY;
-    if (targetEaseZ)
-        delete targetEaseZ;
-    if (positionEaseX)
-        delete positionEaseX;
-    if (positionEaseY)
-        delete positionEaseY;
-    if (positionEaseZ)
-        delete positionEaseZ;
-    if (fieldOfViewEase)
-        delete fieldOfViewEase;
-    if (distanceEase)
-        delete distanceEase;
-}
-
-// 0x00463620: only while the two points are within a tenth of Camera's
-// +0x1c4/+0x1c8 in x and y, eases +0x220 toward a target that shrinks with
-// the source height (capped at 335), keeping it at 20 or more.
-void FollowCamera::UpdateFollowDistance(const Vector3& from, const Vector3& to, float dt) {
-    if (to.x - from.x < targetWidth * 0.1f && to.y - from.y < targetHeight * 0.1f) {
-        float height = FollowCameraMin(from.z, 335.0f);
-        float target = followDistance - (height - 15.0f) * dt * 0.028f;
-        followDistance = distanceEase->Update(target, dt);
-        if (followDistance < 20.0f)
-            followDistance = 20.0f;
-    }
-}
-
-// 0x00463450
-bool FollowCamera::SetTableEntry(int index, const Vector3* position, const float* distanceRate,
-                                 const float* raiseRate, const float* lowerRate, const float* tiltRate,
-                                 const float* yawRate) {
-    if (index < pointCount) {
-        if (position)
-            points[index].position = *position;
-        if (distanceRate)
-            points[index].distanceRate = *distanceRate;
-        if (raiseRate)
-            points[index].raiseRate = *raiseRate;
-        if (lowerRate)
-            points[index].lowerRate = *lowerRate;
-        if (tiltRate)
-            points[index].tiltRate = *tiltRate;
-        if (yawRate)
-            points[index].yawRate = *yawRate;
-        return true;
-    }
-    return false;
-}
-
-// 0x00463520
-bool FollowCamera::AppendTableEntry(const Vector3& position, float distanceRate, float raiseRate,
-                                    float lowerRate, float tiltRate, float yawRate) {
-    if (pointCount < pointCapacity) {
-        points[pointCount].position = position;
-        points[pointCount].distanceRate = distanceRate;
-        points[pointCount].raiseRate = raiseRate;
-        points[pointCount].lowerRate = lowerRate;
-        points[pointCount].tiltRate = tiltRate;
-        points[pointCount].yawRate = yawRate;
-        pointCount++;
-        return true;
-    }
-    return false;
-}
-
 // 0x00463140: Camera slot 8, then the +0x294/+0x298 values, presets, the
 // point table and the state list (states 5-7 and values outside 0..7 are
 // dropped); releases itself when no state is left.
@@ -228,10 +154,84 @@ FollowCamera* FollowCamera::SetupFollowCamera(void* context, float fieldOfViewEa
     return this;
 }
 
+// 0x00463350 (scalar deleting wrapper 0x00463120): frees the owned values,
+// then the Camera destructor (PCCamera's is implicit).
+FollowCamera::~FollowCamera() {
+    if (points)
+        delete[] points;
+    if (targetEaseX)
+        delete targetEaseX;
+    if (targetEaseY)
+        delete targetEaseY;
+    if (targetEaseZ)
+        delete targetEaseZ;
+    if (positionEaseX)
+        delete positionEaseX;
+    if (positionEaseY)
+        delete positionEaseY;
+    if (positionEaseZ)
+        delete positionEaseZ;
+    if (fieldOfViewEase)
+        delete fieldOfViewEase;
+    if (distanceEase)
+        delete distanceEase;
+}
+
+// 0x00463450
+bool FollowCamera::SetTableEntry(int index, const Vector3* position, const float* distanceRate,
+                                 const float* raiseRate, const float* lowerRate, const float* tiltRate,
+                                 const float* yawRate) {
+    if (index < pointCount) {
+        if (position)
+            points[index].position = *position;
+        if (distanceRate)
+            points[index].distanceRate = *distanceRate;
+        if (raiseRate)
+            points[index].raiseRate = *raiseRate;
+        if (lowerRate)
+            points[index].lowerRate = *lowerRate;
+        if (tiltRate)
+            points[index].tiltRate = *tiltRate;
+        if (yawRate)
+            points[index].yawRate = *yawRate;
+        return true;
+    }
+    return false;
+}
+
+// 0x00463520
+bool FollowCamera::AppendTableEntry(const Vector3& position, float distanceRate, float raiseRate,
+                                    float lowerRate, float tiltRate, float yawRate) {
+    if (pointCount < pointCapacity) {
+        points[pointCount].position = position;
+        points[pointCount].distanceRate = distanceRate;
+        points[pointCount].raiseRate = raiseRate;
+        points[pointCount].lowerRate = lowerRate;
+        points[pointCount].tiltRate = tiltRate;
+        points[pointCount].yawRate = yawRate;
+        pointCount++;
+        return true;
+    }
+    return false;
+}
+
 // 0x00463600
 void FollowCamera::SetSubject(FollowCameraTerrainView* newSubject) {
     subject = newSubject;
     subjectCellSize = newSubject->gridCellSize;
+}
+
+// 0x00463620: only while the two points are within a tenth of Camera's
+// +0x1c4/+0x1c8 in x and y, eases +0x220 toward a target that shrinks with
+// the source height (capped at 335), keeping it at 20 or more.
+void FollowCamera::UpdateFollowDistance(const Vector3& from, const Vector3& to, float dt) {
+    if (to.x - from.x < targetWidth * 0.1f && to.y - from.y < targetHeight * 0.1f) {
+        float height = FollowCameraMin(from.z, 335.0f);
+        float target = followDistance - (height - 15.0f) * dt * 0.028f;
+        followDistance = distanceEase->Update(target, dt);
+        if (followDistance < 20.0f)
+            followDistance = 20.0f;
+    }
 }
 
 // Inlined by slot 38: the yaw turns and wraps to [-pi, pi]; the pitch tilts
@@ -518,109 +518,6 @@ bool FollowCamera::ProcessCameraInput(bool active, float dt) {
     return moved;
 }
 
-// 0x00464a80: the point the camera follows, by state.
-Vector3 FollowCamera::SelectFollowPoint(int a, bool flag, float dt) {
-    Vector3 result;
-    if (cameraState == 5) {
-        if (overrideActive)
-            result = cachedTarget;
-        else
-            result = GetStateFiveFollowPoint(dt);
-    } else if (cameraState == 7) {
-        result = targetPoint;
-        result.y += 3.0f;
-    } else if (flag) {
-        result = ComputeLookAheadPoint(a, dt);
-    } else {
-        result = GetTargetPoint();
-    }
-    return result;
-}
-
-// 0x00464b30: in states 5 and 7 the camera keeps its position. Orbiting, the
-// +0x29c direction is pitched about its horizontal normal (by +0x22c, scaled
-// by its y and at least 0.8) and turned about y by +0x234 + +0x308, then
-// pushed +0x220 back from the target point (state 3 takes slot 50 instead);
-// outside state 6 that also snapshots the presets and +0x23c. Otherwise
-// +0x23c is re-based when it dropped below -8, then slot 40 runs and the camera
-// sits +0x220 behind `base` at yaw +0x234 + +0x23c, raised by +0x2d4.
-Vector3 FollowCamera::ComputeCameraPosition(bool orbit, const Vector3& base, float dt) {
-    Vector3 result;
-    if (cameraState == 5 || cameraState == 7) {
-        result = eyePosition;
-    } else if (orbit) {
-        float yaw = turnYaw + followYaw;
-        if (cameraState != 3) {
-            Vector3 axis;
-            axis.x = followHeading.z;
-            axis.y = 0.0f;
-            axis.z = -followHeading.x;
-            float pitch;
-            if (followHeading.y == 0.0f) {
-                pitch = followPitch;
-            } else {
-                float scaled = followPitch * followHeading.y;
-                if (scaled > 0.8f)
-                    pitch = scaled;
-                else
-                    pitch = 0.8f;
-            }
-            D3DRMVectorRotate(&result, &followHeading, &axis, pitch);
-            Vector3 turned;
-            D3DRMVectorRotate(&turned, &result, &kVec3YAxis, yaw);
-            turned *= -followDistance;
-            result = turned + targetPoint;
-        } else {
-            result = GetOnboardEyePosition();
-        }
-        if (!isCrashView && cameraState != 6) {
-            savedDistance = followDistance;
-            savedPitch = followPitch;
-            savedYaw = followYaw;
-            worldYaw = yaw - 16.0f;
-        }
-    } else {
-        if (worldYaw < -8.0f) {
-            followHeight = defaultFollowHeight;
-            worldYaw = worldYaw + 16.0f;
-            if (worldYaw < 0.0f) {
-                followPitch = 0.0f;
-                followYaw = 0.0f;
-                if (worldYaw < -1.5707964f)
-                    worldYaw = yawOffset - 3.1415927f;
-                else
-                    worldYaw = -yawOffset;
-            } else if (worldYaw > 1.5707964f) {
-                worldYaw = 3.1415927f - yawOffset;
-            } else {
-                worldYaw = yawOffset;
-            }
-            worldYaw += GetCrashYaw();
-            if (worldYaw >= 6.2831855f)
-                worldYaw -= 6.2831855f;
-            distanceEase->Set(followDistance, FLT_MAX);
-        }
-        SteerToKeepTargetOnScreen(dt);
-        Vector3 direction;
-        D3DRMVectorRotate(&direction, &kVec3ZAxis, &kVec3YAxis,
-                          followYaw + worldYaw);
-        direction *= -followDistance;
-        Vector3 position = direction + base;
-        result = position;
-        result.y = position.y + followHeight;
-    }
-    return result;
-}
-
-// 0x00464ee0 and 0x00464f70: feed a vector into the +0x27c..+0x284 and
-// +0x288..+0x290 values with a rate chosen by the subject's +0xbe8.
-void FollowCamera::EaseTargetToward(const Vector3& value) {
-    float rate = (subject->field_0xbe8 == 1) ? 0.25f : 0.3f;
-    targetEaseX->Set(value.x, rate);
-    targetEaseY->Set(value.y, rate);
-    targetEaseZ->Set(value.z, rate);
-}
-
 void FollowCamera::EasePositionToward(const Vector3& value) {
     float rate = (subject->field_0xbe8 == 1) ? 0.25f : 0.3f;
     positionEaseX->Set(value.x, rate);
@@ -773,8 +670,103 @@ Vector3 FollowCamera::GetStateFiveFollowPoint(float) {
     return result;
 }
 
+// 0x00464a80: the point the camera follows, by state.
+Vector3 FollowCamera::SelectFollowPoint(int a, bool flag, float dt) {
+    Vector3 result;
+    if (cameraState == 5) {
+        if (overrideActive)
+            result = cachedTarget;
+        else
+            result = GetStateFiveFollowPoint(dt);
+    } else if (cameraState == 7) {
+        result = targetPoint;
+        result.y += 3.0f;
+    } else if (flag) {
+        result = ComputeLookAheadPoint(a, dt);
+    } else {
+        result = GetTargetPoint();
+    }
+    return result;
+}
+
+// 0x00464b30: in states 5 and 7 the camera keeps its position. Orbiting, the
+// +0x29c direction is pitched about its horizontal normal (by +0x22c, scaled
+// by its y and at least 0.8) and turned about y by +0x234 + +0x308, then
+// pushed +0x220 back from the target point (state 3 takes slot 50 instead);
+// outside state 6 that also snapshots the presets and +0x23c. Otherwise
+// +0x23c is re-based when it dropped below -8, then slot 40 runs and the camera
+// sits +0x220 behind `base` at yaw +0x234 + +0x23c, raised by +0x2d4.
+Vector3 FollowCamera::ComputeCameraPosition(bool orbit, const Vector3& base, float dt) {
+    Vector3 result;
+    if (cameraState == 5 || cameraState == 7) {
+        result = eyePosition;
+    } else if (orbit) {
+        float yaw = turnYaw + followYaw;
+        if (cameraState != 3) {
+            Vector3 axis;
+            axis.x = followHeading.z;
+            axis.y = 0.0f;
+            axis.z = -followHeading.x;
+            float pitch;
+            if (followHeading.y == 0.0f) {
+                pitch = followPitch;
+            } else {
+                float scaled = followPitch * followHeading.y;
+                if (scaled > 0.8f)
+                    pitch = scaled;
+                else
+                    pitch = 0.8f;
+            }
+            D3DRMVectorRotate(&result, &followHeading, &axis, pitch);
+            Vector3 turned;
+            D3DRMVectorRotate(&turned, &result, &kVec3YAxis, yaw);
+            turned *= -followDistance;
+            result = turned + targetPoint;
+        } else {
+            result = GetOnboardEyePosition();
+        }
+        if (!isCrashView && cameraState != 6) {
+            savedDistance = followDistance;
+            savedPitch = followPitch;
+            savedYaw = followYaw;
+            worldYaw = yaw - 16.0f;
+        }
+    } else {
+        if (worldYaw < -8.0f) {
+            followHeight = defaultFollowHeight;
+            worldYaw = worldYaw + 16.0f;
+            if (worldYaw < 0.0f) {
+                followPitch = 0.0f;
+                followYaw = 0.0f;
+                if (worldYaw < -1.5707964f)
+                    worldYaw = yawOffset - 3.1415927f;
+                else
+                    worldYaw = -yawOffset;
+            } else if (worldYaw > 1.5707964f) {
+                worldYaw = 3.1415927f - yawOffset;
+            } else {
+                worldYaw = yawOffset;
+            }
+            worldYaw += GetCrashYaw();
+            if (worldYaw >= 6.2831855f)
+                worldYaw -= 6.2831855f;
+            distanceEase->Set(followDistance, FLT_MAX);
+        }
+        SteerToKeepTargetOnScreen(dt);
+        Vector3 direction;
+        D3DRMVectorRotate(&direction, &kVec3ZAxis, &kVec3YAxis,
+                          followYaw + worldYaw);
+        direction *= -followDistance;
+        Vector3 position = direction + base;
+        result = position;
+        result.y = position.y + followHeight;
+    }
+    return result;
+}
+
 // 0x00464e80 and 0x00464e90 (slots 53, 54 and 58-62 share the empty body).
 void FollowCamera::ClampPositionAboveGround(Vector3*) {}
+
 void FollowCamera::HideSubject() {}
 void FollowCamera::ShowSubject() {}
 void FollowCamera::ShowCameraStateName() {}
@@ -788,6 +780,15 @@ void FollowCamera::RestoreCameraState() {}
 unsigned char FollowCamera::IsLookBackHeld() {
     return ((FollowCameraKeyboardDeviceView*)g_TrackGame->controlInterface->keyboard)
         ->IsButtonDown(0x38, 0x3F, 0);
+}
+
+// 0x00464ee0 and 0x00464f70: feed a vector into the +0x27c..+0x284 and
+// +0x288..+0x290 values with a rate chosen by the subject's +0xbe8.
+void FollowCamera::EaseTargetToward(const Vector3& value) {
+    float rate = (subject->field_0xbe8 == 1) ? 0.25f : 0.3f;
+    targetEaseX->Set(value.x, rate);
+    targetEaseY->Set(value.y, rate);
+    targetEaseZ->Set(value.z, rate);
 }
 
 bool FollowCamera::IsTargetViewHeld() {

@@ -20,6 +20,43 @@ static const Vector3 kVec3XAxis = Vector3(1.0f, 0.0f, 0.0f);
 static const Vector3 kVec3YAxis = Vector3(0.0f, 1.0f, 0.0f);
 static const Vector3 kVec3ZAxis = Vector3(0.0f, 0.0f, 1.0f);
 
+// ControllerAngles helpers: the out-of-line helpers retail calls from its second and
+// third axis blocks, declared with retail's pointer signatures.
+// (Their first uses, in the x axis block, are expanded inline in retail;
+// ControllerAngles writes that block out the same way.)  The defined providers are
+// VectorCalls.cpp's Vec3DotCall, CrossProduct.cpp's CrossProductCall,
+// MovingPart.cpp's GetMatrixRow, BoundingBoxTreeBuild.cpp's AxisAngleMatrix (a
+// TreeMatrix4, the same 64 bytes) and CollisionObject.cpp's CollisionMatrixMultiply;
+// config/game_build.json's link_aliases bind the names whose types differ (same cdecl
+// ABI: a reference and a pointer are both one address, and the Vector3/Vec3 views are
+// both three floats returned through a hidden pointer).
+float FastInvSqrt(float x);                                          // 0x00460c00 (FastMath.cpp)
+float Vec3Dot(const Vector3* a, const Vector3* b);                   // 0x0040ae30: a.b
+Vector3 CrossProduct(const Vector3* a, const Vector3* b);            // 0x00515600: a x b
+Vector3 GetMatrixRow(const Matrix4* m, int row);                     // 0x004a2350: row of m
+void AxisAngleMatrix(Matrix4* out, float x, float y, float z, float angle); // 0x0042de90
+void CollisionMatrixMultiply(Matrix4* out, const Matrix4* a, const Matrix4* b); // 0x00436500
+
+// 0x00404e60: the out-of-line Vector3 constructor.
+struct MbVector3Call : Vector3 {
+    MbVector3Call(float x, float y, float z);
+};
+
+// Normalise, or zero when the length is zero (inline in retail around calls to
+// 0x0040ae30 and 0x00460c00).
+static inline void MbNormalizeOrZero(Vector3& v)
+{
+    float squared = Vec3Dot(&v, &v);
+    if (squared == 0.0f) {
+        v = kVec3Zero;
+    } else {
+        float scale = FastInvSqrt(squared);
+        v.x *= scale;
+        v.y *= scale;
+        v.z *= scale;
+    }
+}
+
 // 0x004a3150
 MorphBastardModifier::MorphBastardModifier(int flags)
     : D3DIMSoultreeModifier(flags)
@@ -247,43 +284,6 @@ float AngleBetween(Vector3 a, Vector3 b)
     if (dot == 0.0)
         return 1.5707964f;
     return (float)acos(dot);
-}
-
-// ControllerAngles helpers: the out-of-line helpers retail calls from its second and
-// third axis blocks, declared with retail's pointer signatures.
-// (Their first uses, in the x axis block, are expanded inline in retail;
-// ControllerAngles writes that block out the same way.)  The defined providers are
-// VectorCalls.cpp's Vec3DotCall, CrossProduct.cpp's CrossProductCall,
-// MovingPart.cpp's GetMatrixRow, BoundingBoxTreeBuild.cpp's AxisAngleMatrix (a
-// TreeMatrix4, the same 64 bytes) and CollisionObject.cpp's CollisionMatrixMultiply;
-// config/game_build.json's link_aliases bind the names whose types differ (same cdecl
-// ABI: a reference and a pointer are both one address, and the Vector3/Vec3 views are
-// both three floats returned through a hidden pointer).
-float FastInvSqrt(float x);                                          // 0x00460c00 (FastMath.cpp)
-float Vec3Dot(const Vector3* a, const Vector3* b);                   // 0x0040ae30: a.b
-Vector3 CrossProduct(const Vector3* a, const Vector3* b);            // 0x00515600: a x b
-Vector3 GetMatrixRow(const Matrix4* m, int row);                     // 0x004a2350: row of m
-void AxisAngleMatrix(Matrix4* out, float x, float y, float z, float angle); // 0x0042de90
-void CollisionMatrixMultiply(Matrix4* out, const Matrix4* a, const Matrix4* b); // 0x00436500
-
-// 0x00404e60: the out-of-line Vector3 constructor.
-struct MbVector3Call : Vector3 {
-    MbVector3Call(float x, float y, float z);
-};
-
-// Normalise, or zero when the length is zero (inline in retail around calls to
-// 0x0040ae30 and 0x00460c00).
-static inline void MbNormalizeOrZero(Vector3& v)
-{
-    float squared = Vec3Dot(&v, &v);
-    if (squared == 0.0f) {
-        v = kVec3Zero;
-    } else {
-        float scale = FastInvSqrt(squared);
-        v.x *= scale;
-        v.y *= scale;
-        v.z *= scale;
-    }
 }
 
 // 0x004a3c80 (ret 0x44): the rotation of the channel's controller relative to its rest

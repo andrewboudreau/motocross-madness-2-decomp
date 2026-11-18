@@ -79,6 +79,12 @@ static int s_UnknownGlobal68a440;
 // 0x0068a444: when set, ChatOverlay redraws all of its lines.
 int s_UnknownGlobal68a444;
 
+// 0x004dc4c0 (folded with ProjectedShadow's slot 23 and Terrain's slot 22)
+int StatsOverlay::OnControlPress(ControlEvent*, InputButtonState*)
+{
+    return 0;
+}
+
 // 0x00518720
 InstrumentOverlay::InstrumentOverlay(int flags) : Overlay(flags, 1)
 {
@@ -284,23 +290,6 @@ NameOverlay* NameOverlay::Create(RenderTarget* target, TextureMap* texture,
     return this;
 }
 
-// 0x00519000: every fourth frame, tests whether `point` can be seen from the
-// camera (no terrain in between).
-int NameOverlay::IsPointVisible(const Vector3* point)
-{
-    Vector3 hit;
-    if (frameCounter == testPhase) {
-        int hidden = reinterpret_cast<Terrain*>(world->terrain)->CastSegment(
-            reinterpret_cast<const TerrainVec3*>(&((RenderTarget*)renderContext)->currentCamera->eyePosition),
-            reinterpret_cast<const TerrainVec3*>(point), reinterpret_cast<TerrainVec3*>(&hit), 0, 0, 0);
-        lastVisible = !hidden;
-    }
-    frameCounter++;
-    if (frameCounter > 3)
-        frameCounter = 0;
-    return lastVisible;
-}
-
 // 0x00518f30 (slot 10): fades the tag in after Render3D sets becameVisible and
 // out after it sets becameHidden, over fadeTime seconds of g_TrackGame's frame
 // time (the argument is unused). Retail converts the alpha with its inline-asm
@@ -326,6 +315,23 @@ int NameOverlay::Tick(float frameTime)
     if (becameVisible || becameHidden)
         overlayAlpha = X87FloatToInt(fadeElapsed / fadeTime * 255.0f - 0.5f);
     return 1;
+}
+
+// 0x00519000: every fourth frame, tests whether `point` can be seen from the
+// camera (no terrain in between).
+int NameOverlay::IsPointVisible(const Vector3* point)
+{
+    Vector3 hit;
+    if (frameCounter == testPhase) {
+        int hidden = reinterpret_cast<Terrain*>(world->terrain)->CastSegment(
+            reinterpret_cast<const TerrainVec3*>(&((RenderTarget*)renderContext)->currentCamera->eyePosition),
+            reinterpret_cast<const TerrainVec3*>(point), reinterpret_cast<TerrainVec3*>(&hit), 0, 0, 0);
+        lastVisible = !hidden;
+    }
+    frameCounter++;
+    if (frameCounter > 3)
+        frameCounter = 0;
+    return lastVisible;
 }
 
 // 0x00519080
@@ -590,12 +596,6 @@ int StatsOverlay::RenderPre3D()
     return 1;
 }
 
-// 0x004dc4c0 (folded with ProjectedShadow's slot 23 and Terrain's slot 22)
-int StatsOverlay::OnControlPress(ControlEvent*, InputButtonState*)
-{
-    return 0;
-}
-
 // 0x00519980
 int StatsOverlay::Render3D()
 {
@@ -613,6 +613,109 @@ int StatsOverlay::Render3D()
             break;
         }
     }
+    return 1;
+}
+
+// 0x005199f0
+int CompareScoresDescending(const void* a, const void* b)
+{
+    const float* left = (const float*)a;
+    const float* right = (const float*)b;
+    if (*left > *right)
+        return -1;
+    if (*left == *right)
+        return 0;
+    return 1;
+}
+
+// 0x00519a20. Not exact (605 of 1002 bytes, 1004 compiled: retail keeps `this` in edi
+// and the view in ebp, here swapped, with the row index in edx;
+// docs/TRACKOVERLAY.md forms tried)
+// The standings, best score first: the time left (as a label), then a row
+// per racer that is shown, ending with the player's own row. Draws only
+// when a row changed.
+int StatsOverlay::DrawStandings()
+{
+    RacerScoreRank scores[11];
+    char time[0x80];
+    char label[0x80];
+    int iterator;
+    int own;
+    void* dc;
+    void* font;
+    int i;
+    int count = 0;
+    EventBikeRaceView* view = g_TrackGame->quarryEvent->raceView;
+    if (g_TrackGame->mode.raceSettings.raceMode != 0 && g_TrackGame->mode.raceSettings.raceMode != 4) {
+        g_TrackGame->LoadResourceString(0x943, label, 0x80);
+        TrackGameViewOwner* owner = g_TrackGame->quarryEvent;
+        float limit = g_TrackGame->mode.raceSettings.timeLimitMinutes * 60.0f;
+        FormatMinutesSeconds(time, limit - (owner->elapsedMinutes * 60.0f + owner->elapsedSeconds));
+        sprintf(rowText[0], "%s", label);
+    }
+    iterator = 0;
+    EventKrustyBikeView* racer;
+    while ((racer = reinterpret_cast<EventKrustyBikeView*>(reinterpret_cast<BikeRace*>(view)->NextBike(&iterator))) != 0) {
+        if (racer->isEnabled) {
+            scores[count].value = racer->score;
+            scores[count].racer = racer;
+            count++;
+        }
+    }
+    qsort(scores, count, sizeof(RacerScoreRank), CompareScoresDescending);
+    for (i = 0; i < count; i++) {
+        if (scores[i].racer == view->localRacer) {
+            own = i;
+            break;
+        }
+    }
+    int first = 1;
+    if (g_TrackGame->mode.raceSettings.raceMode != 0 && g_TrackGame->mode.raceSettings.raceMode != 4)
+        count++;
+    else
+        first = 0;
+    if (count >= 6)
+        count = 6;
+    int row;
+    int shown = 0;
+    for (row = first; row < count - 1; row++) {
+        sprintf(rowText[row], "%d) %s : %.0f", shown + 1, scores[shown].racer->racerName,
+                scores[shown].racer->score);
+        shown++;
+    }
+    if (own >= shown)
+        sprintf(rowText[row], "%d) %s : %.0f", own + 1, scores[own].racer->racerName,
+                scores[own].racer->score);
+    else
+        sprintf(rowText[row], "%d) %s : %.0f", shown + 1, scores[shown].racer->racerName,
+                scores[shown].racer->score);
+    for (i = 0; i <= row; i++) {
+        if (strcmp(rowText[i], drawnRowText[i]) != 0)
+            break;
+    }
+    if (row < i)
+        return 1;
+    RestoreRect(&sourceRect);
+    PCTextureMap* texture = (PCTextureMap*)sharedTexture;
+    if (texture->systemSurface->GetDC(&dc) != 0)
+        goto fail;
+    SetBkColor(dc, 1);
+    SetBkMode(dc, 1);
+    SetTextColor(dc, 0xffffff);
+    font = SelectObject(dc, largeFont);
+    for (i = 0; i <= row; i++) {
+        if (i == 0)
+            GetTextExtentPoint32A(dc, rowText[0], strlen(rowText[0]), &rowExtent);
+        DrawTextA(dc, rowText[i], strlen(rowText[i]), &rowRects[i], 0x120);
+        strcpy(drawnRowText[i], rowText[i]);
+    }
+    SelectObject(dc, font);
+    if (texture->systemSurface->ReleaseDC(dc) != 0) {
+fail:
+        return 0;
+    }
+    TintRows(0, 0x80, 0xffff);
+    overlayTexture->Upload(0, -1);
     return 1;
 }
 
@@ -914,109 +1017,6 @@ draw:
     SetTextColor(dc, 0xffffff);
     font = SelectObject(dc, largeFont);
     for (i = 0; i < 6; i++) {
-        DrawTextA(dc, rowText[i], strlen(rowText[i]), &rowRects[i], 0x120);
-        strcpy(drawnRowText[i], rowText[i]);
-    }
-    SelectObject(dc, font);
-    if (texture->systemSurface->ReleaseDC(dc) != 0) {
-fail:
-        return 0;
-    }
-    TintRows(0, 0x80, 0xffff);
-    overlayTexture->Upload(0, -1);
-    return 1;
-}
-
-// 0x005199f0
-int CompareScoresDescending(const void* a, const void* b)
-{
-    const float* left = (const float*)a;
-    const float* right = (const float*)b;
-    if (*left > *right)
-        return -1;
-    if (*left == *right)
-        return 0;
-    return 1;
-}
-
-// 0x00519a20. Not exact (605 of 1002 bytes, 1004 compiled: retail keeps `this` in edi
-// and the view in ebp, here swapped, with the row index in edx;
-// docs/TRACKOVERLAY.md forms tried)
-// The standings, best score first: the time left (as a label), then a row
-// per racer that is shown, ending with the player's own row. Draws only
-// when a row changed.
-int StatsOverlay::DrawStandings()
-{
-    RacerScoreRank scores[11];
-    char time[0x80];
-    char label[0x80];
-    int iterator;
-    int own;
-    void* dc;
-    void* font;
-    int i;
-    int count = 0;
-    EventBikeRaceView* view = g_TrackGame->quarryEvent->raceView;
-    if (g_TrackGame->mode.raceSettings.raceMode != 0 && g_TrackGame->mode.raceSettings.raceMode != 4) {
-        g_TrackGame->LoadResourceString(0x943, label, 0x80);
-        TrackGameViewOwner* owner = g_TrackGame->quarryEvent;
-        float limit = g_TrackGame->mode.raceSettings.timeLimitMinutes * 60.0f;
-        FormatMinutesSeconds(time, limit - (owner->elapsedMinutes * 60.0f + owner->elapsedSeconds));
-        sprintf(rowText[0], "%s", label);
-    }
-    iterator = 0;
-    EventKrustyBikeView* racer;
-    while ((racer = reinterpret_cast<EventKrustyBikeView*>(reinterpret_cast<BikeRace*>(view)->NextBike(&iterator))) != 0) {
-        if (racer->isEnabled) {
-            scores[count].value = racer->score;
-            scores[count].racer = racer;
-            count++;
-        }
-    }
-    qsort(scores, count, sizeof(RacerScoreRank), CompareScoresDescending);
-    for (i = 0; i < count; i++) {
-        if (scores[i].racer == view->localRacer) {
-            own = i;
-            break;
-        }
-    }
-    int first = 1;
-    if (g_TrackGame->mode.raceSettings.raceMode != 0 && g_TrackGame->mode.raceSettings.raceMode != 4)
-        count++;
-    else
-        first = 0;
-    if (count >= 6)
-        count = 6;
-    int row;
-    int shown = 0;
-    for (row = first; row < count - 1; row++) {
-        sprintf(rowText[row], "%d) %s : %.0f", shown + 1, scores[shown].racer->racerName,
-                scores[shown].racer->score);
-        shown++;
-    }
-    if (own >= shown)
-        sprintf(rowText[row], "%d) %s : %.0f", own + 1, scores[own].racer->racerName,
-                scores[own].racer->score);
-    else
-        sprintf(rowText[row], "%d) %s : %.0f", shown + 1, scores[shown].racer->racerName,
-                scores[shown].racer->score);
-    for (i = 0; i <= row; i++) {
-        if (strcmp(rowText[i], drawnRowText[i]) != 0)
-            break;
-    }
-    if (row < i)
-        return 1;
-    RestoreRect(&sourceRect);
-    PCTextureMap* texture = (PCTextureMap*)sharedTexture;
-    if (texture->systemSurface->GetDC(&dc) != 0)
-        goto fail;
-    SetBkColor(dc, 1);
-    SetBkMode(dc, 1);
-    SetTextColor(dc, 0xffffff);
-    font = SelectObject(dc, largeFont);
-    for (i = 0; i <= row; i++) {
-        if (i == 0)
-            GetTextExtentPoint32A(dc, rowText[0], strlen(rowText[0]), &rowExtent);
         DrawTextA(dc, rowText[i], strlen(rowText[i]), &rowRects[i], 0x120);
         strcpy(drawnRowText[i], rowText[i]);
     }
@@ -1440,6 +1440,7 @@ void RadarOverlay::DrawFrameRate()
     frameTimeSum = 0.0f;
     frameCount = 0.0f;
 }
+
 // 0x0051bed0. Not exact (1129 of 1160 bytes: retail puts the int-to-float slot of `outside`
 // above `x` and schedules the distance products before the name and the pushes;
 // docs/TRACKOVERLAY.md forms tried)
@@ -1844,7 +1845,6 @@ ChatOverlay::~ChatOverlay()
         backingTexture->Release();
 }
 
-
 // 0x0051cf80: sets the chat overlay up: the chat and cue rectangles, the
 // texture, the side panels on wide screens, the pen, two fonts and the
 // thirteen name-tag rectangles.
@@ -2089,6 +2089,80 @@ void ChatOverlay::AddMessage(const char* name, int text, int value)
     chatInput->AddHistory(shown, (const char*)text, value);
 }
 
+// 0x0051de10
+int ChatOverlay::RedrawChat()
+{
+    void* dc;
+    int lineHeight;
+    int value;
+    void* font;
+    int rows;
+    OverlayRect rect;
+    char text[0x80];
+    RestoreRect(&sourceRect);
+    PCTextureMap* texture = (PCTextureMap*)sharedTexture;
+    if (texture->systemSurface->GetDC(&dc) != 0)
+        goto fail;
+    SetBkColor(dc, 1);
+    SetBkMode(dc, 1);
+    SetTextColor(dc, 0xffffff);
+    font = SelectObject(dc, chatFont);
+    strcpy(text, ">");
+    strcat(text, chatInput->GetLineTail());
+    strcat(text, "_");
+    rect.left = 1;
+    if (largeLayout) {
+        rect.right = 0xff;
+        rect.top = 7;
+        rect.bottom = 0x15;
+        lineHeight = 0xe;
+        rows = 0x3e;
+    } else {
+        rect.right = 0x7f;
+        rect.top = 7;
+        rect.bottom = 0xe;
+        lineHeight = 7;
+        rows = 0x1f;
+    }
+    DrawTextA(dc, text, strlen(text), &rect, 0x124);
+    int i;
+    for (i = 0; i <= chatInput->historyCount; i++) {
+        int sourceLength = strlen(chatInput->GetHistory(i, &value));
+        int length = sourceLength > 0x7f ? 0x7f : sourceLength;
+        strncpy(text, chatInput->GetHistory(i, &value), length);
+        rect.top = (i + 1) * lineHeight + 7;
+        rect.bottom = rect.top + lineHeight;
+        text[length] = '\0';
+        if (value == 0)
+            DrawTextA(dc, text, strlen(text), &rect, 0x124);
+    }
+    SelectObject(dc, font);
+    if (texture->systemSurface->ReleaseDC(dc) != 0)
+        goto fail;
+    TintRows(0, rows, 0xfff0);
+    if (texture->systemSurface->GetDC(&dc) != 0)
+        goto fail;
+    SetBkColor(dc, 1);
+    SetBkMode(dc, 1);
+    SetTextColor(dc, 0xffffff);
+    font = SelectObject(dc, chatFont);
+    for (i = 0; i <= chatInput->historyCount; i++) {
+        strcpy(text, chatInput->GetHistory(i, &value));
+        rect.top = (i + 1) * lineHeight + 7;
+        rect.bottom = rect.top + lineHeight;
+        if (value != 0)
+            DrawTextA(dc, text, strlen(text), &rect, 0x124);
+    }
+    SelectObject(dc, font);
+    if (texture->systemSurface->ReleaseDC(dc) != 0) {
+fail:
+        return 0;
+    }
+    TintRows(0, rows, 0xf0ff);
+    overlayTexture->Upload(0, -1);
+    return 1;
+}
+
 // 0x0051e200
 int ChatOverlay::Tick(float frameTime)
 {
@@ -2226,80 +2300,6 @@ void ChatOverlay::DrawNameTag(void* dc, int index)
     SelectObject(dc, font);
 }
 
-// 0x0051de10
-int ChatOverlay::RedrawChat()
-{
-    void* dc;
-    int lineHeight;
-    int value;
-    void* font;
-    int rows;
-    OverlayRect rect;
-    char text[0x80];
-    RestoreRect(&sourceRect);
-    PCTextureMap* texture = (PCTextureMap*)sharedTexture;
-    if (texture->systemSurface->GetDC(&dc) != 0)
-        goto fail;
-    SetBkColor(dc, 1);
-    SetBkMode(dc, 1);
-    SetTextColor(dc, 0xffffff);
-    font = SelectObject(dc, chatFont);
-    strcpy(text, ">");
-    strcat(text, chatInput->GetLineTail());
-    strcat(text, "_");
-    rect.left = 1;
-    if (largeLayout) {
-        rect.right = 0xff;
-        rect.top = 7;
-        rect.bottom = 0x15;
-        lineHeight = 0xe;
-        rows = 0x3e;
-    } else {
-        rect.right = 0x7f;
-        rect.top = 7;
-        rect.bottom = 0xe;
-        lineHeight = 7;
-        rows = 0x1f;
-    }
-    DrawTextA(dc, text, strlen(text), &rect, 0x124);
-    int i;
-    for (i = 0; i <= chatInput->historyCount; i++) {
-        int sourceLength = strlen(chatInput->GetHistory(i, &value));
-        int length = sourceLength > 0x7f ? 0x7f : sourceLength;
-        strncpy(text, chatInput->GetHistory(i, &value), length);
-        rect.top = (i + 1) * lineHeight + 7;
-        rect.bottom = rect.top + lineHeight;
-        text[length] = '\0';
-        if (value == 0)
-            DrawTextA(dc, text, strlen(text), &rect, 0x124);
-    }
-    SelectObject(dc, font);
-    if (texture->systemSurface->ReleaseDC(dc) != 0)
-        goto fail;
-    TintRows(0, rows, 0xfff0);
-    if (texture->systemSurface->GetDC(&dc) != 0)
-        goto fail;
-    SetBkColor(dc, 1);
-    SetBkMode(dc, 1);
-    SetTextColor(dc, 0xffffff);
-    font = SelectObject(dc, chatFont);
-    for (i = 0; i <= chatInput->historyCount; i++) {
-        strcpy(text, chatInput->GetHistory(i, &value));
-        rect.top = (i + 1) * lineHeight + 7;
-        rect.bottom = rect.top + lineHeight;
-        if (value != 0)
-            DrawTextA(dc, text, strlen(text), &rect, 0x124);
-    }
-    SelectObject(dc, font);
-    if (texture->systemSurface->ReleaseDC(dc) != 0) {
-fail:
-        return 0;
-    }
-    TintRows(0, rows, 0xf0ff);
-    overlayTexture->Upload(0, -1);
-    return 1;
-}
-
 // 0x0051e7c0
 void ChatOverlay::CycleNameTagShade()
 {
@@ -2329,52 +2329,34 @@ void ChatOverlay::RedrawNameLine()
     }
 }
 
-// 0x0051eb40
-void ChatInput::AddHistory(const char* name, const char* text, int value)
+// 0x0051e910: redraws name tag `index` (all of them for -1) into the shared
+// texture, then colours it with a grey that darkens with the cycle
+// TrackGameMode+0x90 (nameTagShade).
+void ChatOverlay::RedrawNameTags(int index)
 {
-    char separator[8];
-    int nameLength = strlen(name);
-    int textLength = strlen(text);
-    strcpy(separator, ": ");
-    int separatorLength = strlen(separator);
-    if (historyCount < 3) {
-        strcpy(history[historyCount].text, name);
-        strcat(history[historyCount].text, separator);
-        strncat(history[historyCount].text, text, 0x31);
-        history[historyCount].text[0x31] = '\0';
-        history[historyCount].value = value;
-        historyCount++;
+    unsigned char level = 0xff - g_TrackGame->mode.nameTagShade * 0x33;
+    if (index == -1) {
+        for (int i = 0; i < racerCount; i++)
+            RestoreRect(&nameTagRects[i]);
     } else {
-        for (int i = 0; i < 2; i++) {
-            strncpy(history[i].text, history[i + 1].text, 0x31);
-            history[i].value = history[i + 1].value;
-            history[i].text[0x31] = '\0';
-        }
-        strcpy(history[2].text, name);
-        strcat(history[2].text, separator);
-        strncat(history[2].text, text, 0x31);
-        history[2].text[0x31] = '\0';
-        history[2].value = value;
+        RestoreRect(&nameTagRects[index]);
     }
-    if (nameLength + separatorLength + textLength > 0x31) {
-        if (historyCount < 3) {
-            strcpy(history[historyCount].text, "             ");
-            history[historyCount].text[separatorLength + nameLength] = '\0';
-            strncat(history[historyCount].text, text + 0x31 - separatorLength - nameLength, 0x31);
-            history[historyCount].value = value;
-            historyCount++;
+    PCTextureMap* texture = (PCTextureMap*)sharedTexture;
+    void* dc;
+    if (texture->systemSurface->GetDC(&dc) == 0) {
+        SetBkColor(dc, 1);
+        SetBkMode(dc, 1);
+        SetTextColor(dc, 0xffffff);
+        if (index == -1) {
+            for (int i = 0; i < racerCount; i++)
+                DrawNameTag(dc, i);
         } else {
-            for (int i = 0; i < 2; i++) {
-                strncpy(history[i].text, history[i + 1].text, 0x31);
-                history[i].text[0x31] = '\0';
-                history[i].value = history[i + 1].value;
-            }
-            strcpy(history[2].text, "             ");
-            history[2].text[separatorLength + nameLength] = '\0';
-            strncat(history[2].text, text + 0x31 - separatorLength - nameLength, 0x31);
-            history[2].value = value;
+            DrawNameTag(dc, index);
         }
+        texture->systemSurface->ReleaseDC(dc);
     }
+    TintRows(0x89, 0x46, 0xf000 | ((level & ~0xf) << 4) | (level & ~0xf) | (level >> 4));
+    overlayTexture->Upload(0, -1);
 }
 
 // 0x0051ea50
@@ -2440,32 +2422,50 @@ char* ChatInput::GetHistory(int index, int* value)
     return 0;
 }
 
-// 0x0051e910: redraws name tag `index` (all of them for -1) into the shared
-// texture, then colours it with a grey that darkens with the cycle
-// TrackGameMode+0x90 (nameTagShade).
-void ChatOverlay::RedrawNameTags(int index)
+// 0x0051eb40
+void ChatInput::AddHistory(const char* name, const char* text, int value)
 {
-    unsigned char level = 0xff - g_TrackGame->mode.nameTagShade * 0x33;
-    if (index == -1) {
-        for (int i = 0; i < racerCount; i++)
-            RestoreRect(&nameTagRects[i]);
+    char separator[8];
+    int nameLength = strlen(name);
+    int textLength = strlen(text);
+    strcpy(separator, ": ");
+    int separatorLength = strlen(separator);
+    if (historyCount < 3) {
+        strcpy(history[historyCount].text, name);
+        strcat(history[historyCount].text, separator);
+        strncat(history[historyCount].text, text, 0x31);
+        history[historyCount].text[0x31] = '\0';
+        history[historyCount].value = value;
+        historyCount++;
     } else {
-        RestoreRect(&nameTagRects[index]);
-    }
-    PCTextureMap* texture = (PCTextureMap*)sharedTexture;
-    void* dc;
-    if (texture->systemSurface->GetDC(&dc) == 0) {
-        SetBkColor(dc, 1);
-        SetBkMode(dc, 1);
-        SetTextColor(dc, 0xffffff);
-        if (index == -1) {
-            for (int i = 0; i < racerCount; i++)
-                DrawNameTag(dc, i);
-        } else {
-            DrawNameTag(dc, index);
+        for (int i = 0; i < 2; i++) {
+            strncpy(history[i].text, history[i + 1].text, 0x31);
+            history[i].value = history[i + 1].value;
+            history[i].text[0x31] = '\0';
         }
-        texture->systemSurface->ReleaseDC(dc);
+        strcpy(history[2].text, name);
+        strcat(history[2].text, separator);
+        strncat(history[2].text, text, 0x31);
+        history[2].text[0x31] = '\0';
+        history[2].value = value;
     }
-    TintRows(0x89, 0x46, 0xf000 | ((level & ~0xf) << 4) | (level & ~0xf) | (level >> 4));
-    overlayTexture->Upload(0, -1);
+    if (nameLength + separatorLength + textLength > 0x31) {
+        if (historyCount < 3) {
+            strcpy(history[historyCount].text, "             ");
+            history[historyCount].text[separatorLength + nameLength] = '\0';
+            strncat(history[historyCount].text, text + 0x31 - separatorLength - nameLength, 0x31);
+            history[historyCount].value = value;
+            historyCount++;
+        } else {
+            for (int i = 0; i < 2; i++) {
+                strncpy(history[i].text, history[i + 1].text, 0x31);
+                history[i].text[0x31] = '\0';
+                history[i].value = history[i + 1].value;
+            }
+            strcpy(history[2].text, "             ");
+            history[2].text[separatorLength + nameLength] = '\0';
+            strncat(history[2].text, text + 0x31 - separatorLength - nameLength, 0x31);
+            history[2].value = value;
+        }
+    }
 }

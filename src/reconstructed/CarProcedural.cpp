@@ -99,17 +99,6 @@ CarProcedural::~CarProcedural()
         delete pathKeys;
 }
 
-// 0x00430e60
-void CarProcedural::HermiteWeights(float t, float* h0, float* h1, float* h2, float* h3)
-{
-    float t2 = t * t;
-    float t3 = t2 * t;
-    *h0 = 1.0f - (3.0f * t2 - t3 - t3);
-    *h1 = 3.0f * t2 - t3 - t3;
-    *h2 = t3 - t2 - t2 + t;
-    *h3 = t3 - t2;
-}
-
 // 0x0042f600: slot 27 sets the car up from its parameters: the model and
 // its wheels, the two collision objects and the path.
 CarProcedural* CarProcedural::Create(void* renderContext, const char* name, const char* collisionFile,
@@ -530,4 +519,15 @@ Vector3 CarProcedural::PositionAtTime(float time)
         return h0 * fromKey->position + h1 * toKey->position + t0 * h2 + t1 * time;
     }
     return kVec3Zero;
+}
+
+// 0x00430e60
+void CarProcedural::HermiteWeights(float t, float* h0, float* h1, float* h2, float* h3)
+{
+    float t2 = t * t;
+    float t3 = t2 * t;
+    *h0 = 1.0f - (3.0f * t2 - t3 - t3);
+    *h1 = 3.0f * t2 - t3 - t3;
+    *h2 = t3 - t2 - t2 + t;
+    *h3 = t3 - t2;
 }

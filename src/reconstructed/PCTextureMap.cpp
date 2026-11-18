@@ -42,6 +42,16 @@ PCTextureMap::~PCTextureMap() {
     }
 }
 
+// 0x004c6040
+void PCTextureMap::RecreateIfLost() {
+    if (textureSurface && textureSurface->IsLost()) {
+        ReleaseTextureSurface();
+        CreateTextureSurface(1, 0, 0);
+        if (g_DebugCountTextureMemory)
+            ownerManager->CountTextureMemory();
+    }
+}
+
 // The larger of two formats' pixel sizes (re-evaluated, max-macro style).
 static inline int LargerPixelSize(int first, int second) {
     return PixelFormatBytesPerPixel(first) > PixelFormatBytesPerPixel(second) ? PixelFormatBytesPerPixel(first)
@@ -547,84 +557,6 @@ TextureMap* PCTextureMap::Clone() {
     return 0;
 }
 
-// 0x004c6040
-void PCTextureMap::RecreateIfLost() {
-    if (textureSurface && textureSurface->IsLost()) {
-        ReleaseTextureSurface();
-        CreateTextureSurface(1, 0, 0);
-        if (g_DebugCountTextureMemory)
-            ownerManager->CountTextureMemory();
-    }
-}
-
-// 0x004c7470
-int PCTextureMap::IsResident() {
-    return textureSurface != 0;
-}
-
-// 0x004c7610
-void PCTextureMap::ReleaseTextureSurface() {
-    if (textureSurface) {
-        textureSurface->Release();
-        textureSurface = 0;
-        if (g_DebugCountTextureMemory)
-            ownerManager->CountTextureMemory();
-    }
-}
-
-// 0x004c7970
-int PCTextureMap::SetAsTexture() {
-    if (textureSurface &&
-        !((PCRenderTarget*)g_TrackGame->renderTarget)->device->SetTexture(0, textureSurface))
-        return 1;
-    return 0;
-}
-
-// 0x004c79a0
-void PCTextureMap::Bind() {
-    SetAsTexture();
-    for (int i = 0; i < statePairCount; i++)
-        g_TrackGame->renderTarget->SetRenderState(statePairs[i].state, statePairs[i].value, 0);
-}
-
-// 0x004c79e0
-void* PCTextureMap::LockSurface(void* rect, long* pitch, int flags) {
-    DDSurfaceDesc2 desc;
-    memset(&desc, 0, sizeof(desc));
-    desc.size = sizeof(desc);
-    if (systemSurface->Lock(rect, &desc, flags, 0))
-        return 0;
-    if (pitch)
-        *pitch = desc.pitch;
-    return desc.surface;
-}
-
-// 0x004c7a50
-int PCTextureMap::UnlockSurface(void* rect) {
-    return !systemSurface->Unlock(rect);
-}
-
-// 0x004c7a70
-void* PCTextureMap::LockLevel(int level) {
-    DirectDrawSurface* surface = FindMipLevel(level);
-    if (surface) {
-        DDSurfaceDesc2 desc;
-        memset(&desc, 0, sizeof(desc));
-        desc.size = sizeof(desc);
-        if (!surface->Lock(0, &desc, DDLOCK_WAIT | DDLOCK_NOSYSLOCK, 0))
-            return desc.surface;
-    }
-    return 0;
-}
-
-// 0x004c7ad0
-int PCTextureMap::UnlockLevel(int level) {
-    DirectDrawSurface* surface = FindMipLevel(level);
-    if (surface && !surface->Unlock(0))
-        return 1;
-    return 0;
-}
-
 // 0x004c7420
 int PCTextureMap::RestoreTextureSurface() {
     if (textureSurface && textureSurface->IsLost()) {
@@ -637,180 +569,9 @@ int PCTextureMap::RestoreTextureSurface() {
     return 1;
 }
 
-// 0x004c7b00
-int PCTextureMap::BlitTo(void* destinationRect, DirectDrawSurface* destination,
-                                        void* sourceRect, int flags, int skip) {
-    if (!skip)
-        return !destination->Blt(destinationRect, systemSurface, sourceRect, flags, 0);
-    return 0;
-}
-
-// 0x004c7b40: copies `rect` of +0x70 to (x, y) in `destination`. Without a
-// table this is BltFast; with one, both surfaces are locked and each
-// destination pixel becomes table[source << 8 | destination], clipped to
-// the destination. Every non-8-bit format follows the WORD path and reads
-// a byte through the destination WORD value, including its low-address fault.
-// Not exact (364 of 750 bytes, 775 compiled: the destination WORD is read
-// before the source one, as retail faults; register choice and loop entry
-// differ; docs/TEXTURE_RECT_COPY.md).
-int PCTextureMap::CopyRectTo(unsigned long x, unsigned long y, DirectDrawSurface* destination,
-                                        Win32Rect* rect, int flags, unsigned char* table) {
-    DDSurfaceDesc2 source;
-    DDSurfaceDesc2 target;
-    long left, top, right, bottom;
-    if (!table) {
-        if (destination->BltFast(x, y, systemSurface, rect, flags))
-            goto failed;
-        return 1;
-    }
-    memset(&source, 0, sizeof(source));
-    source.size = sizeof(source);
-    if (systemSurface->Lock(0, &source, 0x811, 0))
-        goto failed;
-    memset(&target, 0, sizeof(target));
-    target.size = sizeof(target);
-    if (destination->Lock(0, &target, 0x811, 0))
-        goto failed;
-    top = rect->top;
-    bottom = rect->bottom;
-    left = rect->left;
-    right = rect->right;
-    if (x < target.width && y < target.height) {
-        if (right - left + x + 1 >= target.width)
-            right = target.width - x + left - 2;
-        if (bottom - top + y + 1 >= target.height)
-            bottom = target.height - y + top - 2;
-        if (target.pixelFormat.bitCount == 8) {
-            unsigned char* from = (unsigned char*)source.surface + source.pitch * top + left;
-            unsigned char* to = (unsigned char*)target.surface + target.pitch * y + x;
-            for (long row = top; row <= bottom; row++) {
-                unsigned char* pixel = to;
-                for (long column = left; column <= right; column++, pixel++)
-                    *pixel = table[(from[column - left] << 8) + *pixel];
-                from += source.pitch;
-                to += target.pitch;
-            }
-        } else {
-            unsigned short* from = (unsigned short*)source.surface + source.pitch * top / 2 + left;
-            unsigned short* to = (unsigned short*)target.surface + target.pitch * y / 2 + x;
-            for (long row = top; row <= bottom; row++) {
-                unsigned short* pixel = to;
-                for (long column = left; column <= right; column++, pixel++) {
-                    // Preserve the observed destination-before-source access/fault order.
-                    unsigned short destinationPixel = *(volatile unsigned short*)pixel;
-                    unsigned short sourcePixel = *(volatile unsigned short*)(from + column - left);
-                    *pixel = table[(sourcePixel << 8) + *(unsigned char*)destinationPixel];
-                }
-                from += source.pitch / 2;
-                to += target.pitch / 2;
-            }
-        }
-    }
-    if (destination->Unlock(0))
-        goto failed;
-    if (systemSurface->Unlock(0))
-        goto failed;
-    return 1;
-failed:
-    return 0;
-}
-
-// 0x004c83a0: follows the attached mip surfaces, halving the width, until it
-// reaches `width`. (`next` shares the dead parameter's stack slot, as in
-// retail.)
-DirectDrawSurface* PCTextureMap::FindMipLevel(int width) {
-    DDSCaps2 caps;
-    memset(&caps, 0, sizeof(caps));
-    int size = textureWidth;
-    DirectDrawSurface* surface = systemSurface;
-    caps.caps = 0x401000;
-    long result = 0;
-    while (size != width) {
-        DirectDrawSurface* next;
-        result = surface->GetAttachedSurface(&caps, &next);
-        if (result)
-            break;
-        surface = next;
-        size /= 2;
-    }
-    if (result && result != (long)DDERR_NOTFOUND)
-        ReportDirectDrawError(result, __FILE__, 2034);
-    else if (size == width)
-        return surface;
-    return 0;
-}
-
-// 0x004c8430: dumps every mip level (0x004c84e0).
-int PCTextureMap::DumpAllLevels() {
-    if (systemSurface) {
-        DumpLevel(systemSurface, 0);
-        if (mipCount > 1) {
-            DirectDrawSurface* surface;
-            DDSCaps2 caps;
-            DirectDrawSurface* top = systemSurface;
-            memset(&caps, 0, sizeof(caps));
-            caps.caps = 0x401000;
-            long result = top->GetAttachedSurface(&caps, &surface);
-            while (!result) {
-                DumpLevel(surface, 0);
-                result = surface->GetAttachedSurface(&caps, &surface);
-            }
-            if (result != (long)DDERR_NOTFOUND) {
-                ReportDirectDrawError(result, __FILE__, 2084);
-                return 0;
-            }
-        }
-    }
-    return 1;
-}
-
-// 0x004c84e0: locks a level and writes it to a file (0x004c8550).
-int PCTextureMap::DumpLevel(DirectDrawSurface* surface, const char* name) {
-    DDSurfaceDesc2 desc;
-    memset(&desc, 0, sizeof(desc));
-    desc.size = sizeof(desc);
-    surface->Lock(0, &desc, DDLOCK_WAIT | DDLOCK_READONLY | DDLOCK_NOSYSLOCK, 0);
-    WriteLevel(&desc, name);
-    surface->Unlock(0);
-    return 1;
-}
-
-// 0x004c8550: writes a locked level to C:\temp\<name><nnn>.bmp (8-bit) or
-// .tga (anything else, converted to 32-bit first), taking the first number
-// with no existing file. `name` defaults to "tex".
-void PCTextureMap::WriteLevel(DDSurfaceDesc2* desc, const char* name) {
-    char path[260];
-    BitmapFile bitmap;
-    const char* extension = desc->pixelFormat.bitCount == 8 ? ".bmp" : ".tga";
-    int number = 0;
-    if (!name)
-        name = "tex";
-    FILE* file = 0;
-    do {
-        if (file)
-            fclose(file);
-        sprintf(path, "C:\\temp\\%s%03d%s", name, number, extension);
-        file = fopen(path, "r");
-        number++;
-    } while (file);
-    if (desc->pixelFormat.bitCount == 8) {
-        // Reading the description through a second name here makes VC6 load the height before
-        // the width in the .tga branch's buffer size, as retail does.
-        const DDSurfaceDesc2& level = *desc;
-        DescribeBitmap8(&bitmap, level.surface, colorMapper->entries, level.width, level.height);
-        int length = strlen(path);
-        int count = length > 0x7f ? 0x7f : length;
-        strncpy(bitmap.name, path, count);
-        bitmap.name[count] = 0;
-        WriteBitmap(&bitmap);
-    } else {
-        void* pixels = DebugMalloc(desc->width * desc->height * sizeof(unsigned int), __FILE__, 2149);
-        ConvertPixels(pixels, desc->surface, desc->width, desc->height, desc->width,
-                              desc->pitch / PixelFormatBytesPerPixel(mapFormat), 8888, mapFormat, 0, 0, 0x80,
-                              0xff00ff);
-        WriteTga32(pixels, desc->width, desc->height, 0, path, 32);
-        DebugFree(pixels, __FILE__, 2154);
-    }
+// 0x004c7470
+int PCTextureMap::IsResident() {
+    return textureSurface != 0;
 }
 
 // 0x004c7480: creates the texture surface from +0x70 (or shares +0x70 when
@@ -855,6 +616,16 @@ done:
     return 1;
 failed:
     return 0;
+}
+
+// 0x004c7610
+void PCTextureMap::ReleaseTextureSurface() {
+    if (textureSurface) {
+        textureSurface->Release();
+        textureSurface = 0;
+        if (g_DebugCountTextureMemory)
+            ownerManager->CountTextureMemory();
+    }
 }
 
 // 0x004c7640: with partial texture blits (Display+0x5bc) or a positive
@@ -952,6 +723,137 @@ int PCTextureMap::BuildMipLevels(int filter) {
         return 0;
     }
     if (parent->Unlock(0))
+        goto failed;
+    return 1;
+failed:
+    return 0;
+}
+
+// 0x004c7970
+int PCTextureMap::SetAsTexture() {
+    if (textureSurface &&
+        !((PCRenderTarget*)g_TrackGame->renderTarget)->device->SetTexture(0, textureSurface))
+        return 1;
+    return 0;
+}
+
+// 0x004c79a0
+void PCTextureMap::Bind() {
+    SetAsTexture();
+    for (int i = 0; i < statePairCount; i++)
+        g_TrackGame->renderTarget->SetRenderState(statePairs[i].state, statePairs[i].value, 0);
+}
+
+// 0x004c79e0
+void* PCTextureMap::LockSurface(void* rect, long* pitch, int flags) {
+    DDSurfaceDesc2 desc;
+    memset(&desc, 0, sizeof(desc));
+    desc.size = sizeof(desc);
+    if (systemSurface->Lock(rect, &desc, flags, 0))
+        return 0;
+    if (pitch)
+        *pitch = desc.pitch;
+    return desc.surface;
+}
+
+// 0x004c7a50
+int PCTextureMap::UnlockSurface(void* rect) {
+    return !systemSurface->Unlock(rect);
+}
+
+// 0x004c7a70
+void* PCTextureMap::LockLevel(int level) {
+    DirectDrawSurface* surface = FindMipLevel(level);
+    if (surface) {
+        DDSurfaceDesc2 desc;
+        memset(&desc, 0, sizeof(desc));
+        desc.size = sizeof(desc);
+        if (!surface->Lock(0, &desc, DDLOCK_WAIT | DDLOCK_NOSYSLOCK, 0))
+            return desc.surface;
+    }
+    return 0;
+}
+
+// 0x004c7ad0
+int PCTextureMap::UnlockLevel(int level) {
+    DirectDrawSurface* surface = FindMipLevel(level);
+    if (surface && !surface->Unlock(0))
+        return 1;
+    return 0;
+}
+
+// 0x004c7b00
+int PCTextureMap::BlitTo(void* destinationRect, DirectDrawSurface* destination,
+                                        void* sourceRect, int flags, int skip) {
+    if (!skip)
+        return !destination->Blt(destinationRect, systemSurface, sourceRect, flags, 0);
+    return 0;
+}
+
+// 0x004c7b40: copies `rect` of +0x70 to (x, y) in `destination`. Without a
+// table this is BltFast; with one, both surfaces are locked and each
+// destination pixel becomes table[source << 8 | destination], clipped to
+// the destination. Every non-8-bit format follows the WORD path and reads
+// a byte through the destination WORD value, including its low-address fault.
+// Not exact (364 of 750 bytes, 775 compiled: the destination WORD is read
+// before the source one, as retail faults; register choice and loop entry
+// differ; docs/TEXTURE_RECT_COPY.md).
+int PCTextureMap::CopyRectTo(unsigned long x, unsigned long y, DirectDrawSurface* destination,
+                                        Win32Rect* rect, int flags, unsigned char* table) {
+    DDSurfaceDesc2 source;
+    DDSurfaceDesc2 target;
+    long left, top, right, bottom;
+    if (!table) {
+        if (destination->BltFast(x, y, systemSurface, rect, flags))
+            goto failed;
+        return 1;
+    }
+    memset(&source, 0, sizeof(source));
+    source.size = sizeof(source);
+    if (systemSurface->Lock(0, &source, 0x811, 0))
+        goto failed;
+    memset(&target, 0, sizeof(target));
+    target.size = sizeof(target);
+    if (destination->Lock(0, &target, 0x811, 0))
+        goto failed;
+    top = rect->top;
+    bottom = rect->bottom;
+    left = rect->left;
+    right = rect->right;
+    if (x < target.width && y < target.height) {
+        if (right - left + x + 1 >= target.width)
+            right = target.width - x + left - 2;
+        if (bottom - top + y + 1 >= target.height)
+            bottom = target.height - y + top - 2;
+        if (target.pixelFormat.bitCount == 8) {
+            unsigned char* from = (unsigned char*)source.surface + source.pitch * top + left;
+            unsigned char* to = (unsigned char*)target.surface + target.pitch * y + x;
+            for (long row = top; row <= bottom; row++) {
+                unsigned char* pixel = to;
+                for (long column = left; column <= right; column++, pixel++)
+                    *pixel = table[(from[column - left] << 8) + *pixel];
+                from += source.pitch;
+                to += target.pitch;
+            }
+        } else {
+            unsigned short* from = (unsigned short*)source.surface + source.pitch * top / 2 + left;
+            unsigned short* to = (unsigned short*)target.surface + target.pitch * y / 2 + x;
+            for (long row = top; row <= bottom; row++) {
+                unsigned short* pixel = to;
+                for (long column = left; column <= right; column++, pixel++) {
+                    // Preserve the observed destination-before-source access/fault order.
+                    unsigned short destinationPixel = *(volatile unsigned short*)pixel;
+                    unsigned short sourcePixel = *(volatile unsigned short*)(from + column - left);
+                    *pixel = table[(sourcePixel << 8) + *(unsigned char*)destinationPixel];
+                }
+                from += source.pitch / 2;
+                to += target.pitch / 2;
+            }
+        }
+    }
+    if (destination->Unlock(0))
+        goto failed;
+    if (systemSurface->Unlock(0))
         goto failed;
     return 1;
 failed:
@@ -1088,6 +990,104 @@ int PCTextureMap::ApplyColorKey(unsigned int color) {
     SetRenderStatePair(this, 0x29, 1);
     SetRenderStatePair(this, 0x1b, 0);
     return 1;
+}
+
+// 0x004c83a0: follows the attached mip surfaces, halving the width, until it
+// reaches `width`. (`next` shares the dead parameter's stack slot, as in
+// retail.)
+DirectDrawSurface* PCTextureMap::FindMipLevel(int width) {
+    DDSCaps2 caps;
+    memset(&caps, 0, sizeof(caps));
+    int size = textureWidth;
+    DirectDrawSurface* surface = systemSurface;
+    caps.caps = 0x401000;
+    long result = 0;
+    while (size != width) {
+        DirectDrawSurface* next;
+        result = surface->GetAttachedSurface(&caps, &next);
+        if (result)
+            break;
+        surface = next;
+        size /= 2;
+    }
+    if (result && result != (long)DDERR_NOTFOUND)
+        ReportDirectDrawError(result, __FILE__, 2034);
+    else if (size == width)
+        return surface;
+    return 0;
+}
+
+// 0x004c8430: dumps every mip level (0x004c84e0).
+int PCTextureMap::DumpAllLevels() {
+    if (systemSurface) {
+        DumpLevel(systemSurface, 0);
+        if (mipCount > 1) {
+            DirectDrawSurface* surface;
+            DDSCaps2 caps;
+            DirectDrawSurface* top = systemSurface;
+            memset(&caps, 0, sizeof(caps));
+            caps.caps = 0x401000;
+            long result = top->GetAttachedSurface(&caps, &surface);
+            while (!result) {
+                DumpLevel(surface, 0);
+                result = surface->GetAttachedSurface(&caps, &surface);
+            }
+            if (result != (long)DDERR_NOTFOUND) {
+                ReportDirectDrawError(result, __FILE__, 2084);
+                return 0;
+            }
+        }
+    }
+    return 1;
+}
+
+// 0x004c84e0: locks a level and writes it to a file (0x004c8550).
+int PCTextureMap::DumpLevel(DirectDrawSurface* surface, const char* name) {
+    DDSurfaceDesc2 desc;
+    memset(&desc, 0, sizeof(desc));
+    desc.size = sizeof(desc);
+    surface->Lock(0, &desc, DDLOCK_WAIT | DDLOCK_READONLY | DDLOCK_NOSYSLOCK, 0);
+    WriteLevel(&desc, name);
+    surface->Unlock(0);
+    return 1;
+}
+
+// 0x004c8550: writes a locked level to C:\temp\<name><nnn>.bmp (8-bit) or
+// .tga (anything else, converted to 32-bit first), taking the first number
+// with no existing file. `name` defaults to "tex".
+void PCTextureMap::WriteLevel(DDSurfaceDesc2* desc, const char* name) {
+    char path[260];
+    BitmapFile bitmap;
+    const char* extension = desc->pixelFormat.bitCount == 8 ? ".bmp" : ".tga";
+    int number = 0;
+    if (!name)
+        name = "tex";
+    FILE* file = 0;
+    do {
+        if (file)
+            fclose(file);
+        sprintf(path, "C:\\temp\\%s%03d%s", name, number, extension);
+        file = fopen(path, "r");
+        number++;
+    } while (file);
+    if (desc->pixelFormat.bitCount == 8) {
+        // Reading the description through a second name here makes VC6 load the height before
+        // the width in the .tga branch's buffer size, as retail does.
+        const DDSurfaceDesc2& level = *desc;
+        DescribeBitmap8(&bitmap, level.surface, colorMapper->entries, level.width, level.height);
+        int length = strlen(path);
+        int count = length > 0x7f ? 0x7f : length;
+        strncpy(bitmap.name, path, count);
+        bitmap.name[count] = 0;
+        WriteBitmap(&bitmap);
+    } else {
+        void* pixels = DebugMalloc(desc->width * desc->height * sizeof(unsigned int), __FILE__, 2149);
+        ConvertPixels(pixels, desc->surface, desc->width, desc->height, desc->width,
+                              desc->pitch / PixelFormatBytesPerPixel(mapFormat), 8888, mapFormat, 0, 0, 0x80,
+                              0xff00ff);
+        WriteTga32(pixels, desc->width, desc->height, 0, path, 32);
+        DebugFree(pixels, __FILE__, 2154);
+    }
 }
 
 // 0x004c86e0: formats the name of a DirectDraw result into a local buffer.

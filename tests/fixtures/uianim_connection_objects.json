@@ -1,5 +1,5 @@
 {
-  "baseline": "Published 7ecf5ff4 same-path old/current objects preserve every nondebug byte and resolved destination under exactly two method-name joins. Portable pins normalize only the checkout prefix and lexical spelling of the four source paths, ContainerList.h and GuiScreenTexture.cpp; no section is excluded. DlgProcs canonical and aggregate pins were independently reproduced from published round52 before objects, then advanced under only the verified DialogSoultreeObjectView to D3DIMSoultreeObject ReplaceMaterialTexture external-name join; all section bytes, flags and destination offsets remain identical. GUIManager.cpp now holds the former aggregate (CopyScreenToTexture and SetPointerDevice moved in): 208 sections, the aggregate's 209 less its second __FILE__ literal, and the same 871 relocations.",
+  "baseline": "Published 7ecf5ff4 same-path old/current objects preserve every nondebug byte and resolved destination under exactly two method-name joins. Portable pins normalize only the checkout prefix and lexical spelling of the four source paths, ContainerList.h and GuiScreenTexture.cpp; no section is excluded. DlgProcs canonical and aggregate pins were independently reproduced from published round52 before objects, then advanced under only the verified DialogSoultreeObjectView to D3DIMSoultreeObject ReplaceMaterialTexture external-name join; all section bytes, flags and destination offsets remain identical. GUIManager.cpp now holds the former aggregate (CopyScreenToTexture and SetPointerDevice moved in): 208 sections, the aggregate's 209 less its second __FILE__ literal, and the same 871 relocations. GUIManager.cpp's function blocks were then put in retail address order: the same 208 sections and 871 relocations in a new order, and every case of the unit stays strict exact.",
   "renames": {
     "?GetCurrentTexture@DialogUIAnimView@@QAEHXZ": "?GetCurrentTexture@UIAnim@@QAEPAVTextureMap@@XZ",
     "?AdvancePastSounds@CursorUIAnimView@@QAEHXZ": "?AdvancePastSounds@UIAnim@@QAEPAVTextureMap@@XZ"
@@ -8,7 +8,7 @@
     "src/reconstructed/GUIManager.cpp": {
       "sections": 208,
       "relocations": 871,
-      "sha256": "6ce942b8c989ad89656e10983d3eaee85324c4b70c2604ab8b2368a6e22d1419"
+      "sha256": "55575cee7d236b1e89aa3d9c302032517eb21ccc646f57738c02916d34cc352d"
     },
     "src/reconstructed/DlgProcs.cpp": {
       "sections": 421,
