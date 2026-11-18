@@ -275,7 +275,7 @@ exact (2026-11-12 sweep):
 
 | Unit | Missing retail range | What is there |
 |---|---|---|
-| `BoundingBoxTreeBuild.cpp` | `0x0042c260..0x0042c8c0` | `GatherModelTriangles`, near miss (`samples/physics/bvh/BoundingBoxTreeBuildNearMisses.cpp`) |
+| `BoundingBoxTreeBuild.cpp` | `0x0042c260..0x0042c8c0` | `GatherModelTriangles`, near miss (in the unit, retail order) |
 | `D3DIMSoulTree.cpp` | `0x00440f30..0x00442e00`, `0x00442f40..0x00442f70` | `DrawCurrentLod`, near miss (`samples/render/D3DIMSoulTreeNearMisses.cpp`), and the atexit `ret` stubs of its three function-local statics. The stubs are strict exact in that sample, but they are emitted with `DrawCurrentLod` and cannot move without it |
 | `DebugOverlay.cpp` | `0x00447a00..0x00447de0` | `LoadFont`, not exact, in the unit |
 | `MSZoneInterface.cpp` | `0x004aa150..0x004aa350` | the seven `SoultreePhysicsBaseObject` methods, left for the reason above |

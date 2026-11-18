@@ -20,7 +20,6 @@ TREE = 'src/reconstructed/BoundingBoxTreeBuild.cpp'
 MATRIX = 'src/reconstructed/MatrixUtil.cpp'
 MODEL = 'src/reconstructed/D3DIMSoulTree.cpp'
 SCENE = 'src/krusty2/soultree/soultree.cpp'
-PARTIAL = 'samples/physics/bvh/BoundingBoxTreeBuildNearMisses.cpp'
 PROVIDERS = (
     (MATRIX, '?IdentityMatrix@@YA?AUMatrix4@@XZ', 0x4a1410, 71),
     (TREE, '?BuildModelTriangleTree@@YAXPAUBoxTreeNode@@PAUTreeMatrix4@@PAVTreeModelSource@@PAPAUTreeVec3@@PAVTreeSceneNode@@H@Z', 0x42c8c0, 928),
@@ -66,7 +65,7 @@ class CollisionBuilderConnectionsTests(unittest.TestCase):
         self.assertEqual(bases[b'.?AVGameObject@@'], (12, -1, 0))
         with tempfile.TemporaryDirectory(prefix='mcm2-collision-builders-') as directory:
             objects = {}
-            jobs = [(source, []) for source in (COLLISION, TREE, MATRIX, MODEL, SCENE, PARTIAL)]
+            jobs = [(source, []) for source in (COLLISION, TREE, MATRIX, MODEL, SCENE)]
             fixture = 'tests/fixtures/collision_builder_layout.cpp'
             jobs += [(fixture, []), (fixture, ['--extra', '/DPHYSICS_VIEW'])]
             for index, (source, extra) in enumerate(jobs):
@@ -116,11 +115,12 @@ class CollisionBuilderConnectionsTests(unittest.TestCase):
                                    and i.operands[0].type == capstone.x86.X86_OP_IMM)
             self.assertEqual(retail_calls[0x440d40], 1)
             self.assertEqual(retail_calls[0x4fca80], 2)
-            partial = objects[PARTIAL]
+            # GatherModelTriangles is BoundingBoxTreeBuild.cpp's one near miss.
+            partial = objects[TREE]
             entry = partial.find_symbol('?GatherModelTriangles@@')
             self.assertEqual((entry.function_size, entry.extent_source), (1627, 'coff_function_aux'))
             result = compare(retail, partial, entry.name, 0x42c260, 1627,
-                             (ROOT / PARTIAL).with_suffix('.bindings.json'))
+                             (ROOT / TREE).with_suffix('.bindings.json'))
             self.assertFalse(result['strict_exact'])
             self.assertEqual(result['strict_match']['matching_positions'], 1626)
 

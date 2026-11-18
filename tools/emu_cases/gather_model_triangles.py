@@ -1,6 +1,6 @@
 """GatherModelTriangles 0x0042c260 (tools/emu_diff.py case).
 
-The linked body is src/bringup/Group0_GatherModelTriangles.cpp. The model (+0x27c current
+The linked body is src/reconstructed/BoundingBoxTreeBuild.cpp's. The model (+0x27c current
 LOD, +0x28c LOD table of {meshCount, meshes}) has 0..3 meshes of 0x38 bytes: parts (+0x00
 count, +0x04 records of {frame, vertexCount, firstVertex}), +0x0c triangle count, +0x10 and
 +0x14 two vertex arrays (0x20-byte vertices, position first) and +0x1c the triangles
@@ -21,7 +21,7 @@ import struct
 
 RETAIL_VA = 0x0042c260
 SYMBOL = '?GatherModelTriangles@@YAXPAVTreeModelSource@@PAVTreeSceneNode@@PAH2PAPAHPAPAUTreeVec3@@@Z'
-SOURCE = 'src/bringup/Group0_GatherModelTriangles.cpp'
+SOURCE = 'src/reconstructed/BoundingBoxTreeBuild.cpp'
 PROBES = {0x0042c309: 'frame count', 0x0042c6af: 'keep alloc', 0x0042c8ab: 'restore'}
 GRID = [0.0, -0.0, 1.0, -1.0, 0.5, 2.0]
 

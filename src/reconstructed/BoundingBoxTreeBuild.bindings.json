@@ -46,5 +46,10 @@
   "__real@4@4002a000000000000000": "0x00550780",
   "?TriangleNormal@@YAXPBUVector3@@00PAU1@PAM@Z": "0x004a11e0",
   "?GetMatrixIn@SoultreeObject@@QAEXPAV1@PAUMatrix4@@@Z": "0x004fca80",
-  "?TransformVertexGroups@D3DIMSoultreeObject@@QAEXH@Z": "0x00440d40"
+  "?TransformVertexGroups@D3DIMSoultreeObject@@QAEXH@Z": "0x00440d40",
+  "?MarkSubtreeDirty@TreeSceneNode@@QAEXXZ": "0x004fdab0",
+  "?SetAxesIn@TreeSceneNode@@QAEXPAV1@PBUTreeVec3@@1HH@Z": "0x004fc050",
+  "?SetMatrixIn@TreeSceneNode@@QAEXPAV1@PAUTreeMatrix4@@@Z": "0x004fb8c0",
+  "?SetPositionIn@TreeSceneNode@@QAEXPAV1@PBUTreeVec3@@@Z": "0x004fc740",
+  "?TriangleNormal@@YAXPBUTreeVec3@@00PAU1@PAM@Z": "0x004a11e0"
 }

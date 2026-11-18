@@ -33,8 +33,8 @@ Evidence
   but GatherModelTriangles uses them earlier. They are therefore declared `extern` in the header
   and defined midway (tier 3; linkage is not visible in the image).
 
-Partial (`samples/physics/bvh/BoundingBoxTreeBuildNearMisses.cpp`):
-- GatherModelTriangles 0x42c260: one reload order and one base/index order.
+Partial (in `src/reconstructed/BoundingBoxTreeBuild.cpp`, retail order, `// Not exact` status comment):
+- GatherModelTriangles 0x42c260: one base/index order (1626/1627).
   BuildModelPointTree 0x42d390 is exact in the canonical file: its two operand-order
   spots needed a `TreeVec3* p = &points[count]` local in both vertex loops.
 

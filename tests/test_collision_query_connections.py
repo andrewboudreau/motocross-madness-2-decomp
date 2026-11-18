@@ -26,7 +26,7 @@ NODE = 'src/krusty2/soultree/soultree.cpp'
 VECTOR = 'src/reconstructed/VectorCalls.cpp'
 SOURCES = (COLLISION, QUERY, 'src/krusty2/motion/CollisionCharacter.cpp',
            'samples/physics/bvh/BoundingBoxTreeQueryNearMisses.cpp',
-           'samples/physics/bvh/BoundingBoxTreeBuildNearMisses.cpp')
+           'src/reconstructed/BoundingBoxTreeBuild.cpp')
 PROVIDERS = (
     ('TreeTreeQuery', 0x428950, 708, 5),
     ('TreeBoxOverlap', 0x428c20, 395, 4),
