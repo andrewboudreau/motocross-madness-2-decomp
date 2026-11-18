@@ -37,8 +37,7 @@ class GuiConnectionTests(unittest.TestCase):
         sources = {name: f'src/reconstructed/{name}.cpp' for name in (
             'GUIManager', 'KrustyUI', 'BikeRace', 'EventManager', 'trkgame',
             'DlgProcs', 'OptionProcs', 'SelectGamePicProcs', 'TrackOverlay')}
-        sources.update({'event_sample': 'samples/game/EventManagerNearMisses.cpp',
-                        'layout': 'tests/fixtures/gui_layout.cpp'})
+        sources.update({'layout': 'tests/fixtures/gui_layout.cpp'})
         with tempfile.TemporaryDirectory(prefix='mcm2-gui-') as directory:
             objects = {}
             for name, source in sources.items():
@@ -57,7 +56,7 @@ class GuiConnectionTests(unittest.TestCase):
             providers = {s.name for s in objects['GUIManager'].symbols
                          if s.storage_class == 2 and s.section_number > 0}
             production = set().union(*(imports(obj) for name, obj in objects.items()
-                                      if name not in ('GUIManager', 'event_sample', 'layout')))
+                                      if name not in ('GUIManager', 'layout')))
             connected = {
                 '?ShowCursors@GUIManager@@QAEXH@Z',
                 '?GetUser@GUIManager@@QAEPAVGUIUser@@H@Z',

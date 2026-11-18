@@ -132,18 +132,20 @@ That is inference from their use (slots 4 and 5, the +0x25 flag bits), and
 it fits KrustyBike's primary base chain for the views. Their classes are not
 established; `src/reconstructed/RaceView.h` declares them.
 
-Near miss (draft):
+Near miss:
 - `0x0045d480` (4247 bytes): the podium scene. It calls `0x0045cdc0(1)`,
   creates a `PCCamera` (constructor `0x004bed80`) at +0x3d4 and, for places
   1 to min(+0x4c, 3), a `D3DIMSoultreeCharacter` (0x240 bytes, constructor
   `0x004455b0`) at +0x424 from "%s\Winner.mcf" (or "Winnerd.mcf") with a
   "Podium3/4/5_%02d" motion kept at +0x430; it also uses "CrowdLoop.wav"
   and clears the podium area with `0x0045fce0` / `0x0045fdc0`. A nonzero
-  result makes `0x0045e600` block UI interaction for slot 10. The
-  candidate is in `samples/game/EventManagerNearMisses.cpp` (4167 of 4247
-  bytes with its bindings; the 0x460 frame, extent, control flow, calls and
-  EH states match, and the header lists the shapes found and what still
-  differs: mainly retail's spilled z square, see BIKERACE.md). Retail's buffers are a 0x80-byte name, a 0x104-byte path, a
+  result makes `0x0045e600` block UI interaction for slot 10. It sits in
+  EventManager.cpp in retail order with a `// Not exact` status comment
+  (4167 of 4247 bytes; the 0x460 frame, extent, control flow, calls and
+  EH states match; mainly retail's spilled z square still differs, see
+  BIKERACE.md and [CreatePodiumScene: forms tried](#createpodiumscene-forms-tried)).
+  The game build linked an older copy (4139 bytes) from
+  `src/bringup/Group1_PodiumScene.cpp`, now removed. Retail's buffers are a 0x80-byte name, a 0x104-byte path, a
   0x184-byte message and a separate 0x80-byte buffer for the CrowdLoop
   error. `EventManager.h` now gives
   the podium characters' slot 11 and motion calls, +0x3d0 as the podium
@@ -178,3 +180,39 @@ object's +0x10 for type 0x101 (`DPSYS_HOST`). The DirectPlay system message
 constants are shared in `src/reconstructed/DirectPlayMessages.h`.
 The view's +0x38 and +0x3c are racers (`EventKrustyBikeView`, in
 `RaceView.h`); TrackGame's 0xf8-byte racer records start at +0x215c, after their count.
+
+## CreatePodiumScene: forms tried
+
+Carried over from the header of the former `samples/game` near-miss file:
+
+EventManager::CreatePodiumScene (0x0045d480, 4247 bytes): the podium
+scene; 4167 of 4247 bytes (bindings: EventManagerNearMisses.bindings.json,
+with the EH handler 0x0054ab22 the prologue pushes). Control flow, calls,
+strings, `new` lines, EH states and the frame size (0x460) follow retail.
+Shapes found: the last-race test assigned to `ok` (retail materialises the
+sete), separate `column`/`row` products, the zero direction test through
+an inline helper (it places the copy branch first), PodiumLength over a
+reference (no by-value copy) with `xx` and `yy` locals and `v.z * v.z`
+left in the sum (retail's `fld; fld st(0); fmulp` per component in the
+offsets/facings loop and the plain camera sites; plain, all-local,
+component-local, Square-helper, dot-product and three-float-helper forms
+load all three components first, and a lone `zz` local is 6 bytes longer),
+the nested InProCircuitCareer test (three Winner sprintf copies) with the
+career in a `ProCircuit* circuit` local inside it (a named value takes no
+scratch-register turn: read as g_TrackGame->proCircuit->careerFlags the
+branch and the OpenArchiveFile arguments ran one register behind, 4139;
+an inline accessor returning the career scores the same 4167; the racer
+compare with its operands reversed loses a byte; the two tests as nested
+ifs duplicate an arm, 2618), and the
+buffers name[0x80], path[0x104], message[0x184] plus the crowd message's
+own [0x80] buffer at +0x168. Left: retail spills the z square to the
+temporary [esp+0x1c] (`fstp [t]; fstp st(0); faddp; fadd [t]`, as BikeRace
+0x00417ed0 does) where VC6 here keeps it on the stack (`faddp st(3); fxch;
+fadd st(1); fxch` and two pops; the 11 sum, bracket, order and
+declaration forms of 2026-10-19 do not spill), so the scalar homes at
++0x1c/+0x20 swap; the place counter store (retail stores 1 after the count
+test), the z component order of `podiumPosition + offsets[place - 1]` and
+the loop's two increments (the place store and increment are unchanged by
+++place, place = place + 1, the counter declared ahead of the loop, a while
+loop or the increment at the end of the body; reversed test operands 4165,
+place++ < count from 0 3666, place <= count 3256).

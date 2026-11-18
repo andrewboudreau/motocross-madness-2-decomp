@@ -1,7 +1,7 @@
 """EventManager::CreatePodiumScene 0x0045d480, the end-of-event podium (tools/emu_diff.py case,
 call-record/replay mode).
 
-The linked body is src/bringup/Group1_PodiumScene.cpp. The body decides whether a podium is due
+The linked body is in src/reconstructed/EventManager.cpp. The body decides whether a podium is due
 (pro-circuit career: the series' last race; otherwise race mode 2 after the last race, the
 showPodiums option and a top-three finish outside network play), closes the race, creates the
 podium camera, places the podium from the grid's podium position and direction, from the
@@ -30,7 +30,7 @@ import struct
 
 RETAIL_VA = 0x0045d480
 SYMBOL = '?CreatePodiumScene@EventManager@@QAEHXZ'
-SOURCE = 'src/bringup/Group1_PodiumScene.cpp'
+SOURCE = 'src/reconstructed/EventManager.cpp'
 PROBES = {0x0045d556: 'podium due', 0x0045d64f: 'grid direction', 0x0045d6a7: 'node axes',
           0x0045d6e0: 'grid spacing', 0x0045d9cb: 'outdoor layout', 0x0045dfac: 'character',
           0x0045e189: 'crowd loop', 0x0045e46f: 'camera aimed'}

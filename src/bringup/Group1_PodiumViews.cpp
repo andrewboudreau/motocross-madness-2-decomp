@@ -1,5 +1,5 @@
 // Group1_PodiumViews.cpp -- bring-up forwarders for the provisional views that
-// EventManager::CreatePodiumScene (Group1_PodiumScene.cpp) calls.  Every view method
+// EventManager::CreatePodiumScene (EventManager.cpp) calls.  Every view method
 // is a retail function already reconstructed under its canonical class (addresses
 // from the canonical *.bindings.json), so each forwards with the same `this`:
 //   EventBikeRaceView::NextBike          0x004204e0 = BikeRace::NextBike
