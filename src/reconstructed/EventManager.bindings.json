@@ -190,7 +190,6 @@
   "?PlayWithOptions@PodiumSoundView@@QAEHHKH@Z": "0x004bc6b0",
   "?SetPosition@PodiumArcadeObjectView@@QAEXPBUVector3@@@Z": "0x004014f0",
   "?SetAxes@PodiumArcadeObjectView@@QAEXPBUVector3@@0HH@Z": "0x00401520",
-  "?NextBike@EventBikeRaceView@@QAEPAUEventKrustyBikeView@@PAH@Z": "0x004204e0",
   "?SetUseLighting@PodiumD3DIMSoultreeObjectView@@QAEXH@Z": "0x004444c0",
   "?ReplaceMaterialTexture@PodiumD3DIMSoultreeObjectView@@QAEXHPBDPAX@Z": "0x00444c70",
   "?ResetClock@Game@@QAEXXZ": "0x00468880",

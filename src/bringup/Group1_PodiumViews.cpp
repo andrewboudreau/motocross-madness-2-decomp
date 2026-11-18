@@ -2,7 +2,6 @@
 // EventManager::CreatePodiumScene (EventManager.cpp) calls.  Every view method
 // is a retail function already reconstructed under its canonical class (addresses
 // from the canonical *.bindings.json), so each forwards with the same `this`:
-//   EventBikeRaceView::NextBike          0x004204e0 = BikeRace::NextBike
 //   PodiumTerrainView::QueryGround    0x00507c10 = Terrain::QueryGround
 //   PodiumSoultreeObjectView::GetPosition           0x004fc970 = SoultreeObject::GetPosition
 //   PodiumSoultreeObjectView::GetAxes               0x004fc4f0 = SoultreeObject::GetAxes
@@ -24,16 +23,9 @@
 struct Vec3;
 struct Vector3;
 struct TerrainVec3;
-struct EventKrustyBikeView;
-class BikeRaceKrustyBikeView;
 class FileStream;
 class GameObject;
 class SoundGroup;
-
-class BikeRace {
-public:
-    BikeRaceKrustyBikeView* NextBike(int* iterator);
-};
 
 class Terrain {
 public:
@@ -69,10 +61,6 @@ public:
 
 // ---- the views (same keys and signatures as RaceView.h / EventManager.h / the sample)
 
-struct EventBikeRaceView {
-    EventKrustyBikeView* NextBike(int* iterator);
-};
-
 struct PodiumTerrainView {
     void QueryGround(Vector3* point, int a, int b, int c);
 };
@@ -101,11 +89,6 @@ public:
     int Load(const char* name, FileStream* stream, int flags, int a, int b, int c);
     int PlayWithOptions(int restart, unsigned long playFlags, int preferHardware);
 };
-
-EventKrustyBikeView* EventBikeRaceView::NextBike(int* iterator)
-{
-    return reinterpret_cast<EventKrustyBikeView*>(reinterpret_cast<BikeRace*>(this)->NextBike(iterator));
-}
 
 // The view's three ints are Terrain::QueryGround's normal out, flat-shaded flag and
 // surface out (the podium passes 0 for all of them).

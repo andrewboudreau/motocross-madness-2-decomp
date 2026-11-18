@@ -684,9 +684,9 @@ int EventManager::CreatePodiumScene() {
     for (int place = 1; place - 1 < podiumCharacterCount; place++) {
         EventKrustyBikeView* racer = 0;
         iterator = 0;
-        racer = PODIUM_OWNER(owner)->raceView->NextBike(&iterator);
+        racer = reinterpret_cast<EventKrustyBikeView*>(reinterpret_cast<BikeRace*>(PODIUM_OWNER(owner)->raceView)->NextBike(&iterator));
         while (racer && ((PodiumKrustyBikeView*)racer)->place != place)
-            racer = PODIUM_OWNER(owner)->raceView->NextBike(&iterator);
+            racer = reinterpret_cast<EventKrustyBikeView*>(reinterpret_cast<BikeRace*>(PODIUM_OWNER(owner)->raceView)->NextBike(&iterator));
         if (g_TrackGame->InProCircuitCareer()) {
             ProCircuit* circuit = g_TrackGame->proCircuit;
             if ((circuit->careerFlags & 2) &&
