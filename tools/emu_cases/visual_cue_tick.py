@@ -129,7 +129,7 @@ def setup(ctx, c):
     def query_ground(cx, e, a):
         cx.note('QueryGround', e, vec(cx, a[0]), a[1], a[2], a[3])
         cx.pack(a[0] + 4, 'f', cx.rng.uniform(-5, 5))
-    ctx.stub_at(0x00507c10, 'RunwayTerrainView::QueryGround', pop=16, nargs=4, ret=query_ground, log=False)
+    ctx.stub_at(0x00507c10, 'Terrain::QueryGround', pop=16, nargs=4, ret=query_ground, log=False)
     ctx.stub_at(0x00401520, 'ArcadeObject::SetAxes', pop=16, nargs=4, log=False,
                 ret=lambda cx, e, a: cx.note('SetAxes', e, vec(cx, a[0]), vec(cx, a[1]), a[2], a[3]))
     ctx.stub_at(0x004fd340, 'D3DIMSoultreeObject::Scale', pop=12, nargs=3)

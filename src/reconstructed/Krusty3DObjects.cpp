@@ -313,7 +313,7 @@ int VisualCue::Tick(float frameTime) {
             cueView->raceTrack->PointAt(cueView->ownRacer->statusNode->progressPos, &target);
         else
             target = cueView->ownRacer->trackPoint;
-        groundTerrain->QueryGround(&target, 0, 0, 0);
+        reinterpret_cast<Terrain*>(groundTerrain)->QueryGround(reinterpret_cast<TerrainVec3*>(&target), 0, 0, 0);
         direction = target - arcadeView->cameraPosition;
         SetAxes(&direction, &kVec3YAxis, 1, 1);
         scale = modelScale;

@@ -4,12 +4,11 @@
 //   QuarryStuntEvent's argument types; Krusty3DObjects.cpp defines the same retail
 //   function with Krusty3DObjects.h's types.  The QuarryEvent overload forwards
 //   every argument unchanged (the light manager travels as the int `lights`).
-// * VisualCue::Tick (src/reconstructed/Krusty3DObjects.cpp) calls two provisional view methods
-//   whose retail targets are already reconstructed under canonical classes:
-//     RunwayTerrainView::QueryGround 0x00507c10 = Terrain::QueryGround
+// * VisualCue::Tick and BonusObjectManager (src/reconstructed/Krusty3DObjects.cpp)
+//   call a provisional view method whose retail target is already reconstructed
+//   under its canonical class:
 //     BonusSoultreeObjectView::GetPosition 0x004fc970 = SoultreeObject::GetPosition
-//   (the caller passes 0 for the surface pointer; GetPosition's returned pointer is
-//   the argument and is ignored by the view).
+//   (GetPosition's returned pointer is the argument and is ignored by the view).
 // The two VisualCue declarations (QuarryEvent.h derives from GameObject,
 // Krusty3DObjects.h from ArcadeObject) cannot share a translation unit, so the
 // classes are declared here with only the members needed, same class keys and
@@ -49,22 +48,6 @@ VisualCue* VisualCue::LoadVisualCue(void* target, LightManager* lights, int opti
     return LoadVisualCue(target, (int)lights, options, (RunwayTerrainView*)terrain, offset,
                          (VisualCueBikeRaceView*)view, count, (ArcadeCameraView*)camera,
                          size, screenXFraction, screenYFraction);
-}
-
-class Terrain {
-public:
-    void QueryGround(TerrainVec3* pos, TerrainVec3* normal, int flatShaded, unsigned char* surface);
-};
-
-struct RunwayTerrainView {
-    void QueryGround(Vector3* point, Vector3* normal, int flatShaded, int surface);
-};
-
-// 0x00507c10
-void RunwayTerrainView::QueryGround(Vector3* point, Vector3* normal, int flatShaded, int surface)
-{
-    reinterpret_cast<Terrain*>(this)->QueryGround((TerrainVec3*)point, (TerrainVec3*)normal,
-                                                  flatShaded, (unsigned char*)surface);
 }
 
 class SoultreeObject {

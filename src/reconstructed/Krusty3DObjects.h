@@ -110,10 +110,9 @@ struct RunwayKrustyBikeView {
     char finished;                            // +0x7a4
 };
 
-// The terrain (NationalRace.cpp's +0x40): 0x00507c10 drops `point` onto it.
-struct RunwayTerrainView {
-    void QueryGround(Vector3* point, Vector3* normal, int flatShaded, int surface);
-};
+// The terrain (NationalRace.cpp's +0x40); the lights and the cue drop points
+// onto it with Terrain::QueryGround (0x00507c10).
+struct RunwayTerrainView;
 
 // 0x4c bytes (NationalRace.cpp 0x004aa8cd): five "pointer.slt" models.
 class RunwayLights : public GameObject {
