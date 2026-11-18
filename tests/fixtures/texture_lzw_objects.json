@@ -5,8 +5,8 @@
     "sha256": "afbf4dac19ea380847cdd012eabee05bd1dd7366f865e31c4a0d9888fb495a6f"
   },
   "src/reconstructed/ProCircuitProcs.cpp": {
-    "sections": 336,
-    "relocations": 2089,
-    "sha256": "5bf00f3b4cfdc5886b7a5b0c2c9c3a6527eed527e802b1d25246118f48c2b3f2"
+    "sections": 365,
+    "relocations": 2327,
+    "sha256": "94b9c07d646668feb0b72ab1f7514471bf609e7fc95660469c27599991896bfe"
   }
 }

@@ -1,5 +1,5 @@
 {
-  "baseline": "Published5e51cf31 DlgProcs pair and publishedfb7a9b22 ProCircuit pair: all same-path nondebug section bytes, flags, addends and resolved destinations preserved under the two listed method names. Portable pins normalize only enumerated canonical/sample source paths plus the prior ContainerList.h and GuiScreenTexture.cpp paths; no omitted section or partial extent.",
+  "baseline": "Published5e51cf31 DlgProcs pair and publishedfb7a9b22 ProCircuit pair: all same-path nondebug section bytes, flags, addends and resolved destinations preserved under the two listed method names. Portable pins normalize only enumerated canonical/sample source paths plus the prior ContainerList.h and GuiScreenTexture.cpp paths; no omitted section or partial extent. ProCircuitProcs near-miss merge: the sample's four bodies were folded into ProCircuitProcs.cpp and the unit put in retail order (365 sections, 2327 relocations); every calibration case stays exact. The sample pin is removed.",
   "renames": {
     "?ReplaceMaterialTexture@DialogSoultreeObjectView@@QAEXHPBDPAPAVTextureMapManager@@@Z": "?ReplaceMaterialTexture@D3DIMSoultreeObject@@QAEHHPBDH@Z",
     "?ReplaceMaterialTexture@UnknownProCircuitSkinned@@QAEXHPBDPAPAVTextureMapManager@@@Z": "?ReplaceMaterialTexture@D3DIMSoultreeObject@@QAEHHPBDH@Z"
@@ -16,14 +16,9 @@
       "sha256": "fdf5bc3e00c15bf5ca5e1bebd0f645a819a721b0a9b0e4894f28c3ea83601211"
     },
     "src/reconstructed/ProCircuitProcs.cpp": {
-      "sections": 336,
-      "relocations": 2089,
-      "sha256": "5bf00f3b4cfdc5886b7a5b0c2c9c3a6527eed527e802b1d25246118f48c2b3f2"
-    },
-    "samples/ui/ProCircuitProcsNearMisses.cpp": {
-      "sections": 366,
+      "sections": 365,
       "relocations": 2327,
-      "sha256": "07d5aac217c119052297e857259a1ef212c0b4abde504be6a09e2f02fe1995bd"
+      "sha256": "94b9c07d646668feb0b72ab1f7514471bf609e7fc95660469c27599991896bfe"
     }
   }
 }

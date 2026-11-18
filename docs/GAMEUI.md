@@ -212,7 +212,7 @@ dlgprocs.cpp, and from the constructors):
   button through it; reading the field directly lets VC6 merge their two
   branches, which retail does not. It is defined after the class: an
   in-class body changes the reload order in the header-sensitive near miss
-  0x004d59a0 (`samples/ui/ProCircuitProcsNearMisses.cpp`).
+  0x004d59a0 (`src/reconstructed/ProCircuitProcs.cpp`, unregistered).
 - A local copy `UIListBox* p = static_cast<...>(this)` changes VC6's
   register and address-operand choices in 0x004775f0 and 0x00477900;
   `this` does not.

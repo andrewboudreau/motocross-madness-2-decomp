@@ -1,6 +1,6 @@
 """PCLastRaceDlg::PayOutRace 0x004d8c40, the pro-circuit race payout (tools/emu_diff.py case).
 
-The linked body is the bring-up src/bringup/Group0_PCLastRaceDlg.cpp. Offsets from the retail
+The linked body is src/reconstructed/ProCircuitProcs.cpp's. Offsets from the retail
 body: g_TrackGame+0x3444 the circuit (series +0x40, feesPaid +0x454, racerCount +0x460, racers
 +0x465 stride 0x140 with race stats points/purse/repair/medical/rank/stunt at +0..+0x14, the
 season stats at +0x18..+0x2c and money +0x30, entry fees +0x1229, purse multiplier +0x1241,
@@ -16,7 +16,7 @@ import struct
 
 RETAIL_VA = 0x004d8c40
 SYMBOL = '?PayOutRace@PCLastRaceDlg@@QAEXXZ'
-SOURCE = 'src/bringup/Group0_PCLastRaceDlg.cpp'
+SOURCE = 'src/reconstructed/ProCircuitProcs.cpp'
 TRACK_GAME = 0x0056e26c
 PROBES = {0x004d8d1f: 'result loop', 0x004d8d52: 'medical cap', 0x004d8ea1: 'race rank sort',
           0x004d8f76: 'season rank sort'}

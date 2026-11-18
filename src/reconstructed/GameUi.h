@@ -697,7 +697,7 @@ public:
     // Inline: the button. SelectGamePicProcs.cpp reads it through this
     // accessor; reading buttonPart directly lets VC6 merge the two branches
     // of 0x004f3260 and 0x004f8700, which retail does not. Defined after the
-    // class (an in-class body flips ProCircuitProcsNearMisses' 0x004d59a0).
+    // class (an in-class body flips ProCircuitProcs.cpp's 0x004d59a0).
     UIDDLButton* GetButtonPart();
 
     UIDDLButton* buttonPart;                  // +0x1ec

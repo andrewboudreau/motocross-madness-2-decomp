@@ -1,7 +1,7 @@
 """PCBailoutDlg::HandleEvent 0x004d8fc0, the career bail-out offer (tools/emu_diff.py case,
 call-record/replay mode).
 
-The linked body is src/bringup/Group5_PCBailoutDlg.cpp. g_TrackGame 0x0056e26c +0x3444 is the
+The linked body is src/reconstructed/ProCircuitProcs.cpp's. g_TrackGame 0x0056e26c +0x3444 is the
 pro circuit (+0x40 series, +0x1229 the unaligned entry-fee table, +0x495 the player's money,
 +0x499 debts, +0x464 career flags), +0x3448 the career file, +0x420 the resource instance.
 The dialog keeps the entry fee, the player's cash and the shortfall at +0x7f58/+0x7f5c/+0x7f60.
@@ -20,7 +20,7 @@ from tools.emu_cases.kb_simulate_frame import install_seh_segment
 
 RETAIL_VA = 0x004d8fc0
 SYMBOL = '?HandleEvent@PCBailoutDlg@@UAEXPAUDialogEvent@@@Z'
-SOURCE = 'src/bringup/Group5_PCBailoutDlg.cpp'
+SOURCE = 'src/reconstructed/ProCircuitProcs.cpp'
 TRACK_GAME = 0x0056e26c
 FIND_CONTROL, SPRINTF, STRICMP, NEW = 0x0046ebf0, 0x00534aaf, 0x00536070, 0x004a3010
 PROBES = {0x004d9005: 'init', 0x004d9205: 'accept', 0x004d929b: 'decline'}

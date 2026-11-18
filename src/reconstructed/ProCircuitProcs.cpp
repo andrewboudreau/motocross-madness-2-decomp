@@ -336,7 +336,6 @@ void PCStartupDlg::AddCircuitRow(ProCircuit* circuit, int row)
     }
 }
 
-
 // 0x004d5ca0
 void PCStartupDlg::FreeFileNames()
 {
@@ -536,6 +535,402 @@ void PCCentralDlg::OpenPage(int page)
         }
         break;
     }
+}
+
+// 0x004d6770: as SPBikeRiderDlg slot 29 (dlgprocs.cpp 0x0044ef70); the
+// engine sizes offered follow the circuit's bike class rule.
+void PCCentralBikeRiderDlg::HandleEvent(DialogEvent* event)
+{
+    char plate[12];
+    char typed[12];
+    switch (event->kind) {
+    case kDialogInit: {
+        previewDragged = 0;
+        static_cast<UIMultiState*>(FindControl("ChkAutoRotate", 2))->SetCurrentState(1);
+        riderChanged = 1;
+        bikeChanged = 1;
+        FillBikeRiderLists();
+        UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLEngineSize", 6))->listPart;
+        list->RemoveAllRows();
+        if (g_TrackGame->proCircuit->bikeClassRule == 1 || g_TrackGame->proCircuit->bikeClassRule == 3)
+            list->AddRow("125cc 2-stroke", BikeClassOf(125), 0);
+        if (g_TrackGame->proCircuit->bikeClassRule == 2 || g_TrackGame->proCircuit->bikeClassRule == 3) {
+            list->AddRow("250cc 2-stroke", BikeClassOf(250), 0);
+            list->AddRow("400cc 4-stroke", BikeClassOf(400), 0);
+        }
+        if (g_TrackGame->proCircuit->bikeClassRule == 3) {
+            list->AddRow("500cc 2-stroke", BikeClassOf(500), 0);
+            list->AddRow("600cc 4-stroke", BikeClassOf(600), 0);
+        }
+        list->SelectRowByData(BikeClassOf(g_TrackGame->proCircuit->racers[0].engineSize));
+        UIEditBox* edit = static_cast<UIEditBox*>(FindControl("EditPlateNumber", 0xb));
+        edit->SetAcceptedCharacters("0123456789");
+        g_TrackGame->ui->ShowScene(this);
+        Vector3* eye = &viewEye;
+        previewArea.left = 0x52;
+        previewArea.right = 0x216;
+        previewArea.top = 0x74;
+        previewArea.bottom = 0x150;
+        *eye = kVec3Zero;
+        float fov = 50.0f;
+        Vector3* target = &viewTarget;
+        viewEye.z = 15.0f;
+        viewEye.y = 1.0f;
+        *target = g_TrackGame->ui->garageFocus;
+        viewTarget.y += 3.0f;
+        g_TrackGame->ui->garageCamera->SetFrame(eye, 0, 0, 0, &fov);
+        g_TrackGame->ui->garageCamera->LookAt(*target);
+        g_TrackGame->ui->garageCamera->SetViewport(
+            previewArea.left, previewArea.top, previewArea.right - previewArea.left,
+            previewArea.bottom - previewArea.top);
+        viewDistance = VectorLength(VectorDifference(*eye, g_TrackGame->ui->garageFocus));
+        ApplyChosenRider();
+        ApplyChosenBike();
+        PaintPlateNumber(g_TrackGame->mode.plateNumber);
+        srand(ReadClock());
+        if (dialogBackground)
+            previewRegion = dialogBackground->AllocRegion(0);
+        break;
+    }
+    case kDialogListSelect:
+        if (!_stricmp("DDLBikes", event->controlName))
+            ApplyChosenBike();
+        else if (!_stricmp("DDLRiders", event->controlName))
+            ApplyChosenRider();
+        else if (!_stricmp("DDLEngineSize", event->controlName))
+            ApplyChosenBike();
+        break;
+    case kDialogCommand:
+        if (!_stricmp("BikeLeft", event->controlName)) {
+            UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLBikes", 6))->listPart;
+            int rows = list->rowCount;
+            list->SelectRow((list->GetSelectedRow() + rows - 1) % rows);
+            list->ReportClick(0);
+        } else if (!_stricmp("BikeRight", event->controlName)) {
+            UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLBikes", 6))->listPart;
+            int rows = list->rowCount;
+            list->SelectRow((list->GetSelectedRow() + 1) % rows);
+            list->ReportClick(0);
+        } else if (!_stricmp("RiderLeft", event->controlName)) {
+            UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLRiders", 6))->listPart;
+            int rows = list->rowCount;
+            list->SelectRow((list->GetSelectedRow() + rows - 1) % rows);
+            list->ReportClick(0);
+        } else if (!_stricmp("RiderRight", event->controlName)) {
+            UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLRiders", 6))->listPart;
+            int rows = list->rowCount;
+            list->SelectRow((list->GetSelectedRow() + 1) % rows);
+            list->ReportClick(0);
+        } else if (!_stricmp("ChkAutoRotate", event->controlName)) {
+            previewDragged = !static_cast<UIMultiState*>(FindControl("ChkAutoRotate", 2))->GetSelectedState();
+        } else if (!_stricmp("ButWrench", event->controlName)) {
+            OptionsDlg* dialog = new(__FILE__, 719) OptionsDlg;
+            guiManager->ShowDialog((UIDialog*)dialog, 0, 2, 0, parentDialog, 2, 0, 1);
+        }
+        break;
+    case kDialogEditDone:
+        if (!_stricmp("EditPlateNumber", event->controlName)) {
+            static_cast<UIEditBox*>(event->control)->GetEditText(plate, 9);
+            int number = atoi(plate);
+            if (number < 100)
+                number += 100;
+            if (number >= 101) {
+                if (number > 999)
+                    number = 999;
+            } else {
+                number = 101;
+            }
+            g_TrackGame->mode.plateNumber = number;
+            _itoa(number, plate, 10);
+            static_cast<UIEditBox*>(event->control)->SetEditText(plate);
+            PaintPlateNumber(number);
+        }
+        break;
+    case kDialogEditChange:
+        if (!_stricmp("EditPlateNumber", event->controlName)) {
+            static_cast<UIEditBox*>(event->control)->GetEditText(typed, 9);
+            int number = atoi(typed);
+            if (number >= 100 && number <= 999) {
+                PaintPlateNumber(number);
+                g_TrackGame->mode.plateNumber = number;
+            }
+        }
+        break;
+    case kDialogClose:
+        g_TrackGame->ui->HideScene();
+        if (dialogBackground)
+            dialogBackground->ReleaseRegion(previewRegion);
+        ((RenderTarget*)renderContext)->SetCamera(0);
+        break;
+    }
+}
+
+// 0x004d6fc0
+void PCCentralBikeRiderDlg::FillBikeRiderLists()
+{
+    int bike = 0;
+    int rider = 0;
+    char text[128];
+    PCCentralBikeRiderDlg* self = this;
+    UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLBikes", 6))->listPart;
+    list->RemoveAllRows();
+    for (int i = 0; i < g_TrackGame->ui->bikeCount; i++) {
+        int rule = g_TrackGame->proCircuit->bikeClassRule;
+        if (rule != 3 && !((KrustyUIBikeRecord*)g_TrackGame->ui->bikes)[i].engineSizeSelectable) {
+            int bikeClass = BikeClassOf(((KrustyUIBikeRecord*)g_TrackGame->ui->bikes)[i].engineSize);
+            if (bikeClass != 0) {
+                if (bikeClass <= 0 || bikeClass > 2)
+                    continue;
+                if (rule != 2)
+                    continue;
+            } else if (rule != 1) {
+                continue;
+            }
+        }
+        KrustyUIModelRecord* model = &((KrustyUIModelRecord*)g_TrackGame->ui->manufacturers)[((KrustyUIBikeRecord*)g_TrackGame->ui->bikes)[i].manufacturer];
+        if (model->availability > g_TrackGame->proCircuit->maxAvailability)
+            continue;
+        sprintf(text, "%s %s", model->displayName, ((KrustyUIBikeRecord*)g_TrackGame->ui->bikes)[i].displayName);
+        list->AddRow(text, i, 0);
+        if (g_TrackGame->proCircuit->bikeRow == i)
+            bike = i;
+    }
+    if (bike)
+        list->SelectRowByData(bike);
+    else
+        list->SelectRow(0);
+    list->Sort(1);
+    list = static_cast<UIDropDownList*>(self->FindControl("DDLRiders", 6))->listPart;
+    list->RemoveAllRows();
+    for (int j = 0; j < g_TrackGame->ui->riderCount; j++) {
+        KrustyUIModelRecord* entry = &((KrustyUIModelRecord*)g_TrackGame->ui->riders)[j];
+        if (entry->availability <= g_TrackGame->proCircuit->maxAvailability || entry->uiModel) {
+            list->AddRow(entry->displayName, j, 0);
+            if (g_TrackGame->proCircuit->riderRow == j)
+                rider = j;
+        }
+    }
+    if (rider)
+        list->SelectRowByData(rider);
+    else
+        list->SelectRow(0);
+}
+
+// 0x004d71f0
+void PCCentralBikeRiderDlg::PaintPlateNumber(int number)
+{
+    BikeNumberPainter painter(g_TrackGame->textureContext);
+    for (int i = 0; i < g_TrackGame->ui->manufacturerCount; i++)
+        painter.PaintNumber(
+            reinterpret_cast<D3DIMSoultreeObject*>(((KrustyUIModelRecord*)g_TrackGame->ui->manufacturers)[i].uiModel->plateTexture), number);
+}
+
+// 0x004d72a0
+void PCCentralBikeRiderDlg::MarkPendingRelease()
+{
+    g_TrackGame->ui->HideScene();
+    UIDialog::MarkPendingRelease();
+}
+
+// 0x0044fa00 (folded with SPBikeRiderDlg::OnControlPress): a click inside
+// the bike preview (inset by 50 and 30 pixels) starts dragging it and turns
+// automatic rotation off.
+int PCCentralBikeRiderDlg::OnControlPress(ControlEvent* event, InputButtonState* entry) {
+    if (event->kind == 1 && event->control == 0) {
+        RECT area = previewArea;
+        area.left += 50;
+        area.top += 30;
+        area.right -= 50;
+        area.bottom -= 30;
+        if (PtInRect(&area, guiUser->pointerDevice->pointerPosition)) {
+            previewDragged = 1;
+            previewDragging = 1;
+            static_cast<UIMultiState*>(FindControl("ChkAutoRotate", 2))->SetCurrentState(0);
+        }
+    }
+    return UIDialog::OnControlPress(event, entry);
+}
+
+// 0x0044fab0 (folded with SPBikeRiderDlg::OnControlRelease)
+int PCCentralBikeRiderDlg::OnControlRelease(ControlEvent* event, InputButtonState* entry) {
+    if (event->kind == 1 && event->control == 0)
+        previewDragging = 0;
+    return UIDialog::OnControlRelease(event, entry);
+}
+
+// 0x004d72c0: as SPBikeRiderDlg slot 10 (dlgprocs.cpp 0x0044fae0). Not exact (1237 of
+// 1291 bytes: only the scheduling of the by-value Vector3 copies for the camera call
+// differs; docs/PROCIRCUIT.md forms tried)
+int PCCentralBikeRiderDlg::Tick(float frameTime)
+{
+    if (dialogBackground)
+        dialogBackground->MarkAllDirty();
+    Vector3 offset;
+    Vector3 turned;
+    GUIInputDevice* pointer = guiUser->pointerDevice;
+    if (pointer && previewDragged && previewDragging) {
+        float dx = (float)(pointer->pointerPosition.x - guiUser->pointerX);
+        viewEye.y += (pointer->pointerPosition.y - guiUser->pointerY) * 0.1f;
+        viewEye.y = __max(1.0f, __min(viewEye.y, 10.0f));
+        offset = VectorDifference(viewEye, g_TrackGame->ui->garageFocus);
+        D3DRMVectorRotate(&turned, &offset, (Vector3*)&kVec3YAxis, dx * 0.015707964f);
+        float distance = viewDistance;
+        turned *= distance;
+        viewEye = VectorSum(turned, g_TrackGame->ui->garageFocus);
+        g_TrackGame->ui->garageCamera->SetFrame(&viewEye, 0, 0, 0, 0);
+        g_TrackGame->ui->garageCamera->LookAt(viewTarget);
+        previewDragged = 1;
+        static_cast<UIMultiState*>(FindControl("ChkAutoRotate", 2))->SetCurrentState(0);
+    } else if (!previewDragged) {
+        offset = VectorDifference(viewEye, g_TrackGame->ui->garageFocus);
+        D3DRMVectorRotate(&turned, &offset, (Vector3*)&kVec3YAxis, frameTime * 0.39269909f);
+        turned *= viewDistance;
+        viewEye = VectorSum(turned, g_TrackGame->ui->garageFocus);
+        g_TrackGame->ui->garageCamera->SetFrame(&viewEye, 0, 0, 0, 0);
+        g_TrackGame->ui->garageCamera->LookAt(viewTarget);
+    }
+    g_TrackGame->ui->riderPreview->AdvanceMotionInterpolated(frameTime, 0, 0);
+    g_TrackGame->ui->garageCharacter->AdvanceMotionInterpolated(frameTime, 0, 0);
+    if (idleMotionPlaying && rand() % 200 == 1) {
+        UIListBox* bikes = static_cast<UIDropDownList*>(FindControl("DDLBikes", 6))->listPart;
+        bikes->GetRowData(-1);
+        switch (rand() % 3) {
+        case 0:
+            g_TrackGame->ui->riderPreview->SetMotionByName("LookLeftR");
+            break;
+        case 1:
+            g_TrackGame->ui->riderPreview->SetMotionByName("LookRightR");
+            break;
+        case 2:
+            g_TrackGame->ui->riderPreview->SetMotionByName("StretchR");
+            break;
+        }
+        idleMotionPlaying = 0;
+    }
+    if (!idleMotionPlaying && g_TrackGame->ui->riderPreview->motionFinished) {
+        UIListBox* bikes = static_cast<UIDropDownList*>(FindControl("DDLBikes", 6))->listPart;
+        KrustyUI* ui = g_TrackGame->ui;
+        KrustyUIModelRecord* model =
+            &((KrustyUIModelRecord*)ui->manufacturers)[((KrustyUIBikeRecord*)ui->bikes)[bikes->GetRowData(-1)].manufacturer];
+        model->uiModel->SetMotionByName("WaitB");
+        g_TrackGame->ui->riderPreview->SetMotionByName("WaitR");
+        idleMotionPlaying = 1;
+    }
+    if (dialogBackground)
+        dialogBackground->SetRegionRect(previewRegion, (CameraRect*)&previewArea);
+    return UIDialog::Tick(frameTime);
+}
+
+// The material replacement below consumes the canonical model declaration.
+#include "D3DIMSoulTree.h"
+
+// 0x004d77d0
+int PCCentralBikeRiderDlg::RenderPre3D()
+{
+    if (bikeChanged) {
+        UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLBikes", 6))->listPart;
+        KrustyUI* ui = g_TrackGame->ui;
+        int bike = list->GetRowData(-1);
+        KrustyUIBikeRecord* entry = &((KrustyUIBikeRecord*)ui->bikes)[bike];
+        reinterpret_cast<D3DIMSoultreeObject*>(((KrustyUIModelRecord*)ui->manufacturers)[entry->manufacturer].uiModel->plateTexture)
+            ->ReplaceMaterialTexture(0, entry->texture, reinterpret_cast<int>(&g_TrackGame->textureContext));
+        bikeChanged = 0;
+    }
+    if (riderChanged) {
+        UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLRiders", 6))->listPart;
+        KrustyUI* ui = g_TrackGame->ui;
+        KrustyUIModelRecord* rider = &((KrustyUIModelRecord*)ui->riders)[list->GetRowData(-1)];
+        reinterpret_cast<D3DIMSoultreeObject*>(ui->riderPreview->plateTexture)
+            ->ReplaceMaterialTexture(0, rider->modelFile, reinterpret_cast<int>(&g_TrackGame->textureContext));
+        riderChanged = 0;
+    }
+    return UIDialog::RenderPre3D();
+}
+
+// 0x004d78c0
+void PCCentralBikeRiderDlg::ApplyChosenRider()
+{
+    UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLRiders", 6))->listPart;
+    riderChanged = 1;
+    g_TrackGame->proCircuit->riderRow = list->GetRowData(-1);
+}
+
+// 0x004d7900: shows the chosen bike and loads its class's garage defaults.
+void PCCentralBikeRiderDlg::ApplyChosenBike()
+{
+    char text[12];
+    UIListBox* bikes = static_cast<UIDropDownList*>(FindControl("DDLBikes", 6))->listPart;
+    KrustyUI* ui = g_TrackGame->ui;
+    KrustyUIBikeRecord* bike = &((KrustyUIBikeRecord*)ui->bikes)[bikes->GetRowData(-1)];
+    KrustyUIModelRecord* model = &((KrustyUIModelRecord*)ui->manufacturers)[bike->manufacturer];
+    int i;
+    // Retail re-reads TrackGame's KrustyUI after each model is hidden.
+    for (i = 0; i < ui->manufacturerCount; i++) {
+        ((KrustyUIModelRecord*)ui->manufacturers)[i].uiModel->Disable();
+        ui = g_TrackGame->ui;
+    }
+    model->uiModel->Enable();
+    bikeChanged = 1;
+    if (bike->engineSizeSelectable) {
+        UIControl* engine = FindControl("DDLEngineSize", 0);
+        if (!engine->shown) {
+            engine->Show(1, 1);
+            FindControl("TxtEngineSize", 0)->Show(1, 1);
+            if (dialogBackground)
+                dialogBackground->MarkAllDirty();
+        }
+    } else {
+        UIControl* engine = FindControl("DDLEngineSize", 0);
+        if (engine->shown) {
+            engine->Show(0, 1);
+            FindControl("TxtEngineSize", 0)->Show(0, 1);
+            if (dialogBackground)
+                dialogBackground->MarkAllDirty();
+        }
+    }
+    g_TrackGame->proCircuit->bikeRow = bikes->GetRowData(-1);
+    if (bike->engineSizeSelectable) {
+        UIListBox* sizes = static_cast<UIDropDownList*>(FindControl("DDLEngineSize", 6))->listPart;
+        int size = sizes->GetRowData(-1);
+        g_TrackGame->proCircuit->racers[0].engineSize = g_BikeClassEngineSizes[size];
+        g_TrackGame->proCircuit->racers[0].fourStroke = size == 2 || size == 4 ? 1 : 0;
+        UNKNOWN_APPLY_BIKE_CLASS(size, i);
+    } else {
+        int row = bikes->GetRowData(-1);
+        g_TrackGame->proCircuit->racers[0].engineSize =
+            ((KrustyUIBikeRecord*)g_TrackGame->ui->bikes)[row].engineSize;
+        g_TrackGame->proCircuit->racers[0].fourStroke =
+            ((KrustyUIBikeRecord*)g_TrackGame->ui->bikes)[row].fourStroke;
+        int bikeClass = BikeClassOf(g_TrackGame->proCircuit->racers[0].engineSize);
+        UNKNOWN_APPLY_BIKE_CLASS(bikeClass, i);
+    }
+    UNKNOWN_GARAGE_SETTINGS->engineSize = g_TrackGame->proCircuit->racers[0].engineSize;
+    UNKNOWN_GARAGE_SETTINGS->fourStroke = g_TrackGame->proCircuit->racers[0].fourStroke;
+    UIEditBox* plate = static_cast<UIEditBox*>(FindControl("EditPlateNumber", 0xb));
+    _itoa(g_TrackGame->mode.plateNumber, text, 10);
+    plate->SetEditText(text);
+}
+
+// 0x004d7d70
+void PCCentralBikeRiderDlg::SyncValues(int apply)
+{
+    if (!apply)
+        return;
+    strcpy(g_TrackGame->proCircuit->racers[0].bikeModel, "");
+    UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLBikes", 6))->listPart;
+    int bike = list->GetRowData(-1);
+    strcpy(g_TrackGame->proCircuit->racers[0].bikeModel,
+           ((KrustyUIModelRecord*)g_TrackGame->ui->manufacturers)
+               [((KrustyUIBikeRecord*)g_TrackGame->ui->bikes)[bike].manufacturer].modelFile);
+    strcpy(g_TrackGame->proCircuit->racers[0].bikeName,
+           ((KrustyUIBikeRecord*)g_TrackGame->ui->bikes)[bike].texture);
+    strcpy(g_TrackGame->proCircuit->racers[0].bikeDisplayName,
+           ((KrustyUIBikeRecord*)g_TrackGame->ui->bikes)[bike].displayName);
+    strcpy(g_TrackGame->proCircuit->racers[0].riderModel, "");
+    list = static_cast<UIDropDownList*>(FindControl("DDLRiders", 6))->listPart;
+    int rider = list->GetRowData(-1);
+    strcpy(g_TrackGame->proCircuit->racers[0].riderModel,
+           ((KrustyUIModelRecord*)g_TrackGame->ui->riders)[rider].modelFile);
 }
 
 // 0x004d7f40
@@ -749,6 +1144,118 @@ int CompareRankPoints(const void* a, const void* b)
     return first != second;
 }
 
+// 0x004d8c40. Not exact (427 of 883 bytes, 886 compiled: same flow, calls and x87
+// code; in the per-racer update retail loads +0x0c before +0x08; docs/PROCIRCUIT.md
+// forms tried)
+void PCLastRaceDlg::PayOutRace()
+{
+    ProCircuit* circuit = g_TrackGame->proCircuit;
+    int fee = circuit->entryFees[circuit->series];
+    int purse = (int)(fee * circuit->purseMultiplier);
+    float* shares = (float*)DebugMalloc(circuit->racerCount * 4, __FILE__, 1420);
+    float total = 0.0f;
+    int i;
+    for (i = 0; i < circuit->racerCount; i++)
+        total += circuit->placePct[i];
+    for (i = 0; i < circuit->racerCount; i++)
+        shares[i] = circuit->placePct[i] / total;
+    circuit->feesPaid += fee;
+
+    int paid = 0;
+    for (int j = 0; j < g_TrackGame->eventManager->resultCount; j++) {
+        ProCircuitRacerResultView* result = &((ProCircuitRacerResultView*)g_TrackGame->eventManager->results)[j];
+        ProCircuitRacer* racer = &circuit->racers[result->racer];
+        racer->raceStats.medicalCost = (int)__min(purse * circuit->medicalCapPct, result->medical * 250.0f);
+        racer->raceStats.repairCost = (int)__min(purse * circuit->repairCapPct, result->repairs * 500.0f);
+        racer->raceStats.stuntWinnings = (int)__min(purse * circuit->stuntCapPct, result->stunts * 400.0f);
+        racer->raceStats.purseWinnings = (int)ceil(purse * shares[result->position - 1]);
+        racer->raceStats.points = result->points;
+        paid += racer->raceStats.purseWinnings;
+        racer->money += racer->raceStats.stuntWinnings - racer->raceStats.medicalCost - racer->raceStats.repairCost - fee +
+                             racer->raceStats.purseWinnings;
+        racer->totalStats.medicalCost += racer->raceStats.medicalCost;
+        racer->totalStats.repairCost += racer->raceStats.repairCost;
+        racer->totalStats.stuntWinnings += racer->raceStats.stuntWinnings;
+        racer->totalStats.purseWinnings += racer->raceStats.purseWinnings;
+        racer->totalStats.points += racer->raceStats.points;
+    }
+
+    CircuitPointsRank order[11];
+    for (i = 0; i < circuit->racerCount; i++) {
+        order[i].points = circuit->racers[i].raceStats.points;
+        order[i].racer = i;
+    }
+    qsort(order, circuit->racerCount, sizeof(CircuitPointsRank), CompareRankPoints);
+    for (i = 0; i < circuit->racerCount; i++)
+        circuit->racers[order[i].racer].raceStats.rank = i + 1;
+    int rest = purse - paid;
+    circuit->racers[order[0].racer].raceStats.purseWinnings += rest;
+    circuit->racers[order[0].racer].totalStats.purseWinnings += rest;
+    circuit->racers[order[0].racer].money += rest;
+    for (i = 0; i < circuit->racerCount; i++) {
+        order[i].points = circuit->racers[i].totalStats.points;
+        order[i].racer = i;
+    }
+    qsort(order, circuit->racerCount, sizeof(CircuitPointsRank), CompareRankPoints);
+    for (i = 0; i < circuit->racerCount; i++)
+        circuit->racers[order[i].racer].totalStats.rank = i + 1;
+}
+
+// 0x004d8fc0. Not exact (836 of 882 bytes: retail loads the event kind into ecx before
+// the circuit and stores the fee member first; docs/PROCIRCUIT.md forms tried)
+void PCBailoutDlg::HandleEvent(DialogEvent* event)
+{
+    ProCircuit* circuit = g_TrackGame->proCircuit;
+    UIControl* label;
+    char text[128];
+    switch (event->kind) {
+    case kDialogInit: {
+        int fee = circuit->entryFees[circuit->series];
+        int cash = circuit->racers[0].money;
+        playerCash = cash;
+        cashShortfall = fee - cash;
+        entryFee = fee;
+        SetResourceText(FindControl("TitleText", 12), 0x144a);
+        UIControl* description = FindControl("TxtDescription", 12);
+        description->wordWrap = 1;
+        SetResourceText(description, 0x1449);
+        unsigned int color = circuit->racers[0].money < 0 ? 0xff : 0xff00;
+        SetResourceText(FindControl("TxtItem1", 12), 0x144b);
+        UIControl* item = FindControl("Item1", 12);
+        sprintf(text, "$%d", playerCash);
+        item->SetText(text);
+        item->SetFontColor(color);
+        SetResourceText(FindControl("TxtItem2", 12), 0x144d);
+        item = FindControl("Item2", 12);
+        sprintf(text, "$%d", entryFee);
+        item->SetText(text);
+        item->SetFontColor(0xff);
+        SetResourceText(FindControl("TxtItem4", 12), 0x144c);
+        item = FindControl("Item4", 12);
+        sprintf(text, "$%d", cashShortfall);
+        item->SetText(text);
+        item->SetFontColor(0xff00);
+        FindControl("Back", 1)->Show(0, 1);
+        break;
+    }
+    case kDialogCommand:
+        if (_stricmp("ButAccept", event->controlName) == 0) {
+            circuit->racers[0].money += cashShortfall;
+            circuit->racers[0].debts += cashShortfall;
+            g_TrackGame->proCircuit->Save(g_TrackGame->careerFile);
+            PCCentralDlg* dialog = new(__FILE__, 1551) PCCentralDlg;
+            guiManager->ShowDialog((UIDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
+            EndDialog(0);
+        } else if (_stricmp("ButDecline", event->controlName) == 0) {
+            circuit->careerFlags |= 4;
+            PCFailedDlg* dialog = new(__FILE__, 1556) PCFailedDlg;
+            guiManager->ShowDialog((UIDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
+            EndDialog(0);
+        }
+        break;
+    }
+}
+
 // 0x004d9340
 void PCFailedDlg::HandleEvent(DialogEvent* event)
 {
@@ -824,6 +1331,71 @@ void PCFinishedDlg::HandleEvent(DialogEvent* event)
     case kDialogCommand:
         if (_stricmp("Back", event->controlName) == 0) {
             PCStartupDlg* dialog = new(__FILE__, 1659) PCStartupDlg;
+            guiManager->ShowDialog((UIDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
+            EndDialog(0);
+        }
+        break;
+    }
+}
+
+// 0x004d9860. Not exact (1068 of 1122 bytes: the prologue and init-store differences
+// of 0x004d8fc0; docs/PROCIRCUIT.md forms tried)
+void PCBunnyDlg::HandleEvent(DialogEvent* event)
+{
+    ProCircuit* circuit = g_TrackGame->proCircuit;
+    char text[128];
+    switch (event->kind) {
+    case kDialogInit: {
+        int debt = circuit->racers[0].debts;
+        int fee = circuit->entryFees[circuit->series];
+        int cash = circuit->racers[0].money;
+        playerCash = cash;
+        loanAmount = fee - cash + debt;
+        entryFee = fee;
+        SetResourceText(FindControl("TitleText", 12), 0x1452);
+        UIControl* description = FindControl("TxtDescription", 12);
+        description->wordWrap = 1;
+        SetResourceText(description, 0x1451);
+        unsigned int color = circuit->racers[0].money < 0 ? 0xff : 0xff00;
+        SetResourceText(FindControl("TxtItem1", 12), 0x144b);
+        UIControl* item = FindControl("Item1", 12);
+        sprintf(text, "$%d", playerCash);
+        item->SetText(text);
+        item->SetFontColor(color);
+        SetResourceText(FindControl("TxtItem2", 12), 0x144d);
+        item = FindControl("Item2", 12);
+        sprintf(text, "$%d", entryFee);
+        item->SetText(text);
+        item->SetFontColor(0xff);
+        SetResourceText(FindControl("TxtItem3", 12), 0x1453);
+        item = FindControl("Item3", 12);
+        sprintf(text, "$%d", debt);
+        item->SetText(text);
+        item->SetFontColor(0xff);
+        SetResourceText(FindControl("TxtItem4", 12), 0x144f);
+        item = FindControl("Item4", 12);
+        sprintf(text, "$%d", loanAmount);
+        item->SetText(text);
+        item->SetFontColor(0xff00);
+        SetResourceText(FindControl("TxtItem5", 12), 0x1450);
+        item = FindControl("Item5", 12);
+        sprintf(text, "$%d", 1000);
+        item->SetText(text);
+        item->SetFontColor(0xff00);
+        FindControl("Back", 1)->Show(0, 1);
+        break;
+    }
+    case kDialogCommand:
+        if (_stricmp("ButAccept", event->controlName) == 0) {
+            circuit->racers[0].money += loanAmount - circuit->racers[0].debts;
+            circuit->racers[0].debts = 0;
+            g_TrackGame->proCircuit->Save(g_TrackGame->careerFile);
+            PCCentralDlg* dialog = new(__FILE__, 1744) PCCentralDlg;
+            guiManager->ShowDialog((UIDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
+            EndDialog(0);
+        } else if (_stricmp("ButDecline", event->controlName) == 0) {
+            circuit->careerFlags |= 4;
+            PCFailedDlg* dialog = new(__FILE__, 1749) PCFailedDlg;
             guiManager->ShowDialog((UIDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
             EndDialog(0);
         }
@@ -980,339 +1552,4 @@ void PCCompleteDlg::HandleEvent(DialogEvent* event)
         break;
     }
     }
-}
-
-// 0x004d71f0
-void PCCentralBikeRiderDlg::PaintPlateNumber(int number)
-{
-    BikeNumberPainter painter(g_TrackGame->textureContext);
-    for (int i = 0; i < g_TrackGame->ui->manufacturerCount; i++)
-        painter.PaintNumber(
-            reinterpret_cast<D3DIMSoultreeObject*>(((KrustyUIModelRecord*)g_TrackGame->ui->manufacturers)[i].uiModel->plateTexture), number);
-}
-
-// 0x004d72a0
-void PCCentralBikeRiderDlg::MarkPendingRelease()
-{
-    g_TrackGame->ui->HideScene();
-    UIDialog::MarkPendingRelease();
-}
-
-// 0x0044fa00 (folded with SPBikeRiderDlg::OnControlPress): a click inside
-// the bike preview (inset by 50 and 30 pixels) starts dragging it and turns
-// automatic rotation off.
-int PCCentralBikeRiderDlg::OnControlPress(ControlEvent* event, InputButtonState* entry) {
-    if (event->kind == 1 && event->control == 0) {
-        RECT area = previewArea;
-        area.left += 50;
-        area.top += 30;
-        area.right -= 50;
-        area.bottom -= 30;
-        if (PtInRect(&area, guiUser->pointerDevice->pointerPosition)) {
-            previewDragged = 1;
-            previewDragging = 1;
-            static_cast<UIMultiState*>(FindControl("ChkAutoRotate", 2))->SetCurrentState(0);
-        }
-    }
-    return UIDialog::OnControlPress(event, entry);
-}
-
-// 0x0044fab0 (folded with SPBikeRiderDlg::OnControlRelease)
-int PCCentralBikeRiderDlg::OnControlRelease(ControlEvent* event, InputButtonState* entry) {
-    if (event->kind == 1 && event->control == 0)
-        previewDragging = 0;
-    return UIDialog::OnControlRelease(event, entry);
-}
-
-// 0x004d78c0
-void PCCentralBikeRiderDlg::ApplyChosenRider()
-{
-    UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLRiders", 6))->listPart;
-    riderChanged = 1;
-    g_TrackGame->proCircuit->riderRow = list->GetRowData(-1);
-}
-
-// 0x004d7900: shows the chosen bike and loads its class's garage defaults.
-void PCCentralBikeRiderDlg::ApplyChosenBike()
-{
-    char text[12];
-    UIListBox* bikes = static_cast<UIDropDownList*>(FindControl("DDLBikes", 6))->listPart;
-    KrustyUI* ui = g_TrackGame->ui;
-    KrustyUIBikeRecord* bike = &((KrustyUIBikeRecord*)ui->bikes)[bikes->GetRowData(-1)];
-    KrustyUIModelRecord* model = &((KrustyUIModelRecord*)ui->manufacturers)[bike->manufacturer];
-    int i;
-    // Retail re-reads TrackGame's KrustyUI after each model is hidden.
-    for (i = 0; i < ui->manufacturerCount; i++) {
-        ((KrustyUIModelRecord*)ui->manufacturers)[i].uiModel->Disable();
-        ui = g_TrackGame->ui;
-    }
-    model->uiModel->Enable();
-    bikeChanged = 1;
-    if (bike->engineSizeSelectable) {
-        UIControl* engine = FindControl("DDLEngineSize", 0);
-        if (!engine->shown) {
-            engine->Show(1, 1);
-            FindControl("TxtEngineSize", 0)->Show(1, 1);
-            if (dialogBackground)
-                dialogBackground->MarkAllDirty();
-        }
-    } else {
-        UIControl* engine = FindControl("DDLEngineSize", 0);
-        if (engine->shown) {
-            engine->Show(0, 1);
-            FindControl("TxtEngineSize", 0)->Show(0, 1);
-            if (dialogBackground)
-                dialogBackground->MarkAllDirty();
-        }
-    }
-    g_TrackGame->proCircuit->bikeRow = bikes->GetRowData(-1);
-    if (bike->engineSizeSelectable) {
-        UIListBox* sizes = static_cast<UIDropDownList*>(FindControl("DDLEngineSize", 6))->listPart;
-        int size = sizes->GetRowData(-1);
-        g_TrackGame->proCircuit->racers[0].engineSize = g_BikeClassEngineSizes[size];
-        g_TrackGame->proCircuit->racers[0].fourStroke = size == 2 || size == 4 ? 1 : 0;
-        UNKNOWN_APPLY_BIKE_CLASS(size, i);
-    } else {
-        int row = bikes->GetRowData(-1);
-        g_TrackGame->proCircuit->racers[0].engineSize =
-            ((KrustyUIBikeRecord*)g_TrackGame->ui->bikes)[row].engineSize;
-        g_TrackGame->proCircuit->racers[0].fourStroke =
-            ((KrustyUIBikeRecord*)g_TrackGame->ui->bikes)[row].fourStroke;
-        int bikeClass = BikeClassOf(g_TrackGame->proCircuit->racers[0].engineSize);
-        UNKNOWN_APPLY_BIKE_CLASS(bikeClass, i);
-    }
-    UNKNOWN_GARAGE_SETTINGS->engineSize = g_TrackGame->proCircuit->racers[0].engineSize;
-    UNKNOWN_GARAGE_SETTINGS->fourStroke = g_TrackGame->proCircuit->racers[0].fourStroke;
-    UIEditBox* plate = static_cast<UIEditBox*>(FindControl("EditPlateNumber", 0xb));
-    _itoa(g_TrackGame->mode.plateNumber, text, 10);
-    plate->SetEditText(text);
-}
-
-// 0x004d7d70
-void PCCentralBikeRiderDlg::SyncValues(int apply)
-{
-    if (!apply)
-        return;
-    strcpy(g_TrackGame->proCircuit->racers[0].bikeModel, "");
-    UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLBikes", 6))->listPart;
-    int bike = list->GetRowData(-1);
-    strcpy(g_TrackGame->proCircuit->racers[0].bikeModel,
-           ((KrustyUIModelRecord*)g_TrackGame->ui->manufacturers)
-               [((KrustyUIBikeRecord*)g_TrackGame->ui->bikes)[bike].manufacturer].modelFile);
-    strcpy(g_TrackGame->proCircuit->racers[0].bikeName,
-           ((KrustyUIBikeRecord*)g_TrackGame->ui->bikes)[bike].texture);
-    strcpy(g_TrackGame->proCircuit->racers[0].bikeDisplayName,
-           ((KrustyUIBikeRecord*)g_TrackGame->ui->bikes)[bike].displayName);
-    strcpy(g_TrackGame->proCircuit->racers[0].riderModel, "");
-    list = static_cast<UIDropDownList*>(FindControl("DDLRiders", 6))->listPart;
-    int rider = list->GetRowData(-1);
-    strcpy(g_TrackGame->proCircuit->racers[0].riderModel,
-           ((KrustyUIModelRecord*)g_TrackGame->ui->riders)[rider].modelFile);
-}
-
-// 0x004d6770: as SPBikeRiderDlg slot 29 (dlgprocs.cpp 0x0044ef70); the
-// engine sizes offered follow the circuit's bike class rule.
-void PCCentralBikeRiderDlg::HandleEvent(DialogEvent* event)
-{
-    char plate[12];
-    char typed[12];
-    switch (event->kind) {
-    case kDialogInit: {
-        previewDragged = 0;
-        static_cast<UIMultiState*>(FindControl("ChkAutoRotate", 2))->SetCurrentState(1);
-        riderChanged = 1;
-        bikeChanged = 1;
-        FillBikeRiderLists();
-        UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLEngineSize", 6))->listPart;
-        list->RemoveAllRows();
-        if (g_TrackGame->proCircuit->bikeClassRule == 1 || g_TrackGame->proCircuit->bikeClassRule == 3)
-            list->AddRow("125cc 2-stroke", BikeClassOf(125), 0);
-        if (g_TrackGame->proCircuit->bikeClassRule == 2 || g_TrackGame->proCircuit->bikeClassRule == 3) {
-            list->AddRow("250cc 2-stroke", BikeClassOf(250), 0);
-            list->AddRow("400cc 4-stroke", BikeClassOf(400), 0);
-        }
-        if (g_TrackGame->proCircuit->bikeClassRule == 3) {
-            list->AddRow("500cc 2-stroke", BikeClassOf(500), 0);
-            list->AddRow("600cc 4-stroke", BikeClassOf(600), 0);
-        }
-        list->SelectRowByData(BikeClassOf(g_TrackGame->proCircuit->racers[0].engineSize));
-        UIEditBox* edit = static_cast<UIEditBox*>(FindControl("EditPlateNumber", 0xb));
-        edit->SetAcceptedCharacters("0123456789");
-        g_TrackGame->ui->ShowScene(this);
-        Vector3* eye = &viewEye;
-        previewArea.left = 0x52;
-        previewArea.right = 0x216;
-        previewArea.top = 0x74;
-        previewArea.bottom = 0x150;
-        *eye = kVec3Zero;
-        float fov = 50.0f;
-        Vector3* target = &viewTarget;
-        viewEye.z = 15.0f;
-        viewEye.y = 1.0f;
-        *target = g_TrackGame->ui->garageFocus;
-        viewTarget.y += 3.0f;
-        g_TrackGame->ui->garageCamera->SetFrame(eye, 0, 0, 0, &fov);
-        g_TrackGame->ui->garageCamera->LookAt(*target);
-        g_TrackGame->ui->garageCamera->SetViewport(
-            previewArea.left, previewArea.top, previewArea.right - previewArea.left,
-            previewArea.bottom - previewArea.top);
-        viewDistance = VectorLength(VectorDifference(*eye, g_TrackGame->ui->garageFocus));
-        ApplyChosenRider();
-        ApplyChosenBike();
-        PaintPlateNumber(g_TrackGame->mode.plateNumber);
-        srand(ReadClock());
-        if (dialogBackground)
-            previewRegion = dialogBackground->AllocRegion(0);
-        break;
-    }
-    case kDialogListSelect:
-        if (!_stricmp("DDLBikes", event->controlName))
-            ApplyChosenBike();
-        else if (!_stricmp("DDLRiders", event->controlName))
-            ApplyChosenRider();
-        else if (!_stricmp("DDLEngineSize", event->controlName))
-            ApplyChosenBike();
-        break;
-    case kDialogCommand:
-        if (!_stricmp("BikeLeft", event->controlName)) {
-            UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLBikes", 6))->listPart;
-            int rows = list->rowCount;
-            list->SelectRow((list->GetSelectedRow() + rows - 1) % rows);
-            list->ReportClick(0);
-        } else if (!_stricmp("BikeRight", event->controlName)) {
-            UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLBikes", 6))->listPart;
-            int rows = list->rowCount;
-            list->SelectRow((list->GetSelectedRow() + 1) % rows);
-            list->ReportClick(0);
-        } else if (!_stricmp("RiderLeft", event->controlName)) {
-            UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLRiders", 6))->listPart;
-            int rows = list->rowCount;
-            list->SelectRow((list->GetSelectedRow() + rows - 1) % rows);
-            list->ReportClick(0);
-        } else if (!_stricmp("RiderRight", event->controlName)) {
-            UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLRiders", 6))->listPart;
-            int rows = list->rowCount;
-            list->SelectRow((list->GetSelectedRow() + 1) % rows);
-            list->ReportClick(0);
-        } else if (!_stricmp("ChkAutoRotate", event->controlName)) {
-            previewDragged = !static_cast<UIMultiState*>(FindControl("ChkAutoRotate", 2))->GetSelectedState();
-        } else if (!_stricmp("ButWrench", event->controlName)) {
-            OptionsDlg* dialog = new(__FILE__, 719) OptionsDlg;
-            guiManager->ShowDialog((UIDialog*)dialog, 0, 2, 0, parentDialog, 2, 0, 1);
-        }
-        break;
-    case kDialogEditDone:
-        if (!_stricmp("EditPlateNumber", event->controlName)) {
-            static_cast<UIEditBox*>(event->control)->GetEditText(plate, 9);
-            int number = atoi(plate);
-            if (number < 100)
-                number += 100;
-            if (number >= 101) {
-                if (number > 999)
-                    number = 999;
-            } else {
-                number = 101;
-            }
-            g_TrackGame->mode.plateNumber = number;
-            _itoa(number, plate, 10);
-            static_cast<UIEditBox*>(event->control)->SetEditText(plate);
-            PaintPlateNumber(number);
-        }
-        break;
-    case kDialogEditChange:
-        if (!_stricmp("EditPlateNumber", event->controlName)) {
-            static_cast<UIEditBox*>(event->control)->GetEditText(typed, 9);
-            int number = atoi(typed);
-            if (number >= 100 && number <= 999) {
-                PaintPlateNumber(number);
-                g_TrackGame->mode.plateNumber = number;
-            }
-        }
-        break;
-    case kDialogClose:
-        g_TrackGame->ui->HideScene();
-        if (dialogBackground)
-            dialogBackground->ReleaseRegion(previewRegion);
-        ((RenderTarget*)renderContext)->SetCamera(0);
-        break;
-    }
-}
-
-
-// 0x004d6fc0
-void PCCentralBikeRiderDlg::FillBikeRiderLists()
-{
-    int bike = 0;
-    int rider = 0;
-    char text[128];
-    PCCentralBikeRiderDlg* self = this;
-    UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLBikes", 6))->listPart;
-    list->RemoveAllRows();
-    for (int i = 0; i < g_TrackGame->ui->bikeCount; i++) {
-        int rule = g_TrackGame->proCircuit->bikeClassRule;
-        if (rule != 3 && !((KrustyUIBikeRecord*)g_TrackGame->ui->bikes)[i].engineSizeSelectable) {
-            int bikeClass = BikeClassOf(((KrustyUIBikeRecord*)g_TrackGame->ui->bikes)[i].engineSize);
-            if (bikeClass != 0) {
-                if (bikeClass <= 0 || bikeClass > 2)
-                    continue;
-                if (rule != 2)
-                    continue;
-            } else if (rule != 1) {
-                continue;
-            }
-        }
-        KrustyUIModelRecord* model = &((KrustyUIModelRecord*)g_TrackGame->ui->manufacturers)[((KrustyUIBikeRecord*)g_TrackGame->ui->bikes)[i].manufacturer];
-        if (model->availability > g_TrackGame->proCircuit->maxAvailability)
-            continue;
-        sprintf(text, "%s %s", model->displayName, ((KrustyUIBikeRecord*)g_TrackGame->ui->bikes)[i].displayName);
-        list->AddRow(text, i, 0);
-        if (g_TrackGame->proCircuit->bikeRow == i)
-            bike = i;
-    }
-    if (bike)
-        list->SelectRowByData(bike);
-    else
-        list->SelectRow(0);
-    list->Sort(1);
-    list = static_cast<UIDropDownList*>(self->FindControl("DDLRiders", 6))->listPart;
-    list->RemoveAllRows();
-    for (int j = 0; j < g_TrackGame->ui->riderCount; j++) {
-        KrustyUIModelRecord* entry = &((KrustyUIModelRecord*)g_TrackGame->ui->riders)[j];
-        if (entry->availability <= g_TrackGame->proCircuit->maxAvailability || entry->uiModel) {
-            list->AddRow(entry->displayName, j, 0);
-            if (g_TrackGame->proCircuit->riderRow == j)
-                rider = j;
-        }
-    }
-    if (rider)
-        list->SelectRowByData(rider);
-    else
-        list->SelectRow(0);
-}
-
-
-// The material replacement below consumes the canonical model declaration.
-#include "D3DIMSoulTree.h"
-
-// 0x004d77d0
-int PCCentralBikeRiderDlg::RenderPre3D()
-{
-    if (bikeChanged) {
-        UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLBikes", 6))->listPart;
-        KrustyUI* ui = g_TrackGame->ui;
-        int bike = list->GetRowData(-1);
-        KrustyUIBikeRecord* entry = &((KrustyUIBikeRecord*)ui->bikes)[bike];
-        reinterpret_cast<D3DIMSoultreeObject*>(((KrustyUIModelRecord*)ui->manufacturers)[entry->manufacturer].uiModel->plateTexture)
-            ->ReplaceMaterialTexture(0, entry->texture, reinterpret_cast<int>(&g_TrackGame->textureContext));
-        bikeChanged = 0;
-    }
-    if (riderChanged) {
-        UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLRiders", 6))->listPart;
-        KrustyUI* ui = g_TrackGame->ui;
-        KrustyUIModelRecord* rider = &((KrustyUIModelRecord*)ui->riders)[list->GetRowData(-1)];
-        reinterpret_cast<D3DIMSoultreeObject*>(ui->riderPreview->plateTexture)
-            ->ReplaceMaterialTexture(0, rider->modelFile, reinterpret_cast<int>(&g_TrackGame->textureContext));
-        riderChanged = 0;
-    }
-    return UIDialog::RenderPre3D();
 }

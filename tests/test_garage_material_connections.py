@@ -22,7 +22,7 @@ from test_uianim_connections import whole_object, pin, FILENAMES
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCES = ('src/reconstructed/DlgProcs.cpp', 'samples/ui/DlgProcsNearMisses.cpp',
-           'src/reconstructed/ProCircuitProcs.cpp', 'samples/ui/ProCircuitProcsNearMisses.cpp')
+           'src/reconstructed/ProCircuitProcs.cpp')
 RENDER = 'src/reconstructed/D3DIMSoulTree.cpp'
 GARAGE = 'src/reconstructed/KrustyUI.cpp'
 CHARACTER = 'src/krusty2/motion/D3DIMSoultreeMotnctrl.cpp'
@@ -204,7 +204,7 @@ class GarageMaterialConnectionsTests(unittest.TestCase):
             self.assertEqual(result.stdout.strip(),
                              'ReplaceMaterialTexture: 11589 cases, 69 AV, 1080 scripted throws')
         self.assertEqual(strict, 136)
-        print('%d strict checks; four whole objects; four calls; %s' % (strict, result.stdout.strip()))
+        print('%d strict checks; three whole objects; three calls; %s' % (strict, result.stdout.strip()))
 
 
 if __name__ == '__main__':
