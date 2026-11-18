@@ -458,6 +458,87 @@ int PCJoystickDevice::ReadImmediateState(int value) {
     return 1;
 }
 
+// Inline (no retail body of its own): a failed poll is retried by
+// re-acquiring a lost (0x8007001e) or unacquired (0x8007000c) device; any
+// other failure is reported. Nonzero when reading can go ahead.
+inline int PCJoystickDevice::CheckPollResult(long result) {
+    if (result < 0) {
+        if (result == DIERR_INPUTLOST || result == DIERR_NOTACQUIRED) {
+            if (device->Acquire() < 0) {
+                ReportDirectInputError(result, __FILE__, 540);
+                return 0;
+            }
+        } else {
+            ReportDirectInputError(result, __FILE__, 544);
+            return 0;
+        }
+    }
+    return 1;
+}
+
+// 0x004c3960: polls the device (see CheckPollResult), then reads it with
+// the buffered (bit 0 of +0x5d4) or immediate reader. Gamepads with bit 1 also run
+// 0x004c2d90 for each of the six lists.
+int PCJoystickDevice::Update(int value) {
+    if (!device)
+        return 0;
+    if (!CheckPollResult(device->Poll()))
+        return 0;
+    if (bufferedInput)
+        ReadBufferedState(value);
+    else
+        ReadImmediateState(value);
+    if (DEVICE_SUBTYPE(deviceInfo.deviceType) == 4 && axisRepeatEnabled) {
+        for (int i = 0; i < 6; i++)
+            UpdateAxisRepeat(i, value);
+    }
+    return 1;
+}
+
+// 0x004c3a10: switches buffered input on (16 entries) or off. Property 1 is
+// consistent with DIPROP_BUFFERSIZE; the device is unacquired around it.
+int PCJoystickDevice::SetBufferedInput(int buffered) {
+    if (!device)
+        return 0;
+    device->Unacquire();
+    DIPropDword property;
+    memset(&property, 0, sizeof(property));
+    property.size = sizeof(property);
+    property.headerSize = 0x10;
+    property.object = 0;
+    property.how = DIPH_DEVICE;
+    property.data = buffered ? 16 : 0;
+    long result = device->SetProperty(DIPROP_BUFFERSIZE, &property);
+    if (result < 0) {
+        ReportDirectInputError(result, __FILE__, 590);
+        goto failed;
+    }
+    bufferedInput = buffered;
+    if (device->Acquire() < 0)
+        goto failed;
+    return 1;
+failed:
+    return 0;
+}
+
+// 0x004c3ae0
+void PCJoystickDevice::SetJoystickFilter(unsigned char value) {
+    joystickFilter = value;
+}
+
+// 0x004c3af0: joystick subtypes 4-7 are recorded in +0x10.
+void PCJoystickDevice::DetectSubtype() {
+    int subtype = DEVICE_SUBTYPE(deviceInfo.deviceType);
+    if (subtype == 4)
+        deviceSubtype = subtype;
+    else if (subtype == 5)
+        deviceSubtype = subtype;
+    else if (subtype == 6)
+        deviceSubtype = subtype;
+    else if (subtype == 7)
+        deviceSubtype = subtype;
+}
+
 // 0x004c3b20: POV index in hundredths of a degree, as radians; -1 when
 // centred (-1 or 0xffff) or out of range.
 int PCJoystickDevice::GetPovAngle(int index, float* angle) {
@@ -664,36 +745,11 @@ int PCJoystickDevice::IsEffectPlaying(int effect) {
     return 0;
 }
 
-// 0x004c3af0: joystick subtypes 4-7 are recorded in +0x10.
-void PCJoystickDevice::DetectSubtype() {
-    int subtype = DEVICE_SUBTYPE(deviceInfo.deviceType);
-    if (subtype == 4)
-        deviceSubtype = subtype;
-    else if (subtype == 5)
-        deviceSubtype = subtype;
-    else if (subtype == 6)
-        deviceSubtype = subtype;
-    else if (subtype == 7)
-        deviceSubtype = subtype;
-}
-
 // 0x00689958: effects stored by the enumeration callback.
 static int s_UnknownEffectCount;
 
-// 0x004c4260: the IDirectInputDevice2::EnumEffects (method 19) callback; copies each effect into the caller's
-// array, stopping at 32. The formatted line is not used further.
-static int __stdcall EnumEffectsCallback(const DIEffectInfo* info, void* context) {
-    DIEffectInfo* effects = (DIEffectInfo*)context;
-    if (!effects)
-        return 0;
-    effects[s_UnknownEffectCount] = *info;
-    char typeName[260];
-    GetForceFeedbackEffectName(effects[s_UnknownEffectCount].guid, typeName);
-    char text[528];   // the frame fixes this size
-    sprintf(text, "\t '%s' '%s'\n", typeName, effects[s_UnknownEffectCount].name);
-    s_UnknownEffectCount++;
-    return s_UnknownEffectCount < 32;
-}
+// The callback (0x004c4260) follows EnumEffects in retail.
+static int __stdcall EnumEffectsCallback(const DIEffectInfo* info, void* context);
 
 // 0x004c4190: clears five entries, then enumerates the device's effects into
 // `effects` and stores how many were found.
@@ -716,72 +772,19 @@ int PCJoystickDevice::EnumEffects(DIEffectInfo* effects, int* count) {
     return 1;
 }
 
-// Inline (no retail body of its own): a failed poll is retried by
-// re-acquiring a lost (0x8007001e) or unacquired (0x8007000c) device; any
-// other failure is reported. Nonzero when reading can go ahead.
-inline int PCJoystickDevice::CheckPollResult(long result) {
-    if (result < 0) {
-        if (result == DIERR_INPUTLOST || result == DIERR_NOTACQUIRED) {
-            if (device->Acquire() < 0) {
-                ReportDirectInputError(result, __FILE__, 540);
-                return 0;
-            }
-        } else {
-            ReportDirectInputError(result, __FILE__, 544);
-            return 0;
-        }
-    }
-    return 1;
-}
-
-// 0x004c3960: polls the device (see CheckPollResult), then reads it with
-// the buffered (bit 0 of +0x5d4) or immediate reader. Gamepads with bit 1 also run
-// 0x004c2d90 for each of the six lists.
-int PCJoystickDevice::Update(int value) {
-    if (!device)
+// 0x004c4260: the IDirectInputDevice2::EnumEffects (method 19) callback; copies each effect into the caller's
+// array, stopping at 32. The formatted line is not used further.
+static int __stdcall EnumEffectsCallback(const DIEffectInfo* info, void* context) {
+    DIEffectInfo* effects = (DIEffectInfo*)context;
+    if (!effects)
         return 0;
-    if (!CheckPollResult(device->Poll()))
-        return 0;
-    if (bufferedInput)
-        ReadBufferedState(value);
-    else
-        ReadImmediateState(value);
-    if (DEVICE_SUBTYPE(deviceInfo.deviceType) == 4 && axisRepeatEnabled) {
-        for (int i = 0; i < 6; i++)
-            UpdateAxisRepeat(i, value);
-    }
-    return 1;
-}
-
-// 0x004c3a10: switches buffered input on (16 entries) or off. Property 1 is
-// consistent with DIPROP_BUFFERSIZE; the device is unacquired around it.
-int PCJoystickDevice::SetBufferedInput(int buffered) {
-    if (!device)
-        return 0;
-    device->Unacquire();
-    DIPropDword property;
-    memset(&property, 0, sizeof(property));
-    property.size = sizeof(property);
-    property.headerSize = 0x10;
-    property.object = 0;
-    property.how = DIPH_DEVICE;
-    property.data = buffered ? 16 : 0;
-    long result = device->SetProperty(DIPROP_BUFFERSIZE, &property);
-    if (result < 0) {
-        ReportDirectInputError(result, __FILE__, 590);
-        goto failed;
-    }
-    bufferedInput = buffered;
-    if (device->Acquire() < 0)
-        goto failed;
-    return 1;
-failed:
-    return 0;
-}
-
-// 0x004c3ae0
-void PCJoystickDevice::SetJoystickFilter(unsigned char value) {
-    joystickFilter = value;
+    effects[s_UnknownEffectCount] = *info;
+    char typeName[260];
+    GetForceFeedbackEffectName(effects[s_UnknownEffectCount].guid, typeName);
+    char text[528];   // the frame fixes this size
+    sprintf(text, "\t '%s' '%s'\n", typeName, effects[s_UnknownEffectCount].name);
+    s_UnknownEffectCount++;
+    return s_UnknownEffectCount < 32;
 }
 
 // 0x004c4320
