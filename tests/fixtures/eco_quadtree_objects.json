@@ -1,5 +1,5 @@
 {
-  "baseline": "Published ed3d06ce same-path complete objects; all nondebug bytes and relocation destinations preserved under exactly these six interface names. Only enumerated complete source paths are portable. Insert remains complete627/620 nonexact. The frozen visibility camera now uses actual PCCamera storage: its old complete pin was independently reproduced first; three names join the same lifecycle/storage, with one exact implicit destructor COMDAT (5 code bytes plus 11 alignment NOPs) and the cleanup reference resolving to that definition. All 87 old sections and 341 relocations otherwise preserve their bytes and destinations. Round57 light lookup: published dfdf9823 canonical EcoSystem pin independently reproduced, then complete132 sections/720 relocations preserved under only the EcoLightEmitterView*-to-LightEmitter* method-return spelling. All other records unchanged. EcoSystem near-miss merge: the sample EcoSystemNearMisses.cpp and the Group4/Group5 bring-ups were folded into EcoSystem.cpp (six near-miss bodies and their helpers); the canonical object is repinned at 207 sections/1143 relocations and the sample pin removed. Every calibration case stays exact.",
+  "baseline": "Published ed3d06ce same-path complete objects; all nondebug bytes and relocation destinations preserved under exactly these six interface names. Only enumerated complete source paths are portable. Insert remains complete627/620 nonexact. The frozen visibility camera now uses actual PCCamera storage: its old complete pin was independently reproduced first; three names join the same lifecycle/storage, with one exact implicit destructor COMDAT (5 code bytes plus 11 alignment NOPs) and the cleanup reference resolving to that definition. All 87 old sections and 341 relocations otherwise preserve their bytes and destinations. Round57 light lookup: published dfdf9823 canonical EcoSystem pin independently reproduced, then complete132 sections/720 relocations preserved under only the EcoLightEmitterView*-to-LightEmitter* method-return spelling. All other records unchanged. EcoSystem near-miss merge: the sample EcoSystemNearMisses.cpp and the Group4/Group5 bring-ups were folded into EcoSystem.cpp (six near-miss bodies and their helpers); the canonical object is repinned at 207 sections/1143 relocations and the sample pin removed. Every calibration case stays exact. VisibilityQuadTreeNode::Traverse merge: the sample VisibilityQuadTreeTraversal.cpp (2 sections, 52 relocations) was folded into VisibilityQuadTree.cpp, where Traverse is strict exact; the canonical object is repinned at 89 sections/395 relocations (88/342 plus Traverse's section, its 52 relocations and the one recursive call VC6 no longer cross-jumps) and the sample pin removed.",
   "renames": {
     "?ComputeCode@EcoQuadTreeView@@QAEIMMMM@Z": "?ComputeCode@QuadTree@@QAEIMMMM@Z",
     "?Insert@EcoQuadTreeView@@QAEXPAVUnknownEcoQuadTreeObject@@IMM@Z": "?Insert@QuadTree@@QAEXPAVQuadTreeObject@@IMM@Z",
@@ -20,9 +20,9 @@
       "sha256": "064052b332cd10e6dde69ae798a49fed5468a9f866404a083cf2ce72d8414b48"
     },
     "src/krusty2/visibility/VisibilityQuadTree.cpp": {
-      "sections": 88,
-      "relocations": 342,
-      "sha256": "61c17ed5762336459bfefc1d642fe20b4eb0853bd5f6e0ac0a95e8ae12dcd36f"
+      "sections": 89,
+      "relocations": 395,
+      "sha256": "0d8cbe11529347bdba172b98b2cb371f952bd67f4c530fb83e191787267d84be"
     }
   },
   "inventory": [

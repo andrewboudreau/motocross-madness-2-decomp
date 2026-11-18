@@ -23,7 +23,7 @@ from tools.emu_cases.segment_triangle_query import dot, unit
 
 RETAIL_VA = 0x0052d610
 SYMBOL = '?Traverse@VisibilityQuadTreeNode@@QAEPAUQuadTreeResultLink@@HHPAU2@HHHPAUVisibilityCamera@@@Z'
-SOURCE = 'samples/physics/visibility/VisibilityQuadTreeTraversal.cpp'
+SOURCE = 'src/krusty2/visibility/VisibilityQuadTree.cpp'
 PROBES = {0x0052f570: 'TestBox', 0x0052d718: 'GatherNodes (first arm)', 0x0052d73b: 'recursion (first arm)',
           0x0052e19c: 'recursion (last arm)', 0x0052e1b9: 'item cell'}
 

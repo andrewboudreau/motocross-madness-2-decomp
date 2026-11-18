@@ -92,6 +92,16 @@
   {
     "class": "VisibilityQuadTree",
     "source": "VisibilityQuadTree.cpp",
+    "candidate_symbol_contains": "Traverse@VisibilityQuadTreeNode",
+    "target_va": "0x0052d610",
+    "target_size": 3027,
+    "expect": "exact",
+    "notes": "back-to-front frustum walk; the VisitChild helper loads the child into a local before the recursive call, so the object load precedes the argument pushes as in retail. Exact only in this unit: the same body alone with VisibilityQuadTree.h, or with the unit's includes, compiles to 3022 bytes (2265 strict).",
+    "bindings": "VisibilityQuadTree.bindings.json"
+  },
+  {
+    "class": "VisibilityQuadTree",
+    "source": "VisibilityQuadTree.cpp",
     "candidate_symbol_contains": "Render3D",
     "target_va": "0x0052e3b0",
     "target_size": 148,

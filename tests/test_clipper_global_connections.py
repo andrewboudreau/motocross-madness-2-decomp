@@ -25,7 +25,6 @@ SOURCES = (
     'src/krusty2/shadow/D3DIMSoultreeShadow.cpp',
     'src/krusty2/visibility/VisibilityQuadTree.cpp',
     'samples/physics/shadow/D3DIMSoultreeShadowNearMisses.cpp',
-    'samples/physics/visibility/VisibilityQuadTreeTraversal.cpp',
     'src/krusty2/broadphase/Terrain.cpp',
 )
 FILENAMES = SOURCES
@@ -191,7 +190,11 @@ class ClipperGlobalConnectionsTests(unittest.TestCase):
             # The Griddraw near misses move from their sample (16 sections, 112
             # relocations) into Griddraw.cpp (89 -> 99 sections, 503 -> 615
             # relocations); six duplicate COMDATs disappear.
-            self.assertEqual(sum(row['sections'] for row in pins['objects'].values()), 940)
+            # Traverse moves from its sample (2 sections, 52 relocations) into
+            # VisibilityQuadTree.cpp (88 -> 89 sections, 342 -> 395 relocations): the
+            # sample's duplicate directive section disappears, and the exact Traverse
+            # keeps one recursive call that the sample's cross-jump had merged.
+            self.assertEqual(sum(row['sections'] for row in pins['objects'].values()), 939)
             # The corrected camera loader adds its explicit first-cross call relocation.
             # QueryGround's emulation-found normal/height repairs drop one Terrain relocation.
             # The D3DIMSoultreeShadow slot 30 frame pragma takes ebp, so the shadow-point
@@ -199,7 +202,7 @@ class ClipperGlobalConnectionsTests(unittest.TestCase):
             # LoadTexturesAndCoords' promotion moves its COMDAT from the sample to CubeDraw.cpp
             # and the rewritten BuildFaceGeometry differs: three more relocations.
             # BuildFaceGeometry's own promotion keeps all 41 of its relocations.
-            self.assertEqual(sum(row['relocations'] for row in pins['objects'].values()), 4589)
+            self.assertEqual(sum(row['relocations'] for row in pins['objects'].values()), 4590)
         print('Clipper global:', strict, 'strict checks; 10 whole objects; 46 retail pointer loads; storage remains unresolved')
 
 

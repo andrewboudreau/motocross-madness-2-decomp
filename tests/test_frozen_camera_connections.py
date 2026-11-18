@@ -59,7 +59,7 @@ class FrozenCameraConnectionsTests(unittest.TestCase):
             rows, filenames = view(consumer, normalize_paths=(ROOT,))
             self.assertEqual([name for _, name in filenames], [SOURCE])
             self.assertEqual(pin(rows), expected['after'])
-            self.assertEqual((len(rows), sum(len(row[3]) for row in rows)), (88, 342))
+            self.assertEqual((len(rows), sum(len(row[3]) for row in rows)), (89, 395))
             indexed = {row[0]: row for row in rows}
             added = ('named', ((DTOR, 0),))
             destructor = indexed[added]
@@ -78,11 +78,11 @@ class FrozenCameraConnectionsTests(unittest.TestCase):
             del indexed[added]
             original = sorted(indexed.values(), key=lambda row: repr(row[0]))
             self.assertEqual(pin(original), expected['before_joined'])
-            self.assertEqual((len(original), sum(len(row[3]) for row in original)), (87, 341))
+            self.assertEqual((len(original), sum(len(row[3]) for row in original)), (88, 394))
             bindings = ROOT/Path(SOURCE).with_suffix('.bindings.json')
             targets = json.loads((ROOT/'src/krusty2/visibility/targets.json').read_text())
             selected = [target for target in targets if target.get('source') == 'VisibilityQuadTree.cpp']
-            self.assertEqual(len(selected), 41)
+            self.assertEqual(len(selected), 42)
             strict = 0
             for target in selected:
                 result = compare(image, consumer, target['candidate_symbol_contains'],
@@ -167,8 +167,8 @@ class FrozenCameraConnectionsTests(unittest.TestCase):
             0x52ef64: ('mov', 'eax, 0x68a968'),
         }.items():
             self.assertEqual(instructions[va], expected_ins)
-        self.assertEqual(strict, 44)
-        print('Frozen camera: 44 strict checks; 87 old sections/341 relocations; '
+        self.assertEqual(strict, 45)
+        print('Frozen camera: 45 strict checks; 88 old sections/394 relocations; '
               'one exact implicit destructor; actual CRT/storage/primary-layout proof')
 
 

@@ -156,7 +156,7 @@ class EcoQuadTreeConnectionsTests(unittest.TestCase):
                         if source in SOURCES:
                             cases.append((source,target['candidate_symbol_contains'],int(target['target_va'],0),target['target_size'],manifest.parent/target['bindings']))
             cases=list(dict.fromkeys(cases))
-            self.assertEqual(len(cases),120)
+            self.assertEqual(len(cases),121)
             for source,symbol,va,size,bindings in cases:
                 self.assertTrue(compare(image,objects[source],symbol,va,size,bindings)['strict_exact'],(source,symbol))
             result=compare(image,objects[SOURCES[1]],INSERT,0x4dcac0,627,ROOT/'src/krusty2/broadphase/Quadtree.bindings.json')

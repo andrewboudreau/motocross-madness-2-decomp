@@ -665,7 +665,7 @@ per-function checks on random and edge inputs.
 | `TerrainShadow.cpp` | `terrain_shadow_slot30` | 0x509aa0 | 400 |
 | `TerrainShadow.cpp` | `terrain_shadow_slot28` | 0x5097d0 | 200 |
 | `TerrainShadow.cpp` | `terrain_shadow_slot27` | 0x508bc0 | 200 |
-| `VisibilityQuadTreeTraversal.cpp` | `visibility_traverse` | 0x52d610 | 300 |
+| `VisibilityQuadTree.cpp` | `visibility_traverse` | 0x52d610 | 300 |
 | `DebugOverlay.cpp` | `overlay_load_font` | 0x447a00 | 200 |
 | `Griddraw.cpp` | `grid_viewer_detail` | 0x4815e0 | 200 |
 | `Griddraw.cpp` | `grid_walk_visibility` | 0x481de0 | 80 |

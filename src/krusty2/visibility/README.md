@@ -1,8 +1,8 @@
 # VisibilityQuadTree.cpp
 
-Validation: all 17 required targets pass strict VC6 SP3 comparison with every
-relocation resolved by `VisibilityQuadTree.bindings.json`. Traverse remains a
-partial candidate; the separate helper samples are not covered by that claim.
+Validation: every target in `targets.json` passes strict VC6 SP3 comparison
+with every relocation resolved by `VisibilityQuadTree.bindings.json`. The file
+is in retail function order, each body under its address comment.
 
 - `__FILE__` string at 0x575a3c, xref 0x52d4c9 (node factory, `new(__FILE__, 0x4f)`).
 - Bracket 0x52d22a..0x5300f8. The front (0x52d240, 0x52d250, 0x52d2f0) is VideoCard;
@@ -11,7 +11,12 @@ partial candidate; the separate helper samples are not covered by that claim.
   other imports; their callers are 0x4c9cd5..0x4c9ea8 and 0x4a0ea1).
 - `VisibilityQuadTree : QuadTree (+0), GameObject (+0x874)`; primary vtable 0x558dfc,
   secondary (GameObject shape) 0x558d8c. `VisibilityQuadTreeNode : QuadTreeNode`, vtable 0x558e08.
-- 18 exact (see targets.json), Traverse 0x52d610 partial (72.7%, 3026 vs 3027 bytes, call-site arg scheduling).
+- Traverse 0x52d610 (3027 bytes) is strict exact, but only inside this unit. The same
+  body compiled alone, with only `VisibilityQuadTree.h` or with the unit's includes,
+  is 3022 bytes (2265 strict): VC6 cross-jumps the recursive-call tails of the near and
+  far child, where retail keeps them apart. The cause in the rest of the unit is not
+  bisected. The `VisitChild` helper loads the child into a local before the recursive
+  call, so the object load comes before the argument pushes as in retail.
 - File statics, in `.CRT$XCU` order (entries 340-347, right after the previous unit's
   vectors and before wrecker.cpp's): an empty static (0x52d2c0/0x52d2d0), the frozen camera
   0x68a968 built by the PCCamera constructor 0x4bed80(1) with atexit destructor 0x4624d0
@@ -91,5 +96,5 @@ python tools/run_physics_samples.py --strict --root src/krusty2/visibility \
   --vc6-root "$VC6_ROOT" --exe "$MCM2_EXE"
 ```
 
-The partial Traverse target is still reported, including its full compiler
-extent. It is not trimmed to retail's length or counted as exact.
+`python tools/emu_diff.py visibility_traverse --compile -n 300` runs Traverse
+against retail on random trees and cameras (600 runs, 0 mismatches).

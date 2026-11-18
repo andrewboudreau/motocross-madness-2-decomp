@@ -87,5 +87,6 @@
   "_kVec3XAxis": "0x0068acc8",
   "_kVec3YAxis": "0x0068acd8",
   "_kVec3ZAxis": "0x0068aba8",
-  "_kVec3Zero": "0x0068abb8"
+  "_kVec3Zero": "0x0068abb8",
+  "?Alloc@BlockAllocator@@QAEPAXXZ": "0x00423fc0"
 }

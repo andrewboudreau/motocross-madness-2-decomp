@@ -42,15 +42,7 @@ extern int g_visibilityQueryTicks;         // 0x0068ab88 clock delta around Quer
 
 unsigned int ReadClock();                                        // 0x004bfa80
 
-VisibilityQuadTreeNode::VisibilityQuadTreeNode()
-{
-}
-
-QuadTreeNode* VisibilityQuadTree::CreateNode()
-{
-    return new(__FILE__, 0x4f) VisibilityQuadTreeNode;
-}
-
+// 0x0052d340
 VisibilityQuadTree::VisibilityQuadTree(int flags)
     : GameObject(flags)
 {
@@ -64,11 +56,13 @@ VisibilityQuadTree::VisibilityQuadTree(int flags)
     }
 }
 
+// 0x0052d3f0
 VisibilityQuadTree::~VisibilityQuadTree()
 {
     g_collisionQuadTree = 0;
 }
 
+// 0x0052d460
 GameObject* VisibilityQuadTree::Setup(int parentArg, float x0, float z0, float x1, float z1, float minCell)
 {
     GameObject::SetRenderContext((void*)parentArg);
@@ -77,6 +71,18 @@ GameObject* VisibilityQuadTree::Setup(int parentArg, float x0, float z0, float x
     return this;
 }
 
+// 0x0052d4b0
+QuadTreeNode* VisibilityQuadTree::CreateNode()
+{
+    return new(__FILE__, 0x4f) VisibilityQuadTreeNode;
+}
+
+// 0x0052d510
+VisibilityQuadTreeNode::VisibilityQuadTreeNode()
+{
+}
+
+// 0x0052d560
 int VisibilityQuadTree::Query(float x, float z, VisibilityCamera* camera)
 {
     if (stateFlags & 1)
@@ -98,67 +104,84 @@ int VisibilityQuadTree::Query(float x, float z, VisibilityCamera* camera)
     return 1;
 }
 
-int VisibilityQuadTree::RenderPost3D()
+// One child of the walk: skipped when absent or outside the frustum, gathered whole when all 8
+// box corners are inside and recursed into otherwise.
+__forceinline QuadTreeResultLink* VisibilityQuadTreeNode::VisitChild(
+    int i, int x, int z, QuadTreeResultLink* tail, int nodeX, int nodeZ, int midX, int midZ,
+    int half, float centerX, float centerZ, float halfExtent, VisibilityCamera* camera,
+    VisibilityBoxVec* center, VisibilityBoxVec* extent, int* cornersInside)
 {
-    EndQuery();
-    return 1;
+    if (!children[i])
+        return tail;
+    center->y = children[i]->yCenter;
+    extent->y = children[i]->yHalfExtent;
+    center->x = (i & 2) ? centerX + halfExtent : centerX - halfExtent;
+    center->z = (i & 1) ? centerZ + halfExtent : centerZ - halfExtent;
+    if (!g_visibilityClipper->TestBox(camera, (const float*)((char*)camera + 0xec), &center->x,
+                                      &extent->x, 0, cornersInside, 0))
+        return tail;
+    int childX = (i & 2) ? midX : nodeX;
+    int childZ = (i & 1) ? midZ : nodeZ;
+    if (*cornersInside == 8)
+        return children[i]->GatherNodesBackToFront(x, z, tail, childX, childZ, half);
+    VisibilityQuadTreeNode* child = (VisibilityQuadTreeNode*)children[i];
+    return child->Traverse(x, z, tail, childX, childZ, half, camera);
 }
 
-int VisibilityQuadTree::OnControlPress(ControlEvent* a, InputButtonState* b)
+// 0x0052d610
+// Back-to-front walk: the quadrant containing the query point is visited last.
+QuadTreeResultLink* VisibilityQuadTreeNode::Traverse(int x, int z, QuadTreeResultLink* tail,
+                                                     int nodeX, int nodeZ, int size,
+                                                     VisibilityCamera* camera)
 {
-    if (TestInputEvent(0x44, 0, a, 0x80)) {
-        g_visibilityDebugDraw = 1 - g_visibilityDebugDraw;
-        return 1;
-    }
-    if (TestInputEvent(0x57, 0, a, 0x80)) {
-        g_visibilityFreeze = 1 - g_visibilityFreeze;
-        if (g_visibilityFreeze)
-            *reinterpret_cast<VisibilityCamera*>(&g_frozenCamera) = *View()->camera;
-        return 1;
-    }
-    return 0;
-}
-
-int VisibilityQuadTree::PrepareGeometry()
-{
-    unsigned int start = ReadClock();
-    VisibilityCamera* cam;
-    if (g_visibilityFreeze)
-        cam = reinterpret_cast<VisibilityCamera*>(&g_frozenCamera);
-    else
-        cam = View()->camera;
-    Query(cam->worldX, cam->worldZ, cam);
-    g_visibilityQueryTicks = ReadClock() - start;
-    if (reinterpret_cast<VisibilityProfiler*>(g_TrackGame)->log) {
-        if (statsId < 0) {
-            DebugOverlay* log = reinterpret_cast<VisibilityProfiler*>(g_TrackGame)->log;
-            int line = log->nextPage++;
-            statsId = line;
+    int midX = nodeX + size;
+    int midZ = nodeZ + size;
+    float centerX = (float)midX * g_quadTreeInvScale;
+    float centerZ = (float)midZ * g_quadTreeInvScale;
+    size >>= 1;
+    float halfExtent = (float)size * g_quadTreeInvScale;
+    VisibilityBoxVec center;
+    VisibilityBoxVec extent;
+    int cornersInside;
+    extent.x = halfExtent;
+    extent.z = halfExtent;
+    if (children) {
+        if (x >= midX) {
+            if (z >= midZ) {
+                tail = VisitChild(0, x, z, tail, nodeX, nodeZ, midX, midZ, size, centerX, centerZ, halfExtent, camera, &center, &extent, &cornersInside);
+                tail = VisitChild(1, x, z, tail, nodeX, nodeZ, midX, midZ, size, centerX, centerZ, halfExtent, camera, &center, &extent, &cornersInside);
+                tail = VisitChild(2, x, z, tail, nodeX, nodeZ, midX, midZ, size, centerX, centerZ, halfExtent, camera, &center, &extent, &cornersInside);
+                tail = VisitChild(3, x, z, tail, nodeX, nodeZ, midX, midZ, size, centerX, centerZ, halfExtent, camera, &center, &extent, &cornersInside);
+            } else {
+                tail = VisitChild(1, x, z, tail, nodeX, nodeZ, midX, midZ, size, centerX, centerZ, halfExtent, camera, &center, &extent, &cornersInside);
+                tail = VisitChild(0, x, z, tail, nodeX, nodeZ, midX, midZ, size, centerX, centerZ, halfExtent, camera, &center, &extent, &cornersInside);
+                tail = VisitChild(3, x, z, tail, nodeX, nodeZ, midX, midZ, size, centerX, centerZ, halfExtent, camera, &center, &extent, &cornersInside);
+                tail = VisitChild(2, x, z, tail, nodeX, nodeZ, midX, midZ, size, centerX, centerZ, halfExtent, camera, &center, &extent, &cornersInside);
+            }
+        } else if (z >= midZ) {
+            tail = VisitChild(2, x, z, tail, nodeX, nodeZ, midX, midZ, size, centerX, centerZ, halfExtent, camera, &center, &extent, &cornersInside);
+            tail = VisitChild(3, x, z, tail, nodeX, nodeZ, midX, midZ, size, centerX, centerZ, halfExtent, camera, &center, &extent, &cornersInside);
+            tail = VisitChild(0, x, z, tail, nodeX, nodeZ, midX, midZ, size, centerX, centerZ, halfExtent, camera, &center, &extent, &cornersInside);
+            tail = VisitChild(1, x, z, tail, nodeX, nodeZ, midX, midZ, size, centerX, centerZ, halfExtent, camera, &center, &extent, &cornersInside);
+        } else {
+            tail = VisitChild(3, x, z, tail, nodeX, nodeZ, midX, midZ, size, centerX, centerZ, halfExtent, camera, &center, &extent, &cornersInside);
+            tail = VisitChild(2, x, z, tail, nodeX, nodeZ, midX, midZ, size, centerX, centerZ, halfExtent, camera, &center, &extent, &cornersInside);
+            tail = VisitChild(1, x, z, tail, nodeX, nodeZ, midX, midZ, size, centerX, centerZ, halfExtent, camera, &center, &extent, &cornersInside);
+            tail = VisitChild(0, x, z, tail, nodeX, nodeZ, midX, midZ, size, centerX, centerZ, halfExtent, camera, &center, &extent, &cornersInside);
         }
-        g_visibilityTickStat.Record(g_visibilityQueryTicks);
-        reinterpret_cast<VisibilityProfiler*>(g_TrackGame)->log->Title(statsId, "QuadTree");
-        reinterpret_cast<VisibilityProfiler*>(g_TrackGame)->log->Print(statsId, "Memory %d", g_MemTagStack->GetBytes("QuadTree"));
-        reinterpret_cast<VisibilityProfiler*>(g_TrackGame)->log->Print(statsId, "PrepareGeometry %d %d", g_visibilityQueryTicks,
-                g_visibilityTickStat.Peak());
     }
-    return 1;
+    if (itemList) {
+        QuadTreeResultLink* cell = (QuadTreeResultLink*)g_pQuadTree->resultPool->Alloc();
+        if (tail)
+            tail->next = cell;
+        cell->item = this;
+        cell->next = 0;
+        return cell;
+    }
+    return tail;
 }
 
-int VisibilityQuadTree::Render3D()
-{
-    if (!g_visibilityDebugDraw)
-        return 1;
-    VisibilityView* view = View();
-    VisibilityCamera* cam = view->camera;
-    int x = (int)((cam->worldX - worldMinX - worldMinX) * quantScale);
-    int z = (int)(cam->worldZ * quantScale);
-    View()->SetTextureStageState(0, 1, 1);
-    View()->SetTextureStageState(0, 4, 1);
-    if (rootNode)
-        ((VisibilityQuadTreeNode*)rootNode)->DebugDraw(x, z, 0, 0, 0x4000, View()->camera);
-    return 1;
-}
-
+// 0x0052e1f0
 // Builds the 16-vertex line strip that traces the box (bottom square, one vertical edge, top
 // square, the remaining vertical edges) and draws it.
 void VisibilityQuadTreeNode::DrawBox(VisibilityRenderer* renderer, const float* center, const float* extent)
@@ -189,6 +212,22 @@ void VisibilityQuadTreeNode::DrawBox(VisibilityRenderer* renderer, const float* 
     renderer->DrawLineStrip(3, 0x1e2, strip, 16, 0);
 }
 
+// 0x0052e3b0
+int VisibilityQuadTree::Render3D()
+{
+    if (!g_visibilityDebugDraw)
+        return 1;
+    VisibilityView* view = View();
+    VisibilityCamera* cam = view->camera;
+    int x = (int)((cam->worldX - worldMinX - worldMinX) * quantScale);
+    int z = (int)(cam->worldZ * quantScale);
+    View()->SetTextureStageState(0, 1, 1);
+    View()->SetTextureStageState(0, 4, 1);
+    if (rootNode)
+        ((VisibilityQuadTreeNode*)rootNode)->DebugDraw(x, z, 0, 0, 0x4000, View()->camera);
+    return 1;
+}
+
 // One child of the debug walk: draws the child's box when it is at least partly visible and
 // recurses unless it is completely inside.
 __forceinline void VisibilityQuadTreeNode::DrawChild(
@@ -210,6 +249,7 @@ __forceinline void VisibilityQuadTreeNode::DrawChild(
                                                           (i & 1) ? midZ : nodeZ, half, camera);
 }
 
+// 0x0052e450
 // Same back-to-front walk as Traverse, drawing the box of every visible node.
 void VisibilityQuadTreeNode::DebugDraw(int x, int z, int nodeX, int nodeZ, int size,
                                        VisibilityCamera* camera)
@@ -250,6 +290,55 @@ void VisibilityQuadTreeNode::DebugDraw(int x, int z, int nodeX, int nodeZ, int s
         DrawChild(1, x, z, nodeX, nodeZ, midX, midZ, size, centerX, centerZ, halfExtent, camera, &center, &extent, &cornersInside);
         DrawChild(0, x, z, nodeX, nodeZ, midX, midZ, size, centerX, centerZ, halfExtent, camera, &center, &extent, &cornersInside);
     }
+}
+
+// 0x0052eec0
+int VisibilityQuadTree::OnControlPress(ControlEvent* a, InputButtonState* b)
+{
+    if (TestInputEvent(0x44, 0, a, 0x80)) {
+        g_visibilityDebugDraw = 1 - g_visibilityDebugDraw;
+        return 1;
+    }
+    if (TestInputEvent(0x57, 0, a, 0x80)) {
+        g_visibilityFreeze = 1 - g_visibilityFreeze;
+        if (g_visibilityFreeze)
+            *reinterpret_cast<VisibilityCamera*>(&g_frozenCamera) = *View()->camera;
+        return 1;
+    }
+    return 0;
+}
+
+// 0x0052ef50
+int VisibilityQuadTree::PrepareGeometry()
+{
+    unsigned int start = ReadClock();
+    VisibilityCamera* cam;
+    if (g_visibilityFreeze)
+        cam = reinterpret_cast<VisibilityCamera*>(&g_frozenCamera);
+    else
+        cam = View()->camera;
+    Query(cam->worldX, cam->worldZ, cam);
+    g_visibilityQueryTicks = ReadClock() - start;
+    if (reinterpret_cast<VisibilityProfiler*>(g_TrackGame)->log) {
+        if (statsId < 0) {
+            DebugOverlay* log = reinterpret_cast<VisibilityProfiler*>(g_TrackGame)->log;
+            int line = log->nextPage++;
+            statsId = line;
+        }
+        g_visibilityTickStat.Record(g_visibilityQueryTicks);
+        reinterpret_cast<VisibilityProfiler*>(g_TrackGame)->log->Title(statsId, "QuadTree");
+        reinterpret_cast<VisibilityProfiler*>(g_TrackGame)->log->Print(statsId, "Memory %d", g_MemTagStack->GetBytes("QuadTree"));
+        reinterpret_cast<VisibilityProfiler*>(g_TrackGame)->log->Print(statsId, "PrepareGeometry %d %d", g_visibilityQueryTicks,
+                g_visibilityTickStat.Peak());
+    }
+    return 1;
+}
+
+// 0x0052f050
+int VisibilityQuadTree::RenderPost3D()
+{
+    EndQuery();
+    return 1;
 }
 
 // 0x0052f080 / 0x0052f090: the second empty file static (see the top).

@@ -20,7 +20,8 @@ something different from retail.
 - 18 of the 92 have no differential emulation case (19 at triage time) (listed at the end). The
   cases that exist were not run in this pass.
 - The index is stale for several rows. Three are now within 256 bytes and so
-  no longer far misses: `0x0050dad0` (4913/5020), `0x004e6f80` (2056/2148), `0x0052a940` (3229/3254). Rows marked "(masked)" in the index were scored on
+  no longer far misses: `0x0050dad0` (4913/5020), `0x004e6f80` (2056/2148), `0x0052a940` (3229/3254). Row 40, `0x0052d610` (VisibilityQuadTreeNode::Traverse), is now strict exact in
+  `src/krusty2/visibility/VisibilityQuadTree.cpp`; its sample is gone. Rows marked "(masked)" in the index were scored on
   a short extent; the table gives the full-extent strict score.
 
 ## Method
@@ -105,7 +106,7 @@ the function were wrong, not a finding that it is.
 | 37 | `0x004a4c60` | MorphBastardModifier::ModifyMesh | src/reconstructed/MorphBastardModifier.cpp:459 | 185/1571; index 185/1570 | R | low | yes, src/reconstructed/MorphBastardModifier.cpp (0.908) | 69 | 532/532 insns: registers of the object/channel loop (retail keeps the object offset in esi and the channel in ebp). |
 | 38 | `0x00448560` | GetDXVersion | samples/game/DeviceSetupNearMisses.cpp:40 | 170/1011; index 148/1006 | R | low, no emu case | yes, same file (0.914) | 67 | 344/345 insns; zero register ebp vs edi, frame 0x11c vs 0x118, and the build-number test as `cmp word ptr` where retail loads, masks with 0xffff and compares. |
 | 39 | `0x00457480` | EcoSystem::ReadEst | src/reconstructed/EcoSystem.cpp:599 | 561/2629 | R | low | yes, src/reconstructed/EcoSystem.cpp (0.989) | 62 | 13 diffs, all the constant 1 held in edi (VC6 zero/one-register over-cache, docs/VC6_ZERO_REGISTER.md). A fix would be compiler-only. |
-| 40 | `0x0052d610` | VisibilityQuadTreeNode::Traverse | samples/physics/visibility/VisibilityQuadTreeTraversal.cpp:29 | 2265/3027 | R | low | yes, same file (0.988) | 61 | 1056/1056 insns: VC6 cross-jumps a different pair of call tails (direct 32 vs 33, slot-2 indirect 15 vs 14). |
+| 40 | `0x0052d610` | VisibilityQuadTreeNode::Traverse | src/krusty2/visibility/VisibilityQuadTree.cpp (now exact) | 2265/3027 | R | low | yes, same file (0.988) | 61 | 1056/1056 insns: VC6 cross-jumps a different pair of call tails (direct 32 vs 33, slot-2 indirect 15 vs 14). |
 | 41 | `0x004a5e40` | MotionManager::LoadVue | samples/physics/motion/Motnctrl.cpp:19 | 505/1090 | R | low | yes, src/krusty2/motion/Motnctrl.cpp (0.990) | 58 | 301/301 insns, 5 masked diffs: a register permutation (ebx/ebp, esi/edi). |
 | 42 | `0x00447a00` | DebugOverlay::LoadFont | src/reconstructed/DebugOverlay.cpp:71 | 463/980 | S | low | yes, same file (0.977) | 54 | Body matches; VC6 copies the epilogue into the failure and success returns where retail has one shared epilogue (303 vs 299 insns). |
 | 43 | `0x004507a0` | SPRaceInfoDlg::HandleEvent | samples/ui/DlgProcsNearMisses.cpp:132 | 583/1652; index 589/1668 | R | low | yes, src/bringup/Group2_SPRaceInfoDlg.cpp (0.994) | 53 | 438/442 insns; retail recomputes `lea [TrackGame+0x570]` in each loop test. Header: a dozen accessor and loop forms compile the same. |
