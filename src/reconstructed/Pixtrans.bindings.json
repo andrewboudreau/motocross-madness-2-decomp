@@ -57,5 +57,9 @@
   "?GetIndexFrom555@ColorMapper@@QAEPAEXZ": "0x004de280",
   "?GetIndexFrom565@ColorMapper@@QAEPAEXZ": "0x004de290",
   "__FILE__:pixtrans.cpp": "0x00571688",
-  "?AverageColor@@YAHPAXHHHHPAUTextureColorMapperView@@@Z": "0x004d24d0"
+  "?AverageColor@@YAHPAXHHHHPAUTextureColorMapperView@@@Z": "0x004d24d0",
+  "?GetColors@TextureColorMapperView@@QAEPAEXZ": "0x004de270",
+  "?PixelFormatBytesPerPixel@@YAHH@Z": "0x00511970",
+  "?g_ditherCapacity@@3HA": "0x00689a6c",
+  "?g_ditherRows@@3PAPAHA": "0x00689a70"
 }

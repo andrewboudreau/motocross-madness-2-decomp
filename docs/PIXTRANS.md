@@ -117,8 +117,8 @@ alpha with an if/else (a `?:` changes the base offset of the
 strength-reduced pixel pointer).
 
 The average colour `0x004d24d0` is exact (identical explicit returns in the
-palette and 24-bit cases, `default: return 0;`). Near misses
-(`samples/render/PixtransNearMisses.cpp`): `0x004ce420` (the
+palette and 24-bit cases, `default: return 0;`). Near misses, in the unit in retail order with
+`// Not exact` status comments (forms tried below): `0x004ce420` (the
 1555 halver, 280/458 strict: the lower pair read into frame-slot locals before
 the tests and one reused upper `pixel` give retail's x loop; the source row
 stays in ebp from entry where retail copies it from eax at each row head); `0x004cdf10`, the 8888 halver, which
@@ -141,7 +141,7 @@ halvers; their pixel loops accumulate into a zeroed argument slot in memory,
 `mov [ebp+0x1c], 0; add [ebp+0x1c], ebx; ...`, and count down `dec [ebp+0x24]`,
 which VC6 `/O2` does not emit for C locals). The ditherer `0x004cf2a0`
 (Floyd-Steinberg over two 16.16 error rows, 0x00689a6c..0x00689a74) is a
-near miss in `samples/render/PixtransNearMisses.cpp` (534 of 566
+near miss in the unit (534 of 566
 instructions aligned, 276 of 1759 strict: the abs() intrinsic, quantized
 levels stored at once and row pointers derived from y give retail's
 registers and frame; the ebp push and the y loop's setup order differ). The table getters
@@ -212,3 +212,93 @@ replace are in Git history. Tier 3 unless the entry says otherwise.
 Texture formats are written as their decimal bit layouts (8, 555, 565, 888,
 1555, 4444, 8888); retail's 0x22b, 0x235, 0x378, 0x613, 0x115c and 0x22b8
 are exactly those numbers.
+
+## Near misses: forms tried
+
+Scores are matching bytes under `vc6_o2_mt` with relocations resolved.
+
+Halve8888 (0x004cdf10, 636 bytes with its jump table; candidate 628, 110
+strict, 182 of 203 aligned, 0.925 masked): the 8888 halver. Control flow, the
+count switch and the retail alpha quirk line up. Retail derives the block
+pointer from x (`sourceRow + x * 2` inside the x loop) and reads the lower
+pixels as `top[sourceStride]`: separate `top`/`bottom` pointers stepped by 2
+in the for increment kept the upper pointer on the stack and most registers
+differed (82 of 203 aligned). Retail reads the first alpha twice rather than
+through a local; an `alpha0` local cost 0.23 masked. Still differs: VC6
+strength-reduces the lower row to `top + sourceStride` (lea edx, [ecx+ebp*4])
+where retail biases it to the alpha byte (+3) and spills it; the order of the
+green/blue reads moves the upper pointer's bias (+1 green first, +2 blue
+first) but not the lower one. Ruled out: accumulator declaration orders,
+dropping the alpha1/alpha2 locals (same code), fully indexed `sourceRow[x * 2
++ k]` and `sourceRow[i + k]` forms, `bottom` declared in the loop, a
+count-down x loop.
+
+Halve1555 (0x004ce420, 456 bytes; candidate 458, 280 strict): the 1555 halver
+behind 0x004d0170. The arithmetic, the >= 2 test and the packing match. Retail
+reads the lower pair into locals before the first test and keeps them in frame
+slots (0x10 frame), and reuses one `pixel` variable for the upper pair (read
+in place, both in dx): declaring the lower pair and the reused pixel after the
+accumulators gives that (55 -> 246), and `*to++ =` in both arms instead of
+`to++` in the x loop increment gives retail's shared `add eax, 2` tail (280).
+Still differs: VC6 here loads `source` into ebp at entry (so ebp is pushed
+before the height guard and popped last) and computes the next source row in
+ebp, where retail uses eax and copies it to ebp at the row head; the first
+opaque pixel's zero-extended value is formed in ecx (retail: in blue's edi).
+All 24 accumulator orders, the row/pointer declaration orders, char/int row
+pointers, for-init pointers, count-down loops, the first arm's statement
+orders (48), pixel types and 1..33 dead locals leave it at 280 or worse;
+earlier: every pixel declaration order, a lower-row pointer, a 1555 bitfield
+struct and an inline AddPixel1555 helper.
+
+Halve8 (0x004cee30, 1133 bytes; candidate 1133, 1121 of 1125 masked bytes,
+1129 of 1133 strict): the palette-index halver. The search for the magenta
+entry, both block loops, the key test and the >= 2 rule match, and nested ifs
+reproduce retail's single `return 0` block. The keyed and plain loops are an
+if/else with one `return 1` after it: with a `return 1` after the keyed loop
+VC6 pushes ebp in the prologue, as an if/else it pushes ebp after the three
+checks as retail does (docs/VC6_SHRINK_WRAP.md). Declaring the keyed block's
+accumulators first in the x loop body gives retail's frame (0x48) and
+registers; declared after the four entry copies, VC6 homed `sourceRow` in
+`source`'s slot (frame 0x44) and every slot moved. The plain loop ORs the blue
+term before the green one as retail does. The four 3-byte entry copies are
+declared once at the top of the entries block, shared by both loops: declared
+in each x loop body (in any order) they took their slots in the reverse order.
+Declaring the accumulators count, red, blue, green orders the two zero stores
+as retail's. Still differs: after the keyed x loop retail reloads the source
+stride before the width. Updating `row` before `sourceRow`, the row steps or
+`to++` in the for increments, declaring `to` before `from`, a `below` row
+pointer, counting x or y down and hoisting the loop counters, pointers or
+entry indices are the same or worse. So are (40 forms, all 1129) `width > x`,
+the x increments swapped, `1 + sourceStride` and five spellings of the source
+row step. Session 14 parentheses (all 1129): `(sourceStride * 2)` in the keyed
+row step, `(count * 4)` in the three averages, a fully bracketed index
+expression, `from[(sourceStride + 1)]`, `(from + sourceStride)[1]` and `*(from
++ sourceStride)`. The two differing loads are the reloads of sourceStride
+(eax) and width (edx) at the keyed x loop's exit, both carried into the y
+loop's head. Session 15: a `stride` copy of sourceStride for the keyed branch
+is propagated back to the argument (1129); an end-pointer x loop (`to < end`)
+loses retail's width down-counter (225).
+
+DitherConvert (0x004cf2a0, 1759 bytes; candidate 1745, 276 strict, 534 of 566
+aligned, 0.954 masked): the Floyd-Steinberg ditherer behind the dithered
+converters. Two 16.16 error rows (grown on demand,
+0x00689a6c/0x00689a70/0x00689a74), each pixel rounded to the nearest 5-bit
+level per channel and, with a palette, to the palette entry when it is exactly
+that colour; errors spread 7/16 right, 5/16 below, 3/16 below left and the
+remainder below right (retail forms that as e - 7e/16 - 5e/16 - 3e/16 with the
+last term negated first, which is the same value). Checked against retail:
+free/malloc lines 0x429/0x42c, width * 24 bytes, formats 0x22b/0x235 select
+the 555/565 readers, the 555 palette lookup and the output packings. Shape:
+retail uses the CRT abs() intrinsic (cdq/xor/sub; a ternary gave jns/neg),
+stores each quantized level to its slot at once (the out-parameter
+QuantizeChannel), loads the palette entry as colors[index * 3 + k] and derives
+the four output row pointers and the next source row from y (`base + y *
+stride`), which VC6 strength-reduces into retail's shared induction variables;
+stepping separate row pointers at the end of the y loop gave 385 of 566
+aligned. Still differs: where ebp is pushed, the order of the y loop's pointer
+setup and its rotated loop entry jump.
+
+k-scan (s22): compiled behind 0..63 prepended typedefs, 0x004cdf10,
+0x004ce420, 0x004cee30, 0x004cf2a0 have the same code at every count, so their
+differences are not a declaration-count effect (docs/VC6_OPERAND_ORDER.md
+section 2).

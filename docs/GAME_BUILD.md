@@ -671,10 +671,10 @@ per-function checks on random and edge inputs.
 | `Griddraw.cpp` | `grid_walk_visibility` | 0x481de0 | 80 |
 | `Griddraw.cpp` | `grid_vertex_cache_get_vertex` | 0x47de90 | 300 |
 | `Griddraw.cpp` | `grid_rebuild_block_buffers` | 0x47f210 | 120 |
-| `PixtransNearMisses.cpp` | `halve8888` | 0x4cdf10 | 60 |
-| `PixtransNearMisses.cpp` | `halve1555` | 0x4ce420 | 60 |
-| `PixtransNearMisses.cpp` | `halve8` | 0x4cee30 | 100 |
-| `PixtransNearMisses.cpp` | `dither_convert` | 0x4cf2a0 | 60 |
+| `Pixtrans.cpp` | `halve8888` | 0x4cdf10 | 60 |
+| `Pixtrans.cpp` | `halve1555` | 0x4ce420 | 60 |
+| `Pixtrans.cpp` | `halve8` | 0x4cee30 | 100 |
+| `Pixtrans.cpp` | `dither_convert` | 0x4cf2a0 | 60 |
 | `Tgafile.cpp` | `tga_write` | 0x512990 | 200 |
 | `DropTextOverlaySetup.cpp` | `drop_text_setup` | 0x51af00 | 800 |
 | `Track.cpp` | `track_place_near` | 0x517340 | 400 |

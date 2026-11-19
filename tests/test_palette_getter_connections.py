@@ -17,7 +17,7 @@ from tools.run_calibration import CASES
 from test_edit_box_on_char import extract
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCES = ('src/reconstructed/Pixtrans.cpp', 'samples/render/PixtransNearMisses.cpp')
+SOURCES = ('src/reconstructed/Pixtrans.cpp',)
 FILENAMES = SOURCES
 PROOFS = ('src/reconstructed/Quantize.cpp', 'src/reconstructed/Palette8.cpp',
           'src/reconstructed/Texmap.cpp', 'src/reconstructed/PCTextureMap.cpp')
@@ -133,7 +133,7 @@ class PaletteGetterConnections(unittest.TestCase):
             code=decode(va,size)
             self.assertEqual([at for at,op in code.items() if op==('call',hex(target))],sites)
             self.assertEqual(code[va+4],('mov','ecx, dword ptr [esp + 0x20]'))
-        # Sample receivers are the unchanged seventh/eleventh caller arguments.
+        # The halver's and ditherer's receivers are the unchanged seventh/eleventh caller arguments.
         for va,size,expected_ops in (
             (0x4cee30,41,{0x4cee34:('mov','ebx, dword ptr [esp + 0x68]'),
                            0x4cee52:('mov','ecx, ebx'),0x4cee54:('call','0x4de280')}),
@@ -179,7 +179,7 @@ class PaletteGetterConnections(unittest.TestCase):
                     found.extend((entry.name,r.virtual_address-entry.value,obj.symbol_by_index[r.symbol_index].name)
                                  for r in relocs if obj.symbol_by_index[r.symbol_index].name in RENAMES.values())
                 self.assertEqual(sorted(set(found)),sorted((r['caller'],r['offset'],r['callee'])for r in rows))
-            # Whole sample pins above include every complete nonexact body, not selected windows.
+            # The whole-object pin above includes every complete nonexact body, not selected windows.
             native=output/'providers.cpp'
             native.write_text('#include "Pixtrans.h"\n#include "TextureMap.h"\n#include "Quantize.h"\n'+
                               '\n'.join(extract((ROOT/src).read_text(),sig)for src,sig,_,_,_ in NATIVE)+'\n')
@@ -206,7 +206,7 @@ class PaletteGetterConnections(unittest.TestCase):
             self.assertEqual(result.returncode,0,result.stdout+result.stderr)
             self.assertEqual(result.stdout.strip(),'Palette getters: 8139 cases, 22 access faults, scalar buffers and aliases match')
             self.assertEqual(strict, 103)
-            print('%d strict checks; two complete objects; six calls; '%strict+result.stdout.strip())
+            print('%d strict checks; one complete object; six calls; '%strict+result.stdout.strip())
 
 
 if __name__=='__main__':

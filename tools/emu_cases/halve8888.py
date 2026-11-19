@@ -8,7 +8,7 @@ import struct
 
 RETAIL_VA = 0x004cdf10
 SYMBOL = '?Halve8888@@YAHPAX0HHHH@Z'
-SOURCE = 'samples/render/PixtransNearMisses.cpp'
+SOURCE = 'src/reconstructed/Pixtrans.cpp'
 FPCWS = (0x027f,)   # integer only
 
 

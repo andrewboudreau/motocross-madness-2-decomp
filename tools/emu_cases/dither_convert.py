@@ -14,7 +14,7 @@ import struct
 
 RETAIL_VA = 0x004cf2a0
 SYMBOL = '?DitherConvert@@YAHPAXHHHHH0000PAUTextureColorMapperView@@@Z'
-SOURCE = 'samples/render/PixtransNearMisses.cpp'
+SOURCE = 'src/reconstructed/Pixtrans.cpp'
 FPCWS = (0x027f,)   # integer only
 PROBES = {0x004cf31a: 'grow', 0x004cf629: 'snap', 0x004cf353: '555', 0x004cf369: '565', 0x004cf370: '24'}
 

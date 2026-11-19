@@ -47,7 +47,7 @@ class PixtransHalveBehaviorTests(unittest.TestCase):
                 blob.write_bytes(pe.bytes_at_va(start, size))
                 blobs.append(f'{start:x}:{blob}')
             objects = []
-            for source in ('samples/render/PixtransNearMisses.cpp',
+            for source in ('src/reconstructed/Pixtrans.cpp',
                            'tests/fixtures/pixtrans_halve_compare.cpp'):
                 obj = output / (Path(source).stem + '.obj')
                 result = subprocess.run([
