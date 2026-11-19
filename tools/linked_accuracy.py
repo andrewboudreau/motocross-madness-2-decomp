@@ -81,7 +81,8 @@ def retail_sizes(root: Path = ROOT) -> dict[int, int]:
                         out.setdefault(int(case['target_va'], 16), int(case['target_size']))
                     except (ValueError, TypeError):
                         pass
-    for path in sorted((root / 'samples').rglob('targets.json')):
+    # Promoted units keep their reviewed extents in src/**/targets.json.
+    for path in sorted(p for base in ('samples', 'src') for p in (root / base).rglob('targets.json')):
         try:
             data = json.loads(path.read_text(encoding='utf-8'))
         except ValueError:

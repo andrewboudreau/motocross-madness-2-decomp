@@ -1,6 +1,6 @@
 """KrustyBike::UpdateAIRacingLine 0x00414370, the AI racing line (tools/emu_diff.py case).
 
-The linked body is the Group 3 bring-up copy (src/bringup/Group3_KrustyBikeAI.cpp). The bike,
+The linked body is the unit (src/krusty2/vehicle/BikeAI.cpp). The bike,
 race, status node, gate and terrain are filled with random floats (so every comparison of
 positions, speeds and timers falls either way), then the pointers and tested values are set:
 event type 0..5 (free roam, gate races, track races), difficulty, raceMode, hasFinished,
@@ -23,7 +23,7 @@ import struct
 
 RETAIL_VA = 0x00414370
 SYMBOL = '?UpdateAIRacingLine@KrustyBike@@QAEHM@Z'
-SOURCE = 'src/bringup/Group3_KrustyBikeAI.cpp'
+SOURCE = 'src/krusty2/vehicle/BikeAI.cpp'
 TRACK_GAME = 0x0056e26c
 PROBES = {0x00414439: 'roam re-pick', 0x00414580: 'roam keep', 0x004146e9: 'gate track',
           0x0041484f: 'gate work list', 0x00414929: 'gate line', 0x004149c0: 'gate distance',

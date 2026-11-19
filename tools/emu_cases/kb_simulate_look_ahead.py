@@ -1,6 +1,6 @@
 """SimulateLookAhead 0x0040eca0, the AI's two-wheel look-ahead simulation (tools/emu_diff.py case).
 
-The linked body is the Group 3 bring-up copy (src/bringup/Group3_KrustyBikeAI.cpp), cdecl with
+The linked body is the unit (src/krusty2/vehicle/BikeAI.cpp), cdecl with
 22 arguments (steer, frontVel, rearVel, outVel, outSpeed, center, forward, side, maxTime, dt,
 terrain, outAirborne, outImpact, probe, frontSusp, rearSusp, outFrontContact, outRearContact,
 path, speedTable, sideOffset, nearOnly). Its callees run as retail code in both runs (the
@@ -38,7 +38,7 @@ import struct
 
 RETAIL_VA = 0x0040eca0
 SYMBOL = '?SimulateLookAhead@@YAHPAUVec3@@000PAM000MMPAVTerrain@@PAE1PAVCollisionObject@@11PAH5PAUBikeAIRacingLine@@1MH@Z'
-SOURCE = 'src/bringup/Group3_KrustyBikeAI.cpp'
+SOURCE = 'src/krusty2/vehicle/BikeAI.cpp'
 TRACK_GAME = 0x0056e26c
 PROBES = {0x0040f78a: 'terrain', 0x0040f7ac: 'no terrain', 0x0040f834: 'probe contact', 0x00410a43: 'obstacles',
           0x00410a53: 'obstacle hit', 0x00412c57: 'final ground'}

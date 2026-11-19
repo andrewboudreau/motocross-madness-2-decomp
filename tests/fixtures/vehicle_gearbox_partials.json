@@ -110,40 +110,40 @@
       "01009ee822a5689524d62cbb090a5742304c27ea5112b0828f77678667e4ab65"
     ],
     [
-      "samples/physics/bikeai/BikeAINearMisses.cpp",
+      "src/krusty2/vehicle/BikeAI.cpp",
       "QuerySegmentObstacles",
       4281920,
       6112,
       6111,
       6063,
-      "5fbff3ac055e9e83d24981a476f63f459ecb7eeb7065e2d6a919dfbe16a4005d"
+      "524a84654ed7c9c501d4c5572016c861aedb89994bfc43b75bbbcccdb20b8419"
     ],
     [
-      "samples/physics/bikeai/BikeAINearMisses.cpp",
+      "src/krusty2/vehicle/BikeAI.cpp",
       "SimulateLookAhead",
       4254880,
       17585,
-      17382,
-      1542,
-      "b76bcf1812555e12c52e90473c1c411d9c9bb6ff12d4529b53ea90c013247551"
+      17385,
+      1479,
+      "f814430cfa7604429ffa7c08c178cc1962549c4e2e41dfec5a0bbfa176d023be"
     ],
     [
-      "samples/physics/bikeai/BikeAINearMisses.cpp",
+      "src/krusty2/vehicle/BikeAI.cpp",
       "?SimulateAIFrame@KrustyBike@@",
       4272640,
       4112,
-      4114,
-      2044,
-      "64119b5558c9e21a1aa6fb2e7d406f093fe50199639197d6c0aa4fac2d97b4c2"
+      4112,
+      2153,
+      "4020e88dfe3bf05459e34fe7a290f649183c5727c840284a793331d05d367189"
     ],
     [
-      "samples/physics/bikeai/BikeAINearMisses.cpp",
+      "src/krusty2/vehicle/BikeAI.cpp",
       "?UpdateAIRacingLine@KrustyBike@@",
       4277104,
       4802,
-      4735,
-      645,
-      "c7b1385a0beb4583c7446307473d3feb133246b3b348014b70de93ccf71b39b5"
+      4765,
+      782,
+      "c6d02e48591a6f57a096c88879b1e9ef8ba61f32ec92b575341eed42ba4b275c"
     ],
     [
       "samples/physics/krustybike/KrustyBikeNearMisses.cpp",

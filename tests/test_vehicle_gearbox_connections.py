@@ -19,7 +19,7 @@ from tools.run_calibration import CASES
 ROOT = Path(__file__).resolve().parents[1]
 SOURCES = ('src/krusty2/vehicle/Vehicle.cpp', 'src/krusty2/vehicle/KrustyBike.cpp',
            'src/krusty2/vehicle/Bike.cpp', 'samples/physics/krustybike/KrustyBikeNearMisses.cpp',
-           'samples/physics/bikeai/BikeAINearMisses.cpp', 'src/reconstructed/GearRatios.cpp')
+           'src/krusty2/vehicle/BikeAI.cpp', 'src/reconstructed/GearRatios.cpp')
 PROVIDERS = (('??0EngineGearbox@@', 0x4d2940, 1542, 36),
              ('?UpdateThrottle@EngineGearbox@@', 0x4d2f50, 215, 12),
              ('?AutoShift@EngineGearbox@@', 0x4d3030, 373, 8),

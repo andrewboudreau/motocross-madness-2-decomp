@@ -122,7 +122,7 @@ Their complete callers retain strict matches and the primary scene pointers.
   thunks 0x00497c30/0x00497ca0 close the unit. The RTTI tables (+0 0x00554548, +540
   0x00554514, +5644 0x005544a4) name the class.
 - Two KrustyBike members, 0x00413200 and 0x00414370, were emitted in BikeAI.cpp's code; their
-  near-miss reconstructions are in `samples/physics/bikeai/BikeAINearMisses.cpp`.
+  near-miss reconstructions are in `vehicle/BikeAI.cpp` (docs/BIKEAI.md).
 - `samples/physics/krustybike/KrustyBikeNearMisses.cpp` includes the canonical file and holds
   the 11 partial targets (constructor, slots 11/14/70/101 and helpers, the network encoders
   0x00492ad0/0x00493660, 0x00495ff0 and 0x0048e280).

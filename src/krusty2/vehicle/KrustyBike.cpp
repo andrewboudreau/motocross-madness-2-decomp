@@ -9,7 +9,7 @@
 // sits mid-file and the two vtordisp thunks 0x00497c30/0x00497ca0 close it.
 // KrustyBikeCamera (0x00497cb0..) follows as its own unit.  Two KrustyBike methods,
 // 0x00413200 and 0x00414370, were emitted inside BikeAI.cpp's code; their near misses
-// are in samples/physics/bikeai/BikeAINearMisses.cpp.  This unit's near misses are in
+// are in vehicle/BikeAI.cpp (docs/BIKEAI.md).  This unit's near misses are in
 // samples/physics/krustybike/KrustyBikeNearMisses.cpp,
 // which includes this file.  Member and helper names are provisional (tier 3); see
 // KrustyBikeTypes.h.

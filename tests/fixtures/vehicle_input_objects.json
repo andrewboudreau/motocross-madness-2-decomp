@@ -35,10 +35,10 @@
       "relocations": 24,
       "sha256": "80d2e9a25d07f80bab29b81a8873c4dd9bb92ae33432b9ca4fae9324ea2250a4"
     },
-    "samples/physics/bikeai/BikeAINearMisses.cpp": {
+    "src/krusty2/vehicle/BikeAI.cpp": {
       "sections": 98,
-      "relocations": 819,
-      "sha256": "b22ccaa24fb28ab9dac9580529de32c43b3e926c4afe8fe7d3c0c39a52a4edda"
+      "relocations": 817,
+      "sha256": "8e45914023c0e85bf4a943539bfb2d4b46ec911694f2937e6f368edcf0948999"
     },
     "samples/physics/krustybike/KrustyBikeNearMisses.cpp": {
       "sections": 271,
@@ -1551,11 +1551,11 @@
       "bindings": "src/krusty2/vehicle/BikeAI.bindings.json"
     },
     {
-      "source": "samples/physics/bikeai/BikeAINearMisses.cpp",
+      "source": "src/krusty2/vehicle/BikeAI.cpp",
       "symbol": "??ZVec3@@QAEAAU0@ABU0@@Z",
       "va": "0x413160",
       "extent": 33,
-      "bindings": "samples/physics/bikeai/BikeAINearMisses.bindings.json"
+      "bindings": "src/krusty2/vehicle/BikeAI.bindings.json"
     },
     {
       "source": "src/reconstructed/VehicleMethods.cpp",
@@ -1782,7 +1782,7 @@
       "matching": 6428
     },
     {
-      "source": "samples/physics/bikeai/BikeAINearMisses.cpp",
+      "source": "src/krusty2/vehicle/BikeAI.cpp",
       "symbol": "PathSteeringDirection",
       "va": "0x40e510",
       "extent": 1935,
@@ -1790,7 +1790,7 @@
       "matching": 1935
     },
     {
-      "source": "samples/physics/bikeai/BikeAINearMisses.cpp",
+      "source": "src/krusty2/vehicle/BikeAI.cpp",
       "symbol": "QuerySegmentObstacles",
       "va": "0x415640",
       "extent": 6112,
@@ -1798,28 +1798,28 @@
       "matching": 6063
     },
     {
-      "source": "samples/physics/bikeai/BikeAINearMisses.cpp",
+      "source": "src/krusty2/vehicle/BikeAI.cpp",
       "symbol": "SimulateLookAhead",
       "va": "0x40eca0",
       "extent": 17585,
-      "candidate": 17382,
-      "matching": 1542
+      "candidate": 17385,
+      "matching": 1479
     },
     {
-      "source": "samples/physics/bikeai/BikeAINearMisses.cpp",
+      "source": "src/krusty2/vehicle/BikeAI.cpp",
       "symbol": "?SimulateAIFrame@KrustyBike@@",
       "va": "0x413200",
       "extent": 4112,
-      "candidate": 4114,
-      "matching": 2044
+      "candidate": 4112,
+      "matching": 2153
     },
     {
-      "source": "samples/physics/bikeai/BikeAINearMisses.cpp",
+      "source": "src/krusty2/vehicle/BikeAI.cpp",
       "symbol": "?UpdateAIRacingLine@KrustyBike@@",
       "va": "0x414370",
       "extent": 4802,
-      "candidate": 4735,
-      "matching": 644
+      "candidate": 4765,
+      "matching": 782
     },
     {
       "source": "samples/physics/krustybike/KrustyBikeNearMisses.cpp",
@@ -2104,7 +2104,7 @@
     "src/reconstructed/VehicleMethods.cpp",
     "src/reconstructed/VehicleReset.cpp",
     "src/reconstructed/VehicleWheelAttachment.cpp",
-    "samples/physics/bikeai/BikeAINearMisses.cpp",
+    "src/krusty2/vehicle/BikeAI.cpp",
     "samples/physics/krustybike/KrustyBikeNearMisses.cpp",
     "src/reconstructed/InputDevice.cpp"
   ]

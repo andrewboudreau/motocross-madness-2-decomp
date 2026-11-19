@@ -7,7 +7,7 @@ cover what that case cannot steer (a failed PredictPathMotion, path braking to a
 steering signs). Both control words must agree exactly: at 24-bit every intermediate rounds,
 so this case sees the grouping of each sum (the dot products' (x + y) + z).
 
-The linked body is the Group 3 bring-up copy (src/bringup/Group3_KrustyBikeAI.cpp). Pure math
+The linked body is the unit (src/krusty2/vehicle/BikeAI.cpp). Pure math
 helpers run as retail code (SafeNormalize, the Vec3 constructor, the dot call, CrossProduct,
 FastSqrt, FastInvSqrt, Vec3Magnitude, __ftol), so the values flowing through the body are
 real. Every other call is recorded and replayed (``REPLAY``):
@@ -33,7 +33,7 @@ import struct
 RETAIL_VA = 0x0040eca0
 SYMBOL = ('?SimulateLookAhead@@YAHPAUVec3@@000PAM000MMPAVTerrain@@PAE1PAVCollisionObject@@11PAH5'
           'PAUBikeAIRacingLine@@1MH@Z')
-SOURCE = 'src/bringup/Group3_KrustyBikeAI.cpp'
+SOURCE = 'src/krusty2/vehicle/BikeAI.cpp'
 TRACK_GAME = 0x0056e26c
 SPEED_TABLE = 0x00566f74           # g_BikeAISpeedTable_00566f74[3][200]
 FAST_TABLE_INITS = (0x00460ae0, 0x00460bb0)

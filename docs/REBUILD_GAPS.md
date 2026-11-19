@@ -177,7 +177,7 @@ xrefs, else the name match.
 | 4 | `AuralScape.cpp` | `0x00401a30..0x00403d4c` (doc) | 2 | src | `reconstructed/AuralScape.cpp` |
 | 5 | `BackgroundImage.cpp` | `0x00403fbf..0x00404151` (xref) | 3 | src | `reconstructed/BackgroundImage.cpp` |
 | 6 | `Bike.cpp` | `0x00407c3a..0x00409440` (xref) | 12 | src | `krusty2/vehicle/Bike.cpp` |
-| 7 | `BikeAI.cpp` | `0x0040d070..0x00416e20` (doc) | 3 | src | `samples/physics/bikeai/BikeAINearMisses.cpp` |
+| 7 | `BikeAI.cpp` | `0x0040d070..0x00416e20` (doc) | 3 | src | `krusty2/vehicle/BikeAI.cpp` |
 | 8 | `bikerace.cpp` | `0x00417b00..0x004238bc` (doc) | 60 | src | `reconstructed/BikeRace.cpp` |
 | 9 | `BlockAllocator.cpp` | `0x00424079..0x004240d9` (xref) | 2 | src | `reconstructed/BlockAllocator.cpp` |
 | 10 | `bmpfile.cpp` | `0x0042416e..0x004245dd` (xref) | 6 | src | `reconstructed/bmpfile.cpp` |

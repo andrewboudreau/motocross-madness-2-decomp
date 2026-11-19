@@ -74,7 +74,7 @@ include `EventManager.h` themselves. `D3DIMSoultreeCharacter.h` no longer
 includes `math/Math3D.h`, because that header's per-TU `Vec3` constants collide
 with the reconstructed tree's.
 
-The BikeAI sample (`samples/physics/bikeai/BikeAINearMisses.cpp`) now includes
+BikeAI.cpp (`src/krusty2/vehicle/BikeAI.cpp`, formerly the BikeAI sample) includes
 `TrackGame.h`. It reads `mode.raceSettings.eventType`,
 `mode.raceSettings.treeCollision`, `mode.raceSettings.raceMode`,
 `mode.difficulty` and `childRoot` without casts. 0x0040eca0 rose from 1218 to

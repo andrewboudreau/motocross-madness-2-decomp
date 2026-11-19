@@ -1490,6 +1490,66 @@
     "bindings": "BikeAI.bindings.json"
   },
   {
+    "class": "BikeAI",
+    "source": "BikeAI.cpp",
+    "candidate_symbol_contains": "PathSteeringDirection",
+    "target_va": "0x0040e510",
+    "target_size": 1935,
+    "expect": "exact",
+    "notes": "AI path steering direction; strict exact over the 1935 code bytes (the 1936th byte, 0x0040ec9f, is the nop aligning 0x0040eca0). Needed: a separate walk index (path=esi/index=edi), component-wise perpendiculars with one perp at the enclosing scope, the step per component with t assigned in the x product, ONE segment vector at function scope reused by the single-point tail (retail keeps both in the +0x20 slot; a separate tail vector leaves seg short of references and swaps the two 12-byte slots, 1884 -> 1925), BikeAISegmentLength with (y*y) parenthesised as well as (x*x) (y product loaded first, 1933), and seg.y = 0 after the neighbour-segment differences (flattening before the 2D intersection; a dead store that makes seg.y's x87 leaf older than t's so the step's y product loads t first, 1935; inferred from the leaf order). See the comment at the top of the file. (moved from samples/physics/bikeai/BikeAINearMisses.cpp)",
+    "bindings": "BikeAI.bindings.json"
+  },
+  {
+    "class": "BikeAI",
+    "source": "BikeAI.cpp",
+    "candidate_symbol_contains": "SimulateLookAhead",
+    "target_va": "0x0040eca0",
+    "target_size": 17585,
+    "expect": "partial",
+    "notes": "Near miss in the unit, 1479 of 17585 strict (candidate 17385); see its status comment and docs/BIKEAI.md.",
+    "bindings": "BikeAI.bindings.json"
+  },
+  {
+    "class": "BikeAI",
+    "source": "BikeAI.cpp",
+    "candidate_symbol_contains": "??ZVec3@@QAEAAU0@ABU0@@Z",
+    "target_va": "0x00413160",
+    "target_size": 33,
+    "expect": "exact",
+    "notes": "Vec3::operator-= (math/Math3D.h) out-of-line COMDAT that VC6 emits after 0x0040eca0 once that function exhausts its inline budget (called at 0x00412eff / 0x00412f97) (moved from samples/physics/bikeai/BikeAINearMisses.cpp)",
+    "bindings": "BikeAI.bindings.json"
+  },
+  {
+    "class": "KrustyBike",
+    "source": "BikeAI.cpp",
+    "candidate_symbol_contains": "?SimulateAIFrame@KrustyBike@@",
+    "target_va": "0x00413200",
+    "target_size": 4112,
+    "expect": "partial",
+    "notes": "Near miss in the unit, 2153 of 4112 strict; see its status comment and docs/BIKEAI.md.",
+    "bindings": "BikeAI.bindings.json"
+  },
+  {
+    "class": "KrustyBike",
+    "source": "BikeAI.cpp",
+    "candidate_symbol_contains": "?UpdateAIRacingLine@KrustyBike@@",
+    "target_va": "0x00414370",
+    "target_size": 4802,
+    "expect": "partial",
+    "notes": "Near miss in the unit, 782 of 4802 strict (candidate 4765); see its status comment and docs/BIKEAI.md.",
+    "bindings": "BikeAI.bindings.json"
+  },
+  {
+    "class": "BikeAI",
+    "source": "BikeAI.cpp",
+    "candidate_symbol_contains": "QuerySegmentObstacles",
+    "target_va": "0x00415640",
+    "target_size": 6112,
+    "expect": "partial",
+    "notes": "Near miss in the unit, 6063 of 6112 strict (candidate 6111); see its status comment and docs/BIKEAI.md.",
+    "bindings": "BikeAI.bindings.json"
+  },
+  {
     "class": "Bike",
     "source": "Bike.cpp",
     "candidate_symbol_contains": "?BikeCollisionCallback@@",

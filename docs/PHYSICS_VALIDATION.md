@@ -216,22 +216,22 @@ Extent: `0x40d070..0x416e1f` (strong inference). Bike.cpp ends at
 `0x415640`. A second Math3D set at `0x417350` means BikeCamera code
 (`0x416e20..0x417aff`) is a separate, unattested unit.
 
-Four near misses, the exact steering direction and one exact COMDAT are in `samples/physics/bikeai`:
+The unit holds every function in retail order (docs/BIKEAI.md):
 - the steering direction `0x40e510` is strict exact (one reused segment vector);
-- the obstacle query `0x415640` (6112 bytes, 5987/6111) differs in the order of
-  its one-use temporaries and two argument-push placements;
-- the two-wheel look-ahead simulation `0x40eca0` (17585 bytes, extent
-  `0x40eca0..0x413150`; `0x412700` is a mid-function address) is fully
-  reconstructed: 392 masked code differences, frame 0x8b8 vs 0x93c;
 - the Vec3 `operator-=` COMDAT `0x413160` is strict exact; VC6 emits it after
   `0x40eca0`, whose epilogue calls it;
-- the KrustyBike AI physics step `0x413200` (4112 bytes, 16.1%): calls, branches
+- the obstacle query `0x415640` (6063 of 6112) differs in the order of its
+  one-use temporaries in the frame;
+- the two-wheel look-ahead simulation `0x40eca0` (1479 of 17585, extent
+  `0x40eca0..0x413150`; `0x412700` is a mid-function address) is fully
+  reconstructed with retail's 24-bit dot-product grouping; frame 0x968 vs 0x93c;
+- the KrustyBike AI physics step `0x413200` (2153 of 4112): calls, branches
   and the 1120 instructions match, the 0x74 frame too, but slot 11's out-vectors sit
   at other offsets and the angular-velocity cross products load their operands in
   another order;
-- the KrustyBike racing-line builder `0x414370` (4802 bytes, 8.5%): block order,
-  calls and the 0x78 frame match (linked masked 0.951, strict 0.921); register allocation and
-  statusNode reloads in the kind 1/5 gate line differ.
+- the KrustyBike racing-line builder `0x414370` (782 of 4802): calls, stores
+  and constants match; retail reloads `statusNode->nextGate` where VC6 keeps it in
+  edi, and the vector copies are scheduled in another order.
 
 `0x40eca0` exhausts VC6's per-function inline budget. Its first part expands every
 Vec3 operator; from `0x410d00` the operators are expanded but call the
@@ -244,16 +244,10 @@ it. `0x413200` and `0x414370` are KrustyBike members placed in BikeAI.cpp's code
 unit's `__FILE__` xrefs); they use the promoted `src/krusty2/vehicle/KrustyBike.h`.
 
 ```bash
-python tools/run_physics_samples.py --strict \
-  --source src/krusty2/vehicle/BikeAI.cpp \
-  --vc6-root "$VC6_ROOT" --exe "$MCM2_EXE"
-python tools/run_physics_samples.py --strict \
-  --source samples/physics/bikeai/BikeAINearMisses.cpp \
-  --vc6-root "$VC6_ROOT" --exe "$MCM2_EXE"
+python tools/run_physics_samples.py --strict   --source src/krusty2/vehicle/BikeAI.cpp   --vc6-root "$VC6_ROOT" --exe "$MCM2_EXE"
 ```
 
-The first run reports `24/24 strict exact`, the second `1/6 strict exact` (the
-COMDAT; the five near misses are registered as partial).
+The run reports `26/30 strict exact`; the four near misses are registered as partial.
 
 ## Wave-10 soultree and box-tree query slice
 

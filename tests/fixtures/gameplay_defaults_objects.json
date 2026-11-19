@@ -36,10 +36,10 @@
       "relocations": 24,
       "sha256": "80d2e9a25d07f80bab29b81a8873c4dd9bb92ae33432b9ca4fae9324ea2250a4"
     },
-    "samples/physics/bikeai/BikeAINearMisses.cpp": {
+    "src/krusty2/vehicle/BikeAI.cpp": {
       "sections": 98,
-      "relocations": 819,
-      "sha256": "b22ccaa24fb28ab9dac9580529de32c43b3e926c4afe8fe7d3c0c39a52a4edda"
+      "relocations": 817,
+      "sha256": "8e45914023c0e85bf4a943539bfb2d4b46ec911694f2937e6f368edcf0948999"
     },
     "samples/physics/krustybike/KrustyBikeNearMisses.cpp": {
       "sections": 271,

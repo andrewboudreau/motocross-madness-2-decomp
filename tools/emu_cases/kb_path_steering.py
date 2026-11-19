@@ -1,6 +1,6 @@
 """PathSteeringDirection 0x0040e510, the AI path steering direction (tools/emu_diff.py case).
 
-The linked body is the Group 3 bring-up copy (src/bringup/Group3_KrustyBikeAI.cpp), cdecl
+The linked body is the unit (src/krusty2/vehicle/BikeAI.cpp), cdecl
 (outDir, Vec3 pos, path, speed, side). The path (BikeAIRacingLine, KrustyBikeRecords.h: count
 +0x0, index +0x4, t +0x8, points +0xc, lookAhead +0x974) holds 0..12 points: random, lattice
 (exact ties between the nearest-point candidates), repeated (zero segments) or along a line
@@ -11,7 +11,7 @@ The linked body is the Group 3 bring-up copy (src/bringup/Group3_KrustyBikeAI.cp
 """
 RETAIL_VA = 0x0040e510
 SYMBOL = '?PathSteeringDirection@@YAHPAUVec3@@U1@PAUBikeAIRacingLine@@MM@Z'
-SOURCE = 'src/bringup/Group3_KrustyBikeAI.cpp'
+SOURCE = 'src/krusty2/vehicle/BikeAI.cpp'
 TRACK_GAME = 0x0056e26c
 PROBES = {0x0040e6a3: 'previous segment', 0x0040e79c: 'next segment', 0x0040e80a: 'offset ahead',
           0x0040eb99: 'zero direction', 0x0040ebdb: 'normalised', 0x0040ebdc: 'single point', 0x0040ec95: 'rejected',

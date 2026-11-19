@@ -1,7 +1,7 @@
 """KrustyBike::SimulateAIFrame 0x00413200, the AI bike's physics step (tools/emu_diff.py case,
 call-record/replay mode).
 
-The linked body is the Group 3 bring-up copy (src/bringup/Group3_KrustyBikeAI.cpp). Every call
+The linked body is the unit (src/krusty2/vehicle/BikeAI.cpp). Every call
 leaving it is recorded and replayed (``REPLAY``): the look-ahead SimulateLookAhead 0x0040eca0,
 PredictLanding 0x0040e370, the wheel shocks, the node transforms and about 25 virtual slots all
 return the same synthetic results to both bodies, and the comparison checks the call sequence
@@ -23,7 +23,7 @@ import struct
 
 RETAIL_VA = 0x00413200
 SYMBOL = '?SimulateAIFrame@KrustyBike@@QAEHM@Z'
-SOURCE = 'src/bringup/Group3_KrustyBikeAI.cpp'
+SOURCE = 'src/krusty2/vehicle/BikeAI.cpp'
 KB_VT = 0x00554548
 KB_VT2 = 0x00554514
 PREDICT_LANDING = 0x0040e370

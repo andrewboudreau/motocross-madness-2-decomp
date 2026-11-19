@@ -958,7 +958,8 @@ body was unregistered:
     - `ManagedTextureGroup.cpp` (the `UnknownTimer` pair, linked to
       PeakHold.cpp's `Peak`/`Record` through aliases, and
       `ContainerList::Reserve`);
-    - the `Vec3` helpers in `Group3_KrustyBikeAI.cpp`.
+    - the `Vec3` call views of `src/krusty2/vehicle/BikeAI.cpp` (linked to the
+      Math3D definitions through aliases).
 
 ## Low-scoring linked bodies audited against retail
 
@@ -1488,7 +1489,7 @@ Perturbation controls all differ:
 - the `Game::Tick` frame clamp 0.2 to 0.25 (96).
 
 The candidate-sample twins follow the linked fixes where the score allows:
-`samples/physics/bikeai/BikeAINearMisses.cpp` takes the trick-delay union
+`src/krusty2/vehicle/BikeAI.cpp` (formerly the BikeAI sample) takes the trick-delay union
 (588 -> 589 bytes); `samples/physics/krustybike/KrustyBikeNearMisses.cpp` keeps
 `FindPlacement`'s fall-off-the-end copy path, because the explicit
 `return *(int*)&outPosition->z` reloads z there (451 -> 435).

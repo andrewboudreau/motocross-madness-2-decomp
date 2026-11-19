@@ -1,6 +1,6 @@
 """QuerySegmentObstacles 0x00415640, the AI obstacle query along a segment (tools/emu_diff.py case).
 
-The linked body is the Group 3 bring-up copy (src/bringup/Group3_KrustyBikeAI.cpp), cdecl
+The linked body is the unit (src/krusty2/vehicle/BikeAI.cpp), cdecl
 (seg, radius, skipVegetation, ignoreCount, ignoreList, push, outPush, outPoint, outDist,
 nearOnly). The collision quadtree (0x0068aba4) is a stub object in most runs: BeginQuery
 0x004dd270 logs the query box, NextObject 0x004dd540 hands out 0..7 random objects and
@@ -22,7 +22,7 @@ import struct
 
 RETAIL_VA = 0x00415640
 SYMBOL = '?QuerySegmentObstacles@@YAHPAUVec3@@MHHPAPAVCollisionObject@@M00PAMH@Z'
-SOURCE = 'src/bringup/Group3_KrustyBikeAI.cpp'
+SOURCE = 'src/krusty2/vehicle/BikeAI.cpp'
 BINDINGS = {'_s_BikeAICollisionObjectTypeId': 0x00566f70, '_s_BikeAIVegetationTypeId': 0x00566f71}
 QUADTREE = 0x0068aba4
 TRACK_GAME = 0x0056e26c

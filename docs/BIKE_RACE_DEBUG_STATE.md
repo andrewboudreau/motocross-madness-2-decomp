@@ -36,8 +36,9 @@ flags after `xor eax,eax` at `0x415c09`. BikeRace's debug drawing method at
 addresses to the drawing operation. `Tick` at `0x41d2b0/5980` and
 `OnControlPress` at `0x41f5e0/2644` read and update the selected row.
 These instructions establish the storage boundary independently of the
-unadmitted AI candidates in `BikeAINearMisses.cpp`. Those candidates retain
-their provisional `Vec3[2]` views and are not promoted by this change. The
+AI near misses in `src/krusty2/vehicle/BikeAI.cpp`. Those declare the five
+segments as `Vec3[2]` views, which `config/game_build.json` links to these
+`Vector3` arrays. The
 exact path prediction `0x40d200`, now in `src/krusty2/vehicle/BikeAI.cpp`,
 declares `g_PathTargetDebugLine` with this `Vector3` type and writes it
 through a `Vec3*` view.
