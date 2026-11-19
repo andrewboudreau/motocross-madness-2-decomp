@@ -51,29 +51,35 @@ Exact: 52 calibration cases:
   bounds pointers before the bounds call.
 - The eight `$E`.
 
-Near misses (`samples/render/D3DIMSoulTreeNearMisses.cpp`, details in its
-header):
-- The LOD `.slt` reader `0x00440060` (1955 of 1964 bytes) and the
-  vertex-group transform `0x00440d40`. Retail adds `offset + base`; a
-  probe with only the face loop reproduces retail, so the swap is a
-  whole-function effect.
-- Slot 12 `0x00443aa0` (799 of 832): row 1 of the inline view-matrix
+Near misses, in `D3DIMSoulTree.cpp` in retail order with `// Not exact`
+status comments ([forms tried](#near-misses-forms-tried)). They replaced the
+game build's bring-up copy `src/bringup/Group5_D3DIMSoulTreeDraw.cpp`, whose
+bodies they are:
+- Slot 12 `0x00443aa0` (802 of 832): row 1 of the inline view-matrix
   product adds its terms in another order. VC6 canonicalises each sum by
-  the kind of its leaves and destination, not by the source order.
-- Slot 7 `0x00444560` matches once the surface pointer `d` is declared
-  before `s`.
-- The drawing function `0x00440f30..0x00442dd8`: a nine-way switch on the
+  the kind of its leaves and destination, not by the source order. `_21`,
+  `_23` and `_24` are bracketed in retail's addition order, which
+  `tools/emu_cases/soultree_prepare_geometry.py` shows at 24-bit precision.
+- The drawing function `0x00440f30..0x00442dd8` (751 of 7851): a nine-way switch on the
   material mapping type, then modifiers, draw and debug overlays. Its
   function-local statics are the .data ints `0x00568930..0x0056893c`, the
   float `0x00568940` and three vectors (`0x0057eef8`, `0x0057ef38`,
   `0x0057eee8`, guard `0x0057ef24`) with an empty destructor; the `ret`
-  stubs `0x00442f40/50/60` are their atexit entries, so they belong to
-  this TU and are matched only together with the drawing function.
+  stubs `0x00442f40/50/60` are their atexit entries (`_$E4`, `_$E3`,
+  `_$E2`, strict exact), so they belong to this TU. Defining the drawing
+  function before the kVec3 constants numbers those three first and moves
+  the eight kVec3 `$E` up by four (`_$E5`..`_$E15`). Mode 5's group index
+  `k` starts at 0 (best guess: retail reads the restore loop's leftover
+  value, uninitialised before the first restore). Mode 2's scroll distance
+  uses its own `ScrollLength` (y*y, x*x, z*z): with the unit's `Length`
+  grouping the emu case differs from retail in 17 of 480 runs (751 against
+  758 bytes for the scored form, which is the one kept).
 
 Header note: adding the node calls `0x004fca80`, `0x004fc9a0`,
 `0x004fd710`, `0x004fd7f0` and `0x004fd5c0` to `SoultreeObject` here
 changes VC6's operand order in SceneManager.cpp's exact `0x004eb570`, so
-the near-miss file declares them on a local view class.
+the unit declares them on a local view class (`DrawSoultreeObjectView`,
+forwarded by `src/bringup/Group5_SoultreeNodeView.cpp`).
 
 ## Function names
 
@@ -170,4 +176,111 @@ $env:VC6_ROOT = (Resolve-Path work/vc6sp3-disc).Path
 $env:MCM2_EXE = (Resolve-Path work/game/mcm2.exe).Path
 python -m unittest discover -s tests -p test_render_node_connections.py -v
 python -m unittest discover -s tests -p test_vehicle_model_connections.py -v
+```
+
+## Near misses: forms tried
+
+Carried over from the header of the former `samples/render/D3DIMSoulTreeNearMisses.cpp` when its bodies (in the bring-up copy's linked form) moved into D3DIMSoulTree.cpp. Scores below are the sample's.
+
+```text
+// Near-miss D3DIMSoulTree.CPP candidates (D3DIMSoultreeObject), kept out of
+// src/reconstructed/D3DIMSoulTree.cpp until they match. The class, its
+// evidence and the exact functions are in src/reconstructed/D3DIMSoulTree.h
+// and .cpp. Bindings: D3DIMSoulTreeNearMisses.bindings.json.
+//
+// PrepareGeometry (0x00443aa0, 832 bytes): 799/832. The inline view
+// matrix product only gets retail's `add eax, 0xec` base when the camera
+// is not held in a local; named result fields (_11.._44) fix the term
+// order of rows 0, 2 and 3. Row 1 still adds its four products in a
+// different order. VC6 canonicalises each sum (the source term order and
+// the statement order of the rows do not matter); the order changes with
+// the kind of the leaves and of the destination (a row pointer for row 1:
+// 808 of 832; operator(): 787; `view.m[r][c]` stores: 768; a `float*`
+// or pointer/reference to `view`: 739), not with symbol numbering (dummy
+// locals), a plain struct instead of the union, projection pointers or
+// flattened indices (unchanged), and no uniform form gives retail's row 1.
+// The product as an inline helper (reference or pointer result, by-value
+// left operand, or returning the matrix) is not inlined by VC6. Redundant
+// parentheses (docs/VC6_OPERAND_ORDER.md section 3): one bracketing for the
+// whole row gives 806; a different one per element of row 1 reaches 826
+// (_21..._23 retail's order, _24 still t1, t3, t2, t0 where retail sums t3,
+// t2, t1, t0, unchanged by its 264 orders); not kept here, since nothing ties
+// those per-element forms to the source. The linked copy
+// (src/bringup/Group5_D3DIMSoulTreeDraw.cpp) does bracket _21, _23 and _24:
+// there every row 1 sum gets retail's grouping (_22 differs only by
+// commutation), which tools/emu_cases/soultree_prepare_geometry.py shows
+// at 24-bit precision. Any extra local, even an unused
+// `const Matrix4& p = projection;` or `Matrix4* w = &world;`, reorders the
+// sums globally (737); reference aliases of world/projection on one or all
+// row 1 leaves score the same as the bare declaration (references to locals
+// fold), and a second reference to the camera's view matrix gives 160.
+// Dead initialised int locals (2026-10-11): 0..33 at the top and 0..31 just before row 1
+// give the same scores by count (799 at 0 and 29..33, otherwise 706..776), so the count
+// moves all rows together and no count gives retail's row 1.
+// One term per statement (2026-10-20, 625 forms: row 1 summed into the
+// field or into a float local, terms t0 up or t3 down): only `_24` summed
+// into a local from t3 down moves it (805); the same form on _21.._23 gives
+// 739..741, so no uniform form exists and none is kept.
+//
+// DrawCurrentLod (0x00440f30..0x00442dd8, 7848 bytes): the drawing
+// function. A nine-way switch on the material mapping type (+0xc8; source
+// order 0, 7, 1, 3, 4, 8, 2, 5, 6 from the case layout) rewrites the
+// source texture coordinates, then the modifiers, the texture
+// coordinate transform 0x00510910, the draw (slot 15) and the debug
+// overlays run, and the coordinates are restored from +0x28. The .data
+// ints 0x00568930..0x0056893c (all 1) and the float 0x00568940 (20.0) are
+// function-local statics, as are the three vectors 0x0057eef8,
+// 0x0057ef38 and 0x0057eee8 (guard 0x0057ef24 bits 1, 2, 4) whose type has
+// an empty destructor: their atexit entries are the `ret` stubs
+// 0x00442f60, 0x00442f50 and 0x00442f40. Same structure (1895 of 1893
+// instructions, 484 differing, then 7832 bytes): the three mode 8 and mode 2
+// normalisations return through the out-of-line Vector3 constructor
+// 0x00404e60 as retail does (Vector3Call; the inline budget, with the
+// constructor expanded in the mode 5 and 6 normalisations). Mode 5's
+// `lines` has 8 entries (4 used). This is a strong inference from the
+// frame, not confirmed: retail leaves 0x80 bytes after it that nothing
+// touches, and with 8 entries circle, ring, identity and line all sit
+// 0x40 below their retail slots (tools/frame_layout.py). Sweeping 13
+// choice points (8192 forms; insn diffs 507 to 495, aligned 1386 to 1398)
+// kept identity(r, c) stores, a reference to the light position (since
+// replaced by retail's by-value copy, see below) and a
+// separate normalisation in mode 3. Accumulating the squared lengths and
+// the mode 5 and 6 dot products one term per statement (512 forms; the
+// MPBikeRiderDlg lever in docs/VC6_OPERAND_ORDER.md) gives 484 differing
+// and 1409 aligned; Length adds y first, the normalisations x first. Left: retail's frame is 0x9e8 (ours
+// 0x9a8) with temporaries the source does not have yet (mode 2 reads the
+// vertex's y and z through a stack copy, x straight from the vertex; a
+// named copy, a copy constructor, a by-value difference and three-float
+// constructor forms all copy x too; x subtracted before a named copy keeps
+// retail's loads but adds a dead x store (713); y and z in float locals,
+// alone or with x read in place, are folded away (744)), `this` is in esi where ours is in
+// ebx, and the identity diagonal is stored from m[3][3] down (every order
+// and spelling of the four stores is emitted from m[0][0] up).
+// Session 16 (masked linked metric 0.8842 -> 0.8911, 342 -> 317 differing
+// instructions; every float-constant operation is now retail's, in
+// retail's order, checked by value): mode 2 halves the reflection into
+// two float locals before adding 0.5 (a Vector3 half multiplies both
+// components before either add; `x * 0.5f + 0.5f` is factored by VC6
+// to `(x + 1) * 0.5`, not retail's code), and the scroll step is a named
+// `moved` added after lastScrollPosition is stored, which gives retail's
+// `fcom 100; fst textureScroll` (the in-place `+=` before the store
+// reloads it). Mode 3 copies the light position by value, as retail
+// does (add edi, 0x64, then three dword stores to the frame); it costs
+// strict bytes but removes differing instructions. No change: every order
+// of the mode 2 and mode 3/4 dot-product terms, the third world-normal
+// row's order, by-value operator- operands (worse), scale-first or
+// mixed operand order in the normalisations (identical code).
+// The mode 5 source keeps two retail bugs: `circle[i + 1]` reads past the
+// 16 points, and the group loop indexes with the restore loop's `k`.
+// Behaviour (tools/emu_cases/soultree_draw_current_lod.py, 2026-11-11): several
+// sums were added in a different order from retail's, an ulp off at 24 bits:
+// the mode 3/4 tu dot products, mode 2's world normal and facing, and mode 5's
+// world normal. Mode 5's ray also stored dx to a float where retail keeps
+// dx/dz on the x87 stack (an ulp at 53 bits). The forms here follow retail;
+// together they raise the linked masked metric from 0.891 to 0.898 (this copy:
+// 473 differing, 1422 aligned).
+//
+// k-scan (s22): compiled behind 0..63 prepended typedefs, 0x00440f30,
+// 0x00443aa0 have the same code at every count, so their differences are not
+// a declaration-count effect (docs/VC6_OPERAND_ORDER.md section 2).
 ```

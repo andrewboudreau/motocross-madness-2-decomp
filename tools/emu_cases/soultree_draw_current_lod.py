@@ -1,7 +1,7 @@
 """D3DIMSoultreeObject::DrawCurrentLod 0x00440f30, the tree's per-material draw loop
 (tools/emu_diff.py case, call-record/replay mode).
 
-The linked body is src/bringup/Group5_D3DIMSoulTreeDraw.cpp. FastInvSqrt 0x00460c00 (tables
+The linked body is src/reconstructed/D3DIMSoulTree.cpp's. FastInvSqrt 0x00460c00 (tables
 built by 0x00460ae0/0x00460bb0) and its estimate 0x00460c70, the out-of-line dot product
 0x0040ae30, the Vector3 constructor 0x00404e60, ReflectAndNormalize 0x004a10e0 and the CRT
 helpers (__ftol, __CIpow, asin 0x00534db0, acos 0x00535240) run natively; every other call is
@@ -33,7 +33,7 @@ import struct
 
 RETAIL_VA = 0x00440f30
 SYMBOL = '?DrawCurrentLod@D3DIMSoultreeObject@@QAEXXZ'
-SOURCE = 'src/bringup/Group5_D3DIMSoulTreeDraw.cpp'
+SOURCE = 'src/reconstructed/D3DIMSoulTree.cpp'
 FAST_TABLE_INITS = (0x00460ae0, 0x00460bb0)
 TRANSFORM_GROUPS = 0x00440d40
 APPLY_STATES = 0x004ff180

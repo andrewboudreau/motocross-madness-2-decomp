@@ -21,7 +21,6 @@ from tools.run_calibration import CASES
 ROOT = Path(__file__).resolve().parents[1]
 MODEL = 'src/reconstructed/D3DIMSoulTree.cpp'
 NODE = 'src/krusty2/soultree/soultree.cpp'
-PARTIAL = 'samples/render/D3DIMSoulTreeNearMisses.cpp'
 METHODS = (
     ('LoadHierarchy', 2, 0x4fdc00, 433, 0x43f950, 1257),
     ('LoadHierarchyFromParameters', 3, 0x4fddc0, 605, 0x43fe40, 543),
@@ -52,7 +51,7 @@ class SoultreeHierarchyConnectionsTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix='mcm2-hierarchy-') as directory:
             objects = {}
             layout = 'tests/fixtures/soultree_hierarchy_layout.cpp'
-            jobs = [(s, s, []) for s in (MODEL, NODE, PARTIAL)]
+            jobs = [(s, s, []) for s in (MODEL, NODE)]
             jobs += [('render_layout', layout, []), ('physics_layout', layout, ['--extra', '/DPHYSICS_VIEW'])]
             for index, (key, source, extra) in enumerate(jobs):
                 path = Path(directory) / ('unit%d.obj' % index)

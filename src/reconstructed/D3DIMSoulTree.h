@@ -252,8 +252,8 @@ public:
     void RemoveModifier(GameObject* modifier);
     void RemoveSecondModifier(GameObject* modifier);
 
-    // Not reconstructed: 0x00440810, the drawing function 0x00440f30, slot
-    // 12 and 0x00443de0 (see samples/render/D3DIMSoulTreeNearMisses.cpp).
+    // 0x00440810, the drawing function 0x00440f30, slot 12 and 0x00443de0
+    // are defined in D3DIMSoulTree.cpp (0x00440f30 and slot 12 not exact).
     void UpdateMaterialTexelRatios();                  // 0x00440810
     void TransformVertexGroups(int lod);           // 0x00440d40 (ret 4): transforms the vertex groups
     void DrawCurrentLod();                         // 0x00440f30: draws the current level of detail

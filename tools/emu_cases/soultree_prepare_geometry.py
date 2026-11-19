@@ -17,7 +17,7 @@ import random
 
 RETAIL_VA = 0x00443aa0
 SYMBOL = '?PrepareGeometry@D3DIMSoultreeObject@@UAEHXZ'
-SOURCE = 'src/bringup/Group5_D3DIMSoulTreeDraw.cpp'
+SOURCE = 'src/reconstructed/D3DIMSoulTree.cpp'
 CLIPPER = 0x00575a98
 UPDATE_BOUNDS = 0x004fe0f0
 GET_MATRIX = 0x004fca80

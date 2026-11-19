@@ -67,7 +67,7 @@ and output storage is compared. The cache callback is a fixture dependency;
 this is not an end-to-end model loader or rendering test.
 
 The private same-path before/after audit covers CarProcedural,
-D3DIMSoultreeMotnctrl, D3DIMSoulTree, soultree and D3DIMSoulTreeNearMisses:
+D3DIMSoultreeMotnctrl, D3DIMSoulTree, soultree and D3DIMSoulTreeNearMisses (since merged into D3DIMSoulTree.cpp):
 all 362 nondebug sections and 1,512 relocations retain their raw bytes,
 attributes and destinations under only the six verified external renames.
 Local labels are identified by destination section and offset. No function

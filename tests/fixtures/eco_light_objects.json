@@ -1,5 +1,5 @@
 {
-  "baseline": "Published dfdf98230fff5c3ccead8e21a82acc4eebc5b3b9: complete same-path before/after objects preserve all payloads, flags, addends and destinations under precisely one return-type symbol mapping. Only enumerated filenames are normalized in these portable retained pins. Explicit ContainerList.h filename normalization repairs the sole cross-root SceneManager pin difference; all thirteen original private pins were reproduced before repair, and complete cross-root rows then match. QuarryStuntEvent preserves every nondebug section and relocation under only the verified SetDetailLevel method-name join; its standalone sample is unchanged. EcoSystem near-miss merge: the sample EcoSystemNearMisses.cpp and the Group4/Group5 bring-ups were folded into EcoSystem.cpp (six near-miss bodies and their helpers); the canonical object is repinned at 207 sections/1143 relocations and the sample pin removed. Every calibration case stays exact. QuarryStuntEvent near-miss merge: slot 12 (0x004e14a0) moved from its sample into QuarryStuntEvent.cpp in retail order (104 sections, 488 relocations); the sample pin is removed and every calibration case stays exact.",
+  "baseline": "Published dfdf98230fff5c3ccead8e21a82acc4eebc5b3b9: complete same-path before/after objects preserve all payloads, flags, addends and destinations under precisely one return-type symbol mapping. Only enumerated filenames are normalized in these portable retained pins. Explicit ContainerList.h filename normalization repairs the sole cross-root SceneManager pin difference; all thirteen original private pins were reproduced before repair, and complete cross-root rows then match. QuarryStuntEvent preserves every nondebug section and relocation under only the verified SetDetailLevel method-name join; its standalone sample is unchanged. EcoSystem near-miss merge: the sample EcoSystemNearMisses.cpp and the Group4/Group5 bring-ups were folded into EcoSystem.cpp (six near-miss bodies and their helpers); the canonical object is repinned at 207 sections/1143 relocations and the sample pin removed. Every calibration case stays exact. QuarryStuntEvent near-miss merge: slot 12 (0x004e14a0) moved from its sample into QuarryStuntEvent.cpp in retail order (104 sections, 488 relocations); the sample pin is removed and every calibration case stays exact. D3DIMSoulTree near-miss merge: the sample's bodies moved into D3DIMSoulTree.cpp (not pinned here); the sample pin is removed.",
   "renames": {
     "?FindLightOfType@LightManager@@QAEPAVEcoLightEmitterView@@H@Z": "?FindLightOfType@LightManager@@QAEPAVLightEmitter@@H@Z"
   },
@@ -48,11 +48,6 @@
       "sections": 96,
       "relocations": 484,
       "sha256": "95a204f549f5b41d6f1a51b85ef8b4874741fd2e21cd93c0f1f025f6e4a3ee89"
-    },
-    "samples/render/D3DIMSoulTreeNearMisses.cpp": {
-      "sections": 29,
-      "relocations": 148,
-      "sha256": "4253d8de080af600ebd528efc965bed0c3b4cca769eda75bbd3514dcce3d2c0d"
     },
     "samples/game/QuarryStuntEventLoaderNearMiss.cpp": {
       "sections": 50,

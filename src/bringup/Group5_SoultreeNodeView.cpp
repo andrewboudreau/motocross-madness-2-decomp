@@ -1,7 +1,7 @@
 // Group5 bring-up definitions (best-guess, link frontier). Not strict matches.
 //
-// DrawSoultreeObjectView is the drawing function's (Group5_D3DIMSoulTreeDraw.cpp,
-// from samples/render/D3DIMSoulTreeNearMisses.cpp) view of soultree.cpp's node
+// DrawSoultreeObjectView is the drawing function's (src/reconstructed/D3DIMSoulTree.cpp)
+// view of soultree.cpp's node
 // calls. The retail functions are already defined as SoultreeObject members,
 // with Vec3 instead of Vector3 (same 12-byte x, y, z layout), so the view
 // forwards to them:

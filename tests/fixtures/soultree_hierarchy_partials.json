@@ -2,20 +2,21 @@
   "baseline": "799f6e9daca7b8af7057ad9a6b61d57c0552a898",
   "functions": [
     [
-      "samples/render/D3DIMSoulTreeNearMisses.cpp",
+      "src/reconstructed/D3DIMSoulTree.cpp",
       "?PrepareGeometry@D3DIMSoultreeObject@@UAEHXZ",
       4471456,
       832,
       832,
-      "5ea97b888c0f3af61fdbaac2464fe3c4b06d884438864907303f96c1f90161a0"
+      "41dcd401dc9883a7cf73c775c3500d6c361d2779e1749d770ba7d46b499cdc2a"
     ],
     [
-      "samples/render/D3DIMSoulTreeNearMisses.cpp",
+      "src/reconstructed/D3DIMSoulTree.cpp",
       "?DrawCurrentLod@D3DIMSoultreeObject@@QAEXXZ",
       4460336,
       7848,
-      7848,
-      "455fa1790cbd148f4c9e1f95da794db20c4fd8f8076439a4e9021ece5daaa557"
+      7856,
+      "c7dbd03a76f0f2a7bd1cbc9245892f5a8238ef2ddba354905f5be7537a45ff19"
     ]
-  ]
+  ],
+  "note": "D3DIMSoulTree near-miss merge: both bodies now come from D3DIMSoulTree.cpp in the bring-up copy's linked form (VisibilityClipper declaration, Vec3DotCall, bracketed row 1, k = 0); fingerprints renewed, DrawCurrentLod 7848 -> 7856 bytes."
 }

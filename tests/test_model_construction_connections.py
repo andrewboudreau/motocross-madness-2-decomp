@@ -23,22 +23,23 @@ CAR = 'src/reconstructed/CarProcedural.cpp'
 MOTION = 'src/krusty2/motion/D3DIMSoultreeMotnctrl.cpp'
 MODEL = 'src/reconstructed/D3DIMSoulTree.cpp'
 NODE = 'src/krusty2/soultree/soultree.cpp'
-PARTIAL = 'samples/render/D3DIMSoulTreeNearMisses.cpp'
-SOURCES = (CAR, MOTION, MODEL, NODE, PARTIAL)
+PARTIAL = MODEL  # DrawCurrentLod and PrepareGeometry, not exact, in the unit
+SOURCES = (CAR, MOTION, MODEL, NODE)
 HELPERS = (
     ('Vec3* SoultreeObject::GetPosition(', '?GetPosition@SoultreeObject@@QAEPAUVec3@@PAU2@@Z', 0x4fc970, 33),
     ('SoultreeObject* SoultreeObject::FindByName(', '?FindByName@SoultreeObject@@QAEPAV1@PBD@Z', 0x4fdae0, 84),
     ('void SoultreeObject::GetLocalBounds(', '?GetLocalBounds@SoultreeObject@@QAEXPAUVec3@@0@Z', 0x4fe0a0, 74),
 )
 CONSTRUCTOR = '??0D3DIMSoultreeObject@@QAE@H@Z'
-# Complete pre-change candidate fingerprints: these remain explicitly nonexact.
+# Complete candidate fingerprints of the unit's two nonexact bodies (renewed when
+# they moved in from the sample in the bring-up copy's linked form).
 # Same-path baseline/current object proof additionally checks all section bytes,
 # attributes and relocation destinations, including the jump table in DrawCurrentLod.
 PARTIALS = (
     ('?PrepareGeometry@D3DIMSoultreeObject@@UAEHXZ', 0x443aa0, 832,
-     '5ea97b888c0f3af61fdbaac2464fe3c4b06d884438864907303f96c1f90161a0'),
-    ('?DrawCurrentLod@D3DIMSoultreeObject@@QAEXXZ', 0x440f30, 7848,
-     '455fa1790cbd148f4c9e1f95da794db20c4fd8f8076439a4e9021ece5daaa557'),
+     '41dcd401dc9883a7cf73c775c3500d6c361d2779e1749d770ba7d46b499cdc2a'),
+    ('?DrawCurrentLod@D3DIMSoultreeObject@@QAEXXZ', 0x440f30, 7856,
+     'c7dbd03a76f0f2a7bd1cbc9245892f5a8238ef2ddba354905f5be7537a45ff19'),
 )
 
 
