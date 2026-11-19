@@ -77,9 +77,10 @@ Exact (10): the constructor, the destructor and its deleting wrapper, slots
 2, 4, 6, 7 and 8, and the two eviction callbacks that slot 3 registers with
 AgeManager. Slot 7 reads the block record's index and own bits (one word)
 through `x->blocks[block]` each time, which gives retail's single load and
-its esi/edi/ebp assignment. Near misses (`samples/render/Grid1NearMisses.cpp`,
-notes there): slot 3 `0x0047caa0` (the stage switch with retries), and the
-two run-length texture fills `0x0047d470` and `0x0047d780`. All three keep
+its esi/edi/ebp assignment. Near misses, in the unit in retail order
+([GRID1.md](GRID1.md) has the forms tried): slot 3 `0x0047caa0` (the stage
+switch with retries), and the two run-length texture fills `0x0047d470` and
+`0x0047d780`. All three keep
 retail's control flow and calls and differ in register allocation. Slot 3
 gets retail's ebp arrangement only when `block` is left uninitialised;
 that source is rejected.

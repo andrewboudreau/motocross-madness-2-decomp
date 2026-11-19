@@ -1,7 +1,7 @@
 """DrawableGridNodeSharedTextures::SelectTexture 0x0047caa0, the terrain node's texture LOD choice
 (tools/emu_diff.py case, call-record/replay mode).
 
-The linked body is samples/render/Grid1NearMisses.cpp. The detail (node size on screen: 16 <<
+The linked body is src/reconstructed/Grid1.cpp. The detail (node size on screen: 16 <<
 shift times the terrain's focal length +0x70 over the distance, 10000 at distance 0) picks a stage
 against g_grid1DetailDistance (0x0056c034) times 1/16, 1/4, 1 and 4; a root node (level 0) whose
 camera moved more than 0.5 (Terrain +0x18 -> +8 -> +0x200) caps the wanted stage at 2. Each stage
@@ -28,7 +28,7 @@ import struct
 
 RETAIL_VA = 0x0047caa0
 SYMBOL = '?SelectTexture@DrawableGridNodeSharedTextures@@UAEXM@Z'
-SOURCE = 'samples/render/Grid1NearMisses.cpp'
+SOURCE = 'src/reconstructed/Grid1.cpp'
 DETAIL_DISTANCE = 0x0056c034
 OWN_COUNT = 0x0066529c
 ACQUIRE = 0x00505600

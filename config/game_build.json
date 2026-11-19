@@ -286,12 +286,6 @@
       "evidence": "docs/GAME_BUILD.md#near-miss-bodies-replacing-bring-up-copies"
     },
     {
-      "path": "samples/render/Grid1NearMisses.cpp",
-      "status": "reviewed-nonexact",
-      "reason": "DrawableGridNodeSharedTextures::SelectTexture 0x0047caa0, BuildNodeTexture 0x0047d470 and BuildBlockTexture 0x0047d780 replace the Group3_GridShared bring-up copies of the same source. The copy reached 0x00505600 through an out-of-line static wrapper; here the body calls it directly as Grid1.h's Grid1Terrain::AcquireOwnedObject, which link_aliases binds to TerrainSupport.cpp's Terrain::AcquireOwnedObject (no arguments, no this adjustment). Not differentially tested.",
-      "evidence": "docs/GAME_BUILD.md#near-miss-bodies-replacing-bring-up-copies"
-    },
-    {
       "path": "samples/physics/bvh/BoundingBoxTreeQueryNearMisses.cpp",
       "status": "reviewed-nonexact",
       "reason": "BoxCapsuleOverlap 0x00425900, BoxTriangleQuery 0x00426be0, SegmentTriangleQuery 0x00427c10, TreeTreeQueryNodes 0x004280e0 and SegmentSegmentDistance 0x0042a640 replace the Group0_BvhQuery bring-up copies of the same bodies; the file includes the canonical BoundingBoxTreeQuery.cpp (included_sources) for the unit's file statics and defines the never-written 0x00579668 flag. The out-of-line vector call views resolve through link_aliases. All five agree with retail under tools/emu_diff.py (docs/GAME_BUILD.md, second differential sweep). Differential review against retail (tools/emu_diff.py, re-run 2026-11-16): segment_segment_distance 0x42a640 0 of 200 runs differ; segment_triangle_query 0x427c10 0 of 600 runs differ; box_capsule_overlap 0x425900 0 of 88 runs differ; box_triangle_query 0x426be0 0 of 180 runs differ; tree_tree_query 0x4280e0 0 of 150 runs differ; box_overlap 0x424ab0 0 of 94 runs differ. Bytes nonexact.",

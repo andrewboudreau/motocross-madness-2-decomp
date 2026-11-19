@@ -19,7 +19,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SOURCES = (
     'src/krusty2/broadphase/Terrain.cpp', 'src/reconstructed/TerrainSupport.cpp',
     'src/reconstructed/Griddraw.cpp', 'src/reconstructed/Grid1.cpp',
-    'samples/render/Grid1NearMisses.cpp', 'samples/physics/shadow/TerrainShadow.cpp',
+    'samples/physics/shadow/TerrainShadow.cpp',
     'src/reconstructed/AgeManager.cpp',
     'src/reconstructed/EcoSystem.cpp', 'src/reconstructed/TerrainShadow.cpp',
 )
@@ -63,7 +63,7 @@ class AgeManagerConnectionsTests(unittest.TestCase):
                 path = output / (Path(source).stem + '.obj')
                 args = [sys.executable, str(ROOT / 'tools/compile.py'), str(ROOT / source),
                         '-o', str(path), '--vc6-root', os.environ['VC6_ROOT'], '--profile', 'vc6_o2_mt']
-                if source == SOURCES[5]:
+                if source == SOURCES[4]:
                     args += ['--include', str(ROOT / 'src/krusty2')]
                 result = subprocess.run(args, cwd=ROOT, capture_output=True, text=True, encoding='latin-1',
                                         env={**os.environ, 'PYTHONPATH': str(ROOT)})
@@ -85,8 +85,8 @@ class AgeManagerConnectionsTests(unittest.TestCase):
                 self.assertTrue(compare(retail, objects[source], symbol, va, size, bindings)['strict_exact'],
                                 (source, symbol))
             self.assertGreaterEqual(len(cases), 170)
-            provider = objects[SOURCES[6]]
-            provider_cases = [c for c in CASES if c['source'] == SOURCES[6]]
+            provider = objects[SOURCES[5]]
+            provider_cases = [c for c in CASES if c['source'] == SOURCES[5]]
             self.assertEqual(len(provider_cases), 9)
             for case in provider_cases:
                 entry = provider.find_symbol(case['symbol'])
@@ -97,7 +97,7 @@ class AgeManagerConnectionsTests(unittest.TestCase):
             required = {
                 SOURCES[0]: {'??0AgeManager@@QAE@XZ', '??1AgeManager@@QAE@XZ'},
                 SOURCES[1]: {EVICT}, SOURCES[2]: {REGISTER, UNREGISTER, MARK},
-                SOURCES[3]: {MARK}, SOURCES[4]: {REGISTER}, SOURCES[5]: {MARK},
+                SOURCES[3]: {REGISTER, MARK}, SOURCES[4]: {MARK},
             }
             for source, names in required.items():
                 obj = objects[source]
@@ -133,7 +133,7 @@ class AgeManagerConnectionsTests(unittest.TestCase):
             libraries = find_child_ci(infer_vc98_root(compiler), 'lib')
             executable = output / 'age.exe'
             result = subprocess.run([str(linker), '/nologo', '/subsystem:console', f'/out:{executable}',
-                f'/libpath:{libraries}', str(paths[SOURCES[6]]), str(paths[fixture]), 'kernel32.lib'],
+                f'/libpath:{libraries}', str(paths[SOURCES[5]]), str(paths[fixture]), 'kernel32.lib'],
                 cwd=ROOT, capture_output=True, text=True, encoding='latin-1')
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             result = subprocess.run([str(executable)], capture_output=True, text=True, timeout=30)

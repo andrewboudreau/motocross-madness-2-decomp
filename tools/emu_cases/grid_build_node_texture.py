@@ -1,7 +1,7 @@
 """DrawableGridNodeSharedTextures::BuildNodeTexture 0x0047d470, the node-wide terrain texture
 built from run-length tile rows (tools/emu_diff.py case).
 
-The linked body is samples/render/Grid1NearMisses.cpp. The node's extra (+0x3c) holds the run
+The linked body is src/reconstructed/Grid1.cpp. The node's extra (+0x3c) holds the run
 table (+4) and the packed own bit and index (+0xc: index -1 or own clear return 0). Each run is a
 (tile, length - 1) byte pair; the runs of a row sum to 256 pixels, as the terrain files have
 them, with lengths from 1 to 256 so runs fit inside one tile, start or end mid-tile and span
@@ -17,7 +17,7 @@ import random
 
 RETAIL_VA = 0x0047d470
 SYMBOL = '?BuildNodeTexture@DrawableGridNodeSharedTextures@@QAEHPAVManagedTexture@@@Z'
-SOURCE = 'samples/render/Grid1NearMisses.cpp'
+SOURCE = 'src/reconstructed/Grid1.cpp'
 FPCWS = (0x027f,)   # integer only
 PROBES = {0x0047d495: 'malloc', 0x0047d574: 'new tile', 0x0047d5bf: 'one span', 0x0047d603: 'head',
           0x0047d664: 'whole tile', 0x0047d697: 'tail', 0x0047d729: 'downsample', 0x0047d772: 'none'}

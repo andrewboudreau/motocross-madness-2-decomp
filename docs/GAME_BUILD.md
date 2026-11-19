@@ -784,9 +784,10 @@ clearly more faithful, the game now links the sample's text:
 - Whole near-miss files are now candidate sources with status
   `reviewed-nonexact`:
   - `samples/track/SceneManagerNearMisses.cpp`
-  - `samples/render/Grid1NearMisses.cpp`
 
-  The two Wrecker near misses that were linked the same way now sit in their
+  Grid1's three now sit in their retail positions in
+  `src/reconstructed/Grid1.cpp`. The two Wrecker near misses that were
+  linked the same way now sit in their
   retail positions in `src/reconstructed/wrecker.cpp`, and VisualCue::Tick in
   `src/reconstructed/Krusty3DObjects.cpp` (docs/ORIGINAL_UNITS.md).
 - The following bring-up files were deleted:
