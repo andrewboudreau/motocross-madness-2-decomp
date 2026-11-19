@@ -20,8 +20,7 @@ from test_edit_box_on_char import extract
 from test_edit_box_draw import signature
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCES = ('src/reconstructed/GUIManager.cpp', 'src/reconstructed/DlgProcs.cpp',
-           'samples/ui/DlgProcsNearMisses.cpp')
+SOURCES = ('src/reconstructed/GUIManager.cpp', 'src/reconstructed/DlgProcs.cpp')
 FILENAMES = SOURCES + ('src/reconstructed/ContainerList.h',)
 GETTER = '?GetCurrentTexture@UIAnim@@QAEPAVTextureMap@@XZ'
 ADVANCE = '?AdvancePastSounds@UIAnim@@QAEPAVTextureMap@@XZ'
@@ -185,7 +184,7 @@ class UIAnimConnectionsTests(unittest.TestCase):
                 self.assertEqual([(r.virtual_address-entry.value, r.type) for r in calls
                                   if obj.symbol_by_index[r.symbol_index].name == wanted],
                                  [(11 if cursor else 416, 20)])
-            self.assertEqual((strict, sections, relocations), (194, 1187, 8069))
+            self.assertEqual((strict, sections, relocations), (194, 765, 5026))
             _, provider = compile_source(ROOT/'src/reconstructed/GameUi.cpp', 'provider')
             for symbol, address, size in (
                 ('??0UIAnim@@QAE@PAX0@Z', 0x472e30, 82),
@@ -221,7 +220,7 @@ class UIAnimConnectionsTests(unittest.TestCase):
             self.assertEqual(result.stdout.strip(),
                 'UIAnim GetCurrentTexture: 3067 cases, 41 independently checked AV; no storage writes')
             self.assertEqual(strict, 200)
-        print('200 strict checks; four whole objects; two retail calls; '+result.stdout.strip())
+        print('200 strict checks; three whole objects; two retail calls; '+result.stdout.strip())
 
 
 if __name__ == '__main__':

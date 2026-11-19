@@ -1,7 +1,7 @@
 """SPRaceInfoDlg::HandleEvent 0x004507a0, the single-player race results dialog
 (tools/emu_diff.py case, call-record/replay mode).
 
-The linked body is src/bringup/Group2_SPRaceInfoDlg.cpp. g_TrackGame 0x0056e26c is a block of
+The linked body is src/reconstructed/DlgProcs.cpp. g_TrackGame 0x0056e26c is a block of
 seeded bytes with the fields the body branches on set: +0x56c the UI (+0x40 replay available,
 +0x3c current menu), +0x570 the event manager (+0x48 races run, a byte; +0x4c result count;
 0x50-byte results from +0x50), +0x2d70 race mode (2 is a championship), +0x2d74 event type
@@ -19,7 +19,7 @@ import random
 
 RETAIL_VA = 0x004507a0
 SYMBOL = '?HandleEvent@SPRaceInfoDlg@@UAEXPAUDialogEvent@@@Z'
-SOURCE = 'src/bringup/Group2_SPRaceInfoDlg.cpp'
+SOURCE = 'src/reconstructed/DlgProcs.cpp'
 TRACK_GAME = 0x0056e26c
 SPRINTF, STRICMP, LOAD_STRING, FORMAT_LAP = 0x00534aaf, 0x00536070, 0x00521970, 0x00518690
 FOPEN, FREAD = 0x00534ceb, 0x00534f65

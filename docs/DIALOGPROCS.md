@@ -167,9 +167,8 @@ creation `0x00451b80`; race start `0x004536e0`. Source forms needed:
 - The bike view distance is `(x*x + y*y) + z*z`.
 - `0x004536e0`'s switch cases are written in the order 3, 5, 0, 4, 1, 2.
 
-Near misses (`samples/ui/DlgProcsNearMisses.cpp`):
-- SPBikeRiderDlg slot 23 `0x0044fa00`, the bike and rider lists
-  `0x0044f750`, and `0x00452930`: register allocation or tail merging.
+Near misses (in `src/reconstructed/DlgProcs.cpp`, retail order, each with a
+`// Not exact` status comment; forms tried are at the end of this file):
 - MainDlg slot 29 `0x0044b200`: retail shares one frame slot between its two
   ConnectionInfoType[5] arrays; VC6 here does not (frame 0xc64 vs 0x6c4).
   Retail's unwind map (FuncInfo `0x00560770`) gives both arrays `[ebp-0x5ac]`
@@ -211,3 +210,120 @@ python -m unittest discover -s tests -p test_progress_dialog_connection.py -v
 The isolated real build compiled 197/197 units and reduced unresolved symbols
 from 540 to 539, removing only the obsolete FindControl name. This connects
 the loading-progress receiver; it does not establish working menus or startup.
+
+## Near misses: forms tried
+
+Scores are matching bytes under `vc6_o2_mt` with relocations resolved.
+
+MainDlg::HandleEvent (0x0044b200, 5232 bytes): the same cases, calls and
+strings; retail shares one frame slot between the two ConnectionInfoType[5]
+arrays (frame 0x6c4), VC6 here gives each array its own slot (frame 0xc64), so
+every later frame offset differs. Retail also pushes the constant 1 where VC6
+here keeps it in edi. One array at function scope is constructed at entry
+(worse) and one array in a braced kDialogCommand case is worse. In probes VC6
+SP3 shares disjoint slots for POD arrays, constructor-only arrays and scalar
+objects with destructors, but never for two arrays whose element has a
+destructor (sibling blocks, else-if chains, switch cases, sequential blocks,
+try, same name, inline virtual InfoType destructor), so the source shape that
+lets retail share them is still unknown. Retail's unwind map (FuncInfo
+0x00560770, 16 states) places both arrays at [ebp-0x5ac] (states 1 and 0xc)
+and every `new` temporary at [ebp-0x6d0]. Also 0xc64 here: each array block
+moved into a static inline helper (both inline, slots still separate), a
+wrapper struct holding the array, scalar destructor objects in place of the
+arrays, the blocks as switch cases, sequential blocks, nested depths, a loop
+body, a try block, the helper returning early or allocating first, and the
+flags /Od /Ox /O1 /Og /Oy- /Ob0 /Ob2 /Gy /Oa /Ow /GF /Gf /Zi /Gs. Only /GX-
+shares the slot (it drops the unwind states). ButModem returns from inside its
+loop once the modem connection is set up: retail destroys that block's array
+on two paths (three ??_M calls in all, the found path jumping straight to the
+epilogue), which `break` merged into one (tools/reference_diff.py, session
+14). With `return` both OpenExitDialog calls and every g_kbGame load stay
+apart as in retail; aligned instructions 1293 -> 1342 (regmasked hunks 44 ->
+37), strict unchanged because the frame still differs.
+
+SPBikeRiderDlg::Tick (0x0044fae0, 1235 bytes, 1181 match): the same flow and
+x87 code; only the scheduling of the by-value Vector3 copies passed to the
+camera's slot 29 differs (retail takes `edi = esp` after the camera and vtable
+loads and loads z before storing y). A pointer, reference, `this->`, explicit
+copy, cast or camera local for the argument leaves it; a user-defined Vector3
+copy constructor copies before the camera is evaluated (worse). Also
+unchanged: inline helpers taking the camera and the vector (const reference,
+by value, pointer), a `Vector3(viewTarget)` temporary, parentheses, and the
+declaration count (0..63 prepended typedefs); a `Vector3(x, y, z)` temporary
+is much worse. In probes VC6 interleaves the copy like retail only when the
+destination pointer lands in a scratch register; with it in a callee-saved
+register (edi, `this` live afterwards) it takes the pointer first and copies
+x, y, z in order, whatever the struct type. VC6 gives retail's order when the
+callee is one load (EventManager slot 10 0x0045f200,
+`podiumCamera->LookAt(podiumFocus)`, is exact) or when the camera comes from a
+separate tested block, a volatile local or a register source pointer, all of
+which add code; with the two-load chain g_TrackGame->ui->garageCamera it takes
+edi = esp first. Also 1181: compiler flags (-G3/-G5/-Ox), float[3]/union
+arguments, `(camera = ...)->` and a function-scope camera, the target declared
+at any scope; `eye[1]` gives retail's `add edi, 0xc` but moves earlier
+registers (183). The same copy differs in 0x004f8820 (SelectGamePicProcs) and
+0x004d72c0 (ProCircuitProcs). Also 1181 or worse (11 forms): a comma
+expression, `1 ? camera : 0`, `&*camera`, `camera + 0`, inline helpers taking
+the KrustyUI and the vector (by value or const reference), an inline camera
+getter with or without a redundant test, a `*(Vector3*)&` argument and a
+qualified `Camera::LookAt` call. Mechanism (Fable probe, 2026-10-16): the
+difference is VC6's Pentium scheduler, whose region is the whole basic block
+(calls are not barriers). A label (or `goto l; l:`) between the SetFrame call
+and the slot-29 call in both branches makes all three dialogs' copies exact
+(0x0044fae0 1235/1235). No label-free construct split the block ({}, if (1),
+do/while (0), switch, empty inline call, (void)x, dead copies), so the
+original had some code-free block boundary there; a bare label is a
+matching-only form and is not applied. Session 14: an inline helper wrapping
+both calls with `goto look; look:` between them is also exact (1235/1235), the
+same label moved into a helper, so not applied. Without the label the helper
+(const reference or pointer target, void or int result, one helper per call)
+gives 1181, by value 74; so do branches that fold after inlining or
+propagation (an `int look = 1` parameter or local, `static const` flag, `if
+(look) {}`) and `for (;;) { ...; break; }`, `while (1)` and `if (LookAt(..))
+{}` around the slot-29 call; tests on `this`, `&viewTarget` or a target
+pointer add code (109-523). Session 14 copy forms, all 1181 unless noted: a
+`const Vector3&` local passed by value, that reference copied into a named
+local first, a named copy assigned after its declaration, and a `pointer ?
+viewTarget : viewTarget` argument in the drag branch only (pointer is known
+there, so the test is threaded away). The same ternary in both branches, or on
+previewDragging or frameTime, keeps a real test (75-295). Repeated `if
+(pointer)` or `if (dx == dx)` tests ahead of the slot-29 call are also
+threaded away and leave the block unsplit (1181); an `if (!previewDragged)`
+test on the member is reloaded (801). The reference, named-copy and
+threaded-ternary forms also leave 0x004f8820 (1214) and 0x004d72c0 (1233)
+unchanged. 2026-11: the scheduler works on blocks of a bounded tuple count,
+and both Tick branches sit exactly at the bound; retail behaves as if each
+held one more tuple (one extra store ahead of the slot-29 call gives retail's
+order too, and is as matching-only as the label). Looked for that tuple in the
+inline maths the branches expand, all 1181 unless noted:
+VectorDifference/VectorSum taking pointers, returning const, building `Vector3
+r(...)`, through float locals or operator[] (by-value parameters 267-397, a
+named result filled member by member 490-514); the `turned *= viewDistance`
+scale as an inline helper taking a value or pointer (a `const float&`
+parameter 376) or through a `float distance` local. None changes the slot-29
+schedule.
+
+SPRaceInfoDlg::HandleEvent (0x004507a0, 1652 bytes) and
+
+MPRaceInfoDlg::HandleEvent (0x004513a0, 2004 bytes): the same calls, strings
+and list columns; inside the per-racer loops retail reloads
+TrackGame/EventManager into other registers (VC6 here keeps them live across
+the loop), so the loop bodies differ from the first loop on. In 0x004513a0's
+first loop (595/2004) retail reloads the EventManager for the +0x04 sprintf
+argument while VC6 here reuses it. Unchanged (2026-10-11): `continue` on the
++0x24 test, an `EventManager* const&` alias, an entry reference or pointer, a
+TrackGame local, an `(int)` cast and `(results + i)->`. Probe (2026-10-12):
+reading the first loop's position through `(EventManager*
+volatile&)g_TrackGame->eventManager` gives 1659/1668 for 0x004507a0 (every
+later loop then matches); only the load's place differs (retail schedules it
+after `lea ecx`, which a volatile load does not allow), so retail's load is an
+ordinary one that VC6 did not carry across the branch. Not adopted. Casts
+through int, char* + 0x570, `const&`, `void**` and `results + i` stay at 589.
+An inline `Events(TrackGame*)` accessor at all or any group of the
+EventManager reads of 0x004513a0 changes nothing (583, 2026-11-13).
+0x004507a0's first loop again (wave 26, all 589): an `EventManager**` local
+assigned in the loop test (inside the comparison or before a comma) and
+dereferenced in the body, which is retail's `lea` and `mov edx, [eax]` written
+out, is forwarded away; so are `(*&eventManager)->`, `(&results[0])[i]`, the
+comparison reversed, an `(int)` cast and an unsigned comparison. A TrackGame
+local assigned in the test is kept and is far worse (142 of 1672).

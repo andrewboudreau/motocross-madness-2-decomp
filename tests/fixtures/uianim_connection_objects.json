@@ -1,5 +1,5 @@
 {
-  "baseline": "Published 7ecf5ff4 same-path old/current objects preserve every nondebug byte and resolved destination under exactly two method-name joins. Portable pins normalize only the checkout prefix and lexical spelling of the four source paths, ContainerList.h and GuiScreenTexture.cpp; no section is excluded. DlgProcs canonical and aggregate pins were independently reproduced from published round52 before objects, then advanced under only the verified DialogSoultreeObjectView to D3DIMSoultreeObject ReplaceMaterialTexture external-name join; all section bytes, flags and destination offsets remain identical. GUIManager.cpp now holds the former aggregate (CopyScreenToTexture and SetPointerDevice moved in): 208 sections, the aggregate's 209 less its second __FILE__ literal, and the same 871 relocations. GUIManager.cpp's function blocks were then put in retail address order: the same 208 sections and 871 relocations in a new order, and every case of the unit stays strict exact.",
+  "baseline": "Published 7ecf5ff4 same-path old/current objects preserve every nondebug byte and resolved destination under exactly two method-name joins. Portable pins normalize only the checkout prefix and lexical spelling of the four source paths, ContainerList.h and GuiScreenTexture.cpp; no section is excluded. DlgProcs canonical and aggregate pins were independently reproduced from published round52 before objects, then advanced under only the verified DialogSoultreeObjectView to D3DIMSoultreeObject ReplaceMaterialTexture external-name join; all section bytes, flags and destination offsets remain identical. GUIManager.cpp now holds the former aggregate (CopyScreenToTexture and SetPointerDevice moved in): 208 sections, the aggregate's 209 less its second __FILE__ literal, and the same 871 relocations. GUIManager.cpp's function blocks were then put in retail address order: the same 208 sections and 871 relocations in a new order, and every case of the unit stays strict exact. DlgProcs.cpp now holds the four former sample bodies (MainDlg, SPBikeRiderDlg::Tick, SP/MPRaceInfoDlg) in retail order; its pin replaces both.",
   "renames": {
     "?GetCurrentTexture@DialogUIAnimView@@QAEHXZ": "?GetCurrentTexture@UIAnim@@QAEPAVTextureMap@@XZ",
     "?AdvancePastSounds@CursorUIAnimView@@QAEHXZ": "?AdvancePastSounds@UIAnim@@QAEPAVTextureMap@@XZ"
@@ -11,14 +11,9 @@
       "sha256": "55575cee7d236b1e89aa3d9c302032517eb21ccc646f57738c02916d34cc352d"
     },
     "src/reconstructed/DlgProcs.cpp": {
-      "sections": 421,
-      "relocations": 3043,
-      "sha256": "b84edf7d9db30dc84b12e3aaf68339aca17c6c087e75ba6d78af44a33cce2e51"
-    },
-    "samples/ui/DlgProcsNearMisses.cpp": {
-      "sections": 558,
+      "sections": 557,
       "relocations": 4155,
-      "sha256": "fdf5bc3e00c15bf5ca5e1bebd0f645a819a721b0a9b0e4894f28c3ea83601211"
+      "sha256": "becb57c4a60b61466d6a010e374a28f7938cad8bff7e7e802bc5df720e883428"
     }
   }
 }

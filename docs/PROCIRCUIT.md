@@ -141,7 +141,7 @@ PCBunnyDlg::HandleEvent (0x004d9860, 1122 bytes, 1068 match): the
   a cash-and-shortfall setter) are all worse than the locals form in the
   same standalone unit (485 or less against its 586).
 PCCentralBikeRiderDlg::Tick (0x004d72c0, 1291 bytes, 1237
-  match): as SPBikeRiderDlg slot 10 (DlgProcsNearMisses.cpp), only the
+  match): as SPBikeRiderDlg slot 10 (DlgProcs.cpp), only the
   scheduling of the by-value Vector3 copies for the camera call differs.
   kVec3YAxis is this unit's own copy at 0x00689b28 (ProCircuitProcs.cpp's
   `$E` vector, as in the canonical bindings); the sample had bound

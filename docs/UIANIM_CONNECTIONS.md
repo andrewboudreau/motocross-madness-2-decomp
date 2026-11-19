@@ -64,6 +64,9 @@ these two method-name substitutions:
 GUIManager.cpp has since absorbed the aggregate's two near misses; the
 current pins are GUIManager 208/871, DlgProcs 421/3,043 and
 DlgProcsNearMisses 558/4,155 (1,187 sections, 8,069 relocations).
+DlgProcs.cpp has since absorbed the sample's four bodies in retail order;
+the pins are now GUIManager 208/871 and DlgProcs 557/4,155 (765 sections,
+5,026 relocations).
 
 Both published aggregates compile without prerequisite fixes. No function
 extent or partial score changes. All seven existing DlgProcs partial pins

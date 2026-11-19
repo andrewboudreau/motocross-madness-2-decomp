@@ -21,8 +21,7 @@ from test_edit_box_draw import signature
 from test_uianim_connections import whole_object, pin, FILENAMES
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCES = ('src/reconstructed/DlgProcs.cpp', 'samples/ui/DlgProcsNearMisses.cpp',
-           'src/reconstructed/ProCircuitProcs.cpp')
+SOURCES = ('src/reconstructed/DlgProcs.cpp', 'src/reconstructed/ProCircuitProcs.cpp')
 RENDER = 'src/reconstructed/D3DIMSoulTree.cpp'
 GARAGE = 'src/reconstructed/KrustyUI.cpp'
 CHARACTER = 'src/krusty2/motion/D3DIMSoultreeMotnctrl.cpp'
@@ -37,7 +36,7 @@ OTHER_CALLER = '?RenderPre3D@PCCentralBikeRiderDlg@@UAEHXZ'
 def material_object(obj):
     # Reuse the complete-section representation, extending only its explicit
     # filename allowlist for the two added caller paths.
-    with patch('test_uianim_connections.FILENAMES', FILENAMES + SOURCES[2:]):
+    with patch('test_uianim_connections.FILENAMES', FILENAMES + SOURCES[1:]):
         return whole_object(obj)
 
 
@@ -155,12 +154,12 @@ class GarageMaterialConnectionsTests(unittest.TestCase):
                 imports = {s.name for s in obj.symbols if s.section_number == 0 and s.storage_class == 2}
                 self.assertIn(PROVIDER, imports)
                 self.assertFalse(imports & {OLD, OTHER_OLD})
-                symbol = obj.find_symbol(CALLER if n < 2 else OTHER_CALLER)
+                symbol = obj.find_symbol(CALLER if n < 1 else OTHER_CALLER)
                 _, size, relocs = obj.symbol_extent(symbol)
-                self.assertEqual(size, 257 if n < 2 else 236)
+                self.assertEqual(size, 257 if n < 1 else 236)
                 self.assertEqual([(r.virtual_address-symbol.value, r.type) for r in relocs
                                   if obj.symbol_by_index[r.symbol_index].name == PROVIDER],
-                                 [(131, 20), (237, 20)] if n < 2 else [(106, 20), (212, 20)])
+                                 [(131, 20), (237, 20)] if n < 1 else [(106, 20), (212, 20)])
             objects = {}
             for n, source in enumerate((RENDER, GARAGE, CHARACTER, MATERIAL)):
                 _, objects[source] = compile_source(ROOT/source, 'provider'+str(n),

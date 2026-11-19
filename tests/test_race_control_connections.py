@@ -21,7 +21,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SOURCES = (
     'src/reconstructed/EventManager.cpp', 'src/reconstructed/InGameProcs.cpp',
     'src/reconstructed/DlgProcs.cpp', 'src/reconstructed/QuarryStuntEvent.cpp',
-    'src/reconstructed/BikeRace.cpp', 'samples/ui/DlgProcsNearMisses.cpp',
+    'src/reconstructed/BikeRace.cpp',
 )
 PROVIDERS = {
     '?HandlePlayerLeft@BikeRace@@QAEXH@Z': (0x420590, 189),
@@ -150,9 +150,9 @@ class RaceControlConnectionsTests(unittest.TestCase):
                 self.assertTrue(compare(retail, objects[case['source']], case['symbol'],
                     int(case['target_va'], 0), case['target_size'], ROOT / case['bindings'])['strict_exact'], case)
             self.assertEqual(len(cases), 207)
-            bindings_path = ROOT / 'samples/ui/DlgProcsNearMisses.bindings.json'
+            bindings_path = ROOT / 'src/reconstructed/DlgProcs.bindings.json'
             bindings = {key: int(value, 0) for key, value in json.loads(bindings_path.read_text()).items()}
-            obj = objects[SOURCES[5]]
+            obj = objects[SOURCES[2]]
             for symbol, va, size, extent, positions, digest in PARTIAL:
                 result = compare(retail, obj, symbol, va, size, bindings_path)
                 self.assertEqual((result['candidate_size'], result['strict_match']['matching_positions']),

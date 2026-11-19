@@ -932,7 +932,7 @@ try on similar code. None is a rule.
   between the two calls (no code) gives retail's schedule exactly; `{}`,
   `if (1)`, `do {} while (0)`, `switch`, an empty inline call and dead copies
   do not split the block. The label is not used in source (it is a
-  matching-only form); see samples/ui/DlgProcsNearMisses.cpp.
+  matching-only form); see the status comment in src/reconstructed/DlgProcs.cpp.
 - **The matrix operand's spelling sets an inlined rotation's sum order.**
   CollisionObject HullVsHull (`0x00436720`, 66 to 932) and HullVsHullSwept
   (`0x00436af0`, 715 to 809) inline the same `out->x = v.x*m[0][0] + ...` helper

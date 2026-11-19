@@ -1,5 +1,5 @@
 {
-  "baseline": "Complete body bytes and relocation target identities, with physical source-path suffix normalization and defined compiler-local $L/$T labels represented by COFF section and offset. OnNetworkMessage changes only the verified external decoder name; CreateRacers has the separately proved seven-byte independent-instruction schedule exception described in BIKE_RACE_STATE_CONNECTIONS.md. Extents remain complete.",
+  "baseline": "Complete body bytes and relocation target identities, with physical source-path suffix normalization and defined compiler-local $L/$T labels represented by COFF section and offset. OnNetworkMessage changes only the verified external decoder name; CreateRacers has the separately proved seven-byte independent-instruction schedule exception described in BIKE_RACE_STATE_CONNECTIONS.md. Extents remain complete. The DlgProcs sample rows now fingerprint src/reconstructed/DlgProcs.cpp, which holds the four former sample bodies in retail order.",
   "partials": [
     [
       "src/reconstructed/QuarryStuntEvent.cpp",
@@ -98,46 +98,46 @@
       "4e63b7555c884f4141c2974028e21a80685e95d8c90c798789d691603915e038"
     ],
     [
-      "samples/ui/DlgProcsNearMisses.cpp",
+      "src/reconstructed/DlgProcs.cpp",
       "?PaintPlateNumber@SPBikeRiderDlg@@QAEXH@Z",
       161,
-      "e06547d7c6dee44c6042968fadcc3a58585da171ecc0595e8c995b9eb654d01c"
+      "f94efcaa6d2a51767fb5606c3db58c3cd3a662a10c0d2bbbf0956fb87d14a0cf"
     ],
     [
-      "samples/ui/DlgProcsNearMisses.cpp",
+      "src/reconstructed/DlgProcs.cpp",
       "?CreateProfile@@YAXPAUDialogEvent@@@Z",
       1130,
-      "9c11e4547ffb4edd7a6b3ba93d09618dc00b5846e86246df38fea0e1d344cdc4"
+      "a4a31c6e34d74981348eb34d12711c156dfbd87ef7be0c7462441f24c776546c"
     ],
     [
-      "samples/ui/DlgProcsNearMisses.cpp",
+      "src/reconstructed/DlgProcs.cpp",
       "?LeaveMenusForRace@@YAXXZ",
       1076,
-      "3e3587e5a9f561bd0b73029dd089a9f9df229bf89a7ca3c7094ba8f15266f87f"
+      "6f5d9d5efaf9002b527ecafc004a4a9cc2a47f45cd16a7cd60190281d0d4efe2"
     ],
     [
-      "samples/ui/DlgProcsNearMisses.cpp",
+      "src/reconstructed/DlgProcs.cpp",
       "?HandleEvent@MainDlg@@UAEXPAUDialogEvent@@@Z",
       5292,
-      "3018448893b6cdcbf3bd99957663632ce95416fb201c2b28ce50c842247d3ca4"
+      "75ddbe6e98de14f08764b040a841b0bb21f9ece5da95960ebbeba57df58275ae"
     ],
     [
-      "samples/ui/DlgProcsNearMisses.cpp",
+      "src/reconstructed/DlgProcs.cpp",
       "?Tick@SPBikeRiderDlg@@UAEHM@Z",
       1235,
       "7c3187436274b187ee83e2efabf056e7d9094227da3e6b2d663ae9268c753012"
     ],
     [
-      "samples/ui/DlgProcsNearMisses.cpp",
+      "src/reconstructed/DlgProcs.cpp",
       "?HandleEvent@SPRaceInfoDlg@@UAEXPAUDialogEvent@@@Z",
       1652,
-      "3309a49ba34ddfdcb432a387e2990fe2f567babf6d13f675e0f54f21dd4543c2"
+      "0870edbff2c65e4ffb952fbeb6d5aa5d1c5d82c0bae1319ba0ec8b7c0078e367"
     ],
     [
-      "samples/ui/DlgProcsNearMisses.cpp",
+      "src/reconstructed/DlgProcs.cpp",
       "?HandleEvent@MPRaceInfoDlg@@UAEXPAUDialogEvent@@@Z",
       2004,
-      "1255a529c7833d95e0bc5d30ea2d1ff7e8717ccab713ccbd5adb4c469205801e"
+      "e31b4f06bcaeda2371026d974da79af4f6f990c237c0e0371a7cc5764b3297e3"
     ],
     [
       "src/reconstructed/racesnd.cpp",

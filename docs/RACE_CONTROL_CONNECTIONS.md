@@ -66,16 +66,17 @@ paused race with a nonzero pause-only argument returns without synchronizing
 the global pause field; the test retains that behavior. No game constructors
 or uninitialized virtual methods execute.
 
-`DlgProcsNearMisses.cpp` includes the changed canonical DlgProcs file. Before
-this work it failed compilation because one `ShowDialog` parent argument
-still used `(int)this` despite the canonical `UIDialog*` parameter. Only that
-cast is repaired to `(UIDialog*)this`. MainDlg directly derives from UIDialog;
-retail saves the receiver in EBP at `0x0044b226` and pushes that unchanged
-pointer as the parent at `0x0044b360`. The four sample bodies' complete
-resolved hashes remain identical to a private baseline with this mandatory
-type correction applied **before** the race-control changes. This is not
-byte-preservation evidence for the unmodified, uncompilable old sample.
-The sample remains nonexact and excluded from the source-built game.
+`DlgProcsNearMisses.cpp` (since merged into DlgProcs.cpp) included the changed
+canonical DlgProcs file. Before this work it failed compilation because one
+`ShowDialog` parent argument still used `(int)this` despite the canonical
+`UIDialog*` parameter. Only that cast is repaired to `(UIDialog*)this`.
+MainDlg directly derives from UIDialog; retail saves the receiver in EBP at
+`0x0044b226` and pushes that unchanged pointer as the parent at `0x0044b360`.
+The four sample bodies' complete resolved hashes remain identical to a private
+baseline with this mandatory type correction applied **before** the
+race-control changes. This is not byte-preservation evidence for the
+unmodified, uncompilable old sample. The four bodies remain nonexact; they
+now build in DlgProcs.cpp with the same resolved hashes.
 
 These connections resolve declaration mismatches; they do not establish
 working race restarts, replay files, network play or game startup. The game
