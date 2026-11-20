@@ -146,7 +146,7 @@
       "c6d02e48591a6f57a096c88879b1e9ef8ba61f32ec92b575341eed42ba4b275c"
     ],
     [
-      "samples/physics/krustybike/KrustyBikeNearMisses.cpp",
+      "src/krusty2/vehicle/KrustyBike.cpp",
       "IsSpeedGainBelowLimit@KrustyBike",
       4790688,
       229,
@@ -155,16 +155,16 @@
       "0553b93850ac519689c1f09521b8b45bbb4e51f35e74d0f15a9785627628bc77"
     ],
     [
-      "samples/physics/krustybike/KrustyBikeNearMisses.cpp",
+      "src/krusty2/vehicle/KrustyBike.cpp",
       "FindPlacement@KrustyBike",
       4791568,
       1296,
-      1288,
-      526,
-      "d9ab4bb76a4ec54e1ff5fd9db1f3de9656d13b186ff6770194eb6cf9618578c5"
+      1296,
+      548,
+      "f9ddc769192168b072a3f8af8b8bda5f51fbb64330eae0c52806287ff59a659a"
     ],
     [
-      "samples/physics/krustybike/KrustyBikeNearMisses.cpp",
+      "src/krusty2/vehicle/KrustyBike.cpp",
       "SendStateDelta@KrustyBike",
       4795088,
       2315,
@@ -173,7 +173,7 @@
       "f8f5b4ff7bca7538ad95a904d159897f2319e566ff66f01b6493f0da4e177618"
     ],
     [
-      "samples/physics/krustybike/KrustyBikeNearMisses.cpp",
+      "src/krusty2/vehicle/KrustyBike.cpp",
       "InterpolateNetworkState@KrustyBike",
       4798048,
       8545,
@@ -182,49 +182,13 @@
       "ddfe56420ed029a495a12f44d9ab6ee848e6189dc8a0b5ee24c3b49173d05b9e"
     ],
     [
-      "samples/physics/krustybike/KrustyBikeNearMisses.cpp",
+      "src/krusty2/vehicle/KrustyBike.cpp",
       "UpdateRiderPose@KrustyBike",
       4779680,
       2920,
       2952,
       608,
-      "6252d47aee2008cf3d358842d5ddc9d99d1baec2476b46b77fc64732189a75f9"
-    ],
-    [
-      "samples/physics/krustybike/KrustyBikeNearMisses.cpp",
-      "AwardTrickScore@KrustyBike",
-      4808688,
-      895,
-      895,
-      null,
-      "6be0383de8932ab230de17769217e64241d175dbefc80909b1f42bad7b93bd11"
-    ],
-    [
-      "samples/physics/krustybike/KrustyBikeNearMisses.cpp",
-      "IntegrateMotion@KrustyBike",
-      4810208,
-      431,
-      431,
-      null,
-      "eae1856b51569b4a709ce2a10616fe09d0ce45dd0c5fcc72ec636a37f480760f"
-    ],
-    [
-      "samples/physics/krustybike/KrustyBikeNearMisses.cpp",
-      "UseBikeCollision@KrustyBike",
-      4812064,
-      119,
-      119,
-      null,
-      "56faa8d02da19fc9bbdcdcd7ddddc636c307398821ddc7981fd0d857f35ed351"
-    ],
-    [
-      "samples/physics/krustybike/KrustyBikeNearMisses.cpp",
-      "UseBikeAndRiderCollision@KrustyBike",
-      4812192,
-      119,
-      119,
-      null,
-      "c5d030fc75b6a6ec0d53d90752e8e35f2dc92f1aa102ccf486005ba343827dc3"
+      "813c70ed152558f8136e5ff8ce8f3539aefadfd228a8f446223d4c267d0f7dfb"
     ]
   ]
 }

@@ -19,45 +19,44 @@ from tools.run_calibration import CASES
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCES = ('src/krusty2/vehicle/KrustyBike.cpp',
-           'samples/physics/krustybike/KrustyBikeNearMisses.cpp',
            'src/reconstructed/GhostMod.cpp', 'src/reconstructed/MorphBastardModifier.cpp',
            'src/reconstructed/D3DIMSoultreeModifier.cpp', 'src/reconstructed/D3DIMSoulTree.cpp')
-NATIVE = ((SOURCES[2], 'void GhostMod1::StartFade(', '?StartFade@GhostMod1@@', 0x47bbf0, 46),
-          (SOURCES[4], 'void D3DIMSoultreeModifier::AddObject(', '?AddObject@D3DIMSoultreeModifier@@', 0x4452f0, 104),
-          (SOURCES[4], 'void D3DIMSoultreeModifier::RemoveObject(', '?RemoveObject@D3DIMSoultreeModifier@@', 0x445360, 115),
-          (SOURCES[5], 'void D3DIMSoultreeObject::AddModifier(', '?AddModifier@D3DIMSoultreeObject@@', 0x444d80, 84),
-          (SOURCES[5], 'void D3DIMSoultreeObject::RemoveModifier(', '?RemoveModifier@D3DIMSoultreeObject@@', 0x444de0, 145),
-          (SOURCES[5], 'void D3DIMSoultreeObject::AddSecondModifier(', '?AddSecondModifier@D3DIMSoultreeObject@@', 0x444eb0, 84),
-          (SOURCES[5], 'void D3DIMSoultreeObject::RemoveSecondModifier(', '?RemoveSecondModifier@D3DIMSoultreeObject@@', 0x444f10, 145))
-PARTIAL = [['samples/physics/krustybike/KrustyBikeNearMisses.cpp',
+NATIVE = ((SOURCES[1], 'void GhostMod1::StartFade(', '?StartFade@GhostMod1@@', 0x47bbf0, 46),
+          (SOURCES[3], 'void D3DIMSoultreeModifier::AddObject(', '?AddObject@D3DIMSoultreeModifier@@', 0x4452f0, 104),
+          (SOURCES[3], 'void D3DIMSoultreeModifier::RemoveObject(', '?RemoveObject@D3DIMSoultreeModifier@@', 0x445360, 115),
+          (SOURCES[4], 'void D3DIMSoultreeObject::AddModifier(', '?AddModifier@D3DIMSoultreeObject@@', 0x444d80, 84),
+          (SOURCES[4], 'void D3DIMSoultreeObject::RemoveModifier(', '?RemoveModifier@D3DIMSoultreeObject@@', 0x444de0, 145),
+          (SOURCES[4], 'void D3DIMSoultreeObject::AddSecondModifier(', '?AddSecondModifier@D3DIMSoultreeObject@@', 0x444eb0, 84),
+          (SOURCES[4], 'void D3DIMSoultreeObject::RemoveSecondModifier(', '?RemoveSecondModifier@D3DIMSoultreeObject@@', 0x444f10, 145))
+PARTIAL = [['src/krusty2/vehicle/KrustyBike.cpp',
   'IsSpeedGainBelowLimit@KrustyBike',
   4790688,
   229,
   230,
   151,
   '3124025ed125d088a9cf9d706154f76eb28d5e8661543863782a91d540c2e19f'],
- ['samples/physics/krustybike/KrustyBikeNearMisses.cpp',
+ ['src/krusty2/vehicle/KrustyBike.cpp',
   'FindPlacement@KrustyBike',
   4791568,
   1296,
-  1288,
-  526,
-  '2260143a9d880dfabfff868e69178f34173f372aa53195cc6d885ed5f14bc576'],
- ['samples/physics/krustybike/KrustyBikeNearMisses.cpp',
+  1296,
+  548,
+  '177e575d9440c2edf215c83c48a6b94d43a5e3dbb3b1280061429e44149630a4'],
+ ['src/krusty2/vehicle/KrustyBike.cpp',
   'SendStateDelta@KrustyBike',
   4795088,
   2315,
   2312,
   192,
   '1941ddbc72fdfd7b01b5ad4ea65fcace024e8e828a4019450c91e9f4d1fb6a95'],
- ['samples/physics/krustybike/KrustyBikeNearMisses.cpp',
+ ['src/krusty2/vehicle/KrustyBike.cpp',
   'InterpolateNetworkState@KrustyBike',
   4798048,
   8545,
   8558,
   2305,
   'ffc638804e115abac59baeed51fe496e2c2167f5f006b1c337aaee4f7e249815'],
- ['samples/physics/krustybike/KrustyBikeNearMisses.cpp',
+ ['src/krusty2/vehicle/KrustyBike.cpp',
   'UpdateRiderPose@KrustyBike',
   4779680,
   2920,
@@ -137,8 +136,8 @@ class BikeModifierConnectionsTests(unittest.TestCase):
                         entry = obj.find_symbol(symbol)
                         self.assertEqual((entry.function_size, entry.extent_source), (size, 'coff_function_aux'))
                         self.assertTrue(compare(retail, obj, symbol, va, size, binding)['strict_exact'], symbol)
-            for source, symbol, va, size in ((SOURCES[2], '??0GhostMod1@@QAE@H@Z', 0x47bb20, 33),
-                    (SOURCES[3], '??0MorphBastardModifier@@QAE@H@Z', 0x4a3150, 48)):
+            for source, symbol, va, size in ((SOURCES[1], '??0GhostMod1@@QAE@H@Z', 0x47bb20, 33),
+                    (SOURCES[2], '??0MorphBastardModifier@@QAE@H@Z', 0x4a3150, 48)):
                 self.assertTrue(compare(retail, objects[source], symbol, va, size,
                                        (ROOT / source).with_suffix('.bindings.json'))['strict_exact'])
             imports = {s.name for s in objects[SOURCES[0]].symbols if s.section_number == 0}

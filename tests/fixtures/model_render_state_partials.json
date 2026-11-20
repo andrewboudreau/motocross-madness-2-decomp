@@ -128,7 +128,7 @@
       "9bcbfd9d8f540b6e0d5940830d4fc4450dd15d499a5018587c34c76ff10e393e"
     ],
     [
-      "samples/physics/krustybike/KrustyBikeNearMisses.cpp",
+      "src/krusty2/vehicle/KrustyBike.cpp",
       "IsSpeedGainBelowLimit@KrustyBike",
       4790688,
       229,
@@ -137,16 +137,16 @@
       "3124025ed125d088a9cf9d706154f76eb28d5e8661543863782a91d540c2e19f"
     ],
     [
-      "samples/physics/krustybike/KrustyBikeNearMisses.cpp",
+      "src/krusty2/vehicle/KrustyBike.cpp",
       "FindPlacement@KrustyBike",
       4791568,
       1296,
-      1288,
-      526,
-      "2260143a9d880dfabfff868e69178f34173f372aa53195cc6d885ed5f14bc576"
+      1296,
+      548,
+      "177e575d9440c2edf215c83c48a6b94d43a5e3dbb3b1280061429e44149630a4"
     ],
     [
-      "samples/physics/krustybike/KrustyBikeNearMisses.cpp",
+      "src/krusty2/vehicle/KrustyBike.cpp",
       "SendStateDelta@KrustyBike",
       4795088,
       2315,
@@ -155,7 +155,7 @@
       "1941ddbc72fdfd7b01b5ad4ea65fcace024e8e828a4019450c91e9f4d1fb6a95"
     ],
     [
-      "samples/physics/krustybike/KrustyBikeNearMisses.cpp",
+      "src/krusty2/vehicle/KrustyBike.cpp",
       "InterpolateNetworkState@KrustyBike",
       4798048,
       8545,
@@ -164,7 +164,7 @@
       "ffc638804e115abac59baeed51fe496e2c2167f5f006b1c337aaee4f7e249815"
     ],
     [
-      "samples/physics/krustybike/KrustyBikeNearMisses.cpp",
+      "src/krusty2/vehicle/KrustyBike.cpp",
       "UpdateRiderPose@KrustyBike",
       4779680,
       2920,

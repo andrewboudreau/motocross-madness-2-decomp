@@ -17,7 +17,6 @@ from tools.match import compare
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCES = ('src/krusty2/vehicle/Bike.cpp', 'src/krusty2/vehicle/KrustyBike.cpp',
-           'samples/physics/krustybike/KrustyBikeNearMisses.cpp',
            'src/krusty2/soultree/soultree.cpp', 'samples/physics/helpers/SoultreeMatrix.cpp')
 FIND = '?FindByName@SoultreeObject@@QAEPAV1@PBD@Z'
 BOUNDS = '?GetSubtreeBounds@SoultreeObject@@QAEXPAUVec3@@0@Z'
@@ -33,11 +32,11 @@ PARTIAL = [
     ('src/krusty2/vehicle/Bike.cpp', 'IntegrateSteerTorque@Bike', 4236576, 2272, 2272, 2084, '3cf3ebbf965fecf2b9f005b5b4d620860be4b78c96f426345cc8b16ef5bb5036'),
     ('src/krusty2/vehicle/Bike.cpp', 'LoadBike@Bike', 4225472, 6745, 6745, 6428, '9bcbfd9d8f540b6e0d5940830d4fc4450dd15d499a5018587c34c76ff10e393e'),
     ('samples/physics/helpers/SoultreeMatrix.cpp', 'SetMatrixIn', 5224640, 1096, 1134, 262, '21bd27d95aad6a35851bd016a070df65b6d2ad9cbd4acf8205d6fba7d06e08b3'),
-    ('samples/physics/krustybike/KrustyBikeNearMisses.cpp', 'IsSpeedGainBelowLimit@KrustyBike', 4790688, 229, 230, 151, '3124025ed125d088a9cf9d706154f76eb28d5e8661543863782a91d540c2e19f'),
-    ('samples/physics/krustybike/KrustyBikeNearMisses.cpp', 'FindPlacement@KrustyBike', 4791568, 1296, 1288, 526, '2260143a9d880dfabfff868e69178f34173f372aa53195cc6d885ed5f14bc576'),
-    ('samples/physics/krustybike/KrustyBikeNearMisses.cpp', 'SendStateDelta@KrustyBike', 4795088, 2315, 2312, 192, '1941ddbc72fdfd7b01b5ad4ea65fcace024e8e828a4019450c91e9f4d1fb6a95'),
-    ('samples/physics/krustybike/KrustyBikeNearMisses.cpp', 'InterpolateNetworkState@KrustyBike', 4798048, 8545, 8558, 2305, 'ffc638804e115abac59baeed51fe496e2c2167f5f006b1c337aaee4f7e249815'),
-    ('samples/physics/krustybike/KrustyBikeNearMisses.cpp', 'UpdateRiderPose@KrustyBike', 4779680, 2920, 2952, 608, '1bbe35c0f4249dd69e1255c94f129b84d7d0f79ae2e94173ce021cf0a3a4b87c'),
+    ('src/krusty2/vehicle/KrustyBike.cpp', 'IsSpeedGainBelowLimit@KrustyBike', 4790688, 229, 230, 151, '3124025ed125d088a9cf9d706154f76eb28d5e8661543863782a91d540c2e19f'),
+    ('src/krusty2/vehicle/KrustyBike.cpp', 'FindPlacement@KrustyBike', 4791568, 1296, 1296, 548, '177e575d9440c2edf215c83c48a6b94d43a5e3dbb3b1280061429e44149630a4'),
+    ('src/krusty2/vehicle/KrustyBike.cpp', 'SendStateDelta@KrustyBike', 4795088, 2315, 2312, 192, '1941ddbc72fdfd7b01b5ad4ea65fcace024e8e828a4019450c91e9f4d1fb6a95'),
+    ('src/krusty2/vehicle/KrustyBike.cpp', 'InterpolateNetworkState@KrustyBike', 4798048, 8545, 8558, 2305, 'ffc638804e115abac59baeed51fe496e2c2167f5f006b1c337aaee4f7e249815'),
+    ('src/krusty2/vehicle/KrustyBike.cpp', 'UpdateRiderPose@KrustyBike', 4779680, 2920, 2952, 608, '1bbe35c0f4249dd69e1255c94f129b84d7d0f79ae2e94173ce021cf0a3a4b87c'),
 ]
 
 
@@ -76,13 +75,13 @@ class BikeNodeConnectionsTests(unittest.TestCase):
                     text=True, encoding='latin-1', env={**os.environ, 'PYTHONPATH': str(ROOT)})
                 self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
                 objects[source] = CoffObject(path)
-            provider = objects[SOURCES[3]]
+            provider = objects[SOURCES[2]]
             for symbol, va, extent in ((FIND, 0x4fdae0, 84), (BOUNDS, 0x4fe850, 74)):
                 entry = provider.find_symbol(symbol)
                 self.assertEqual((entry.function_size, entry.extent_source), (extent, 'coff_function_aux'))
                 self.assertTrue(compare(retail, provider, symbol, va, extent,
                                        ROOT / 'src/krusty2/soultree/soultree.bindings.json')['strict_exact'])
-            matrix = objects[SOURCES[4]]
+            matrix = objects[SOURCES[3]]
             self.assertGreater(matrix.find_symbol(MATRIX).section_number, 0)
             self.assertEqual(matrix.find_symbol(MATRIX).function_size, 1134)
             # Matrix body remains reviewed nonexact; test_soultree_transform_behavior
@@ -94,7 +93,7 @@ class BikeNodeConnectionsTests(unittest.TestCase):
                        '?GetSubtreeBounds@BikeA1A0@@QAEXPAUVec3@@0@Z',
                        '?SetMatrixIn@BikeA1A0@@QAEXHPAUMatrix4@@@Z'}
             for source, required in ((SOURCES[0], {FIND, BOUNDS, MATRIX}),
-                                     (SOURCES[1], {MATRIX}), (SOURCES[2], {MATRIX})):
+                                     (SOURCES[1], {MATRIX})):
                 obj = objects[source]
                 imports = {s.name for s in obj.symbols if s.storage_class == 2 and s.section_number == 0}
                 self.assertTrue(required <= imports, (source, required - imports))

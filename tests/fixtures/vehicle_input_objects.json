@@ -11,9 +11,9 @@
       "sha256": "df5b5fbe400bb84004926eeb6a18094b9c050ddeeefbd1098e8ee6dc7ce664ab"
     },
     "src/krusty2/vehicle/KrustyBike.cpp": {
-      "sections": 248,
-      "relocations": 1082,
-      "sha256": "adcc0eefe91ea87119b17f9be8f0f5eb23caeea99ec82442d7859e1a5a8b44e1"
+      "sections": 271,
+      "relocations": 1443,
+      "sha256": "c6376eadf10e7485235cb75dfca0ab5cf59c3549d69800a8c493490b88f491fd"
     },
     "src/reconstructed/VehicleDefaults.cpp": {
       "sections": 13,
@@ -39,11 +39,6 @@
       "sections": 98,
       "relocations": 817,
       "sha256": "8e45914023c0e85bf4a943539bfb2d4b46ec911694f2937e6f368edcf0948999"
-    },
-    "samples/physics/krustybike/KrustyBikeNearMisses.cpp": {
-      "sections": 271,
-      "relocations": 1443,
-      "sha256": "eba27d0e79b49acf2d1051400f387f0d65425d9c7de05ce9a7addab412434a18"
     },
     "src/reconstructed/InputDevice.cpp": {
       "sections": 11,
@@ -1822,7 +1817,7 @@
       "matching": 782
     },
     {
-      "source": "samples/physics/krustybike/KrustyBikeNearMisses.cpp",
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
       "symbol": "IsSpeedGainBelowLimit@KrustyBike",
       "va": "0x4919a0",
       "extent": 229,
@@ -1830,7 +1825,7 @@
       "matching": 151
     },
     {
-      "source": "samples/physics/krustybike/KrustyBikeNearMisses.cpp",
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
       "symbol": "FindPlacement@KrustyBike",
       "va": "0x491d10",
       "extent": 1296,
@@ -1838,7 +1833,7 @@
       "matching": 526
     },
     {
-      "source": "samples/physics/krustybike/KrustyBikeNearMisses.cpp",
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
       "symbol": "SendStateDelta@KrustyBike",
       "va": "0x492ad0",
       "extent": 2315,
@@ -1846,7 +1841,7 @@
       "matching": 192
     },
     {
-      "source": "samples/physics/krustybike/KrustyBikeNearMisses.cpp",
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
       "symbol": "InterpolateNetworkState@KrustyBike",
       "va": "0x493660",
       "extent": 8545,
@@ -1854,7 +1849,7 @@
       "matching": 2305
     },
     {
-      "source": "samples/physics/krustybike/KrustyBikeNearMisses.cpp",
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
       "symbol": "UpdateRiderPose@KrustyBike",
       "va": "0x48eea0",
       "extent": 2920,
@@ -2105,7 +2100,6 @@
     "src/reconstructed/VehicleReset.cpp",
     "src/reconstructed/VehicleWheelAttachment.cpp",
     "src/krusty2/vehicle/BikeAI.cpp",
-    "samples/physics/krustybike/KrustyBikeNearMisses.cpp",
     "src/reconstructed/InputDevice.cpp"
   ]
 }

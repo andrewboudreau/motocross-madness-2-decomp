@@ -41,9 +41,10 @@ conversion to seconds. The file's ExtrapLimit is **0.5f**, whereas the loader's
 replaces those existing runtime configuration reads. Slot 94 at `0x4963f0`
 (236 bytes) sets the pad-active latch to one and clears it to zero.
 
-The unrelated `g_kbZeroVec` needs a separate connection to already emitted
-vector storage. StallThreshold and StallHoldSec are declared nearby but are not
-missing imports of the current source build. None is added here.
+The former `g_kbZeroVec` (0x0067c348) is KrustyBike.cpp's own `kVec3Zero`.
+`g_kbStallThreshold` 0x0056cb64 (1.0) and `g_kbStallHoldSec` 0x0056cb68 (3.0)
+are now defined in `src/reconstructed/KrustyBikeState.cpp` after the network
+controls, in `.data` order; that is a data grouping, not an ownership claim.
 
 ## Verification
 

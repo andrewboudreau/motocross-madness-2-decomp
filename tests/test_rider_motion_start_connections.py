@@ -21,8 +21,7 @@ SOURCES={
  # Emitter joins preserve every prior byte/target under the verified constructor and Spark setter names.
  'src/krusty2/vehicle/Bike.cpp':(243,1105,3,'41aad99ca17aeb310495b6cd69e4e601fdd32a0e3cb7c0aef1a52655ed7caa3a'),
  # Verified collision/debug-overlay connections change only three external names.
- 'src/krusty2/vehicle/KrustyBike.cpp':(248,1082,2,'2b91a9109ece87000e556103fa5d5bf702608e2cf3f2097d1043f1ae47d1ed85'),
- 'samples/physics/krustybike/KrustyBikeNearMisses.cpp':(271,1443,8,'7f57b0a0c68971166185bc1eecb28d7d438e854cf32c6bddc44d71ea6d3c7bc6'),
+ 'src/krusty2/vehicle/KrustyBike.cpp':(271,1443,8,'2ead6ac40d5a5d14982ed578257f5468bf2caba4ef75b92ce022015d8473abd8'),
 }
 
 def view(obj, normalize_paths=()):
@@ -130,7 +129,7 @@ class RiderMotionStartConnectionsTests(unittest.TestCase):
                 if source!='src/krusty2/vehicle/Bike.cpp':
                     self.assertTrue(compare(retail,obj,'LookBackAtNearestRival',0x48e280,339,
                         ROOT/Path(source).with_suffix('.bindings.json'))['strict_exact'])
-            print('Two strict339-byte callers; three complete objects,756 sections3586 relocations; primary rider imports preserved')
+            print('One strict 339-byte caller; two complete objects, 514 sections, 2548 relocations; primary rider imports preserved')
 
 
 if __name__=='__main__':

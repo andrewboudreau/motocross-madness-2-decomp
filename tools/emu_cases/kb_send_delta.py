@@ -1,6 +1,6 @@
 """KrustyBike::SendStateDelta 0x00492ad0, the message 13 delta sender (tools/emu_diff.py case).
 
-The linked body is the Group 3 bring-up copy. The bike is filled with small random floats
+The linked body is in src/krusty2/vehicle/KrustyBike.cpp. The bike is filled with small random floats
 (so every byte-coded delta, pose byte and flag bit takes random values and the deltas fall on
 both sides of the +-30 / +-2 pi limits), then the pointers and the tested values are set:
 network and recorder present or not, record or network mode, the short / full interval
@@ -14,7 +14,7 @@ import struct
 
 RETAIL_VA = 0x00492ad0
 SYMBOL = '?SendStateDelta@KrustyBike@@QAEXMH@Z'
-SOURCE = 'src/bringup/Group3_KrustyBike.cpp'
+SOURCE = 'src/krusty2/vehicle/KrustyBike.cpp'
 TRACK_GAME = 0x0056e26c
 PROBES = {0x00492b03: 'record', 0x00492b74: 'short interval due', 0x00492c54: 'velocity fits',
           0x00493061: 'clock read', 0x00493081: 'fine count', 0x00493085: 'coarse count',

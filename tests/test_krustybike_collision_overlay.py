@@ -34,7 +34,6 @@ def signature(obj, query):
 
 ROOT = Path(__file__).resolve().parents[1]
 BIKE = 'src/krusty2/vehicle/KrustyBike.cpp'
-SAMPLE = 'samples/physics/krustybike/KrustyBikeNearMisses.cpp'
 COLLISION = 'src/krusty2/collision/CollisionObject.cpp'
 QUERY = 'src/krusty2/bvh/BoundingBoxTreeQuery.cpp'
 OVERLAY = 'src/reconstructed/DebugOverlay.cpp'
@@ -113,7 +112,7 @@ class KrustyBikeCollisionOverlayTests(unittest.TestCase):
                 self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
                 return path, CoffObject(path)
             objects = {}
-            for index, source in enumerate([BIKE, SAMPLE, COLLISION, OVERLAY, QUERY, 'src/reconstructed/Game.cpp']):
+            for index, source in enumerate([BIKE, COLLISION, OVERLAY, QUERY, 'src/reconstructed/Game.cpp']):
                 _, obj = compile_source(ROOT/source, 'full%d' % index)
                 objects[source] = obj
                 if source in pins['objects']:

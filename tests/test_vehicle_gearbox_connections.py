@@ -18,7 +18,7 @@ from tools.run_calibration import CASES
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCES = ('src/krusty2/vehicle/Vehicle.cpp', 'src/krusty2/vehicle/KrustyBike.cpp',
-           'src/krusty2/vehicle/Bike.cpp', 'samples/physics/krustybike/KrustyBikeNearMisses.cpp',
+           'src/krusty2/vehicle/Bike.cpp',
            'src/krusty2/vehicle/BikeAI.cpp', 'src/reconstructed/GearRatios.cpp')
 PROVIDERS = (('??0EngineGearbox@@', 0x4d2940, 1542, 36),
              ('?UpdateThrottle@EngineGearbox@@', 0x4d2f50, 215, 12),
@@ -38,8 +38,6 @@ def cases():
                 if source in SOURCES:
                     rows.append((source, target['candidate_symbol_contains'], int(target['target_va'], 0),
                                  target['target_size'], (manifest.parent / target['bindings']).relative_to(ROOT).as_posix()))
-    rows += [(SOURCES[3], symbol, va, size, SOURCES[3].replace('.cpp', '.bindings.json'))
-             for source, symbol, va, size, _ in list(rows) if source == SOURCES[1]]
     return list(dict.fromkeys(rows))
 
 
@@ -198,9 +196,9 @@ class VehicleGearboxConnectionsTests(unittest.TestCase):
                 objects[source], paths[source] = CoffObject(obj), obj
             addresses = {}
             for symbol, va, size, popped in PROVIDERS:
-                entry = objects[SOURCES[5]].find_symbol(symbol)
+                entry = objects[SOURCES[4]].find_symbol(symbol)
                 self.assertEqual((entry.function_size, entry.extent_source), (size, 'coff_function_aux'))
-                self.assertTrue(compare(retail, objects[SOURCES[5]], symbol, va, size,
+                self.assertTrue(compare(retail, objects[SOURCES[4]], symbol, va, size,
                     ROOT / 'src/reconstructed/GearRatios.bindings.json')['strict_exact'])
                 instructions = list(decoder.disasm(retail.bytes_at_va(va, size), va))
                 self.assertEqual(sum(i.size for i in instructions), size)
@@ -247,7 +245,7 @@ class VehicleGearboxConnectionsTests(unittest.TestCase):
             executable = output / 'boundaries.exe'
             result = subprocess.run([str(find_child_ci(find_vc6_bin(compiler), 'link.exe')), '/nologo',
                 '/subsystem:console', f'/out:{executable}', f'/libpath:{find_child_ci(infer_vc98_root(compiler), "lib")}',
-                str(paths[SOURCES[5]]), str(paths[fixture]), 'kernel32.lib'], cwd=ROOT,
+                str(paths[SOURCES[4]]), str(paths[fixture]), 'kernel32.lib'], cwd=ROOT,
                 capture_output=True, text=True, encoding='latin1')
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             result = subprocess.run([str(executable)], capture_output=True, text=True, timeout=30)

@@ -1,5 +1,5 @@
 {
-  "note": "Whole before/after objects preserve all bytes and relocation destinations under three names except unadmitted CreateRacers offsets538..545: independent XOR EDI/MOV EBX instructions exchange. All full extents retained; see BIKE_RACE_STATE_CONNECTIONS.md.",
+  "note": "Whole before/after objects preserve all bytes and relocation destinations under three names except unadmitted CreateRacers offsets538..545: independent XOR EDI/MOV EBX instructions exchange. All full extents retained; see BIKE_RACE_STATE_CONNECTIONS.md. The five KrustyBike.cpp near misses (shared with vehicle_gearbox_partials.json) keep their full extents too.",
   "partials": [
     [
       "samples/race/BikeRaceNearMisses.cpp",
@@ -45,6 +45,51 @@
       13428,
       13400,
       "4e63b7555c884f4141c2974028e21a80685e95d8c90c798789d691603915e038"
+    ],
+    [
+      "src/krusty2/vehicle/KrustyBike.cpp",
+      "IsSpeedGainBelowLimit@KrustyBike",
+      4790688,
+      229,
+      230,
+      151,
+      "0553b93850ac519689c1f09521b8b45bbb4e51f35e74d0f15a9785627628bc77"
+    ],
+    [
+      "src/krusty2/vehicle/KrustyBike.cpp",
+      "FindPlacement@KrustyBike",
+      4791568,
+      1296,
+      1296,
+      548,
+      "f9ddc769192168b072a3f8af8b8bda5f51fbb64330eae0c52806287ff59a659a"
+    ],
+    [
+      "src/krusty2/vehicle/KrustyBike.cpp",
+      "SendStateDelta@KrustyBike",
+      4795088,
+      2315,
+      2312,
+      192,
+      "f8f5b4ff7bca7538ad95a904d159897f2319e566ff66f01b6493f0da4e177618"
+    ],
+    [
+      "src/krusty2/vehicle/KrustyBike.cpp",
+      "InterpolateNetworkState@KrustyBike",
+      4798048,
+      8545,
+      8558,
+      2305,
+      "ddfe56420ed029a495a12f44d9ab6ee848e6189dc8a0b5ee24c3b49173d05b9e"
+    ],
+    [
+      "src/krusty2/vehicle/KrustyBike.cpp",
+      "UpdateRiderPose@KrustyBike",
+      4779680,
+      2920,
+      2952,
+      608,
+      "813c70ed152558f8136e5ff8ce8f3539aefadfd228a8f446223d4c267d0f7dfb"
     ]
   ]
 }

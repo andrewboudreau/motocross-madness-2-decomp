@@ -800,7 +800,6 @@ clearly more faithful, the game now links the sample's text:
 - Some samples also carry functions that other units of the build provide,
   so they cannot be linked whole:
   - `BikeRaceNearMisses`
-  - `KrustyBikeNearMisses`
 
   Their bring-up copies now use the sample's text for the functions listed
   below.
@@ -810,8 +809,8 @@ clearly more faithful, the game now links the sample's text:
   (tier 3); the file is named for the function.
 - `Character::ApplyFourMotionBlendAtPhase`, the four-pose blend that `UpdateRiderPose`
   calls on the rider and the bike, is a candidate sample
-  ([below](#four-pose-motion-blend)); the bring-up reimplementation in
-  `Group3_KrustyBike.cpp` was removed.
+  ([below](#four-pose-motion-blend)); the bring-up reimplementation was
+  removed.
 - The sample bodies call retail's callees under view names. `link_aliases`
   binds each view name to the provider at the same retail address. Each pair
   was checked for the following:
@@ -868,8 +867,8 @@ The sample column is the standalone object's score.
 | 0x00459ce0 | `EcoSystem::GenerateObjects` | 0.899 | 0.918 | 0.918 | bring-up copy (EcoSystem.cpp since) |
 | 0x00456890 | `Vegetation::TestDistance` | 0.953 | 0.991 | 0.991 | bring-up copy (EcoSystem.cpp since) |
 | 0x00497e20 | `KrustyBikeCamera::Tick` | 0.938 | 0.979 | 0.979 | bring-up copy (KrustyBikeCamera.cpp since) |
-| 0x0048eea0 | `KrustyBike::UpdateRiderPose` | 0.958 | 0.971 | 0.971 | bring-up copy |
-| 0x00493660 | `KrustyBike::InterpolateNetworkState` | 0.987 | 0.989 | 0.989 | bring-up copy |
+| 0x0048eea0 | `KrustyBike::UpdateRiderPose` | 0.958 | 0.971 | 0.971 | bring-up copy (KrustyBike.cpp since) |
+| 0x00493660 | `KrustyBike::InterpolateNetworkState` | 0.987 | 0.989 | 0.989 | bring-up copy (KrustyBike.cpp since) |
 | 0x004da7b0 | `ProjectedShadow::Init` | 0.892 | 0.992 | 0.992 | bring-up copy (sample file since) |
 | 0x004db0d0 | `ProjectedShadow::ComputeBounds` | 0.924 | 0.985 | 0.985 | bring-up copy (sample file since) |
 
@@ -892,8 +891,7 @@ Not switched, and why:
 - `KrustyBikeCamera::Tick` now sits in `src/reconstructed/KrustyBikeCamera.cpp`
   and passes the unit's own y axis (0x0067c3e8) to slot 46; the bring-up copy
   and the sample are gone.
-- `KrustyBike::FindPlacement` (0x00491d10) and the Recorder worker
-  (0x004e6f80): the samples score below the linked bodies.
+- The Recorder worker (0x004e6f80): the sample scores below the linked body.
 - `FollowCamera`'s constructor (0x00462ee0, 0.932 against 0.955): the
   linked body is a reviewed candidate that corrects observable behaviour,
   and it is kept. `ProbePartialTextureUploads` (0x004cab00) was listed here
@@ -1175,9 +1173,10 @@ were moved out, not converted:
   `__ftol` at 0x0049e7b1 and the other worker sites) now live in
   `Group4_GridLightColor.cpp`, which is compiled without the flag. They were
   already called out of line before the split.
-- `Character::ApplyFourMotionBlendAtPhase` left `Group3_KrustyBike.cpp` (it is now the
+- `Character::ApplyFourMotionBlendAtPhase` left the KrustyBike bring-up (it is now the
   candidate sample described under [Four-pose motion blend](#four-pose-motion-blend)).
-  `Group3_KrustyBike.cpp` keeps the 15 and 3 `__ftol` truncations of 0x00492ad0 and 0x00493660, which retail also makes.
+  The 15 and 3 `__ftol` truncations of 0x00492ad0 and 0x00493660, which retail also
+  makes, are now in `src/krusty2/vehicle/KrustyBike.cpp`, compiled without the flag.
 
 `/QIfist` stores 64 bits, so a site is safe when its value stays inside `int`
 or when only its low bits are kept. `FistpFloatToIntChecked` casts to
@@ -1299,7 +1298,7 @@ run as retail code; only calls with side effects outside the function
 | 0x00517340 | `Track::PlaceNear` (Track.cpp, via `KbRaceSub::PlaceNear`) | 600 | 44 of 600 | path loop's second `DistanceAlong` took (candidate, start); retail passes (start, from) | 0.842 (0.868 before) |
 | 0x00491d10 | `KrustyBike::FindPlacement` | 600 | 112 of 600 | stored-vector path returned the pointer; retail leaves the bits of `outPosition->z` in eax | 0.947 |
 | 0x00414370 | `KrustyBike::UpdateAIRacingLine` (AI racing line) | 1000 | 114 of 1000 | outside free roam retail reads the trick delay from the difficulty's frame slot (an uninitialised local that VC6 gives that slot). Later source shapes, 0 of 1000 at both control words after each: `for (t = T0, i = 0; t <= T1; t += 0.1f)` point loops with a leading count break, the finished bike's off-track exit as an else that frees the list and returns, and the kinds 1/5 count stores through an `&aiPath` pointer (aligned 1092 -> 1188 of 1302) | 0.899 -> 0.951 (strict 0.805 -> 0.921) |
-| 0x0048eea0 | `KrustyBike::UpdateRiderPose` | 1500 | 28 of 1500 | retail indexes the 16-entry `s_kbTrickFrame` (0x0056d060) with chained tricks (16..31) too and reads the next 16 words of `.data`; the bring-up copy now has 32 entries holding those words ([below](#chained-trick-frame-overread)) | 0.955 |
+| 0x0048eea0 | `KrustyBike::UpdateRiderPose` | 1500 | 28 of 1500 | retail indexes the 16-entry `s_kbTrickFrame` (0x0056d060) with chained tricks (16..31) too and reads the next 16 words of `.data`; KrustyBike.cpp's table now has 32 entries holding those words ([below](#chained-trick-frame-overread)) | 0.955 |
 | 0x005097d0 | `TerrainShadow` slot 28 | 600 | 0 | latent: the orthographic scale read an unset `fov` that VC6 happened to place in `extent`'s slot; it now reads `extent` (retail `fmul [esp+0x4c]` at 0x00509949) | 0.986 |
 | 0x00426be0 | `BoxTriangleQuery` (sample) | 4500 | 2 of 2250 at 53-bit (0 at 24-bit) | retail keeps `p2 = p0 - Dot(e1)` on the x87 stack (`fsubr ; fst`) and compares p1 against it unrounded; the named `float p2` was stored and rounded to binary32. `QueryMinBFirst`/`QueryMaxBFirst` on `(p0 - d2, p0 - d1)` evaluate and compare in retail's order | 1.000 (0.979 before) |
 
@@ -1486,9 +1485,10 @@ Perturbation controls all differ:
 
 The candidate-sample twins follow the linked fixes where the score allows:
 `src/krusty2/vehicle/BikeAI.cpp` (formerly the BikeAI sample) takes the trick-delay union
-(588 -> 589 bytes); `samples/physics/krustybike/KrustyBikeNearMisses.cpp` keeps
-`FindPlacement`'s fall-off-the-end copy path, because the explicit
-`return *(int*)&outPosition->z` reloads z there (451 -> 435).
+(588 -> 589 bytes), and `src/krusty2/vehicle/KrustyBike.cpp` (formerly the
+KrustyBike sample and bring-up) takes `FindPlacement`'s explicit
+`return *(int*)&outPosition->z` (548 of 1296 strict; the sample's
+fall-off-the-end copy path scored 526 and leaves other bits in eax).
 
 #### Chained-trick frame overread
 
@@ -1520,10 +1520,9 @@ The window `frame > t && frame < t + 3` therefore opens for chained tricks 0
 before it is the trick pick's (clip lengths 0x0056cc60 and 12 rows of 0x50
 bytes 0x0056cca0..0x0056d060), not a second frame group, and the word after it
 is a variable that `Tick` writes, so the original is most plausibly a 16-entry
-table read out of bounds (inference). The linked build's bring-up copy
-`s_g3TrickFrame` has 32 entries, the last 16 being those retail words; its
-128 bytes equal retail's 0x0056d060..0x0056d0e0 in the linked `.rdata`
-(0x00558cd8 in the current build). Only the debug overlay's TimeTo60
+table read out of bounds (inference). KrustyBike.cpp's `s_kbTrickFrame` has
+32 entries, the last 16 being those retail words; its 128 bytes equal retail's
+0x0056d060..0x0056d0e0 and occur once in the linked image. Only the debug overlay's TimeTo60
 stopwatch clears `s_kbTimeTo60Armed`, which would move chained trick 0's
 window to frames 1-2 in retail; the copy keeps the initial 1.
 `tools/emu_cases/kb_update_rider_pose.py` now draws indices 0..31 and forces
@@ -2147,7 +2146,7 @@ shape there (`expect: partial`).
 blend that `KrustyBike::UpdateRiderPose` (0x0048eea0) calls on the rider and
 on the bike. It is now `samples/physics/motion/CharacterMotionFourPose.cpp`, a
 `reviewed-nonexact` candidate compiled with `/QIfist /Op`. The
-reimplementation in `src/bringup/Group3_KrustyBike.cpp` was removed.
+bring-up reimplementation was removed.
 
 What it does (decoded from the retail instructions):
 

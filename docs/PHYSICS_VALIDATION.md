@@ -639,11 +639,14 @@ Strict exact with the units' existing sources (registration pending):
 
 ## KrustyBike and Tire with bindings
 
-KrustyBike.cpp is promoted: its 75 exact targets are in
-`src/krusty2/vehicle/KrustyBike.cpp` (bindings `KrustyBike.bindings.json`, entries
-in `src/krusty2/vehicle/targets.json`), its 7 partial targets in
-`samples/physics/krustybike/KrustyBikeNearMisses.cpp`, which includes the canonical
-file. `src/krusty2/tire/Tire.bindings.json` resolves every relocation of the
+KrustyBike.cpp is promoted: its 77 exact targets and its 5 near misses are in
+`src/krusty2/vehicle/KrustyBike.cpp` in retail order, each near miss with a
+`// Not exact (...)` note (bindings `KrustyBike.bindings.json`, entries in
+`src/krusty2/vehicle/targets.json`). PickTrick `0x0048d780` and slot 89
+`0x0048e3e0` are compiled with /QIfist from
+`samples/physics/bikeai/KrustyBikeTrickPick.cpp` and
+`samples/physics/krustybike/KrustyBikeSelectRiderPose.cpp`; the unit marks their
+places. `src/krusty2/tire/Tire.bindings.json` resolves every relocation of the
 Tire unit's exact targets (promoted from `samples/physics/tire/`):
 
 - KrustyBike.cpp: the 56 exact targets of the first slice, plus the `.CRT$XCU` 155-158
@@ -667,8 +670,8 @@ Tire unit's exact targets (promoted from `samples/physics/tire/`):
   ret 8) is exact: VC6 hoists two stores into the load delay of the +0x1540
   vector copy and picks them at a fixed distance from the end of the block,
   counted in statements, so retail's pair (+0x11b8/+0x604) is written at that
-  position (after nextLapGate) rather than next to the copy. `0x0048d780` uses
-  an inline-asm rounding helper and stays excluded.
+  position (after nextLapGate) rather than next to the copy. `0x0048d780` rounds
+  with the inline `fistp` helper and is compiled from its /QIfist sample.
   Exact as well: GameObject slot 10 `0x004977a0`
   (the per-frame update reached through the virtual base: update path by
   network state and mode, the mode 4 player re-target, the end of start-up
@@ -685,8 +688,8 @@ Tire unit's exact targets (promoted from `samples/physics/tire/`):
   x87 order, `coarse:1, count:7` its time byte) match, but VC6 packs `diff`
   over the int temporary (frame 0x30, retail 0x34) and keeps the full
   message 1 call after the record-interval test in place instead of
-  cross-jumping it to the last call site. Not reconstructed: `0x0048e3e0`
-  (inline-asm `fistp` rounding). Slot 102 `0x0048eea0` (2920 bytes, the head-turn
+  cross-jumping it to the last call site. `0x0048e3e0` rounds with `fistp`
+  and is compiled from its /QIfist sample. Slot 102 `0x0048eea0` (2920 bytes, the head-turn
   update) is a partial: calls, frame and constants match; branch cross-jumping,
   the trick-chain switch tails and one spilled clamp differ. The loader `0x0048fc80` (5.4 KB, 31 argument
   dwords) is exact and the network update `0x00493660` (8.5 KB) is a partial.
@@ -709,10 +712,9 @@ Check:
 ```bash
 python tools/run_physics_samples.py --strict \
   --source src/krusty2/vehicle/KrustyBike.cpp \
-  --source samples/physics/krustybike/KrustyBikeNearMisses.cpp \
   --source src/krusty2/tire/Tire.cpp \
   --vc6-root "$VC6_ROOT" --exe "$MCM2_EXE"
 ```
 
-The KrustyBike sources give 75 of 82 strict exact (the 7 partials are the near
-misses listed above and in docs/NEAR_MISS_INDEX.md).
+KrustyBike.cpp gives 77 of 82 strict exact (the 5 partials are the near misses
+listed above and in docs/NEAR_MISS_INDEX.md).

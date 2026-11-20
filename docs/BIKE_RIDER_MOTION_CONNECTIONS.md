@@ -72,9 +72,9 @@ section/offset. Initializer, CRT-registration and storage bytes are unchanged.
 The isolated link after the separately reviewed UI-default additions changes
 **348 to 347 unresolved names**, compiling 223 translation units.
 
-The unadmitted sample slot 11 still reads its old provisional `g_kbZeroVec`
-name. Its binding is deliberately retained, preserving that complete partial
-candidate and comparison score. The production object no longer imports it.
+Slot 11 (FindPlacement), formerly a sample that read the provisional
+`g_kbZeroVec`, now sits in KrustyBike.cpp and reads `kVec3Zero` too; the old
+binding was retired with the sample.
 No whole-class or translation-unit ownership claim follows from this local
 data connection.
 

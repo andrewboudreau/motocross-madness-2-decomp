@@ -1,6 +1,6 @@
 """KrustyBike::UpdateRiderPose 0x0048eea0, slot 102 (tools/emu_diff.py case).
 
-The linked body is the Group 3 bring-up copy. Five starting states: crashed (the steer pose),
+The linked body is in src/krusty2/vehicle/KrustyBike.cpp. Five starting states: crashed (the steer pose),
 a trick clip (start, the held / AI hold-window arms, remote and local release, the chain
 switch for every trick % 8 and input), the head turn towards the nearest rival (turning back,
 turning towards it on both sides with the re-aim near the target, holding), the finish pose,
@@ -13,15 +13,16 @@ it is handed), and the virtual slots: this 84 (QueryControlInput), 88 (ClassifyI
 Trick indices cover chained tricks (16..31) too. Retail indexes s_kbTrickFrame (0x0056d060,
 16 entries) without a bound in the hold-window arm, so a chained trick reads the 16 words after
 the table in the retail image (s_kbTimeTo60Armed, the KrustyBike TypeDescriptor and two string
-literals); the bring-up's 32-entry copy repeats those words, and the candidate reads its own
-copy (a file-local static, not bound to retail).
+literals); the unit's 32-entry copy repeats those words.  The tables are bound to retail for
+byte matching, so PREFER_OBJECT keeps the candidate on its own copies, as the game runs them.
 """
 import math
 import struct
 
 RETAIL_VA = 0x0048eea0
 SYMBOL = '?UpdateRiderPose@KrustyBike@@UAEXM@Z'
-SOURCE = 'src/bringup/Group3_KrustyBike.cpp'
+SOURCE = 'src/krusty2/vehicle/KrustyBike.cpp'
+PREFER_OBJECT = {'_s_kbTrickFrame', '_s_kbTrickLength'}
 TRACK_GAME = 0x0056e26c
 PROBES = {0x0048f968: 'crash steer pose', 0x0048eee9: 'trick start', 0x0048efda: 'trick remote',
           0x0048f061: 'trick chain switch', 0x0048f186: 'AI hold window', 0x0048f1bd: 'player hold window',

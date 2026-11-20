@@ -18,7 +18,7 @@ from test_character_motion_connections import PROVIDERS as OLD_PROVIDERS, functi
 from test_vehicle_gearbox_connections import cases as gearbox_cases, fingerprint
 
 ROOT = Path(__file__).resolve().parents[1]
-CALLERS = ('src/krusty2/vehicle/KrustyBike.cpp', 'samples/physics/krustybike/KrustyBikeNearMisses.cpp')
+CALLERS = ('src/krusty2/vehicle/KrustyBike.cpp',)
 MOTION = 'src/krusty2/motion/Motnctrl.cpp'
 PROVIDERS = (*OLD_PROVIDERS,
     ('void Character::ApplyFullPoseList(', '?ApplyFullPoseList@Character@@QAEXPAUMotionPoseList@@H@Z', 0x4a8ac0, 59),
@@ -94,8 +94,7 @@ class BikeMotionConnectionsTests(unittest.TestCase):
                     for r in obj.symbol_extent(thunk)[2]], [(1, '_$E1')])
                 self.assertEqual(sum(obj.symbol_by_index[r.symbol_index].name == '_$E2' and
                     obj.sections[r.section_number - 1].name == '.CRT$XCU' for r in obj.relocations), 1)
-                if source != CALLERS[1]:
-                    self.assertFalse(any('g_kbZeroVec' in s.name for s in obj.symbols))
+                self.assertFalse(any('g_kbZeroVec' in s.name for s in obj.symbols))
                 self.assertTrue(compare(retail, obj, 'ComputeDriveTorque@KrustyBike', 0x491ca0, 103, binding)['strict_exact'])
             addresses = {symbol: va for _, symbol, va, _ in CONNECTED}
             rows = [r for r in gearbox_cases() if r[0] in CALLERS]
@@ -128,7 +127,7 @@ class BikeMotionConnectionsTests(unittest.TestCase):
                         self.assertEqual(original[addresses[name]], count, key)
                         calls[(source, entry.name, name)] = count
             self.assertEqual(preserved, len(partials))
-            for source, count in zip(CALLERS, (65, 66)):
+            for source, count in zip(CALLERS, (66,)):
                 self.assertEqual(sum(n for (s, _, _), n in calls.items() if s == source), count)
                 self.assertFalse(any(any(old in s.name for old in ('FindMotion@KbA5C4', 'SetMotion@KbA5C4',
                     'ApplyRestPose@KbA5C4')) for s in objects[source].symbols))

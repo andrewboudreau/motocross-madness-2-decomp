@@ -19,8 +19,7 @@ from tools.run_calibration import CASES
 from test_vehicle_gearbox_connections import cases as gearbox_cases, fingerprint
 
 ROOT = Path(__file__).resolve().parents[1]
-CALLERS = ('src/krusty2/vehicle/KrustyBike.cpp',
-           'samples/physics/krustybike/KrustyBikeNearMisses.cpp')
+CALLERS = ('src/krusty2/vehicle/KrustyBike.cpp',)
 PROVIDERS = (
     ('Net', 'NetworkInterface::Send', '?Send@NetworkInterface@@', 0x4ac830, 145, 20),
     ('Recorder', 'VCRInterface::QueueRecord', '?QueueRecord@VCRInterface@@', 0x4e8720, 240, 16),
@@ -130,8 +129,7 @@ class BikeNetworkConnectionsTests(unittest.TestCase):
                     for name, count in connected.items():
                         calls[(source, entry.name, name)] = count
             self.assertEqual(preserved, len(partials))
-            self.assertEqual(sum(n for (s, _, _), n in calls.items() if s == CALLERS[0]), 8)
-            self.assertEqual(sum(n for (s, _, _), n in calls.items() if s == CALLERS[1]), 12)
+            self.assertEqual(sum(n for (s, _, _), n in calls.items() if s == CALLERS[0]), 12)
             for source in CALLERS:
                 self.assertFalse(any(any(old in s.name for old in
                     ('Send@KbGameCfg', 'QueueRecord@KbRecorder', 'FindRaceMode@KbSession'))

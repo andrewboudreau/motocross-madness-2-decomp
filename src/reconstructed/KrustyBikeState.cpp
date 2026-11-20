@@ -14,6 +14,8 @@ float g_kbWarpThreshold = 0.2f;  // 0x0056cb54
 int g_kbUseTimeReceived = 1;     // 0x0056cb58
 int g_kbAllowNegative = 1;       // 0x0056cb5c
 int g_kbInterpolate = 1;         // 0x0056cb60
+float g_kbStallThreshold = 1.0f; // 0x0056cb64; remote-bike interval at which the stall hold starts
+float g_kbStallHoldSec = 3.0f;   // 0x0056cb68; length of that hold
 
 // Loader-zeroed retail storage, not file-backed initialized words.
 int g_kbUseLatencyThreshold;    // 0x0067c3a0

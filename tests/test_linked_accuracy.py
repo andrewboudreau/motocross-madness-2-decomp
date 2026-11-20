@@ -29,7 +29,8 @@ class LinkedAccuracyTest(unittest.TestCase):
         funcs = [(0x401000, '?Insert@QuadTree@@QAEXPAX@Z', 'A.obj'),
                  (0x401010, '?Draw@Foo@@QAEXXZ', 'B.obj'),
                  (0x401020, '?Draw@Bar@@QAEXXZ', 'B.obj'),
-                 (0x401030, '?Bound@Baz@@QAEXXZ', 'C.obj')]
+                 (0x401030, '?Bound@Baz@@QAEXXZ', 'C.obj'),
+                 (0x401040, '?Pose@Bike@@UAEXM@Z', 'Bike.obj')]
         bindings = {'?Bound@Baz@@QAEXXZ': {0x460000}}
         with tempfile.TemporaryDirectory() as tmp:
             d = Path(tmp) / 'samples' / 'x'
@@ -40,8 +41,14 @@ class LinkedAccuracyTest(unittest.TestCase):
                 {'target_va': '0x4a0200', 'candidate_symbol_contains': 'Bound@Baz'},
                 {'target_va': '0x4a0300'},
             ]), encoding='utf-8')
+            # A promoted unit's near misses keep their targets in src/.
+            unit = Path(tmp) / 'src' / 'vehicle'
+            unit.mkdir(parents=True)
+            (unit / 'targets.json').write_text(json.dumps([
+                {'target_va': '0x4a0400', 'candidate_symbol_contains': 'Pose@Bike'},
+            ]), encoding='utf-8')
             got = target_symbols(funcs, bindings, Path(tmp))
-        self.assertEqual(got, {'?Insert@QuadTree@@QAEXPAX@Z': 0x4a0000})
+        self.assertEqual(got, {'?Insert@QuadTree@@QAEXPAX@Z': 0x4a0000, '?Pose@Bike@@UAEXM@Z': 0x4a0400})
 
     def test_forwarder_is_followed_but_real_body_is_not(self):
         # mov eax,[esp+8]; push eax; mov ecx,[esp+8]; push ecx; call 0x2000; add esp,8; ret

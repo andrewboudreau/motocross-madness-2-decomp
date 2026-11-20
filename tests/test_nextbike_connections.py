@@ -34,11 +34,11 @@ SOURCES = (
 PARTIAL = [
     ('samples/race/FollowRacerNearMisses.cpp', '?PickFollowedRacer@TrackGameViewOwner@@QAEXXZ', 4889888, 340, 342, 67, '458488750e4bac7e802c4cfedbd485c6a2abb98a503c88e044ab31a9f57a78fc'),
     ('samples/race/FollowRacerNearMisses.cpp', '?SetFollowedRacer@TrackGameViewOwner@@QAEXPAUEventKrustyBikeView@@0H@Z', 4890240, 272, 272, 259, '6f7a0fdf97b1e244baeb6a3f3af7cf634acda08a0ea738fd1e3de094ccc7032d'),
-    ('samples/physics/krustybike/KrustyBikeNearMisses.cpp', 'IsSpeedGainBelowLimit@KrustyBike', 4790688, 229, 230, 151, '3124025ed125d088a9cf9d706154f76eb28d5e8661543863782a91d540c2e19f'),
-    ('samples/physics/krustybike/KrustyBikeNearMisses.cpp', 'FindPlacement@KrustyBike', 4791568, 1296, 1288, 526, '2260143a9d880dfabfff868e69178f34173f372aa53195cc6d885ed5f14bc576'),
-    ('samples/physics/krustybike/KrustyBikeNearMisses.cpp', 'SendStateDelta@KrustyBike', 4795088, 2315, 2312, 192, '1941ddbc72fdfd7b01b5ad4ea65fcace024e8e828a4019450c91e9f4d1fb6a95'),
-    ('samples/physics/krustybike/KrustyBikeNearMisses.cpp', 'InterpolateNetworkState@KrustyBike', 4798048, 8545, 8558, 2305, 'ffc638804e115abac59baeed51fe496e2c2167f5f006b1c337aaee4f7e249815'),
-    ('samples/physics/krustybike/KrustyBikeNearMisses.cpp', 'UpdateRiderPose@KrustyBike', 4779680, 2920, 2952, 608, '1bbe35c0f4249dd69e1255c94f129b84d7d0f79ae2e94173ce021cf0a3a4b87c'),
+    ('src/krusty2/vehicle/KrustyBike.cpp', 'IsSpeedGainBelowLimit@KrustyBike', 4790688, 229, 230, 151, '3124025ed125d088a9cf9d706154f76eb28d5e8661543863782a91d540c2e19f'),
+    ('src/krusty2/vehicle/KrustyBike.cpp', 'FindPlacement@KrustyBike', 4791568, 1296, 1296, 548, '177e575d9440c2edf215c83c48a6b94d43a5e3dbb3b1280061429e44149630a4'),
+    ('src/krusty2/vehicle/KrustyBike.cpp', 'SendStateDelta@KrustyBike', 4795088, 2315, 2312, 192, '1941ddbc72fdfd7b01b5ad4ea65fcace024e8e828a4019450c91e9f4d1fb6a95'),
+    ('src/krusty2/vehicle/KrustyBike.cpp', 'InterpolateNetworkState@KrustyBike', 4798048, 8545, 8558, 2305, 'ffc638804e115abac59baeed51fe496e2c2167f5f006b1c337aaee4f7e249815'),
+    ('src/krusty2/vehicle/KrustyBike.cpp', 'UpdateRiderPose@KrustyBike', 4779680, 2920, 2952, 608, '1bbe35c0f4249dd69e1255c94f129b84d7d0f79ae2e94173ce021cf0a3a4b87c'),
 ]
 
 

@@ -42,7 +42,7 @@ Headers have no retail names beyond a few `.h` strings, so their names are ours
 | `rigidbody/` | `PhysicsBody.cpp` (`0x4cbc50..0x4cc05c`) and `PhysicsRigidBody.cpp` (`0x4cc060..0x4ccbcc`) with the shared `PhysicsBody.h` (unattested names, provisional; RTTI PhysicsBody/PhysicsRigidBody, one Math3D vector set each): 44 strict cases. Wrecker (`src/reconstructed/wrecker.cpp`) constructs the body at its +0x40 directly; `PhysicsBody.h` is includable by relative path and leaves `math/Math3D.h` to the two .cpp files |
 | `suspension/` | `Shock.cpp` (unattested name, provisional; RTTI Shock/InlineShock/RotatingShock, extent `0x4f9a60..0x4fb1d7`): 27 strict cases; the class declarations are in `src/reconstructed/Suspension.h`, and `InlineShock::UpdateAxis` is the included body `src/reconstructed/InlineShockAxis.cpp`. The game build links it through the forwarding shims in `src/bringup/Group4_VehicleShock.cpp` |
 | `tire/` | `Tire.cpp`/`.h` (unattested name, provisional; RTTI Tire, extent `0x512e30..0x515dc0`): 26 strict cases of 28; the partials are UpdateContactPatch `0x005135f0` and UpdateSuspensionProbe `0x00514550`. The game build links it through the forwarding shims in `src/bringup/Group2_VehicleWheel.cpp` |
-| `vehicle/` | `Vehicle.cpp` (74 strict cases of 83 registered), `Bike.cpp` (44 strict cases of 55), `BikeAI.cpp` (24 strict cases) and `KrustyBike.cpp` (70 strict cases; its 11 partials are in `samples/physics/krustybike/KrustyBikeNearMisses.cpp`), `Vehicle.h`, `Bike.h`, `KrustyBike.h`, `KrustyBikeTypes.h` |
+| `vehicle/` | `Vehicle.cpp` (74 strict cases of 83 registered), `Bike.cpp` (44 strict cases of 55), `BikeAI.cpp` (24 strict cases) and `KrustyBike.cpp` (77 strict cases of 82; its 5 near misses are in the file in retail order), `Vehicle.h`, `Bike.h`, `KrustyBike.h`, `KrustyBikeTypes.h` |
 | `broadphase/` | `Quadtree.cpp`/`.h` (24 strict cases of 27), `Terrain.cpp`/`.h` (21 strict cases of 24) |
 | `bvh/` | Shared box-tree layouts and `BoundingBoxTreeQuery.cpp` (unattested name, 42 strict cases); the builder is matched in `src/reconstructed/BoundingBoxTreeBuild.cpp` |
 | `effects/` | NormalDistribution, NullManager, ParticleManager: 18 strict cases |
@@ -123,9 +123,10 @@ Their complete callers retain strict matches and the primary scene pointers.
   0x00554514, +5644 0x005544a4) name the class.
 - Two KrustyBike members, 0x00413200 and 0x00414370, were emitted in BikeAI.cpp's code; their
   near-miss reconstructions are in `vehicle/BikeAI.cpp` (docs/BIKEAI.md).
-- `samples/physics/krustybike/KrustyBikeNearMisses.cpp` includes the canonical file and holds
-  the 11 partial targets (constructor, slots 11/14/70/101 and helpers, the network encoders
-  0x00492ad0/0x00493660, 0x00495ff0 and 0x0048e280).
+- The 5 near misses (UpdateRiderPose 0x0048eea0, IsSpeedGainBelowLimit 0x004919a0,
+  FindPlacement 0x00491d10 and the network encoders 0x00492ad0/0x00493660) sit in the unit in
+  retail order with `// Not exact (...)` notes; PickTrick 0x0048d780 and slot 89 0x0048e3e0
+  are /QIfist samples (samples/physics/bikeai, samples/physics/krustybike).
 
 ## Evidence: CollisionObject.cpp, Vehicle.cpp, Bike.cpp, SoulTreePhysics.cpp (wave 6)
 

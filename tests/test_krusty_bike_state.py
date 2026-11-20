@@ -14,21 +14,26 @@ from mcm2tool.toolchain import sha256_file
 from tools.match import compare
 
 ROOT = Path(__file__).resolve().parents[1]
-# Name, VA, scalar format, initial value, independently decoded write.
+# Name, VA, scalar format, initial value, independently decoded access, its mnemonic.
 VALUES = (
-    ('LatencyHiding', 0x56cb3c, 'i', 1, 0x490a55),
-    ('RateLimiting', 0x56cb40, 'i', 1, 0x490a6b),
-    ('AllowWarping', 0x56cb44, 'i', 1, 0x490a81),
-    ('UseExtrapLimit', 0x56cb48, 'i', 1, 0x490aad),
-    ('ExtrapLimit', 0x56cb4c, 'f', 0.5, 0x490adb),
-    ('LatencyThreshold', 0x56cb50, 'f', 0.5, 0x490b04),
-    ('WarpThreshold', 0x56cb54, 'f', 0.2, 0x490b29),
-    ('UseTimeReceived', 0x56cb58, 'i', 1, 0x490b3a),
-    ('AllowNegative', 0x56cb5c, 'i', 1, 0x490b50),
-    ('Interpolate', 0x56cb60, 'i', 1, 0x490b60),
-    ('UseLatencyThreshold', 0x67c3a0, 'i', 0, 0x490a97),
-    ('PadActive', 0x67c3ac, 'i', 0, 0x4964a0),
+    ('LatencyHiding', 0x56cb3c, 'i', 1, 0x490a55, 'mov'),
+    ('RateLimiting', 0x56cb40, 'i', 1, 0x490a6b, 'mov'),
+    ('AllowWarping', 0x56cb44, 'i', 1, 0x490a81, 'mov'),
+    ('UseExtrapLimit', 0x56cb48, 'i', 1, 0x490aad, 'mov'),
+    ('ExtrapLimit', 0x56cb4c, 'f', 0.5, 0x490adb, 'fstp'),
+    ('LatencyThreshold', 0x56cb50, 'f', 0.5, 0x490b04, 'fstp'),
+    ('WarpThreshold', 0x56cb54, 'f', 0.2, 0x490b29, 'fstp'),
+    ('UseTimeReceived', 0x56cb58, 'i', 1, 0x490b3a, 'mov'),
+    ('AllowNegative', 0x56cb5c, 'i', 1, 0x490b50, 'mov'),
+    ('Interpolate', 0x56cb60, 'i', 1, 0x490b60, 'mov'),
+    # Read-only: InterpolateNetworkState compares the remote interval with the
+    # threshold and loads the hold length into stallHoldTimer.
+    ('StallThreshold', 0x56cb64, 'f', 1.0, 0x4956ca, 'fcomp'),
+    ('StallHoldSec', 0x56cb68, 'f', 3.0, 0x4956d7, 'mov'),
+    ('UseLatencyThreshold', 0x67c3a0, 'i', 0, 0x490a97, 'mov'),
+    ('PadActive', 0x67c3ac, 'i', 0, 0x4964a0, 'mov'),
 )
+READ_ONLY = {'StallThreshold', 'StallHoldSec'}
 
 
 @unittest.skipUnless(os.environ.get('VC6_ROOT') and os.environ.get('MCM2_EXE'),
@@ -42,7 +47,7 @@ class KrustyBikeStateTests(unittest.TestCase):
         retail = PEImage(reference)
         bindings = json.loads((ROOT / 'src/reconstructed/KrustyBikeState.bindings.json').read_text())
         expected = {'?g_kb' + n + '@@3' + ('M' if t == 'f' else 'H') + 'A': va
-                    for n, va, t, value, write in VALUES}
+                    for n, va, t, value, access, mnemonic in VALUES}
         self.assertEqual({k: int(v, 0) for k, v in bindings.items()}, expected)
         decoder = capstone.Cs(capstone.CS_ARCH_X86, capstone.CS_MODE_32)
         decoder.detail = True
@@ -67,8 +72,8 @@ class KrustyBikeStateTests(unittest.TestCase):
             self.assertFalse([r for r in obj.relocations
                               if not obj.section(r.section_number).name.startswith('.debug')])
             self.assertFalse([s for s in obj.sections if s.name.startswith('.CRT') or s.characteristics & 0x20])
-            self.assertEqual(sum(s.raw_size for s in obj.sections if s.characteristics & 0x80000000), 48)
-            for name, va, fmt, initial, write in VALUES:
+            self.assertEqual(sum(s.raw_size for s in obj.sections if s.characteristics & 0x80000000), 56)
+            for name, va, fmt, initial, access, mnemonic in VALUES:
                 symbol = '?g_kb' + name + '@@3' + ('M' if fmt == 'f' else 'H') + 'A'
                 entry = definitions[symbol]
                 section = obj.section(entry.section_number)
@@ -90,10 +95,12 @@ class KrustyBikeStateTests(unittest.TestCase):
                 else:
                     self.assertLessEqual(offset + 4, original.raw_size)
                     self.assertEqual(retail.bytes_at_va(va, 4), data)
-                instruction = next(decoder.disasm(retail.bytes_at_va(write, 15), write))
-                self.assertEqual(instruction.mnemonic, 'fstp' if fmt == 'f' else 'mov')
-                self.assertEqual(instruction.operands[0].type, capstone.x86.X86_OP_MEM)
-                self.assertEqual(instruction.operands[0].mem.disp, va)
+                instruction = next(decoder.disasm(retail.bytes_at_va(access, 15), access))
+                self.assertEqual(instruction.mnemonic, mnemonic)
+                self.assertEqual([o.mem.disp for o in instruction.operands
+                                  if o.type == capstone.x86.X86_OP_MEM], [va])
+                if name not in READ_ONLY:  # the destination is the global itself
+                    self.assertEqual(instruction.operands[0].type, capstone.x86.X86_OP_MEM)
             clear = next(decoder.disasm(retail.bytes_at_va(0x4964cc, 10), 0x4964cc))
             self.assertEqual(clear.mnemonic, 'mov')
             self.assertEqual(clear.operands[0].mem.disp, 0x67c3ac)

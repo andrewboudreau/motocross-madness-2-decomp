@@ -74,7 +74,7 @@ The regression checks:
 
 - All **338** registered strict cases in the seven caller TUs and BikeRace.
 - The complete relocation-resolved hashes of **eight** existing partial bodies
-  in FollowRacerNearMisses and KrustyBikeNearMisses, without claiming those
+  in FollowRacerNearMisses and KrustyBike.cpp (then KrustyBikeNearMisses), without claiming those
   partial bodies match retail. The picker's fingerprint now records its
   separately demonstrated [saved-view correction](FOLLOWED_RACER_PICKER.md);
   the other seven retain their original fingerprints.

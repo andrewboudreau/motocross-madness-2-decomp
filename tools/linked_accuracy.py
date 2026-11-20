@@ -96,10 +96,11 @@ def retail_sizes(root: Path = ROOT) -> dict[int, int]:
 def target_symbols(funcs, bindings, root: Path = ROOT) -> dict[str, int]:
     """Linked symbol -> VA for targets.json entries named only by ``candidate_symbol_contains``.
 
-    Used only when exactly one unbound linked symbol contains the substring.
+    Reads samples/ and promoted units in src/; used only when exactly one unbound linked
+    symbol contains the substring.
     """
     out: dict[str, int] = {}
-    for path in sorted((root / 'samples').rglob('targets.json')):
+    for path in sorted(p for base in ('samples', 'src') for p in (root / base).rglob('targets.json')):
         try:
             data = json.loads(path.read_text(encoding='utf-8'))
         except ValueError:

@@ -58,9 +58,6 @@ struct KbGate {
 // tier 3.  KrustyBike+0x838 holds one; 0x00414370 rebuilds it every frame.
 #include "KrustyBikeRecords.h"
 
-// 0x0067C348: a global zero vector copied by several overrides (three dword loads).
-extern Vec3 g_kbZeroVec;
-
 // Object reached through the global at 0x0056E26C (game/session singleton).
 struct KbTrackRec { Vec3 position; char pad_0x0C[0xC]; };
 struct KbMode { char pad_0x00[0x94]; int GetSelectedSeries(); };
@@ -280,7 +277,7 @@ extern float g_kbWarpThreshold;      // 0x0056CB54
 extern int g_kbUseTimeReceived;      // 0x0056CB58
 extern int g_kbAllowNegative;        // 0x0056CB5C
 extern int g_kbInterpolate;          // 0x0056CB60
-extern float g_kbStallThreshold;     // 0x0056CB64  interval time below which slot 50 holds
+extern float g_kbStallThreshold;     // 0x0056CB64  interval time at which slot 50 holds
 extern float g_kbStallHoldSec;       // 0x0056CB68  length of that hold
 // Track view behind KbGame+0x560 (tier 3): checkpoint count at +0xac.
 struct KbTrack {
@@ -552,11 +549,8 @@ struct KbBikeLoader {
 // 0x004a2fc0 (cdecl): zeroed debug-heap allocation of count x size bytes tagged with the source line.
 void* DebugCalloc(unsigned int count, unsigned int size, const char* file, int line);
 
-// Non-virtual callees of slot 11 (cdecl; call targets are relocation-masked).  Tier 3 names.
-// 0x004B0AC0: probe at a position with three radii and a scale; returns a byte flag.
-unsigned char Kb_004B0AC0(Vec3* pos, float r0, float r1, float r2, float scale,
-                          int a, int b, int c, int d);
-// 0x004B0DF0 (the query the base slot 11 issues) is FindObjectPlacement, declared in
-// ../contact/ObjectPlacement.h.
+// Non-virtual callees of slot 11: 0x004B0AC0 is PointInPlacementSquare (declared in
+// KrustyBike.cpp; src/reconstructed/PlacementQueries.cpp has no header) and 0x004B0DF0 (the
+// query the base slot 11 issues) is FindObjectPlacement, declared in ../contact/ObjectPlacement.h.
 
 #endif

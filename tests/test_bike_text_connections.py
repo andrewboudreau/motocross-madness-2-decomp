@@ -18,7 +18,7 @@ from tools.run_calibration import CASES
 from test_vehicle_gearbox_connections import cases as gearbox_cases, fingerprint
 
 ROOT = Path(__file__).resolve().parents[1]
-CALLERS = ('src/krusty2/vehicle/KrustyBike.cpp', 'samples/physics/krustybike/KrustyBikeNearMisses.cpp')
+CALLERS = ('src/krusty2/vehicle/KrustyBike.cpp',)
 PROVIDERS = (
     ('TrackOverlay', 'TextQueueMessage::TextQueueMessage(const char* text, float duration)', '??0TextQueueMessage@@QAE@PBDM@Z', 0x51b200, 68),
     ('TrackOverlay', 'TextQueueMessage::TextQueueMessage(const TextQueueMessage& other)', '??0TextQueueMessage@@QAE@ABV0@@Z', 0x51b250, 74),

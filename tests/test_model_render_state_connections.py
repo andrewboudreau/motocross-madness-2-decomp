@@ -26,7 +26,7 @@ SOURCES = ('src/krusty2/vehicle/Bike.cpp', 'src/krusty2/vehicle/Vehicle.cpp',
     'src/krusty2/vehicle/KrustyBike.cpp', 'src/reconstructed/BikeRace.cpp',
     'src/reconstructed/KrustyUI.cpp', 'src/reconstructed/SceneManager.cpp',
     'src/krusty2/soultree/SoulTreePhysics.cpp',
-    'samples/physics/krustybike/KrustyBikeNearMisses.cpp', 'samples/race/BikeRaceNearMisses.cpp',
+    'samples/race/BikeRaceNearMisses.cpp',
     MODEL, NODE)
 PROVIDERS = (
     ('SetUseLighting', 'int value', 0x4444c0, 23),

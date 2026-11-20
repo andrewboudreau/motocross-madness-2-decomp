@@ -1,7 +1,7 @@
 """KrustyBike::InterpolateNetworkState 0x00493660, the remote/replay bike's state interpolation
 (tools/emu_diff.py case, call-record/replay mode).
 
-The linked body is the Group 3 bring-up copy (src/bringup/Group3_KrustyBike.cpp). Every call
+The linked body is in src/krusty2/vehicle/KrustyBike.cpp. Every call
 leaving it is recorded and replayed (``REPLAY``): ReadClock, the orientation helpers, the node
 transforms, the wreck calls, the trick starts, SelectLapGates and the virtual slots return the
 same synthetic results to both bodies. FastSqrt and FastInvSqrtEstimate run as retail code.
@@ -18,7 +18,7 @@ import struct
 
 RETAIL_VA = 0x00493660
 SYMBOL = '?InterpolateNetworkState@KrustyBike@@QAEXMH@Z'
-SOURCE = 'src/bringup/Group3_KrustyBike.cpp'
+SOURCE = 'src/krusty2/vehicle/KrustyBike.cpp'
 KB_VT = 0x00554548
 KB_VT2 = 0x00554514
 TRACK_GAME = 0x0056e26c

@@ -1,6 +1,6 @@
 """KrustyBike::IsSpeedGainBelowLimit 0x004919a0, slot 70 (tools/emu_diff.py case).
 
-The linked body is the Group 3 bring-up copy. Human (+0x734 clear) and AI riders, every
+The linked body is in src/krusty2/vehicle/KrustyBike.cpp. Human (+0x734 clear) and AI riders, every
 difficulty (1..3) and event type (3 selects the first row of the AI table), speed gains
 around the per-mode limit (exact ties, both sides, negative and NaN gains).
 """
@@ -8,7 +8,7 @@ import struct
 
 RETAIL_VA = 0x004919a0
 SYMBOL = '?IsSpeedGainBelowLimit@KrustyBike@@UAEHM@Z'
-SOURCE = 'src/bringup/Group3_KrustyBike.cpp'
+SOURCE = 'src/krusty2/vehicle/KrustyBike.cpp'
 TRACK_GAME = 0x0056e26c
 PROBES = {0x004919f5: 'AI arm', 0x00491a44: 'human arm'}
 

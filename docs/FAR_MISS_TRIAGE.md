@@ -43,7 +43,7 @@ Reproduce one row (source, VA and extent from the table):
 
 ```bash
 export VC6_ROOT="$(pwd -W)/work/vc6sp3-disc" MCM2_EXE="$(pwd -W)/work/game/mcm2.exe" PYTHONPATH=.
-python tools/match_one.py samples/physics/krustybike/KrustyBikeNearMisses.cpp 0x492ad0 2315 -q
+python tools/match_one.py src/krusty2/vehicle/KrustyBike.cpp 0x492ad0 2315 -q
 python tools/rank_near_misses.py --help
 ```
 
@@ -67,8 +67,8 @@ the function were wrong, not a finding that it is.
 
 | # | VA | Function | Source | Score (strict) | Class | Risk | Linked by game build | EV | Diagnosis |
 |---|---|---|---|---|---|---|---|---|---|
-| 1 | `0x00493660` | KrustyBike::InterpolateNetworkState | samples/physics/krustybike/KrustyBikeNearMisses.cpp:409 | 2305/8558; index 2305/8545 | R | low | yes, src/bringup/Group3_KrustyBike.cpp (0.989) | 625 | 2260/2260 insns, frame and slots exact, same 53 calls and 235 stores; 44 masked diffs (`c` widened through its stack home, `(len+50)^2` store order, fld/fmul order). |
-| 2 | `0x00492ad0` | KrustyBike::SendStateDelta | samples/physics/krustybike/KrustyBikeNearMisses.cpp:185 | 192/2315 | R | low | yes, src/bringup/Group3_KrustyBike.cpp (0.992) | 531 | 640/642 insns, frame 0x34 exact, 5 hunks: the record-interval test is `je end` where retail has `jne deltas ; push 0 ; jmp end+1`, and the push order of the final call. |
+| 1 | `0x00493660` | KrustyBike::InterpolateNetworkState | src/krusty2/vehicle/KrustyBike.cpp:2056 | 2305/8558; index 2305/8545 | R | low | yes, same file (0.989) | 625 | 2260/2260 insns, frame and slots exact, same 53 calls and 235 stores; 44 masked diffs (`c` widened through its stack home, `(len+50)^2` store order, fld/fmul order). |
+| 2 | `0x00492ad0` | KrustyBike::SendStateDelta | src/krusty2/vehicle/KrustyBike.cpp:1798 | 192/2315 | R | low | yes, same file (0.992) | 531 | 640/642 insns, frame 0x34 exact, 5 hunks: the record-interval test is `je end` where retail has `jne deltas ; push 0 ; jmp end+1`, and the push order of the final call. |
 | 3 | `0x004e14a0` | BaseQuarryEvent::PrepareGeometry | src/reconstructed/QuarryStuntEvent.cpp | 139/1756; index 166/1760 | R | low, no emu case | yes, same file (0.994) | 485 | 511/512 insns, 7 masked diffs: which register holds the g_TrackGame load and one `mov edi, eax` placed three instructions later; everything after is positional fallout. |
 | 4 | `0x0040eca0` | SimulateLookAhead | src/krusty2/vehicle/BikeAI.cpp | 1479/17585 (sample form 1542, emu-divergent) | S | med | yes, same file (0.957) | 481 | 3931/3966 insns, frame 0x968 vs 0x93c, 133 calls vs 132, retail has 6 more fmul and 9 more fsub. At 0x40f5fb retail computes the accelerations with real subtractions (`fld 0.0 ; fld force.x ; fsub`, `fld -32.0 ; fsub [zero temp]`) where the candidate folds them to two `mov [..], 0xc2000000`. |
 | 5 | `0x00417ed0` | BikeRace::Create | samples/race/BikeRaceNearMisses.cpp:632 | 2822/6760; index 2828/6768 | R | low | yes, src/bringup/Group3_QuarryLoad.cpp (0.998) | 473 | 1813/1813 insns, frame 0x4e8 equal, 4 hunks: at two vector-length sites retail has `fstp [t] ; faddp ; fadd [t]` where the candidate keeps z*z on the x87 stack; one store scheduled two instructions later. |
@@ -89,7 +89,7 @@ the function were wrong, not a finding that it is.
 | 20 | `0x0048b100` | VisualCue::Tick | src/reconstructed/Krusty3DObjects.cpp:286 | 390/2816; index 401/2820 | S | low | yes, same file (0.932) | 121 | Retail gives the two early hide returns their own epilogues and +0x30 stores (6 vs 4); the candidate shares one return and caches 0 in ebx (retail edi). |
 | 21 | `0x004c69c0` | PCTextureMap::CreateSurface | src/reconstructed/PCTextureMap.cpp:269 | 518/2033; index 429/894 (masked) | R | low, no emu case | yes, samples/render/TextureSurfaceCreate.cpp (0.957) | 121 | 577/579 insns, same 32 calls and 34 stores; 49 masked diffs. |
 | 22 | `0x004a70c0` | Character::AdvanceMotionInterpolated | samples/physics/motion/Motnctrl.cpp:382 | 307/3333; index 234/3412 | S | low | yes, src/krusty2/motion/Motnctrl.cpp (0.905) | 121 | Frame 0x2d0 vs 0x2dc, 67 direct calls vs 68: retail keeps the blend loop's unused sums as operator calls; `this` in edi vs esi. |
-| 23 | `0x0048eea0` | KrustyBike::UpdateRiderPose | samples/physics/krustybike/KrustyBikeNearMisses.cpp:1070 | 608/2952 | S | low | yes, src/bringup/Group3_KrustyBike.cpp (0.971) | 117 | Frame 0x50 exact. Tail merging of the head-turn arms differs (the candidate duplicates the +0x1554/+0x1558 stores retail shares), switch compare polarity, crash clamp spill. |
+| 23 | `0x0048eea0` | KrustyBike::UpdateRiderPose | src/krusty2/vehicle/KrustyBike.cpp:521 | 608/2952 | S | low | yes, same file (0.971) | 117 | Frame 0x50 exact. Tail merging of the head-turn arms differs (the candidate duplicates the +0x1554/+0x1558 stores retail shares), switch compare polarity, crash clamp spill. |
 | 24 | `0x0042fd80` | CarProcedural::Tick | src/reconstructed/CarProcedural.cpp:331 | 604/2909 | R | med | yes, src/reconstructed/CarProcedural.cpp (0.941) | 116 | 780/782 insns, frame 0xdc equal, same 31 calls and 35 stores; 81 masked diffs: steering clamp memory local, load order in the `back` normalisation and blend, argument push scheduling. |
 | 25 | `0x004e7d60` | VCRInterface::Tick | src/reconstructed/Recorder.cpp:444 | 270/2448; index 272/2448 | R | low | yes, same file (0.960) | 109 | 799/792 insns, same 62 calls and 24 stores; 54 masked diffs, slot order. |
 | 26 | `0x004e9030` | ResourceManager::AddArchive | src/reconstructed/ResourceManager.cpp:123 | 120/804; index 100/804 | R | low, no emu case | yes, same file (0.991) | 103 | 265/266 insns, 5 diffs, all from retail homing `archive` in the `new` temporary's slot. |
@@ -136,7 +136,7 @@ the function were wrong, not a finding that it is.
 | 67 | `0x00519a20` | StatsOverlay::DrawStandings | src/reconstructed/TrackOverlay.cpp:948 | 605/1004; index 535/894 (masked) | R | low | yes, same file (0.965) | 32 | 342/342 insns, same calls; 16 masked diffs. |
 | 68 | `0x004079c0` | LoadBike @Bike | src/krusty2/vehicle/Bike.cpp:506 | 6428/6745 | R | low | yes, src/bringup/Group1_KbBikeLoader.cpp (0.987) | 32 | 1633/1633 insns, equal size, same 108 calls and 168 stores; spill homes and store scheduling of the string tables and Vec3 constants. |
 | 69 | `0x0047d780` | DrawableGridNodeSharedTextures::BuildBlockTexture | src/reconstructed/Grid1.cpp:478 | 227/1010 | R | low | yes, same file (0.871) | 31 | 322/319 insns, same calls; 71 masked diffs, slot order. |
-| 70 | `0x00491d10` | FindPlacement @KrustyBike | samples/physics/krustybike/KrustyBikeNearMisses.cpp:43 | 526/1296 | S | low | yes, src/bringup/Group3_KrustyBike.cpp (0.947) | 31 | 1264 vs 1296 B: the mode 2/3 normalise join and the case 0/4 call sit in different arms; 101 masked diffs. |
+| 70 | `0x00491d10` | FindPlacement @KrustyBike | src/krusty2/vehicle/KrustyBike.cpp:1496 | 548/1296 | S | low | yes, same file (0.947) | 31 | 1264 vs 1296 B: the mode 2/3 normalise join and the case 0/4 call sit in different arms; 101 masked diffs. |
 | 71 | `0x00486170` | GUIManager::CopyScreenToTexture | src/reconstructed/GUIManager.cpp:535 | 284/896; index 280/896 | R | low, no emu case | yes, samples/ui/GuiScreenTexture.cpp (0.867) | 31 | 284/286 insns, frame 0xa4 vs 0xb0, zero-register placement. |
 | 72 | `0x004cb330` | MeanTextureChannelDifference | src/reconstructed/PCVideoCard.cpp:837 | 35/629 | R | low | yes (0.923) | 30 | 200/205 insns, same calls; registers and loop entry. |
 | 73 | `0x004650e0` | FollowCamera::LoadCameraFile | src/reconstructed/FollowCamera.cpp:866 | 429/1014; index 519/1014 | S | low | yes, same file (0.842) | 29 | Inline boundary: retail expands both side cross products (12 fmul, components in memory temporaries), the candidate expands one and calls for the other (19 calls against 18, 6 fmul); frame 0x198 vs 0x18c. docs/FOLLOW_CAMERA_LOAD_FILE.md: every inline spelling tried. |
@@ -188,7 +188,7 @@ would plausibly write, singled out by the bytes).
    shape of a full-packet send whose first argument push is shared with the
    common exit, so retail's source most likely reaches the full send by
    falling through from the interval test, not by the `goto sendFull` at
-   samples/physics/krustybike/KrustyBikeNearMisses.cpp:193 (provisional).
+   src/krusty2/vehicle/KrustyBike.cpp:1807 (provisional).
    Next: restructure the record arm so the delta block is the `else` of the
    interval test, and check the final call's argument order against retail's
    pushes. The header already records some forms; read it first.

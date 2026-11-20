@@ -1,6 +1,6 @@
 """KrustyBike::FindPlacement 0x00491d10, slot 11, the respawn placement (tools/emu_diff.py case).
 
-The linked body is the Group 3 bring-up copy. Every event type (0..5 and out of range), every
+The linked body is in src/krusty2/vehicle/KrustyBike.cpp. Every event type (0..5 and out of range), every
 selected series (GetSelectedSeries 0x00524100 runs as retail code: KbGame +0x578 +0x2800), the
 mode 2/3 "copy the stored vectors" conditions one at a time, a zero-length heading, the tag
 event's ball / followed racer arms and the respawn-pending arms. PointInPlacementSquare
@@ -12,7 +12,7 @@ import struct
 
 RETAIL_VA = 0x00491d10
 SYMBOL = '?FindPlacement@KrustyBike@@UAEHHPAUVec3@@00PAH@Z'
-SOURCE = 'src/bringup/Group3_KrustyBike.cpp'
+SOURCE = 'src/krusty2/vehicle/KrustyBike.cpp'
 TRACK_GAME = 0x0056e26c
 PROBES = {0x00491dc6: 'PointInPlacementSquare', 0x00491f5e: 'mode 2/3 copy',
           0x00491edb: 'mode 2/3 zero heading', 0x00491f3b: 'mode 2/3 invsqrt',
