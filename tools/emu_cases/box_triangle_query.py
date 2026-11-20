@@ -21,7 +21,7 @@ from tools.emu_cases.segment_triangle_query import (
 
 RETAIL_VA = 0x00426be0
 SYMBOL = '?BoxTriangleQuery@@YAHPBUVec3@@0PBUQueryTriangle@@PBUMatrix4@@@Z'
-SOURCE = 'samples/physics/bvh/BoundingBoxTreeQueryNearMisses.cpp'
+SOURCE = 'src/krusty2/bvh/BoundingBoxTreeQuery.cpp'
 BINDINGS = dict(STATIC_BINDINGS)
 PROBES = {0x0042759f: 'returns 1'}
 BISECT_EVERY = 2

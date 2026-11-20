@@ -16,7 +16,7 @@ from tools.emu_cases.segment_triangle_query import (
 
 RETAIL_VA = 0x004280e0
 SYMBOL = '?TreeTreeQueryNodes@@YAHPAUQueryTreeNode@@0H@Z'
-SOURCE = 'samples/physics/bvh/BoundingBoxTreeQueryNearMisses.cpp'
+SOURCE = 'src/krusty2/bvh/BoundingBoxTreeQuery.cpp'
 BINDINGS = dict(STATIC_BINDINGS)
 PROBES = {0x004275f0: 'LeafPairQuery', 0x004269e0: 'LeafNodeQuery', 0x00424730: 'SweptBoxOverlap'}
 BISECT_EVERY = 3

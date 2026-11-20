@@ -18,55 +18,5 @@
     "expect": "exact",
     "notes": "Complete strict body promoted to a grouping of collision transform helpers; original TU identity remains provisional. Point-through-local transform and grouped x-row products preserve the decoded operand order.",
     "bindings": "../../../src/reconstructed/CollisionTransforms.bindings.json"
-  },
-  {
-    "class": "(free)",
-    "source": "BoundingBoxTreeQueryNearMisses.cpp",
-    "candidate_symbol_contains": "?SegmentTriangleQuery@@",
-    "target_va": "0x00427c10",
-    "target_size": 1101,
-    "expect": "partial",
-    "notes": "natural operator form: retail's inline/out-of-line helper sequence; z-first push dot in the clear-flag arm; retail keeps 1 in ebp and loads segment[1] at entry (see the file header).",
-    "bindings": "BoundingBoxTreeQueryNearMisses.bindings.json"
-  },
-  {
-    "class": "(free)",
-    "source": "BoundingBoxTreeQueryNearMisses.cpp",
-    "candidate_symbol_contains": "?BoxCapsuleOverlap@@",
-    "target_va": "0x00425900",
-    "target_size": 4314,
-    "expect": "partial",
-    "notes": "2450/4314 (4321 B, aligned 1283/1300): one componentwise axis normalised in place, named dist/ra sums with QueryDot projections, named box-test extents and an if/return QuerySigned; left: the seventh normalisation's DotProduct stays inline, two fxch, c1z's slot and a permuted frame (see the file header). Local-count scan (session 25, k extra initialised int locals, dead, scratch only): not periodic, k = 0..15: 2450 2441 2435 2435 2494 2476 2477 2478 2478 2479 2474 2474 2476 2486 2485 2476, then 2467 falling to 2444 at 31; best 2494 at k = 4, far from exact",
-    "bindings": "BoundingBoxTreeQueryNearMisses.bindings.json"
-  },
-  {
-    "class": "(free)",
-    "source": "BoundingBoxTreeQueryNearMisses.cpp",
-    "candidate_symbol_contains": "?BoxTriangleQuery@@",
-    "target_va": "0x00426be0",
-    "target_size": 2576,
-    "expect": "partial",
-    "notes": "13-axis SAT: every instruction and the 0x164 frame match; stack-slot assignment differs (see the file header).",
-    "bindings": "BoundingBoxTreeQueryNearMisses.bindings.json"
-  },
-  {
-    "class": "(free)",
-    "source": "BoundingBoxTreeQueryNearMisses.cpp",
-    "candidate_symbol_contains": "?TreeTreeQueryNodes@@",
-    "target_va": "0x004280e0",
-    "target_size": 2160,
-    "expect": "partial",
-    "notes": "inline copy of the BoxOverlap SAT; one extra expanded constructor and the recursion tails differ (see the file header).",
-    "bindings": "BoundingBoxTreeQueryNearMisses.bindings.json"
-  },
-  {
-    "class": "(free)",
-    "source": "BoundingBoxTreeQueryNearMisses.cpp",
-    "candidate_symbol_contains": "?SegmentSegmentDistance@@",
-    "target_va": "0x0042a640",
-    "target_size": 1471,
-    "expect": "partial",
-    "notes": "call-view form; retail homes floats in the dead d0/d1 argument slots (frame 0x60 vs 0x80) (see the file header).",
-    "bindings": "BoundingBoxTreeQueryNearMisses.bindings.json"
   }
 ]

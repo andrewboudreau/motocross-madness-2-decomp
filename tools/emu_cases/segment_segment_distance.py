@@ -8,7 +8,7 @@ is read from ST0.
 """
 RETAIL_VA = 0x0042a640
 SYMBOL = '?SegmentSegmentDistance@@YAMPBUVec3@@000@Z'
-SOURCE = 'samples/physics/bvh/BoundingBoxTreeQueryNearMisses.cpp'
+SOURCE = 'src/krusty2/bvh/BoundingBoxTreeQuery.cpp'
 
 
 def _vec(rng, scale):

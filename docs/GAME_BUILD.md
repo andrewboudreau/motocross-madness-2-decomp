@@ -646,12 +646,12 @@ per-function checks on random and edge inputs.
 | `Net.cpp` | `net_dispatch_messages` | 0x4aced0 | 120 |
 | `NetThread.cpp` | `net_receive_messages` | 0x4af8e0 | 200 |
 | `KrustyBikeTrickPick.cpp` | `krusty_trick_pick` | 0x48d780 | 800 |
-| `BoundingBoxTreeQueryNearMisses.cpp` | `segment_segment_distance` | 0x42a640 | 200 |
-| `BoundingBoxTreeQueryNearMisses.cpp` | `segment_triangle_query` | 0x427c10 | 600 |
-| `BoundingBoxTreeQueryNearMisses.cpp` | `box_capsule_overlap` | 0x425900 | 88 |
-| `BoundingBoxTreeQueryNearMisses.cpp` | `box_triangle_query` | 0x426be0 | 180 |
-| `BoundingBoxTreeQueryNearMisses.cpp` | `tree_tree_query` | 0x4280e0 | 150 |
-| `BoundingBoxTreeQueryNearMisses.cpp` | `box_overlap` | 0x424ab0 | 94 |
+| `BoundingBoxTreeQuery.cpp` | `segment_segment_distance` | 0x42a640 | 200 |
+| `BoundingBoxTreeQuery.cpp` | `segment_triangle_query` | 0x427c10 | 600 |
+| `BoundingBoxTreeQuery.cpp` | `box_capsule_overlap` | 0x425900 | 88 |
+| `BoundingBoxTreeQuery.cpp` | `box_triangle_query` | 0x426be0 | 180 |
+| `BoundingBoxTreeQuery.cpp` | `tree_tree_query` | 0x4280e0 | 150 |
+| `BoundingBoxTreeQuery.cpp` | `box_overlap` | 0x424ab0 | 94 |
 | `ConstraintMethodCollisionModel.cpp` | `constraint_contact_impulse` | 0x43bdb0 | 120 |
 | `ContactImpulse.cpp` | `contact_solve_impulse` | 0x5004a0 | 120 |
 | `GraphicsTest.cpp` | `graphics_test_draw_circle` | 0x47bd10 | 120 |
@@ -686,12 +686,10 @@ stand-ins. These were inline-arithmetic rewrites that compiled, but their
 linked bodies scored poorly against retail. The game build now links the
 near-miss bodies from `samples/` instead:
 
-- `samples/physics/bvh/BoundingBoxTreeQueryNearMisses.cpp` is a
-  reviewed candidate source. It includes the canonical
-  `src/krusty2/bvh/BoundingBoxTreeQuery.cpp` (an `included_sources` entry) for
-  its file statics: the vertex array, relative frames, motion matrix and axis
-  scratch. It adds the five near-miss bodies and defines the never-written
-  0x00579668 flag. The bring-up copy `Group0_BvhQuery.cpp` was deleted.
+- `src/krusty2/bvh/BoundingBoxTreeQuery.cpp` holds the five BVH near-miss bodies in
+  retail order, next to the file statics they read (the vertex array, relative frames,
+  motion matrix and axis scratch) and the never-written 0x00579668 flag. The bring-up
+  copy `Group0_BvhQuery.cpp` was deleted.
 - `samples/physics/contact/ContactImpulse.cpp` is a reviewed candidate
   source. ApplyContactImpulse, once a second candidate, now sits in its retail
   position in `src/krusty2/constraint/ConstraintMethodCollisionModel.cpp`.

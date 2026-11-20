@@ -143,10 +143,10 @@ not bmpfile.cpp code.
 | Range | Bytes | Nearest `__FILE__` xref | Now |
 |---|---:|---|---|
 | `0x00424ab0..0x004253ac` | 2300 | bmpfile.cpp (-0x4d4) | `BoxOverlap`, strict exact in `src/krusty2/bvh/BoundingBoxTreeQuery.cpp` |
-| `0x00425900..0x004269da` | 4314 | bmpfile.cpp (-0x1324) | `BoxCapsuleOverlap`, near miss in `samples/physics/bvh` |
-| `0x00426be0..0x004275f0` | 2576 | bmpfile.cpp (-0x2604) | `BoxTriangleQuery`, near miss in `samples/physics/bvh` |
-| `0x004280e0..0x00428950` | 2160 | BoundingBoxTreeBuild.cpp (+0x367e) | `TreeTreeQueryNodes`, near miss in `samples/physics/bvh` |
-| `0x0042a640..0x0042abff` | 1471 | BoundingBoxTreeBuild.cpp (+0x111e) | `SegmentSegmentDistance`, near miss in `samples/physics/bvh` |
+| `0x00425900..0x004269da` | 4314 | bmpfile.cpp (-0x1324) | `BoxCapsuleOverlap`, near miss in `src/krusty2/bvh/BoundingBoxTreeQuery.cpp` |
+| `0x00426be0..0x004275f0` | 2576 | bmpfile.cpp (-0x2604) | `BoxTriangleQuery`, near miss in `src/krusty2/bvh/BoundingBoxTreeQuery.cpp` |
+| `0x004280e0..0x00428950` | 2160 | BoundingBoxTreeBuild.cpp (+0x367e) | `TreeTreeQueryNodes`, near miss in `src/krusty2/bvh/BoundingBoxTreeQuery.cpp` |
+| `0x0042a640..0x0042abff` | 1471 | BoundingBoxTreeBuild.cpp (+0x111e) | `SegmentSegmentDistance`, near miss in `src/krusty2/bvh/BoundingBoxTreeQuery.cpp` |
 | `0x0048eea0` (the ninth, not listed at the snapshot) | 2920 | - | KrustyBike slot 102, near miss in `samples/physics/krustybike` |
 | `0x00481300..0x004813d7` | 215 | Griddraw.cpp (+0x129c) | `DrawableGridNode::WalkSlot4Block`, strict exact in `src/reconstructed/Griddraw.cpp` |
 | `0x00532580..0x005327b2` | 562 | wrecker.cpp (+0x3b8) | `Wrecker::RebuildPoseSteps`, strict exact in `src/reconstructed/wrecker.cpp` |

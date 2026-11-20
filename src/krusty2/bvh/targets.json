@@ -112,6 +112,26 @@
   {
     "class": "BoundingBoxTreeQuery",
     "source": "BoundingBoxTreeQuery.cpp",
+    "candidate_symbol_contains": "?SweptBoxOverlap@",
+    "target_va": "0x00424730",
+    "target_size": 891,
+    "expect": "exact",
+    "notes": "moved from samples; moved and swept centres in sibling blocks (shared slot), centre read through a pointer, component-wise add",
+    "bindings": "BoundingBoxTreeQuery.bindings.json"
+  },
+  {
+    "class": "BoundingBoxTreeQuery",
+    "source": "BoundingBoxTreeQuery.cpp",
+    "candidate_symbol_contains": "?BoxOverlap@@",
+    "target_va": "0x00424ab0",
+    "target_size": 2300,
+    "expect": "exact",
+    "notes": "moved from samples; 15-axis box/box SAT; the inline cross products need Math3D.h's parenthesised first product (fsubp between the copy's load and store)",
+    "bindings": "BoundingBoxTreeQuery.bindings.json"
+  },
+  {
+    "class": "BoundingBoxTreeQuery",
+    "source": "BoundingBoxTreeQuery.cpp",
     "candidate_symbol_contains": "?SegmentBoxOverlap@@YAHPBUVec3@@0U1@1PBUMatrix4@@@Z",
     "target_va": "0x004253b0",
     "target_size": 924,
@@ -127,6 +147,76 @@
     "target_size": 419,
     "expect": "exact",
     "notes": "sphere vs box in a frame; called from CollisionObject 0x438946/0x439554 and SphereTreeQuery",
+    "bindings": "BoundingBoxTreeQuery.bindings.json"
+  },
+  {
+    "class": "(free)",
+    "source": "BoundingBoxTreeQuery.cpp",
+    "candidate_symbol_contains": "?BoxCapsuleOverlap@@",
+    "target_va": "0x00425900",
+    "target_size": 4314,
+    "expect": "partial",
+    "notes": "2450/4314 (4321 B, aligned 1283/1300): one componentwise axis normalised in place, named dist/ra sums with QueryDot projections, named box-test extents and an if/return QuerySigned; left: the seventh normalisation's DotProduct stays inline, two fxch, c1z's slot and a permuted frame (docs/BOUNDINGBOXTREEQUERY.md). Local-count scan (session 25, k extra initialised int locals, dead, scratch only): not periodic, k = 0..15: 2450 2441 2435 2435 2494 2476 2477 2478 2478 2479 2474 2474 2476 2486 2485 2476, then 2467 falling to 2444 at 31; best 2494 at k = 4, far from exact Near miss in the unit (moved from samples/physics/bvh/BoundingBoxTreeQueryNearMisses.cpp).",
+    "bindings": "BoundingBoxTreeQuery.bindings.json"
+  },
+  {
+    "class": "BoundingBoxTreeQuery",
+    "source": "BoundingBoxTreeQuery.cpp",
+    "candidate_symbol_contains": "?LeafNodeQuery@",
+    "target_va": "0x004269e0",
+    "target_size": 509,
+    "expect": "exact",
+    "notes": "moved from samples",
+    "bindings": "BoundingBoxTreeQuery.bindings.json"
+  },
+  {
+    "class": "(free)",
+    "source": "BoundingBoxTreeQuery.cpp",
+    "candidate_symbol_contains": "?BoxTriangleQuery@@",
+    "target_va": "0x00426be0",
+    "target_size": 2576,
+    "expect": "partial",
+    "notes": "13-axis SAT: every instruction and the 0x164 frame match; stack-slot assignment differs (docs/BOUNDINGBOXTREEQUERY.md). Near miss in the unit (moved from samples/physics/bvh/BoundingBoxTreeQueryNearMisses.cpp).",
+    "bindings": "BoundingBoxTreeQuery.bindings.json"
+  },
+  {
+    "class": "BoundingBoxTreeQuery",
+    "source": "BoundingBoxTreeQuery.cpp",
+    "candidate_symbol_contains": "?LeafPairQuery@",
+    "target_va": "0x004275f0",
+    "target_size": 736,
+    "expect": "exact",
+    "notes": "moved from samples; segment[2] at function scope",
+    "bindings": "BoundingBoxTreeQuery.bindings.json"
+  },
+  {
+    "class": "BoundingBoxTreeQuery",
+    "source": "BoundingBoxTreeQuery.cpp",
+    "candidate_symbol_contains": "?PointInTriangle@@",
+    "target_va": "0x004278d0",
+    "target_size": 830,
+    "expect": "exact",
+    "notes": "moved from samples; inline cross products and QueryDot first, out-of-line helpers second; needs the parenthesised first product of CrossProduct and the (a.y * b.y) term of QueryDot",
+    "bindings": "BoundingBoxTreeQuery.bindings.json"
+  },
+  {
+    "class": "(free)",
+    "source": "BoundingBoxTreeQuery.cpp",
+    "candidate_symbol_contains": "?SegmentTriangleQuery@@",
+    "target_va": "0x00427c10",
+    "target_size": 1101,
+    "expect": "partial",
+    "notes": "natural operator form: retail's inline/out-of-line helper sequence; z-first push dot in the clear-flag arm; retail keeps 1 in ebp and loads segment[1] at entry (docs/BOUNDINGBOXTREEQUERY.md). Near miss in the unit (moved from samples/physics/bvh/BoundingBoxTreeQueryNearMisses.cpp).",
+    "bindings": "BoundingBoxTreeQuery.bindings.json"
+  },
+  {
+    "class": "(free)",
+    "source": "BoundingBoxTreeQuery.cpp",
+    "candidate_symbol_contains": "?TreeTreeQueryNodes@@",
+    "target_va": "0x004280e0",
+    "target_size": 2160,
+    "expect": "partial",
+    "notes": "inline copy of the BoxOverlap SAT; one extra expanded constructor and the recursion tails differ (docs/BOUNDINGBOXTREEQUERY.md). Near miss in the unit (moved from samples/physics/bvh/BoundingBoxTreeQueryNearMisses.cpp).",
     "bindings": "BoundingBoxTreeQuery.bindings.json"
   },
   {
@@ -157,26 +247,6 @@
     "target_size": 805,
     "expect": "exact",
     "notes": "moved from samples; the loop output in its own local (homed in the dead center argument slot), so the transformed x is never stored",
-    "bindings": "BoundingBoxTreeQuery.bindings.json"
-  },
-  {
-    "class": "BoundingBoxTreeQuery",
-    "source": "BoundingBoxTreeQuery.cpp",
-    "candidate_symbol_contains": "?SphereTreeQuery@@YAHPBUVec3@@MMPAUQueryTreeNode@@PBUMatrix4@@H@Z",
-    "target_va": "0x00429570",
-    "target_size": 789,
-    "expect": "exact",
-    "notes": "moved from samples; one shared return-0 tail, the second child's call kept out of tail position, d reused for the scaled normal; edges compare against radius",
-    "bindings": "BoundingBoxTreeQuery.bindings.json"
-  },
-  {
-    "class": "BoundingBoxTreeQuery",
-    "source": "BoundingBoxTreeQuery.cpp",
-    "candidate_symbol_contains": "?CapsuleTreeQuery@@YAHPBUVec3@@MMPAUQueryTreeNode@@PBUMatrix4@@H@Z",
-    "target_va": "0x004298c0",
-    "target_size": 1436,
-    "expect": "exact",
-    "notes": "moved from samples; SphereTreeQuery's tails, q and e declared with the triangle branch, the point transformed in place and its length taken by reference",
     "bindings": "BoundingBoxTreeQuery.bindings.json"
   },
   {
@@ -272,6 +342,16 @@
   {
     "class": "BoundingBoxTreeQuery",
     "source": "BoundingBoxTreeQuery.cpp",
+    "candidate_symbol_contains": "?SphereTreeQuery@@YAHPBUVec3@@MMPAUQueryTreeNode@@PBUMatrix4@@H@Z",
+    "target_va": "0x00429570",
+    "target_size": 789,
+    "expect": "exact",
+    "notes": "moved from samples; one shared return-0 tail, the second child's call kept out of tail position, d reused for the scaled normal; edges compare against radius",
+    "bindings": "BoundingBoxTreeQuery.bindings.json"
+  },
+  {
+    "class": "BoundingBoxTreeQuery",
+    "source": "BoundingBoxTreeQuery.cpp",
     "candidate_symbol_contains": "?CapsuleTreeQueryWithVertices@@YAHPBUVec3@@MMPAUQueryTreeNode@@PBUMatrix4@@HPAU1@@Z",
     "target_va": "0x00429890",
     "target_size": 48,
@@ -282,11 +362,31 @@
   {
     "class": "BoundingBoxTreeQuery",
     "source": "BoundingBoxTreeQuery.cpp",
+    "candidate_symbol_contains": "?CapsuleTreeQuery@@YAHPBUVec3@@MMPAUQueryTreeNode@@PBUMatrix4@@H@Z",
+    "target_va": "0x004298c0",
+    "target_size": 1436,
+    "expect": "exact",
+    "notes": "moved from samples; SphereTreeQuery's tails, q and e declared with the triangle branch, the point transformed in place and its length taken by reference",
+    "bindings": "BoundingBoxTreeQuery.bindings.json"
+  },
+  {
+    "class": "BoundingBoxTreeQuery",
+    "source": "BoundingBoxTreeQuery.cpp",
     "candidate_symbol_contains": "?SegmentTreeQueryWithVertices@@YAHPBUVec3@@PAUQueryTreeNode@@PBUMatrix4@@PAU1@@Z",
     "target_va": "0x00429e60",
     "target_size": 33,
     "expect": "exact",
     "notes": "stores the vertex array 0x578f4c, calls 0x429e90",
+    "bindings": "BoundingBoxTreeQuery.bindings.json"
+  },
+  {
+    "class": "BoundingBoxTreeQuery",
+    "source": "BoundingBoxTreeQuery.cpp",
+    "candidate_symbol_contains": "?SegmentTreeQuery@",
+    "target_va": "0x00429e90",
+    "target_size": 712,
+    "expect": "exact",
+    "notes": "segment against a tree; nearest hit to g_CollisionBoxResult",
     "bindings": "BoundingBoxTreeQuery.bindings.json"
   },
   {
@@ -360,6 +460,16 @@
     "bindings": "BoundingBoxTreeQuery.bindings.json"
   },
   {
+    "class": "(free)",
+    "source": "BoundingBoxTreeQuery.cpp",
+    "candidate_symbol_contains": "?SegmentSegmentDistance@@",
+    "target_va": "0x0042a640",
+    "target_size": 1471,
+    "expect": "partial",
+    "notes": "call-view form; retail homes floats in the dead d0/d1 argument slots (frame 0x60 vs 0x80) (docs/BOUNDINGBOXTREEQUERY.md). Near miss in the unit (moved from samples/physics/bvh/BoundingBoxTreeQueryNearMisses.cpp).",
+    "bindings": "BoundingBoxTreeQuery.bindings.json"
+  },
+  {
     "class": "BoundingBoxTreeQuery",
     "source": "BoundingBoxTreeQuery.cpp",
     "candidate_symbol_contains": "?PointSegmentDistance@@YAMPBUVec3@@00@Z",
@@ -367,66 +477,6 @@
     "target_size": 289,
     "expect": "exact",
     "notes": "point-to-segment distance (FastSqrt 0x460b50)",
-    "bindings": "BoundingBoxTreeQuery.bindings.json"
-  },
-  {
-    "class": "BoundingBoxTreeQuery",
-    "source": "BoundingBoxTreeQuery.cpp",
-    "candidate_symbol_contains": "?SegmentTreeQuery@",
-    "target_va": "0x00429e90",
-    "target_size": 712,
-    "expect": "exact",
-    "notes": "segment against a tree; nearest hit to g_CollisionBoxResult",
-    "bindings": "BoundingBoxTreeQuery.bindings.json"
-  },
-  {
-    "class": "BoundingBoxTreeQuery",
-    "source": "BoundingBoxTreeQuery.cpp",
-    "candidate_symbol_contains": "?LeafNodeQuery@",
-    "target_va": "0x004269e0",
-    "target_size": 509,
-    "expect": "exact",
-    "notes": "moved from samples",
-    "bindings": "BoundingBoxTreeQuery.bindings.json"
-  },
-  {
-    "class": "BoundingBoxTreeQuery",
-    "source": "BoundingBoxTreeQuery.cpp",
-    "candidate_symbol_contains": "?LeafPairQuery@",
-    "target_va": "0x004275f0",
-    "target_size": 736,
-    "expect": "exact",
-    "notes": "moved from samples; segment[2] at function scope",
-    "bindings": "BoundingBoxTreeQuery.bindings.json"
-  },
-  {
-    "class": "BoundingBoxTreeQuery",
-    "source": "BoundingBoxTreeQuery.cpp",
-    "candidate_symbol_contains": "?SweptBoxOverlap@",
-    "target_va": "0x00424730",
-    "target_size": 891,
-    "expect": "exact",
-    "notes": "moved from samples; moved and swept centres in sibling blocks (shared slot), centre read through a pointer, component-wise add",
-    "bindings": "BoundingBoxTreeQuery.bindings.json"
-  },
-  {
-    "class": "BoundingBoxTreeQuery",
-    "source": "BoundingBoxTreeQuery.cpp",
-    "candidate_symbol_contains": "?BoxOverlap@@",
-    "target_va": "0x00424ab0",
-    "target_size": 2300,
-    "expect": "exact",
-    "notes": "moved from samples; 15-axis box/box SAT; the inline cross products need Math3D.h's parenthesised first product (fsubp between the copy's load and store)",
-    "bindings": "BoundingBoxTreeQuery.bindings.json"
-  },
-  {
-    "class": "BoundingBoxTreeQuery",
-    "source": "BoundingBoxTreeQuery.cpp",
-    "candidate_symbol_contains": "?PointInTriangle@@",
-    "target_va": "0x004278d0",
-    "target_size": 830,
-    "expect": "exact",
-    "notes": "moved from samples; inline cross products and QueryDot first, out-of-line helpers second; needs the parenthesised first product of CrossProduct and the (a.y * b.y) term of QueryDot",
     "bindings": "BoundingBoxTreeQuery.bindings.json"
   }
 ]

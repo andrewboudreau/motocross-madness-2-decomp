@@ -13,7 +13,7 @@ from tools.emu_cases.segment_triangle_query import apply, matrix, retail_flip, r
 
 RETAIL_VA = 0x00425900
 SYMBOL = '?BoxCapsuleOverlap@@YAHPBUVec3@@00MMPBUMatrix4@@@Z'
-SOURCE = 'samples/physics/bvh/BoundingBoxTreeQueryNearMisses.cpp'
+SOURCE = 'src/krusty2/bvh/BoundingBoxTreeQuery.cpp'
 # The last separating-axis test (yz corner direction) and its pass.
 PROBES = {0x004269cd: 'returns 1'}
 BISECT_EVERY = 2

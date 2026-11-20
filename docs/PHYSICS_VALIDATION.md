@@ -270,7 +270,7 @@ rotated into itself through a by-value inline helper, so VC6 copies it as retail
   (VC6_OPERAND_ORDER.md section 3).
 
 **`src/krusty2/bvh/BoundingBoxTreeQuery.cpp`** (an unattested unit,
-`0x00424690..0x0042ad2f`) passes 42 cases:
+`0x00424690..0x0042ad2f`) passes 43 of 48 cases:
 - its 18 `$E` (the kVec3 set and five empty statics);
 - the segment and sphere box tests;
 - GrowBoxByTransformedBox `0x004290d0`, whose loop writes its own local (VC6 homes it in
@@ -281,8 +281,8 @@ rotated into itself through a by-value inline helper, so VC6 copies it as retail
 - the tree-tree and tree-box queries and the three entry points;
 - the matrix and point helpers.
 
-Dot products need `z*z + (x*x + y*y)`. Near misses are in
-`samples/physics/bvh/BoundingBoxTreeQueryNearMisses.cpp`.
+Dot products need `z*z + (x*x + y*y)`. The five near misses sit in the unit in retail
+order ([BOUNDINGBOXTREEQUERY.md](BOUNDINGBOXTREEQUERY.md)).
 
 ```bash
 python tools/run_physics_samples.py --strict --root src/krusty2/soultree \
@@ -292,7 +292,7 @@ python tools/run_physics_samples.py --strict \
   --vc6-root "$VC6_ROOT" --exe "$MCM2_EXE"
 ```
 
-The second run reports `42/42 strict exact`. The soultree root reports one
+The second run reports `43/48 strict exact`. The soultree root reports one
 required failure, SoulTreePhysics'
 `0x5036f0`, which predates this slice.
 

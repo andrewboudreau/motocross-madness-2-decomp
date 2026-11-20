@@ -20,7 +20,6 @@ SOURCE = 'src/reconstructed/VectorAddAssign.cpp'
 VEHICLE = 'src/krusty2/vehicle/Vehicle.cpp'
 QUERY = 'src/krusty2/bvh/BoundingBoxTreeQuery.cpp'
 TRANSFORM = 'src/reconstructed/CollisionTransforms.cpp'
-SAMPLE = 'samples/physics/bvh/BoundingBoxTreeQueryNearMisses.cpp'
 COLLISION = 'src/krusty2/collision/CollisionObject.cpp'
 FIXTURE = 'tests/fixtures/vector_add_assign_compare.cpp'
 VIEW = '??YVec3AddAssignCall@@QAEAAU0@ABUVec3@@@Z'
@@ -99,7 +98,7 @@ class VectorAddAssignTests(unittest.TestCase):
             emission = output/'canonical.cpp'
             emission.write_text('#include "math/Vec3.h"\nVec3& (Vec3::*g_CanonicalAdd)(const Vec3&) = &Vec3::operator+=;\n')
             objects, paths = {}, {}
-            jobs = [(s, ROOT/s, []) for s in (SOURCE, VEHICLE, QUERY, TRANSFORM, SAMPLE, COLLISION)]
+            jobs = [(s, ROOT/s, []) for s in (SOURCE, VEHICLE, QUERY, TRANSFORM, COLLISION)]
             jobs += [('canonical', emission, []), (FIXTURE, ROOT/FIXTURE, ['--extra','/Od'])]
             for index,(key,source,extra) in enumerate(jobs):
                 obj=output/('unit%d.obj'%index)
@@ -109,7 +108,7 @@ class VectorAddAssignTests(unittest.TestCase):
                     encoding='latin1',env={**os.environ,'PYTHONPATH':str(ROOT)})
                 self.assertEqual(result.returncode,0,result.stdout+result.stderr)
                 objects[key],paths[key]=CoffObject(obj),obj
-            for source in (VEHICLE,QUERY,TRANSFORM,SAMPLE):
+            for source in (VEHICLE,QUERY,TRANSFORM):
                 self.assertEqual(fingerprint(objects[source],source),baseline[source],source)
             strict=0
             for source,symbol in ((SOURCE,VIEW),(VEHICLE,CANONICAL),(COLLISION,CANONICAL),('canonical',CANONICAL)):
@@ -142,7 +141,7 @@ class VectorAddAssignTests(unittest.TestCase):
                 for target in json.loads(manifest.read_text()):
                     if not target.get('source') or target.get('expect')!='exact' or not target.get('bindings'):continue
                     source=(manifest.parent/target['source']).resolve().relative_to(ROOT).as_posix()
-                    if source not in (VEHICLE,QUERY,SAMPLE):continue
+                    if source not in (VEHICLE,QUERY):continue
                     result=compare(retail,objects[source],target['candidate_symbol_contains'],int(target['target_va'],0),
                                    target['target_size'],manifest.parent/target['bindings'])
                     self.assertTrue(result['strict_exact'],(source,target['candidate_symbol_contains'],result))

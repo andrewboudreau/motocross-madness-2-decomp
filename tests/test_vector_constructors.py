@@ -191,7 +191,42 @@ PARTIAL = [('src/krusty2/vehicle/Bike.cpp',
   870,
   870,
   840,
-  '238f4dc861a5571c099b02121d0e364461f08fd576fd5427eabc8a72d1a72e61')]
+  '238f4dc861a5571c099b02121d0e364461f08fd576fd5427eabc8a72d1a72e61'),
+ ('src/krusty2/bvh/BoundingBoxTreeQuery.cpp',
+  '?BoxCapsuleOverlap@@',
+  4348160,
+  4314,
+  4321,
+  2450,
+  '66cf6c8ce2a8994891e514a09c704603d69b7e4b64fe1d3734f31acd2c35fa0c'),
+ ('src/krusty2/bvh/BoundingBoxTreeQuery.cpp',
+  '?BoxTriangleQuery@@',
+  4352992,
+  2576,
+  2576,
+  1542,
+  '4ea1694c29bb23ab0c1c2f63077c7f893fd8957a3383ff3ea318d6a043f08e73'),
+ ('src/krusty2/bvh/BoundingBoxTreeQuery.cpp',
+  '?SegmentTriangleQuery@@',
+  4357136,
+  1101,
+  1112,
+  424,
+  '7db6301754d0b32e848240b0bf7f169bc3a81f6d1ec44a35917d1718fc5ef453'),
+ ('src/krusty2/bvh/BoundingBoxTreeQuery.cpp',
+  '?TreeTreeQueryNodes@@',
+  4358368,
+  2160,
+  2228,
+  450,
+  '1e26dd53e8df823a4b811c57c97481bbf3c2f78ba973203b7d34b391b672fcbc'),
+ ('src/krusty2/bvh/BoundingBoxTreeQuery.cpp',
+  '?SegmentSegmentDistance@@',
+  4367936,
+  1471,
+  1458,
+  73,
+  'f107e0b347373cf9b8e5ae6a8b97938d41b7a4bba291ae0adef3ffdf90302820')]
 
 
 @unittest.skipUnless(os.name == 'nt' and os.environ.get('VC6_ROOT') and os.environ.get('MCM2_EXE'),
@@ -298,7 +333,7 @@ class VectorConstructorTests(unittest.TestCase):
                         resolved = match_object(obj, symbol, va, b'', bindings)
                     self.assertEqual(resolved['digest'], digest, key)
                     partial_count += 1
-            self.assertEqual((strict_count, partial_count), (362, 23))
+            self.assertEqual((strict_count, partial_count), (362, 28))
             compiler = Path(os.environ['VC6_ROOT'])
             linker = find_child_ci(find_vc6_bin(compiler), 'link.exe')
             libraries = find_child_ci(infer_vc98_root(compiler), 'lib')
@@ -310,7 +345,7 @@ class VectorConstructorTests(unittest.TestCase):
             result = subprocess.run([str(executable)], capture_output=True, text=True, timeout=30)
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             self.assertIn('Vector constructors: 72240 raw-bit, placement and overlap cases passed', result.stdout)
-            print('362 strict checks and 23 complete partial fingerprints; ' + result.stdout.strip())
+            print('362 strict checks and 28 complete partial fingerprints; ' + result.stdout.strip())
 
 
 if __name__ == '__main__':

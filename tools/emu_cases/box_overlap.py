@@ -1,7 +1,6 @@
 """BoxOverlap 0x00424ab0, the 15-axis box/box separating-axis test (tools/emu_diff.py case).
 
-The linked body is the samples/physics/bvh/BoundingBoxTreeQueryNearMisses.cpp copy of
-src/krusty2/bvh/BoundingBoxTreeQuery.cpp. Box A (centre, half extents) is tested against box
+The linked body is src/krusty2/bvh/BoundingBoxTreeQuery.cpp. Box A (centre, half extents) is tested against box
 B given in A's frame through a matrix (identity, an axis permutation or a random rotation,
 random translation). The axis table s_axes is bound to its retail address (as for the tree
 cases). B's centre offset is random, and every BISECT_EVERY-th case is slid along a random
@@ -13,7 +12,7 @@ from tools.emu_cases.segment_triangle_query import STATIC_BINDINGS, matrix, reta
 
 RETAIL_VA = 0x00424ab0
 SYMBOL = '?BoxOverlap@@YAHPBUVec3@@0U1@1PBUMatrix4@@@Z'
-SOURCE = 'samples/physics/bvh/BoundingBoxTreeQueryNearMisses.cpp'
+SOURCE = 'src/krusty2/bvh/BoundingBoxTreeQuery.cpp'
 BINDINGS = dict(STATIC_BINDINGS)
 BISECT_EVERY = 3
 

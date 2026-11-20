@@ -17,7 +17,6 @@ from tools.match import compare
 
 ROOT = Path(__file__).resolve().parents[1]
 QUERY = 'src/krusty2/bvh/BoundingBoxTreeQuery.cpp'
-SAMPLE = 'samples/physics/bvh/BoundingBoxTreeQueryNearMisses.cpp'
 VECTOR = 'src/reconstructed/VectorCalls.cpp'
 LEFT = 'src/reconstructed/VectorScaleLeft.cpp'
 COLLISION = 'src/krusty2/collision/CollisionObject.cpp'
@@ -84,7 +83,7 @@ class BvhVectorConnectionsTests(unittest.TestCase):
                     definition((ROOT/COLLISION).read_text(), 'CollisionLength'),
             }
             paths, objects = {}, {}
-            jobs = [(source, ROOT/source, []) for source in (QUERY, SAMPLE, VECTOR, LEFT, COLLISION, FAST)]
+            jobs = [(source, ROOT/source, []) for source in (QUERY, VECTOR, LEFT, COLLISION, FAST)]
             for key, text in extracted.items():
                 path = output/(key+'.cpp')
                 path.write_text(text+'\n')
@@ -97,13 +96,18 @@ class BvhVectorConnectionsTests(unittest.TestCase):
                     text=True, encoding='latin1', env={**os.environ, 'PYTHONPATH': str(ROOT)})
                 self.assertEqual(result.returncode, 0, result.stdout+result.stderr)
                 paths[key], objects[key] = obj, CoffObject(obj)
-            for source in (QUERY, SAMPLE):
-                self.assertEqual(object_fingerprint(objects[source]), baseline[source], source)
+            self.assertEqual(object_fingerprint(objects[QUERY]), baseline[QUERY], QUERY)
             imports = {s.name for s in objects[QUERY].symbols if s.section_number == 0}
-            self.assertFalse(set(RENAMES) & imports)
             self.assertTrue(set(RENAMES.values()) <= imports)
-            # Separate aggregate methods retain their existing provisional calls.
-            self.assertTrue(set(RENAMES) & {s.name for s in objects[SAMPLE].symbols if s.section_number == 0})
+            # Only the near miss SegmentSegmentDistance 0x0042a640 keeps its by-value call
+            # views (link_aliases join them to the same providers); no other body uses them.
+            functions = [s for s in objects[QUERY].symbols if s.section_number > 0 and s.type == 0x20]
+            users = set()
+            for r in objects[QUERY].relocations:
+                if objects[QUERY].symbol_by_index[r.symbol_index].name in RENAMES:
+                    users.add(max((f for f in functions if f.section_number == r.section_number
+                                   and f.value <= r.virtual_address), key=lambda f: f.value).name)
+            self.assertEqual(users, {'?SegmentSegmentDistance@@YAMPBUVec3@@000@Z'})
             strict = 0
             targets = []
             for base in ('src/krusty2/bvh', 'samples/physics/bvh'):
@@ -112,7 +116,7 @@ class BvhVectorConnectionsTests(unittest.TestCase):
                     if not target.get('source') or not target.get('bindings'):
                         continue
                     source = (manifest.parent/target['source']).resolve().relative_to(ROOT).as_posix()
-                    if source in (QUERY, SAMPLE) and target.get('expect') == 'exact':
+                    if source == QUERY and target.get('expect') == 'exact':
                         targets.append((source, target['candidate_symbol_contains'], int(target['target_va'], 0),
                                         target['target_size'], manifest.parent/target['bindings']))
             providers = [(VECTOR, '?Vec3AddCall@@', 0x421cb0, 69),

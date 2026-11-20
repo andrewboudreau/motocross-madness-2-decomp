@@ -37,6 +37,11 @@ PARTIAL = [
     ('src/krusty2/vehicle/Bike.cpp', 'LoadBike@Bike', 4225472, 6745, 6745, 6428, '9bcbfd9d8f540b6e0d5940830d4fc4450dd15d499a5018587c34c76ff10e393e'),
     ('src/reconstructed/wrecker.cpp', '?PushProbesOutOfBox@Wrecker@@', 5450208, 1312, 1312, 1200, 'ee990cbeffbb403f2238ce88038c256717237b874c57444ad28b5ed7ff53e2cb'),
     ('src/reconstructed/wrecker.cpp', '?SprayContactParticles@Wrecker@@', 5445440, 1624, 1624, 1606, '439fd80876fa804dde2e6522a6deaae3048455a89c2d1074ae21263310e408d6'),
+    ('src/krusty2/bvh/BoundingBoxTreeQuery.cpp', '?BoxCapsuleOverlap@@', 4348160, 4314, 4321, 2450, '66cf6c8ce2a8994891e514a09c704603d69b7e4b64fe1d3734f31acd2c35fa0c'),
+    ('src/krusty2/bvh/BoundingBoxTreeQuery.cpp', '?BoxTriangleQuery@@', 4352992, 2576, 2576, 1542, '4ea1694c29bb23ab0c1c2f63077c7f893fd8957a3383ff3ea318d6a043f08e73'),
+    ('src/krusty2/bvh/BoundingBoxTreeQuery.cpp', '?SegmentTriangleQuery@@', 4357136, 1101, 1112, 424, '7db6301754d0b32e848240b0bf7f169bc3a81f6d1ec44a35917d1718fc5ef453'),
+    ('src/krusty2/bvh/BoundingBoxTreeQuery.cpp', '?TreeTreeQueryNodes@@', 4358368, 2160, 2228, 450, '1e26dd53e8df823a4b811c57c97481bbf3c2f78ba973203b7d34b391b672fcbc'),
+    ('src/krusty2/bvh/BoundingBoxTreeQuery.cpp', '?SegmentSegmentDistance@@', 4367936, 1471, 1458, 73, 'f107e0b347373cf9b8e5ae6a8b97938d41b7a4bba291ae0adef3ffdf90302820'),
 ]
 
 
@@ -99,12 +104,28 @@ class MathCallConnectionsTests(unittest.TestCase):
                 if any(wrecker.symbol_by_index[r.symbol_index].name == by_value_scale for r in relocs):
                     callers.add(symbol.name)
             self.assertEqual(callers, near_misses)
+            # BoundingBoxTreeQuery.cpp's near misses (and their normalise helper) keep the
+            # by-value dot view; none of the unit's exact functions calls it.
+            by_value_dot = '?Vec3Dot@@YAMABUVec3@@0@Z'
+            query = objects[SOURCES[5]]
+            callers = set()
+            for symbol in query.symbols:
+                if symbol.storage_class != 2 or symbol.section_number <= 0 or not symbol.function_size:
+                    continue
+                _, _, relocs = query.symbol_extent(symbol)
+                if any(query.symbol_by_index[r.symbol_index].name == by_value_dot for r in relocs):
+                    callers.add(symbol.name)
+            self.assertEqual(callers, {'?BoxCapsuleOverlap@@YAHPBUVec3@@00MMPBUMatrix4@@@Z',
+                                       '?BoxTriangleQuery@@YAHPBUVec3@@0PBUQueryTriangle@@PBUMatrix4@@@Z',
+                                       '?TreeTreeQueryNodes@@YAHPAUQueryTreeNode@@0H@Z',
+                                       '?SegmentSegmentDistance@@YAMPBUVec3@@000@Z',
+                                       '?Vec3NormalizeInline@@YA?AUVec3@@ABU1@@Z'})
             for source, wanted in expected_imports.items():
                 obj = objects[source]
                 imports = {symbol.name for symbol in obj.symbols
                            if symbol.storage_class == 2 and symbol.section_number == 0}
                 self.assertTrue(wanted <= imports, (source, wanted - imports))
-                allowed = {by_value_scale} if source == SOURCES[3] else set()
+                allowed = {SOURCES[3]: {by_value_scale}, SOURCES[5]: {by_value_dot}}.get(source, set())
                 self.assertFalse((retired - allowed) & imports, (source, retired & imports))
                 calls = {obj.symbol_by_index[r.symbol_index].name
                          for r in obj.relocations if r.type == 0x14}

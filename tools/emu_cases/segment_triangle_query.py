@@ -127,7 +127,7 @@ def write_matrix(ctx, m, at=None):
 
 RETAIL_VA = 0x00427c10
 SYMBOL = '?SegmentTriangleQuery@@YAHPBUQueryTriangle@@PBUVec3@@PBUMatrix4@@@Z'
-SOURCE = 'samples/physics/bvh/BoundingBoxTreeQueryNearMisses.cpp'
+SOURCE = 'src/krusty2/bvh/BoundingBoxTreeQuery.cpp'
 PROBES = {0x00427f53: 'PointInTriangle call', 0x00427fa6: 'dedup loop', 0x00427fbf: 'normal appended'}
 SET_FLAG = False
 

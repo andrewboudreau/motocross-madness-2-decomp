@@ -1,4 +1,5 @@
-Candidate implementations for this area are preserved in `samples/physics/bvh/`.
+The sources here are canonical; `samples/physics/bvh/targets.json` only registers the two
+CollisionTransforms checks.
 Shared headers stay here. See [physics validation](../../../docs/PHYSICS_VALIDATION.md).
 
 # BoundingBoxTreeBuild.cpp (bvh)
@@ -15,8 +16,8 @@ Evidence
     calls them.
   - The code before 0x42ad30 is a separate, unattested unit (0x424690..0x42ad2f), with
     its own kVec3 `$E` set at 0x429400 and its own bss: the run-time queries in
-    `BoundingBoxTreeQuery.cpp` (file name ours; near misses in
-    `samples/physics/bvh/BoundingBoxTreeQueryNearMisses.cpp`).
+    `BoundingBoxTreeQuery.cpp` (file name ours; its five near misses sit in it in
+    retail order, see docs/BOUNDINGBOXTREEQUERY.md).
   - 0x42e2b0, the rigid inverse, is called only from CollisionObject. It is in
     `src/reconstructed/CollisionTransforms.cpp`.
 - RTTI: none. The file has no classes, only free functions over plain structs.
@@ -59,8 +60,8 @@ Strict exact beyond the registered 33 cases (pending registration, all in
   case-2 `segment[2]` is declared at function scope (retail gives it its own slots above
   case 1's locals, which is where the extra 12 bytes came from).
 
-Near misses with their current scores are listed at the top of
-`samples/physics/bvh/BoundingBoxTreeQueryNearMisses.cpp`.
+The five near misses sit in the unit in retail order, each with a status comment; their
+scores and the forms tried are in docs/BOUNDINGBOXTREEQUERY.md.
 - SweptBoxOverlap 0x424730 is exact: the moved centre and the swept centre are block-scoped
   locals (sibling blocks share one slot, which then ranks below the delta and extent
   vectors), the centre is read through a pointer for the delta, and the swept centre is

@@ -52,7 +52,8 @@ original call site remains unchanged.
 
 The four affected translation units retain all **257 old nondebug sections and
 1,709 relocations**: BoundingBoxTreeQuery, Vehicle, CollisionTransforms and the
-separate BoundingBoxTreeQueryNearMisses aggregate. Every old section payload,
+then-separate BoundingBoxTreeQueryNearMisses aggregate (whose bodies now sit in
+BoundingBoxTreeQuery.cpp; its fixture pin covers them). Every old section payload,
 flag and relocation location/type/addend/destination is preserved. The two
 Vehicle relocation destinations change from the obsolete external view to the
 verified canonical operator. Vehicle adds one natural 33-byte COMDAT; that
