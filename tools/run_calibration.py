@@ -25400,6 +25400,14 @@ CASES = [
         'target_size': 619,
     },
     {
+        'name': 'SceneManager.cpp 0x4ecd60 Scene::ReadStaticModels',
+        'bindings': 'src/reconstructed/SceneManager.bindings.json',
+        'source': 'src/reconstructed/SceneManager.cpp',
+        'symbol': '?ReadStaticModels@Scene@@QAEHPAVLightManager@@HHHP6AXH@ZH@Z',
+        'target_va': '0x004ecd60',
+        'target_size': 4536,
+    },
+    {
         'name': 'SelectGamePicProcs.cpp 0x4f1740 player records initializer stub',
         'bindings': 'src/reconstructed/SelectGamePicProcs.bindings.json',
         'source': 'src/reconstructed/SelectGamePicProcs.cpp',

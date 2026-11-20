@@ -161,7 +161,7 @@ struct SceneAnimationTable {
 class ShadowCaster;
 class ProjectedShadow;
 
-// Views declared in samples/track/SceneManagerNearMisses.cpp (0x004ecd60).
+// Views declared in SceneManager.cpp (0x004ecd60).
 class SceneSoultreePhysicsObjectView;
 class SceneCollisionObjectView;
 
@@ -326,12 +326,12 @@ public:
     // collision object, and its sound emitter. `progress` is called every
     // `interval` models.
     int ReadStaticModels(LightManager* lights, int particleManager, int textureManager, int modelTextures, void (*progress)(int),
-                              int interval);           // near miss (samples/track)
+                              int interval);
     // 0x004edfe0: reads "Animations": a key-framed character or a procedural
     // car per "Animation<n>", with its motions and sound emitter, then the
     // "RandomSet<n>" sections.
     int ReadAnimations(LightManager* lights, int textureManager, int modelTextures, void (*progress)(int),
-                              int interval);           // near miss (samples/track)
+                              int interval);           // near miss
     int ReadSounds();                                // 0x004ef4c0: reads the "Sounds" section
     int ReadEnvironment(const char* directory, const char* cubeDirectory); // 0x004ebfc0: "Environment"
     int ReadLight(int index);             // 0x004eb570: reads "Light<index + 1>"

@@ -14,7 +14,7 @@ relocations. Existing headers, reader bodies, and binding names are unchanged.
 | `LogParameter(const char*, const char*, int)` | `0x004de580` | `ret 12` | 9 |
 | `LogParameter(const char*, const char*, const Vector3*)` | `0x004de580` | `ret 12` | 1 |
 | `LogDefaultParameter(const char*, const char*, const char*)` | `0x004de580` | `ret 12` | 2 |
-| `LogMessage(const char*)` | `0x00464e80` | `ret 4` | 25 |
+| `LogMessage(const char*)` | `0x00464e80` | `ret 4` | 29 |
 
 Each return is followed by thirteen NOPs before the next entry. There are no
 receiver or argument reads, logging calls, output writes, or returned-value
@@ -35,12 +35,12 @@ pointer, writes the Scene vtable to `[esi]` at `0x004ea6f7`, and returns ESI.
 The native fixture also checks Scene's `0x8cc` size and zero-offset GameObject
 conversion.
 
-The regression checks all 74 actual COFF call relocations against decoded retail
-destinations in ten complete readers: ReadVector, ReadColor, ReadLight, ReadFog,
-ReadEnvironment, OpenResourceFiles, ReadSounds, Load, CountObjects, and
-CountTextures. Each saves the incoming primary Scene pointer and restores it to
-ECX at these direct call boundaries. All 51 registered SceneManager bodies,
-including its constructor and these ten readers, remain full strict matches.
+The regression checks all 78 actual COFF call relocations against decoded retail
+destinations in eleven complete readers: ReadVector, ReadColor, ReadLight, ReadFog,
+ReadEnvironment, OpenResourceFiles, ReadStaticModels, ReadSounds, Load, CountObjects,
+and CountTextures. Each saves the incoming primary Scene pointer and restores it to
+ECX at these direct call boundaries. All 52 registered SceneManager bodies,
+including its constructor and these eleven readers, remain full strict matches.
 
 Six representative instruction sequences independently check the argument
 shapes. The callers push section/key/value or one formatted-message pointer;
@@ -56,7 +56,7 @@ folded form at `0x004ec3c3`.
 
 `tests/test_scene_callbacks.py` compiles the actual standalone provider and
 links it unchanged with `tests/fixtures/scene_callbacks.cpp`. It verifies six
-complete strict providers, all 51 existing SceneManager cases, the 74 call
+complete strict providers, all 52 existing SceneManager cases, the 78 call
 boundaries, and **36,864 native calls**: 256 storage patterns, eight argument
 patterns, three receiver arrangements, and six methods. Every call checks the
 complete prepared Scene-sized storage and adjacent guards. Receiver arrangements

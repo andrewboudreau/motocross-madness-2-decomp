@@ -1,7 +1,7 @@
 # SceneManager.cpp: the track scene loader
 
 `src/reconstructed/SceneManager.cpp` reconstructs part of
-`D:\aardvark\VC\krusty2\SceneManager.cpp`. 51 functions match strictly
+`D:\aardvark\VC\krusty2\SceneManager.cpp`. 52 functions match strictly
 under the default VC6 profile. The only RTTI name is `Scene` (`Scene : GameObject : BaseObject`). All other
 type, member and function names are provisional.
 
@@ -27,8 +27,8 @@ type, member and function names are provisional.
   - Overridden slots: 0 (deleting destructor `0x004ea7c0`), 5, 7, 10, 14, 22
     and 23. Slot 10 (`0x004eab00`) is not reconstructed.
 - Function starts in the extent (call targets, data references and
-  post-padding starts, minus jump-table targets): 54. Matched: 51; two
-  near misses, one not reconstructed.
+  post-padding starts, minus jump-table targets): 54. Matched: 52; one
+  near miss (`0x004edfe0`), one not reconstructed (slot 10).
 - `SceneArchiveFinder` (TrackGame+0x574) has its constructor and
   scene-file helpers here: `0x004e99d0`..`0x004ea390`.
 - `0x004de580` (`ret 0xc`) and `0x00464e80` (`ret 4`) are shared empty
@@ -158,19 +158,18 @@ its loader sample read them too; renaming them is a joint change with that
 unit. `SceneCollisionCharacterView::field_0x10` cannot take a name without the
 member lookup resolving to the virtual base's protected `field_0x10`.
 
-## Not reconstructed
+## The model and animation readers
 
-- `0x004eab00` (slot 10, 958 bytes): its ebp frame and `fld; fistp` through
-  a pointer are an inlined `__asm` float-to-int helper. The bring-up body
-  (`src/bringup/Group4_SceneTick.cpp`) keeps the frame with a per-function
-  pragma (docs/GAME_BUILD.md#frame-pointer-units).
-- `0x004ecd60` (4543 bytes with its padding and jump table) is strict
-  exact in `samples/track/SceneManagerNearMisses.cpp` (4536 of 4536
-  compared positions): the "StaticModels" reader, which builds each model's
-  physics object (constructor `0x005037c0`, slots 37/40), collision points
-  (`0x0043a330`), particle emitters (`0x004b8a00`, `0x004b8df0`,
-  `0x004b9310`, slot 27), collision object (`0x00431e70`) and sound emitter.
-  The views of those classes live in the sample. Shapes that mattered:
+Both sit in retail order between `0x004ecc10` (Stadium) and `0x004edf20`
+(shadow receivers), with the views they use declared just above them. They
+moved in from `samples/track/SceneManagerNearMisses.cpp`.
+
+- `0x004ecd60` `ReadStaticModels` (4543 bytes with its padding and jump
+  table) is strict exact (4536 of 4536 compared positions; a calibration
+  case). It reads "StaticModels" and builds each model's physics object
+  (constructor `0x005037c0`, slots 37/40), collision points (`0x0043a330`),
+  particle emitters (`0x004b8a00`, `0x004b8df0`, `0x004b9310`, slot 27),
+  collision object (`0x00431e70`) and sound emitter. Shapes that mattered:
   nested `if`s for the missing-count and no-models messages, `model[0x44]`
   and `slt[0x108]` (retail's frame), the emitter loop inside
   `if (points > 0)` and `if (a2)`, inline keyword lookups over local
@@ -178,47 +177,87 @@ member lookup resolving to the virtual base's protected `field_0x10`.
   declared at function scope and cleared with the other counters at the
   top (`count = 0;`), which gives the name terminator's address retail's
   operand order.
-- `0x004edfe0` (5343 bytes) is a near miss in the same sample (4393 of
-  5346 compared positions): the "Animations" reader. Each "Animation<n>"
-  entry (`SceneAnimation`, 0x44 bytes) is either key-framed (bit 3; a
+- `0x004edfe0` `ReadAnimations` (5343 bytes) is a near miss, 5289 of 5335
+  bytes. It reads "Animations". Each "Animation<n>" entry
+  (`SceneAnimation`, 0x44 bytes) is either key-framed (bit 3; a
   `CollisionCharacter`, 0x294 bytes, constructor `0x004318d0`, loaded by
   `0x004319c0`, motions from `0x004a6b30`) or procedural (a `CarProcedural`,
   0x22c bytes, constructor `0x0042f390`, slot 27). The "RandomSet<n>"
-  sections fill `SceneRandomSet`. Code, calls, EH states and the frame
-  size line up. What differs:
-  - the frame slots of most scalars and of two buffers;
-  - one count comparison (a table local for the allocation count gives
-    retail's reload; the [ebx + reg] operand order is left);
-  - the grouping of the shared "Cannot find %s" error tails;
-  - the load order at the end of the random-set loop.
+  sections fill `SceneRandomSet`.
 
-  VC6 orders this frame by use, not by declaration or name. Shapes that
-  mattered:
-  - `length > 0x103 ? 0x103 : length` through a separate variable;
-  - the MotionSequence/NumberInSequence checks nested as if/else, with the
-    inner error placed first;
-  - `for (m...; m++)` with `m + 1` passed to sprintf;
-  - the sound node chosen by if/else on full member expressions;
-  - `strrchr` for the ".col" name.
+The game links both bodies; `config/game_build.json` `link_aliases` joins
+the views' constructors and methods to their providers.
 
-  Slot map (candidate -> retail, frame-relative, by use count): the
-  shared `axes` / `j` class (20 uses, `+0`), `animations` (6, `+0xc`),
-  `lagDistance` (5, `+0x18`), `tires` (4, `+0x20`), `useLighting` (3,
-  `+0x24`), `exclude` (2, `+0x30`) and `name` (`+0x44`) already sit at
-  retail's offsets. Retail's `+0x4` is `automatic` with 7 uses (6 here:
-  retail stores the strcspn result and reloads it for the compare),
-  `+0x8` is `fps` (4 uses) sharing with the random-set loop's spilled
-  element offset (`k * 0x44`, 4 uses; here the counter itself lives in
-  `i`'s slot, 10 uses), `+0x10` is `i` (6), `+0x14` `frontWheelsTurn`,
-  `+0x1c` `next`; the seven two-use scalars come out in a different order
-  (retail: randomTriggerPercent, oneShotDistance, exclude, flags, heading,
-  pitch, force2D from `+0x28`; here heading, randomTriggerPercent,
-  exclude, pitch, oneShotDistance, force2D, flags), which no declaration
-  order changes (VC6 orders ties by a function of the whole list, not of
-  the tied group); `sltPath` is retail's `+0xaf4` (here `+0xa70`) and
-  `list` retail's `+0xa70` (here `+0xb74`).
-  A separate random-set counter with a loop-scoped `fps` reproduces
-  retail's `fps` sharing but not its strength-reduced offset.
+### Forms tried
+
+Scene::ReadStaticModels (0x004ecd60, 4536 code bytes): the "StaticModels"
+reader, strict exact. The last difference was the model name's terminator
+`staticModels->casters[i].fileName[count] = 0`: retail adds the element
+offset to the array pointer first (`add edx,ebx; mov [edx+esi+0x10],0`),
+the candidate added the count first. `count` is a function-scope local
+that is zeroed with `models` at the top: its leaf is then older than the
+`i * sizeof` temporary created at the first `casters[i]`, and VC6 adds the
+older leaf last (docs/VC6_OPERAND_ORDER.md 1.2). The clear is inferred
+from that order (its value is never read; 4534/4536 without it). A dead
+initialisation of `length` instead, or `count` declared at function scope without the early
+store, leaves the candidate order. Forms that never moved it while `count`
+was first assigned at the strcspn clamp: pointer and index spellings, the
+clamp forms, inline helpers, an element pointer local, declaration order,
+`count`/`length`/`i` types, `'\0'`, `*(p + count)`, extra uses of `count`,
+`(p + i)->`, a count-plus-pointer form, char* arithmetic, `i++` with
+`i + 1`, a `follow` local for the sound emitter's model (worse), 0..63
+prepended typedefs, 0-33 dead locals and the /G3-/G6, /GB, /Gy, /Gf, /Zp,
+/Op, /Ox, /vm* flags.
+k-scan (s22): compiled behind 0..63 prepended typedefs, 0x004ecd60,
+0x004edfe0 have the same code at every count, so their differences are not
+a declaration-count effect (docs/VC6_OPERAND_ORDER.md section 2).
+
+Scene::ReadAnimations (0x004edfe0, 5335 bytes): the "Animations"
+reader. Instruction count (1479), calls, EH states and every error tail
+match. The random-set loop counts with `i++` and prints `i + 1` (no
+`next` temporary), and the strcspn result is its own block-local `dot`:
+that loop then keeps retail's strength-reduced entries offset in ebx,
+stores/reloads `dot` around strlen and stores an immediate 0 at
+token[dot], and the "Cannot find" errors keep retail's two sprintf tails
+(4393 -> 5113 of 5335). The frame: the five sound-settings scalars
+(flags, oneShotDistance, randomTriggerPercent, oneShot, force2D) are
+locals of the `if (strcmp(sound, "") && ...)` block and `automatic` is a
+local of the keyFramed block (it serves both GetInt calls there). Both
+are needed together; either one alone leaves the frame at 0xd00 (5113).
+With them the frame is retail's 0xcfc, slot 0 holds retail's {sequence j,
+axes, random-set j, temporaries} and every slot from useLighting (0x24)
+up is retail's (5288). heading and pitch as loop-body locals give one
+more byte (5289); any other single scalar moved to the loop body gives
+the same byte, more of them nothing further.
+Left (46 bytes): (1) the low scalar slots. Retail: {dot, automatic} 4,
+{fps, the random-set entries-offset spill} 8, animations 0xc, i 0x10,
+frontWheelsTurn 0x14, lagDistance 0x18, next 0x1c, tires 0x20. Here:
+{spill, i} 4, {automatic, dot} 8, animations 0xc, frontWheelsTurn 0x10,
+next 0x14, lagDistance 0x18, fps 0x1c, tires 0x20. So retail lets the
+spill reuse fps's home and keeps i's home to itself. (2) The
+motions allocation tests and reloads motionCount as [ebx + ecx + 0x1c]
+(i offset first) where this gives [ecx + ebx + 0x1c].
+Without effect on (1), on top of the form above: fps (alone or with
+lagDistance, frontWheelsTurn, tires) in the loop body, in a block around
+the loop or in a bare block inside the loop body; any order of the
+loop-body declarations; a separate random-set index (`for (int k` or a
+function local). Before the form above, 72 scope combinations of
+automatic, fps, dot, i and axes were flat too; `automatic` as two
+separate bare-block locals around the two GetInt calls gives slot 0
+retail's contents and moves the spill into the first one's home (5129,
+frame still 0xd00). Reusing `automatic` for dot loses the store/reload
+shape (4349).
+Tried for (2): no `table` local or a named count (5268), `table` taken
+before the test (3076) or used for the store too (2688), an entries or
+entry pointer local (2736, 2869), `i = 0;` or `next = 0;` at the top
+of the function (5289, no change).
+
+## Not reconstructed
+
+- `0x004eab00` (slot 10, 958 bytes): its ebp frame and `fld; fistp` through
+  a pointer are an inlined `__asm` float-to-int helper. The bring-up body
+  (`src/bringup/Group4_SceneTick.cpp`) keeps the frame with a per-function
+  pragma (docs/GAME_BUILD.md#frame-pointer-units).
 - `0x004f17a0` lies after the player-record initializers that open
   SelectGamePicProcs.cpp.
 
@@ -257,5 +296,5 @@ replace are in Git history. Tier 3 unless the entry says otherwise.
 - `0x004f0ec0` `ResolveSltPath`
 - `0x004f1130` `CountTextures`
 - `0x004eaec0` `FindEntryByFileName`
-- `0x0043a330` `AddCollisionPoint` (the near-miss sample's copy; the name
+- `0x0043a330` `AddCollisionPoint` (the view in this file; the name
   krusty2's CollisionPoint.cpp gives the same address)

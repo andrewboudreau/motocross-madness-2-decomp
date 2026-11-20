@@ -974,6 +974,514 @@ void Scene::ReadStadium()
     }
 }
 
+// SoultreeMaterial.h comes in here, after the earlier scene and light parsers:
+// declaration order affects VC6's ReadLight code.  The static-model views and the
+// texture-accounting functions below construct and inspect materials.
+#include "SoultreeMaterial.h"
+
+// The particle emitters a physics model may carry (0x004ecd60). Views of
+// classes reconstructed in src/reconstructed/*ParticleEmitter.cpp: GameObjects whose own
+// slot 27 attaches them and returns the GameObject to add as a child.
+class SceneParticleEmitterView : public GameObject {
+public:
+    virtual GameObject* Create(void* owner, int a);
+};
+class SceneDustParticleEmitterView : public SceneParticleEmitterView {
+public:
+    explicit SceneDustParticleEmitterView(int flags);       // 0x004b8a00
+
+    unsigned char field_0x2c[0x80 - 0x2c];
+};
+class SceneDirtChunkParticleEmitterView : public SceneParticleEmitterView {
+public:
+    explicit SceneDirtChunkParticleEmitterView(int flags);      // 0x004b8df0
+
+    unsigned char field_0x2c[0x608 - 0x2c];
+};
+class SceneDirtSprayParticleEmitterView : public SceneParticleEmitterView {
+public:
+    explicit SceneDirtSprayParticleEmitterView(int flags);      // 0x004b9310
+
+    unsigned char field_0x2c[0x608 - 0x2c];
+};
+
+// The physics part of a "PhysicsObject" model (0x524 bytes, constructor
+// 0x005037c0; src/krusty2/soultree's SoultreePhysicsObject family). Only the
+// slots and fields 0x004ecd60 uses are declared: slot 37 attaches a particle
+// emitter, slot 40 loads the model and returns the GameObject to add.
+class SceneSoultreePhysicsBaseObjectView {
+public:
+    virtual void UpdateMass();
+    virtual void ResetDynamicState();
+    virtual void InitializePhysics();
+    virtual void ApplyStaticContactImpulse();
+    virtual void ApplyBodyContactImpulse();
+    virtual void ShouldRefreshContacts();
+    virtual void ApplyDrag();
+    virtual void DistributeContactForce();
+    virtual void UpdateLocalCenterOfMass();
+    virtual void ComputeFrameSteps();
+    virtual void IsAtBaseWeight();
+    virtual void FindPlacement();
+    virtual void ClassifyOutOfBounds();
+    virtual void AccumulateContactForces();
+    virtual void IntegrateMotion();
+    virtual void ApplyWorldTorque();
+    virtual void LocalTorqueToAngularAcceleration();
+    virtual void AverageAttachmentPosition();
+    virtual void UpdateContactEffect();
+    virtual void UpdateSlideEffect();
+    virtual void UpdateScrapeEffect();
+    virtual void UpdateAttachmentEffects();
+    virtual void ShouldUpdateShadowLight();
+    virtual void ShouldEmitMovingEffects();
+    virtual void ShouldRestartSteamEffect();
+    virtual void ShouldBurstSteamEffect();
+    virtual void OnPhysicsStep();
+    virtual void StartWreck();
+    virtual void ResolveSubstepCollisions();
+    virtual void SaveBodyOrientation();
+    virtual void ClearContactEffectFlags();
+    virtual void UpdateContactStates();
+    virtual void EffectiveLoadWeight();
+    virtual void ResetToPlacement();
+    virtual void LoadBodyAxes();
+    virtual void StoreBodyAxes();
+    virtual void ResetBodyOrientation();
+    virtual void AddAttachment(int type, GameObject* emitter, void* point, int a);
+    virtual void ApplyCollisionEvent();
+    virtual void ApplyPendingRespawn();
+    virtual GameObject* LoadPhysicsModel(void* owner, const char* name, LightManager* lights, int options,
+                                             Vector3 position, Vector3 look, Vector3 up, int terrainProbe, int a9,
+                                             float weight, int points, int emitters, Scene* scene, float fixedStep,
+                                             int maxSteps, float drag, float elasticity, float radius, int shape,
+                                             int minPoints, char probeMask, int createCollision);
+
+    int vbptr;                            // +0x04: vbtable 0x557ff8 (ctor 0x005037c0), compiler generated
+    void* followedNode;                   // +0x08: the scene node the collision points follow
+    Vector3 position;                         // +0x00c SoultreePhysicsBaseObject position
+    Vector3 centerOfMass;                     // +0x018 SoultreePhysicsBaseObject centerOfMass
+    float invMass;                            // +0x024 SoultreePhysicsBaseObject invMass
+    float inverseLoadMass;                    // +0x028 SoultreePhysicsBaseObject inverseLoadMass
+    float bodyRoll;                           // +0x02c SoultreePhysicsBaseObject bodyRoll
+    float bodyPitch;                          // +0x030 SoultreePhysicsBaseObject bodyPitch
+    float bodyYaw;                            // +0x034 SoultreePhysicsBaseObject bodyYaw
+    float bodySinRoll;                        // +0x038 SoultreePhysicsBaseObject bodySinRoll
+    float bodyCosRoll;                        // +0x03c SoultreePhysicsBaseObject bodyCosRoll
+    float bodySinPitch;                       // +0x040 SoultreePhysicsBaseObject bodySinPitch
+    float bodyCosPitch;                       // +0x044 SoultreePhysicsBaseObject bodyCosPitch
+    float savedRoll;                          // +0x048 SoultreePhysicsBaseObject savedRoll
+    float savedPitch;                         // +0x04c SoultreePhysicsBaseObject savedPitch
+    float savedYaw;                           // +0x050 SoultreePhysicsBaseObject savedYaw
+    float savedSinRoll;                       // +0x054 SoultreePhysicsBaseObject savedSinRoll
+    float savedCosRoll;                       // +0x058 SoultreePhysicsBaseObject savedCosRoll
+    float savedSinPitch;                      // +0x05c SoultreePhysicsBaseObject savedSinPitch
+    float savedCosPitch;                      // +0x060 SoultreePhysicsBaseObject savedCosPitch
+    Vector3 velocity;                         // +0x064 SoultreePhysicsBaseObject velocity
+    Vector3 acceleration;                     // +0x070 SoultreePhysicsBaseObject acceleration
+    Vector3 prevVelocity;                     // +0x07c SoultreePhysicsBaseObject prevVelocity
+    Vector3 bodyForward;                      // +0x088 SoultreePhysicsBaseObject bodyForward
+    Vector3 bodyUp;                           // +0x094 SoultreePhysicsBaseObject bodyUp
+    Vector3 savedForward;                     // +0x0a0 SoultreePhysicsBaseObject savedForward
+    Vector3 savedUp;                          // +0x0ac SoultreePhysicsBaseObject savedUp
+    float prevSpeed;                          // +0x0b8 SoultreePhysicsBaseObject prevSpeed
+    float linearSpeed;                        // +0x0bc SoultreePhysicsBaseObject linearSpeed
+    Vector3 angularAcceleration;              // +0x0c0 SoultreePhysicsBaseObject angularAcceleration
+    Vector3 worldAngularVelocity;             // +0x0cc SoultreePhysicsBaseObject worldAngularVelocity
+    Vector3 angularVelocity;                  // +0x0d8 SoultreePhysicsBaseObject angularVelocity
+    Vector3 invInertia;                       // +0x0e4 SoultreePhysicsBaseObject invInertia
+    Vector3 shapeInvInertia;                  // +0x0f0 SoultreePhysicsBaseObject shapeInvInertia
+    unsigned char field_0x0fc[0x108 - 0xfc];
+    char airborne;                            // +0x108 SoultreePhysicsBaseObject airborne
+    char respawnPending;                      // +0x109 SoultreePhysicsBaseObject respawnPending
+    char asleep;                              // +0x10a SoultreePhysicsBaseObject asleep
+    unsigned char field_0x10b[0x10c - 0x10b];
+    Vector3 respawnPosition;                  // +0x10c SoultreePhysicsBaseObject respawnPosition
+    Vector3 respawnHeading;                   // +0x118 SoultreePhysicsBaseObject respawnHeading
+    GameObject* particleManager;              // +0x124 SoultreePhysicsBaseObject particleManager
+    void* collisionObject;                    // +0x128 SoultreePhysicsBaseObject collisionObject
+    void** collisionPoints;               // +0x12c
+    int collisionPointCount;              // +0x130
+    int lastCollisionType;                    // +0x134 SoultreePhysicsBaseObject lastCollisionType
+    char wreckPending;                        // +0x138 SoultreePhysicsBaseObject wreckPending
+    unsigned char field_0x139[0x13c - 0x139];
+    float stepTime;                           // +0x13c SoultreePhysicsBaseObject stepTime
+    float invStepTime;                        // +0x140 SoultreePhysicsBaseObject invStepTime
+    float frameTime;                          // +0x144 SoultreePhysicsBaseObject frameTime
+    float dragCoefficient;                    // +0x148 SoultreePhysicsBaseObject dragCoefficient
+    float restitution;                        // +0x14c SoultreePhysicsBaseObject restitution
+    float baseWeight;                         // +0x150 SoultreePhysicsBaseObject baseWeight
+    float totalWeight;                        // +0x154 SoultreePhysicsBaseObject totalWeight
+    float bodyMass;                           // +0x158 SoultreePhysicsBaseObject bodyMass
+    float loadWeight;                         // +0x15c SoultreePhysicsBaseObject loadWeight
+    float collisionRadius;                    // +0x160 SoultreePhysicsBaseObject collisionRadius
+    unsigned char field_0x164[0x188 - 0x164];
+    Vector3 weightForce;                      // +0x188 SoultreePhysicsBaseObject weightForce
+    Vector3 rotationPivot;                    // +0x194 SoultreePhysicsBaseObject rotationPivot
+    Vector3 localCenterOfMass;                // +0x1a0 SoultreePhysicsBaseObject localCenterOfMass
+    Vector3 scratchVector;                    // +0x1ac SoultreePhysicsBaseObject scratchVector
+    Vector3 scratchVector2;                   // +0x1b8 SoultreePhysicsBaseObject scratchVector2
+    int collisionShape;                       // +0x1c4 SoultreePhysicsBaseObject collisionShape
+    int collisionPointCapacity;               // +0x1c8 SoultreePhysicsBaseObject collisionPointCapacity
+    int touchingPointCount;                   // +0x1cc SoultreePhysicsBaseObject touchingPointCount
+    char pointsTouching;                      // +0x1d0 SoultreePhysicsBaseObject pointsTouching
+    unsigned char field_0x1d1[0x1d4 - 0x1d1];
+    void* attachments;                        // +0x1d4 SoultreePhysicsBaseObject attachments
+    int attachmentCapacity;                   // +0x1d8 SoultreePhysicsBaseObject attachmentCapacity
+    int attachmentCount;                      // +0x1dc SoultreePhysicsBaseObject attachmentCount
+    float stepRemainder;                      // +0x1e0 SoultreePhysicsBaseObject stepRemainder
+    float fixedStepTime;                      // +0x1e4 SoultreePhysicsBaseObject fixedStepTime
+    float lastStepTime;                       // +0x1e8 SoultreePhysicsBaseObject lastStepTime
+    int maxStepsPerFrame;                     // +0x1ec SoultreePhysicsBaseObject maxStepsPerFrame
+    void* track;                              // +0x1f0 SoultreePhysicsBaseObject track
+    void* terrain;                            // +0x1f4 SoultreePhysicsBaseObject terrain
+    float terrainScale;                       // +0x1f8 SoultreePhysicsBaseObject terrainScale
+    char inShadow;                            // +0x1fc SoultreePhysicsBaseObject inShadow
+    unsigned char field_0x1fd[0x200 - 0x1fd];
+    void* shadowLight;                        // +0x200 SoultreePhysicsBaseObject shadowLight
+    int staggerPhase;                         // +0x204 SoultreePhysicsBaseObject staggerPhase
+    int staggerCounter;                       // +0x208 SoultreePhysicsBaseObject staggerCounter
+    char attachmentResetPending;              // +0x20c SoultreePhysicsBaseObject attachmentResetPending
+    char justReset;                           // +0x20d SoultreePhysicsBaseObject justReset
+    char settledLastFrame;                    // +0x20e SoultreePhysicsBaseObject settledLastFrame
+    unsigned char groundProbeMask;            // +0x20f SoultreePhysicsBaseObject groundProbeMask
+    int restContactThreshold;                 // +0x210 SoultreePhysicsBaseObject restContactThreshold
+    float restTimer;                          // +0x214 SoultreePhysicsBaseObject restTimer
+    void* centerNode;                         // +0x218 SoultreePhysicsBaseObject centerNode
+};
+class SceneSoultreePhysicsObjectView : public SceneSoultreePhysicsBaseObjectView, public D3DIMSoultreeObject {
+public:
+    SceneSoultreePhysicsObjectView(int a, int b);         // 0x005037c0
+
+    unsigned char field_0x4f4[0x524 - 0x4f4];
+};
+
+// CollisionObject (0xb8 bytes; ObjectPicker.h and src/krusty2/collision
+// declare the same class). The model it collides for is at +0x60.
+class SceneCollisionObjectView : public UnknownSoultreeQuadTreeObject, public GameObject {
+public:
+    explicit SceneCollisionObjectView(int flags);   // 0x00431e70
+    void Configure(void* a, int b, int c, int d);  // 0x004320f0
+    void SetHullShape(D3DIMSoultreeObject* model, int a, int b, int c, int d); // 0x00432720
+    void LoadShape(D3DIMSoultreeObject* model, const char* path); // 0x00432800: from a ".col" file
+    void SnapPlacement();                      // 0x00435fe0
+
+    int drawColor;                            // +0x38 CollisionObject drawColor
+    int specularColor;                        // +0x3c CollisionObject specularColor
+    Vector3 boundCenter;                      // +0x40 CollisionObject boundCenter
+    float boundRadius;                        // +0x4c CollisionObject boundRadius
+    int shapeType;                            // +0x50 CollisionObject shapeType
+    void* shape;                              // +0x54 CollisionObject shape
+    int hasContact;                           // +0x58 CollisionObject hasContact
+    void* contactRecord;                      // +0x5c CollisionObject contactRecord
+    D3DIMSoultreeObject* ownerObject;           // +0x60, CollisionObject.h's owner
+    int ownerType;                            // +0x64 CollisionObject ownerType
+    int ignoreVegetation;                     // +0x68 CollisionObject ignoreVegetation
+    int collisionEnabled;                     // +0x6c CollisionObject collisionEnabled
+    int collidable;                           // +0x70 CollisionObject collidable
+    int ignoreListMode;                       // +0x74 CollisionObject ignoreListMode
+    int ignoreList;                           // +0x78 CollisionObject ignoreList
+    int ignoreCount;                          // +0x7c CollisionObject ignoreCount
+    int useBroadphase;                        // +0x80 CollisionObject useBroadphase
+    int quadtreeCell;                         // +0x84 CollisionObject quadtreeCell
+    void* onHitCallback;                      // +0x88 CollisionObject onHitCallback
+    void* onHitByCallback;                    // +0x8c CollisionObject onHitByCallback
+    int debugTreeDepth;                       // +0x90 CollisionObject debugTreeDepth
+    int debugDrawMode;                        // +0x94 CollisionObject debugDrawMode
+    int queryTouched;                         // +0x98 CollisionObject queryTouched
+    void* hitObject;                          // +0x9c CollisionObject hitObject
+    Vector3 hitPoint;                         // +0xa0 CollisionObject hitPoint
+    Vector3 hitNormal;                        // +0xac CollisionObject hitNormal
+};
+
+// 0x0043a330 (cdecl, CollisionPoint.cpp): adds a collision point at
+// `position` to `points` (`*count` of `capacity`).
+void* AddCollisionPoint(int capacity, void** points, const Vector3* position, void* owner, float threshold,
+                        int* count, float friction, int surfaceOwner);
+// 0x004b5d00 (cdecl): the look and up vectors of a heading and pitch.
+void OrientationAxesFromAngles(Vector3* look, Vector3* up, float heading, float pitch, int a);
+
+// An "ObjectShape" (0x24 bytes) or "EmitterType<n>" (0x1c bytes) keyword.
+struct SceneObjectShapeKeyword {
+    char name[0x20];
+    int value;
+};
+struct SceneEmitterTypeKeyword {
+    char name[0x18];
+    int value;
+};
+
+// The value of keyword `name` (0 when not listed).
+static inline int FindShape(const char* name, const SceneObjectShapeKeyword* table)
+{
+    for (int i = 0; i < 2; i++) {
+        if (!_stricmp(name, table[i].name))
+            return table[i].value;
+    }
+    return 0;
+}
+static inline int FindEmitter(const char* name, const SceneEmitterTypeKeyword* table)
+{
+    for (int i = 0; i < 4; i++) {
+        if (!_stricmp(name, table[i].name))
+            return table[i].value;
+    }
+    return 0;
+}
+
+// 0x004ecd60: see the declaration. A model whose ".seg" name is the
+// stadium's gets no collision object; its ".col" file is used when the
+// archive has one.
+int Scene::ReadStaticModels(LightManager* lights, int particleManager, int textureManager, int modelTextures, void (*progress)(int),
+                                 int interval)
+{
+    int models;
+    int count;
+    int next;
+    int stadium;
+    int points;
+    int emitters;
+    int minPoints;
+    int physics;
+    int collision;
+    int useLighting;
+    int oneShot;
+    int force2D;
+    unsigned long flags;
+    float radius;
+    float heading;
+    float pitch;
+    float friction;
+    float oneShotDistance;
+    float randomTriggerPercent;
+    Vector3 position;
+    Vector3 look;
+    Vector3 up;
+    DS3DBuffer params;
+    char model[0x44];
+    char key[0x40];
+    char text[0x204];
+    char slt[0x108];
+    char sound[0x104];
+    char sltPath[0x104];
+    char message[0x204];
+    char path[0x104];
+    char colPath[0x104];
+
+    models = 0;
+    count = 0;
+    staticModels = 0;
+    int found = parameters.SelectSection("StaticModels");
+    if (sceneManager->sceneNamed && found) {
+        if (!parameters.GetInt("NumberOfStaticModels", -1, &models)) {
+            sprintf(text, "\nNumberOfStaticModels cannot be found under [%s] in %s.\n\n", "StaticModels",
+                    scenePath);
+            LogMessage(text);
+            return 0;
+        }
+        if (models > 0) {
+    FileStream* stream =
+        new(__FILE__, 1749) FileStream(g_ResourceManager);
+    staticModels = new(__FILE__, 1751) SceneStaticModels;
+    staticModels->casterCount = models;
+    staticModels->casters = new(__FILE__, 1753) SceneStaticModel[staticModels->casterCount];
+    for (int i = 0; i < staticModels->casterCount; i = next) {
+        if (i % interval == interval - 1 && progress)
+            progress(0);
+        next = i + 1;
+        sprintf(model, "Model%d", next);
+        parameters.SelectSection(model);
+        if (!parameters.GetString("SLT", "", slt, 0x104)) {
+            sprintf(message, "\nCannot find %s for [%s] in %s.\n\n", slt, model, scenePath);
+            LogMessage(message);
+            return 0;
+        }
+        strcpy(path, slt);
+        stadium = 0;
+        strcpy(strrchr(path, '.'), ".seg");
+        if (!_stricmp(stadiumFile, path))
+            stadium = 1;
+        sprintf(sltPath, "%s\\%s", "Res", slt);
+        strcpy(strrchr(slt, '.'), ".col");
+        sprintf(path, "%s\\%s", "Res", slt);
+        if (!g_TrackGame->sceneObject->OpenArchiveFile(stream, path, "rb", (int)colPath)) {
+            strcpy(strrchr(slt, '.'), "");
+            colPath[0] = 0;
+        }
+        ReadVector(&position, model, "Position", "0.0,0.0,0.0", 0, 0);
+        if (parameters.GetFloat("Heading", -999.0f, &heading)) {
+            parameters.GetFloat("Pitch", 0, &pitch);
+            OrientationAxesFromAngles(&look, &up, heading * 0.01745329f, pitch * 0.01745329f, 0);
+        } else {
+            ReadVector(&look, model, "LookVector", "0.0,0.0,1.0", 0, 0);
+            ReadVector(&up, model, "UpVector", "0.0,1.0,0.0", 0, 0);
+        }
+        staticModels->casters[i].collisionObject = 0;
+        parameters.GetInt("PhysicsObject", 0, &physics);
+        if (physics) {
+            parameters.GetInt("NumberOfCollisionPoints", 0, &points);
+            parameters.GetInt("NumberOfEmitters", 0, &emitters);
+            parameters.GetInt("MinCollisionPointsToRestOn", 1, &minPoints);
+            parameters.GetFloat("Radius", 1.0f, &radius);
+            parameters.GetString("ObjectShape", "", text, 0x80);
+            SceneObjectShapeKeyword shapes[2] = {{"Box", 0}, {"Sphere", 1}};
+            int shape = FindShape(text, shapes);
+            if (minPoints >= points - 1)
+                minPoints = points - 1;
+            SceneSoultreePhysicsObjectView* object = new(__FILE__, 1845) SceneSoultreePhysicsObjectView(1, 1);
+            AppendChild(object->LoadPhysicsModel(renderContext, sltPath, lights, modelTextures, position, look, up,
+                                                               0, particleManager, 5.0f, points, emitters, this,
+                                                               0.033333f, 10, 0.025f, 0.05f, radius, shape,
+                                                               minPoints, groundProbeMask, 1),
+                                  -1);
+            staticModels->casters[i].physicsObject = object;
+            staticModels->casters[i].model = (ShadowCaster*)(D3DIMSoultreeObject*)object;
+            staticModels->casters[i].physics = 1;
+            if (points > 0) {
+                for (int p = 0; p < points; p++) {
+                    sprintf(key, "CollisionPoint%d", p + 1);
+                    ReadVector(&position, model, key, "0.0,0.0,0.0", 0, 0);
+                    sprintf(key, "FrictionCoefficient%d", p + 1);
+                    parameters.GetFloat(key, 0.6f, &friction);
+                    AddCollisionPoint(points, object->collisionPoints, &position,
+                                      object->SceneSoultreePhysicsBaseObjectView::followedNode, 0,
+                                      &object->collisionPointCount,
+                                      friction, (int)this);
+                }
+            if (particleManager) {
+                int dust = 0;
+                int chunk = 0;
+                int spray = 0;
+                int nextEmitter;
+                for (int e = 0; e < emitters; e = nextEmitter) {
+                    nextEmitter = e + 1;
+                    sprintf(key, "EmitterType%d", nextEmitter);
+                    parameters.GetString(key, "", text, 0x17);
+                    SceneEmitterTypeKeyword types[4] = {
+                        {"DustEmitter", 1}, {"DirtChunkEmitter", 2}, {"DirtSprayEmitter", 3},
+                        {"ExhaustEmitter", 4},
+                    };
+                    switch (FindEmitter(text, types)) {
+                    case 1:
+                        if (dust) {
+                            sprintf(message, "\nOnly ONE %s for [%s] allowed.\n\n", text, model);
+                            LogMessage(message);
+                        } else {
+                            SceneDustParticleEmitterView* emitter = new(__FILE__, 1917) SceneDustParticleEmitterView(1);
+                            D3DIMSoultreeObject* node = object;
+                            node->AppendChild(emitter->Create(renderContext, particleManager), -1);
+                            object->AddAttachment(1, emitter, *object->collisionPoints, 0);
+                            dust = 1;
+                        }
+                        break;
+                    case 2:
+                        if (chunk) {
+                            sprintf(message, "\nOnly ONE %s for [%s] allowed.\n\n", text, model);
+                            LogMessage(message);
+                        } else {
+                            SceneDirtChunkParticleEmitterView* emitter = new(__FILE__, 1927) SceneDirtChunkParticleEmitterView(1);
+                            D3DIMSoultreeObject* node = object;
+                            node->AppendChild(emitter->Create(renderContext, particleManager), -1);
+                            object->AddAttachment(2, emitter, *object->collisionPoints, 0);
+                            chunk = 1;
+                        }
+                        break;
+                    case 3:
+                        if (spray) {
+                            sprintf(message, "\nOnly ONE %s for [%s] allowed.\n\n", text, model);
+                            LogMessage(message);
+                        } else {
+                            SceneDirtSprayParticleEmitterView* emitter = new(__FILE__, 1937) SceneDirtSprayParticleEmitterView(1);
+                            D3DIMSoultreeObject* node = object;
+                            node->AppendChild(emitter->Create(renderContext, particleManager), -1);
+                            object->AddAttachment(3, emitter, *object->collisionPoints, 0);
+                            spray = 1;
+                        }
+                        break;
+                    case 4:
+                        break;
+                    default:
+                        sprintf(message, "\nUnknown EmitterType (%s) for [%s].\n\n", text, model);
+                        LogMessage(message);
+                        break;
+                    }
+                }
+            }
+            }
+        } else {
+            staticModels->casters[i].physicsObject = 0;
+            D3DIMSoultreeObject* object = new(__FILE__, 1956) D3DIMSoultreeObject(1);
+            staticModels->casters[i].model = (ShadowCaster*)object;
+            AppendChild(object->LoadModel(renderContext, sltPath, (int)lights, modelTextures, 1), -1);
+            int length = strcspn(sltPath, ".");
+            count = length < 0x14 ? length : 0x14;
+            strncpy(staticModels->casters[i].fileName, sltPath, count);
+            staticModels->casters[i].fileName[count] = 0;
+            ((D3DIMSoultreeObject*)staticModels->casters[i].model)->SetPositionVec3(position);
+            ((D3DIMSoultreeObject*)staticModels->casters[i].model)->SetAxesPtr(reinterpret_cast<const Vec3*>(&look), reinterpret_cast<const Vec3*>(&up), 1, 0);
+            parameters.GetInt("Collision", 1, &collision);
+            staticModels->casters[i].collisionObject = 0;
+            if (collision && !stadium
+                && ((D3DIMSoultreeObject*)staticModels->casters[i].model)->CountNodes() == 1) {
+                g_MemTagStack->Push("Collision");
+                staticModels->casters[i].collisionObject = new(__FILE__, 1974) SceneCollisionObjectView(1);
+                staticModels->casters[i].collisionObject->Configure(renderContext, 1, 0, 1);
+                staticModels->casters[i].collisionObject->ownerObject =
+                    (D3DIMSoultreeObject*)staticModels->casters[i].model;
+                if (!colPath[0])
+                    staticModels->casters[i].collisionObject->SetHullShape(
+                        (D3DIMSoultreeObject*)staticModels->casters[i].model, 0, 0, 0, 0);
+                else
+                    staticModels->casters[i].collisionObject->LoadShape(
+                        (D3DIMSoultreeObject*)staticModels->casters[i].model, colPath);
+                staticModels->casters[i].collisionObject->SnapPlacement();
+                ((D3DIMSoultreeObject*)staticModels->casters[i].model)
+                    ->AppendChild(staticModels->casters[i].collisionObject, -1);
+                g_MemTagStack->Push("Scene");
+            }
+            staticModels->casters[i].physics = 0;
+        }
+        parameters.GetInt("UseLighting", 1, &useLighting);
+        staticModels->casters[i].useLighting = useLighting;
+        ((D3DIMSoultreeObject*)staticModels->casters[i].model)
+            ->SetUseLighting(staticModels->casters[i].useLighting);
+        if (auralScape) {
+            parameters.GetString("SoundResourceFile", "", sound, 0x103);
+            if (strcmp(sound, "") && _stricmp(sound, "NONE")) {
+                ReadSoundSettings(model, sound, 1, &params, &flags, &oneShotDistance, &randomTriggerPercent,
+                                      &oneShot, &force2D);
+                SoultreeSoundEmitter* emitter =
+                    (new(__FILE__, 2015)
+                         SoultreeSoundEmitter((AuralScape*)auralScape, soundGroup, 1, isEnabled))
+                        ->CreateFollowing(renderContext, sound, "",
+                                                (SoultreeObject*)staticModels->casters[i].model,
+                                                params, flags, oneShotDistance, randomTriggerPercent, 0,
+                                                force2D);
+                AppendChild(emitter, -1);
+                if (!emitter) {
+                    sprintf(text, "\nScene::SoundEmitter(%s) not created\n", sound);
+                    LogMessage(text);
+                }
+            }
+        } else {
+            sprintf(text, "\nScene:  No AuralScape, so NO Static Model SOUNDS!\n");
+            LogMessage(text);
+        }
+    }
+    delete stream;
+    LogMessage("");
+    return 1;
+        }
+        sprintf(text, "\nNumber of models<1 in %s.\n\n", "StaticModels", scenePath);
+        LogMessage(text);
+        return 0;
+    }
+    sprintf(text, "\nCannot find data for [%s] in %s.\n\n", "StaticModels", scenePath);
+    LogMessage(text);
+    return 0;
+}
+
+
 // 0x004edf20: attaches a new shadow receiver for `shadow` to each caster and
 // adds it as a child.
 void Scene::AttachCasterShadows(ProjectedShadow* shadow, int flags)
@@ -985,6 +1493,340 @@ void Scene::AttachCasterShadows(ProjectedShadow* shadow, int flags)
                                                shadow),
                                   -1);
     }
+}
+
+// 0x004edfe0: see the declaration. Reads "Animations": an entry per
+// "Animation<n>", either a key-framed character (MCF file, motions and a
+// motion sequence) or a procedural car (SLT and VUE files), each with an
+// optional sound emitter; then the "RandomSet<n>" sections.
+// Not exact (5289 of 5335 bytes: instructions, calls, EH states and the 0xcfc frame match;
+// retail lets the random-set entries offset share fps's home and keeps i's to itself, and
+// reloads motionCount as [ebx + ecx + 0x1c]; docs/SCENEMANAGER.md lists the forms tried).
+int Scene::ReadAnimations(LightManager* lights, int textureManager, int modelTextures, void (*progress)(int), int interval)
+{
+    float fps;
+    int animations;
+    int i;
+    int frontWheelsTurn;
+    float lagDistance;
+    int next;
+    int tires;
+    int useLighting;
+    int exclude;
+    char name[0x40];
+    Vector3 up;
+    Vector3 look;
+    char motion[0x14];
+    char number[0x18];
+    char setName[0x44];
+    char key[0x44];
+    char message[0x204];
+    char file[0x108];
+    char vue[0x40];
+    char text[0x204];
+    DS3DBuffer params;
+    char colPath[0x104];
+    char sound[0x184];
+    char sequence[0x80];
+    char attach[0x84];
+    char list[0x84];
+    char sltPath[0x104];
+    char vuePath[0x104];
+
+    animations = 0;
+    int found = parameters.SelectSection("Animations");
+    if (sceneManager->sceneNamed && found) {
+        if (!parameters.GetInt("NumberOfAnimations", -1, &animations)) {
+            sprintf(text, "\nNumberOfAnimations cannot be found under [%s] in %s.\n\n", "Animations",
+                    scenePath);
+            LogMessage(text);
+            return 0;
+        }
+        if (animations > 0) {
+    animationTable = new(__FILE__, 2178) SceneAnimationTable;
+    animationTable->entryCount = animations;
+    LogParameter("Animations", "NumberOfAnimations", animations);
+    animationTable->entries = new(__FILE__, 2181) SceneAnimation[animations];
+    for (i = 0; i < animationTable->entryCount; i = next) {
+        float heading;
+        float pitch;
+        if (i % interval == interval - 1 && progress)
+            progress(0);
+        animationTable->entries[i].inRandomSet = 0;
+        next = i + 1;
+        sprintf(name, "Animation%d", next);
+        parameters.SelectSection(name);
+        if (!parameters.GetString("AnimationType", "", text, 0x40)) {
+            sprintf(message, "\nScene: AnimationType not specified for anim#%d.  Using KeyFramed.\n", i);
+            LogMessage(message);
+            animationTable->entries[i].keyFramed = 1;
+        } else if (!_strnicmp(text, "Procedural", 3)) {
+            animationTable->entries[i].keyFramed = 0;
+            if (!parameters.GetString("VUE", "", vue, 0x40)) {
+                sprintf(message, "\nCannot find %s for [%s] in %s.\n\n", "VUE", name, scenePath);
+                LogMessage(message);
+                return 0;
+            }
+            sprintf(text, "%s\\%s", "Res", vue);
+            FileStream* stream =
+                new(__FILE__, 2216) FileStream(g_ResourceManager);
+            if (!g_TrackGame->sceneObject->OpenArchiveFile(stream, text, "rb", (int)vuePath)) {
+                sprintf(sound, "No procedural vue file found in resources.  Aborting.\n");
+                delete stream;
+                return 0;
+            }
+            delete stream;
+            LogParameter(name, "VUE", vuePath);
+            if (!parameters.GetFloat("FPS", 30.0f, &fps))
+                LogParameter(name, "FPS(Default)", fps);
+            else
+                LogParameter(name, "FPS", fps);
+            if (!parameters.GetFloat("LagDistance", 0, &lagDistance))
+                LogParameter(name, "LagDistance(Default)", lagDistance);
+            else
+                LogParameter(name, "LagDistance", lagDistance);
+            if (!parameters.GetInt("FrontWheelsTurn", 1, &frontWheelsTurn)) {
+                LogParameter(name, "FrontWheelsTurn(Default)", frontWheelsTurn);
+                if (lagDistance == 0)
+                    frontWheelsTurn = 1;
+                else
+                    frontWheelsTurn = 0;
+            } else {
+                LogParameter(name, "FrontWheelsTurn", frontWheelsTurn);
+            }
+            if (!parameters.GetInt("NumberOfTires", 4, &tires))
+                LogParameter(name, "NumberOfTires(Default)", tires);
+            else
+                LogParameter(name, "NumberOfTires", tires);
+        } else {
+            animationTable->entries[i].keyFramed = 1;
+        }
+        animationTable->entries[i].animatesWhileHeld = 0;
+        if (animationTable->entries[i].keyFramed && !parameters.GetString("MCF", "", file, 0x104)) {
+            sprintf(message, "\nCannot find %s for [%s] in %s.\n\n", "MCF", name, scenePath);
+            LogMessage(message);
+            return 0;
+        }
+        if (!animationTable->entries[i].keyFramed && !parameters.GetString("SLT", "", file, 0x104)) {
+            sprintf(message, "\nCannot find %s for [%s] in %s.\n\n", "SLT", name, scenePath);
+            LogMessage(message);
+            return 0;
+        }
+        sprintf(sltPath, "%s\\%s", "Res", file);
+        if (animationTable->entries[i].keyFramed)
+            ResolveSltPath(file);
+        int length = strcspn(file, ".");
+        int count = length < 0x14 ? length : 0x14;
+        strncpy(animationTable->entries[i].fileName, file, count);
+        animationTable->entries[i].fileName[count] = 0;
+        length = strlen(file);
+        int size = length > 0x103 ? 0x103 : length;
+        strncpy(colPath, file, size);
+        colPath[size] = 0;
+        strcpy(strrchr(colPath, '.'), ".col");
+        FileStream* stream =
+            new(__FILE__, 2281) FileStream(g_ResourceManager);
+        sprintf(text, "%s\\%s", "Res", colPath);
+        if (!g_TrackGame->sceneObject->OpenArchiveFile(stream, text, "rb", (int)colPath))
+            colPath[0] = 0;
+        delete stream;
+        if (!ReadVector(&animationTable->entries[i].position, name, "Position", "0.0,0.0,0.0", 0, 0))
+            ReadVector(&animationTable->entries[i].position, name, "Offset", "0.0,0.0,0.0", 0, 0);
+        if (animationTable->entries[i].keyFramed) {
+            SceneCollisionCharacterView* character = new(__FILE__, 2300) SceneCollisionCharacterView(1);
+            animationTable->entries[i].character = character;
+            if (!AppendChild(character->Load(renderContext, sltPath, colPath, lights, modelTextures, 1, 1),
+                                       -1)) {
+                sprintf(message, "\nScene: Cannot create character from %s.\n\n", file);
+                LogMessage(message);
+                return 0;
+            }
+        }
+        if (!animationTable->entries[i].keyFramed) {
+            SceneCarProceduralView* car = new(__FILE__, 2305) SceneCarProceduralView(1);
+            animationTable->entries[i].proceduralObject = car;
+            if (!AppendChild(car->Create(renderContext, sltPath, colPath, lights, modelTextures, 0, vuePath,
+                                                                 &animationTable->entries[i].position, fps,
+                                                                 frontWheelsTurn, lagDistance, 1.0f, tires, 0, 0, 0),
+                                       -1)) {
+                sprintf(message, "\nScene: Cannot create procedural model from %s.\n\n", file);
+                LogMessage(message);
+                return 0;
+            }
+        }
+        g_MemTagStack->Push("Scene");
+        parameters.GetInt("UseLighting", 1, &useLighting);
+        int axes = 0;
+        if (parameters.GetFloat("Heading", -999.0f, &heading)) {
+            parameters.GetFloat("Pitch", 0, &pitch);
+            OrientationAxesFromAngles(&look, &up, heading * 0.01745329f, pitch * 0.01745329f, 0);
+            axes = 1;
+        } else if (ReadVector(&look, name, "LookVector", "0.0,0.0,1.0", 0, 0)) {
+            ReadVector(&up, name, "UpVector", "0.0,1.0,0.0", 0, 0);
+            axes = 1;
+        }
+        parameters.GetInt("ExcludeFromCameraIteration", 0, &exclude);
+        animationTable->entries[i].excludeFromCameraIteration = exclude;
+        if (animationTable->entries[i].keyFramed) {
+            int automatic;
+            LogParameter(name, "MCF", file);
+            animationTable->entries[i].character->modelNode->SetPosition(&animationTable->entries[i].position);
+            if (axes)
+                animationTable->entries[i].character->modelNode->SetAxesPtr(&look, &up, 1, 0);
+            reinterpret_cast<D3DIMSoultreeObject*>(animationTable->entries[i].character->modelNode)->SetUseLighting(useLighting);
+            parameters.GetInt("UseBlendedKeys", 1, &automatic);
+            animationTable->entries[i].useBlendedKeys = automatic;
+            parameters.GetInt("NumberOfMotions", 0, &animationTable->entries[i].motionCount);
+            animationTable->entries[i].motions = 0;
+            animationTable->entries[i].motionSequence = 0;
+            if (animationTable->entries[i].motionCount > 0) {
+                SceneAnimationTable* table = animationTable;
+                animationTable->entries[i].motions = new(__FILE__, 2357) void*[table->entries[i].motionCount];
+                for (int m = 0; m < animationTable->entries[i].motionCount; m++) {
+                    sprintf(key, "MotionToPlay%d", m + 1);
+                    if (!parameters.GetString(key, "", motion, 0x10)) {
+                        sprintf(message, "\nCannot find %s for [%s] in %s.\n\n", key, name, scenePath);
+                        LogMessage(message);
+                        return 0;
+                    }
+                    LogParameter(name, key, motion);
+                    animationTable->entries[i].motions[m] =
+                        animationTable->entries[i].character->FindMotion(motion, 1);
+                }
+                if (parameters.GetString("MotionSequence", "", sequence, 0x40)) {
+                    char* token = strtok(sequence, ",");
+                    int j = 0;
+                    parameters.GetString("NumberInSequence", "", number, 0x10);
+                    animationTable->entries[i].sequenceLength = atoi(number);
+                    if (animationTable->entries[i].sequenceLength) {
+                        animationTable->entries[i].motionSequence =
+                            new(__FILE__, 2379) char[animationTable->entries[i].sequenceLength];
+                        for (; token && j < animationTable->entries[i].sequenceLength; j++) {
+                            animationTable->entries[i].motionSequence[j] = atoi(token);
+                            token = strtok(0, ",");
+                        }
+                        parameters.GetInt("AutomaticSequence", 1, &automatic);
+                        animationTable->entries[i].automaticSequence = automatic;
+                        animationTable->entries[i].sequenceIndex = animationTable->entries[i].motionSequence[0];
+                        if (animationTable->entries[i].sequenceIndex >= animationTable->entries[i].sequenceLength)
+                            animationTable->entries[i].sequenceIndex = 0;
+                        animationTable->entries[i].currentMotion = animationTable->entries[i].sequenceIndex;
+                        RestartEntry(i, animationTable->entries[i].sequenceIndex, 0, 0);
+                    } else {
+                        animationTable->entries[i].sequenceIndex = 0;
+                        sprintf(message, "\n%s for [%s] in %s is ZERO!\n\n", "NumberInSequence", name, scenePath);
+                        LogMessage(message);
+                        return 0;
+                    }
+                } else {
+                    animationTable->entries[i].currentMotion = 0;
+                    animationTable->entries[i].sequenceLength = 0;
+                    sprintf(message, "\n%s for [%s] in %s is ZERO!\n\n", "MotionSequence", name, scenePath);
+                    LogMessage(message);
+                    return 0;
+                }
+            }
+        } else {
+            LogParameter(name, "SLT", sltPath);
+            animationTable->entries[i].motionCount = 1;
+            reinterpret_cast<D3DIMSoultreeObject*>(animationTable->entries[i].proceduralObject->carModel)->SetUseLighting(useLighting);
+            if (axes)
+                animationTable->entries[i].proceduralObject->carModel->SetAxesPtr(&look, &up, 1, 0);
+        }
+        if (animationTable->entries[i].motionCount > 0) {
+            if (auralScape) {
+                parameters.GetString("SoundResourceFile", "", sound, 0x103);
+                if (strcmp(sound, "") && _stricmp(sound, "NONE")) {
+                    unsigned long flags;
+                    float oneShotDistance;
+                    float randomTriggerPercent;
+                    int oneShot;
+                    int force2D;
+                    ReadSoundSettings(name, sound, 0, &params, &flags, &oneShotDistance, &randomTriggerPercent,
+                                          &oneShot, &force2D);
+                    parameters.GetString("SoundAttachToObject", "", attach, 0x40);
+                    SceneSoultreeObjectView* node;
+                    if (animationTable->entries[i].keyFramed)
+                        node = animationTable->entries[i].character->modelNode;
+                    else
+                        node = animationTable->entries[i].proceduralObject->carModel;
+                    SoultreeSoundEmitter* emitter =
+                        (new(__FILE__, 2433)
+                             SoultreeSoundEmitter((AuralScape*)auralScape, soundGroup, 1, isEnabled))
+                            ->CreateFollowing(renderContext, sound, attach, (SoultreeObject*)node, params,
+                                                    flags, oneShotDistance, randomTriggerPercent, 0, force2D);
+                    if (!emitter) {
+                        sprintf(text, "\nScene::SoundEmitter(%s) not created\n", sound);
+                        LogMessage(text);
+                    } else {
+                        AppendChild(emitter, -1);
+                    }
+                }
+            } else {
+                sprintf(text, "\nScene:  No AuralScape, so NO Animation SOUNDS!\n");
+                LogMessage(text);
+            }
+        }
+    }
+    parameters.SelectSection("Animations");
+    parameters.GetInt("NumberOfRandomSets", 0, &animationTable->randomSetCount);
+    if (animationTable->randomSetCount > 0) {
+        animationTable->randomSets = new(__FILE__, 2466) SceneRandomSet[animationTable->randomSetCount];
+        for (i = 0; i < animationTable->randomSetCount; i++) {
+            animationTable->randomSets[i].animationIndices = 0;
+            animationTable->randomSets[i].motionIndices = 0;
+            sprintf(setName, "RandomSet%d", i + 1);
+            if (!parameters.SelectSection(setName)) {
+                sprintf(message, "\nCannot find [%s] in %s.\n\n", setName, scenePath);
+                LogMessage(message);
+                return 0;
+            }
+            if (!parameters.GetString("RandomSet", "", list, 0x80)) {
+                sprintf(message, "\nCannot find %s for [%s] in %s.\n\n", "RandomSet", setName, scenePath);
+                LogMessage(message);
+                return 0;
+            }
+            char* token = strtok(list, ",");
+            int j = 0;
+            animationTable->randomSets[i].entry = 0;
+            parameters.GetString("NumberInSequence", 0, (char*)&animationTable->randomSets[i].count, -1);
+            if (animationTable->randomSets[i].count) {
+                animationTable->randomSets[i].animationIndices = new(__FILE__, 2491) signed char[animationTable->randomSets[i].count];
+                animationTable->randomSets[i].motionIndices = new(__FILE__, 2492) signed char[animationTable->randomSets[i].count];
+                for (; token && j < animationTable->randomSets[i].count; j++) {
+                    int dot = strcspn(token, ".");
+                    if (!dot || dot == (int)strlen(token)) {
+                        sprintf(message, "\nInvalid Animation or Motion #%d in [%s] in %s.\n\n", j, setName,
+                                scenePath);
+                        LogMessage(message);
+                        return 0;
+                    }
+                    token[dot] = 0;
+                    animationTable->randomSets[i].animationIndices[j] = atoi(token) - 1;
+                    animationTable->entries[animationTable->randomSets[i].animationIndices[j]].inRandomSet = 1;
+                    if (animationTable->entries[i].keyFramed)
+                        animationTable->entries[animationTable->randomSets[i].animationIndices[j]].character->Disable();
+                    else
+                        animationTable->entries[animationTable->randomSets[i].animationIndices[j]].proceduralObject->Disable();
+                    animationTable->randomSets[i].motionIndices[j] = atoi(token + dot + 1) - 1;
+                    token = strtok(0, ",");
+                }
+                animationTable->randomSets[i].entry = animationTable->entries;
+            }
+        }
+    } else {
+        animationTable->randomSets = 0;
+    }
+    LogMessage("");
+    return 1;
+        }
+        sprintf(text, "\nNumber of animations<1 in %s.\n\n", "Animations", scenePath);
+        LogMessage(text);
+        return 0;
+    }
+    sprintf(text, "\nCannot find data for [%s] in %s.\n\n", "Animations", scenePath);
+    LogMessage(text);
+    return 0;
 }
 
 // 0x004ef4c0: reads the "Sounds" section: whether a crowd is present and
@@ -1290,11 +2132,6 @@ static inline void CopyPathPart(char* to, const char* from)
     strncpy(to, from, count);
     to[count] = 0;
 }
-
-// The texture-accounting functions below construct and inspect materials.
-// Keep that complete class dependency local to this group; earlier scene and
-// light parsers do not use it. Declaration order affects VC6's ReadLight code.
-#include "SoultreeMaterial.h"
 
 // 0x004f0390: see the declaration. The compiled ".slb" file holds the node
 // records (skipped) and the materials; without it the ".slt" text file's

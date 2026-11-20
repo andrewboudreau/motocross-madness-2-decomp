@@ -43,12 +43,9 @@ pointer and argument boundaries without equating all provisional class fields.
 
 ## Complete-object preservation
 
-The canonical Scene object preserves all **272 nondebug sections and 1,273
-relocations** under exactly the two external-name substitutions. The separate
-SceneManagerNearMisses aggregate preserves all **96 sections and 484
-relocations**, with no substitutions. That sample includes the shared header,
-not the canonical CPP, and does not contain either retired call. Its source and
-bindings need no changes.
+The Scene object preserves all **335 nondebug sections and 1,757
+relocations** under exactly the two external-name substitutions (pinned again when
+ReadStaticModels and ReadAnimations moved in from their sample).
 
 Same-path before/after proof retains all bytes, relocation locations, kinds,
 addends and resolved section/offset destinations, including all partial bodies.

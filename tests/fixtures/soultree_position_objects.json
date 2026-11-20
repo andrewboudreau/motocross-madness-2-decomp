@@ -11,20 +11,15 @@
       "relocations": 273,
       "sha256": "8a98772623e4589458bbf0b9e94c2907b38fb2988568a1e5ef9aa0fe9b40c495"
     },
-    "samples/track/SceneManagerNearMisses.cpp": {
-      "sections": 96,
-      "relocations": 484,
-      "sha256": "689017b768b95d216a82311ae80733330c1090e8ecffef835d4508f2be8da74c"
-    },
     "samples/race/BikeRaceNearMisses.cpp": {
       "sections": 206,
       "relocations": 1932,
       "sha256": "bc91071c1c00a4f2e7196c1f5f45d84f301697e733cc531879363e81d6b8868d"
     },
     "src/reconstructed/SceneManager.cpp": {
-      "sections": 272,
-      "relocations": 1273,
-      "sha256": "f4f2d6e5e6cadd4c5b051f5a7948b2ed229d64dfe7836c0dce51dc8cfd61888b"
+      "sections": 335,
+      "relocations": 1757,
+      "sha256": "d5dc4852bad383aff84de6db0c5f4d1b634a406e2902335817c3e6dfb3967e9e"
     }
   }
 }

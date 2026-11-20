@@ -221,7 +221,7 @@ written out per case gives the other order. Naming the mirrored value instead, b
 values, or the row coordinate too is equal or worse. When two induction-variable spills
 of mirrored expressions swap, name one of them and negate it for the other.
 Scene::ReadStaticModels `0x004ecd60` (class c, 4534/4536) is exact too, in
-samples/track/SceneManagerNearMisses.cpp: `count` is declared at function scope and
+src/reconstructed/SceneManager.cpp: `count` is declared at function scope and
 cleared (`count = 0;`) with the other counters at the top, so its leaf is older than the
 element offset's and the name terminator adds it last (`add edx, ebx` then the count).
 A block-local `int count = ...` at its first use, an uninitialised function-scope

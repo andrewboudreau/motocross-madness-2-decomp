@@ -73,10 +73,9 @@ The retained same-path before/after proof covers:
 |---|---:|---:|
 | LightEmitter | 57 | 172 |
 | D3DIMSoultreeMotnctrl | 62 | 273 |
-| SceneManagerNearMisses | 96 | 484 |
 | BikeRaceNearMisses | 206 | 1,929 |
-| SceneManager | 272 | 1,273 |
-| Total | **693** | **4,131** |
+| SceneManager | 335 | 1,757 |
+| Total | **660** | **4,131** |
 
 Every section payload, relocation location, kind, addend and resolved
 destination is preserved with **no symbol substitutions**. Both aggregates

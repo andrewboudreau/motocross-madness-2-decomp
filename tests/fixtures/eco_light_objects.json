@@ -15,9 +15,9 @@
       "sha256": "be05f881f96ba98b5f46faceb6db24b447f96838a8e906962553ef6b2f80a8be"
     },
     "src/reconstructed/SceneManager.cpp": {
-      "sections": 272,
-      "relocations": 1273,
-      "sha256": "07aefc3588507c06c1ab6390ac096ff4ad145a267dca856906797bcd14abcf1e"
+      "sections": 335,
+      "relocations": 1757,
+      "sha256": "3e3a66f65b88417bafedb940f0d4d282b793c014f1871128c78cec1e9724c8af"
     },
     "src/reconstructed/KrustyUI.cpp": {
       "sections": 317,
@@ -43,11 +43,6 @@
       "sections": 2,
       "relocations": 5,
       "sha256": "65d2ab2191b9b48a52c63b02ddf49b2248ce72ad52d79ece30e02a34309174b6"
-    },
-    "samples/track/SceneManagerNearMisses.cpp": {
-      "sections": 96,
-      "relocations": 484,
-      "sha256": "95a204f549f5b41d6f1a51b85ef8b4874741fd2e21cd93c0f1f025f6e4a3ee89"
     },
     "samples/game/QuarryStuntEventLoaderNearMiss.cpp": {
       "sections": 50,

@@ -20,7 +20,6 @@ from test_character_motion_start import complete
 
 ROOT = Path(__file__).resolve().parents[1]
 SCENE = 'src/reconstructed/SceneManager.cpp'
-SAMPLE = 'samples/track/SceneManagerNearMisses.cpp'
 MOTION = 'src/krusty2/motion/Motnctrl.cpp'
 FIXTURE = 'tests/fixtures/scene_motion_compare.cpp'
 RENAMES = {
@@ -43,7 +42,7 @@ def object_fingerprint(obj, root, renames=None):
         name = value.decode('latin1').replace('\\', '/')
         if separator and name.lower().startswith(prefix.lower()):
             suffix = name[len(prefix):]
-            if suffix in (SCENE, SAMPLE, 'src/reconstructed/ContainerList.h'):
+            if suffix in (SCENE, 'src/reconstructed/ContainerList.h'):
                 return ('source:' + suffix).encode() + separator + tail
         return data
     def name(symbol):
@@ -133,7 +132,7 @@ class SceneMotionConnectionsTests(unittest.TestCase):
             }
             math = ['src/reconstructed/' + name + '.cpp' for name in
                     ('VectorCalls', 'CrossProduct', 'Math3D', 'FastMath')]
-            jobs = [(source, ROOT/source) for source in (SCENE, SAMPLE, MOTION, *math, FIXTURE)]
+            jobs = [(source, ROOT/source) for source in (SCENE, MOTION, *math, FIXTURE)]
             for key, value in extracted.items():
                 path = output/(key+'.cpp')
                 path.write_text(value+'\n')
@@ -148,14 +147,13 @@ class SceneMotionConnectionsTests(unittest.TestCase):
                     env={**os.environ, 'PYTHONPATH': str(ROOT)})
                 self.assertEqual(result.returncode, 0, result.stdout+result.stderr)
                 paths[key], objects[key] = obj, CoffObject(obj)
-            for source in (SCENE, SAMPLE):
-                self.assertEqual(object_fingerprint(objects[source], ROOT), baseline[source], source)
+            self.assertEqual(object_fingerprint(objects[SCENE], ROOT), baseline[SCENE], SCENE)
             imports = {s.name for s in objects[SCENE].symbols if s.section_number == 0}
             self.assertFalse(set(RENAMES) & imports)
             self.assertTrue(set(RENAMES.values()) <= imports)
             strict = 0
             cases = [c for c in CASES if c['source'] == SCENE]
-            self.assertEqual(len(cases), 51)
+            self.assertEqual(len(cases), 52)
             for case in cases:
                 result = compare(retail, objects[SCENE], case['symbol'], int(case['target_va'], 0),
                                  case['target_size'], ROOT/case['bindings'])

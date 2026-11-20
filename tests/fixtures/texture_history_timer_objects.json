@@ -6,9 +6,9 @@
       "sha256": "6635829131acb5c050ff57a48183725a85cf72a6880d4102c70fa95b45559004"
     },
     "src/reconstructed/SceneManager.cpp": {
-      "sections": 272,
-      "relocations": 1273,
-      "sha256": "07aefc3588507c06c1ab6390ac096ff4ad145a267dca856906797bcd14abcf1e"
+      "sections": 335,
+      "relocations": 1757,
+      "sha256": "3e3a66f65b88417bafedb940f0d4d282b793c014f1871128c78cec1e9724c8af"
     },
     "src/reconstructed/ProCircuitProcs.cpp": {
       "sections": 365,

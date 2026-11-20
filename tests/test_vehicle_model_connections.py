@@ -52,7 +52,6 @@ class VehicleModelConnections(unittest.TestCase):
         sources = {name: 'src/reconstructed/' + name + '.cpp'
                    for name in CALLERS + ('D3DIMSoulTree', 'SceneManager', 'ProCircuitProcs')}
         sources.update({'soultree': 'src/krusty2/soultree/soultree.cpp',
-                        'scene_sample': 'samples/track/SceneManagerNearMisses.cpp',
                         'layout': 'tests/fixtures/vehicle_model_layout.cpp'})
         with tempfile.TemporaryDirectory(prefix='mcm2-vehicle-models-') as temp:
             objects = {}
@@ -83,9 +82,8 @@ class VehicleModelConnections(unittest.TestCase):
                 all_imports.update(names)
             self.assertTrue(set(PROVIDERS) <= all_imports)
             self.assertIn(FOLLOWING, definitions(objects['AuralScape']))
-            # These caller bodies remain partial samples; compile and check their
-            # real relocation dependency without calling them strict matches.
-            self.assertIn(FOLLOWING, imports(objects['scene_sample']))
+            # Scene::ReadStaticModels and ReadAnimations (a near miss) call it.
+            self.assertIn(FOLLOWING, imports(objects['SceneManager']))
 
             for symbol, (va, size) in PROVIDERS.items():
                 name = 'D3DIMSoulTree' if va == 0x4444e0 else 'soultree'

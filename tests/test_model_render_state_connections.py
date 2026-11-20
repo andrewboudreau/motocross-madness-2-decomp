@@ -27,7 +27,7 @@ SOURCES = ('src/krusty2/vehicle/Bike.cpp', 'src/krusty2/vehicle/Vehicle.cpp',
     'src/reconstructed/KrustyUI.cpp', 'src/reconstructed/SceneManager.cpp',
     'src/krusty2/soultree/SoulTreePhysics.cpp',
     'samples/physics/krustybike/KrustyBikeNearMisses.cpp', 'samples/race/BikeRaceNearMisses.cpp',
-    'samples/track/SceneManagerNearMisses.cpp', MODEL, NODE)
+    MODEL, NODE)
 PROVIDERS = (
     ('SetUseLighting', 'int value', 0x4444c0, 23),
     ('ClearScreenRects', '', 0x4444e0, 55),
@@ -124,7 +124,7 @@ class ModelRenderStateConnectionsTests(unittest.TestCase):
                 imported.update(names)
                 self.assertFalse(set(names) & RENAMES.keys(), source)
             # The two Load branches share one emitted SetLod call site.
-            self.assertEqual(counts, [2, 1, 7, 6, 3, 4, 2])
+            self.assertEqual(counts, [2, 1, 7, 6, 3, 7, 2])
             self.assertTrue(set(RENAMES.values()) <= imported)
             cases = [(c['source'], c['symbol'], int(c['target_va'], 0), c['target_size'], ROOT / c['bindings'])
                      for c in CASES if c['source'] in SOURCES]

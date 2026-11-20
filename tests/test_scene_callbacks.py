@@ -24,7 +24,7 @@ METHODS = {
     '?LogParameter@Scene@@QAEXPBD0H@Z': (0x4de580, 9),
     '?LogParameter@Scene@@QAEXPBD0PBUVector3@@@Z': (0x4de580, 1),
     '?LogDefaultParameter@Scene@@QAEXPBD00@Z': (0x4de580, 2),
-    '?LogMessage@Scene@@QAEXPBD@Z': (0x464e80, 25),
+    '?LogMessage@Scene@@QAEXPBD@Z': (0x464e80, 29),
 }
 
 
@@ -86,6 +86,7 @@ class SceneCallbacksTests(unittest.TestCase):
             0x4f1130: (0x4f114d, 'ebx'), 0x4eb160: (0x4eb173, 'ebx'),
             0x4eb300: (0x4eb311, 'esi'), 0x4ebdb0: (0x4ebdbf, 'esi'),
             0x4eca20: (0x4eca27, 'esi'), 0x4f0d20: (0x4f0d3d, 'esi'),
+            0x4ecd60: (0x4ecd7d, 'ebp'),
         }
 
         with tempfile.TemporaryDirectory(prefix='mcm2-scene-callbacks-') as directory:
@@ -142,8 +143,8 @@ class SceneCallbacksTests(unittest.TestCase):
                     if instruction.mnemonic == 'call' and instruction.op_str in ('0x4de580', '0x464e80'):
                         retail_counts[int(instruction.op_str, 0)] += 1
             self.assertEqual(counts, Counter({name: count for name, (_, count) in METHODS.items()}))
-            self.assertEqual(retail_counts, Counter({0x4de580: 49, 0x464e80: 25}))
-            self.assertEqual((callers, strict), (10, 51))
+            self.assertEqual(retail_counts, Counter({0x4de580: 49, 0x464e80: 29}))
+            self.assertEqual((callers, strict), (11, 52))
             compiler = Path(os.environ['VC6_ROOT'])
             executable = output/'callbacks.exe'
             result = subprocess.run([str(find_child_ci(find_vc6_bin(compiler), 'link.exe')), '/nologo',
@@ -155,7 +156,7 @@ class SceneCallbacksTests(unittest.TestCase):
             result = subprocess.run([str(executable)], capture_output=True, text=True, timeout=30)
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             self.assertEqual(result.stdout.strip(), 'Scene callbacks: 36864 complete-storage calls passed')
-            print('57 strict bodies, 74 direct calls in ten readers; ' + result.stdout.strip())
+            print('58 strict bodies, 78 direct calls in eleven readers; ' + result.stdout.strip())
 
 
 if __name__ == '__main__':

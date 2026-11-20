@@ -779,11 +779,9 @@ copies scored below their samples. For every near miss in
 body and the sample object were scored against retail. Where the sample was
 clearly more faithful, the game now links the sample's text:
 
-- Whole near-miss files are now candidate sources with status
-  `reviewed-nonexact`:
-  - `samples/track/SceneManagerNearMisses.cpp`
-
-  Grid1's three now sit in their retail positions in
+- Scene::ReadStaticModels and ReadAnimations, first linked from their
+  near-miss sample, now sit in their retail positions in
+  `src/reconstructed/SceneManager.cpp`. Grid1's three now sit in their retail positions in
   `src/reconstructed/Grid1.cpp`. The two Wrecker near misses that were
   linked the same way now sit in their
   retail positions in `src/reconstructed/wrecker.cpp`, and VisualCue::Tick in
@@ -857,8 +855,8 @@ The sample column is the standalone object's score.
 
 | VA | Function | Before | After | Sample | Now from |
 |---|---|---|---|---|---|
-| 0x004ecd60 | `Scene::ReadStaticModels` | 0.940 | 1.000 | 1.000 | sample file |
-| 0x004edfe0 | `Scene::ReadAnimations` | 0.955 | 0.998 | 0.998 | sample file |
+| 0x004ecd60 | `Scene::ReadStaticModels` | 0.940 | 1.000 | 1.000 | SceneManager.cpp |
+| 0x004edfe0 | `Scene::ReadAnimations` | 0.955 | 0.998 | 0.998 | SceneManager.cpp |
 | 0x00419970 | `BikeRace::CreateRacers` | 0.963 | 1.000 | 0.999 | bring-up copy |
 | 0x0042c260 | `GatherModelTriangles` | 0.985 | 1.000 | 1.000 | canonical src (near miss in BoundingBoxTreeBuild.cpp since) |
 | 0x0048ccc0 | `BonusObjectManager::Tick` | 0.952 | 1.000 | 1.000 | canonical src (exact since) |

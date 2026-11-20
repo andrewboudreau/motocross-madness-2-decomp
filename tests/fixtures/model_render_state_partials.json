@@ -220,14 +220,7 @@
   ],
   "additional_functions": [
     [
-      "samples/track/SceneManagerNearMisses.cpp",
-      "?ReadStaticModels@Scene@@QAEHPAVLightManager@@HHHP6AXH@ZH@Z",
-      5164384,
-      4536,
-      "2790f4e96bd4da22b9c14b459474cbce263694c5583502a0943c6285d0432931"
-    ],
-    [
-      "samples/track/SceneManagerNearMisses.cpp",
+      "src/reconstructed/SceneManager.cpp",
       "?ReadAnimations@Scene@@QAEHPAVLightManager@@HHP6AXH@ZH@Z",
       5169120,
       5335,

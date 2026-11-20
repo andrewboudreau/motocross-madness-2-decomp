@@ -20,10 +20,10 @@
       "relocations": 1105,
       "sha256": "df5b5fbe400bb84004926eeb6a18094b9c050ddeeefbd1098e8ee6dc7ce664ab"
     },
-    "samples/track/SceneManagerNearMisses.cpp": {
-      "sections": 96,
-      "relocations": 484,
-      "sha256": "95a204f549f5b41d6f1a51b85ef8b4874741fd2e21cd93c0f1f025f6e4a3ee89"
+    "src/reconstructed/SceneManager.cpp": {
+      "sections": 335,
+      "relocations": 1757,
+      "sha256": "4837fae1c2e00af36c5471c653e050ff25b3637bcae94c2a2fce95cbfdc86a7e"
     }
   },
   "renames": {
