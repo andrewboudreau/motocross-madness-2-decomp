@@ -73,8 +73,8 @@ identifiers are mapped.
 | `UnknownEventRacer::UnknownFunction4925a0` | `UnknownEventRacer::SendFollowedRacer` | `0x004925a0` | 2 | Same VA as `KrustyBike::SendFollowedRacer`. |
 | `UnknownEventRacer::UnknownFunction496f90` | `UnknownEventRacer::IgnoreCollisionsWith` | `0x00496f90` | 2 | Same VA as `KrustyBike::IgnoreCollisionsWith`. |
 | `Fn_0043caa0` (collision `targets.json` note) | `TestInputEvent` | `0x0043caa0` | 2 | This note was the last place still using the old name. |
-| `UnknownBikeRaceRacer::Load` `a`, `c`, `d`, `e` | `engineName`, `gasGyroOption`, `brakeGyroOption`, `withRider` | `0x0048fc80` | 2 | Forwarded position for position to `KrustyBike::Load`. |
-| `KbBikeLoader::LoadBike` `a2`, `desc`, `a5`, `a6`, `a12`, `noSetup`, `setupName`, `s50`/`s54`/`s58`, `s0c`..`s20`, `gasGyro`, `brakeGyro` | `engineName`, `riderModel`, `desc`, `info`, `name`, `defaultEngine`, `torqueTable`, `rpmLow`/`rpmHigh`/`rpmStep`, `frontSpring`, `frontDamper`, `rearSpring`, `rearDamper`, `frontRatio`, `rearRatio`, `gasGyroOption`, `brakeGyroOption` | `0x004079c0` | 2 | Same VA as `Bike::LoadBike`. Each argument goes unchanged to the parameter in the same position, and the names are `Bike::LoadBike`'s. `a13` (its unused `a19`) is kept. |
+| `UnknownBikeRaceRacer::Load` `a`, `c`, `d`, `e` | `engineName`, `gasGyroOption`, `brakeGyroOption`, `withRider` | `0x0048fc80` | 2 | Merged into `KrustyBike::Load` when BikeRace.cpp moved to direct canonical calls. Forwarded position for position to `KrustyBike::Load`. |
+| `KbBikeLoader::LoadBike` `a2`, `desc`, `a5`, `a6`, `a12`, `noSetup`, `setupName`, `s50`/`s54`/`s58`, `s0c`..`s20`, `gasGyro`, `brakeGyro` | `engineName`, `riderModel`, `desc`, `info`, `name`, `defaultEngine`, `torqueTable`, `rpmLow`/`rpmHigh`/`rpmStep`, `frontSpring`, `frontDamper`, `rearSpring`, `rearDamper`, `frontRatio`, `rearRatio`, `gasGyroOption`, `brakeGyroOption` | `0x004079c0` | 2 | Same VA as `Bike::LoadBike`. Each argument goes unchanged to the parameter in the same position, and the names are `Bike::LoadBike`'s. `a13` (its unused `a19`) is kept. Merged into `Bike::LoadBike`: `KrustyBike::Load` now calls it directly. |
 | `KrustyBike::Load` `a2`, `desc`, `a5`, `a6`, `a15` | `engineName`, `riderModel`, `desc`, `info`, `riderName` | `0x0048fc80` | 2 | Forwarded to `LoadBike` in the same positions. `a15` is `LoadBike`'s `name`, which is copied to `Bike::riderName`. `a16` (always 0) is kept. |
 | `KrustyBike::Load` `a24` | `aiSkill` | `0x0048fc80` | 3 | BikeRace passes the racer's `skill` there (0 for players). It is stored at +0x15d8. |
 | `KrustyBike::field_0x778` | `aiCrashImpactLimit` | +0x778 | 2 | The loader sets 100.0f. The AI step `0x00413200` crashes the bike when the impact exceeds it (`fcomp` at `0x00413f3a`), and nothing else reads it. |
@@ -435,8 +435,8 @@ Left as placeholders in wave 6:
 - `D3DIMVirtualSlot11`'s fifth argument and `CollisionCharacter`'s `a6`: they
   are stored at +0x68, and nothing shows what reads them.
 - The `aN` parameters of `Scene::Load`/`ReadStaticModels` (a3 to a5) and
-  `Grid` a1, and the chain `KrustyBike` a16 to `Bike` a19 to `KbBikeLoader`
-  a13: no callee or arithmetic names them.
+  `Grid` a1, and the chain `KrustyBike` a16 to `Bike` a19: no callee or
+  arithmetic names them.
 - `Tire::UpdateShock`'s `offset`: the caller passes a float (`linearSpeed`)
   through a pointer-typed parameter. A name would need a type change, so it
   waits.
@@ -1711,7 +1711,7 @@ precedent):
 | `UnknownScaled`, `UnknownRandomSkill` | `ScaledVector`, `RandomSkill` | BikeRaceNearMisses.cpp, Group6_BikeRaceCreate*.cpp |
 | `UnknownFileExists` | `FileExists` | ProCircuitProcs.cpp |
 | `UnknownDropDownList` | `DropDownListBox` | OptionProcs.cpp |
-| `UnknownAsVec3` | `Vector3AsVec3` | Group6_BikeRaceViews.cpp (other bringup units already have an `AsVec3`) |
+| `UnknownAsVec3` | `Vector3AsVec3` | Group6_BikeRaceViews.cpp (other bringup units already have an `AsVec3`); removed with that file |
 
 ### Fields
 
@@ -3958,8 +3958,8 @@ decision rather than more evidence:
   - EngineGearbox `field_0x74`/`field_0x80`/`field_0x14c`/`field_0x1d8`, and
     the `arg6` that the last one is stored from.
   - FollowCamera `field_0x33c`.
-  - CarProcedural `a11`-`a15`, and KbBikeLoader `a13`/KrustyBike `a16`,
-    which only pass through to LoadBike's unused `a19`.
+  - CarProcedural `a11`-`a15`, and KrustyBike `a16`, which only passes
+    through to LoadBike's unused `a19`.
 - Union arms kept by policy:
   - UIEditBox, UIScrollBar and UIListBox `field_0x1ec`/`1f4`/`1f8`/`204`/
     `208`/`218`;

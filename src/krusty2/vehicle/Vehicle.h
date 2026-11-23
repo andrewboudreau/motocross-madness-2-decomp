@@ -58,7 +58,7 @@ extern void __cdecl VehContactsB(int count, VehicleContact** contacts, Vec3* sca
 extern void __cdecl VehContactsC(int n, VehicleContact** arr);
 
 // Vehicle+0x468 holds the game's ControlInterface (src/reconstructed/ControlInterface.h):
-// BikeRace's view of KrustyBike::Load (0x0048fc80) passes a ControlInterface* in this
+// BikeRace::CreateRacers passes a ControlInterface* to KrustyBike::Load (0x0048fc80) in this
 // argument position, and +0x0c / +0x34 are its activeJoystick and keyboard.  The structs
 // below are views of those classes; argument names follow JoystickDevice / KeyboardDevice /
 // ControlInterface.

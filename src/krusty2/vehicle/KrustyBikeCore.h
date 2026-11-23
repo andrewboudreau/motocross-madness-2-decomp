@@ -23,6 +23,14 @@ struct KbNetState;
 struct KbObj128;
 struct KbRace;
 struct KbRecorder;
+class BikeRace;
+class ControlInterface;
+class KrustyVCR;
+class LightManager;
+class Scene;
+class Terrain;
+struct TextureContext;
+struct Vector3;
 
 
 class KrustyBike : public Bike {
@@ -124,14 +132,20 @@ public:
     // 0x0048fc80 (ret 0x7c = 31 argument dwords; not a vtable entry, like Vehicle::LoadVehicle):
     // the bike loader.  Runs Bike's loader 0x004079c0, then builds the collision bodies, the
     // trick animation tables, the network settings and the optional rider morph.  Returns the
-    // GameObject base.  Parameter names are tier 3; `kind` 0xff marks a ghost bike.  The
+    // GameObject base.  Parameter names are tier 3; `kind` -1 marks a ghost bike (BikeRace's
+    // ghost passes -1, and its sign-extended pushes of the AI index need a signed char).  The
     // forwarded ones take Bike::LoadBike's name in the same position (riderName is its
-    // `name`, copied to Bike::riderName; a16 is its unused a19; the types are this view's).
-    GameObject* Load(int context, int engineName, const char* modelPath, const SoultreeLoadDesc* riderModel, int desc, int info,
-                     Vec3 startPosition, Vec3 forward, Vec3 up, int terrainProbe, VehicleInputMap* map, unsigned char kind,
-                     unsigned char remote, KbRace* race, int riderName, int a16, int netId,
-                     const KbBikeSetup* setup, int gasGyroOption, int brakeGyroOption, int linkedObject, int trackObject,
-                     KbRecorder* recorder, void* aiSkill, int withRider);
+    // `name`, copied to Bike::riderName; a16 is its unused a19).  The types are those
+    // BikeRace::CreateRacers declares for the values it passes (provisional, like its own:
+    // the skill is a float, never read here).  Where Bike::LoadBike and this class's fields
+    // view an argument through another provisional type (lights as SoultreeLoadDesc*,
+    // textures as BikeA5C8*, scene as SoultreeSlot1f0*), Load casts at the use.
+    GameObject* Load(void* context, const char* engineName, const char* modelPath, const char* riderModel,
+                     LightManager* lights, TextureContext* textures, Vector3 startPosition, Vector3 forward,
+                     Vector3 up, Terrain* terrain, ControlInterface* control, char kind,
+                     unsigned char remote, BikeRace* race, const char* riderName, int a16, int netId,
+                     const KbBikeSetup* setup, int gasGyroOption, int brakeGyroOption, int particles, Scene* scene,
+                     KrustyVCR* recorder, float aiSkill, int withRider);
 
 public:
     char aiKind;  // +0x734  loader kind (0 for a ghost); nonzero bikes take the BikeAI step 0x00413200 and racing line 0x00414370
@@ -255,7 +269,7 @@ public:
     int field_0x15cc; // 0x15CC
     float shortMessageTimer;  // +0x15D0  seconds since the last short message (0x00492ad0); starts at shortNetPacketIntervalSec
     int aiTrickId; // 0x15D4  trick id PickTrick chose for the AI (UpdateAIRacingLine 0x00414370), then passed to StartTrick
-    void* aiSkill; // 0x15D8  loader argument 30: BikeRace passes the racer's skill (0 for players); never read
+    float aiSkill; // 0x15D8  loader argument 30: BikeRace passes the racer's skill (0 for players); never read
     float aiStuntChance;  // +0x15DC KbRace aiStuntChance1/2/3 by difficulty (2.0 outside event type 0) for an AI bike; BikeAI tricks when rand*100 <= it
     CollisionObject* probeSegment;  // +0x15E0  AI bike's vertical probe segment (0,4,0)-(0,-1,0)
     char aiTricksEnabled;  // +0x15E4 the loader sets it for an AI bike (aiKind) and clears it otherwise; gates BikeAI's trick roll

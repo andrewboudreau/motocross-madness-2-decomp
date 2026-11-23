@@ -300,7 +300,6 @@
   "?FastInvSqrt@@YAMM@Z": "0x00460c00",
   "?FindEntryByFileName@Scene@@QAEPAUSceneCollisionCharacterView@@PBDPAH@Z": "0x004eaec0",
   "?GetRacer@KrustyVCR@@QAEXPAHPADH11111000@Z": "0x0049c1e0",
-  "?Load@BikeRaceKrustyBikeView@@QAEPAVGameObject@@PAXPBD11PAVLightManager@@PAUTextureContext@@UVector3@@44PAVTerrain@@PAVControlInterface@@DHPAVBikeRace@@1HHPAUBikeEngineSetup@@HHHPAVScene@@PAVKrustyVCR@@MH@Z": "0x0048fc80",
   "?Load@VCRFile@@QAEXPAD0@Z": "0x00524b80",
   "?LoadTrack@Track@@QAEHPAVFileStream@@PAX1PAH2@Z": "0x00515ed0",
   "?MakeRandomNames@KrustyUI@@QAEXPAPBDH@Z": "0x0049b020",
@@ -357,5 +356,6 @@
   "?SetLod@D3DIMSoultreeObject@@QAEXH@Z": "0x00444d00",
   "?SetLowestLod@D3DIMSoultreeObject@@QAEXH@Z": "0x00444d40",
   "?ClearFlag14c@SoultreeObject@@QAEXXZ": "0x004fdb50",
-  "?ClearCasters@ProjectedShadow@@QAEXXZ": "0x004dab90"
+  "?ClearCasters@ProjectedShadow@@QAEXXZ": "0x004dab90",
+  "?Load@KrustyBike@@QAEPAVGameObject@@PAXPBD11PAVLightManager@@PAUTextureContext@@UVector3@@44PAVTerrain@@PAVControlInterface@@DEPAVBikeRace@@1HHPBUKbBikeSetup@@HHHPAVScene@@PAVKrustyVCR@@MH@Z": "0x0048fc80"
 }

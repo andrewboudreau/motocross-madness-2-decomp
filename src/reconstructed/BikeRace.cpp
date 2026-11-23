@@ -755,9 +755,9 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, TextureContext* te
             return 0;
         }
         localRacer = new(__FILE__, 0x42a) BikeRaceKrustyBikeView(1);
-        localRacer->Load(owner, "", bikeFile, circuitRiderFile, lights, textures, position,
+        reinterpret_cast<KrustyBike*>(localRacer)->Load(owner, "", bikeFile, circuitRiderFile, lights, textures, position,
                                            direction, up, terrain, g_TrackGame->controlInterface, 0, 0, this,
-                                           g_TrackGame->mode.profileName, 0, 0, &setup,
+                                           g_TrackGame->mode.profileName, 0, 0, (const KbBikeSetup*)&setup,
                                            g_TrackGame->mode.gasGyro,
                                            g_TrackGame->mode.brakeGyro, particleManager, raceScene,
                                            replayVcr, 0, !(circuit->careerFlags & 2));
@@ -798,9 +798,9 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, TextureContext* te
                 setup.weight = g_TrackGame->ui->weight[bikeClass];
                 RandomSkill(skill, aiSettings[0], aiSettings[1]);
                 aiRacers[n - 1] = new(__FILE__, 0x47c) BikeRaceKrustyBikeView(1);
-                aiRacers[n - 1]->Load(owner, empty, bikeFile, riderFile, lights, textures,
+                reinterpret_cast<KrustyBike*>(aiRacers[n - 1])->Load(owner, empty, bikeFile, riderFile, lights, textures,
                                                           position, direction, up, terrain, 0, 1, 0, this,
-                                                          racer->racerName, 0, id, &setup, 1, 1, particleManager,
+                                                          racer->racerName, 0, id, (const KbBikeSetup*)&setup, 1, 1, particleManager,
                                                           raceScene, replayVcr, skill, 1);
                 AppendChild(aiRacers[n - 1], -1);
                 aiRacers[n - 1]->modelNode->ReplaceMaterialTexture(0, racer->bikeName, (int)textures);
@@ -857,10 +857,10 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, TextureContext* te
         WriteRelativePositions(&position, &direction, event, order[0]);
         localRacer = new(__FILE__, 0x4ea) BikeRaceKrustyBikeView(1);
         if (!AppendChild(
-                localRacer->Load(
+                reinterpret_cast<KrustyBike*>(localRacer)->Load(
                     owner, empty, bikeFile, riderFile, lights, textures, position, direction, up, terrain,
                     g_TrackGame->controlInterface, 0, 0, this, name, 0, id,
-                    (BikeEngineSetup*)g_TrackGame->mode.garageOptions,
+                    (const KbBikeSetup*)g_TrackGame->mode.garageOptions,
                     g_TrackGame->mode.gasGyro, g_TrackGame->mode.brakeGyro, particleManager,
                     raceScene, replayVcr, 0, 1),
                 -1)) {
@@ -908,10 +908,10 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, TextureContext* te
                 BikeRaceKrustyBikeView* racer = new(__FILE__, 0x53b) BikeRaceKrustyBikeView(1);
                 racerSlots[j] = racer;
                 if (!AppendChild(
-                        racer->Load(
+                        reinterpret_cast<KrustyBike*>(racer)->Load(
                             owner, empty, bikeFile, riderFile, lights, textures, position, direction, up, terrain,
                             g_TrackGame->controlInterface, 0, 0, this, g_TrackGame->mode.profileName, 0,
-                            playerId, (BikeEngineSetup*)g_TrackGame->mode.garageOptions,
+                            playerId, (const KbBikeSetup*)g_TrackGame->mode.garageOptions,
                             g_TrackGame->mode.gasGyro, g_TrackGame->mode.brakeGyro,
                             particleManager, raceScene, replayVcr, 0, 1),
                         -1)) {
@@ -973,10 +973,10 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, TextureContext* te
             sprintf(path, "%s\\%s", resources, g_TrackGame->mode.racers[j].bikeModelName);
             BikeRaceKrustyBikeView* racer = new(__FILE__, 0x5a3) BikeRaceKrustyBikeView(1);
             racerSlots[j] = racer;
-            if (!AppendChild(racer->Load(
+            if (!AppendChild(reinterpret_cast<KrustyBike*>(racer)->Load(
                                            owner, empty, path, riderFile, lights, textures, position, direction,
                                            up, terrain, 0, 0, 1, this, g_TrackGame->mode.racers[j].playerName, 0, g_TrackGame->mode.racers[j].networkPlayerId,
-                                           &setup, 0, 1, particleManager, raceScene, replayVcr, 0, 1),
+                                           (const KbBikeSetup*)&setup, 0, 1, particleManager, raceScene, replayVcr, 0, 1),
                                        -1)) {
                 sprintf(message, "Net Bike%d not loaded\n", j);
             }
@@ -1025,10 +1025,10 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, TextureContext* te
             setup.weight = g_TrackGame->ui->weight[bikeClass];
             BikeRaceKrustyBikeView* racer = new(__FILE__, 0x61f) BikeRaceKrustyBikeView(1);
             racerSlots[j] = racer;
-            if (!AppendChild(racer->Load(
+            if (!AppendChild(reinterpret_cast<KrustyBike*>(racer)->Load(
                                            owner, empty, g_TrackGame->mode.racers[j].bikeModelName, riderFile, lights, textures, position,
                                            direction, up, terrain, 0, (char)g_TrackGame->mode.racers[j].racerIndex, 1, this,
-                                           g_TrackGame->mode.racers[j].playerName, 0, g_TrackGame->mode.racers[j].networkPlayerId, &setup, 0, 1, particleManager,
+                                           g_TrackGame->mode.racers[j].playerName, 0, g_TrackGame->mode.racers[j].networkPlayerId, (const KbBikeSetup*)&setup, 0, 1, particleManager,
                                            raceScene, replayVcr, 0, 1),
                                        -1)) {
                 sprintf(message, "Net Bike%d not loaded\n", j);
@@ -1066,9 +1066,9 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, TextureContext* te
             BikeRaceKrustyBikeView* racer = new(__FILE__, 0x67c) BikeRaceKrustyBikeView(1);
             aiRacers[0] = racer;
             if (!AppendChild(
-                    racer->Load(
+                    reinterpret_cast<KrustyBike*>(racer)->Load(
                         owner, empty, bikeFile, riderFile, lights, textures, position, direction, up, terrain, 0, -1,
-                        0, this, "Ghost", 0, 0, (BikeEngineSetup*)g_TrackGame->mode.garageOptions,
+                        0, this, "Ghost", 0, 0, (const KbBikeSetup*)g_TrackGame->mode.garageOptions,
                         g_TrackGame->mode.gasGyro, g_TrackGame->mode.brakeGyro,
                         particleManager, raceScene, replayVcr, 0, 1),
                     -1)) {
@@ -1141,9 +1141,9 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, TextureContext* te
                 setup.weight = g_TrackGame->ui->weight[bikeClass];
                 BikeRaceKrustyBikeView* racer = new(__FILE__, 0x718) BikeRaceKrustyBikeView(1);
                 aiRacers[n] = racer;
-                if (!AppendChild(racer->Load(
+                if (!AppendChild(reinterpret_cast<KrustyBike*>(racer)->Load(
                                                owner, empty, bikeFile, riderFile, lights, textures, position,
-                                               direction, up, terrain, 0, ai, 0, this, aiName, 0, id, &setup, 1, 1,
+                                               direction, up, terrain, 0, ai, 0, this, aiName, 0, id, (const KbBikeSetup*)&setup, 1, 1,
                                                particleManager, raceScene, replayVcr, skill, 1),
                                            -1)) {
                     sprintf(message, "AI Bike%d not loaded\n", n);
@@ -1224,10 +1224,10 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, TextureContext* te
                 setup.weight = g_TrackGame->ui->weight[bikeClass];
                 BikeRaceKrustyBikeView* racer = new(__FILE__, 0x78f) BikeRaceKrustyBikeView(1);
                 racerSlots[j] = racer;
-                if (!AppendChild(racer->Load(
+                if (!AppendChild(reinterpret_cast<KrustyBike*>(racer)->Load(
                                                owner, empty, g_TrackGame->mode.racers[j].bikeModelName, riderFile, lights, textures,
                                                position, direction, up, terrain, 0, (char)g_TrackGame->mode.racers[j].racerIndex, 0,
-                                               this, g_TrackGame->mode.racers[j].playerName, 0, g_TrackGame->mode.racers[j].networkPlayerId, &setup, 0, 1,
+                                               this, g_TrackGame->mode.racers[j].playerName, 0, g_TrackGame->mode.racers[j].networkPlayerId, (const KbBikeSetup*)&setup, 0, 1,
                                                particleManager, raceScene, replayVcr, 0, 1),
                                            -1)) {
                     sprintf(message, "Net Bike%d not loaded\n", j);

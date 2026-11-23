@@ -1,9 +1,7 @@
 """Bike::LoadBike 0x004079c0, the bike loader (tools/emu_diff.py case, call-record/replay mode).
 
-The linked body for 0x004079c0 is KbBikeLoader::LoadBike (src/bringup/Group1_KbBikeLoader.cpp),
-a forwarder that hands its 40 argument dwords unchanged to Bike::LoadBike in
-src/krusty2/vehicle/Bike.cpp (identity checked by running the forwarder on marker arguments), so
-this case compares that body. Every callee is replayed: LoadVehicle 0x00525e20, the rider
+The case compiles Bike::LoadBike in src/krusty2/vehicle/Bike.cpp, which KrustyBike::Load calls
+directly (the bring-up KbBikeLoader forwarder that once stood at this VA is retired). Every callee is replayed: LoadVehicle 0x00525e20, the rider
 character (D3DIMSoultreeCharacter ctor 0x004455b0 and its load slot), FindByName/FindMotion
 (synthetic nodes and motions, sometimes null), the shocks, wheels, tire, steering control,
 particle emitters, collision points and the bike's own virtual slots (retail's Bike vtables,

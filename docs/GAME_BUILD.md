@@ -1684,8 +1684,8 @@ A loader sweep fed synthetic file contents to the linked file loaders and parser
 that no case covered (empty and over-long strings, unknown tokens, negative and huge numbers,
 truncated streams, NULL results): `eco_read_est` (`EcoSystem::ReadEst` 0x00457480), `tga_write`
 (`WriteTga` 0x00512990), `grid_read_node` (`DrawableGridNode::ReadNode` 0x0047e600),
-`morph_load_parameter_file` (0x004a33b0), `bike_load_bike` (`LoadBike` behind the KbBikeLoader
-forward 0x004079c0), `overlay_load_font` (0x00447a00), `mp_fill_bike_rider_lists` (0x004f8220),
+`morph_load_parameter_file` (0x004a33b0), `bike_load_bike` (`Bike::LoadBike`
+0x004079c0), `overlay_load_font` (0x00447a00), `mp_fill_bike_rider_lists` (0x004f8220),
 `dlg_read_resource` (`UIDialog::ReadDialogResource` 0x0046a920, every control type),
 `projected_shadow_init` (0x004da7b0), `terrain_load` (`Terrain::Load` 0x005059d0) and
 `bike_race_create` (0x00417ed0). Each now agrees at both precisions. Three bugs were fixed:

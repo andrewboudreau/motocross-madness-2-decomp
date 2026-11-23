@@ -537,15 +537,6 @@ struct KbMorphMod {
     char pad_0x00[0x58];
     KbMorphMod* LoadParameterFile(void* a, const char* path, SoultreeObject* node);
 };
-// Bike's own loader 0x004079c0 (`ret 0xa0`, 40 argument dwords; not a vtable entry).  It is a
-// Bike member in truth; vehicle/Bike.h is canonical, so it is reached through this view.
-struct KbBikeLoader {
-    GameObject* LoadBike(int context, int engineName, const char* modelPath, const SoultreeLoadDesc* riderModel, int desc, int info,
-                            Vec3 startPosition, Vec3 forward, Vec3 up, int terrainProbe, VehicleInputMap* map, int name, int a13,
-                            int defaultEngine, void* torqueTable, int rpmLow, int rpmHigh, int rpmStep, float frontSpring, float frontDamper,
-                            float rearSpring, float rearDamper, float frontRatio, float rearRatio, int gasGyroOption, int brakeGyroOption, int linkedObject, int device,
-                            void* steer, void* lean, void* throttle, int trackObject, float weight, int createCollision);
-};
 // 0x004a2fc0 (cdecl): zeroed debug-heap allocation of count x size bytes tagged with the source line.
 void* DebugCalloc(unsigned int count, unsigned int size, const char* file, int line);
 

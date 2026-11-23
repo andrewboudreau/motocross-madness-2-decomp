@@ -104,7 +104,6 @@
   "?FastSqrt@@YAMM@Z": "0x00460b50",
   "?FindMotion@Character@@QAEPAUMotion@@PBDH@Z": "0x004a6b30",
   "?FindNearestRival@KrustyBike@@QAEPAV1@PAM@Z": "0x0048e190",
-  "?LoadBike@KbBikeLoader@@QAEPAVGameObject@@HHPBDPBUSoultreeLoadDesc@@HHUVec3@@22HPAUVehicleInputMap@@HHHPAXHHHMMMMMMHHHH444HMH@Z": "0x004079c0",
   "?SimulateAIFrame@KrustyBike@@QAEHM@Z": "0x00413200",
   "?UpdateAIRacingLine@KrustyBike@@QAEHM@Z": "0x00414370",
   "?SnapPlacement@CollisionObject@@QAEXXZ": "0x00435fe0",
@@ -151,7 +150,6 @@
   "?LoadResourceString@TrackGame@@QAEHHPADH@Z": "0x00521970",
   "?KrustyCollisionCallbackA@@YAXPAVCollisionObject@@0@Z": "0x0048dcd0",
   "?KrustyCollisionCallbackB@@YAXPAVCollisionObject@@0@Z": "0x0048dd80",
-  "?Load@KrustyBike@@QAEPAVGameObject@@HHPBDPBUSoultreeLoadDesc@@HHUVec3@@22HPAUVehicleInputMap@@EEPAUKbRace@@HHHPBUKbBikeSetup@@HHHHPAUKbRecorder@@PAXH@Z$ehhandler": "0x0054bd32",
   "?LoadShape@CollisionObject@@QAEXPAXPBD@Z": "0x00432800",
   "?LocalToWorldDirection@SoultreeObject@@QAE?AUVec3@@ABU2@@Z": "0x004fd5c0",
   "?AppendChild@GameObject@@QAEHPAV1@H@Z": "0x00469190",
@@ -390,5 +388,7 @@
   "__real@8@00000000000000000000": "0x005507e8",
   "_s_kbTrickLength": "0x0056cc60",
   "_s_kbTrickFrame": "0x0056d060",
-  "?PointInPlacementSquare@@YAHPBUCollisionVec3@@MMMMPAM111@Z": "0x004b0ac0"
+  "?PointInPlacementSquare@@YAHPBUCollisionVec3@@MMMMPAM111@Z": "0x004b0ac0",
+  "?LoadBike@Bike@@QAEPAVGameObject@@HPBD00PBUSoultreeLoadDesc@@PBUBikeA5C8@@UVec3@@33PAXPAUVehicleInputMap@@0HHPAHHHHMMMMMMHH44PAUVehicleAxis@@77PAVSoultreeSlot1f0@@MH@Z": "0x004079c0",
+  "?Load@KrustyBike@@QAEPAVGameObject@@PAXPBD11PAVLightManager@@PAUTextureContext@@UVector3@@44PAVTerrain@@PAVControlInterface@@DEPAVBikeRace@@1HHPBUKbBikeSetup@@HHHPAVScene@@PAVKrustyVCR@@MH@Z$ehhandler": "0x0054bd32"
 }

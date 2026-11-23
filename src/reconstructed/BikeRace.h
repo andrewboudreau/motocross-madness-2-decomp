@@ -329,15 +329,6 @@ public:
     virtual void UpdateForceFeedback(); // slot 10 calls it while TrackGameMode+0xa88 is set
 
     int ReceivedPositionChanged();              // 0x00495c00 (KrustyBike.cpp's code)
-    // 0x0048fc80 (KrustyBike::Load in src/krusty2/vehicle, ret 0x7c): loads the bike and
-    // rider models and sets the racer up; returns the GameObject to add.
-    GameObject* Load(void* owner, const char* engineName, const char* bikeFile, const char* riderFile,
-                                      LightManager* lights, TextureContext* textures,
-                                      Vector3 position, Vector3 direction, Vector3 up,
-                                      Terrain* terrain, ControlInterface* control, char ai,
-                                      int remote, BikeRace* race, const char* name, int b, int id,
-                                      BikeEngineSetup* setup, int gasGyroOption, int brakeGyroOption, int particles,
-                                      Scene* scene, KrustyVCR* vcr, float skill, int withRider);
 
     // 0x004933e0 (KrustyBike.cpp's code): applies message 13 to a state.
     void ApplyStateDelta(RacerDeltaMessage* message, ReceivedRacerState* part);
