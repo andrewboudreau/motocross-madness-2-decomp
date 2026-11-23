@@ -197,9 +197,8 @@ static inline int CountRaceRacers() {
 // last, rounded to a float temporary (0x004188d8); this sum has its order, so
 // the two agree at 24-bit precision.
 static inline float VectorLength(const Vector3& v) {
-    float xx = v.x * v.x;
-    float yy = v.y * v.y;
-    float lengthSquared = xx + yy + v.z * v.z;
+    float zz = v.z * v.z;
+    float lengthSquared = v.x * v.x + v.y * v.y + zz;
     if (lengthSquared == 1.0f)
         return 1.0f;
     return (float)sqrt(lengthSquared);
@@ -209,7 +208,7 @@ static inline Vector3 ScaledVector(const Vector3& v, float scale) {
     return Vector3(v.x * scale, v.y * scale, v.z * scale);
 }
 
-// 0x00417ed0. Not exact (6760 bytes against 6745, 2821 strict, linked 0.996):
+// 0x00417ed0. Not exact (6756 bytes against 6745, 2800 strict, linked 0.998):
 // all 166 calls in retail order, EH states 0..0x10 and the 0x4e8 frame with
 // its buffers at retail's offsets. Retail spills z*z of both vector lengths
 // to a stack temporary and orders the girl block's temporaries differently,
@@ -281,9 +280,9 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
             delete stream;
         }
         if (hasFinishProbe)
-            raceTerrain->QueryGround(&finishProbe.center, 0, 0, 0);
+            reinterpret_cast<Terrain*>(raceTerrain)->QueryGround(reinterpret_cast<TerrainVec3*>(&finishProbe.center), 0, 0, 0);
         if (hasStartProbe)
-            raceTerrain->QueryGround(&startProbe.center, 0, 0, 0);
+            reinterpret_cast<Terrain*>(raceTerrain)->QueryGround(reinterpret_cast<TerrainVec3*>(&startProbe.center), 0, 0, 0);
         if (hasFinishProbe && hasStartProbe)
             UpdateTrackSeparation();
         break;
@@ -333,7 +332,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
                 } else {
                     point = position;
                 }
-                terrain->QueryGround(&point, &normal, 0, 0);
+                reinterpret_cast<Terrain*>(terrain)->QueryGround(reinterpret_cast<TerrainVec3*>(&point), reinterpret_cast<TerrainVec3*>(&normal), 0, 0);
                 thirtySecondMan = (StartObjectCharacterView*)raceScene->FindEntryByFileName("30SecMan.slt", &thirtySecondManEntry);
                 if (thirtySecondMan) {
                     raceScene->RestartEntry(thirtySecondManEntry, 0, 0, 0);
@@ -358,7 +357,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
                 } else {
                     point = position;
                 }
-                terrain->QueryGround(&point, &normal, 0, 0);
+                reinterpret_cast<Terrain*>(terrain)->QueryGround(reinterpret_cast<TerrainVec3*>(&point), reinterpret_cast<TerrainVec3*>(&normal), 0, 0);
                 if (g_TrackGame->mode.raceSettings.eventType == 3) {
                     startGate =
                         (StartObjectCharacterView*)raceScene->FindEntryByFileName("StartGate.slb", &startGateEntry);
@@ -383,7 +382,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
             if (hasFinishProbe) {
                 point.x = finishProbe.center.x;
                 point.z = finishProbe.center.z;
-                terrain->QueryGround(&point, 0, 0, 0);
+                reinterpret_cast<Terrain*>(terrain)->QueryGround(reinterpret_cast<TerrainVec3*>(&point), 0, 0, 0);
                 direction.x = finishProbe.direction.x;
                 direction.y = 0.0f;
                 direction.z = finishProbe.direction.z;
@@ -414,7 +413,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
             D3DRMVectorRotate(&turned, &girlOffset, (Vector3*)&kVec3YAxis, angle);
             girlOffset = ScaledVector(turned, VectorLength(girlOffset));
             ground = point + girlOffset;
-            terrain->QueryGround(&ground, 0, 0, 0);
+            reinterpret_cast<Terrain*>(terrain)->QueryGround(reinterpret_cast<TerrainVec3*>(&ground), 0, 0, 0);
             float height = ground.y - point.y;
             girlPosition = point + girlOffset;
             D3DRMVectorRotate(&turned, &boxOffset, (Vector3*)&kVec3YAxis, angle);
@@ -515,7 +514,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
             point.x += localRacer->heading.x * 15.0f;
             point.z += localRacer->heading.z * 15.0f;
         }
-        terrain->QueryGround(&point, 0, 0, 0);
+        reinterpret_cast<Terrain*>(terrain)->QueryGround(reinterpret_cast<TerrainVec3*>(&point), 0, 0, 0);
         thirtySecondMan->model->SetPositionVec3(point);
     }
     if (g_TrackGame->playingReplay && g_TrackGame->mode.raceSettings.raceMode != 4 &&

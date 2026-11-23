@@ -95,12 +95,14 @@ against retail, 600 runs with 0 mismatches):
     p0/p1 slots.
 - `0x00417ed0` (`Create`, the setup; 6745 bytes with the jump table at
   `0x0041992c`; ret 0x24; QuarryStuntEvent.cpp's loader calls it after the
-  constructor): 2821 of 6760 positions; linked 0.996. All 166 calls are in retail order,
-  with EH states 0..0x10 (`new` lines 0x193..0x367) and the 0x4e8-byte frame
-  with the buffers at retail's offsets.
-  - **The length helper.** It squares x and y into `xx` / `yy` locals and
-    adds `z*z` last, the shape of EventManager `0x0045d480`'s squared
-    lengths. A `zz` local in the sum gives 2800 of 6756.
+  constructor): 2800 of 6756 positions; linked 0.998. All 166 calls are in
+  retail order, with EH states 0..0x10 (`new` lines 0x193..0x367) and the
+  0x4e8-byte frame with the buffers at retail's offsets.
+  - **The length helper stays `x*x + y*y + zz`.** Squaring x and y into
+    `xx` / `yy` locals (EventManager `0x0045d480`'s shape) scores 2821 of
+    6760 but rounds differently: at 24-bit precision it moves the flag
+    girl's and box's offsets in 2 of 400 emulated runs. That form is a
+    pre-fix shape in tests/test_emu_diff.py, so behaviour wins over bytes.
   - **The spill.** Retail spills `z*z` of both vector lengths to a stack
     temporary (`fstp [t]; faddp; fadd [t]`). The only other copies in the
     binary are EventManager `0x0045d480`'s two squared lengths at

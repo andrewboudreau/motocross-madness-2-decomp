@@ -71,7 +71,7 @@ the function were wrong, not a finding that it is.
 | 2 | `0x00492ad0` | KrustyBike::SendStateDelta | src/krusty2/vehicle/KrustyBike.cpp:1798 | 192/2315 | R | low | yes, same file (0.992) | 531 | 640/642 insns, frame 0x34 exact, 5 hunks: the record-interval test is `je end` where retail has `jne deltas ; push 0 ; jmp end+1`, and the push order of the final call. |
 | 3 | `0x004e14a0` | BaseQuarryEvent::PrepareGeometry | src/reconstructed/QuarryStuntEvent.cpp | 139/1756; index 166/1760 | R | low, no emu case | yes, same file (0.994) | 485 | 511/512 insns, 7 masked diffs: which register holds the g_TrackGame load and one `mov edi, eax` placed three instructions later; everything after is positional fallout. |
 | 4 | `0x0040eca0` | SimulateLookAhead | src/krusty2/vehicle/BikeAI.cpp | 1479/17585 (sample form 1542, emu-divergent) | S | med | yes, same file (0.957) | 481 | 3931/3966 insns, frame 0x968 vs 0x93c, 133 calls vs 132, retail has 6 more fmul and 9 more fsub. At 0x40f5fb retail computes the accelerations with real subtractions (`fld 0.0 ; fld force.x ; fsub`, `fld -32.0 ; fsub [zero temp]`) where the candidate folds them to two `mov [..], 0xc2000000`. |
-| 5 | `0x00417ed0` | BikeRace::Create | src/reconstructed/BikeRace.cpp | 2821/6760 strict | R | low | yes, the unit (0.996) | 473 | 1813/1813 insns, frame 0x4e8 equal, 4 hunks: at two vector-length sites retail has `fstp [t] ; faddp ; fadd [t]` where the candidate keeps z*z on the x87 stack; one store scheduled two instructions later. |
+| 5 | `0x00417ed0` | BikeRace::Create | src/reconstructed/BikeRace.cpp | 2800/6756 strict | R | low, emu 0/600 differ | yes, the unit (0.998) | 473 | 1813/1813 insns, frame 0x4e8 equal, 4 hunks: at two vector-length sites retail has `fstp [t] ; faddp ; fadd [t]` where the candidate keeps z*z on the x87 stack; one store scheduled two instructions later. |
 | 6 | `0x004db0d0` | ProjectedShadow::ComputeBounds | samples/physics/shadow/ProjectedShadowNearMisses.cpp:238 | 211/2020 | R | low | yes, same file (0.996) | 452 | 560/560 insns, identical mnemonics, 3 masked diffs (one load schedule). The whole gap is frame-slot order: disp8 against disp32 makes the candidate 1975 B against 2020. |
 | 7 | `0x004de590` | BaseQuarryEvent::LoadEventObjects | src/reconstructed/QuarryStuntEvent.cpp | 2044/7952 strict | R | low, emu 0/600 differ | yes, the unit (0.986) | 394 | 2206 insns against 2208, frame 0x650 equal; slots below 0x1c, register choices in the memory-budget tree and the fog/sky block, the collision loop head and the racer loop's esi/edi swap. |
 | 8 | `0x00463a30` | FollowCamera::ProcessCameraInput | src/reconstructed/FollowCamera.cpp:352 | 927/4058; index 903/4042 | R | low | yes, same file (0.982) | 313 | 1088/1080 insns, same call, store and branch counts; 34 masked diffs spread over the keyboard/joystick arms. |
@@ -216,7 +216,7 @@ would plausibly write, singled out by the bytes).
    the retail operand order). The byte gap is the largest of the set, but most
    of it is frame fallout, so recovery is all-or-nothing.
 
-5. **0x00417ed0 BikeRace::Create** (2821/6760).
+5. **0x00417ed0 BikeRace::Create** (2800/6756).
    Confirmed: 1813/1813 instructions, frame 0x4e8 equal, 4 hunks. At two
    vector-length sites retail has `fstp [t] ; faddp ; fadd [t]`, that is, z*z
    stored to a temporary and added last, where the candidate keeps it on the

@@ -49,9 +49,9 @@ PARTIAL = [['src/reconstructed/BikeRace.cpp',
   '?Create@BikeRace@@',
   4292304,
   6745,
-  6760,
-  2821,
-  '59d5d6fed62ff5b907d3df81802c39f84c8feeede5d33f5cde930089545f8c90'],
+  6756,
+  2800,
+  '72b4158f144b7172be7bfb0612d50ba19b9ee54ebf4abf6bc3669eb393e34cf3'],
  # Nonexact score 13400: XOR EDI/MOV EBX at +538..545 in retail's order since
  # Krusty3DObjects.h declares RunwayTerrainView without the QueryGround forwarder
  # (a TU-wide count effect; 13394 before). BIKE_RACE_STATE_CONNECTIONS.md.
