@@ -163,14 +163,15 @@ CHECK(record,sizeof(ReceivedRacerState)==0x60 && offsetof(ReceivedRacerState,sta
                 else:
                     self.assertTrue(result['strict_exact'], (key, result))
                     strict += 1
-            # Count each compiled call once.
+            # Count each compiled call once. SetNetRecorder's four are Create's ghost
+            # VCR and the three replay/restart sites.
             for source in totals:
                 obj = objects[source]
                 for r in obj.relocations:
                     name = obj.symbol_by_index[r.symbol_index].name
                     if r.type == 0x14 and name in addresses:
                         totals[source][name] += 1
-                self.assertEqual(totals[source], Counter({BODIES[0][1]: 1, BODIES[1][1]: 3, BODIES[2][1]: 3}))
+                self.assertEqual(totals[source], Counter({BODIES[0][1]: 1, BODIES[1][1]: 3, BODIES[2][1]: 4}))
             self.assertEqual(preserved, len(partials))
             compiler = Path(os.environ['VC6_ROOT'])
             executable = output / 'state.exe'

@@ -1,6 +1,6 @@
 # BikeRace received-state and recorder connections
 
-Seven production calls now use three existing KrustyBike implementations. The
+Eight production calls now use three existing KrustyBike implementations. The
 BikeRace view declarations now carry the provider names (docs/NAMING.md, wave 2);
 no new implementation, thunk or alias is introduced.
 
@@ -8,10 +8,12 @@ no new implementation, thunk or alias is introduced.
 |---|---|---|---:|
 | `ReceivedPositionChanged()` | `KrustyBike::ReceivedPositionChanged()` | `0x00495c00`, 151 bytes | 1 |
 | `ApplyStateDelta(message, state)` | `KrustyBike::ApplyStateDelta(const KbNetDelta*, KbNetState*)` | `0x004933e0`, 634 bytes | 3 |
-| `SetNetRecorder(recorder)` | `KrustyBike::SetNetRecorder(KbRecorder*)` | `0x00496e20`, 13 bytes | 3 |
+| `SetNetRecorder(recorder)` | `KrustyBike::SetNetRecorder(KbRecorder*)` | `0x00496e20`, 13 bytes | 4 |
 
 The calls serve AnyRacerRemote, incoming network messages, race/replay restart
-and recorded frames. Each provider is present in the actual production COFF
+and recorded frames. Create's ghost-VCR call went through the bring-up
+`BikeRaceKrustyBikeView::SetNetRecorder` forwarder until BikeRace.cpp moved to
+direct canonical calls; it now calls KrustyBike's method like the other three. Each provider is present in the actual production COFF
 object and matches its complete retail extent with resolved relocations.
 The isolated source build removed precisely these three missing names
 (314 to 311 after the separate Bike placement connection); it still does not

@@ -43,7 +43,6 @@ RENAMES.update({
     '?Method_004444E0@VehSceneNodeView@@QAEXXZ': '?ClearScreenRects@D3DIMSoultreeObject@@QAEXXZ',
     '?SetLod@KbXform@@QAEXH@Z': '?SetLod@D3DIMSoultreeObject@@QAEXH@Z',
     '?SetLowestLod@KbXform@@QAEXH@Z': '?SetLowestLod@D3DIMSoultreeObject@@QAEXH@Z',
-    '?ApplyLodSettings@RacerD3DIMSoultreeObjectView@@QAEXH@Z': '?ApplyLodSettings@D3DIMSoultreeObject@@QAEXH@Z',
     '?ApplyLodSettings@SceneSoultreeObjectView@@QAEXH@Z': '?ApplyLodSettings@D3DIMSoultreeObject@@QAEXH@Z',
 })
 
@@ -123,9 +122,10 @@ class ModelRenderStateConnectionsTests(unittest.TestCase):
                 imported.update(names)
                 self.assertFalse(set(names) & RENAMES.keys(), source)
             # The two Load branches share one emitted SetLod call site. BikeRace.cpp's
-            # eight are SetDetailLevel's six ApplyLodSettings and two of Create's three
-            # 0x004444c0 calls (the third still goes through the start-object view).
-            self.assertEqual(counts, [2, 1, 7, 8, 3, 7, 2])
+            # 27 are SetDetailLevel's six ApplyLodSettings, Create's three 0x004444c0
+            # calls, and the camera's StartFollowing (inlined three times in AimCamera)
+            # with two SetLod and four SetLowestLod calls each.
+            self.assertEqual(counts, [2, 1, 7, 27, 3, 7, 2])
             self.assertTrue(set(RENAMES.values()) <= imported)
             cases = [(c['source'], c['symbol'], int(c['target_va'], 0), c['target_size'], ROOT / c['bindings'])
                      for c in CASES if c['source'] in SOURCES]

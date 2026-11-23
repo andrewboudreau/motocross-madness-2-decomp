@@ -69,7 +69,7 @@ identifiers are mapped.
 | `riderPoseHandles[N]`, `bikePoseHandles[N]`, pose literals 1..17 | `enum RiderPose`: `RiderPose_LeanR01` (0) .. `RiderPose_Turn3U` (8), `RiderPose_Wheelie` (10), `RiderPose_CrosOv1..3` (11..13), `RiderPose_LookBack`, `RiderPose_Victory`, `RiderPose_BackUpTop`, `RiderPose_BackUpBottom` (14..17) | Bike +0x66c / +0x6b4 index | 1 | `Bike::LoadBike` (`0x004079c0`) fills slot N with `FindMotion("LeanR01".."BackUpBottom")`. The bike clips use the same slots ("BLeanR02", "BTurn2D/U", "BWheelie", "CrosBik1..3", "bLookBack", "bBackUpTop"). Slot 9 is never loaded. |
 | `UnknownBikeRaceRacer::UnknownFunction495c00` | `UnknownBikeRaceRacer::ReceivedPositionChanged` | `0x00495c00` | 2 | Same VA and `this` as `KrustyBike::ReceivedPositionChanged` (wave 1). |
 | `UnknownBikeRaceRacer::UnknownFunction4933e0` | `UnknownBikeRaceRacer::ApplyStateDelta` | `0x004933e0` | 2 | Same VA as `KrustyBike::ApplyStateDelta`. |
-| `UnknownBikeRaceRacer::UnknownFunction496e20` | `UnknownBikeRaceRacer::SetNetRecorder` | `0x00496e20` | 2 | Same VA as `KrustyBike::SetNetRecorder`. The bring-up view forwards to it. |
+| `UnknownBikeRaceRacer::UnknownFunction496e20` | `UnknownBikeRaceRacer::SetNetRecorder` | `0x00496e20` | 2 | Same VA as `KrustyBike::SetNetRecorder`. BikeRace.cpp now calls KrustyBike's method directly. |
 | `UnknownEventRacer::UnknownFunction4925a0` | `UnknownEventRacer::SendFollowedRacer` | `0x004925a0` | 2 | Same VA as `KrustyBike::SendFollowedRacer`. |
 | `UnknownEventRacer::UnknownFunction496f90` | `UnknownEventRacer::IgnoreCollisionsWith` | `0x00496f90` | 2 | Same VA as `KrustyBike::IgnoreCollisionsWith`. |
 | `Fn_0043caa0` (collision `targets.json` note) | `TestInputEvent` | `0x0043caa0` | 2 | This note was the last place still using the old name. |
@@ -2572,10 +2572,10 @@ Left for later:
 | `UnknownBikeRaceRacerPart604` | `BikeRaceWreckerView` | 2 | 2 | A racer's +0x604 is the Wrecker (Bike SetupWrecker); +0x38 is Wrecker::collisionModel. |
 | `UnknownBikeRaceViews` | `BikeRaceRaceSoundView` | 2 | 5 | BikeRace+0x44 is the RaceSound (RaceView.h raceSound); +0x3c and +0x44 are RaceSound's engineGroup and effectsGroup. |
 | `UnknownBikeRaceCharacter` | `BikeRaceD3DIMSoultreeCharacterView` | 2 | 13 | Its slots 0-11 are D3DIMSoultreeCharacter's primary slots (LoadCharacter is slot 11) and 0x004a8b10 is the character's SetMotionByName. |
-| `UnknownBikeRaceMesh` | `StartD3DIMSoultreeObjectView` | 2 | 13 | The model at +0x1a0 of the start character and of the BikeRace+0x64/+0x6c objects; the methods called on it are D3DIMSoultreeObject's (0x004444c0, 0x004fc630, 0x004fbd70) and +0x28c is the LOD table. |
-| `UnknownBikeRaceModel` | `RacerD3DIMSoultreeObjectView` | 2 | 34 | A racer's +0x3bc model and its rider's +0x1a0: 0x00444d00, 0x00444d40 and 0x00444c70 are D3DIMSoulTree/D3DIMSoultreeModifier code, and +0x274/+0x27c/+0x280/+0x28c are the LOD count, level, distances and table. |
-| `UnknownBikeRaceMeshGroup` | `BikeRaceSoultreeLodView` | 2 | 5 | An entry of the +0x28c LOD table (8 bytes): D3DIMSoulTree's SoultreeLod, item count and surfaces. |
-| `UnknownBikeRaceMeshItem` | `BikeRaceSoultreeSurfaceView` | 3 | 3 | One of a LOD's surfaces (0x38 bytes); ReplaceMeshId walks its ids. |
+| `UnknownBikeRaceMesh` | `StartD3DIMSoultreeObjectView` | 2 | 13 | The model at +0x1a0 of the start character and of the BikeRace+0x64/+0x6c objects; the methods called on it are D3DIMSoultreeObject's (0x004444c0, 0x004fc630, 0x004fbd70) and +0x28c is the LOD table. Merged into `D3DIMSoultreeObject` (BikeRace.h) when BikeRace.cpp moved to direct canonical calls. |
+| `UnknownBikeRaceModel` | `RacerD3DIMSoultreeObjectView` | 2 | 34 | A racer's +0x3bc model and its rider's +0x1a0: 0x00444d00, 0x00444d40 and 0x00444c70 are D3DIMSoulTree/D3DIMSoultreeModifier code, and +0x274/+0x27c/+0x280/+0x28c are the LOD count, level, distances and table. Merged into `D3DIMSoultreeObject` (BikeRace.h) when BikeRace.cpp moved to direct canonical calls. |
+| `UnknownBikeRaceMeshGroup` | `BikeRaceSoultreeLodView` | 2 | 5 | An entry of the +0x28c LOD table (8 bytes): D3DIMSoulTree's SoultreeLod, item count and surfaces. Merged into `SoultreeLod` when BikeRace.cpp moved to direct canonical calls. |
+| `UnknownBikeRaceMeshItem` | `BikeRaceSoultreeSurfaceView` | 3 | 3 | One of a LOD's surfaces (0x38 bytes); ReplaceMeshId walks its ids. Merged into `SoultreeSurface` when BikeRace.cpp moved to direct canonical calls. |
 | `UnknownBikeRaceRider` | `BikeRaceRiderView` | 3 | 6 | A racer's +0x5c4 rider character, seen only for its +0x1a0 model. |
 | `UnknownBikeRaceNetPlayer` | `BikeRaceGridEntryView` | 2 | 7 | TrackGame+0x2ebc (race settings +0x14c) is the grid; +0x04 is GridEntry::points (TrackGame.h). |
 | `UnknownKrustyVcrRecord` | `KrustyVcrGridEntry` | 2 | 3 | KrustyVCR+0x25c holds the race settings' grid (+0x14c) copied with the settings: player id and points per slot. |
@@ -2584,11 +2584,11 @@ Left for later:
 | `UnknownBikeRaceView6c` | `StartObjectCharacterView` | 3 | 9 | BikeRace+0x64/+0x6c ("StartGate.slb", "30SecMan.slt"): vbptr GameObject at +4, model at +0x1a0 and CollisionCharacter::collisionObject at +0x210; the class is not established. |
 | `UnknownBikeRaceColliderBase` | `StartObjectColliderBase` | 3 | 2 | The object at +0x210 of the 30SecMan: a base with its own vfptr in front of the GameObject part 0x00421050 releases. |
 | `UnknownBikeRaceCollider` | `StartObjectCollider` | 3 | 2 | The same object with its GameObject base. |
-| `UnknownBikeRaceProjector` | `BikeRaceTerrainView` | 2 | 26 | BikeRace+0x4c: 0x00507c10 is Terrain::QueryGround and +0x40 is Terrain::gridCellSize. |
+| `UnknownBikeRaceProjector` | `BikeRaceTerrainView` | 2 | 26 | BikeRace+0x4c: 0x00507c10 is Terrain::QueryGround and +0x40 is Terrain::gridCellSize. Merged into `Terrain` when BikeRace.cpp moved to direct canonical calls. |
 | `UnknownBikeRaceObjectFlags` | `BikeRaceGameObjectFlags` | 2 | 10 | GameObject's +0x25 flags (GameObject.h keeps them protected). |
 | `UnknownBikeRaceSceneCharacter` | `BikeRaceSceneCharacterView` | 3 | 13 | A Scene+0xb4 entry with bit 3 set, reaching its GameObject flags through a vbptr at +4. |
 | `UnknownBikeRaceCameraView` | `BikeRaceKrustyBikeCameraView` | 2 | 8 | BikeRace+0x50 is the KrustyBikeCamera; the members are FollowCamera's +0x244/+0x274, VehicleCamera's +0x384..+0x394, BikeCamera's +0x3b0 and KrustyBikeCamera's +0x3b4. |
-| `UnknownBikeRaceShadow` | `BikeRaceProjectedShadowView` | 2 | 18 | BikeRace+0x5c: 0x004dab00 and 0x004dab90 are ProjectedShadow.cpp code (RTTI ProjectedShadow). |
+| `UnknownBikeRaceShadow` | `BikeRaceProjectedShadowView` | 2 | 18 | BikeRace+0x5c: 0x004dab00 and 0x004dab90 are ProjectedShadow.cpp code (RTTI ProjectedShadow). Merged into `ProjectedShadow` when BikeRace.cpp moved to direct canonical calls. |
 | `UnknownBikeRacePickModel` | `PickPhysicsObjectView` | 2 | 2 | A scene caster's +0x08 physics object: +0x128 is SoultreePhysicsBaseObject::collisionObject. |
 | `UnknownBikeRacePickCaster` | `PickSceneStaticModelView` | 2 | 3 | A Scene+0xb8 caster: SceneStaticModel's flags, physicsObject (+0x08) and collisionObject (+0x0c). |
 | `UnknownBikeRacePickCharacter` | `PickCollisionCharacterView` | 2 | 2 | +0x210 is CollisionCharacter::collisionObject. |

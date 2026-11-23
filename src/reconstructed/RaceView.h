@@ -215,7 +215,6 @@ struct EventKrustyVCRView {
 // EventManager use it as a GameObject (slot 5, the +0x25 flag bits), which
 // fits KrustyBike's primary base chain; its class is not established.
 struct EventBikeRaceView : public GameObject {
-    void NextCameraTarget(int forward, int racers, int objects); // 0x0041f1d0 (InGameProcs.cpp)
     void ToggleReplayPause(int value);   // 0x0041f550 (InGameProcs.cpp)
     void RestartRace(int mode, int path, int description); // 0x00420650 (InGameProcs.cpp ExitDlg)
     void ResetStartCountdown();             // 0x00421050 (dlgprocs.cpp LoadingDlg)

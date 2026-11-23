@@ -12,8 +12,8 @@ class ChatOverlay;
 class KrustyVCR;
 class VCRFile;
 class BikeRaceKrustyBikeView;
-class BikeRaceTerrainView;
-class BikeRaceProjectedShadowView;
+class Terrain;
+class ProjectedShadow;
 class BikeRaceD3DIMSoultreeCharacterView;
 struct TextureContext;
 struct BikeRaceKrustyBikeCameraView;
@@ -58,13 +58,13 @@ public:
     // overlays, the replay recorder, the loader 0x00419970, the dialogs,
     // the sound and the plate numbers. Returns this, or 0 after Release.
     BikeRace* Create(void* owner, void* particles, LightManager* lights,
-                                    TextureContext* textures, BikeRaceTerrainView* terrain,
+                                    TextureContext* textures, Terrain* terrain,
                                     KrustyBikeCamera* camera, Scene* scene, RaceGateEvent* event,
-                                    BikeRaceProjectedShadowView* shadow);
+                                    ProjectedShadow* shadow);
     // 0x00419970 (ret 0x14): loads the rider models and creates the racers;
     // 0 on failure.
     int CreateRacers(void* owner, LightManager* lights, TextureContext* textures,
-                              BikeRaceTerrainView* terrain, RaceGateEvent* event);
+                              Terrain* terrain, RaceGateEvent* event);
     // 0x00417bc0: the racer numbers 1..+0x158 ordered by championship points.
     void RankByPoints(int* order);
     // 0x0041d0d0: appends a node for `source[index]` at `*tail`.
@@ -110,11 +110,11 @@ public:
     BikeRaceKrustyBikeView** aiRacers;       // AI racers (TrackGame+0x2d94 of them)
     BikeRaceRaceSoundView* raceSound;          // +0x44 the RaceSound object (RaceSound::Create in the setup)
     Track* raceTrack;
-    BikeRaceTerrainView* raceTerrain;  // +0x4C  Create's terrain argument; QueryGround (Terrain 0x00507c10) puts probes/debug lines on the ground; grid scale
+    Terrain* raceTerrain;  // +0x4C  Create's terrain argument; QueryGround (Terrain 0x00507c10) puts probes/debug lines on the ground; grid scale
     KrustyBikeCamera* raceCamera;            // the race camera
     int particleManager;  // +0x54  Create's particles argument (QuarryStuntEvent passes its particleManager); forwarded to every racer loader
     Scene* raceScene;
-    BikeRaceProjectedShadowView* raceShadow;  // +0x5C  Create's shadow argument (ProjectedShadow); camera targeting clears it and adds the target's casters
+    ProjectedShadow* raceShadow;  // +0x5C  Create's shadow argument (ProjectedShadow); camera targeting clears it and adds the target's casters
     GameObject* youIndicator;                 // +0x60 the spinning "youind.slt" marker over the local racer
     StartObjectCharacterView* startGate;         // +0x64 the scene's "StartGate.slb" entry; reset by a restart (slot 5)
     int startGateEntry;                       // +0x68 its scene animation entry index

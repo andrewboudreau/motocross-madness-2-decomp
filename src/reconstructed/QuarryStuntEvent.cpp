@@ -640,8 +640,8 @@ int BaseQuarryEvent::LoadEventObjects(LoadProgressFn progress) {
     g_MemTagStack->Push("BikeRace");
     raceView = (EventBikeRaceView*)((BikeRace*)raceView)
                      ->Create(renderContext, particleManager, lightManager, &modelTextures,
-                              (BikeRaceTerrainView*)eventTerrain, (KrustyBikeCamera*)raceCamera, eventScene,
-                              (RaceGateEvent*)this, (BikeRaceProjectedShadowView*)projectedShadow);
+                              (Terrain*)eventTerrain, (KrustyBikeCamera*)raceCamera, eventScene,
+                              (RaceGateEvent*)this, (ProjectedShadow*)projectedShadow);
     if (!raceView) {
         sprintf(text, "BikeRace create failed.\n");
         return 0;

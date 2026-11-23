@@ -28,7 +28,7 @@ from tools.emu_cases import bike_race_create as base
 
 RETAIL_VA = 0x00419970
 SYMBOL = ('?CreateRacers@BikeRace@@QAEHPAXPAVLightManager@@PAUTextureContext@@'
-          'PAVBikeRaceTerrainView@@PAURaceGateEvent@@@Z')
+          'PAVTerrain@@PAURaceGateEvent@@@Z')
 SOURCE = 'src/reconstructed/BikeRace.cpp'
 BINDINGS = dict(base.BINDINGS)
 PROBES = {0x00419a57: 'no rider archive', 0x00419b43: 'replay rank', 0x00419bb8: 'pro circuit check',

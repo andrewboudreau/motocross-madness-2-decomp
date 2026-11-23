@@ -4,6 +4,7 @@
 
 #include "FollowCamera.h"
 #include "KrustyBikeCamera.h"
+#include "D3DIMSoulTree.h"
 #include "DebugAlloc.h"
 #include "DebugOverlay.h"
 #include "ObjectPicker.h"
@@ -41,13 +42,13 @@
 // provisional.
 
 class CollisionObject;  // collision/CollisionObject.h (src/krusty2)
+class ProjectedShadow;  // shadow/ProjectedShadow.h (src/krusty2)
+class Terrain;  // broadphase/Terrain.h (src/krusty2)
 class LightManager;
 struct TextureContext;
 struct BikeEngineSetup;
-struct BikeRaceSoultreeLodView;
 struct LodBikeRaceView;
 struct BikeRaceSceneCharacterView;
-struct BikeRaceSoultreeSurfaceView;
 struct ReceivedRacerState;
 struct RacerDeltaMessage;
 struct StartObjectCharacterView;
@@ -124,26 +125,6 @@ public:
     KrustyVcrRacerRecord racers[11];         // +0x300 0x0049c070 / 0x0049c1e0
 };
 
-// The model at +0x1a0 of BikeRace+0x74's object: +0x274 groups at +0x28c
-// whose items list ids (0x0041ea60 swaps one id for another; bikerace.cpp
-// passes 1 and 2 around its "FlagStart"/"FlagLoop" motions).
-struct StartD3DIMSoultreeObjectView {
-    // D3DIMSoultreeObject's methods (D3DIMSoulTree.h), as bikerace.cpp's
-    // setup places the flag girl and the scene's start objects.
-    void SetUseLighting(int value);    // 0x004444c0
-    void SetPositionVec3(Vector3 position); // 0x004fc630: sets the translation
-    void SetAxesPtr(const Vector3* look, const Vector3* up, int orthogonalize, int keepZ); // 0x004fbd70
-
-    unsigned char field_0x000[0x274];
-    int groupCount;                           // +0x274 group count
-    int lowestLod;                            // +0x278 D3DIMSoultreeObject lowestLod
-    int currentLod;                           // +0x27c D3DIMSoultreeObject currentLod
-    float* autoLodDistances;                  // +0x280 D3DIMSoultreeObject autoLodDistances
-    float inverseLodThreshold;                // +0x284 D3DIMSoultreeObject inverseLodThreshold
-    int useAutoLod;                           // +0x288 D3DIMSoultreeObject useAutoLod
-    BikeRaceSoultreeLodView* levelGroups;  // +0x28C  per-level groups (+0x274 of them), as RacerD3DIMSoultreeObjectView::levelGroups / D3DIMSoulTree lodTable
-};
-
 class BikeRaceD3DIMSoultreeCharacterView {
 public:
     // D3DIMSoultreeCharacter's primary slots 0-11 (the object is one; names as there).
@@ -170,7 +151,7 @@ public:
     unsigned char field_0x004[0x0c - 0x04];
     int motionFinished;                       // +0x00c the motion finished (slot 10 then loops "FlagLoop")
     unsigned char field_0x010[0x1a0 - 0x10];
-    StartD3DIMSoultreeObjectView* modelNode;           // +0x1a0
+    D3DIMSoultreeObject* modelNode;            // +0x1a0 the flag girl's model (Create places it)
 };
 
 // The object at BikeRace+0x44: three GameObjects at +0x3c..+0x44 that a
@@ -182,54 +163,15 @@ struct BikeRaceRaceSoundView {
     GameObject* effectsGroup;  // +0x44  RaceSound+0x44 effectsGroup (RaceSound.h); a restart re-enables it
 };
 
-// An entry of the mesh's +0x28c table (8 bytes).
-struct BikeRaceSoultreeLodView {
-    int itemCount;                            // +0x00 item count
-    BikeRaceSoultreeSurfaceView* surfaces;  // +0x4  itemCount surfaces (D3DIMSoulTree SoultreeLod::surfaces); ReplaceMeshId walks their ids
-};
-
-// An item of a mesh group (0x38 bytes).
-struct BikeRaceSoultreeSurfaceView {
-    unsigned char field_0x00[0x0c];
-    int faceCount;                            // +0x0c face count
-    unsigned char field_0x10[0x20 - 0x10];
-    int idCount;                              // +0x20 id count
-    int* ids;                                 // +0x24 ids
-    unsigned char field_0x28[0x38 - 0x28];
-};
-
 // Shared chat overlay stored at BikeRace+0x19c and by the race events.
 class ChatOverlay;
 
-// A racer's model parts as 0x00423790 reaches them: the racer's +0x3bc and
-// its rider's +0x1a0 take a detail level through 0x004451e0
-// (D3DIMSoultreeModifier.cpp's code).
-class RacerD3DIMSoultreeObjectView {
-public:
-    void SetLod(int value);    // 0x00444d00
-    void SetLowestLod(int value);    // 0x00444d40: hidden for the followed racer
-    void ClearFlag14c();             // 0x004fdb50
-    void GetPosition(Vector3* position); // 0x004fc970: the translation
-    // 0x00444c70 (D3DIMSoulTree.cpp): replaces texture `index` with `name`.
-    int ReplaceMaterialTexture(int index, const char* name, int textures);
-
-    unsigned char field_0x000[0x274];
-    int detailLevelCount;                     // +0x274 detail level count
-    unsigned char lowestLod[0x27c - 0x278]; // +0x278: D3DIMSoultreeObject::lowestLod (bytes kept)
-    int currentDetailLevel;                   // +0x27c current detail level
-    float* detailDistances;                   // +0x280 automatic detail distances (slot 10's debug page)
-    float inverseLodThreshold;                // +0x284 D3DIMSoultreeObject inverseLodThreshold
-    int useAutoLod;                           // +0x288 D3DIMSoultreeObject useAutoLod
-    BikeRaceSoultreeLodView* levelGroups;    // +0x28c per level
-};
-
 struct BikeRaceRiderView {
     unsigned char field_0x000[0x1a0];
-    RacerD3DIMSoultreeObjectView* modelNode;          // +0x1a0
+    D3DIMSoultreeObject* modelNode;            // +0x1a0 the rider's model (SetDetailLevel 0x00423790)
 };
 
 class BikeRace;
-class BikeRaceTerrainView;
 
 // The object at a racer's +0x604: its +0x38 collision is paired with the
 // other racers' (the loader 0x00419970).
@@ -392,13 +334,11 @@ public:
     GameObject* Load(void* owner, const char* engineName, const char* bikeFile, const char* riderFile,
                                       LightManager* lights, TextureContext* textures,
                                       Vector3 position, Vector3 direction, Vector3 up,
-                                      BikeRaceTerrainView* terrain, ControlInterface* control, char ai,
+                                      Terrain* terrain, ControlInterface* control, char ai,
                                       int remote, BikeRace* race, const char* name, int b, int id,
                                       BikeEngineSetup* setup, int gasGyroOption, int brakeGyroOption, int particles,
                                       Scene* scene, KrustyVCR* vcr, float skill, int withRider);
 
-    // Its own slot 43 (0x00420650 calls it on each racer on a restart).
-    void SetNetRecorder(KrustyVCR* vcr); // 0x00496e20 (KrustyBike.cpp's code)
     // 0x004933e0 (KrustyBike.cpp's code): applies message 13 to a state.
     void ApplyStateDelta(RacerDeltaMessage* message, ReceivedRacerState* part);
 
@@ -438,7 +378,7 @@ public:
     unsigned char particleManager[0x128 - 0x124];  // +0x124 KrustyBike particleManager (SoultreePhysicsBaseObject) (bytes kept)
     CollisionObject* collisionObject;  // +0x128  SoultreePhysicsBaseObject+0x128 collisionObject; its +0x68 is set without tree collision (the loader)
     unsigned char field_0x12c[0x3bc - 0x12c];
-    RacerD3DIMSoultreeObjectView* modelNode;          // +0x3bc
+    D3DIMSoultreeObject* modelNode;            // +0x3bc the bike's model (SetDetailLevel 0x00423790)
     unsigned char field_0x3c0[0x4a0 - 0x3c0];
     int outOfRace;                            // +0x4a0 out of the race (0x0041f1d0 skips it)
     unsigned char field_0x4a4[0x5bc - 0x4a4];
@@ -608,21 +548,9 @@ class StartObjectCollider : public StartObjectColliderBase, public GameObject {
 struct StartObjectCharacterView : virtual public GameObject {
     virtual void UnknownVirtualSlot0();
     unsigned char field_0x008[0x1a0 - 0x08];
-    StartD3DIMSoultreeObjectView* model;               // +0x1a0 model (the setup places it)
+    D3DIMSoultreeObject* model;                // +0x1a0 model (the setup places it)
     unsigned char field_0x1a4[0x210 - 0x1a4];
     StartObjectCollider* collisionObject; // +0x210 krusty2 CollisionCharacter::collisionObject
-};
-
-// The object at BikeRace+0x4c: 0x00507c10 moves a point (the track debug
-// drawing passes each end point with three zeros).
-class BikeRaceTerrainView {
-public:
-    // 0x00507c10 (Terrain::QueryGround): puts `point` on the ground; the
-    // ground normal goes to `normal` when given.
-    void QueryGround(Vector3* point, Vector3* normal, int flatShaded, unsigned char* surface);
-
-    unsigned char field_0x00[0x40];
-    float gridCellSize;  // +0x40  Terrain+0x40 gridCellSize (Terrain.h); scales the start grid (0x004210f0)
 };
 
 // A GameObject's +0x25 flags, which GameObject.h keeps protected
@@ -669,10 +597,10 @@ struct BikeRaceKrustyBikeCameraView {
         if (followedBike != 0 && !racer->bikeView->forceHighLod) {
             followedBike->modelNode->SetLowestLod(1);
             followedBike->riderCharacter->modelNode->SetLowestLod(1);
-            if (followedBike->modelNode->currentDetailLevel == 0) {
+            if (followedBike->modelNode->currentLod == 0) {
                 followedBike->modelNode->SetLod(1);
             }
-            if (followedBike->riderCharacter->modelNode->currentDetailLevel == 0) {
+            if (followedBike->riderCharacter->modelNode->currentLod == 0) {
                 followedBike->riderCharacter->modelNode->SetLod(1);
             }
         }
@@ -723,13 +651,6 @@ struct BikeRaceKrustyBikeCameraView {
         targetCharacter = 0;
         shadowCaster = 0;
     }
-};
-
-// The ProjectedShadow at BikeRace+0x5c (ProjectedShadow.cpp's code).
-class BikeRaceProjectedShadowView {
-public:
-    void AddCaster(RacerD3DIMSoultreeObjectView* model); // 0x004dab00: adds a caster
-    void ClearCasters();             // 0x004dab90: clears the casters
 };
 
 // What slot 23 compares a pick against: a Scene+0xb8 caster's model (+0x08,

@@ -13,6 +13,7 @@
 #include "EventManager.h"
 #include "BaseQuarryEvent.h"
 #include "../krusty2/vehicle/KrustyBikeCore.h"
+#include "../krusty2/shadow/ProjectedShadow.h"
 
 #include <math.h>
 #include <stdlib.h>
@@ -215,9 +216,9 @@ static inline Vector3 ScaledVector(const Vector3& v, float scale) {
 // so most esp offsets below +0x44 differ (docs/BIKERACE.md).
 BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
                                           TextureContext* textures,
-                                          BikeRaceTerrainView* terrain, KrustyBikeCamera* camera,
+                                          Terrain* terrain, KrustyBikeCamera* camera,
                                           Scene* scene, RaceGateEvent* event,
-                                          BikeRaceProjectedShadowView* shadow) {
+                                          ProjectedShadow* shadow) {
     char name[0x104];
     char path[0x104];
     char modelName[0x104];
@@ -280,9 +281,9 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
             delete stream;
         }
         if (hasFinishProbe)
-            reinterpret_cast<Terrain*>(raceTerrain)->QueryGround(reinterpret_cast<TerrainVec3*>(&finishProbe.center), 0, 0, 0);
+            raceTerrain->QueryGround(reinterpret_cast<TerrainVec3*>(&finishProbe.center), 0, 0, 0);
         if (hasStartProbe)
-            reinterpret_cast<Terrain*>(raceTerrain)->QueryGround(reinterpret_cast<TerrainVec3*>(&startProbe.center), 0, 0, 0);
+            raceTerrain->QueryGround(reinterpret_cast<TerrainVec3*>(&startProbe.center), 0, 0, 0);
         if (hasFinishProbe && hasStartProbe)
             UpdateTrackSeparation();
         break;
@@ -332,7 +333,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
                 } else {
                     point = position;
                 }
-                reinterpret_cast<Terrain*>(terrain)->QueryGround(reinterpret_cast<TerrainVec3*>(&point), reinterpret_cast<TerrainVec3*>(&normal), 0, 0);
+                terrain->QueryGround(reinterpret_cast<TerrainVec3*>(&point), reinterpret_cast<TerrainVec3*>(&normal), 0, 0);
                 thirtySecondMan = (StartObjectCharacterView*)raceScene->FindEntryByFileName("30SecMan.slt", &thirtySecondManEntry);
                 if (thirtySecondMan) {
                     raceScene->RestartEntry(thirtySecondManEntry, 0, 0, 0);
@@ -345,7 +346,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
                 if (g_TrackGame->mode.raceSettings.raceMode != 0 &&
                     g_TrackGame->mode.raceSettings.raceMode != 4 && thirtySecondMan) {
                     thirtySecondMan->model->SetPositionVec3(point);
-                    thirtySecondMan->model->SetAxesPtr(&direction, &kVec3YAxis, 1, 0);
+                    thirtySecondMan->model->SetAxesPtr((const Vec3*)&direction, (const Vec3*)&kVec3YAxis, 1, 0);
                 }
                 if (thirtySecondMan)
                     thirtySecondMan->Disable();
@@ -357,7 +358,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
                 } else {
                     point = position;
                 }
-                reinterpret_cast<Terrain*>(terrain)->QueryGround(reinterpret_cast<TerrainVec3*>(&point), reinterpret_cast<TerrainVec3*>(&normal), 0, 0);
+                terrain->QueryGround(reinterpret_cast<TerrainVec3*>(&point), reinterpret_cast<TerrainVec3*>(&normal), 0, 0);
                 if (g_TrackGame->mode.raceSettings.eventType == 3) {
                     startGate =
                         (StartObjectCharacterView*)raceScene->FindEntryByFileName("StartGate.slb", &startGateEntry);
@@ -372,7 +373,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
                         g_TrackGame->mode.raceSettings.raceMode != 4) {
                         if (startGate) {
                             startGate->model->SetPositionVec3(point);
-                            startGate->model->SetAxesPtr(&direction, &kVec3YAxis, 1, 0);
+                            startGate->model->SetAxesPtr((const Vec3*)&direction, (const Vec3*)&kVec3YAxis, 1, 0);
                         }
                     } else if (startGate) {
                         startGate->Disable();
@@ -382,7 +383,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
             if (hasFinishProbe) {
                 point.x = finishProbe.center.x;
                 point.z = finishProbe.center.z;
-                reinterpret_cast<Terrain*>(terrain)->QueryGround(reinterpret_cast<TerrainVec3*>(&point), 0, 0, 0);
+                terrain->QueryGround(reinterpret_cast<TerrainVec3*>(&point), 0, 0, 0);
                 direction.x = finishProbe.direction.x;
                 direction.y = 0.0f;
                 direction.z = finishProbe.direction.z;
@@ -413,7 +414,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
             D3DRMVectorRotate(&turned, &girlOffset, (Vector3*)&kVec3YAxis, angle);
             girlOffset = ScaledVector(turned, VectorLength(girlOffset));
             ground = point + girlOffset;
-            reinterpret_cast<Terrain*>(terrain)->QueryGround(reinterpret_cast<TerrainVec3*>(&ground), 0, 0, 0);
+            terrain->QueryGround(reinterpret_cast<TerrainVec3*>(&ground), 0, 0, 0);
             float height = ground.y - point.y;
             girlPosition = point + girlOffset;
             D3DRMVectorRotate(&turned, &boxOffset, (Vector3*)&kVec3YAxis, angle);
@@ -431,7 +432,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
                 ReplaceMeshId(flagGirl, 1, 2);
                 flagGirl->modelNode->SetUseLighting(1);
                 flagGirl->modelNode->SetPositionVec3(girlPosition);
-                flagGirl->modelNode->SetAxesPtr(&direction, &kVec3YAxis, 1, 0);
+                flagGirl->modelNode->SetAxesPtr((const Vec3*)&direction, (const Vec3*)&kVec3YAxis, 1, 0);
                 reinterpret_cast<Character*>(flagGirl)->SetMotionByName("Stand");
                 flagGirl->AdvanceMotionInterpolated(0.001f, 0, 0);
             }
@@ -510,11 +511,11 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
 
     if (thirtySecondMan) {
         if (hasStartProbe) {
-            localRacer->modelNode->GetPosition(&point);
+            localRacer->modelNode->GetPosition((Vec3*)&point);
             point.x += localRacer->heading.x * 15.0f;
             point.z += localRacer->heading.z * 15.0f;
         }
-        reinterpret_cast<Terrain*>(terrain)->QueryGround(reinterpret_cast<TerrainVec3*>(&point), 0, 0, 0);
+        terrain->QueryGround(reinterpret_cast<TerrainVec3*>(&point), 0, 0, 0);
         thirtySecondMan->model->SetPositionVec3(point);
     }
     if (g_TrackGame->playingReplay && g_TrackGame->mode.raceSettings.raceMode != 4 &&
@@ -537,7 +538,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
                 COPY_TEXT(ghostFilePlayed, "VCRgtemp.dat", 0x104);
                 ghostVcr->OpenRecording(RecorderCallback, 1, ghostFilePlayed, vcrFile);
                 bestGhostLength = ghostVcr->RecordedLength();
-                aiRacers[0]->SetNetRecorder(ghostVcr);
+                reinterpret_cast<KrustyBike*>(aiRacers[0])->SetNetRecorder(reinterpret_cast<KbRecorder*>(ghostVcr));
                 if (startBeforeFinish)
                     aiRacers[0]->Disable();
                 else
@@ -647,7 +648,7 @@ static inline BikeRaceManufacturerRecord& UiRider(int i) {
 // `mov ebx, 1` at +538 moves with the unit's declaration count
 // (docs/BIKERACE.md).
 int BikeRace::CreateRacers(void* owner, LightManager* lights, TextureContext* textures,
-                                    BikeRaceTerrainView* terrain, RaceGateEvent* event) {
+                                    Terrain* terrain, RaceGateEvent* event) {
     const char* const resources = "Res";
     char path[0x104];
     char message[0x184];
@@ -1777,7 +1778,7 @@ int BikeRace::Tick(float frameTime) {
         }
         if (g_TrackGame->debugOverlay->shownPage == lodDebugPage) {
             char name[0x20];
-            RacerD3DIMSoultreeObjectView* model;
+            D3DIMSoultreeObject* model;
             int pass = 0;
             if ((signed char)targetKind < 0) {
                 strncpy(name,
@@ -1791,7 +1792,7 @@ int BikeRace::Tick(float frameTime) {
             } else if (targetKind == 0) {
                 strncpy(name, raceScene->staticModels->casters[targetIndex].fileName, 0x14);
                 name[0x14] = 0;
-                model = (RacerD3DIMSoultreeObjectView*)raceScene->staticModels->casters[targetIndex].model;
+                model = (D3DIMSoultreeObject*)raceScene->staticModels->casters[targetIndex].model;
             } else {
                 strncpy(name, raceScene->animationTable->entries[targetIndex].fileName, 0x14);
                 name[0x14] = 0;
@@ -1799,34 +1800,34 @@ int BikeRace::Tick(float frameTime) {
                 if (entry->keyFramed) {
                     model = ((BikeRaceRiderView*)entry->character)->modelNode;
                 } else {
-                    model = (RacerD3DIMSoultreeObjectView*)entry->proceduralObject->carModel;
+                    model = (D3DIMSoultreeObject*)entry->proceduralObject->carModel;
                 }
             }
             do {
                 int faces = 0;
-                BikeRaceSoultreeLodView* group = &model->levelGroups[model->currentDetailLevel];
-                for (int i = 0; i < group->itemCount; i++) {
+                SoultreeLod* group = &model->lodTable[model->currentLod];
+                for (int i = 0; i < group->surfaceCount; i++) {
                     faces += group->surfaces[i].faceCount;
                 }
                 g_TrackGame->debugOverlay->Title(lodDebugPage, "Soultree LOD (%s)", name);
                 g_TrackGame->debugOverlay->Print(lodDebugPage, "Current LOD %d out of %d",
-                                                                        model->currentDetailLevel + 1, model->detailLevelCount);
+                                                                        model->currentLod + 1, model->lodCount);
                 g_TrackGame->debugOverlay->Print(lodDebugPage, "Number of Faces = %d", faces);
                 if ((signed char)targetKind < 0) {
                     if (g_LodDebugSelectedRow > 5) {
-                        if ((pass == 1 && g_LodDebugSelectedRow - 7 > model->detailLevelCount) || g_LodDebugSelectedRow < 2) {
+                        if ((pass == 1 && g_LodDebugSelectedRow - 7 > model->lodCount) || g_LodDebugSelectedRow < 2) {
                             g_TrackGame->debugOverlay->SetRowHighlight(lodDebugPage, g_LodDebugSelectedRow + 1, 0);
                             g_LodDebugSelectedRow = 2;
                         }
-                    } else if ((pass == 0 && g_LodDebugSelectedRow > model->detailLevelCount) || g_LodDebugSelectedRow < 2) {
+                    } else if ((pass == 0 && g_LodDebugSelectedRow > model->lodCount) || g_LodDebugSelectedRow < 2) {
                         g_TrackGame->debugOverlay->SetRowHighlight(lodDebugPage, g_LodDebugSelectedRow + 1, 0);
                         g_LodDebugSelectedRow = 9;
                     }
-                } else if (g_LodDebugSelectedRow > model->detailLevelCount || g_LodDebugSelectedRow < 2) {
+                } else if (g_LodDebugSelectedRow > model->lodCount || g_LodDebugSelectedRow < 2) {
                     g_TrackGame->debugOverlay->SetRowHighlight(lodDebugPage, g_LodDebugSelectedRow + 1, 0);
                     g_LodDebugSelectedRow = 2;
                 }
-                if (model->detailLevelCount > 1) {
+                if (model->lodCount > 1) {
                     int up = g_TrackGame->controlInterface->IsDeviceButtonDown(0xd0, 0, 0x80, 0);
                     int down = g_TrackGame->controlInterface->IsDeviceButtonDown(0xc8, 0, 0x80, 0);
                     int row = g_LodDebugSelectedRow - 1;
@@ -1844,55 +1845,55 @@ int BikeRace::Tick(float frameTime) {
                         }
                         switch (row) {
                         case 1:
-                            if (model->detailLevelCount > 1) {
+                            if (model->lodCount > 1) {
                                 if (down) {
-                                    model->detailDistances[0] += 0.05f;
+                                    model->autoLodDistances[0] += 0.05f;
                                 } else {
-                                    model->detailDistances[0] -= 0.05f;
-                                    model->detailDistances[0] = MaxFloat(model->detailDistances[0], 0.0f);
+                                    model->autoLodDistances[0] -= 0.05f;
+                                    model->autoLodDistances[0] = MaxFloat(model->autoLodDistances[0], 0.0f);
                                 }
                             }
                             break;
                         case 2:
-                            if (model->detailLevelCount > 2) {
+                            if (model->lodCount > 2) {
                                 if (down) {
-                                    model->detailDistances[1] += 0.05f;
+                                    model->autoLodDistances[1] += 0.05f;
                                 } else {
-                                    model->detailDistances[1] -= 0.05f;
-                                    model->detailDistances[1] = MaxFloat(model->detailDistances[1], 0.0f);
+                                    model->autoLodDistances[1] -= 0.05f;
+                                    model->autoLodDistances[1] = MaxFloat(model->autoLodDistances[1], 0.0f);
                                 }
                             }
                             break;
                         case 3:
-                            if (model->detailLevelCount > 3) {
+                            if (model->lodCount > 3) {
                                 if (down) {
-                                    model->detailDistances[2] += 0.05f;
+                                    model->autoLodDistances[2] += 0.05f;
                                 } else {
-                                    model->detailDistances[2] -= 0.05f;
-                                    model->detailDistances[2] = MaxFloat(model->detailDistances[2], 0.0f);
+                                    model->autoLodDistances[2] -= 0.05f;
+                                    model->autoLodDistances[2] = MaxFloat(model->autoLodDistances[2], 0.0f);
                                 }
                             }
                             break;
                         case 4:
-                            if (model->detailLevelCount > 4) {
+                            if (model->lodCount > 4) {
                                 if (down) {
-                                    model->detailDistances[3] += 0.05f;
+                                    model->autoLodDistances[3] += 0.05f;
                                 } else {
-                                    model->detailDistances[3] -= 0.05f;
-                                    model->detailDistances[3] = MaxFloat(model->detailDistances[3], 0.0f);
+                                    model->autoLodDistances[3] -= 0.05f;
+                                    model->autoLodDistances[3] = MaxFloat(model->autoLodDistances[3], 0.0f);
                                 }
                             }
                             break;
                         }
                     }
                     g_TrackGame->debugOverlay->Print(
-                        lodDebugPage, "AutoLOD#0 %.2f", model->detailLevelCount > 1 ? model->detailDistances[0] : 0.0f);
+                        lodDebugPage, "AutoLOD#0 %.2f", model->lodCount > 1 ? model->autoLodDistances[0] : 0.0f);
                     g_TrackGame->debugOverlay->Print(
-                        lodDebugPage, "AutoLOD#1 %.2f", model->detailLevelCount > 2 ? model->detailDistances[1] : 0.0f);
+                        lodDebugPage, "AutoLOD#1 %.2f", model->lodCount > 2 ? model->autoLodDistances[1] : 0.0f);
                     g_TrackGame->debugOverlay->Print(
-                        lodDebugPage, "AutoLOD#2 %.2f", model->detailLevelCount > 3 ? model->detailDistances[2] : 0.0f);
+                        lodDebugPage, "AutoLOD#2 %.2f", model->lodCount > 3 ? model->autoLodDistances[2] : 0.0f);
                     g_TrackGame->debugOverlay->Print(
-                        lodDebugPage, "AutoLOD#3 %.2f", model->detailLevelCount > 4 ? model->detailDistances[3] : 0.0f);
+                        lodDebugPage, "AutoLOD#3 %.2f", model->lodCount > 4 ? model->autoLodDistances[3] : 0.0f);
                     g_TrackGame->debugOverlay->SetRowHighlight(lodDebugPage, g_LodDebugSelectedRow + 1, 1);
                 }
                 if ((signed char)targetKind >= 0) {
@@ -1920,11 +1921,11 @@ int BikeRace::AnyRacerRemote() {
 
 // 0x0041ea60
 void BikeRace::ReplaceMeshId(BikeRaceD3DIMSoultreeCharacterView* character, int from, int to) {
-    for (int i = 0; i < character->modelNode->groupCount; i++) {
-        for (int j = 0; j < character->modelNode->levelGroups[i].itemCount; j++) {
-            for (int k = 0; k < character->modelNode->levelGroups[i].surfaces[j].idCount; k++) {
-                if (character->modelNode->levelGroups[i].surfaces[j].ids[k] == from) {
-                    character->modelNode->levelGroups[i].surfaces[j].ids[k] = to;
+    for (int i = 0; i < character->modelNode->lodCount; i++) {
+        for (int j = 0; j < character->modelNode->lodTable[i].surfaceCount; j++) {
+            for (int k = 0; k < character->modelNode->lodTable[i].surfaces[j].materialCount; k++) {
+                if (character->modelNode->lodTable[i].surfaces[j].materialIndices[k] == from) {
+                    character->modelNode->lodTable[i].surfaces[j].materialIndices[k] = to;
                 }
             }
         }
@@ -1942,8 +1943,8 @@ int BikeRace::AimCamera(int caster) {
             RaceCameraView()->StartFollowing(racerSlots[targetRacer]);
             if (raceShadow != 0) {
                 raceShadow->ClearCasters();
-                raceShadow->AddCaster(racerSlots[targetRacer]->modelNode);
-                raceShadow->AddCaster(racerSlots[targetRacer]->riderCharacter->modelNode);
+                raceShadow->AddCaster((ShadowCaster*)racerSlots[targetRacer]->modelNode);
+                raceShadow->AddCaster((ShadowCaster*)racerSlots[targetRacer]->riderCharacter->modelNode);
             }
             if (g_TrackGame->bajaEnduroEvent != 0) {
                 BikeRaceKrustyBikeView* racer = racerSlots[targetRacer];
@@ -1956,8 +1957,8 @@ int BikeRace::AimCamera(int caster) {
             RaceCameraView()->StartFollowing(localRacer);
             if (raceShadow != 0) {
                 raceShadow->ClearCasters();
-                raceShadow->AddCaster(localRacer->modelNode);
-                raceShadow->AddCaster(localRacer->riderCharacter->modelNode);
+                raceShadow->AddCaster((ShadowCaster*)localRacer->modelNode);
+                raceShadow->AddCaster((ShadowCaster*)localRacer->riderCharacter->modelNode);
             }
             if (g_TrackGame->bajaEnduroEvent != 0) {
                 BikeRaceKrustyBikeView* racer = localRacer;
@@ -1971,8 +1972,8 @@ int BikeRace::AimCamera(int caster) {
             RaceCameraView()->StartFollowing(aiRacers[index]);
             if (raceShadow != 0) {
                 raceShadow->ClearCasters();
-                raceShadow->AddCaster(aiRacers[index]->modelNode);
-                raceShadow->AddCaster(aiRacers[index]->riderCharacter->modelNode);
+                raceShadow->AddCaster((ShadowCaster*)aiRacers[index]->modelNode);
+                raceShadow->AddCaster((ShadowCaster*)aiRacers[index]->riderCharacter->modelNode);
             }
             if (g_TrackGame->bajaEnduroEvent != 0) {
                 BikeRaceKrustyBikeView* racer = aiRacers[index];
@@ -3458,23 +3459,23 @@ void BikeRace::DrawTrack(Track* track) {
                 SetDrawColor(0, 0xff, 0);
                 a = *(Vector3*)&segment->edgeAX;
                 b = *(Vector3*)&segment->next->edgeAX;
-                reinterpret_cast<Terrain*>(raceTerrain)->QueryGround(reinterpret_cast<TerrainVec3*>(&a), 0, 0, 0);
-                reinterpret_cast<Terrain*>(raceTerrain)->QueryGround(reinterpret_cast<TerrainVec3*>(&b), 0, 0, 0);
+                raceTerrain->QueryGround(reinterpret_cast<TerrainVec3*>(&a), 0, 0, 0);
+                raceTerrain->QueryGround(reinterpret_cast<TerrainVec3*>(&b), 0, 0, 0);
                 a.y += 5.0f;
                 b.y += 5.0f;
                 DrawLine((const Vec3*)&a, (const Vec3*)&b);
                 a = *(Vector3*)&segment->edgeBX;
                 b = *(Vector3*)&segment->next->edgeBX;
-                reinterpret_cast<Terrain*>(raceTerrain)->QueryGround(reinterpret_cast<TerrainVec3*>(&a), 0, 0, 0);
-                reinterpret_cast<Terrain*>(raceTerrain)->QueryGround(reinterpret_cast<TerrainVec3*>(&b), 0, 0, 0);
+                raceTerrain->QueryGround(reinterpret_cast<TerrainVec3*>(&a), 0, 0, 0);
+                raceTerrain->QueryGround(reinterpret_cast<TerrainVec3*>(&b), 0, 0, 0);
                 a.y += 5.0f;
                 b.y += 5.0f;
                 DrawLine((const Vec3*)&a, (const Vec3*)&b);
                 SetDrawColor(0, 0, 0xff);
                 a = *(Vector3*)&segment->pointX;
                 b = *(Vector3*)&segment->next->pointX;
-                reinterpret_cast<Terrain*>(raceTerrain)->QueryGround(reinterpret_cast<TerrainVec3*>(&a), 0, 0, 0);
-                reinterpret_cast<Terrain*>(raceTerrain)->QueryGround(reinterpret_cast<TerrainVec3*>(&b), 0, 0, 0);
+                raceTerrain->QueryGround(reinterpret_cast<TerrainVec3*>(&a), 0, 0, 0);
+                raceTerrain->QueryGround(reinterpret_cast<TerrainVec3*>(&b), 0, 0, 0);
                 a.y += 5.0f;
                 b.y += 5.0f;
                 DrawLine((const Vec3*)&a, (const Vec3*)&b);
@@ -3572,17 +3573,17 @@ int BikeRace::Render3D() {
 // 0x00423790
 void BikeRace::SetDetailLevel(int level) {
     g_ActiveLodSettings = g_TrackGame->bladeRenderer ? g_BladeLodSettings : g_NonBladeLodSettings;
-    reinterpret_cast<D3DIMSoultreeObject*>(localRacer->modelNode)->ApplyLodSettings(level);
-    reinterpret_cast<D3DIMSoultreeObject*>(localRacer->riderCharacter->modelNode)->ApplyLodSettings(level);
+    localRacer->modelNode->ApplyLodSettings(level);
+    localRacer->riderCharacter->modelNode->ApplyLodSettings(level);
     if (g_TrackGame->mode.raceSettings.raceMode != 4) {
         for (int i = 0; i < g_TrackGame->mode.raceSettings.aiRacerCount; i++) {
-            reinterpret_cast<D3DIMSoultreeObject*>(aiRacers[i]->modelNode)->ApplyLodSettings(level);
-            reinterpret_cast<D3DIMSoultreeObject*>(aiRacers[i]->riderCharacter->modelNode)->ApplyLodSettings(level);
+            aiRacers[i]->modelNode->ApplyLodSettings(level);
+            aiRacers[i]->riderCharacter->modelNode->ApplyLodSettings(level);
         }
     }
     for (int j = 0; j < g_TrackGame->mode.raceSettings.networkPlayerCount; j++) {
-        reinterpret_cast<D3DIMSoultreeObject*>(racerSlots[j]->modelNode)->ApplyLodSettings(level);
-        reinterpret_cast<D3DIMSoultreeObject*>(racerSlots[j]->riderCharacter->modelNode)->ApplyLodSettings(level);
+        racerSlots[j]->modelNode->ApplyLodSettings(level);
+        racerSlots[j]->riderCharacter->modelNode->ApplyLodSettings(level);
     }
 }
 

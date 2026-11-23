@@ -82,12 +82,12 @@ static void Run(int level,int blade,int mode,int aiCount,int netCount,int alias,
  for(int i=0;i<2;i++){state.ai[i]=state.racers[i+1].ptr();state.net[i]=state.racers[i+3].ptr();}
  for(i=0;i<5;i++){
   state.racers[i].ptr()->riderCharacter=state.riders[i].ptr();
-  state.racers[i].ptr()->modelNode=(RacerD3DIMSoultreeObjectView*)state.models[alias?i%2:2*i].ptr();
-  state.riders[i].ptr()->modelNode=(RacerD3DIMSoultreeObjectView*)state.models[alias?i%2:2*i+1].ptr();
+  state.racers[i].ptr()->modelNode=(D3DIMSoultreeObject*)state.models[alias?i%2:2*i].ptr();
+  state.riders[i].ptr()->modelNode=(D3DIMSoultreeObject*)state.models[alias?i%2:2*i+1].ptr();
  }
  if(failAt>=0){
   REQUIRE(!alias && aiCount==2 && netCount==2 && mode!=4);
-  RacerD3DIMSoultreeObjectView* bad=(RacerD3DIMSoultreeObjectView*)(pages+4096-0x284);
+  D3DIMSoultreeObject* bad=(D3DIMSoultreeObject*)(pages+4096-0x284);
   if(failAt&1)state.riders[failAt/2].ptr()->modelNode=bad;
   else state.racers[failAt/2].ptr()->modelNode=bad;
  }

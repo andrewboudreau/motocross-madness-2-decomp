@@ -31,8 +31,8 @@ import struct
 
 RETAIL_VA = 0x00417ed0
 SYMBOL = ('?Create@BikeRace@@QAEPAV1@PAX0PAVLightManager@@PAUTextureContext@@'
-          'PAVBikeRaceTerrainView@@PAVKrustyBikeCamera@@PAVScene@@PAURaceGateEvent@@'
-          'PAVBikeRaceProjectedShadowView@@@Z')
+          'PAVTerrain@@PAVKrustyBikeCamera@@PAVScene@@PAURaceGateEvent@@'
+          'PAVProjectedShadow@@@Z')
 SOURCE = 'src/reconstructed/BikeRace.cpp'
 PROBES = {0x0041800f: 'tdf from env', 0x004180f3: 'no track file', 0x00418338: 'after load',
           0x00418b06: 'flag girl', 0x00419578: 'AI speeds', 0x00419660: 'joystick',
