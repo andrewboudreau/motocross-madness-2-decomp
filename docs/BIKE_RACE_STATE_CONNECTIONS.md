@@ -63,8 +63,8 @@ objects, 10,548 sections and 45,478 relocations under these three names plus
 the separate Bike placement name. No new initializer or storage sections were
 introduced. Full calibration and physics matrices retained every strict case.
 
-The unadmitted BikeRaceNearMisses aggregate has one explicit exception. In its
-complete 13,428-byte CreateRacers body, offsets `[538,545)` exchange independent
+CreateRacers (then in the BikeRaceNearMisses aggregate sample, now in
+`BikeRace.cpp`) has one explicit exception. In its complete 13,428-byte CreateRacers body, offsets `[538,545)` exchange independent
 `XOR EDI,EDI` and `MOV EBX,1`. Both orders leave EDI zero, EBX one and the XOR
 flags, without memory access. Independent full decoding found no interior
 branch entry, label or relocation. All other body bytes and all 1,929 aggregate
@@ -76,7 +76,7 @@ typedef units (VC6_OPERAND_ORDER.md section 2; measured weights in NAMING.md
 Wave 18). Replacing the sample's own `UnknownBikeRaceDemoDlg` stand-in with the
 canonical `DemoDlg` (`DemoDlg.h`) gave the 13,390 order, and an extra class with
 an inline constructor restores 13,396, but so do other counts; the
-CursorUIAnimView-to-UIAnim merge alone also restores 13,396. CreateRacers never uses that class, so the sample
+CursorUIAnimView-to-UIAnim merge alone also restores 13,396. CreateRacers never uses that class, so the unit
 keeps the canonical class rather than a matching-only declaration.
 The count of initialised locals inside CreateRacers moves the same six bytes (13,396 at 1..4, 6, 7
 and 10..14 extra locals, 13,390 otherwise). The sample now names the "Res" directory it spells nine

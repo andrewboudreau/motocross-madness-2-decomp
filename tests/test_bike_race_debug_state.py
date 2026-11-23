@@ -16,7 +16,7 @@ from test_race_event_connections import cases, fingerprint
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = 'src/reconstructed/BikeRaceDebugState.cpp'
-CALLERS = ('src/reconstructed/BikeRace.cpp', 'samples/race/BikeRaceNearMisses.cpp')
+CALLERS = ('src/reconstructed/BikeRace.cpp',)
 # Existing names describe debug uses; no original translation-unit identity is inferred.
 DATA = (
     ('g_ObstacleDebugLeftLine', 0x5779d8, 24, 0),

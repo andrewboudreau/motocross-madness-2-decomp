@@ -20,7 +20,7 @@ from tools.run_calibration import CASES
 ROOT = Path(__file__).resolve().parents[1]
 SOURCES = tuple('src/reconstructed/' + name + '.cpp' for name in (
     'KrustyUI', 'DlgProcs', 'ProCircuitProcs', 'SelectGamePicProcs', 'ProCircuit', 'BikeNumberPainter')) + (
-    'samples/race/BikeRaceNearMisses.cpp',
+    'src/reconstructed/BikeRace.cpp',
     'src/krusty2/motion/D3DIMSoultreeMotnctrl.cpp', 'src/krusty2/motion/Motnctrl.cpp')
 CHARACTER = '??0D3DIMSoultreeCharacter@@QAE@H@Z'
 ADVANCE = '?AdvanceMotion@Character@@QAEHMHH@Z'
@@ -31,28 +31,21 @@ PROVIDERS = ((CHARACTER, 0x4455b0, 195, SOURCES[7]), (ADVANCE, 0x4a6bb0, 1293, S
              (PAINTER, 0x417500, 97, SOURCES[5]), (DESTROY, 0x417570, 7, SOURCES[5]),
              (PAINT, 0x417670, 1157, SOURCES[5]))
 # Complete pre-change resolved bodies; partial preservation is not source acceptance.
-PARTIAL = [['samples/race/BikeRaceNearMisses.cpp',
-  '?AimCamera@BikeRace@@',
-  4320032,
-  1708,
-  1710,
-  1708,
-  '1387d0f133cb78ab58632dbc7704639b734d939c5fd1c72ec684f95a1105ba50'],
- ['samples/race/BikeRaceNearMisses.cpp',
+PARTIAL = [['src/reconstructed/BikeRace.cpp',
   '?NextCameraTarget@BikeRace@@',
   4321744,
   881,
   887,
   313,
   'df3be110fb36de62c0df1f54eb38613db3d2bf0f99f72063d2b9f8509e71a43a'],
- ['samples/race/BikeRaceNearMisses.cpp',
+ ['src/reconstructed/BikeRace.cpp',
   '?WriteRelativePositions@BikeRace@@',
   4329712,
   2940,
-  2996,
-  464,
-  '454a98214dfd14f40107bfd84eb338824e07a1f4267d9fdc3300b79a2f3614c2'],
- ['samples/race/BikeRaceNearMisses.cpp',
+  2960,
+  465,
+  '2502199a55c5d38e7ada21516e10d56bb8cf34f8cd04461e73d8e13283723f43'],
+ ['src/reconstructed/BikeRace.cpp',
   '?Create@BikeRace@@',
   4292304,
   6745,
@@ -62,7 +55,7 @@ PARTIAL = [['samples/race/BikeRaceNearMisses.cpp',
  # Nonexact score 13400: XOR EDI/MOV EBX at +538..545 in retail's order since
  # Krusty3DObjects.h declares RunwayTerrainView without the QueryGround forwarder
  # (a TU-wide count effect; 13394 before). BIKE_RACE_STATE_CONNECTIONS.md.
- ['samples/race/BikeRaceNearMisses.cpp',
+ ['src/reconstructed/BikeRace.cpp',
   '?CreateRacers@BikeRace@@',
   4299120,
   13428,
@@ -165,7 +158,7 @@ class GaragePreviewConnectionsTests(unittest.TestCase):
                         resolved = match_object(obj, symbol, va, b'', bindings)
                     self.assertEqual(resolved['digest'], digest, key)
                     partial_count += 1
-            self.assertEqual((strict_count, partial_count), (320, 5))
+            self.assertEqual((strict_count, partial_count), (363, 4))
             compiler = Path(os.environ['VC6_ROOT'])
             linker = find_child_ci(find_vc6_bin(compiler), 'link.exe')
             libraries = find_child_ci(infer_vc98_root(compiler), 'lib')
@@ -177,7 +170,7 @@ class GaragePreviewConnectionsTests(unittest.TestCase):
             result = subprocess.run([str(executable)], capture_output=True, text=True, timeout=30)
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             self.assertIn('Garage painter: 192 resource, normal cleanup and exception lifetime cases passed', result.stdout)
-            print('320 strict checks, five complete partial fingerprints; ' + result.stdout.strip())
+            print('363 strict checks, four complete partial fingerprints; ' + result.stdout.strip())
 
 
 if __name__ == '__main__':

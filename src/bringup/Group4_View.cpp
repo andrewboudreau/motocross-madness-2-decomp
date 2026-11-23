@@ -1,7 +1,7 @@
 // Bring-up definition (best-guess-unreviewed): EventBikeRaceView is the
 // view RaceView.h/InGameProcs.cpp use for the race object whose 0x0041f1d0
 // is BikeRace::NextCameraTarget (BikeRaceCore.h; the body is provided by
-// src/bringup/Group1_BikeRaceCamera.cpp). Both names bind to the same retail
+// src/reconstructed/BikeRace.cpp). Both names bind to the same retail
 // address and the view pointer is the race object itself, so this forwards.
 //
 // Minimal local declarations: only the member functions are named, so the

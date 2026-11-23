@@ -1,5 +1,5 @@
 // Group6_BikeRaceViews.cpp -- bring-up forwarders for the provisional views that
-// BikeRace::Create (Group6_BikeRaceCreate.cpp) calls.  Each view method is a retail
+// BikeRace::Create (src/reconstructed/BikeRace.cpp) calls.  Each view method is a retail
 // function already reconstructed under its canonical class (addresses from the
 // *.bindings.json files), so it forwards with the same `this`:
 //   StartD3DIMSoultreeObjectView::SetUseLighting    0x004444c0 = D3DIMSoultreeObject::SetUseLighting
@@ -66,7 +66,7 @@ public:
                      void* aiSkill, int withRider);
 };
 
-// ---- the views (same keys and signatures as BikeRace.h / Group6_BikeRaceCreate.cpp)
+// ---- the views (same keys and signatures as BikeRace.h / BikeRace.cpp)
 
 struct StartD3DIMSoultreeObjectView {
     void SetUseLighting(int value);

@@ -19,8 +19,7 @@ from tools.run_calibration import CASES
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCES = ('src/krusty2/vehicle/Bike.cpp', 'src/reconstructed/BikeRace.cpp',
-           'src/reconstructed/KrustyUI.cpp', 'samples/race/BikeRaceNearMisses.cpp',
-           'src/krusty2/motion/Motnctrl.cpp')
+           'src/reconstructed/KrustyUI.cpp', 'src/krusty2/motion/Motnctrl.cpp')
 FIND = '?FindMotion@Character@@QAEPAUMotion@@PBDH@Z'
 SET = '?SetMotionByName@Character@@QAEXPBD@Z'
 PROVIDERS = (
@@ -30,7 +29,7 @@ PROVIDERS = (
     ('void Character::SetMotion(', '?SetMotion@Character@@QAEXPAUMotion@@@Z', 0x4a8b40, 27),
 )
 # Full resolved candidates captured before this connection. These hashes guard
-# preservation, including the five complete BikeRace sample methods, not fidelity.
+# preservation, including four complete BikeRace.cpp near misses, not fidelity.
 PARTIAL = [['src/krusty2/vehicle/Bike.cpp',
   'ApplyCollisionEvent@Bike',
   4215184,
@@ -80,28 +79,21 @@ PARTIAL = [['src/krusty2/vehicle/Bike.cpp',
   6745,
   6428,
   '9bcbfd9d8f540b6e0d5940830d4fc4450dd15d499a5018587c34c76ff10e393e'],
- ['samples/race/BikeRaceNearMisses.cpp',
-  '?AimCamera@BikeRace@@',
-  4320032,
-  1708,
-  1710,
-  1708,
-  '1387d0f133cb78ab58632dbc7704639b734d939c5fd1c72ec684f95a1105ba50'],
- ['samples/race/BikeRaceNearMisses.cpp',
+ ['src/reconstructed/BikeRace.cpp',
   '?NextCameraTarget@BikeRace@@',
   4321744,
   881,
   887,
   313,
   'df3be110fb36de62c0df1f54eb38613db3d2bf0f99f72063d2b9f8509e71a43a'],
- ['samples/race/BikeRaceNearMisses.cpp',
+ ['src/reconstructed/BikeRace.cpp',
   '?WriteRelativePositions@BikeRace@@',
   4329712,
   2940,
-  2996,
-  464,
-  '454a98214dfd14f40107bfd84eb338824e07a1f4267d9fdc3300b79a2f3614c2'],
- ['samples/race/BikeRaceNearMisses.cpp',
+  2960,
+  465,
+  '2502199a55c5d38e7ada21516e10d56bb8cf34f8cd04461e73d8e13283723f43'],
+ ['src/reconstructed/BikeRace.cpp',
   '?Create@BikeRace@@',
   4292304,
   6745,
@@ -111,7 +103,7 @@ PARTIAL = [['src/krusty2/vehicle/Bike.cpp',
  # Nonexact score 13400: XOR EDI/MOV EBX at +538..545 in retail's order since
  # Krusty3DObjects.h declares RunwayTerrainView without the QueryGround forwarder
  # (a TU-wide count effect; 13394 before). BIKE_RACE_STATE_CONNECTIONS.md.
- ['samples/race/BikeRaceNearMisses.cpp',
+ ['src/reconstructed/BikeRace.cpp',
   '?CreateRacers@BikeRace@@',
   4299120,
   13428,
@@ -164,7 +156,7 @@ class CharacterMotionConnectionsTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix='mcm2-character-motion-') as directory:
             output = Path(directory)
             extracted = output / 'motion_routes.cpp'
-            text = (ROOT / SOURCES[4]).read_text()
+            text = (ROOT / SOURCES[3]).read_text()
             extracted.write_text('#include <string.h>\n#include "motion/Motnctrl.h"\n'
                 'extern MotionManager* g_pMotionManager;\n' + '\n\n'.join(
                     function_text(text, signature) for signature, _, _, _ in PROVIDERS))
@@ -174,15 +166,15 @@ class CharacterMotionConnectionsTests(unittest.TestCase):
                 path = output / (Path(source).stem + '.obj')
                 command = [sys.executable, str(ROOT / 'tools/compile.py'), str(ROOT / source), '-o', str(path),
                            '--vc6-root', os.environ['VC6_ROOT'], '--profile', 'vc6_o2_mt']
-                if source in (SOURCES[0], SOURCES[4], str(extracted), fixture):
+                if source in (SOURCES[0], SOURCES[3], str(extracted), fixture):
                     command += ['--include', str(ROOT / 'src/krusty2')]
                 result = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, encoding='latin-1',
                                         env={**os.environ, 'PYTHONPATH': str(ROOT)})
                 self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
                 objects[source], paths[source] = CoffObject(path), path
-            bindings_path = ROOT / Path(SOURCES[4]).with_suffix('.bindings.json')
+            bindings_path = ROOT / Path(SOURCES[3]).with_suffix('.bindings.json')
             for _, symbol, va, size in PROVIDERS:
-                for source in (SOURCES[4], str(extracted)):
+                for source in (SOURCES[3], str(extracted)):
                     obj = objects[source]
                     self.assertEqual((obj.find_symbol(symbol).function_size, obj.find_symbol(symbol).extent_source),
                                      (size, 'coff_function_aux'))
@@ -190,8 +182,7 @@ class CharacterMotionConnectionsTests(unittest.TestCase):
             for source, symbol, retired in (
                 (SOURCES[0], FIND, '?FindMotion@BikeA5C4@@QAEHPBDH@Z'),
                 (SOURCES[1], SET, '?SetMotionByName@BikeRaceD3DIMSoultreeCharacterView@@QAEXPBD@Z'),
-                (SOURCES[2], SET, '?SetMotionByName@KrustyUID3DIMSoultreeCharacterView@@QAEXPBD@Z'),
-                (SOURCES[3], SET, '?SetMotionByName@BikeRaceD3DIMSoultreeCharacterView@@QAEXPBD@Z')):
+                (SOURCES[2], SET, '?SetMotionByName@KrustyUID3DIMSoultreeCharacterView@@QAEXPBD@Z')):
                 obj = objects[source]
                 imports = {s.name for s in obj.symbols if s.section_number == 0}
                 self.assertIn(symbol, imports)
@@ -212,7 +203,7 @@ class CharacterMotionConnectionsTests(unittest.TestCase):
                                           target['target_size'], manifest.parent / target['bindings']))
             partial = {tuple(row[:4]): row[4:] for row in PARTIAL}
             for source, symbol, va, size in partial:
-                if source == SOURCES[3]:
+                if source == SOURCES[1]:
                     cases.append((source, symbol, va, size, (ROOT / source).with_suffix('.bindings.json')))
             strict_count = partial_count = 0
             for source, symbol, va, size, bindings_path in dict.fromkeys(cases):
@@ -232,7 +223,7 @@ class CharacterMotionConnectionsTests(unittest.TestCase):
                         resolved = match_object(obj, symbol, va, b'', bindings)
                     self.assertEqual(resolved['digest'], digest, key)
                     partial_count += 1
-            self.assertEqual(partial_count, 12)
+            self.assertEqual(partial_count, 11)
             compiler = Path(os.environ['VC6_ROOT'])
             linker = find_child_ci(find_vc6_bin(compiler), 'link.exe')
             libraries = find_child_ci(infer_vc98_root(compiler), 'lib')

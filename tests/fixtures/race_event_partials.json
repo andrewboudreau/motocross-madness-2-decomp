@@ -1,5 +1,5 @@
 {
-  "baseline": "Complete body bytes and relocation target identities, with physical source-path suffix normalization and defined compiler-local $L/$T labels represented by COFF section and offset. OnNetworkMessage changes only the verified external decoder name; CreateRacers has the separately proved seven-byte independent-instruction schedule exception described in BIKE_RACE_STATE_CONNECTIONS.md. Extents remain complete. The DlgProcs sample rows now fingerprint src/reconstructed/DlgProcs.cpp, which holds the four former sample bodies in retail order.",
+  "baseline": "Complete body bytes and relocation target identities, with physical source-path suffix normalization and defined compiler-local $L/$T labels represented by COFF section and offset. OnNetworkMessage changes only the verified external decoder name; CreateRacers has the separately proved seven-byte independent-instruction schedule exception described in BIKE_RACE_STATE_CONNECTIONS.md. Extents remain complete. The DlgProcs sample rows now fingerprint src/reconstructed/DlgProcs.cpp, which holds the four former sample bodies in retail order. The BikeRaceNearMisses aggregate sample was retired when its bodies moved into BikeRace.cpp; its rows were dropped.",
   "partials": [
     [
       "src/reconstructed/QuarryStuntEvent.cpp",
@@ -36,66 +36,6 @@
       "?PrepareEvent3DObjects@BaseQuarryEvent@@UAEHXZ",
       6,
       "19e61053eb0aac4a10120261c29cfa8b46438e26a0dc689ce1bb60c8c53647ef"
-    ],
-    [
-      "samples/race/BikeRaceNearMisses.cpp",
-      "?Tick@BikeRace@@UAEHM@Z",
-      5980,
-      "dfb7d813d2b6e51499d328116f66b1bacbacb36aef5661caa97ae660f8a6dfd3"
-    ],
-    [
-      "samples/race/BikeRaceNearMisses.cpp",
-      "?OnChar@BikeRace@@UAEHH@Z",
-      75,
-      "adff63105d44d3a779174c5eb0556af32c3690645a27f0451347767130819d90"
-    ],
-    [
-      "samples/race/BikeRaceNearMisses.cpp",
-      "?OnControlPress@BikeRace@@UAEHPAUControlEvent@@PAUInputButtonState@@@Z",
-      2644,
-      "7d640f04f6294c801d066d8ef9e9207ce37058296050616ecb5c7a2a2a1bce4f"
-    ],
-    [
-      "samples/race/BikeRaceNearMisses.cpp",
-      "?OnNetworkMessage@BikeRace@@UAEHHPAXHHH@Z",
-      1182,
-      "f38ecfa7f849efdf808f534266c69ba626acb1b86fea72e10693f8eaa0fba836"
-    ],
-    [
-      "samples/race/BikeRaceNearMisses.cpp",
-      "?AimCamera@BikeRace@@QAEHH@Z",
-      1710,
-      "cb6f7a35cceb060fc2f7171cc39be638a537ca15bdb7ea863b1896cc75387138"
-    ],
-    [
-      "samples/race/BikeRaceNearMisses.cpp",
-      "?NextCameraTarget@BikeRace@@QAEXHHH@Z",
-      887,
-      "f54896a0a560c6bb8a14d38abcca9710bcf5716193e6e49104d9d12feb47a0df"
-    ],
-    [
-      "samples/race/BikeRaceNearMisses.cpp",
-      "?WriteRelativePositions@BikeRace@@QAEXPAUVector3@@0PAXH@Z",
-      2996,
-      "b7285998a66f6b49e9c113d529f7ccb51da4aa8863315fbb170e501fbe091ea9"
-    ],
-    [
-      "samples/race/BikeRaceNearMisses.cpp",
-      "??0Vector3@@QAE@MMM@Z",
-      25,
-      "10ee05da94fe2e32287ca4578bada446366c58cca63fec91024b645d4bc9aba4"
-    ],
-    [
-      "samples/race/BikeRaceNearMisses.cpp",
-      "?Create@BikeRace@@QAEPAV1@PAX0PAVLightManager@@PAUTextureContext@@PAVBikeRaceTerrainView@@PAVKrustyBikeCamera@@PAVScene@@PAURaceGateEvent@@PAVBikeRaceProjectedShadowView@@@Z",
-      6760,
-      "1d4e84eb742e57c796a683eef56e40b0f44b842eb8859281fe09e27dedb68f65"
-    ],
-    [
-      "samples/race/BikeRaceNearMisses.cpp",
-      "?CreateRacers@BikeRace@@QAEHPAXPAVLightManager@@PAUTextureContext@@PAVBikeRaceTerrainView@@PAURaceGateEvent@@@Z",
-      13428,
-      "4e63b7555c884f4141c2974028e21a80685e95d8c90c798789d691603915e038"
     ],
     [
       "src/reconstructed/DlgProcs.cpp",

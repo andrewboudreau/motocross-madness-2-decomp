@@ -1,6 +1,6 @@
 """BikeRace::CreateRacers 0x00419970, the racer loader (tools/emu_diff.py case, call-record/replay mode).
 
-The linked body is src/bringup/Group6_BikeRaceCreateRacers.cpp (13428 retail bytes): it opens
+The linked body is in src/reconstructed/BikeRace.cpp (13428 retail bytes): it opens
 the rider archive, works out the racer count and start order (replay, single player, pro
 circuit, network), then loads the local racer and every AI or remote racer (archive lookups,
 engine setup from the garage and the bike-class tables, KrustyBike::Load, textures, skill).
@@ -29,7 +29,7 @@ from tools.emu_cases import bike_race_create as base
 RETAIL_VA = 0x00419970
 SYMBOL = ('?CreateRacers@BikeRace@@QAEHPAXPAVLightManager@@PAUTextureContext@@'
           'PAVBikeRaceTerrainView@@PAURaceGateEvent@@@Z')
-SOURCE = 'src/bringup/Group6_BikeRaceCreateRacers.cpp'
+SOURCE = 'src/reconstructed/BikeRace.cpp'
 BINDINGS = dict(base.BINDINGS)
 PROBES = {0x00419a57: 'no rider archive', 0x00419b43: 'replay rank', 0x00419bb8: 'pro circuit check',
           0x00419d0f: 'no PC rider', 0x00419f0b: 'load pro circuit racer', 0x0041a36a: 'load pro circuit AI',

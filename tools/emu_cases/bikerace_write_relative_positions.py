@@ -1,6 +1,6 @@
 """BikeRace::WriteRelativePositions 0x004210f0, the start-grid slot (tools/emu_diff.py case).
 
-The linked body is the bring-up copy (src/bringup/Group1_BikeRaceCamera.cpp). The race is
+The linked body is in src/reconstructed/BikeRace.cpp. The race is
 random floats; from the retail body: gridReady +0x188 (byte), the cached grid (first slot
 +0x164, step +0x170, direction +0x17c), raceTrack +0x48, raceTerrain +0x4c (gridCellSize
 +0x40), raceScene +0x58 (default start position +0x70, direction +0x7c), hasStartProbe +0x144
@@ -27,7 +27,7 @@ import struct
 
 RETAIL_VA = 0x004210f0
 SYMBOL = '?WriteRelativePositions@BikeRace@@QAEXPAUVector3@@0PAXH@Z'
-SOURCE = 'src/bringup/Group1_BikeRaceCamera.cpp'
+SOURCE = 'src/reconstructed/BikeRace.cpp'
 TRACK_GAME = 0x0056e26c
 # Event 4's out-of-line Vector3 operator+ and operator- (retail code in both runs).
 BINDINGS = {'?BikeRaceAddCall@@YA?AUVector3@@ABU1@0@Z': 0x00421cb0,

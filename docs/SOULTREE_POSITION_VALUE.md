@@ -73,13 +73,13 @@ The retained same-path before/after proof covers:
 |---|---:|---:|
 | LightEmitter | 57 | 172 |
 | D3DIMSoultreeMotnctrl | 62 | 273 |
-| BikeRaceNearMisses | 206 | 1,929 |
 | SceneManager | 335 | 1,757 |
-| Total | **660** | **4,131** |
+| Total | **454** | **2,202** |
 
 Every section payload, relocation location, kind, addend and resolved
-destination is preserved with **no symbol substitutions**. Both aggregates
-retain their complete partial bodies. Private evidence is in
+destination is preserved with **no symbol substitutions**. SceneManager
+retains its complete partial bodies. The BikeRaceNearMisses row was dropped
+when that sample's bodies moved into `BikeRace.cpp`. Private evidence is in
 `work/connections43/final-proof/`.
 
 Portable retained pins recognize only complete source-filename strings and

@@ -240,8 +240,8 @@ None of them was moved; the reasons are below.
   use (see [EXCEPTIONHANDLER.md](EXCEPTIONHANDLER.md)). The object starts at
   `hprintf` and is identical from there.
 - `BikeRace.cpp`: the gap `0x004210f0..0x00421d50` holds
-  `WriteRelativePositions` (`0x004210f0`, a near miss in
-  `samples/race/BikeRaceNearMisses.cpp`) and the vector helpers at
+  `WriteRelativePositions` (`0x004210f0`, a near miss now in the unit) and
+  the vector helpers at
   `0x00421cb0..0x00421d50`. The helpers are registered in `VectorCalls.cpp`
   and `VectorValueArithmetic.cpp`; the latter is identical on its own. They have
   callers in earlier units and fold across several vector types. That fits

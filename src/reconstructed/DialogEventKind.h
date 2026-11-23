@@ -16,4 +16,4 @@ enum DialogEventKind {
 };
 
 // Kept out of DialogProc.h: declaring it there changes VC6's register
-// choice in BikeRaceNearMisses' 0x00419970.
+// choice in BikeRace::CreateRacers (0x00419970).

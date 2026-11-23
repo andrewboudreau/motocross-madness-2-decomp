@@ -18,8 +18,7 @@ from tools.run_calibration import CASES
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCES = tuple('src/reconstructed/' + n + '.cpp' for n in
-                ('BikeRace', 'DlgProcs', 'racesnd', 'QuarryStuntEvent', 'EventManager', 'trkgame')) + (
-                'samples/race/BikeRaceNearMisses.cpp',)
+                ('BikeRace', 'DlgProcs', 'racesnd', 'QuarryStuntEvent', 'EventManager', 'trkgame'))
 PROVIDERS = (('?ResetClock@BaseQuarryEvent@@QAEXXZ', 0x4e1f00, 9),
              ('?ShowOnOffMessage@BaseQuarryEvent@@QAEXHH@Z', 0x4e0c30, 175))
 
@@ -27,9 +26,6 @@ PROVIDERS = (('?ResetClock@BaseQuarryEvent@@QAEXXZ', 0x4e1f00, 9),
 def cases():
     rows = [(c['source'], c['symbol'], int(c['target_va'], 0), c['target_size'], c['bindings'])
             for c in CASES if c['source'] in SOURCES]
-    for original, aggregate in zip(SOURCES[:3], SOURCES[6:]):
-        rows += [(aggregate, symbol, va, size, aggregate.replace('.cpp', '.bindings.json'))
-                 for source, symbol, va, size, _ in list(rows) if source == original]
     return list(dict.fromkeys(rows))
 
 

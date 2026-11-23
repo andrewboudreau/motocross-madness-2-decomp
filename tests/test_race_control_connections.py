@@ -152,7 +152,7 @@ class RaceControlConnectionsTests(unittest.TestCase):
             for case in cases:
                 self.assertTrue(compare(retail, objects[case['source']], case['symbol'],
                     int(case['target_va'], 0), case['target_size'], ROOT / case['bindings'])['strict_exact'], case)
-            self.assertEqual(len(cases), 207)
+            self.assertEqual(len(cases), 208)
             bindings_path = ROOT / 'src/reconstructed/DlgProcs.bindings.json'
             bindings = {key: int(value, 0) for key, value in json.loads(bindings_path.read_text()).items()}
             obj = objects[SOURCES[2]]
@@ -175,7 +175,7 @@ class RaceControlConnectionsTests(unittest.TestCase):
             result = subprocess.run([str(executable)], capture_output=True, text=True, timeout=30)
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             self.assertIn('Race control: 993 exact-provider route and pause cases passed', result.stdout)
-            print('207 strict comparisons and four complete partial fingerprints preserved; ' + result.stdout.strip())
+            print('208 strict comparisons and four complete partial fingerprints preserved; ' + result.stdout.strip())
 
 
 if __name__ == '__main__':

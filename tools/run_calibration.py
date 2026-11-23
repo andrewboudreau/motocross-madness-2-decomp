@@ -14655,6 +14655,15 @@ CASES = [
         'reason': 'triple loop over +0x1a0 mesh groups',
     },
     {
+        'name': 'bikerace.cpp BikeRace aim camera 0x41eb20',
+        'bindings': 'src/reconstructed/BikeRace.bindings.json',
+        'source': 'src/reconstructed/BikeRace.cpp',
+        'symbol': '?AimCamera@BikeRace@@QAEHH@Z',
+        'target_va': '0x0041eb20',
+        'target_size': 1710,
+        'reason': 'camera target dispatch: racers, static casters and the scene animation table',
+    },
+    {
         'name': 'bikerace.cpp BikeRace toggle 0x41f550',
         'bindings': 'src/reconstructed/BikeRace.bindings.json',
         'source': 'src/reconstructed/BikeRace.cpp',

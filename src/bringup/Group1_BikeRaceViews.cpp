@@ -1,5 +1,5 @@
 // Group1_BikeRaceViews.cpp -- bring-up forwarders for BikeRace.h's provisional views
-// whose methods BikeRace::AimCamera (Group1_BikeRaceCamera.cpp) calls.  Each view
+// whose methods BikeRace::AimCamera (src/reconstructed/BikeRace.cpp) calls.  Each view
 // method is the retail function already reconstructed under its canonical class, so
 // it forwards with the same `this` (retail calls the canonical address directly):
 //   BikeRaceProjectedShadowView::AddCaster    0x004dab00 = ProjectedShadow::AddCaster

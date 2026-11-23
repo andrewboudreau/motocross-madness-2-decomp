@@ -1,6 +1,6 @@
 """BikeRace::AimCamera 0x0041eb20, points the race camera at its current target (emu_diff case).
 
-The linked body is the bring-up copy (src/bringup/Group1_BikeRaceCamera.cpp). Offsets from the
+The linked body is in src/reconstructed/BikeRace.cpp. Offsets from the
 retail body: the camera view +0x50 (followingRacer byte +0x390, followedBike +0x3b0, the
 inline follow's stores +0x274/+0x384..+0x394/+0x3b4), targetIndex +0xac, targetKind byte +0xb0,
 targetRacer +0x14c, targetEntry +0x150, targetCaster +0x154, localRacer +0x38, racerSlots +0x3c,
@@ -22,7 +22,7 @@ import random
 
 RETAIL_VA = 0x0041eb20
 SYMBOL = '?AimCamera@BikeRace@@QAEHH@Z'
-SOURCE = 'src/bringup/Group1_BikeRaceCamera.cpp'
+SOURCE = 'src/reconstructed/BikeRace.cpp'
 TRACK_GAME = 0x0056e26c
 PROBES = {0x0041eb54: 'remote racer', 0x0041ed1f: 'local racer', 0x0041eea0: 'AI racer',
           0x0041ecd9: 'lap gates', 0x0041f070: 'caster', 0x0041f123: 'entry character',

@@ -1,6 +1,6 @@
 """BikeRace::NextCameraTarget 0x0041f1d0, the spectator camera's next/previous target.
 
-The linked body is the bring-up copy (src/bringup/Group1_BikeRaceCamera.cpp). Offsets from the
+The linked body is in src/reconstructed/BikeRace.cpp. Offsets from the
 retail body: g_TrackGame (0x0056e26c) +0x3430 uiInteractionBlocked, +0x18 playerCount, +0x3424
 network AI count, +0x2d70 raceMode (4 = one other), +0x2d94 aiRacerCount; the race's camera
 view +0x50 (overrideActive +0x268, cameraState +0x244 (7 tested), targetCharacter +0x384,
@@ -23,7 +23,7 @@ import random
 
 RETAIL_VA = 0x0041f1d0
 SYMBOL = '?NextCameraTarget@BikeRace@@QAEXHHH@Z'
-SOURCE = 'src/bringup/Group1_BikeRaceCamera.cpp'
+SOURCE = 'src/reconstructed/BikeRace.cpp'
 TRACK_GAME = 0x0056e26c
 PROBES = {0x0041f244: 'aim on switch', 0x0041f2a4: 'racer walk', 0x0041f348: 'racer wrap',
           0x0041f38b: 'entry walk', 0x0041f422: 'entry wrap', 0x0041f4c8: 'caster step',

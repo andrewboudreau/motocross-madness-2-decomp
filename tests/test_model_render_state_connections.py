@@ -26,7 +26,6 @@ SOURCES = ('src/krusty2/vehicle/Bike.cpp', 'src/krusty2/vehicle/Vehicle.cpp',
     'src/krusty2/vehicle/KrustyBike.cpp', 'src/reconstructed/BikeRace.cpp',
     'src/reconstructed/KrustyUI.cpp', 'src/reconstructed/SceneManager.cpp',
     'src/krusty2/soultree/SoulTreePhysics.cpp',
-    'samples/race/BikeRaceNearMisses.cpp',
     MODEL, NODE)
 PROVIDERS = (
     ('SetUseLighting', 'int value', 0x4444c0, 23),
@@ -123,8 +122,10 @@ class ModelRenderStateConnectionsTests(unittest.TestCase):
                 counts.append(sum(name in RENAMES.values() for name in names))
                 imported.update(names)
                 self.assertFalse(set(names) & RENAMES.keys(), source)
-            # The two Load branches share one emitted SetLod call site.
-            self.assertEqual(counts, [2, 1, 7, 6, 3, 7, 2])
+            # The two Load branches share one emitted SetLod call site. BikeRace.cpp's
+            # eight are SetDetailLevel's six ApplyLodSettings and two of Create's three
+            # 0x004444c0 calls (the third still goes through the start-object view).
+            self.assertEqual(counts, [2, 1, 7, 8, 3, 7, 2])
             self.assertTrue(set(RENAMES.values()) <= imported)
             cases = [(c['source'], c['symbol'], int(c['target_va'], 0), c['target_size'], ROOT / c['bindings'])
                      for c in CASES if c['source'] in SOURCES]
@@ -154,7 +155,7 @@ class ModelRenderStateConnectionsTests(unittest.TestCase):
                         resolved = match_object(objects[source], symbol, va, b'',
                             {k: int(v, 0) for k, v in json.loads(binding.read_text()).items()})
                     self.assertEqual(resolved['digest'], digest, key); preserved += 1
-            self.assertEqual(preserved, 24)
+            self.assertEqual(preserved, 23)
             for source, symbol, va, size, digest in evidence['additional_functions']:
                 self.assertEqual(objects[source].find_symbol(symbol).function_size, size)
                 bindings = {k: int(v, 0) for k, v in json.loads((ROOT / source).with_suffix('.bindings.json').read_text()).items()}

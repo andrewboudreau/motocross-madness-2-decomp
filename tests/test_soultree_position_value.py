@@ -24,7 +24,6 @@ SCENE = 'src/reconstructed/SceneManager.cpp'
 MOTION = 'src/krusty2/motion/D3DIMSoultreeMotnctrl.cpp'
 TREE = 'src/krusty2/soultree/soultree.cpp'
 RENDER = 'src/reconstructed/D3DIMSoulTree.cpp'
-SAMPLES = ('samples/race/BikeRaceNearMisses.cpp',)
 VIEW = '?SetPositionVec3@SoultreeObject@@QAEXUVec3@@@Z'
 OLD = '?SetPositionVec3@D3DIMSoultreeObject@@QAEXUVector3@@@Z'
 FIXTURE = 'tests/fixtures/soultree_position_compare.cpp'
@@ -36,9 +35,7 @@ def fingerprint(obj, root, renames=None):
     """Complete sections and destinations; only recognized __FILE__ roots vary."""
     renames = renames or {}
     prefix = str(root).replace('\\', '/') + '/'
-    filenames = (LIGHT, MOTION, SCENE, *SAMPLES, 'src/reconstructed/ContainerList.h',
-                 'samples/race/../../src/reconstructed/BikeRace.h',
-                 'samples/race/../../src/reconstructed/BikeRace.cpp')
+    filenames = (LIGHT, MOTION, SCENE, 'src/reconstructed/ContainerList.h')
     def filename(data):
         value, separator, tail = data.partition(b'\0')
         name = value.decode('latin1').replace('\\', '/')
@@ -140,7 +137,7 @@ class SoultreePositionValueTests(unittest.TestCase):
                 'offsetof(Vector3,x)==0 && offsetof(Vector3,y)==4 && offsetof(Vector3,z)==8)?1:-1];\n'
                 'extern "C" void RenderingPositionBoundary(void* node,const void* position) {\n'
                 ' reinterpret_cast<D3DIMSoultreeObject*>(node)->SetPositionVec3(*reinterpret_cast<const Vector3*>(position));\n}\n')
-            jobs = [(s,ROOT/s) for s in (SOURCE,RENDER_SOURCE,LIGHT,SCENE,MOTION,TREE,RENDER,*SAMPLES,FIXTURE)]
+            jobs = [(s,ROOT/s) for s in (SOURCE,RENDER_SOURCE,LIGHT,SCENE,MOTION,TREE,RENDER,FIXTURE)]
             jobs += [('helpers',helper),('layout',layout)]
             paths,objects = {},{}
             for index,(key,source) in enumerate(jobs):
@@ -151,7 +148,7 @@ class SoultreePositionValueTests(unittest.TestCase):
                     cwd=ROOT,capture_output=True,text=True,encoding='latin1',env={**os.environ,'PYTHONPATH':str(ROOT)})
                 self.assertEqual(result.returncode,0,result.stdout+result.stderr)
                 paths[key],objects[key] = obj,CoffObject(obj)
-            for source in (LIGHT,MOTION,*SAMPLES,SCENE):
+            for source in (LIGHT,MOTION,SCENE):
                 self.assertEqual(fingerprint(objects[source],ROOT),baseline[source],source)
             for source,symbol in ((SOURCE,VIEW),(RENDER_SOURCE,OLD)):
                 self.assertEqual({s.name for s in objects[source].symbols if s.storage_class==2 and s.section_number==0},

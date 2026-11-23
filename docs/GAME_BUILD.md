@@ -797,12 +797,9 @@ clearly more faithful, the game now links the sample's text:
   - `Group0_SoultreeBridge.cpp` and `Group0_SoultreeBridge.h`
 - `Group4_EcoBridges.cpp` lost its five forwarders, then its shared
   normal-distribution pointer, which `NormalDistribution.cpp` now defines.
-- Some samples also carry functions that other units of the build provide,
-  so they cannot be linked whole:
-  - `BikeRaceNearMisses`
-
-  Their bring-up copies now use the sample's text for the functions listed
-  below.
+- The BikeRace near misses (`Create`, `CreateRacers`, `AimCamera`,
+  `NextCameraTarget`, `WriteRelativePositions`) are in `BikeRace.cpp`. Their
+  bring-up copies and the BikeRaceNearMisses aggregate sample were removed.
 - The exact `OrientationAxesFromAngles` (0x004b5d00) is now
   `src/reconstructed/OrientationAxes.cpp`; the Scene readers and `KrustyBike`
   link it in place of private copies. Which unit owns it is still unsettled

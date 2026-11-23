@@ -1,5 +1,5 @@
 {
-  "baseline": "e5ec20dc; same-path full old/current objects preserve all nondebug bytes and destinations with no symbol substitutions. Only the existing cache-helper declaration is added to the rendering header. Filename roots normalize for checkout portability; named sections retain their complete identity independent of RTTI COMDAT ordering. BikeRaceNearMisses.cpp was later repinned when Krusty3DObjects.h dropped RunwayTerrainView's QueryGround forwarder: same 206 sections and 1932 relocations, CreateRacers 13400 instead of 13394 (a TU-wide declaration-count effect).",
+  "baseline": "e5ec20dc; same-path full old/current objects preserve all nondebug bytes and destinations with no symbol substitutions. Only the existing cache-helper declaration is added to the rendering header. Filename roots normalize for checkout portability; named sections retain their complete identity independent of RTTI COMDAT ordering. The BikeRaceNearMisses.cpp sample pin was dropped when its bodies moved into BikeRace.cpp.",
   "objects": {
     "src/reconstructed/LightEmitter.cpp": {
       "sections": 57,
@@ -10,11 +10,6 @@
       "sections": 62,
       "relocations": 273,
       "sha256": "8a98772623e4589458bbf0b9e94c2907b38fb2988568a1e5ef9aa0fe9b40c495"
-    },
-    "samples/race/BikeRaceNearMisses.cpp": {
-      "sections": 206,
-      "relocations": 1932,
-      "sha256": "bc91071c1c00a4f2e7196c1f5f45d84f301697e733cc531879363e81d6b8868d"
     },
     "src/reconstructed/SceneManager.cpp": {
       "sections": 335,

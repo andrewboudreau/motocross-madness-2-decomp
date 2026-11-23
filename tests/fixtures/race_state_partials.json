@@ -1,17 +1,8 @@
 {
-  "note": "Whole before/after objects preserve all bytes and relocation destinations under three names except unadmitted CreateRacers offsets538..545: independent XOR EDI/MOV EBX instructions exchange. All full extents retained; see BIKE_RACE_STATE_CONNECTIONS.md. The five KrustyBike.cpp near misses (shared with vehicle_gearbox_partials.json) keep their full extents too.",
+  "note": "Whole before/after objects preserve all bytes and relocation destinations under three names except unadmitted CreateRacers offsets538..545: independent XOR EDI/MOV EBX instructions exchange. All full extents retained; see BIKE_RACE_STATE_CONNECTIONS.md. The five KrustyBike.cpp near misses (shared with vehicle_gearbox_partials.json) keep their full extents too. The BikeRaceNearMisses aggregate sample was retired: Create, CreateRacers, NextCameraTarget and WriteRelativePositions are pinned in BikeRace.cpp, and AimCamera is exact there.",
   "partials": [
     [
-      "samples/race/BikeRaceNearMisses.cpp",
-      "?AimCamera@BikeRace@@",
-      4320032,
-      1708,
-      1710,
-      1708,
-      "cb6f7a35cceb060fc2f7171cc39be638a537ca15bdb7ea863b1896cc75387138"
-    ],
-    [
-      "samples/race/BikeRaceNearMisses.cpp",
+      "src/reconstructed/BikeRace.cpp",
       "?NextCameraTarget@BikeRace@@",
       4321744,
       881,
@@ -20,31 +11,31 @@
       "f54896a0a560c6bb8a14d38abcca9710bcf5716193e6e49104d9d12feb47a0df"
     ],
     [
-      "samples/race/BikeRaceNearMisses.cpp",
+      "src/reconstructed/BikeRace.cpp",
       "?WriteRelativePositions@BikeRace@@",
       4329712,
       2940,
-      2996,
-      464,
-      "b7285998a66f6b49e9c113d529f7ccb51da4aa8863315fbb170e501fbe091ea9"
+      2960,
+      465,
+      "925b023ddddcca79f03bf2047005a979da0f73d283c1bdef3eab68b373b118e8"
     ],
     [
-      "samples/race/BikeRaceNearMisses.cpp",
+      "src/reconstructed/BikeRace.cpp",
       "?Create@BikeRace@@",
       4292304,
       6745,
       6760,
       2821,
-      "1d4e84eb742e57c796a683eef56e40b0f44b842eb8859281fe09e27dedb68f65"
+      "f368166cbe471c4c4f38c659a838ee190758d0b17b6f4b24636990fbe9f764a5"
     ],
     [
-      "samples/race/BikeRaceNearMisses.cpp",
+      "src/reconstructed/BikeRace.cpp",
       "?CreateRacers@BikeRace@@",
       4299120,
       13428,
       13428,
       13400,
-      "4e63b7555c884f4141c2974028e21a80685e95d8c90c798789d691603915e038"
+      "35eb9e0d1afaaefff065bcef1a478877d2b5398d0af2796487fe4526eedc6ba4"
     ],
     [
       "src/krusty2/vehicle/KrustyBike.cpp",

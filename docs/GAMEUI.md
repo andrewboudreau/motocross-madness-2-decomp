@@ -243,7 +243,7 @@ Names (strong inference from bodies and literals, not original symbols):
   (1 command, 2 list click, 4 create, 5 init, 6 close, 7 timer, 10 edit
   done, 13 list double click, 18 frame, 19 edit change). It is a separate
   header because declaring the enum in DialogProc.h changes VC6's register
-  choice in BikeRaceNearMisses' 0x00419970.
+  choice in CreateRacers (0x00419970).
 
 Other header facts:
 - InputDevice.h befriends UIDialog, UIScrollBar and UIListBox (they read

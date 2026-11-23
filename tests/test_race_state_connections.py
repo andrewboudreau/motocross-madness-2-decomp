@@ -21,7 +21,6 @@ from test_character_motion_connections import PARTIAL as previous_partials
 
 ROOT = Path(__file__).resolve().parents[1]
 CALLER = 'src/reconstructed/BikeRace.cpp'
-SAMPLE = 'samples/race/BikeRaceNearMisses.cpp'
 PROVIDER = 'src/krusty2/vehicle/KrustyBike.cpp'
 BODIES = (
     ('int KrustyBike::ReceivedPositionChanged()', '?ReceivedPositionChanged@KrustyBike@@QAEHXZ', 0x495c00, 151),
@@ -31,12 +30,10 @@ BODIES = (
 
 def cases():
     rows = [(c['source'], c['symbol'], int(c['target_va'], 0), c['target_size'], c['bindings'])
-            for c in CASES if c['source'] in (CALLER, SAMPLE)]
-    rows += [(SAMPLE, symbol, va, size, SAMPLE.replace('.cpp', '.bindings.json'))
-             for source, symbol, va, size, _ in rows if source == CALLER]
+            for c in CASES if c['source'] == CALLER]
     rows += [r for r in physics_cases() if r[0] == PROVIDER]
     rows += [(s, n, v, z, s.replace(".cpp", ".bindings.json"))
-             for s, n, v, z, *_ in previous_partials if s in (CALLER, SAMPLE)]
+             for s, n, v, z, *_ in previous_partials if s == CALLER]
     return list(dict.fromkeys(rows))
 
 
@@ -121,7 +118,7 @@ class RaceStateConnectionsTests(unittest.TestCase):
                     encoding='latin1', env={**os.environ, 'PYTHONPATH': str(ROOT)})
                 self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
                 paths[key], objects[key] = obj, CoffObject(obj)
-            for source in (CALLER, SAMPLE, PROVIDER):
+            for source in (CALLER, PROVIDER):
                 compile_source(ROOT / source, source, source == PROVIDER)
             extracted = output / 'providers.cpp'
             extracted.write_text('#include "vehicle/KrustyBike.h"\n' + ''.join(
@@ -152,7 +149,7 @@ CHECK(record,sizeof(ReceivedRacerState)==0x60 && offsetof(ReceivedRacerState,sta
                 if s.section_number == 0 and s.storage_class == 2 and s.value == 0},
                 {"__ftol", "__fltused"})
             strict = preserved = 0
-            totals = {CALLER: Counter(), SAMPLE: Counter()}
+            totals = {CALLER: Counter()}
             addresses = {symbol: va for _, symbol, va, _ in BODIES}
             for source, symbol, va, size, binding in cases():
                 obj = objects[source]
@@ -166,7 +163,7 @@ CHECK(record,sizeof(ReceivedRacerState)==0x60 && offsetof(ReceivedRacerState,sta
                 else:
                     self.assertTrue(result['strict_exact'], (key, result))
                     strict += 1
-            # Count each compiled call once, including bodies reused by aggregate.
+            # Count each compiled call once.
             for source in totals:
                 obj = objects[source]
                 for r in obj.relocations:

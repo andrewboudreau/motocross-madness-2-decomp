@@ -60,60 +60,108 @@ Source forms needed:
   `field_0x0a8`, and the cursor-flag branch is written negated (picker
   first) with the new picker in a local.
 
-Near misses (`samples/race/BikeRaceNearMisses.cpp`):
-- `0x0041eb20` (camera target): exact, 1710 of 1710 bytes (registered in
-  `samples/race/targets.json`). The view's inline `TargetShadowCaster`
-  stores `shadowCaster` before `isSettled`; with the other order the
-  scene-object branch's scratch registers were one rotation step off.
-- `0x0041f1d0`, 313 of 881 bytes (887-byte candidate, masked 0.829):
-  retail keeps 0 in edx from the first instruction (re-zeroed after
-  calls); the candidate does not. Retail repeats the `0x0041eb20(caster)`
-  tail call; the objects scan's found path calls it and returns as retail
-  does, and the racer-slot helper re-reads the player count as retail does.
-- `0x004210f0` (start grid), masked 0.958 (465 of 2981 strict; the
-  candidate is 15 bytes longer): VC6's inline budget still places the
-  out-of-line `Vector3` constructor calls of the mode 2/3 case differently
-  (see the comment in the sample); the other cases call what retail calls
-  and every frame slot is at retail's offset. The side test is `p1.x * p0.z - p0.x * p1.z` (retail's load
-  order and p0/p1 slots).
-- `0x00417ed0` (setup, 6745 bytes with the jump table at `0x0041992c`;
-  ret 0x24; QuarryStuntEvent.cpp's loader calls it after the
-  constructor), 2800 of 6756 positions: all 166 calls in retail order, the
-  EH states 0..0x10 (`new` lines 0x193..0x367) and the 0x4e8-byte frame with
-  the buffers at retail's offsets. Retail spills `z*z` of both vector
-  lengths to a stack temporary (`fstp [t]; faddp; fadd [t]`; the only other
-  copies in the binary are EventManager `0x0045d480`'s two squared lengths
-  at `0x0045dc05` and `0x0045dc99`, there with `fstp st(0)` popping the
-  duplicated component first) and orders the girl block's temporaries
-  differently, so most esp offsets below +0x44 differ. The spill is a
-  store-and-reload of a memory temporary: a `volatile float zz = v.z *
-  v.z` in the length helper reproduces the `fstp [t]`, the `fadd [t]`,
-  the slot (`angle`'s dead `[esp+0x34]`) and the rest of the frame (6727
-  of 6768 positions), but VC6 then evaluates the square before `x * x`
-  and `y * y` where retail evaluates it last; assignments inside the
-  expression, casts, comma forms, accumulations and inline helpers keep
-  the products on the x87 stack. Slot map below `+0x44`: retail's `+0x20`
-  (10 uses) and `+0x24` (9) are the classes here at `+0x2c` (8) and
-  `+0x30` (`height` / `angle`, 7), the two extra uses being the spilled
-  square at each site; `axis` moves from `+0x20` to `+0x28` and the
-  seven-use classes from `+0x24` / `+0x28` to `+0x2c` / `+0x30`.
-- `0x00419970` (`CreateRacers`; `0x0041d1e0`, which sets +0x189 from the
-  track distance between +0xf8 and +0x134, is `UpdateTrackSeparation`) (loader, 13428 bytes; ret 0x14, frame 0xab0), 1380 of
-  13322 positions: completely decoded (pro circuit, network, offline,
-  ghost and AI racers, collision pairing; EH states for `new` lines
-  0x3b6..0x78f, frees at lines 0x4ff..0x501, 0x550..0x552 and
-  0x7f7..0x7f9); 194 of retail's 195 calls in order. The candidate's frame
-  (0xac4) orders the locals differently, and register choice follows:
-  retail's 23-use classes at `+0` and `+0x4` are `i` (15 here, `+0x14`)
-  with `fromEvent` (16, `+0x10`) and `riderModels` (29 here, `+0`) with
-  `skill`; its `+0x8` / `+0xc` are `recordIndex` / `id` (here `+0x4` /
-  `+0x8`), `position` and `direction` sit at `+0x14` / `+0x20` (here
-  `+0x20` / `+0x2c`), `playerId` falls to `+0x48` (16 uses here, 10
-  there), `names` to `+0x30`, `plate` to `+0x40`, `setup` to `+0x6c`;
-  the candidate's `slots` (11 uses) has no retail slot, and retail
-  shares its temporaries into fewer classes (0x14 bytes of frame).
+Merged bodies (in `BikeRace.cpp` in retail order; each non-exact one carries
+a `// Not exact (...)` comment, and each has an emu_diff case that runs it
+against retail, 600 runs with 0 mismatches):
+- `0x0041eb20` (`AimCamera`, camera target): exact, 1710 of 1710 bytes
+  (calibration case). The view's inline `TargetShadowCaster` stores
+  `shadowCaster` before `isSettled`. With the other order, the scene-object
+  branch's scratch registers were one rotation step off.
+- `0x0041f1d0` (`NextCameraTarget`): 313 of 881 bytes (887-byte candidate;
+  linked 0.829). Control flow, the three branches and the shared tail call
+  `AimCamera(caster)` are retail's (the caster flag lives in the dead
+  third-argument slot). Retail keeps 0 in edx from the first instruction
+  (`cmp [mem], edx`, re-zeroed after calls); the candidate tests with
+  `test reg, reg` until the first call. Retail has three copies of the
+  `AimCamera` call. The objects scan's found path calls it and returns
+  (230 -> 266), and the racer-slot helper re-reads the player count at
+  each test (266 -> 313).
+  - A third explicit call after the racers loop makes VC6 push a constant
+    0, which is worse.
+  - These leave the zero register unchanged: explicit `!= 0` tests,
+    nested-if or `!(a && b)` heads, a `for (;;)` racers loop, and the
+    caster flag passed through the `objects` parameter.
+- `0x004210f0` (`WriteRelativePositions`, the start grid): 466 of 2981
+  bytes (2960-byte candidate; linked 0.981). The call sequence is retail's.
+  Retail calls the out-of-line `Vector3` constructor `0x00404e60` at most
+  grid sites, the dot `0x0040ae30` and scale `0x005015b0` in `Normalize`,
+  and `operator+` / `operator-` (`0x00421cb0` / `0x00421d00`) in event 4.
+  The unit declares those as the helpers above the body, linked to their
+  canonical symbols. Register choice and scheduling still differ.
+  - The inline form (inline constructors and `Scale`) reached masked 0.958
+    but expands the mode 2/3 tail where retail calls; VC6's inline budget
+    decides which sites expand.
+  - The side test is `p1.x * p0.z - p0.x * p1.z`, retail's load order and
+    p0/p1 slots.
+- `0x00417ed0` (`Create`, the setup; 6745 bytes with the jump table at
+  `0x0041992c`; ret 0x24; QuarryStuntEvent.cpp's loader calls it after the
+  constructor): 2821 of 6760 positions; linked 0.996. All 166 calls are in retail order,
+  with EH states 0..0x10 (`new` lines 0x193..0x367) and the 0x4e8-byte frame
+  with the buffers at retail's offsets.
+  - **The length helper.** It squares x and y into `xx` / `yy` locals and
+    adds `z*z` last, the shape of EventManager `0x0045d480`'s squared
+    lengths. A `zz` local in the sum gives 2800 of 6756.
+  - **The spill.** Retail spills `z*z` of both vector lengths to a stack
+    temporary (`fstp [t]; faddp; fadd [t]`). The only other copies in the
+    binary are EventManager `0x0045d480`'s two squared lengths at
+    `0x0045dc05` and `0x0045dc99`, where `fstp st(0)` pops the duplicated
+    component first.
+  - **The girl block.** Retail orders the girl block's temporaries
+    differently, so most esp offsets below +0x44 differ.
+  - **The `volatile` probe.** `volatile float zz = v.z * v.z` in the length
+    helper reproduces the `fstp [t]`, the `fadd [t]`, the slot (`angle`'s
+    dead `[esp+0x34]`) and the rest of the frame (6727 of 6768). VC6 then
+    evaluates the square before `x * x` and `y * y`, where retail evaluates
+    it last. `volatile` is not retail's code and is not used.
+  - **Forms tried without effect.** None of these stores `z*z`:
+    - named squares in any subset, sum bracketing (the 144 bracketings of
+      docs/VC6_OPERAND_ORDER.md section 3), `+=` accumulation, a `float[3]`
+      or a struct of squares;
+    - inline square helpers, casts, and a double result variable;
+    - the `/G3`-`/G6` settings.
 
-Facts the two functions establish:
+    An all-double sum scores 6625 only because its longer x87 code
+    realigns the stream. It is not retail's float code.
+- `0x00419970` (`CreateRacers`, the racer loader; 13428 bytes; ret 0x14;
+  frame 0xab0): 13400 of 13428 bytes; linked 1.0. The body is decoded
+  completely: pro circuit, network, offline, ghost and AI racers, collision
+  pairing, and the 10 EH states. The facts that put every buffer and scalar
+  at retail's offset:
+  - The 0x40-byte own texture names and `ranking` are function-scope.
+  - The `used` memset (`rep stosd` at `0x0041a456`) sits inside the
+    multiplayer block.
+  - `RandomSkill` takes `const float&` base and range and writes through a
+    `float&`. Retail reads them from memory after the `rand()` calls, and
+    spills the random offset into the skill's own slot.
+  - The pro circuit block caches `g_TrackGame` in a local and takes each
+    computer racer as `&circuit->racers[n]`.
+  - The network loops, the grid entries and the event AI records and front
+    end tables (`EventAi`, `UiBike`, `UiManufacturer`, `UiRider`) read
+    through `g_TrackGame` at each use. With cached locals, VC6 merges the
+    failure tails differently.
+  - The offline player branch comes first in the source: its `new` carries
+    line 0x4ea against the network block's 0x53b. The network player's body
+    sits inside its search loop before a `break`.
+  - The replay player and replay AI blocks share one function-scope
+    `recordedBike` / `recordedRider` pair. Each network player loop declares
+    its own `for (int k`. The network block's `i` is function-scope and is
+    reused by the network AI loop.
+
+  What remains:
+  - one prologue store slot (`+0x3d`);
+  - register choices at `0x00419b0d` and `0x00419b39`;
+  - a load/store order at `0x00419bf0`;
+  - the SIB order of one curve copy (`0x0041b124`);
+  - the own texture pair swapped in the frame (retail has `ownRiderTexture`
+    at 0x400 and `ownBikeTexture` at 0x440). The two buffers have five uses
+    each and VC6 breaks the tie the other way. Declaration order (16
+    combinations), names and array forms do not move it.
+
+  `xor edi, edi` / `mov ebx, 1` at +538 are in retail's order at the unit's
+  current declaration count. This is a TU-wide effect that a header edit can
+  undo (13394 in the other window; BIKE_RACE_STATE_CONNECTIONS.md).
+
+Facts the two loaders establish:
 - Racers are KrustyBike (constructor `0x0048fa60`, 0x1638 bytes, the
   GameObject virtual base at +0x160c), set up by `0x0048fc80` (25
   arguments; its 12th is a char AI index). KrustyBike slot 45 takes no
@@ -126,10 +174,8 @@ Facts the two functions establish:
 - A replay played while KrustyUI's `playingDemo` (+0x4a8) is set gets a
   DemoDlg (vtable `0x00550e18`, 0x7f58 bytes, bikerace.cpp line 0x2fb),
   constructed inline as `UIDialog(1, "credits.dtm")` then the vtable write
-  at `0x00419329`; otherwise a VCRDlg (line 0x2ff). DlgProcs.h declares the
-  constructor (defined in DemoDlg.h) and the game build creates the canonical class. The
-  sample `samples/race/BikeRaceNearMisses.cpp` still uses a local stand-in
-  bound to that vtable.
+  at `0x00419329`; otherwise a VCRDlg (line 0x2ff). `Create` uses the
+  canonical DemoDlg from DemoDlg.h.
 
 ## Naming
 
