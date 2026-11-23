@@ -1,7 +1,9 @@
 #include "BikeRaceCore.h"
 #include "../krusty2/broadphase/Terrain.h"
+#include <math.h>
 #include <stdio.h>
 #include <string.h>
+#include <windows.h>
 
 #include "QuarryEvent.h"
 
@@ -19,13 +21,28 @@
 #include "TrackGame.h"
 #include "EventManager.h"
 #include "TrackOverlay.h"
+#include "Krusty3DObjects.h"
 #include "ResourceEntry.h"
+#include "ArcadeObject.h"
+#include "FollowCamera.h"
+#include "KrustyBikeCamera.h"
+#include "PCGame.h"
+#include "PCRenderTarget.h"
+#include "PCVideoCard.h"
+#include "SkyCube.h"
+#include "TerrainShadow.h"
+#include "TextureMapManager.h"
+#include "../krusty2/collision/CollisionObject.h"
+#include "../krusty2/effects/ParticleManager.h"
+#include "../krusty2/shadow/ProjectedShadow.h"
+#include "../krusty2/soultree/SoultreeQuadTreeRenderer.h"
+#include "../krusty2/visibility/VisibilityQuadTree.h"
 
 // Reconstruction of D:\aardvark\VC\krusty2\QuarryStuntEvent.cpp (literal
 // __FILE__ at 0x00572154): BaseQuarryEvent, 0x004de2a0..0x004e1fa7, between
 // Quantize.cpp (ends 0x004de29f) and racesnd.cpp (RaceSound's constructor
-// 0x004e1fb0). Names are provisional. Not here: the loader 0x004de590
-// (about 7.9 KB, not reconstructed). Slot 12 (0x004e14a0) is not exact.
+// 0x004e1fb0). Names are provisional. The loader 0x004de590 and slot 12
+// (0x004e14a0) are not exact.
 
 #define SoundSystem() ((PCSoundInterface*)g_TrackGame->soundInterface)
 
@@ -121,6 +138,701 @@ int BaseQuarryEvent::Tick(float frameTime) {
 void BaseQuarryEvent::UnknownVirtualSlot34(int a, int b, int c) {
 }
 
+// The loader (0x004de590): its globals and the views of the objects it reads.
+// 0x0059af10: the count of ecosystem textures PreloadEcosystem preloaded, which the memory
+// estimate weighs at 0x2aaaa bytes (defined in src/reconstructed/EcoSystem.cpp; cleared at
+// 0x00457250/0x0045c040, incremented per preloaded texture).
+extern int g_UnknownGlobal59af10;
+
+// 0x0045c040 (cdecl): preloads the ecosystem `path` from `stream`.
+int PreloadEcosystem(TextureMapManager* manager, char* path, FileStream* stream,
+                     int format);
+
+// A physics static model (Scene caster +0x08).
+struct QuarryLoadPhysicsObjectView {
+    unsigned char field_0x000[0x128];
+    CollisionObject* collisionObject;   // +0x128 SoultreePhysicsBaseObjectCore.h
+    unsigned char field_0x12c[0x1f4 - 0x12c];
+    OverlayTerrainView* terrain;                   // +0x1f4
+    void* terrainScale;                        // +0x1f8 copied from the terrain's +0x40
+};
+
+// The terrain as the loader reads it.
+struct QuarryLoadTerrainView {
+    unsigned char field_0x00[0x40];
+    void* worldScale;                          // +0x40 SoultreeProbe::worldScale
+};
+
+// CarProcedural's terrain pointer (Scene's SceneCarProceduralView
+// leaves +0x20c unnamed).
+struct QuarryLoadCarProceduralView {
+    unsigned char field_0x000[0x20c];
+    OverlayTerrainView* groundProvider;            // +0x20c CarProcedural.h
+};
+
+// A racer as the loader reads it.
+struct QuarryLoadRiderView {
+    unsigned char field_0x000[0x1a0];
+    D3DIMSoultreeObject* modelNode;               // +0x1a0
+};
+struct QuarryLoadWreckerView {
+    unsigned char field_0x00[0x38];
+    CollisionObject* collisionModel;    // +0x38 Wrecker.h
+};
+struct QuarryLoadLodBikeRaceView {
+    unsigned char field_0x000[0x18c];
+    unsigned char forceHighLod;                // +0x18c BikeRace.h's "ForceHighLOD"
+};
+struct QuarryLoadKrustyBikeView {
+    unsigned char field_0x000[0x3bc];
+    D3DIMSoultreeObject* modelNode;             // +0x3bc bike model
+    unsigned char field_0x3c0[0x5c4 - 0x3c0];
+    QuarryLoadRiderView* riderCharacter;      // +0x5c4
+    unsigned char loadInfo[0x5e0 - 0x5c8];    // +0x5c8 KrustyBike loadInfo (Bike, BikeA5C8) (bytes kept)
+    char riderName[0x10];                     // +0x5e0 KrustyBike riderName (Bike)
+    CollisionObject* frontWheel;           // +0x5f0
+    CollisionObject* rearWheel;            // +0x5f4
+    unsigned char field_0x5f8[0x604 - 0x5f8];
+    QuarryLoadWreckerView* wrecker;  // +0x604  Bike +0x604 wrecker (its +0x38 collisionModel gets the car's ignore list)
+    unsigned char field_0x608[0x735 - 0x608];
+    unsigned char isRemote;  // +0x735  KrustyBike +0x735 isRemote
+    unsigned char field_0x736[0x740 - 0x736];
+    QuarryLoadLodBikeRaceView* race;  // +0x740  KrustyBike +0x740 race
+    unsigned char field_0x744[0x1414 - 0x744];
+    CollisionObject* bikeAndRiderCollision;  // +0x1414  KrustyBike +0x1414 bikeAndRiderCollision; the loader adds it as an ignored collision owner
+    CollisionObject* bikeCollision;  // +0x1418  KrustyBike +0x1418 bikeCollision; the loader adds it as an ignored collision owner
+};
+
+// The KrustyBikeCamera members the loader writes (FollowCamera's +0x274,
+// VehicleCamera's +0x384..+0x394, BikeCamera's +0x3b0 and KrustyBikeCamera's
+// +0x3b4, which those headers keep protected).
+struct QuarryLoadKrustyBikeCameraView {
+    unsigned char field_0x000[0x274];
+    unsigned char isSettled;                      // +0x274 FollowCamera isSettled
+    unsigned char field_0x275[0x384 - 0x275];
+    void* targetCharacter;                        // +0x384 VehicleCamera targetCharacter
+    void* targetCar;                              // +0x388 VehicleCamera targetCar
+    void* targetCaster;                           // +0x38c VehicleCamera targetCaster
+    unsigned char vehicleMode;                    // +0x390 VehicleCamera vehicleMode
+    unsigned char targetPointCached;              // +0x391 VehicleCamera targetPointCached
+    unsigned char targetHeadingCached;            // +0x392 VehicleCamera targetHeadingCached
+    QuarryLoadKrustyBikeView* vehicle;            // +0x394 VehicleCamera vehicle
+    unsigned char field_0x398[0x3b0 - 0x398];
+    QuarryLoadKrustyBikeView* bike;               // +0x3b0 BikeCamera bike
+    QuarryLoadKrustyBikeView* krustyBike;         // +0x3b4 KrustyBikeCamera krustyBike
+
+    // Inline: the same sequence as BikeRace.h's StartFollowing (three times
+    // in 0x0041eb20). Follows `racer`, showing the previous racer's model
+    // again and hiding the new one's.
+    void StartFollowing(QuarryLoadKrustyBikeView* racer) {
+        if (bike && !racer->race->forceHighLod) {
+            bike->modelNode->SetLowestLod(1);
+            bike->riderCharacter->modelNode->SetLowestLod(1);
+            if (!bike->modelNode->currentLod)
+                bike->modelNode->SetLod(1);
+            if (!bike->riderCharacter->modelNode->currentLod)
+                bike->riderCharacter->modelNode->SetLod(1);
+        }
+        vehicle = racer;
+        targetPointCached = 0;
+        targetHeadingCached = 0;
+        vehicleMode = 1;
+        targetCaster = 0;
+        targetCharacter = 0;
+        targetCar = 0;
+        bike = racer;
+        isSettled = 0;
+        krustyBike = racer;
+        if (!racer->race->forceHighLod) {
+            racer->modelNode->SetLowestLod(0);
+            bike->riderCharacter->modelNode->SetLowestLod(0);
+        }
+        isSettled = 0;
+    }
+};
+
+// BikeRace's start gate and 30-second man (BikeRace.h's StartObjectCharacterView) as the
+// loader reads them: the krusty2 CollisionCharacter's collision object.
+struct QuarryLoadStartObjectView {
+    unsigned char field_0x000[0x210];
+    CollisionObject* collisionObject; // +0x210 krusty2 CollisionCharacter::collisionObject
+};
+
+// The bytes the render target's colour buffers take.
+static inline int FrameBufferBytes(RenderTarget* target) {
+    return PixelFormatBytesPerPixel(target->surfacePixelFormat) * (target->frameModulus + 1) * target->targetHeight *
+           target->targetWidth;
+}
+
+// 0x004de590. Not exact (2206 instructions against retail's 2208, linked
+// score 0.986; all scheduling: the small slots below 0x1c, register choices
+// in the memory-budget tree and around the fog/sky block, the collision
+// loop's head (retail enters a rotated loop with a jmp and indexes the entry
+// table with [ecx + edx + 4]) and the racer loop's esi/edi swap;
+// docs/QUARRYSTUNTEVENT.md).
+int BaseQuarryEvent::LoadEventObjects(LoadProgressFn progress) {
+    int terrainBytes;
+    int textureBytes;
+    int forced;
+    int needed;
+    int sceneSteps;
+    float terrainWidth;
+    int hasCube;
+    unsigned long modelCounts[4];
+    int presets[8];
+    TextureContext terrainTextures;
+    TextureContext modelTextures;
+    TextureContext skyTextures;
+    MEMORYSTATUS memory;
+    char text[0x184];
+    char ecosystem[0x104];
+    char path[0x104];
+    char key[0x100];
+    char terrainPath[0x104];
+
+    GlobalMemoryStatus(&memory);
+    ecosystem[0] = 0;
+    g_TrackGame->sceneObject->CountSceneTextures(modelCounts, (char*)&terrainWidth, (char*)&hasCube,
+                                                (int)ecosystem);
+    sceneSteps = 1;
+    if (g_TrackGame->sceneObject->CountSceneObjects(&sceneSteps)) {
+        int step = (int)(sceneSteps / (sceneSteps * 0.1f));
+        if (progress)
+            progress(&step);
+    }
+    FileStream* stream = new(__FILE__, 252) FileStream(g_ResourceManager);
+    FileStream* preloaded = stream;
+    if (ecosystem[0]) {
+        if (strstr(ecosystem, ".est"))
+            strcpy(strstr(ecosystem, ".est"), ".esb");
+        if (!g_TrackGame->sceneObject->OpenArchiveFile(stream, ecosystem, "rb", 0))
+            sprintf(text, "No Ecosystem found in env file.  Ecosystem not preloaed.\n");
+        else
+            PreloadEcosystem(g_TrackGame->textureManager, ecosystem, stream, 0x115c);
+    }
+
+    // The texture detail levels: 0 keeps every texture, 1 and 2 halve them.
+    if (g_TrackGame->bladeRenderer) {
+        g_TrackGame->texturesCached = 0;
+        if (memory.dwTotalPhys > 0x5a00000) {
+            terrainTextures.halvings = 0;
+            skyTextures.halvings = 0;
+            modelTextures.halvings = 0;
+        } else if (memory.dwTotalPhys > 0x3c00000) {
+            terrainTextures.halvings = 1;
+            skyTextures.halvings = 0;
+            modelTextures.halvings = 0;
+        } else if (memory.dwTotalPhys <= 0x2000000) {
+            terrainTextures.halvings = 2;
+            skyTextures.halvings = 2;
+            modelTextures.halvings = 2;
+        } else {
+            terrainTextures.halvings = 1;
+            skyTextures.halvings = 1;
+            modelTextures.halvings = 1;
+        }
+    } else {
+        int videoMemory = ((PCRenderTarget*)renderContext)->targetDisplay->totalVideoMemory;
+        sprintf(key, "DriverInfo\\%s\\VideoMemoryMB", ((PCRenderTarget*)renderContext)->targetDisplay->driverGuidText);
+        int megabytes = g_TrackGame->GetRegistryInt(key, -1);
+        forced = g_TrackGame->mode.videoSettings[0];
+        if (megabytes != -1)
+            videoMemory = megabytes << 20;
+        PCRenderTarget* target = (PCRenderTarget*)renderContext;
+        int available = videoMemory - FrameBufferBytes(target);
+        if (g_TrackGame->osVersion.platformId != 2 && !(target->targetDisplay->driverCaps & 0x400)) {
+            available = videoMemory - 0x400000;
+            if (!(target->deviceCaps & 0x4000))
+                available = videoMemory - 0x200000;
+        }
+        terrainBytes = EstimateTerrainBytes((int)terrainWidth);
+        int cubeBytes = hasCube ? EstimateCubeBytes() : 0;
+        textureBytes = EstimateModelTextureBytes((int*)modelCounts);
+        int raceBytes = EstimateRaceBytes();
+        needed = g_UnknownGlobal59af10 * 0x2aaaa + raceBytes + textureBytes + cubeBytes + terrainBytes + 0xa0000;
+        terrainTextures.halvings = 0;
+        skyTextures.halvings = 0;
+        modelTextures.halvings = 0;
+        if (g_TrackGame->display->isAGP) {
+            g_TrackGame->texturesCached = 0;
+            if (available - needed <= 0) {
+                if (forced) {
+                    if (needed - terrainBytes + terrainBytes / 4 < available) {
+                        terrainTextures.halvings = 1;
+                    } else if (needed - cubeBytes - terrainBytes + (cubeBytes + terrainBytes) / 4 < available) {
+                        terrainTextures.halvings = 1;
+                        skyTextures.halvings = 1;
+                    } else if (needed - textureBytes - cubeBytes - terrainBytes +
+                                   (textureBytes + cubeBytes + terrainBytes) / 4 < available) {
+                        terrainTextures.halvings = 1;
+                        skyTextures.halvings = 1;
+                        modelTextures.halvings = 1;
+                    } else {
+                        terrainTextures.halvings = 2;
+                        skyTextures.halvings = 2;
+                        modelTextures.halvings = 2;
+                    }
+                } else if (available - needed + memory.dwTotalPhys <= 0x2800000 && memory.dwTotalPhys <= 0x5000000) {
+                    if (memory.dwTotalPhys > 0x3c00000) {
+                        terrainTextures.halvings = 1;
+                    } else if (needed - terrainBytes + terrainBytes / 4 < available) {
+                        terrainTextures.halvings = 1;
+                    } else if (needed - cubeBytes - terrainBytes + (cubeBytes + terrainBytes) / 4 < available) {
+                        terrainTextures.halvings = 1;
+                        skyTextures.halvings = 1;
+                    } else if (needed - textureBytes - cubeBytes - terrainBytes +
+                                   (textureBytes + cubeBytes + terrainBytes) / 4 < available) {
+                        terrainTextures.halvings = 1;
+                        skyTextures.halvings = 1;
+                        modelTextures.halvings = 1;
+                    } else if (needed - textureBytes - cubeBytes - terrainBytes + (textureBytes + cubeBytes) / 4 +
+                                   terrainBytes / 16 < available) {
+                        terrainTextures.halvings = 2;
+                        skyTextures.halvings = 1;
+                        modelTextures.halvings = 1;
+                    } else if (needed - textureBytes - cubeBytes - terrainBytes + textureBytes / 4 +
+                                   (cubeBytes + terrainBytes) / 16 < available) {
+                        terrainTextures.halvings = 2;
+                        skyTextures.halvings = 2;
+                        modelTextures.halvings = 1;
+                    } else {
+                        terrainTextures.halvings = 2;
+                        skyTextures.halvings = 2;
+                        modelTextures.halvings = 2;
+                    }
+                }
+            }
+        } else {
+            int percent = g_TrackGame->GetRegistryInt("MarginPercentage", 10);
+            int minimum = g_TrackGame->GetRegistryInt("MinMarginKBytes", 0x200) << 10;
+            int margin = percent * available / 100;
+            if (margin < minimum)
+                margin = minimum;
+            available -= margin;
+            if (available < 0)
+                available = 0;
+            if (available > needed) {
+                terrainTextures.halvings = 0;
+                skyTextures.halvings = 0;
+                modelTextures.halvings = 0;
+                g_TrackGame->texturesCached = 0;
+            } else if (!forced && memory.dwTotalPhys > 0x5a00000) {
+                terrainTextures.halvings = 0;
+                skyTextures.halvings = 0;
+                modelTextures.halvings = 0;
+                g_TrackGame->texturesCached = 1;
+            } else if (needed - terrainBytes + terrainBytes / 4 < available) {
+                g_TrackGame->texturesCached = 0;
+                terrainTextures.halvings = 1;
+            } else if (!forced && memory.dwTotalPhys > 0x3c00000) {
+                g_TrackGame->texturesCached = 1;
+                terrainTextures.halvings = 1;
+            } else {
+                int all = textureBytes + cubeBytes + terrainBytes;
+                if (needed - textureBytes - cubeBytes - terrainBytes + all / 4 < available) {
+                    g_TrackGame->texturesCached = 0;
+                    terrainTextures.halvings = 1;
+                    skyTextures.halvings = 1;
+                    modelTextures.halvings = 1;
+                } else if (needed - textureBytes - cubeBytes - terrainBytes + (textureBytes + cubeBytes) / 4 +
+                               terrainBytes / 16 < available) {
+                    g_TrackGame->texturesCached = 0;
+                    terrainTextures.halvings = 2;
+                    skyTextures.halvings = 1;
+                    modelTextures.halvings = 1;
+                } else if (needed - textureBytes - cubeBytes - terrainBytes + textureBytes / 4 +
+                               (cubeBytes + terrainBytes) / 16 < available) {
+                    g_TrackGame->texturesCached = 0;
+                    terrainTextures.halvings = 2;
+                    skyTextures.halvings = 2;
+                    modelTextures.halvings = 1;
+                } else {
+                    if (needed - textureBytes - cubeBytes - terrainBytes + all / 16 < available)
+                        g_TrackGame->texturesCached = 0;
+                    else
+                        g_TrackGame->texturesCached = !forced;
+                    terrainTextures.halvings = 2;
+                    skyTextures.halvings = 2;
+                    modelTextures.halvings = 2;
+                }
+            }
+        }
+        if (g_TrackGame->texturesCached) {
+            opaqueTextureGroup = (GameObject*)g_TrackGame->textureManager->CreateGroup(
+                ((PCRenderTarget*)renderContext)->surfacePixelFormat, 0, 2, 1);
+            alphaTextureGroup = (GameObject*)g_TrackGame->textureManager->CreateGroup(0x115c, 0, 2, 1);
+        }
+    }
+    modelTextures.manager = skyTextures.manager = terrainTextures.manager = g_TrackGame->textureManager;
+    modelTextures.opaqueGroup = skyTextures.opaqueGroup = terrainTextures.opaqueGroup = (ManagedTextureGroup*)opaqueTextureGroup;
+    modelTextures.alphaGroup = skyTextures.alphaGroup = terrainTextures.alphaGroup = (ManagedTextureGroup*)alphaTextureGroup;
+    modelTextures.opaqueFormat = skyTextures.opaqueFormat = terrainTextures.opaqueFormat = ((PCRenderTarget*)renderContext)->surfacePixelFormat;
+    modelTextures.alphaFormat = skyTextures.alphaFormat = terrainTextures.alphaFormat = 0x115c;
+    if (progress)
+        progress(0);
+
+    g_MemTagStack->Push("Audio");
+    auralScape = (new(__FILE__, 576) AuralScape(g_TrackGame->mode.soundOn))
+                     ->Create(renderContext, 16);
+    auralScape->reverbEnabled = g_TrackGame->mode.eaxEnabled;
+    auralScapeListener = auralScape->NextListenerNumber();
+    auralScape->AddListener(auralScapeListener, 1.0f, 1.0f);
+    g_MemTagStack->Pop(0);
+
+    lightManager = new(__FILE__, 582) LightManager(1);
+    AppendChild(lightManager->SetRenderContext(renderContext), -1);
+    presets[0] = 0;
+    presets[1] = 1;
+    presets[2] = 2;
+    presets[3] = 3;
+    presets[4] = 4;
+    presets[5] = 5;
+    presets[6] = 6;
+    presets[7] = 7;
+    raceCamera = (QuarryEventKrustyBikeCameraView*)(new(__FILE__, 585) KrustyBikeCamera(1))
+                     ->SetupFlyby(renderContext, 0.55f, 0.3f, 27.0f, 7.0f, 1.048f, 2, 8, presets);
+    if (!AppendChild((GameObject*)raceCamera, -1)) {
+        sprintf(text, "KrustyBikeCamera not created.\n");
+        return 0;
+    }
+    if (progress)
+        progress(0);
+    CreateOverlays();
+
+    g_MemTagStack->Push("Particles");
+    particleManager = new(__FILE__, 613) ParticleManager(g_TrackGame->mode.particlesOn);
+    g_MemTagStack->Push("Scene");
+    eventScene = (new(__FILE__, 624) Scene(isEnabled))
+                     ->AttachSceneManager(g_TrackGame->sceneObject, (int)auralScape, (int)&modelTextures, 8);
+    if (!eventScene) {
+        sprintf(text, "Scene not created.\n");
+        return 0;
+    }
+    if (!eventScene->Load(renderContext, lightManager, (int)particleManager, (int)g_TrackGame->textureManager,
+                                           (int)&modelTextures, "Teraform\\Skies", (void (*)(int))progress,
+                                           (int)ceil(sceneSteps * 0.1f)))
+        return 0;
+    if (progress)
+        progress(0);
+
+    g_MemTagStack->Push("QuadTree");
+    VisibilityQuadTree* visibility = (VisibilityQuadTree*)(new(__FILE__, 659) VisibilityQuadTree(1))
+        ->Setup((int)renderContext, 0.0f, 0.0f,
+                                eventScene->environment->terrainWidth * eventScene->environment->terrainWidthScale * 256.0f,
+                                eventScene->environment->terrainBreadth * eventScene->environment->terrainBreadthScale * 256.0f,
+                                96.0f);
+    if (!visibility)
+        sprintf(text, "VisibilityQuadTree not created.\n");
+    g_MemTagStack->Pop(0);
+    SceneLight* shadowLight = 0;
+    SceneLight* flareLight = 0;
+    for (int i = 0; i < eventScene->lightCount; i++) {
+        if (eventScene->sceneLights[i].emitsLight) {
+            if (eventScene->sceneLights[i].emitter) {
+                AppendChild(eventScene->sceneLights[i].emitter, -1);
+                if (eventScene->sceneLights[i].type == 6)
+                    ambientLight = eventScene->sceneLights[i].emitter;
+                else if (eventScene->sceneLights[i].type == 2 || eventScene->sceneLights[i].type == 4)
+                    sunLight = eventScene->sceneLights[i].emitter;
+            }
+            if (!shadowLight && eventScene->sceneLights[i].castsShadows)
+                shadowLight = &eventScene->sceneLights[i];
+            if (!flareLight && eventScene->sceneLights[i].hasLensFlare)
+                flareLight = &eventScene->sceneLights[i];
+        }
+    }
+    if (shadowLight) {
+        projectedShadow = new(__FILE__, 698) ProjectedShadow(g_TrackGame->mode.shadowsOn);
+        projectedShadow = ((ProjectedShadow*)projectedShadow)->Init((ShadowRenderTarget*)renderContext, g_TrackGame->textureManager);
+    }
+    if (!preloaded)
+        stream = new(__FILE__, 713) FileStream(g_ResourceManager);
+
+    g_MemTagStack->Push("Sky");
+    char* cubeFile = eventScene->environment->cubeFile;
+    if (cubeFile && *cubeFile) {
+        eventFog = (new(__FILE__, 720) Fog(1))
+                         ->Create(renderContext, eventScene->fog->color, eventScene->fog->visibility,
+                                  eventScene->fog->haziness, 768.0f, 256.0f, 128.0f);
+        if (!AppendChild((GameObject*)eventFog, -1))
+            sprintf(text, "Fog not created.\n");
+        if (eventFog)
+            eventFog->SetDetailLevel(g_TrackGame->mode.videoSettings[4]);
+        AppendChild((new(__FILE__, 729) FogOff(1))->SetRenderContext(renderContext), -1);
+        if (!g_TrackGame->sceneObject->OpenArchiveFile(stream, eventScene->environment->cubeFile, "rb", 0)) {
+            sprintf(text, "No Sky found in resources.  Sky not created.\n");
+            if (stream)
+                delete stream;
+            return 0;
+        }
+        skyCube = (new(__FILE__, 744) SkyCube(g_TrackGame->mode.skyCubeOn))
+                         ->Create(renderContext, stream, (CubeTextureContextView*)&skyTextures, 1024.0f);
+        if (!AppendChild((GameObject*)skyCube, -1))
+            sprintf(text, "SkyCube not created.\n");
+        AppendChild((new(__FILE__, 750) FogOn(1))->Create(renderContext, eventFog), -1);
+        eventFog->SetParameters(eventScene->fog->color, eventFog->fogVisibility, eventFog->fogHaziness);
+    }
+    if (progress)
+        progress(0);
+
+    g_MemTagStack->Push("Terrain");
+    if (!g_TrackGame->sceneObject->OpenArchiveFile(terrainStream, eventScene->environment->terrainFile, "rb",
+                                                                   (int)terrainPath)) {
+        sprintf(text, "No Terrain found in env file.  Terrain not created.\n");
+        return 0;
+    }
+    eventTerrain = (OverlayTerrainView*)(new(__FILE__, 799) Terrain(1))
+                     ->Load((int)renderContext, (TerrainStream*)terrainStream, 1,
+                                             (TerrainSurfaceDesc*)&terrainTextures,
+                                             g_TrackGame->mode.videoSettings[3], 0,
+                                             eventScene->environment->detailTexture, 0);
+    if (!AppendChild((GameObject*)eventTerrain, -1)) {
+        sprintf(text, "Terrain not created.\n");
+        return 0;
+    }
+    if (progress)
+        progress(0);
+
+    g_MemTagStack->Push("Shadow");
+    if (projectedShadow) {
+        terrainShadow = (new(__FILE__, 822) TerrainShadow(g_TrackGame->mode.shadowsOn))
+                         ->Attach((int)renderContext, (Terrain*)eventTerrain,
+                                  (ProjectedShadow*)projectedShadow);
+        AppendChild((GameObject*)terrainShadow, -1);
+    }
+    AppendChild(visibility, -1);
+
+    g_MemTagStack->Push("EcoSystem");
+    if (!stream)
+        stream = new(__FILE__, 848) FileStream(g_ResourceManager);
+    if (strstr(eventScene->environment->ecosystemFile, ".est"))
+        strcpy(strstr(eventScene->environment->ecosystemFile, ".est"), ".esb");
+    if (stream && !g_TrackGame->sceneObject->OpenArchiveFile(stream, eventScene->environment->ecosystemFile,
+                                                                           "rb", 0)) {
+        sprintf(text, "No Ecosystem found in env file.  Ecosystem not created.\n");
+    } else {
+        ecoSystem = (new(__FILE__, 870) EcoSystem(1))
+                         ->Create(renderContext, g_TrackGame->textureManager,
+                                                 (EcoTerrainView*)eventTerrain, lightManager,
+                                                 (char*)eventScene->environment, stream, 0x115c,
+                                                 g_TrackGame->mode.raceSettings.treeCollision,
+                                                 g_TrackGame->mode.videoSettings[1]);
+        if (!ecoSystem)
+            sprintf(text, "EcoSystem not created.\n");
+    }
+    if (progress)
+        progress(0);
+
+    g_MemTagStack->Push("3DObjects");
+    if (!PrepareEvent3DObjects())
+        return 0;
+    g_MemTagStack->Push("BikeRace");
+    raceView = (EventBikeRaceView*)new(__FILE__, 898) BikeRace(0);
+    g_MemTagStack->Push("Particles");
+    if (particleManager)
+        particleManager = ((ParticleManager*)particleManager)
+                         ->Create((int)renderContext, g_TrackGame->textureManager,
+                                  eventScene->environment->particleTexture, (int)lightManager);
+    g_MemTagStack->Push("3DObjects");
+    if (!Create3DObjects((int)&modelTextures))
+        return 0;
+    g_TrackGame->mode.networkGame = eventScene->crowdPresent;
+    g_MemTagStack->Push("BikeRace");
+    raceView = (EventBikeRaceView*)((BikeRace*)raceView)
+                     ->Create(renderContext, particleManager, lightManager, &modelTextures,
+                              (BikeRaceTerrainView*)eventTerrain, (KrustyBikeCamera*)raceCamera, eventScene,
+                              (RaceGateEvent*)this, (BikeRaceProjectedShadowView*)projectedShadow);
+    if (!raceView) {
+        sprintf(text, "BikeRace create failed.\n");
+        return 0;
+    }
+    if (progress)
+        progress(0);
+
+    g_MemTagStack->Push("Collision");
+    if (eventScene->staticModels) {
+        for (int i = 0; i < eventScene->staticModels->casterCount; i++) {
+            SceneStaticModel* caster = &eventScene->staticModels->casters[i];
+            if (caster->physics) {
+                OverlayTerrainView* terrain = eventTerrain;
+                QuarryLoadPhysicsObjectView* physics = (QuarryLoadPhysicsObjectView*)caster->physicsObject;
+                physics->terrain = terrain;
+                if (terrain)
+                    physics->terrainScale = ((QuarryLoadTerrainView*)terrain)->worldScale;
+                ((QuarryLoadPhysicsObjectView*)caster->physicsObject)->collisionObject->SnapPlacement();
+                ((QuarryLoadPhysicsObjectView*)caster->physicsObject)->collisionObject->SetUseBroadphase(1);
+                ((QuarryLoadPhysicsObjectView*)caster->physicsObject)->collisionObject->SetOwner(caster->physicsObject, 0x68);
+            } else if (caster->collisionObject && ((D3DIMSoultreeObject*)caster->model)->CountNodes() == 1) {
+                ((CollisionObject*)caster->collisionObject)->SnapPlacement();
+                ((CollisionObject*)caster->collisionObject)->SetUseBroadphase(1);
+            }
+        }
+    }
+    if (((BikeRace*)raceView)->thirtySecondMan && ((QuarryLoadStartObjectView*)((BikeRace*)raceView)->thirtySecondMan)->collisionObject) {
+        ((QuarryLoadStartObjectView*)((BikeRace*)raceView)->thirtySecondMan)->collisionObject->Release();
+        ((QuarryLoadStartObjectView*)((BikeRace*)raceView)->thirtySecondMan)->collisionObject = 0;
+    }
+    if (((BikeRace*)raceView)->startGate && ((QuarryLoadStartObjectView*)((BikeRace*)raceView)->startGate)->collisionObject) {
+        ((QuarryLoadStartObjectView*)((BikeRace*)raceView)->startGate)->collisionObject->Release();
+        ((QuarryLoadStartObjectView*)((BikeRace*)raceView)->startGate)->collisionObject = 0;
+    }
+    if (eventScene->animationTable) {
+        for (int i = 0; i < eventScene->animationTable->entryCount; i++) {
+            if (eventScene->animationTable->entries[i].keyFramed) {
+                SceneCollisionCharacterView* character = eventScene->animationTable->entries[i].character;
+                if (character->collisionObject) {
+                    ((CollisionObject*)character->collisionObject)->SnapPlacement();
+                    ((CollisionObject*)character->collisionObject)->SetUseBroadphase(1);
+                    ((CollisionObject*)character->collisionObject)->SetIgnoreListMode(0);
+                    if (i != ((BikeRace*)raceView)->thirtySecondManEntry && i != ((BikeRace*)raceView)->startGateEntry) {
+                        int iterator = 0;
+                        for (QuarryLoadKrustyBikeView* racer = (QuarryLoadKrustyBikeView*)((BikeRace*)raceView)->NextBike(&iterator);
+                             racer; racer = (QuarryLoadKrustyBikeView*)((BikeRace*)raceView)->NextBike(&iterator)) {
+                            if (!racer->isRemote) {
+                                ((CollisionObject*)character->collisionObject)->AddIgnoredOwner(racer->bikeCollision);
+                                ((CollisionObject*)character->collisionObject)->AddIgnoredOwner(racer->bikeAndRiderCollision);
+                                ((CollisionObject*)character->collisionObject)->AddIgnoredOwner(racer->frontWheel);
+                                ((CollisionObject*)character->collisionObject)->AddIgnoredOwner(racer->rearWheel);
+                                ((CollisionObject*)character->collisionObject)
+                                    ->AddIgnoredOwner(racer->wrecker->collisionModel);
+                            }
+                        }
+                    } else if (character->collisionObject) {
+                        ((CollisionObject*)character->collisionObject)->Release();
+                        character->collisionObject = 0;
+                    }
+                }
+            } else {
+                SceneCarProceduralView* car = eventScene->animationTable->entries[i].proceduralObject;
+                ((QuarryLoadCarProceduralView*)car)->groundProvider = eventTerrain;
+                ((CollisionObject*)car->sensorCollider)->SetIgnoreListMode(1);
+                for (int j = 0; j < eventScene->animationTable->entryCount; j++) {
+                    SceneAnimation* entry = &eventScene->animationTable->entries[j];
+                    if (entry->keyFramed)
+                        ((CollisionObject*)car->sensorCollider)
+                            ->AddIgnoredOwner((CollisionObject*)entry->character->collisionObject);
+                    else
+                        ((CollisionObject*)car->sensorCollider)
+                            ->AddIgnoredOwner((CollisionObject*)entry->proceduralObject->bodyCollider);
+                }
+                ((CollisionObject*)car->bodyCollider)->SnapPlacement();
+                ((CollisionObject*)car->bodyCollider)->SetUseBroadphase(1);
+                ((CollisionObject*)car->bodyCollider)->SetOwner(car, 0x69);
+                ((CollisionObject*)car->bodyCollider)->SetIgnoreListMode(0);
+                int iterator = 0;
+                for (QuarryLoadKrustyBikeView* racer = (QuarryLoadKrustyBikeView*)((BikeRace*)raceView)->NextBike(&iterator); racer;
+                     racer = (QuarryLoadKrustyBikeView*)((BikeRace*)raceView)->NextBike(&iterator)) {
+                    if (!racer->isRemote) {
+                        ((CollisionObject*)car->bodyCollider)->AddIgnoredOwner(racer->bikeCollision);
+                        ((CollisionObject*)car->bodyCollider)->AddIgnoredOwner(racer->bikeAndRiderCollision);
+                        ((CollisionObject*)car->bodyCollider)->AddIgnoredOwner(racer->frontWheel);
+                        ((CollisionObject*)car->bodyCollider)->AddIgnoredOwner(racer->rearWheel);
+                        ((CollisionObject*)car->bodyCollider)->AddIgnoredOwner(racer->wrecker->collisionModel);
+                    }
+                }
+            }
+        }
+    }
+    if (progress)
+        progress(0);
+    AppendChild(eventScene, -1);
+
+    g_MemTagStack->Push("Shadow");
+    eventScene->AttachCasterShadows((ProjectedShadow*)projectedShadow, g_TrackGame->mode.shadowsOn);
+    g_MemTagStack->Pop(0);
+    if (ecoSystem)
+        AppendChild((GameObject*)ecoSystem, -1);
+    AppendChild(raceView, -1);
+    OnRaceViewAttached((int)raceView);
+    AppendChild((GameObject*)particleManager, -1);
+    UnknownVirtualSlot28();
+    AttachOverlays();
+
+    g_MemTagStack->Push("3DObjects");
+    int kind = g_TrackGame->mode.GetSelectedSeries();
+    if (kind >= 2 && kind <= 4)
+        sprintf(path, "%s\\%s", "Res", "podium.slt");
+    else
+        sprintf(path, "%s\\%s", "Res", "truckpodium.slt");
+    g_TrackGame->eventManager->podiumObject =
+        (ArcadeObject*)(new(__FILE__, 1093) ArcadeObject(0))
+            ->Create(renderContext, (int)lightManager, (int)&modelTextures, path,
+                                    g_TrackGame->eventManager->podiumPosition, 0, 0, 2.0f, 0.5f, 0.5f, 0);
+    if (!raceView->AppendChild((GameObject*)g_TrackGame->eventManager->podiumObject, -1))
+        return 0;
+    if (auralScape) {
+        auralScape->groundSubject = (FollowCameraTerrainView*)eventTerrain;
+        AppendChild(auralScape, -1);
+    }
+
+    g_MemTagStack->Push("Shadow");
+    if (projectedShadow) {
+        AppendChild((GameObject*)projectedShadow, -1);
+        ((ProjectedShadow*)projectedShadow)->AddCaster((ShadowCaster*)((QuarryLoadKrustyBikeView*)((BikeRace*)raceView)->localRacer)->modelNode);
+        ((ProjectedShadow*)projectedShadow)
+            ->AddCaster((ShadowCaster*)((QuarryLoadKrustyBikeView*)((BikeRace*)raceView)->localRacer)->riderCharacter->modelNode);
+        ((ProjectedShadow*)projectedShadow)->SetLight((const ShadowVec3*)&shadowLight->position,
+                                                (const ShadowVec3*)&shadowLight->look, 3);
+        ((ProjectedShadow*)projectedShadow)->SetShadowStrength(0x80);
+        int ambient = (int)(ambientLight->ambientRGBA[1] * 255.0f);
+        if (!ambientLight)
+            ambientLight = lightManager->FindLightOfType(6);
+        if (ambientLight)
+            ambient = (int)(ambientLight->ambientRGBA[1] * 255.0f);
+        ((ProjectedShadow*)projectedShadow)->SetShadowGrey(ambient);
+    }
+    if (progress)
+        progress(0);
+
+    g_MemTagStack->Push("Collision");
+    if (!CreateEventCollision())
+        return 0;
+    g_MemTagStack->Push("3DObjects");
+    CreateRacer3DObjects((int)((BikeRace*)raceView)->localRacer);
+    g_MemTagStack->Push("BikeRace");
+    ((FollowCamera*)(KrustyBikeCamera*)raceCamera)->SetSubject((FollowCameraTerrainView*)eventTerrain);
+    ((QuarryLoadKrustyBikeCameraView*)raceCamera)->StartFollowing((QuarryLoadKrustyBikeView*)((BikeRace*)raceView)->localRacer);
+    if (statsOverlay)
+        statsOverlay->SetStatsSource((int)raceView);
+    if (chatOverlay)
+        chatOverlay->CollectRacers((ChatBikeRaceView*)raceView);
+    if (radarOverlay)
+        radarOverlay->TakeRacers(raceView, (int)chatOverlay);
+    if (visualCue)
+        visualCue->CollectRacers((VisualCueBikeRaceView*)raceView);
+    g_MemTagStack->Pop(0);
+
+    if (!g_TrackGame->mode.instrumentOverlayOn)
+        DisableByClassName("InstrumentOverlay");
+    if (!g_TrackGame->mode.skyCubeOn)
+        DisableByClassName("SkyCube");
+    if (!g_TrackGame->mode.particlesOn) {
+        DisableByClassName("ParticleManager");
+        DisableByClassName("DirtParticleEmitter");
+    }
+    if (!g_TrackGame->mode.shadowsOn) {
+        DisableByClassName("ProjectedShadow");
+        DisableByClassName("TerrainShadow");
+        DisableByClassName("D3DIMSoultreeShadow");
+    }
+    ((RenderTarget*)renderContext)->clearTarget = !(skyCube && g_TrackGame->mode.skyCubeOn);
+    loaded = 1;
+    if (g_TrackGame->texturesCached) {
+        g_MemTagStack->Push("TextureCache");
+        g_TrackGame->textureManager->ShareCacheLimit();
+    }
+    g_MemTagStack->Pop(0);
+    eventScene->SetDetailLevel(g_TrackGame->mode.videoSettings[2]);
+    ((BikeRace*)raceView)->SetDetailLevel(g_TrackGame->mode.videoSettings[2]);
+    if (progress)
+        progress(0);
+    SoultreeQuadTreeRenderer* last = new(__FILE__, 1251) SoultreeQuadTreeRenderer(1);
+    last->SetRenderContext(renderContext);
+    AppendChild(last, -1);
+    last->InsertNodesInQuadtree();
+    return 1;
+}
+
 // 0x004e04a0
 int BaseQuarryEvent::EstimateTerrainBytes(int width) {
     int size;
@@ -187,8 +899,9 @@ int BaseQuarryEvent::EstimateRaceBytes() {
 int BaseQuarryEvent::Create3DObjects(int value) {
     char message[388];
     visualCue = (new(__FILE__, 1369) VisualCue(g_TrackGame->mode.visualCuesOn))
-                     ->LoadVisualCue(renderContext, lightManager, value, eventTerrain, Vector3(0.0f, 0.0f, 0.0f),
-                                             raceView, 45, raceCamera, 3.0f, 0.1f, 0.85f);
+                     ->LoadVisualCue(renderContext, (int)lightManager, value, (RunwayTerrainView*)eventTerrain,
+                                     Vector3(0.0f, 0.0f, 0.0f), (VisualCueBikeRaceView*)raceView, 45,
+                                     (ArcadeCameraView*)raceCamera, 3.0f, 0.1f, 0.85f);
     if (!AppendChild(visualCue, -1)) {
         sprintf(message, "Visual Cue not loaded.\n");
         return 0;

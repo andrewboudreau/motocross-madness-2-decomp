@@ -78,7 +78,7 @@ class RaceDetailConnections(unittest.TestCase):
     if includes:args+=['--include',str(ROOT/'src/krusty2'),'--include',str(ROOT/'src/reconstructed')]
     run=subprocess.run(args,cwd=TOOL_ROOT,capture_output=True,text=True,env={**os.environ,'PYTHONPATH':str(TOOL_ROOT)})
     self.assertEqual(run.returncode,0,run.stdout+run.stderr);objects[label]=CoffObject(dest);paths[label]=dest;return objects[label]
-   for source in (CALLER,RACE,MODEL,STATE):compile(source,source.replace('/','_'),source!=CALLER)
+   for source in (CALLER,RACE,MODEL,STATE):compile(source,source.replace('/','_'))
    def obj(source):return objects[source.replace('/','_')]
    pins=json.loads((ROOT/'tests/fixtures/race_detail_objects.json').read_text())['objects']
    self.assertEqual(object_pin(obj(CALLER)),pins[CALLER])
@@ -88,7 +88,7 @@ class RaceDetailConnections(unittest.TestCase):
     self.assertTrue(compare(image,obj(CALLER),c['symbol'],int(c['target_va'],0),c['target_size'],ROOT/c['bindings'])['strict_exact'],c);strict+=1
    self.assertTrue(compare(image,obj(RACE),'??0BikeRace@@QAE@H@Z',0x417c30,632,(ROOT/RACE).with_suffix('.bindings.json'))['strict_exact']);strict+=1
    caller=obj(CALLER);names=[caller.symbol_by_index[r.symbol_index].name for r in caller.relocations]
-   self.assertNotIn(OLD,names);self.assertEqual(names.count(NEW),2)
+   self.assertNotIn(OLD,names);self.assertEqual(names.count(NEW),3)  # the detail-down and detail-up keys, and the loader 0x004de590
    # Complete extraction is byte/relocation identical before native execution.
    for label,source in (('race',RACE),('model',MODEL)):
     path=out/(label+'.cpp')

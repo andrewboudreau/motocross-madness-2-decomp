@@ -65,7 +65,7 @@ behaviour tests use it to link one function of a unit against retail.
 
 | Unit | File | Notes |
 |---|---|---|
-| `QuarryStuntEvent.cpp` | `src/reconstructed/QuarryStuntEvent.cpp` | `D:\aardvark\VC\krusty2\QuarryStuntEvent.cpp` (`0x00572154`). Slot 12 `0x004e14a0` moved in from its sample in retail order; not exact. The loader `0x004de590` stays in `samples/game/QuarryStuntEventLoaderNearMiss.cpp`. 26 cases exact. |
+| `QuarryStuntEvent.cpp` | `src/reconstructed/QuarryStuntEvent.cpp` | `D:\aardvark\VC\krusty2\QuarryStuntEvent.cpp` (`0x00572154`). Slot 12 `0x004e14a0` and the loader `0x004de590` moved in from their sample and bring-up in retail order; neither is exact. 26 cases exact. |
 | `Pixtrans.cpp` | `src/reconstructed/Pixtrans.cpp` | `D:\aardvark\VC\krusty2\Pixtrans.cpp` (`0x00571688`). Now in retail order; the halvers `0x004cdf10`, `0x004ce420`, `0x004cee30` and the ditherer `0x004cf2a0` moved in from their sample; not exact. 47 cases exact. |
 | `Grid1.cpp` | `src/reconstructed/Grid1.cpp` | `D:\aardvark\VC\krusty2\Grid1.cpp` (`0x0056c0a0`). Slot 3 `SelectTexture` `0x0047caa0` and the two texture fills `0x0047d470`/`0x0047d780` moved in from their sample in retail order; not exact. 10 cases exact. |
 | `BikeAI.cpp` | `src/krusty2/vehicle/BikeAI.cpp` | `D:\aardvark\VC\krusty2\BikeAI.cpp` (`0x005678d4`). The steering direction `0x0040e510` and the `Vec3::operator-=` COMDAT `0x00413160` moved in exact; the look-ahead `0x0040eca0`, KrustyBike `0x00413200`/`0x00414370` and the obstacle query `0x00415640` moved in from their sample and the Group 3 bring-up in retail order, with the bring-up's behaviour fixes; not exact. 26 cases exact (docs/BIKEAI.md). |

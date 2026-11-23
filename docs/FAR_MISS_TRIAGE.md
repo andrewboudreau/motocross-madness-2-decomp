@@ -71,9 +71,9 @@ the function were wrong, not a finding that it is.
 | 2 | `0x00492ad0` | KrustyBike::SendStateDelta | src/krusty2/vehicle/KrustyBike.cpp:1798 | 192/2315 | R | low | yes, same file (0.992) | 531 | 640/642 insns, frame 0x34 exact, 5 hunks: the record-interval test is `je end` where retail has `jne deltas ; push 0 ; jmp end+1`, and the push order of the final call. |
 | 3 | `0x004e14a0` | BaseQuarryEvent::PrepareGeometry | src/reconstructed/QuarryStuntEvent.cpp | 139/1756; index 166/1760 | R | low, no emu case | yes, same file (0.994) | 485 | 511/512 insns, 7 masked diffs: which register holds the g_TrackGame load and one `mov edi, eax` placed three instructions later; everything after is positional fallout. |
 | 4 | `0x0040eca0` | SimulateLookAhead | src/krusty2/vehicle/BikeAI.cpp | 1479/17585 (sample form 1542, emu-divergent) | S | med | yes, same file (0.957) | 481 | 3931/3966 insns, frame 0x968 vs 0x93c, 133 calls vs 132, retail has 6 more fmul and 9 more fsub. At 0x40f5fb retail computes the accelerations with real subtractions (`fld 0.0 ; fld force.x ; fsub`, `fld -32.0 ; fsub [zero temp]`) where the candidate folds them to two `mov [..], 0xc2000000`. |
-| 5 | `0x00417ed0` | BikeRace::Create | samples/race/BikeRaceNearMisses.cpp:632 | 2822/6760; index 2828/6768 | R | low | yes, src/bringup/Group3_QuarryLoad.cpp (0.998) | 473 | 1813/1813 insns, frame 0x4e8 equal, 4 hunks: at two vector-length sites retail has `fstp [t] ; faddp ; fadd [t]` where the candidate keeps z*z on the x87 stack; one store scheduled two instructions later. |
+| 5 | `0x00417ed0` | BikeRace::Create | samples/race/BikeRaceNearMisses.cpp:632 | 2822/6760; index 2828/6768 | R | low | yes, Group6_BikeRaceCreate.cpp (0.998) | 473 | 1813/1813 insns, frame 0x4e8 equal, 4 hunks: at two vector-length sites retail has `fstp [t] ; faddp ; fadd [t]` where the candidate keeps z*z on the x87 stack; one store scheduled two instructions later. |
 | 6 | `0x004db0d0` | ProjectedShadow::ComputeBounds | samples/physics/shadow/ProjectedShadowNearMisses.cpp:238 | 211/2020 | R | low | yes, same file (0.996) | 452 | 560/560 insns, identical mnemonics, 3 masked diffs (one load schedule). The whole gap is frame-slot order: disp8 against disp32 makes the candidate 1975 B against 2020. |
-| 7 | `0x004de590` | BaseQuarryEvent::LoadEventObjects | src/bringup/Group3_QuarryLoad.cpp:330 | 1548/6467 masked (link error in match_one); index 3137/7952 | R | low | yes, same file (0.985) | 394 | 2208/2208 insns, frame 0x650 equal, same 229 calls; 56 masked diffs in slots below 0x1c, register choices and the animation loop head. |
+| 7 | `0x004de590` | BaseQuarryEvent::LoadEventObjects | src/reconstructed/QuarryStuntEvent.cpp | 2044/7952 strict | R | low, emu 0/600 differ | yes, the unit (0.986) | 394 | 2206 insns against 2208, frame 0x650 equal; slots below 0x1c, register choices in the memory-budget tree and the fog/sky block, the collision loop head and the racer loop's esi/edi swap. |
 | 8 | `0x00463a30` | FollowCamera::ProcessCameraInput | src/reconstructed/FollowCamera.cpp:352 | 927/4058; index 903/4042 | R | low | yes, same file (0.982) | 313 | 1088/1080 insns, same call, store and branch counts; 34 masked diffs spread over the keyboard/joystick arms. |
 | 9 | `0x00413200` | KrustyBike::SimulateAIFrame | src/krusty2/vehicle/BikeAI.cpp | 2153/4112 (was 2044) | R | low | yes, same file (0.991) | 207 | 1122/1120 insns, frame 0x74 equal, 24 masked diffs: a/b/c slot offsets, operand order of the second lever cross, lean clamp kept on the x87 stack. |
 | 10 | `0x00425900` | BoxCapsuleOverlap | src/krusty2/bvh/BoundingBoxTreeQuery.cpp:264 | 2450/4321 | R | low | yes, same file (0.995) | 187 | 1301/1300 insns, 8 masked diffs: retail calls DotProduct (0x40ae30) in the seventh normalisation where the candidate expands it (26 vs 27 calls), two fxch, and a permuted frame that accounts for most of the byte gap. |
@@ -235,12 +235,14 @@ would plausibly write, singled out by the bytes).
    declarations per docs/VC6_FRAME_LAYOUT.md. Declaration order is something a
    person chooses, so this is within the rule.
 
-7. **0x004de590 BaseQuarryEvent::LoadEventObjects** (1548/6467 masked; `match_one` reports an unresolved symbol).
-   Confirmed: 2208/2208 instructions, frame 0x650 equal, same 229 calls; 56
-   masked diffs in slots below 0x1c, register choices and the animation loop
-   head. Next: fix the unresolved symbol first so the strict score is
-   meaningful, then work the animation loop head (the loop-entry shape decides
-   the register assignment for the rest of the loop). Only skimmed.
+7. **0x004de590 BaseQuarryEvent::LoadEventObjects** (2044/7952 strict, every
+   relocation resolved). Confirmed: 2206 instructions against 2208, frame 0x650
+   equal, the call sequence and EH states retail's. The rest is scheduling:
+   slots below 0x1c, register choices in the memory-budget tree and the
+   fog/sky block, the collision loop head (retail enters a rotated loop with a
+   jmp) and the racer loop's esi/edi swap. Next: the loop-entry shape, which
+   decides the register assignment for the rest of the loop
+   (docs/QUARRYSTUNTEVENT.md).
 
 8. **0x00463a30 FollowCamera::ProcessCameraInput** (927/4058).
    Confirmed: same call, store and branch counts, 1088 against 1080
@@ -317,5 +319,5 @@ would plausibly write, singled out by the bytes).
 No differential emulation case mentions these VAs: `0x004049d0`, `0x00406ae0`, `0x00407440`, `0x0040c000`, `0x00448560`, `0x0044b200`, `0x004513a0`, `0x004738a0`, `0x00478570`, `0x00486170`, `0x004a2560`, `0x004c69c0`, `0x004c7b40`, `0x004ca5a0`, `0x004cab00`, `0x004e14a0`, `0x004e9030`, `0x0050dad0`.
 
 `match_one.py` cannot link 0x004db8c0, 0x004dc2b0 and 0x00483d40 (unresolved
-rounding helper), nor 0x004de590 and 0x004da7b0 (one unresolved symbol each);
-their table scores are masked.
+rounding helper), nor 0x004da7b0 (one unresolved symbol); their table scores
+are masked.

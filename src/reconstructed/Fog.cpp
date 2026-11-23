@@ -276,3 +276,12 @@ int FogOn::Render3D()
     fog->drawnByFogOn = 0;
     return 1;
 }
+
+// 0x00486a10. Retail folds it with ToolTip::Create (GUIManager.cpp, the same
+// body); the quarry loader (QuarryStuntEvent.cpp) calls it.
+GameObject* FogOn::Create(void* target, Fog* fog)
+{
+    GameObject::SetRenderContext(target);
+    this->fog = fog;
+    return this;
+}

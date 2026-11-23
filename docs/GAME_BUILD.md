@@ -2393,8 +2393,8 @@ Next suspect: the backdrop is a stale colour buffer, not a live dialog
 (inference, not confirmed).
 
 - **No colour clear.** The race loaders set
-  `clearTarget = !(skyCube && skyCubeOn)`, in QuarryStuntEvent.cpp and
-  Group3_QuarryLoad.cpp. During a race with the sky on,
+  `clearTarget = !(skyCube && skyCubeOn)`, in QuarryStuntEvent.cpp (the loader
+  0x004de590 and 0x004e0ce0). During a race with the sky on,
   `PCRenderTarget::Clear` 0x004c5510 therefore clears only Z. The last 2D
   loading frame stays in the flip chain wherever the 3D scene draws nothing.
 - **3D gaps in the 2026-10-30 build.** The vtable audit of that tree finds

@@ -40,29 +40,6 @@ struct QuarryEventKrustyBikeCameraView {
     QuarryEventKrustyBikeView* followedBike; // +0x3b0 followed bike
 };
 
-// RTTI: VisualCue : GameObject (vtable 0x00554320; Krusty3DObjects.cpp).
-// 0xfc bytes (the allocation at 0x004e06cd). Only the members
-// QuarryStuntEvent.cpp uses are declared; names are provisional.
-class VisualCue : public GameObject {
-public:
-    explicit VisualCue(int flags);            // 0x0048ad60
-    // 0x0048adf0 (ret 0x34): loads the cue; returns this, or 0.
-    VisualCue* LoadVisualCue(void* target, LightManager* lights, int options, OverlayTerrainView* terrain,
-                                     Vector3 offset, EventBikeRaceView* view, int count,
-                                     QuarryEventKrustyBikeCameraView* camera, float size, float screenXFraction, float screenYFraction);
-    // 0x0048bc30: the next cue index when it changed, else -1.
-    int NextCueIndex();
-    // 0x0048bc80: 1 while a cue is active and more than one exists.
-    int CanCycleCues();
-
-    unsigned char field_0x2c[0x48 - 0x2c];
-    float screenX;                            // +0x48 ArcadeObject::Create's screenXFraction: fraction of the width
-    float screenY;                            // +0x4c ArcadeObject::Create's screenYFraction: fraction of the height
-    unsigned char field_0x50[0xc8 - 0x50];
-    int skippedRacer;                         // +0xc8 Tick copies RadarOverlay::followedIndex; NextCueIndex steps past it (Krusty3DObjects.h)
-    unsigned char field_0xcc[0xfc - 0xcc];
-};
-
 // RTTI: EcoSystem (vtable 0x00552508); constructed by 0x004de590 with
 // 0x00457250 (0x5c4 bytes). Only the methods this file calls; the storage only
 // fixes the allocation size (the full class is EcoSystem.h).

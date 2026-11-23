@@ -40,33 +40,40 @@ status comment ([forms tried](#slot-12-0x004e14a0-forms-tried)): slot 12
 rest). It was a whole candidate source of the game build; the unit now
 provides it.
 
-The loader `0x004de590` (7952 bytes) is a near miss in
-`samples/game/QuarryStuntEventLoaderNearMiss.cpp`, which carries its own
-`UnknownQuarry*` views. About 87% of the normalised instructions align
-(2194 instructions against 2209; the fog object `0x00462e10` allocates
-0x2c bytes, a bare GameObject). These match:
+The loader `0x004de590` (7952 bytes) moved into the unit in retail order,
+from the bring-up `src/bringup/Group3_QuarryLoad.cpp` (both it and the
+older sample are gone). It is not exact. It allocates and calls the
+canonical classes directly: BikeRace, KrustyBikeCamera (`SetupFlyby`,
+FollowCamera's `SetSubject`), Fog/FogOff/FogOn, SkyCube, Terrain,
+TerrainShadow, ProjectedShadow, ParticleManager, VisibilityQuadTree,
+EcoSystem, SoultreeQuadTreeRenderer, the overlays and VisualCue. Its
+TU-local views cover only members that other headers leave unnamed or
+protected: the physics casters, the terrain's scale, the car's ground
+provider, the racers' collision objects and the camera's follow block.
+
+The follow block is the same inline as BikeRace.h's `StartFollowing`
+(three times in `0x0041eb20`). The unit keeps its own copy:
+including BikeRace.h changes the tail duplication of the constructor
+`0x004de2a0` (218 bytes against retail's 237).
+
+FogOn's `Create` (`0x00486a10`, folded with ToolTip::Create) is defined
+in Fog.cpp.
+
+Linked score 0.986, 2206 instructions against retail's 2208. These match:
 - the call sequence;
 - the allocation sizes and `__FILE__` lines (252..1251);
 - the EH states, the error paths and the 0x650 frame.
 
-These differ:
-- the stack slots of most locals: retail shares more. Its `+0xc` (23
-  uses) holds `stream` (13 here at `+0x8`) together with the
-  `shadowLight` / `textureBytes` / `all` class (16 here at `+0xc`); its
-  `+0` (12) is `needed` / `iterator` (19 here at `+0x4`); its `+0x4` (12)
-  joins `visibility` / `forced` (13 here, `+0x10`) with `step` (`+0x68`
-  here); `flareLight` / `margin` (11, `+0`) is retail's `+0x14`, `i` /
-  `iterator` (8, `+0x14`) its `+0x1c`; the 19-use temporary `+0x2c` is
-  retail's `+0x30`, `+0x44` (10) its `+0x48`, `+0x60` (11) stays,
-  `sceneSteps` moves from `+0x48` to `+0x64`, `skyTextures` / `hasCube`
-  share retail's `+0x68`. VC6 shares a slot between locals whose scopes
-  are disjoint (an address-taken local lives for its whole block), so the
-  original declares these in inner blocks;
-- register choices and expression shapes in the memory-budget tree
-  (`0x004de7e0..0x004ded5e`);
-- the zero register retail keeps around the collision links, and the
-  register holding -1 for the EH states from the fog block on (edi in
-  retail, esi here).
+What is left is all scheduling:
+- the small stack slots below 0x1c;
+- register choices in the memory-budget tree (`0x004de7e0..0x004ded5e`)
+  and around the fog/sky block;
+- the collision loop's head (retail enters a rotated loop with a jmp and
+  indexes the entry table with `[ecx + edx + 4]`);
+- the racer loop's esi/edi swap.
+
+`tools/emu_cases/quarry_load_event_objects.py` replays it against retail:
+0 of 600 runs differ.
 
 Facts the loader establishes:
 - The three 0x18-byte `TextureContext` records hold the

@@ -6,6 +6,65 @@
 #include "../../reconstructed/TrackGameGlobal.h"
 #include "../../reconstructed/ControlInterface.h"
 #include "SoultreeQuadTreeRenderer.h"
+
+#ifdef MCM2_PHYSICS_COMMON_SOULTREEOBJECT_H
+#error "SoultreeQuadTreeRenderer.cpp declares its own polymorphic SoultreeObject view"
+#endif
+#include "collision/CollisionObject.h"   // QuadTreeObject (objectTypeId at +8)
+
+// SoultreeObject as the renderer sees it: RTTI .?AVSoultreeObject@@ has the direct bases
+// QuadTreeObject (+0) and GameObject (+12).  Only the fields the renderer reads are named; the
+// flat core/SoultreeObject.h lists the same offsets (tier 1).  The class is polymorphic and
+// carries the RTTI names so that dynamic_cast compiles to the same __RTDynamicCast call as
+// retail and references the type descriptors .?AVSoultreeObject@@ (0x00568950) and
+// .?AVD3DIMSoultreeObject@@ (0x00568970).  This TU-local view and the flat physics layout in
+// core/SoultreeObject.h are alternative declarations of one retail class: never include both.
+// The views stay in this file so SoultreeQuadTreeRenderer.h can share a unit with the
+// canonical D3DIMSoulTree.h and GameObjectIterator.h (QuarryStuntEvent.cpp includes it).
+class SoultreeObject : public QuadTreeObject, public GameObject {
+public:
+    char pad_0x38[0x14c - 0x38];
+    int hidden;                       // +0x14c tested by slot 12
+    char pad_0x150[0x18c - 0x150];
+    int subtreeDirty;                 // +0x18c (common/SoultreeObject.h); set to 1 by 0x5046e0
+    int drawsItself;                  // +0x190 cleared by InsertNodesInQuadtree, set to 1 by RemoveNodesFromQuadtree (core/SoultreeObject.h). Tier 3
+    int inQuadtree;                   // +0x194 set to 1 by InsertNodesInQuadtree; tested by slot 10
+    int quadtreeCell;                 // +0x198 quadtree cell code (core/SoultreeObject.h)
+    void UpdateQuadtreeCell();                 // thiscall, plain ret
+    void RemoveFromQuadtree();                 // thiscall, plain ret: releases the inQuadtree entry
+};
+
+// RTTI .?AVD3DIMSoultreeObject@@ : SoultreeObject (plain inheritance).
+class D3DIMSoultreeObject : public SoultreeObject {
+public:
+    char pad_0x19c[0x28c - 0x19c];
+    int lodTable;                     // +0x28c D3DIMSoulTree.h's SoultreeLod* at this offset; nonzero gates the work in 0x5046e0. Tier 2
+    char pad_0x290[0x2d4 - 0x290];
+    int visible;                      // +0x2d4 D3DIMSoulTree.h's name; set to 1 by slot 12 before SelectLod. Tier 2
+    void TransformVertexGroups(int lod);  // 0x00440d40, ret 4 (src/reconstructed D3DIMSoulTree.h)
+    void SelectLod(int center, int extents);  // 0x00443de0, ret 8: null bounds pick the node's own
+};
+
+// Debug allocator iterator over a GameObject tree: heap allocated, 0x94 bytes
+// (operator new(0x94, __FILE__, line) at 0x504719 and 0x504829).
+class GameObjectIterator {
+public:
+    GameObjectIterator(GameObject* root, int mode, const char* filter);   // 0x00469950 (ret 0xc)
+    ~GameObjectIterator();                                                  // 0x00469a40
+    GameObject* Next();                                                     // 0x00469a50
+private:
+    char field_0x00[0x94];
+};
+
+// TrackGame's Game base stores its DebugOverlay pointer at +0x38.
+#include "../../reconstructed/DebugOverlay.h"
+struct SoultreeStats {
+    char pad_0x00[0x38];
+    DebugOverlay* log;            // +0x38
+    char pad_0x3c[0x2d4 - 0x3c];
+    unsigned char debugFlags;         // +0x2d4 bit 2 enables the debug keys (slot 23)
+};
+
 #include "core/DebugAlloc.h"
 #include "broadphase/Quadtree.h"
 

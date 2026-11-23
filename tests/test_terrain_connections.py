@@ -139,6 +139,9 @@ class TerrainConnectionsTests(unittest.TestCase):
                 # Require its callers and the layout fixture to work that way.
                 if source.startswith('src/krusty2/'):
                     command += ['--include', str(ROOT / 'src/krusty2')]
+                elif source == 'src/reconstructed/QuarryStuntEvent.cpp':
+                    # The quarry loader includes krusty2 headers, as in the game build.
+                    command += ['--include', str(ROOT / 'src/krusty2'), '--include', str(ROOT / 'src/reconstructed')]
                 result = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, encoding='latin-1',
                     env={**os.environ, 'PYTHONPATH': str(ROOT)})
                 self.assertEqual(result.returncode, 0, result.stdout + result.stderr)

@@ -67,8 +67,7 @@ public:
     // texture detail from the video memory, then creates the audio, camera,
     // scene, quadtree, fog and sky, terrain, shadows, ecosystem, race and
     // collision links (MemTagStack tags "Audio" .. "Collision"), calling
-    // `progress` between stages; a near miss in
-    // samples/game/QuarryStuntEventLoaderNearMiss.cpp.
+    // `progress` between stages; not exact (QuarryStuntEvent.cpp).
     int LoadEventObjects(LoadProgressFn progress);
     // 0x004e04a0, 0x004e04e0, 0x004e04f0, 0x004e0560: memory estimates
     // (bytes) 0x004de590 sums and compares against the free video memory:

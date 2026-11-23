@@ -2,7 +2,7 @@
 scene, quadtree, lights, shadow, sky, terrain, ecosystem, race, collision ignore lists, podium,
 overlays) (tools/emu_diff.py case, call-record/replay mode).
 
-The linked body is src/bringup/Group3_QuarryLoad.cpp. Memory is "universal" (as
+The linked body is src/reconstructed/QuarryStuntEvent.cpp. Memory is "universal" (as
 tools/emu_cases/bike_race_create.py): the replay arena is 16-byte cells of the generic fake vptr
 and three cell pointers, and the objects the body walks have that vptr and cell pointers
 everywhere else. The event itself has its own fake vtable (its slots 27..35 take other arguments
@@ -28,7 +28,7 @@ import struct
 
 RETAIL_VA = 0x004de590
 SYMBOL = '?LoadEventObjects@BaseQuarryEvent@@QAEHP6AXPAH@Z@Z'
-SOURCE = 'src/bringup/Group3_QuarryLoad.cpp'
+SOURCE = 'src/reconstructed/QuarryStuntEvent.cpp'
 PROBES = {0x004de768: 'blade budget', 0x004de7e0: 'video memory budget', 0x004de910: 'AGP',
           0x004de9b1: 'AGP unforced', 0x004deaf1: 'registry margins', 0x004ded6c: 'cached groups',
           0x004df01f: 'camera created', 0x004df3f3: 'sky', 0x004dfb4f: 'physics caster',
@@ -53,18 +53,14 @@ CTORS = (0x00401260, 0x00402da0, 0x00417c30, 0x00457250, 0x00460d10, 0x00462620,
          0x00462e90, 0x00497cb0, 0x0049e390, 0x004ba390, 0x004da570, 0x004ea660, 0x004fb1e0,
          0x00504490, 0x00505830, 0x00508ae0, 0x0052d340)
 # The canonical constructors the body allocates inline, and VisibilityQuadTree::Setup
-# (0x0052d460), which the body calls itself. The BikeRace::SetDetailLevel link forward
-# (Group3_QuarryLinkRace.cpp, cdecl, `this` first) stands in for retail's thiscall; the body calls
-# it itself, so it is placed at a separate address (0x00423791, never executed) and both shapes
-# are compared as one note (race, level).
+# (0x0052d460), which the body calls itself.
 SETUP = 0x0052d460
-SET_DETAIL, SET_DETAIL_FORWARD = 0x00423790, 0x00423791
+SET_DETAIL = 0x00423790
 BINDINGS = {'??0ParticleManager@@QAE@H@Z': 0x004ba390, '??0SoultreeQuadTreeRenderer@@QAE@H@Z': 0x00504490,
             '??0Terrain@@QAE@H@Z': 0x00505830, '??0TerrainShadow@@QAE@H@Z': 0x00508ae0,
             '??0VisibilityQuadTree@@QAE@H@Z': 0x0052d340,
             '?Setup@VisibilityQuadTree@@QAEPAVGameObject@@HMMMMM@Z': SETUP,
-            '?Create@FogOn@@QAEPAVGameObject@@PAXPAVFog@@@Z': 0x00486a10,
-            '?G3Q_BikeRaceSetDetailLevel@@YAXPAXH@Z': SET_DETAIL_FORWARD}
+            '?Create@FogOn@@QAEPAVGameObject@@PAXPAVFog@@@Z': 0x00486a10}
 # Callee-popped bytes of the virtual slots (from the retail call sites). The generic objects:
 # slot 20 g_TrackGame's GetRegistryInt (two arguments, an int), 8 SetRenderContext (one; it
 # answers the object), 27 ParticleManager's Create (four), 2 Release. The event: 27
@@ -192,24 +188,19 @@ def _set_detail(ctx, rec):
     ctx.note('SetDetailLevel', rec.ecx, rec.args[0])
 
 
-def _set_detail_forward(ctx, rec):
-    ctx.note('SetDetailLevel', rec.args[0], rec.args[1])
-
-
 REPLAY = dict(returns={SPRINTF: _sprintf, NEW: _new, MEMORY_STATUS: 'void', COUNT_TEXTURES: 'void',
                        COUNT_OBJECTS: _count_objects, OPEN_ARCHIVE: _mostly(0.97),
                        **{e: _estimate for e in ESTIMATES}, BYTES_PER_PIXEL: _bpp,
                        SCENE_CREATE: _scene, SCENE_LOAD: _mostly(0.97), RACE_CREATE: _race,
                        APPEND_CHILD: _mostly(0.95),
                        NEXT_BIKE: _next_bike, COUNT_NODES: _count_nodes,
-                       SET_DETAIL: _set_detail, SET_DETAIL_FORWARD: _set_detail_forward,
+                       SET_DETAIL: _set_detail,
                        **{c: _this for c in CTORS}},
               effects={MEMORY_STATUS: _memory_status, COUNT_TEXTURES: _count_textures},
-              pops={SPRINTF: 0, NEW: 0, MEMORY_STATUS: 4, SET_DETAIL: 4, SET_DETAIL_FORWARD: 0},
-              args={SPRINTF: 2, NEW: 3, MEMORY_STATUS: 1, SET_DETAIL: 1, SET_DETAIL_FORWARD: 2},
-              ecx={SPRINTF: False, NEW: False, MEMORY_STATUS: False, SET_DETAIL: True,
-                   SET_DETAIL_FORWARD: False},
-              unlogged=(SPRINTF, NEW, SET_DETAIL, SET_DETAIL_FORWARD), passthrough=(STRSTR,))
+              pops={SPRINTF: 0, NEW: 0, MEMORY_STATUS: 4, SET_DETAIL: 4},
+              args={SPRINTF: 2, NEW: 3, MEMORY_STATUS: 1, SET_DETAIL: 1},
+              ecx={SPRINTF: False, NEW: False, MEMORY_STATUS: False, SET_DETAIL: True},
+              unlogged=(SPRINTF, NEW, SET_DETAIL), passthrough=(STRSTR,))
 
 MB = 1 << 20
 
