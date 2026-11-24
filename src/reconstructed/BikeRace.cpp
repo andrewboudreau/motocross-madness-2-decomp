@@ -624,7 +624,7 @@ static inline BikeRaceGridEntryView& GridPlayer(int i) {
 // Event AI racer n's record in the event manager; read through g_TrackGame
 // each time (retail keeps only the byte offset n * 0x50 live).
 static inline EventAiRacerRecord& EventAi(int n) {
-    return ((EventAiRacerRecord*)g_TrackGame->eventManager->field_0x444)[n];
+    return g_TrackGame->eventManager->aiRacers[n];
 }
 
 // The front end's bike, manufacturer and rider tables, read through

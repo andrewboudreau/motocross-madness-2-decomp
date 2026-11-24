@@ -194,17 +194,6 @@ struct BikeEngineSetup {
     int rpmStep;                              // +0x58 a tenth of their range
 };
 
-// EventManager+0x444: one 0xcc-byte record per AI racer, kept through a
-// series (mode 2) and reused while EventManager+0x48 is set.
-struct EventAiRacerRecord {
-    char riderTexture[0x40];                  // +0x00 rider texture name
-    char bikeTexture[0x40];                   // +0x40 bike texture name
-    char bikeModelPath[0x40];                 // +0x80 bike model path
-    int engineSize;                           // +0xc0 engine size
-    int fourStroke;                           // +0xc4 four-stroke flag (KrustyUI "BikeFourStroke_%02d")
-    float skill;                              // +0xc8 skill
-};
-
 // TrackGame+0x2ebc (race settings +0x14c): a network player's id and its
 // +5 byte, set for the AI racers a host runs.
 struct BikeRaceGridEntryView {

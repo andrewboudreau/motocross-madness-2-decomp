@@ -54,22 +54,6 @@ int CompareUnsigned(const void* a, const void* b);  // 0x0045fbb0
 // calls their primary slot 7 (0x004a70c0, adds its time to +0x10).
 #include "../krusty2/motion/D3DIMSoultreeCharacter.h"
 
-// The Soultree object at a podium character's +0x1a0 (D3DIMSoulTree.h's
-// D3DIMSoultreeObject methods, seen from the podium scene).
-struct PodiumSoultreeMaterialView {
-    unsigned char field_0x00[0x2c];
-    char textureName[4];                           // +0x2c SoultreeMaterial textureName
-};
-struct PodiumD3DIMSoultreeObjectView {
-    void SetUseLighting(int value);                      // 0x004444c0
-    void SetPosition(const Vector3* position);        // 0x004fc660
-    void SetAxesPtr(const Vector3* look, const Vector3* up, int orthogonalize, int keepZ); // 0x004fbd70
-    void ReplaceMaterialTexture(int index, const char* name, void* context); // 0x00444c70
-
-    unsigned char field_0x000[0x290];
-    PodiumSoultreeMaterialView** materialTable;     // +0x290 D3DIMSoultreeObject::materialTable; [0] gives the racer model's texture
-};
-
 // cdecl 0x004aef40: deletes TrackGame's NetworkInterface (+0x08), sets +0x18
 // to 1 and clears +0x3424, +0x2da5 and +0x2d98. EventManager slot 10 calls
 // it once when +0x3c is set.
@@ -102,6 +86,18 @@ struct RacerResult {
     float injuryDamage;                       // +0x38 racer +0x7b0; charged x 250 as medical costs
     float stuntEarnings;                      // +0x3c racer +0x7b4; paid x 400 as stunt winnings
     char name[16];                                 // +0x40: racer name (racer +0x5e0)
+};
+
+// EventManager+0x444: one 0xcc-byte record per AI racer, kept through a
+// series (mode 2) and reused while EventManager+0x48 is set. BikeRace::
+// CreateRacers reads and fills them; eleven fill the object to 0xd08.
+struct EventAiRacerRecord {
+    char riderTexture[0x40];                  // +0x00 rider texture name
+    char bikeTexture[0x40];                   // +0x40 bike texture name
+    char bikeModelPath[0x40];                 // +0x80 bike model path
+    int engineSize;                           // +0xc0 engine size
+    int fourStroke;                           // +0xc4 four-stroke flag (KrustyUI "BikeFourStroke_%02d")
+    float skill;                              // +0xc8 skill
 };
 
 // RTTI: EventManager : GameObject (vtable 0x0055259c; 0xd08 bytes, the size
@@ -184,5 +180,5 @@ public:
     Motion* podiumMotions[3];                      // "Podium3/4/5_%02d", one per character
     int field_0x43c;
     int resumeArmed;                               // +0x440: armed by slot 23, consumed by slot 22
-    unsigned char field_0x444[0xd08 - 0x444];
+    EventAiRacerRecord aiRacers[11];              // +0x444: one per racer slot, as results
 };

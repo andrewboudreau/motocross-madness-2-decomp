@@ -107,8 +107,9 @@ Exact (31 calibration cases):
   their codes (Vegetation slot 1, `0x00456720`) in a 0x1f40-byte local
   array (`__chkstk`) and removes them after the query; the second calls
   GameObject slot 4 on the GraphicsTest base (+0xc) of each
-  `CollisionObject`. The quadtree classes are TU-local views because the
-  `src/krusty2` declarations cannot share a TU with these headers;
+  `CollisionObject`. They use the krusty2 `QuadTree`, `QuadTreeObject` and
+  `CollisionObject` (reached through ArcadeObject.h); only `Vegetation` is a
+  local class, because Vegetation.h derives it from EcoSystem's quadtree view;
 - `RacerResult`'s constructor `0x0045c830`, reset `0x0045c840`
   (position 1, empty name from the shared `""` literal `0x00577738`) and
   racer copy `0x0045c8b0` (id, name truncated to 15 characters, the fields
@@ -149,7 +150,12 @@ Near miss:
   0x184-byte message and a separate 0x80-byte buffer for the CrowdLoop
   error. `EventManager.h` now gives
   the podium characters' slot 11 and motion calls, +0x3d0 as the podium
-  `ArcadeObject` and +0x3f0 as the camera's look target.
+  `ArcadeObject` and +0x3f0 as the camera's look target. The podium calls
+  `Terrain::QueryGround`, `SoultreeObject`, `ArcadeObject`,
+  `D3DIMSoultreeObject` and `Sound` directly; the bring-up forwarders
+  (`Group1_PodiumViews.cpp`) are retired. EventManager.cpp includes
+  `<windows.h>` and `<imm.h>` for its date, time and IME calls, so its
+  `.drectve` names `uuid.lib`; its code bytes are unchanged.
 
 The cdecl progress callback `0x0045cb20` (67 bytes, exact) adds `*step` to
 the "ProgressBar" control of the page at KrustyUI+0x490, or resets the UI

@@ -538,7 +538,7 @@ Blocked merges:
   swap. Keeping them declared and switching only the uses moves the same
   swap to samples/race/BikeRaceNearMisses.cpp instead. VC6's scheduling
   there depends on the set of declared types, so no neutral form was found.
-- `UnknownPodiumSound` (Group1_PodiumScene.cpp, Group1_PodiumViews.cpp,
+- `UnknownPodiumSound` (Group1_PodiumScene.cpp, the retired Group1_PodiumViews.cpp,
   EventManagerNearMisses.cpp) to `Sound`. Sound is declared only in
   PCAudio.h, which includes `<windows.h>`. Group1_PodiumScene's code bytes
   stayed identical, but its `.drectve` gains `-defaultlib:uuid.lib` twice.
@@ -2580,7 +2580,7 @@ Left for later:
 | `UnknownBikeRaceNetPlayer` | `BikeRaceGridEntryView` | 2 | 7 | TrackGame+0x2ebc (race settings +0x14c) is the grid; +0x04 is GridEntry::points (TrackGame.h). |
 | `UnknownKrustyVcrRecord` | `KrustyVcrGridEntry` | 2 | 3 | KrustyVCR+0x25c holds the race settings' grid (+0x14c) copied with the settings: player id and points per slot. |
 | `UnknownKrustyVcrRacer` | `KrustyVcrRacerRecord` | 2 | 2 | KrustyVCR+0x300: the 0x124-byte record KrustyVCR::SetRacer (0x0049c070) writes and GetRacer (0x0049c1e0) reads. |
-| `UnknownBikeRaceEventAi` | `EventAiRacerRecord` | 2 | 5 | EventManager+0x444: one 0xcc-byte record per AI racer (textures, model path, engine, skill) that the loader reads. |
+| `UnknownBikeRaceEventAi` | `EventAiRacerRecord` | 2 | 5 | EventManager+0x444: one 0xcc-byte record per AI racer (textures, model path, engine, skill) that the loader reads. Declared in EventManager.h as `aiRacers[11]` (+0x444); eleven 0xcc records fill the object to 0xd08. |
 | `UnknownBikeRaceView6c` | `StartObjectCharacterView` | 3 | 9 | BikeRace+0x64/+0x6c ("StartGate.slb", "30SecMan.slt"): vbptr GameObject at +4, model at +0x1a0 and CollisionCharacter::collisionObject at +0x210; the class is not established. |
 | `UnknownBikeRaceColliderBase` | `StartObjectColliderBase` | 3 | 2 | The object at +0x210 of the 30SecMan: a base with its own vfptr in front of the GameObject part 0x00421050 releases. |
 | `UnknownBikeRaceCollider` | `StartObjectCollider` | 3 | 2 | The same object with its GameObject base. |
@@ -3343,19 +3343,19 @@ tools/static_check.py passes.
 | `UnknownNumberOwner` | `NumberRenderTargetView` | 2 | GameObject+0x18 renderContext is a RenderTarget; +0x08 is RenderTarget currentCamera (RenderTarget.h:48) |
 | `UnknownOptKrustyUIRecord` | `OptionsBikeRecord` | 2 | KrustyUI+0x50 0x94-byte bike records (KrustyUI.h 'each manufacturer's bikes'); +0x8c engineSize as BikeRace.h BikeRaceBikeRecord |
 | `UnknownPickCamera` | `PickerCameraView` | 2 | ObjectPicker.h view; its offsets are Camera.h members (Camera +0xac viewMatrix, +0x170 eyePosition, +0x1a0 viewport) |
-| `UnknownPodiumArcade` | `PodiumArcadeObjectView` | 2 | SetPosition 0x004014f0 / SetAxes 0x00401520 are ArcadeObject.h methods; Group1_PodiumViews.cpp casts to ArcadeObject |
+| `UnknownPodiumArcade` | `PodiumArcadeObjectView` | 2 | SetPosition 0x004014f0 / SetAxes 0x00401520 are ArcadeObject.h methods. Merged into `ArcadeObject` (EventManager::podiumObject is one); CreatePodiumScene calls it directly and Group1_PodiumViews.cpp is gone. |
 | `UnknownPodiumContext` | `PodiumTextureContextView` | 2 | Game+0x1c resource context as the podium characters' slot 11 takes it; laid out like TextureMap.h TextureContext |
 | `UnknownPodiumGrid` | `PodiumSceneView` | 2 | reached through BaseQuarryEvent+0x2c eventScene; reads Scene podiumPosition +0x8c / podiumDirection +0x98 / environment +0xa4 (SceneManager.h) |
 | `UnknownPodiumModel` | `PodiumSceneEnvironmentView` | 2 | Scene+0xa4 environment; the field read at +0x398 is SceneEnvironment terrainBreadth (SceneManager.h) |
-| `UnknownPodiumNode` | `PodiumSoultreeObjectView` | 2 | methods bound to SoultreeObject (0x004fc970 / 0x004fc4f0 / 0x004fc660 / 0x004fbd10); Group1_PodiumViews.cpp casts to SoultreeObject |
+| `UnknownPodiumNode` | `PodiumSoultreeObjectView` | 2 | methods bound to SoultreeObject (0x004fc970 / 0x004fc4f0 / 0x004fc660 / 0x004fbd10). Merged into `SoultreeObject` (D3DIMSoulTree.h); PodiumStartGateView's model node is typed as one. |
 | `UnknownPodiumNodeOwner` | `PodiumStartGateView` | 2 | BikeRace+0x64 startGate (BikeRaceCore.h); its model node is read for GetPosition |
 | `UnknownPodiumOwner` | `PodiumBaseQuarryEventView` | 2 | FindRaceMode() result; offsets read are BaseQuarryEvent.h members (eventScene +0x2c, raceView +0x34, lightManager +0x7c, texture groups +0x94/+0x98) |
 | `UnknownPodiumRacer` | `PodiumKrustyBikeView` | 2 | racer list entries; +0x784 finishPosition (KrustyBikeCore.h:160) and +0x5c4 riderCharacter (BikeCore.h:131) |
 | `UnknownPodiumRacerModel` | `PodiumRiderView` | 2 | Bike+0x5c4 riderCharacter (BikeCore.h:131) as the podium reads it |
-| `UnknownPodiumSoultree` | `PodiumD3DIMSoultreeObjectView` | 2 | calls 0x004444c0 D3DIMSoultreeObject::SetUseLighting; ArcadeObject+0x2c arcadeModel is a D3DIMSoultreeObject* |
-| `UnknownPodiumSound` | `PodiumSoundView` | 2 | ctor 0x004bba10, Load 0x004bc320 and PlayWithOptions 0x004bc6b0 are PCAudio.h Sound methods |
-| `UnknownPodiumTextureEntry` | `PodiumSoultreeMaterialView` | 2 | entries of D3DIMSoultreeObject+0x290 materialTable (SoultreeMaterial**, D3DIMSoulTree.h:307); +0x2c texture name = SoultreeMaterial::textureName (first member after GameObject 0x2c) |
-| `UnknownPodiumTrackObject` | `PodiumTerrainView` | 2 | BikeRace+0x4c raceTerrain; +0x40 is BikeRaceTerrainView gridCellSize; Group1_PodiumViews.cpp reinterprets it as Terrain |
+| `UnknownPodiumSoultree` | `PodiumD3DIMSoultreeObjectView` | 2 | calls 0x004444c0 D3DIMSoultreeObject::SetUseLighting; ArcadeObject+0x2c arcadeModel is a D3DIMSoultreeObject*. Merged into `D3DIMSoultreeObject`: PODIUM_MODEL casts to it and PodiumRiderView's model node is typed as one. |
+| `UnknownPodiumSound` | `PodiumSoundView` | 2 | ctor 0x004bba10, Load 0x004bc320 and PlayWithOptions 0x004bc6b0 are PCAudio.h Sound methods. Merged into `Sound`: CreatePodiumScene constructs one directly (EventManager.cpp now includes `<windows.h>`, so its `.drectve` adds `-defaultlib:uuid.lib`; code bytes unchanged). |
+| `UnknownPodiumTextureEntry` | `PodiumSoultreeMaterialView` | 2 | entries of D3DIMSoultreeObject+0x290 materialTable (SoultreeMaterial**, D3DIMSoulTree.h:307); +0x2c texture name = SoultreeMaterial::textureName (first member after GameObject 0x2c). Merged into `SoultreeMaterial`. |
+| `UnknownPodiumTrackObject` | `PodiumTerrainView` | 2 | BikeRace+0x4c raceTerrain; +0x40 is BikeRaceTerrainView gridCellSize. Merged into `Terrain`: PodiumBikeRaceView's +0x4c is typed `Terrain*`. |
 | `UnknownPodiumViewFields` | `PodiumBikeRaceView` | 2 | BaseQuarryEvent+0x34 raceView; +0x4c raceTerrain and +0x64 startGate match BikeRaceCore.h |
 | `UnknownProCircuitResult` | `ProCircuitRacerResultView` | 2 | view of EventManager's 0x50-byte RacerResult entries (eventManager->results) |
 | `UnknownProjector` | `OverlayVisibilityClipperView` | 2 | TrackOverlay.h ProjectPoint 0x0052f340 is bound as VisibilityClipper::ProjectPoint; FollowCamera.h says it views the same pointer 0x00575a98 |
@@ -3436,7 +3436,7 @@ tools/static_check.py passes.
 | --- | --- | --- | --- | --- |
 | podium Scene environment view (Group1_PodiumScene.cpp, EventManagerNearMisses.cpp) | `racerCount` | `terrainBreadth` | 2 | Scene+0xa4 environment +0x398 is SceneEnvironment terrainBreadth (SceneManager.h) |
 | podium terrain view (Group1_PodiumScene.cpp, EventManagerNearMisses.cpp) | `gridSpacing` | `gridCellSize` | 2 | BikeRace+0x4c raceTerrain +0x40 is Terrain gridCellSize (BikeRace.h BikeRaceTerrainView) |
-| PodiumSoultreeMaterialView (was UnknownPodiumTextureEntry) | `field_0x2c` | `textureName` | 2 | The podium materialTable entries are SoultreeMaterial objects, whose +0x2c is char textureName[0x40] (SoultreeMaterial : GameObject); the only uses pass it as ReplaceMaterialTexture's texture name (EventManagerNearMisses.cpp:341, Group1_PodiumScene.cpp:311). |
+| PodiumSoultreeMaterialView (was UnknownPodiumTextureEntry; now `SoultreeMaterial`) | `field_0x2c` | `textureName` | 2 | The podium materialTable entries are SoultreeMaterial objects, whose +0x2c is char textureName[0x40] (SoultreeMaterial : GameObject); the only uses pass it as ReplaceMaterialTexture's texture name (EventManagerNearMisses.cpp:341, Group1_PodiumScene.cpp:311). |
 | PodiumBaseQuarryEventView (was UnknownPodiumOwner) | `field_0x30[0x34 - 0x30]` | `skyCube[0x34 - 0x30] (bytes kept)` | 2 | Exact-size view pad of BaseQuarryEvent +0x30 skyCube; the view (commented TrackGameViewOwner) agrees with BaseQuarryEvent at +0x34 raceView, +0x7c lights and +0x94 opaqueTextureGroup. |
 | TrackGameViewOwner | `field_0x30[0x34 - 0x30]` | `skyCube[0x34 - 0x30] (bytes kept)` | 2 | Exact-size view pad of BaseQuarryEvent +0x30 skyCube; the view agrees with BaseQuarryEvent at +0x2c eventScene, +0x34 raceView, +0x3c raceCamera, +0x5c..+0x6c overlays and +0x9c auralScape (its own comments cite them). No TrackGameViewOwner method has a skyCube parameter or local; nothing derives from it. |
 | TrackGameViewOwner | `field_0x38[0x3c - 0x38]` | `visualCue[0x3c - 0x38] (bytes kept)` | 2 | Exact-size view pad of BaseQuarryEvent +0x38 visualCue (VisualCue*); same view agreement as skyCube. |
@@ -4272,7 +4272,7 @@ endings.
   - VehicleCameraVehicleView `field_0x0c0` (764 bytes).
   - QuarryLoadKrustyBikeCameraView `field_0x02c`.
   - GuiControlView `field_0x60` and `field_0x164`.
-  - EventManager `field_0x444`.
+  - EventManager `field_0x444` (later typed `EventAiRacerRecord aiRacers[11]`).
   - EventManagerNearMisses.cpp and Group1_PodiumScene.cpp
     `field_0x5c8[0x784 - 0x5c8]`.
   - GridManagedTexture `field_0x00` and the GridTerrain pads.
@@ -4491,7 +4491,7 @@ finds every edited file still CRLF.
 - Not split, because the evidence is uncertain:
   - KrustyUI `field_0x4ac`;
   - the MorphBastard channel `field_0x5c`;
-  - EventManager `field_0x444`.
+  - EventManager `field_0x444` (later typed `EventAiRacerRecord aiRacers[11]`).
 - src/krusty2/vehicle/KrustyBikeTypes.h:541 still spells the KbMorphMod
   LoadParameterFile parameter `void* a`. That header is in the closure of the
   concurrent KrustyBike matching work.

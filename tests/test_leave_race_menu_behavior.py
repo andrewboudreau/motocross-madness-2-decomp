@@ -31,7 +31,8 @@ PRELUDE = '''#include "GUIManagerCore.h"
 #include "TrackGame.h"
 #include "EventManager.h"
 #include "UIDialog.h"
-extern "C" void* __stdcall ImmAssociateContext(void* window, void* context);
+#include <windows.h>
+#include <imm.h>
 '''
 EXTRACTED = ('static inline void EnableToolTips(', 'void EventManager::LeaveRaceForMenu(')
 DEPENDENCIES = {0x485df0,0x46ff30,0x53305e,0x4868b0,0x521a40,0x52d250,

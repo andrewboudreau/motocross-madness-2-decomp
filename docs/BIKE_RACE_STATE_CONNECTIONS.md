@@ -106,6 +106,13 @@ now calls `KrustyBike::Load` directly, and KrustyBikeCore.h forward-declares the
 Load's parameters now use. That gives 13,394 (XOR EDI/MOV EBX at +538 swapped). The proof over the 26
 affected units found only those six bytes changed, with all 406 CreateRacers relocations unchanged.
 
+Retiring the podium views moved it back to 13,400 with retail's order. EventManager.h dropped its two
+podium view structs, and `EventAiRacerRecord` moved from BikeRace.h into EventManager.h as the typed
+tail `aiRacers[11]` (+0x444; eleven 0xcc-byte records reach 0xd08). Dropping the structs alone also
+swapped one load pair in SelectGamePicProcs.cpp's exact FillFileList (0x004f17a0), which the record
+declaration restores. The record was moved because EventManager owns that storage, not for this
+count. The proof over the 33 affected units found only CreateRacers' six bytes changed.
+
 | Complete CreateRacers fingerprint | Before | After |
 |---|---|---|
 | Raw body SHA-256 | `1a2b16687fa89e9a0ed33dba31a1e46452caaaefa3ad73ce630b317a32bf07c4` | `9c7483a4d5ff8514f8a350f528dbe11d8d82d4d694439f87d069fd6fbf9e748b` |

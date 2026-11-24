@@ -2,13 +2,18 @@
 #include "GUIManagerCore.h"
 #include "EventManager.h"
 
+#include <windows.h>
+#include <imm.h>
 #include <float.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+#include "../krusty2/broadphase/Terrain.h"
+#include "ArcadeObject.h"
 #include "Camera.h"
+#include "D3DIMSoulTree.h"
 #include "DebugAlloc.h"
 #include "DirectPlayMessages.h"
 #include "ControlInterface.h"
@@ -18,19 +23,11 @@
 #include "TrackGame.h"
 #include "SoundInterface.h"
 #include "UIDialog.h"
+#include "PCAudio.h"
+#include "SoultreeMaterial.h"
 #include "PCCamera.h"
 #include "TextureMap.h"
 #include "ResourceEntry.h"
-
-// IMM32, called through the linker's import thunk.
-extern "C" void* __stdcall ImmAssociateContext(void* window, void* context);
-
-extern "C" __declspec(dllimport) int __stdcall GetDateFormatA(unsigned long locale, unsigned long flags,
-                                                              const void* date, const char* format,
-                                                              char* buffer, int size);
-extern "C" __declspec(dllimport) int __stdcall GetTimeFormatA(unsigned long locale, unsigned long flags,
-                                                              const void* time, const char* format,
-                                                              char* buffer, int size);
 
 // EventManager.cpp's per-file vector set (0x0059af28, 0x0059af38,
 // 0x0059af48 and 0x0059af18), initialised by 0x0045fe40..0x0045ff7b; the
@@ -432,28 +429,19 @@ struct PodiumBaseQuarryEventView : public GameObject {     // TrackGameViewOwner
     int opaqueTextureGroup;                         // +0x94, as BaseQuarryEvent.h
     int alphaTextureGroup;                          // +0x98
 };
-struct PodiumTerrainView {                   // the view's +0x4c
-    void QueryGround(Vector3* point, int a, int b, int c); // 0x00507c10
-    unsigned char field_0x00[0x40];
-    float gridCellSize;                             // +0x40 Terrain gridCellSize
-};
-struct PodiumSoultreeObjectView {
-    void GetPosition(Vector3* position);              // 0x004fc970
-    void GetAxes(Vector3* direction, Vector3* up); // 0x004fc4f0
-};
 struct PodiumStartGateView {                     // the view's +0x64
     unsigned char field_0x000[0x1a0];
-    PodiumSoultreeObjectView* modelNode;                   // +0x1a0 the characters' model node
+    SoultreeObject* modelNode;                      // +0x1a0 the characters' model node
 };
 struct PodiumBikeRaceView {
     unsigned char field_0x00[0x4c];
-    PodiumTerrainView* trackObject;          // +0x4c
+    Terrain* trackObject;                           // +0x4c
     unsigned char field_0x50[0x64 - 0x50];
     PodiumStartGateView* nodeOwner;              // +0x64
 };
 struct PodiumRiderView {                    // racer +0x5c4
     unsigned char field_0x000[0x1a0];
-    PodiumD3DIMSoultreeObjectView* modelNode;             // +0x1a0
+    D3DIMSoultreeObject* modelNode;                 // +0x1a0
 };
 struct PodiumKrustyBikeView {
     unsigned char field_0x000[0x5c4];
@@ -502,27 +490,6 @@ struct PodiumTextureContextView {
     int alphaFormat;                                // +0x10
     int halvings;                                   // +0x14
 };
-class PodiumSoundView {                          // PCAudio.h's Sound
-public:
-    PodiumSoundView(GameObject* group, int type);                    // 0x004bba10
-    int Load(const char* name, FileStream* stream, int flags, int a,
-                              int b, int c);                            // 0x004bc320
-    int PlayWithOptions(int restart, unsigned long playFlags, int preferHardware); // 0x004bc6b0
-    unsigned char field_0x000[0x1f8];
-};
-class PodiumArcadeObjectView {                         // ArcadeObject (+0x3d0)
-public:
-    virtual void UnknownVirtualSlot0();
-    virtual void AddRef();
-    virtual void Release();
-    virtual void GetRefCount();
-    virtual void Disable();
-    virtual void Enable();
-    void SetPosition(const Vector3* position);                // 0x004014f0
-    void SetAxes(const Vector3* a, const Vector3* b, int c, int d); // 0x00401520
-    unsigned char field_0x04[0x2c - 0x4];
-    PodiumD3DIMSoultreeObjectView* soultree;                // +0x2c
-};
 
 extern "C" Vector3* __stdcall D3DRMVectorRotate(Vector3* result, Vector3* vector, Vector3* axis,
                                                 float theta);
@@ -549,8 +516,7 @@ static inline Vector3 operator-(const Vector3& a, const Vector3& b) {
 
 #define PODIUM_OWNER(o) ((PodiumBaseQuarryEventView*)(o))
 #define PODIUM_VIEW(v) ((PodiumBikeRaceView*)(v))
-#define PODIUM_ARCADE ((PodiumArcadeObjectView*)podiumObject)
-#define PODIUM_MODEL(c) ((PodiumD3DIMSoultreeObjectView*)(c)->modelNode)
+#define PODIUM_MODEL(c) ((D3DIMSoultreeObject*)(c)->modelNode)
 
 // Whether v is the zero vector (the grid's "no podium direction").
 static inline int PodiumIsZero(const Vector3& v) {
@@ -618,8 +584,8 @@ int EventManager::CreatePodiumScene() {
         direction = PODIUM_OWNER(owner)->grid->direction;
     } else {
         if (g_TrackGame->mode.raceSettings.eventType == 3 && PODIUM_VIEW(PODIUM_OWNER(owner)->raceView)->nodeOwner) {
-            PODIUM_VIEW(PODIUM_OWNER(owner)->raceView)->nodeOwner->modelNode->GetPosition(&podiumPosition);
-            PODIUM_VIEW(PODIUM_OWNER(owner)->raceView)->nodeOwner->modelNode->GetAxes(&direction, &up);
+            PODIUM_VIEW(PODIUM_OWNER(owner)->raceView)->nodeOwner->modelNode->GetPosition((Vec3*)&podiumPosition);
+            PODIUM_VIEW(PODIUM_OWNER(owner)->raceView)->nodeOwner->modelNode->GetAxes((Vec3*)&direction, (Vec3*)&up);
         } else {
             float spacing = PODIUM_VIEW(PODIUM_OWNER(owner)->raceView)->trackObject->gridCellSize;
             podiumPosition = Vector3((int)column * spacing * 256.0f, 0.0f, (int)row * spacing * 256.0f);
@@ -627,7 +593,7 @@ int EventManager::CreatePodiumScene() {
         }
     }
     up = kVec3YAxis;
-    PODIUM_VIEW(PODIUM_OWNER(owner)->raceView)->trackObject->QueryGround(&podiumPosition, 0, 0, 0);
+    PODIUM_VIEW(PODIUM_OWNER(owner)->raceView)->trackObject->QueryGround((TerrainVec3*)&podiumPosition, 0, 0, 0);
     float angle = (float)atan2(direction.x, direction.z);
     Vector3 offsets[3];
     Vector3 facings[3];
@@ -673,11 +639,11 @@ int EventManager::CreatePodiumScene() {
     context.opaqueFormat = ((RenderTarget*)renderContext)->surfacePixelFormat;
     context.alphaFormat = 0x115c;
     context.halvings = 0;
-    PODIUM_ARCADE->Enable();
-    PODIUM_ARCADE->SetPosition(&podiumPosition);
-    PODIUM_ARCADE->SetAxes(&direction, &up, 0, 1);
+    podiumObject->Enable();
+    podiumObject->SetPosition(&podiumPosition);
+    podiumObject->SetAxes(&direction, &up, 0, 1);
     if (PODIUM_OWNER(owner)->lights && PODIUM_OWNER(owner)->lights->isEnabled)
-        PODIUM_ARCADE->soultree->SetUseLighting(1);
+        podiumObject->arcadeModel->SetUseLighting(1);
     FileStream* stream = new(__FILE__, 0x2f5) FileStream(g_ResourceManager);
     podiumCharacterCount = resultCount < 3 ? resultCount : 3;
     float chance = rand() * (1.0f / 32768);
@@ -721,20 +687,20 @@ int EventManager::CreatePodiumScene() {
             }
             podiumMotions[place - 1] = character->FindMotion(name, 1);
             Vector3 position = podiumPosition + offsets[place - 1];
-            PODIUM_MODEL(character)->SetPosition(&position);
-            PODIUM_MODEL(character)->SetAxesPtr(&facings[place - 1], &kVec3YAxis, 1, 1);
+            PODIUM_MODEL(character)->SetPosition(*(Vec3*)&position);
+            PODIUM_MODEL(character)->SetAxesPtr((Vec3*)&facings[place - 1], (Vec3*)&kVec3YAxis, 1, 1);
             character->SetMotion(podiumMotions[place - 1]);
             character->motionTime = 0.0f;
             if (racer) {
-                PodiumSoultreeMaterialView** texture = ((PodiumKrustyBikeView*)racer)->riderCharacter->modelNode->materialTable;
+                SoultreeMaterial** texture = ((PodiumKrustyBikeView*)racer)->riderCharacter->modelNode->materialTable;
                 if (texture)
-                    PODIUM_MODEL(character)->ReplaceMaterialTexture(0, (*texture)->textureName, &context);
+                    PODIUM_MODEL(character)->ReplaceMaterialTexture(0, (*texture)->textureName, (int)&context);
             }
         }
     }
     delete stream;
     if (g_TrackGame->mode.soundOn && g_TrackGame->mode.networkGame) {
-        PodiumSoundView* sound = new(__FILE__, 0x34e) PodiumSoundView(PODIUM_OWNER(owner)->grid->soundGroup, 1);
+        Sound* sound = new(__FILE__, 0x34e) Sound((SoundGroup*)PODIUM_OWNER(owner)->grid->soundGroup, 1);
         FileStream* audio = new(__FILE__, 0x34f) FileStream(g_ResourceManager);
         if (!g_TrackGame->sceneObject->OpenArchiveFile(audio, "CrowdLoop.wav", "rb", 0)) {
             char text[0x80];
@@ -844,7 +810,7 @@ void EventManager::LeaveRaceForMenu(int menu) {
     if (item)
         item->EndDialog(0);
     if (g_TrackGame->ui->savedInputContext)
-        ImmAssociateContext(g_TrackGame->windowHandle, g_TrackGame->ui->savedInputContext);
+        ImmAssociateContext((HWND)g_TrackGame->windowHandle, (HIMC)g_TrackGame->ui->savedInputContext);
     if (g_TrackGame->ui->allowIme)
         g_TrackGame->ui->gui->EnableWindowClipper(1);
     g_TrackGame->uiInteractionBlocked = 0;
@@ -1378,35 +1344,13 @@ void EventManager::RemovePlayer(int player) {
         qsort(results, g_TrackGame->mode.racerCount - 1, sizeof(RacerResult), CompareUnsigned);
 }
 
-// The quadtree members 0x0045fce0 and 0x0045fdc0 use. Quadtree.cpp and
-// CollisionObject.cpp are declared in full under src/krusty2/broadphase and
-// src/krusty2/collision. That tree reaches krusty2 math/Math3D.h, whose
-// per-TU Vec3 constants collide with this file's kVec3 constants, so this
-// file keeps local views of them.
-// RTTI: Vegetation : QuadTreeObject (vtable 0x005524f8) and
-// CollisionObject : QuadTreeObject (+0), GraphicsTest (+0xc) : GameObject.
-class QuadTree;
-class QuadTreeObject {
-public:
-    virtual void ComputeSortKey();
-    // 0x00456720 for Vegetation: the object's quadtree code (ret 4).
-    virtual unsigned int ComputeQuadTreeCode(QuadTree* tree);
-    short queryStamp;                              // +0x04, as CollisionObject.h
-    short sortKey;                                 // +0x06
-    char objectTypeId;                             // +0x08
-};
+// The quadtree members 0x0045fce0 and 0x0045fdc0 use the krusty2 QuadTree,
+// QuadTreeObject and CollisionObject (through ArcadeObject.h's Wrecker.h).
+// RTTI: Vegetation : QuadTreeObject (vtable 0x005524f8); Vegetation.h
+// declares it over EcoSystem's quadtree view, so the cast here names a
+// local Vegetation on the krusty2 base. It overrides ComputeQuadTreeCode
+// (0x00456720, ret 4) with the object's quadtree code.
 class Vegetation : public QuadTreeObject {};
-class UnknownEventGraphicsTest : public GameObject {};
-class CollisionObject : public QuadTreeObject, public UnknownEventGraphicsTest {};
-
-class QuadTree {
-public:
-    void Remove(QuadTreeObject* object, unsigned int code);     // 0x004dcf20
-    int BeginQuery(float x0, float z0, float x1, float z1);     // 0x004dd270
-    QuadTreeObject* NextObject();                               // 0x004dd540
-    void EndQuery();                                            // 0x004dd770
-};
-extern QuadTree* g_collisionQuadTree;                           // 0x0068aba4
 
 // 0x0045fce0
 void EventManager::RemoveVegetationInRect(float x0, float z0, float x1, float z1) {
