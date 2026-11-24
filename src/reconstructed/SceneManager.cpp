@@ -975,35 +975,16 @@ void Scene::ReadStadium()
 }
 
 // SoultreeMaterial.h comes in here, after the earlier scene and light parsers:
-// declaration order affects VC6's ReadLight code.  The static-model views and the
+// declaration order affects VC6's ReadLight code.  The static-model loader and the
 // texture-accounting functions below construct and inspect materials.
 #include "SoultreeMaterial.h"
 
-// The particle emitters a physics model may carry (0x004ecd60). Views of
-// classes reconstructed in src/reconstructed/*ParticleEmitter.cpp: GameObjects whose own
-// slot 27 attaches them and returns the GameObject to add as a child.
-class SceneParticleEmitterView : public GameObject {
-public:
-    virtual GameObject* Create(void* owner, int a);
-};
-class SceneDustParticleEmitterView : public SceneParticleEmitterView {
-public:
-    explicit SceneDustParticleEmitterView(int flags);       // 0x004b8a00
-
-    unsigned char field_0x2c[0x80 - 0x2c];
-};
-class SceneDirtChunkParticleEmitterView : public SceneParticleEmitterView {
-public:
-    explicit SceneDirtChunkParticleEmitterView(int flags);      // 0x004b8df0
-
-    unsigned char field_0x2c[0x608 - 0x2c];
-};
-class SceneDirtSprayParticleEmitterView : public SceneParticleEmitterView {
-public:
-    explicit SceneDirtSprayParticleEmitterView(int flags);      // 0x004b9310
-
-    unsigned char field_0x2c[0x608 - 0x2c];
-};
+// The particle emitters a physics model may carry (0x004ecd60) and the
+// collision object of a static model: DustParticleEmitter, DirtChunkParticleEmitter
+// and DirtSprayParticleEmitter (ParticleEmitters.h) and CollisionObject
+// (src/krusty2/collision).
+#include "ParticleEmitters.h"
+#include "../krusty2/collision/CollisionObject.h"
 
 // The physics part of a "PhysicsObject" model (0x524 bytes, constructor
 // 0x005037c0; src/krusty2/soultree's SoultreePhysicsObject family). Only the
@@ -1154,44 +1135,6 @@ public:
     SceneSoultreePhysicsObjectView(int a, int b);         // 0x005037c0
 
     unsigned char field_0x4f4[0x524 - 0x4f4];
-};
-
-// CollisionObject (0xb8 bytes; ObjectPicker.h and src/krusty2/collision
-// declare the same class). The model it collides for is at +0x60.
-class SceneCollisionObjectView : public UnknownSoultreeQuadTreeObject, public GameObject {
-public:
-    explicit SceneCollisionObjectView(int flags);   // 0x00431e70
-    void Configure(void* a, int b, int c, int d);  // 0x004320f0
-    void SetHullShape(D3DIMSoultreeObject* model, int a, int b, int c, int d); // 0x00432720
-    void LoadShape(D3DIMSoultreeObject* model, const char* path); // 0x00432800: from a ".col" file
-    void SnapPlacement();                      // 0x00435fe0
-
-    int drawColor;                            // +0x38 CollisionObject drawColor
-    int specularColor;                        // +0x3c CollisionObject specularColor
-    Vector3 boundCenter;                      // +0x40 CollisionObject boundCenter
-    float boundRadius;                        // +0x4c CollisionObject boundRadius
-    int shapeType;                            // +0x50 CollisionObject shapeType
-    void* shape;                              // +0x54 CollisionObject shape
-    int hasContact;                           // +0x58 CollisionObject hasContact
-    void* contactRecord;                      // +0x5c CollisionObject contactRecord
-    D3DIMSoultreeObject* ownerObject;           // +0x60, CollisionObject.h's owner
-    int ownerType;                            // +0x64 CollisionObject ownerType
-    int ignoreVegetation;                     // +0x68 CollisionObject ignoreVegetation
-    int collisionEnabled;                     // +0x6c CollisionObject collisionEnabled
-    int collidable;                           // +0x70 CollisionObject collidable
-    int ignoreListMode;                       // +0x74 CollisionObject ignoreListMode
-    int ignoreList;                           // +0x78 CollisionObject ignoreList
-    int ignoreCount;                          // +0x7c CollisionObject ignoreCount
-    int useBroadphase;                        // +0x80 CollisionObject useBroadphase
-    int quadtreeCell;                         // +0x84 CollisionObject quadtreeCell
-    void* onHitCallback;                      // +0x88 CollisionObject onHitCallback
-    void* onHitByCallback;                    // +0x8c CollisionObject onHitByCallback
-    int debugTreeDepth;                       // +0x90 CollisionObject debugTreeDepth
-    int debugDrawMode;                        // +0x94 CollisionObject debugDrawMode
-    int queryTouched;                         // +0x98 CollisionObject queryTouched
-    void* hitObject;                          // +0x9c CollisionObject hitObject
-    Vector3 hitPoint;                         // +0xa0 CollisionObject hitPoint
-    Vector3 hitNormal;                        // +0xac CollisionObject hitNormal
 };
 
 // 0x0043a330 (cdecl, CollisionPoint.cpp): adds a collision point at
@@ -1367,9 +1310,9 @@ int Scene::ReadStaticModels(LightManager* lights, int particleManager, int textu
                             sprintf(message, "\nOnly ONE %s for [%s] allowed.\n\n", text, model);
                             LogMessage(message);
                         } else {
-                            SceneDustParticleEmitterView* emitter = new(__FILE__, 1917) SceneDustParticleEmitterView(1);
+                            DustParticleEmitter* emitter = new(__FILE__, 1917) DustParticleEmitter(1);
                             D3DIMSoultreeObject* node = object;
-                            node->AppendChild(emitter->Create(renderContext, particleManager), -1);
+                            node->AppendChild((GameObject*)emitter->Create(renderContext, (ParticleManager*)particleManager), -1);
                             object->AddAttachment(1, emitter, *object->collisionPoints, 0);
                             dust = 1;
                         }
@@ -1379,9 +1322,9 @@ int Scene::ReadStaticModels(LightManager* lights, int particleManager, int textu
                             sprintf(message, "\nOnly ONE %s for [%s] allowed.\n\n", text, model);
                             LogMessage(message);
                         } else {
-                            SceneDirtChunkParticleEmitterView* emitter = new(__FILE__, 1927) SceneDirtChunkParticleEmitterView(1);
+                            DirtChunkParticleEmitter* emitter = new(__FILE__, 1927) DirtChunkParticleEmitter(1);
                             D3DIMSoultreeObject* node = object;
-                            node->AppendChild(emitter->Create(renderContext, particleManager), -1);
+                            node->AppendChild((GameObject*)emitter->Create(renderContext, (ParticleManager*)particleManager), -1);
                             object->AddAttachment(2, emitter, *object->collisionPoints, 0);
                             chunk = 1;
                         }
@@ -1391,9 +1334,9 @@ int Scene::ReadStaticModels(LightManager* lights, int particleManager, int textu
                             sprintf(message, "\nOnly ONE %s for [%s] allowed.\n\n", text, model);
                             LogMessage(message);
                         } else {
-                            SceneDirtSprayParticleEmitterView* emitter = new(__FILE__, 1937) SceneDirtSprayParticleEmitterView(1);
+                            DirtSprayParticleEmitter* emitter = new(__FILE__, 1937) DirtSprayParticleEmitter(1);
                             D3DIMSoultreeObject* node = object;
-                            node->AppendChild(emitter->Create(renderContext, particleManager), -1);
+                            node->AppendChild((GameObject*)emitter->Create(renderContext, (ParticleManager*)particleManager), -1);
                             object->AddAttachment(3, emitter, *object->collisionPoints, 0);
                             spray = 1;
                         }
@@ -1424,7 +1367,7 @@ int Scene::ReadStaticModels(LightManager* lights, int particleManager, int textu
             if (collision && !stadium
                 && ((D3DIMSoultreeObject*)staticModels->casters[i].model)->CountNodes() == 1) {
                 g_MemTagStack->Push("Collision");
-                staticModels->casters[i].collisionObject = new(__FILE__, 1974) SceneCollisionObjectView(1);
+                staticModels->casters[i].collisionObject = new(__FILE__, 1974) CollisionObject(1);
                 staticModels->casters[i].collisionObject->Configure(renderContext, 1, 0, 1);
                 staticModels->casters[i].collisionObject->ownerObject =
                     (D3DIMSoultreeObject*)staticModels->casters[i].model;
@@ -1670,10 +1613,10 @@ int Scene::ReadAnimations(LightManager* lights, int textureManager, int modelTex
         if (animationTable->entries[i].keyFramed) {
             int automatic;
             LogParameter(name, "MCF", file);
-            animationTable->entries[i].character->modelNode->SetPosition(&animationTable->entries[i].position);
+            animationTable->entries[i].character->modelNode->SetPosition(*reinterpret_cast<const Vec3*>(&animationTable->entries[i].position));
             if (axes)
-                animationTable->entries[i].character->modelNode->SetAxesPtr(&look, &up, 1, 0);
-            reinterpret_cast<D3DIMSoultreeObject*>(animationTable->entries[i].character->modelNode)->SetUseLighting(useLighting);
+                animationTable->entries[i].character->modelNode->SetAxesPtr(reinterpret_cast<const Vec3*>(&look), reinterpret_cast<const Vec3*>(&up), 1, 0);
+            animationTable->entries[i].character->modelNode->SetUseLighting(useLighting);
             parameters.GetInt("UseBlendedKeys", 1, &automatic);
             animationTable->entries[i].useBlendedKeys = automatic;
             parameters.GetInt("NumberOfMotions", 0, &animationTable->entries[i].motionCount);
@@ -1729,9 +1672,9 @@ int Scene::ReadAnimations(LightManager* lights, int textureManager, int modelTex
         } else {
             LogParameter(name, "SLT", sltPath);
             animationTable->entries[i].motionCount = 1;
-            reinterpret_cast<D3DIMSoultreeObject*>(animationTable->entries[i].proceduralObject->carModel)->SetUseLighting(useLighting);
+            animationTable->entries[i].proceduralObject->carModel->SetUseLighting(useLighting);
             if (axes)
-                animationTable->entries[i].proceduralObject->carModel->SetAxesPtr(&look, &up, 1, 0);
+                animationTable->entries[i].proceduralObject->carModel->SetAxesPtr(reinterpret_cast<const Vec3*>(&look), reinterpret_cast<const Vec3*>(&up), 1, 0);
         }
         if (animationTable->entries[i].motionCount > 0) {
             if (auralScape) {
@@ -1745,7 +1688,7 @@ int Scene::ReadAnimations(LightManager* lights, int textureManager, int modelTex
                     ReadSoundSettings(name, sound, 0, &params, &flags, &oneShotDistance, &randomTriggerPercent,
                                           &oneShot, &force2D);
                     parameters.GetString("SoundAttachToObject", "", attach, 0x40);
-                    SceneSoultreeObjectView* node;
+                    D3DIMSoultreeObject* node;
                     if (animationTable->entries[i].keyFramed)
                         node = animationTable->entries[i].character->modelNode;
                     else
@@ -1753,7 +1696,7 @@ int Scene::ReadAnimations(LightManager* lights, int textureManager, int modelTex
                     SoultreeSoundEmitter* emitter =
                         (new(__FILE__, 2433)
                              SoultreeSoundEmitter((AuralScape*)auralScape, soundGroup, 1, isEnabled))
-                            ->CreateFollowing(renderContext, sound, attach, (SoultreeObject*)node, params,
+                            ->CreateFollowing(renderContext, sound, attach, node, params,
                                                     flags, oneShotDistance, randomTriggerPercent, 0, force2D);
                     if (!emitter) {
                         sprintf(text, "\nScene::SoundEmitter(%s) not created\n", sound);
@@ -2039,16 +1982,16 @@ void Scene::SetDetailLevel(int level)
         int i;
         for (i = 0; i < animationTable->entryCount; i++) {
             if (animationTable->entries[i].keyFramed)
-                reinterpret_cast<D3DIMSoultreeObject*>(animationTable->entries[i].character->modelNode)->ApplyLodSettings(level);
+                animationTable->entries[i].character->modelNode->ApplyLodSettings(level);
             else
-                reinterpret_cast<D3DIMSoultreeObject*>(((SceneCarProceduralView*)animationTable->entries[i].proceduralObject)->carModel)->ApplyLodSettings(level);
+                animationTable->entries[i].proceduralObject->carModel->ApplyLodSettings(level);
         }
         for (i = 0; i < animationTable->randomSetCount; i++) {
             SceneAnimation* entry = animationTable->randomSets[i].entry;
             if (entry->keyFramed)
-                reinterpret_cast<D3DIMSoultreeObject*>(entry->character->modelNode)->ApplyLodSettings(level);
+                entry->character->modelNode->ApplyLodSettings(level);
             else
-                reinterpret_cast<D3DIMSoultreeObject*>(((SceneCarProceduralView*)entry->proceduralObject)->carModel)->ApplyLodSettings(level);
+                entry->proceduralObject->carModel->ApplyLodSettings(level);
         }
     }
     if (staticModels) {

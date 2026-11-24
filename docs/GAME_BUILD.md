@@ -817,7 +817,6 @@ clearly more faithful, the game now links the sample's text:
 
   | Retail | View name | Provider |
   |---|---|---|
-  | 0x00431e70, 0x004320f0, 0x00432720, 0x00432800 | `SceneCollisionObjectView` constructor and methods | `CollisionObject` |
   | 0x004318d0, 0x004319c0 | `SceneCollisionCharacterView` constructor and `Load` | `CollisionCharacter` |
   | 0x004328b0, 0x004329a0, 0x00432a20 | `CollisionObject` hull, sphere and capsule shapes taking `Vector3` | the `CollisionVec3` forms |
   | 0x00507c10, 0x00508970 | `EcoTerrainView::QueryGround`, `GetHeightRange` | `Terrain` |

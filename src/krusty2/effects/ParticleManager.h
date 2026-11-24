@@ -10,8 +10,8 @@
 #ifndef EFFECTS_PARTICLE_MANAGER_H
 #define EFFECTS_PARTICLE_MANAGER_H
 
-#include "core/GameObject.h"
-#include "core/DebugAlloc.h"
+#include "../core/GameObject.h"
+#include "../core/DebugAlloc.h"
 
 // PROVISIONAL: DirectX-style interface; the dtor calls slot 2 with `this` pushed on the stack
 // (`mov ecx,[eax]; push eax; call [ecx+8]`), i.e. an IUnknown::Release.

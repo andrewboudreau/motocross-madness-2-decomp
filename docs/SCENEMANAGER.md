@@ -82,8 +82,13 @@ type, member and function names are provisional.
 - `SceneCarProceduralView` is the procedural entry's CarProcedural: a
   GameObject with +0x34, +0x38/+0x3c, +0x5c and +0x194, plus slot 27.
   Naming +0x20c as well changes VC6's code for `0x004eb570`.
-- `SceneSoultreeObjectView` has `0x004444c0`, `0x004451e0`, `0x004fbd70` and
-  `0x004fc660`.
+- The character (+0x1a0) and car (+0x34) model nodes are `D3DIMSoultreeObject*`.
+  The scene calls `0x004444c0` and `0x004451e0` on them, and the SoultreeObject
+  methods `0x004fbd70` and `0x004fc660` with the `Vector3` arguments cast to `Vec3`.
+- `ReadStaticModels` constructs the real DustParticleEmitter, DirtChunkParticleEmitter,
+  DirtSprayParticleEmitter (ParticleEmitters.h) and CollisionObject
+  (src/krusty2/collision); only the physics object stays a view, because
+  SoultreePhysicsObject.h declares its own `D3DIMSoultreeObject` base.
 
   Together they are what the entry functions touch of the Soultree classes.
 - `SceneAnimation` types +0x08 (the procedural object), +0x0c (a

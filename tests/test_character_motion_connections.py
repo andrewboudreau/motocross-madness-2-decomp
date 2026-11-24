@@ -100,16 +100,16 @@ PARTIAL = [['src/krusty2/vehicle/Bike.cpp',
   6756,
   2800,
   '72b4158f144b7172be7bfb0612d50ba19b9ee54ebf4abf6bc3669eb393e34cf3'],
- # Nonexact score 13400: XOR EDI/MOV EBX at +538..545 in retail's order since
- # EventManager.h declares EventAiRacerRecord and no podium views (a TU-wide count
- # effect; 13394 before). BIKE_RACE_STATE_CONNECTIONS.md.
+ # Nonexact score 13394: XOR EDI/MOV EBX at +538..545 swapped since SceneManager.h
+ # types the scene model nodes as D3DIMSoultreeObject and drops its node view (a
+ # TU-wide count effect; 13400 before). BIKE_RACE_STATE_CONNECTIONS.md.
  ['src/reconstructed/BikeRace.cpp',
   '?CreateRacers@BikeRace@@',
   4299120,
   13428,
   13428,
-  13400,
-  '2da850db52316df8731a83fbd44bed12c4aed598cba48e96e19bc22ce3f63d08']]
+  13394,
+  '0d1c681ea02fca8595769e383bb8c26b54766961c5e0f091988b367da388d9ad']]
 
 
 def function_text(source, signature):

@@ -2716,7 +2716,7 @@ Left for later:
 | Old | New | Tier | Rewrites | Evidence |
 | --- | --- | --- | --- | --- |
 | `UnknownFollowCameraSubject` | `FollowCameraTerrainView` | 2 | 15 | Terrain QueryGround 0x00507c10 |
-| `UnknownSceneCollisionObject` | `SceneCollisionObjectView` | 2 | 16 | CollisionObject members SceneManager reads |
+| `UnknownSceneCollisionObject` | `SceneCollisionObjectView` | 2 | 16 | CollisionObject members SceneManager reads Merged into `CollisionObject` (src/krusty2/collision). |
 | `UnknownSceneAnimatedObject` | `SceneCarProceduralView` | 2 | 20 | CarProcedural members |
 | `UnknownSceneObject` | `SceneCollisionCharacterView` | 2 | 29 | CollisionCharacter ctor 0x004318d0 (0x294 bytes); SetMotion 0x004a8b40 |
 | `UnknownKrustyUICharacter` | `KrustyUID3DIMSoultreeCharacterView` | 2 | 13 | RTTI D3DIMSoultreeCharacter |
@@ -3658,13 +3658,13 @@ tools/static_check.py passes.
 | --- | --- | --- | --- |
 | `UnknownSceneShapeKeyword` | `SceneObjectShapeKeyword` | 1 | The 0x24-byte {name, value} record of ReadStaticModels' shape table, {"Box", 0} and {"Sphere", 1}, looked up with the model's "ObjectShape" string (`0x005734f0`) |
 | `UnknownSceneEmitterKeyword` | `SceneEmitterTypeKeyword` | 1 | The 0x1c-byte record of the "EmitterType%d" table (`0x005734a8`): "DustEmitter", "DirtChunkEmitter", "DirtSprayEmitter", "ExhaustEmitter"; the default case prints "Unknown EmitterType (%s) for [%s]." (`0x00573418`) |
-| `UnknownSceneLodObject` | `SceneSoultreeObjectView` | 2 | Its methods SetAxesPtr `0x004fbd70` and SetPosition `0x004fc660` are SoultreeObject methods; config/game_build.json aliases both to `SoultreeObject`. The objects behind it (character +0x1a0, CarProcedural +0x34 carModel) are D3DIMSoultreeObjects, whose primary base is SoultreeObject at +0 (RTTI). Ready since Wave 28. |
+| `UnknownSceneLodObject` | `SceneSoultreeObjectView` | 2 | Its methods SetAxesPtr `0x004fbd70` and SetPosition `0x004fc660` are SoultreeObject methods; config/game_build.json aliases both to `SoultreeObject`. The objects behind it (character +0x1a0, CarProcedural +0x34 carModel) are D3DIMSoultreeObjects, whose primary base is SoultreeObject at +0 (RTTI). Ready since Wave 28. Merged into `D3DIMSoultreeObject`: SceneManager.h types the character and car model nodes as `D3DIMSoultreeObject*`, and the aliases are gone. |
 | `UnknownScenePhysicsObject` | `SceneSoultreePhysicsObjectView` | 2 | Constructor `0x005037c0` is bound as `SoultreePhysicsObject` (SoulTreePhysics.bindings.json) and aliased to it in config/game_build.json; slot 40 LoadPhysicsModel `0x00503970`; bases SoultreePhysicsBaseObject (+0) and D3DIMSoultreeObject (+0x21c), as RTTI gives them |
 | `UnknownScenePhysicsBody` | `SceneSoultreePhysicsBaseObjectView` | 2 | The +0 base of that view: RTTI SoultreePhysicsObject : SoultreePhysicsBaseObject (+0), D3DIMSoultreeObject (mdisp 540 = 0x21c, the view's extent); its 41 slots end with slot 37 AddAttachment and slot 40, the SoultreePhysicsObject primary vtable `0x00557f54` |
-| `UnknownSceneDustEmitter` | `SceneDustParticleEmitterView` | 2 | Constructor `0x004b8a00` is DustParticleEmitter's (RTTI, vtable `0x00555ab8`, Bike.bindings.json) and the game_build alias target; created for "DustEmitter" |
-| `UnknownSceneChunkEmitter` | `SceneDirtChunkParticleEmitterView` | 2 | Constructor `0x004b8df0` is DirtChunkParticleEmitter's (vtable `0x00555b34`); created for "DirtChunkEmitter" |
-| `UnknownSceneSprayEmitter` | `SceneDirtSprayParticleEmitterView` | 2 | Constructor `0x004b9310` is DirtSprayParticleEmitter's (vtable `0x00555ba8`); created for "DirtSprayEmitter" |
-| `UnknownSceneParticleEmitter` | `SceneParticleEmitterView` | 2 | The view-only base of the three emitter views: slot 27 Create, which all three call (`0x004ba040`, one ICF-folded body). Retail has no ParticleEmitter class (each RTTI chain is Emitter : GameObject : BaseObject); the name describes the view, not a retail base. |
+| `UnknownSceneDustEmitter` | `SceneDustParticleEmitterView` | 2 | Constructor `0x004b8a00` is DustParticleEmitter's (RTTI, vtable `0x00555ab8`, Bike.bindings.json) and the game_build alias target; created for "DustEmitter" Merged into `DustParticleEmitter` (ParticleEmitters.h); ReadStaticModels constructs it directly. |
+| `UnknownSceneChunkEmitter` | `SceneDirtChunkParticleEmitterView` | 2 | Constructor `0x004b8df0` is DirtChunkParticleEmitter's (vtable `0x00555b34`); created for "DirtChunkEmitter" Merged into `DirtChunkParticleEmitter` (ParticleEmitters.h); ReadStaticModels constructs it directly. |
+| `UnknownSceneSprayEmitter` | `SceneDirtSprayParticleEmitterView` | 2 | Constructor `0x004b9310` is DirtSprayParticleEmitter's (vtable `0x00555ba8`); created for "DirtSprayEmitter" Merged into `DirtSprayParticleEmitter` (ParticleEmitters.h); ReadStaticModels constructs it directly. |
+| `UnknownSceneParticleEmitter` | `SceneParticleEmitterView` | 2 | The view-only base of the three emitter views: slot 27 Create, which all three call (`0x004ba040`, one ICF-folded body). Retail has no ParticleEmitter class (each RTTI chain is Emitter : GameObject : BaseObject); the name describes the view, not a retail base. Retired with the three emitter views; the real emitters each declare slot 27 `Create`. |
 
 ### Methods
 
@@ -4359,7 +4359,7 @@ Vehicle base that the canonical layout puts at those offsets.
 | ProCircuitRacerResultView | `field_0x2c[0x34 - 0x2c]` | score, `field_0x30[4]` | 2 | RacerResult score |
 | SceneCarProceduralView (SceneManager.h) | `field_0x2c`, `field_0x40`, `field_0x60`, `field_0x198` | drawColor, specularColor; pathVelocity, groundSpeed, steersFrontWheels, started; numWheels .. smoothedNormal; wheelNodes, bodyContactPoint, bodyContactNormal (pads kept at +0x58, +0x68, +0x178, +0x1b8, +0x1e8, +0x20c) | 2 | CarProcedural and SoultreeObject layouts |
 | SceneManager.cpp SPBO view | `field_0x0c[0x12c - 0x0c]`, `field_0x134[0x21c - 0x134]` | position .. collisionObject; lastCollisionType .. centerNode | 2 | SPBO layout |
-| SceneManager.cpp SceneCollisionObjectView | `field_0x38[0x60 - 0x38]`, `field_0x64[0xb8 - 0x64]` | drawColor .. contactRecord; ownerType .. hitNormal | 2 | CollisionObject layout |
+| SceneManager.cpp SceneCollisionObjectView | `field_0x38[0x60 - 0x38]`, `field_0x64[0xb8 - 0x64]` | drawColor .. contactRecord; ownerType .. hitNormal | 2 | CollisionObject layout Merged into `CollisionObject`. |
 | EventKrustyBikeView (RaceView.h) | `field_0x054[0x64 - 0x54]` | savedSinRoll, savedCosRoll, savedSinPitch, savedCosPitch | 2 | SPBO |
 | VehicleCameraVehicleView (VehicleCamera.h) | `field_0x050[0x64 - 0x50]` | savedYaw, savedSinRoll, savedCosRoll, savedSinPitch, savedCosPitch | 2 | SPBO |
 | VehicleCameraVehicleView | `field_0x0c0[0x3bc - 0xc0]` | angularAcceleration, worldAngularVelocity, angularVelocity, invInertia, shapeInvInertia, `field_0x0fc`, airborne, respawnPending, asleep, `field_0x10b` | 2 | SPBO (+0xfc is a pad in the canonical class too) |

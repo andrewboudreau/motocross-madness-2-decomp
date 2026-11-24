@@ -15,13 +15,10 @@ class Sound;
 class SoundGroup;
 struct DS3DBuffer;
 
-// The Soultree object whose detail level 0x004eff30 sets (0x004451e0, the
-// D3DIMSoultreeObject methods of D3DIMSoulTree.h). A view: the scene reaches
-// it through character +0x1a0, object +0x34 and each shadow caster.
-struct SceneSoultreeObjectView {
-    void SetAxesPtr(const Vector3* look, const Vector3* up, int orthogonalize, int keepZ); // 0x004fbd70
-    void SetPosition(const Vector3* position); // 0x004fc660
-};
+// The model node of a scene character (+0x1a0) and car (+0x34): a
+// D3DIMSoultreeObject (D3DIMSoulTree.h). 0x004eff30 sets its detail level
+// (0x004451e0) and the loader its position and axes (0x004fc660, 0x004fbd70).
+class D3DIMSoultreeObject;
 
 // The object a key-framed scene entry holds: CollisionCharacter (0x294
 // bytes, constructor 0x004318d0, src/krusty2/motion), a
@@ -47,7 +44,7 @@ public:
     int motionStopped;                        // +0xC  Character +0x0c (D3DIMSoultreeCharacter.h motionStopped): set when a non-looping motion ends, cleared by SetMotion 0x004a8b40; AdvanceMotion returns 0 while set
     int motionTime;  // +0x10  Character +0x10: motion time (slot 7 adds time to it); RestartEntry zeroes it before AdvanceMotion
     unsigned char field_0x014[0x1a0 - 0x14];
-    SceneSoultreeObjectView* modelNode;         // +0x1a0
+    D3DIMSoultreeObject* modelNode;           // +0x1a0
     char fileName[0x6c];  // +0x1A4  FindEntryByFileName (0x004eaec0) compares it, up to its '.', with the path's file name
     void* collisionObject;                // +0x210 CollisionCharacter's CollisionObject (QuarryStuntEvent.cpp)
     unsigned char field_0x214[0x268 - 0x214];
@@ -69,7 +66,7 @@ public:
 
     int drawColor;                            // +0x2c GraphicsTest drawColor (CarProcedural's base)
     int specularColor;                        // +0x30 GraphicsTest specularColor
-    SceneSoultreeObjectView* carModel;  // +0x34  CarProcedural +0x34 carModel; SetDetailLevel/BikeRace use it as the model node
+    D3DIMSoultreeObject* carModel;      // +0x34  CarProcedural +0x34 carModel; SetDetailLevel/BikeRace use it as the model node
     void* sensorCollider;  // +0x38  CarProcedural +0x38 sensorCollider (QuarryStuntEvent sets collision ignore lists)
     void* bodyCollider;  // +0x3C  CarProcedural +0x3c bodyCollider
     Vector3 pathVelocity;                     // +0x40 CarProcedural pathVelocity
@@ -163,7 +160,7 @@ class ProjectedShadow;
 
 // Views declared in SceneManager.cpp (0x004ecd60).
 class SceneSoultreePhysicsObjectView;
-class SceneCollisionObjectView;
+class CollisionObject;
 
 // 0x28-byte element of SceneStaticModels::casters: a static model
 // ("Model<n>", 0x004ecd60), also a shadow caster (0x004edf20 attaches a
@@ -174,7 +171,7 @@ struct SceneStaticModel {
     unsigned char field_0x01[3];
     ShadowCaster* model;                      // +0x04 the model (a D3DIMSoultreeObject)
     SceneSoultreePhysicsObjectView* physicsObject; // +0x08
-    SceneCollisionObjectView* collisionObject; // +0x0c
+    CollisionObject* collisionObject;         // +0x0c
     char fileName[0x18];                      // +0x10 the model's file name, at most 0x14 characters
 };
 
