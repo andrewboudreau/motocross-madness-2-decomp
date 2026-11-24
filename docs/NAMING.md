@@ -2687,7 +2687,7 @@ Left for later:
 | `UnknownCameraRider` | `VehicleCameraWheelView` | 2 | 3 | Vehicle+0x53c wheelList entries are VehicleWheel |
 | `UnknownInlineRider` | `PickCameraWheel` | 3 | 2 | wheel entry the inline pick reads |
 | `UnknownCameraTargetA` | `VehicleCameraCharacterTargetView` | 2 | 3 | character target offsets |
-| `UnknownCameraTargetB` | `VehicleCameraCarProceduralView` | 2 | 3 | CarProcedural offsets |
+| `UnknownCameraTargetB` | `VehicleCameraCarProceduralView` | 2 | 3 | CarProcedural offsets Merged into `CarProcedural` (CarProcedural.h); VehicleCamera::targetCar is a `CarProcedural*`. |
 | `UnknownGuiControl` | `GuiControlView` | 2 | 136 | dialog control as GUIUser/ToolTip see it; UIEditBox +0x214 caretRect |
 | `UnknownGuiClipper` | `GuiDirectDrawClipper` | 2 | 5 | IDirectDrawClipper slot layout (SetClipList 7, SetHWnd 8) |
 | `UnknownGuiDirectDraw` | `GuiDirectDraw` | 2 | 2 | IDirectDraw slot 4 CreateClipper |

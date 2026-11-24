@@ -82,12 +82,10 @@ struct VehicleCameraCharacterTargetView {
     Vector3 nodeVelocity;                // +0x224 krusty2 CollisionCharacter::nodeVelocity
 };
 
-struct VehicleCameraCarProceduralView {
-    unsigned char field_0x00[0x34];
-    SoultreeObject* carModel;  // +0x34  camera +0x388 is a scene procedural entry (CarProcedural, BikeRace TargetObject); CarProcedural +0x34 carModel
-    unsigned char field_0x38[0x40 - 0x38];
-    Vector3 pathVelocity;  // +0x40  CarProcedural +0x40 pathVelocity; slot 33 returns it as the tracked velocity (like vehicle velocity)
-};
+// The camera's car target is a scene procedural car (CarProcedural.h); slot 33
+// tracks its pathVelocity (+0x40), and the position and heading come from its
+// carModel (+0x34).
+class CarProcedural;
 
 // RTTI: VehicleCamera : FollowCamera. Vehicle.cpp is a name-overlap candidate
 // for its translation unit, not established. Implements FollowCamera's pure
@@ -143,7 +141,7 @@ public:
 
 protected:
     VehicleCameraCharacterTargetView* targetCharacter;  // +0x384  BikeRace TargetCharacter stores a key-framed scene character; slots 33/41/TargetPoint read its node
-    VehicleCameraCarProceduralView* targetCar;  // +0x388  BikeRace TargetObject stores a scene procedural object (CarProcedural)
+    CarProcedural* targetCar;  // +0x388  BikeRace TargetObject stores a scene procedural object (CarProcedural)
     SoultreeObject* targetCaster;  // +0x38C  BikeRace view +0x38c shadowCaster (TargetCaster); TargetPoint takes its translation
     bool vehicleMode;                    // +0x390, vehicle mode
     unsigned char targetPointCached;     // +0x391 cachedTargetPoint is valid (cleared on a new target)

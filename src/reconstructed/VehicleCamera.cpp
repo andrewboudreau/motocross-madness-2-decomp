@@ -1,6 +1,7 @@
 #include "../krusty2/broadphase/Terrain.h"
 #include "VehicleCamera.h"
 #include "D3DIMSoulTree.h"
+#include "CarProcedural.h"
 #include "TrackGame.h"
 
 // The four Math3D vector constants (.CRT$XCU 336-339, initialisers
