@@ -1,9 +1,9 @@
 {
   "objects": {
     "src/krusty2/soultree/SoulTreePhysics.cpp": {
-      "sections": 161,
-      "relocations": 784,
-      "sha256": "b7fc90dc2239b8374a665fafdf06e5cc702cd82ec11a1e74e50c2a2ffb57cfdb"
+      "sections": 163,
+      "relocations": 787,
+      "sha256": "5dec96409e0bb45ef138b8ba5488586183c9df164d29b61daa8b25c83f3e71d9"
     },
     "src/reconstructed/DustParticleEmitter.cpp": {
       "sections": 28,
@@ -23,7 +23,7 @@
     "src/reconstructed/SceneManager.cpp": {
       "sections": 335,
       "relocations": 1757,
-      "sha256": "0a2800a4665935efab6d75df9fcf0357456e806ecfbf5d74281fd1a12cf22739"
+      "sha256": "f7f8aea155216f7bd1aad130a25b62295b7356e39a0064faf5dbf0e42a9d6cd1"
     }
   },
   "renames": {

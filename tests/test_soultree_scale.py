@@ -22,7 +22,7 @@ AGGREGATE = 'samples/physics/helpers/SoultreeBounds.cpp'
 TREE = 'src/krusty2/soultree/soultree.cpp'
 RENDER = 'src/reconstructed/D3DIMSoulTree.cpp'
 CALLERS = ('src/reconstructed/ArcadeObject.cpp', 'src/reconstructed/LightEmitter.cpp')
-SYMBOL = '?Scale@D3DIMSoultreeObject@@QAEXMMM@Z'
+SYMBOL = '?Scale@SoultreeObject@@QAEXMMM@Z'
 HELPERS = (('InvalidateWorldMatrix',0x4fb850,45),('InvalidateSiblingChain',0x4fb880,50),('MarkSubtreeDirty',0x4fdab0,38))
 
 

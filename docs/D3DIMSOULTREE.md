@@ -18,7 +18,7 @@ large drawing function with a jump table; fnlist's starts inside it are
 false.
 
 In this tree, SoultreeObject is a view with real bases
-(`UnknownSoultreeQuadTreeObject`, GameObject). Its primary hierarchy methods
+(`QuadTreeObject` from src/krusty2/broadphase/QuadTreeObject.h, GameObject). Its primary hierarchy methods
 now share the [loading and cloning declarations](SOULTREE_HIERARCHY_CONNECTIONS.md)
 with the canonical soultree provider. Their slots remain 2, 3, 6, 7 and 8;
 the separate GameObject base remains at offset `+0xc`.

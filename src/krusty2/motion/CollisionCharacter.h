@@ -20,9 +20,9 @@
 #ifndef COLLISION_CHARACTER_H
 #define COLLISION_CHARACTER_H
 
-#include "math/Math3D.h"
-#include "motion/D3DIMSoultreeCharacter.h"
-#include "collision/CollisionObject.h"
+#include "../math/Vec3.h"
+#include "D3DIMSoultreeCharacter.h"
+class CollisionObject;   // collision/CollisionObject.h
 
 class CollisionCharacter : public D3DIMSoultreeCharacter {
 public:

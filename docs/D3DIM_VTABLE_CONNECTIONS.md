@@ -12,8 +12,8 @@ original translation-unit ownership.
 | --- | --- | --- | --- | --- |
 | 2 | LoadHierarchy(stream) | 0x43f950 | 1257 | 4 |
 | 3 | LoadHierarchyFromParameters() | 0x43fe40 | 543 | 0 |
-| 4 | SoultreeVirtualSlot4(out) | 0x4440a0 | 146 | 4 |
-| 5 | SoultreeVirtualSlot5() | 0x444140 | 763 | 0 |
+| 4 | CreateNode(out) | 0x4440a0 | 146 | 4 |
+| 5 | UpdateLocalBounds() | 0x444140 | 763 | 0 |
 | 6 | ResetLocalMatrices() | 0x4450c0 | 280 | 0 |
 | 7 | CloneFrom(source) | 0x444560 | 1234 | 4 |
 | 8 | CopySubtree(source, target) | 0x444b60 | 263 | 8 |

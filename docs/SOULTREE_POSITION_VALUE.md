@@ -1,8 +1,9 @@
 # By-value Soultree position providers
 
 Two existing by-value call views now have complete readable implementations:
-`SoultreeObject::SetPositionVec3(Vec3)` in SoultreePositionValue.cpp and
-`D3DIMSoultreeObject::SetPositionVec3(Vector3)` in D3DIMPositionValue.cpp.
+`SoultreeObject::SetPositionVec3(Vec3)` in SoultreePositionValue.cpp and its
+`SetPositionVec3(Vector3)` overload in D3DIMPositionValue.cpp (formerly declared
+on D3DIMSoultreeObject, which inherits it).
 Both match the same complete **38-byte** retail body at `0x004fc630` under
 authentic VC6 SP3 `vc6_o2_mt`, with resolved relocations. These are two source
 call views of one retail implementation, not two recovered retail functions.

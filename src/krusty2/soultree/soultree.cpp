@@ -17,12 +17,26 @@
 // with the transpose COMDAT 0x004fefb0, SetAxesIn 0x004fc050) are in samples/physics/helpers/.
 // Scale 0x004fd340 (inline 4x4 product) is a near miss in
 // samples/physics/helpers/SoultreeBounds.cpp.
-#define SOULTREE_OBJECT_WITH_BASES
 #include <math.h>
 #include <string.h>
 #include "math/Math3D.h"
 #include "core/DebugAlloc.h"
 #include "broadphase/Quadtree.h"
+#include "../../reconstructed/FileStream.h"
+
+// src/reconstructed/Parameterblocks.h declares the full class; only the members
+// this unit calls are listed (same mangled names).
+class ParameterBlock {
+public:
+    ParameterBlock();                                                     // 0x004b7130
+    ~ParameterBlock();                                                    // 0x004b7190
+    void Attach(FileStream* stream, int offset, int index); // 0x004b77a0
+    int BeginRows(const char* name);                                 // 0x004b7f70
+    int ReadRow(char* raw);                                        // 0x004b8010
+    int GetRowFloat(int index, float* out);                            // 0x004b81c0
+    int GetRowString(int index, char* out);                             // 0x004b8200
+    char field_0x00[0x5c4];        // operator new(0x5c4) at 0x004fdb83 (tier 1)
+};
 
 // Type-id registry (0x00575744), same declaration as collision/CollisionObject.cpp.
 class TypeRegistry {
@@ -153,12 +167,12 @@ SoultreeObject::SoultreeObject(int flags)
     localBoundsHalfExtent.y = 0;
     localBoundsHalfExtent.z = 0;
     subtreeBoundsValid = 0;
-    subtreeBoundsA.x = 0;
-    subtreeBoundsA.y = 0;
-    subtreeBoundsA.z = 0;
-    subtreeBoundsB.x = 0;
-    subtreeBoundsB.y = 0;
-    subtreeBoundsB.z = 0;
+    subtreeBoundsCenter.x = 0;
+    subtreeBoundsCenter.y = 0;
+    subtreeBoundsCenter.z = 0;
+    subtreeBoundsHalfExtent.x = 0;
+    subtreeBoundsHalfExtent.y = 0;
+    subtreeBoundsHalfExtent.z = 0;
     name[0] = 0;
     loadedNodeCount = 0;
     field_0x24 = objectTypeId = g_TypeRegistry->FindTypeId("SoultreeObject");
@@ -815,8 +829,8 @@ void SoultreeObject::LoadHierarchy(FileStream* stream)
         stream->Read(&nodes[i]->localBoundsCenter, 0xc, 1);
         stream->Read(&nodes[i]->localBoundsHalfExtent, 0xc, 1);
         stream->Read(&nodes[i]->subtreeBoundsValid, 4, 1);
-        stream->Read(&nodes[i]->subtreeBoundsA, 0xc, 1);
-        stream->Read(&nodes[i]->subtreeBoundsB, 0xc, 1);
+        stream->Read(&nodes[i]->subtreeBoundsCenter, 0xc, 1);
+        stream->Read(&nodes[i]->subtreeBoundsHalfExtent, 0xc, 1);
         nodes[i]->parent = 0;
         nodes[i]->firstChild = 0;
         nodes[i]->nextSibling = 0;
@@ -912,8 +926,8 @@ void SoultreeObject::UpdateSubtreeBounds()
     }
     for (SoultreeObject* c = firstChild; c; c = c->nextSibling)
         c->AccumulateBounds(&have, &lo, &hi, &worldMatrix);
-    subtreeBoundsA = (hi + lo) * 0.5f;
-    subtreeBoundsB = (hi - lo) * 0.5f;
+    subtreeBoundsCenter = (hi + lo) * 0.5f;
+    subtreeBoundsHalfExtent = (hi - lo) * 0.5f;
 }
 
 // Vec3 whose (x, y, z) constructor is out of line in retail (0x00404e60, thiscall, ret 0xc);
@@ -1003,8 +1017,8 @@ void SoultreeObject::GetSubtreeBounds(Vec3* center, Vec3* extents)
 {
     if (subtreeDirty)
         UpdateSubtreeBounds();
-    *center = subtreeBoundsA;
-    *extents = subtreeBoundsB;
+    *center = subtreeBoundsCenter;
+    *extents = subtreeBoundsHalfExtent;
 }
 
 // 0x004fe8a0. World-space box of the subtree: the centre through the world matrix, the half
@@ -1017,11 +1031,11 @@ void SoultreeObject::GetWorldBounds(Vec3* lo, Vec3* hi)
 {
     if (subtreeDirty)
         UpdateSubtreeBounds();
-    Vec3 axisX(subtreeBoundsB.x, 0.0f, 0.0f);
-    Vec3 axisY(0.0f, subtreeBoundsB.y, 0.0f);
-    Vec3 axisZ(0.0f, 0.0f, subtreeBoundsB.z);
+    Vec3 axisX(subtreeBoundsHalfExtent.x, 0.0f, 0.0f);
+    Vec3 axisY(0.0f, subtreeBoundsHalfExtent.y, 0.0f);
+    Vec3 axisZ(0.0f, 0.0f, subtreeBoundsHalfExtent.z);
     UpdateWorldMatrix();
-    Vec3 c = subtreeBoundsA;
+    Vec3 c = subtreeBoundsCenter;
     Vec3 w(c.x * worldMatrix._11 + c.y * worldMatrix._21 + c.z * worldMatrix._31 + worldMatrix._41,
            c.x * worldMatrix._12 + (c.y * worldMatrix._22 + c.z * worldMatrix._32) + worldMatrix._42,
            c.x * worldMatrix._13 + (c.y * worldMatrix._23 + c.z * worldMatrix._33) + worldMatrix._43);

@@ -4,7 +4,7 @@
     "src/reconstructed/LightEmitter.cpp": {
       "sections": 57,
       "relocations": 172,
-      "sha256": "374b971a2b1aebf1872a98dcabde0dc7c504eb45ebac2666f8684c07b385110b"
+      "sha256": "81dde17217fac75c6313602b565927c4f7d2a3801aea92fc835e06ff2209e1fb"
     },
     "src/krusty2/motion/D3DIMSoultreeMotnctrl.cpp": {
       "sections": 62,
@@ -14,7 +14,7 @@
     "src/reconstructed/SceneManager.cpp": {
       "sections": 335,
       "relocations": 1757,
-      "sha256": "9ade241960604172007b468dedf4c8a314a3997a7af5e77e0c314cb000ac367f"
+      "sha256": "0c93f3fe76e17a617c67c0827585eb179d872e143685d067168245894605439d"
     }
   }
 }

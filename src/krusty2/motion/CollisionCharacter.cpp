@@ -3,6 +3,9 @@
 // 0x004318d0..0x00431da0 (the next function, 0x00431da0, belongs to CollisionObject.cpp).
 // CollisionCharacter.cpp -- see CollisionCharacter.h.
 #include <stddef.h>
+#include "math/Math3D.h"
+#include "D3DIMSoultreeCharacter.h"
+#include "collision/CollisionObject.h"
 #include "CollisionCharacter.h"
 #include "soultree/SoultreePhysicsCallees.h"
 #include "collision/CollisionShapeTests.h"

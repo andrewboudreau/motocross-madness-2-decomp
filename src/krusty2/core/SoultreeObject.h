@@ -11,19 +11,20 @@
 // soultree.cpp __FILE__ references (tier 2). Their bodies are in
 // soultree/soultree.cpp (the retail soultree.cpp, 0x004fb2b0..0x004fefd8).
 //
-// Two views of one class:
-//  * Physics code sees a FLAT view: no virtual functions, the two vptrs and the
-//    base-class bodies are padding, so member offsets are right without pulling
-//    GameObject/QuadTreeObject into every Math3D.h user. Do not derive from it.
-//  * soultree.cpp, the unit that defines the class, defines
-//    SOULTREE_OBJECT_WITH_BASES before including Math3D.h. It then sees the real
-//    bases (QuadTreeObject + GameObject, from collision/CollisionObject.h) and the
-//    virtual functions, so the constructor, destructor and vtables are emitted as
-//    in retail. Member offsets are identical in both views.
+// One declaration for every unit: soultree.cpp, which defines the class, the
+// physics code (through math/Math3D.h) and the rendering code (through
+// src/reconstructed/D3DIMSoulTree.h, whose D3DIMSoultreeObject derives from
+// it). The former flat physics view (no bases, the vptrs as padding) and the
+// rendering view's own declaration are merged here; member offsets are the
+// same in all of them.
 //
-// It is the single declaration of the node for every physics area (the former
-// stand-ins helpers/SoultreeNode.h and the SoultreeNode class of
-// soultree_base/SoultreePhysicsCallees.h are merged here).
+// The rendering code spells vectors as Vector3 (MatrixUtil.h) where this
+// header uses Vec3; both are 12-byte stand-ins for one vector type. The
+// Vector3 overloads below name the same retail functions, and the build links
+// them to the Vec3 definitions (config/game_build.json link_aliases).
+//
+// It replaces the former stand-ins helpers/SoultreeNode.h and the SoultreeNode
+// class of soultree_base/SoultreePhysicsCallees.h.
 #ifndef MCM2_PHYSICS_COMMON_SOULTREEOBJECT_H
 #define MCM2_PHYSICS_COMMON_SOULTREEOBJECT_H
 
@@ -31,31 +32,14 @@ class ParameterBlock;
 class FileStream;
 typedef FileStream UnknownParameterStream;
 
-#ifdef SOULTREE_OBJECT_WITH_BASES
-#include "collision/CollisionObject.h"   // QuadTreeObject, GameObject
+#include "../broadphase/QuadTreeObject.h"   // QuadTreeObject (+0)
+#include "GameObject.h"                    // GameObject (+12)
+#include "../math/Vec3.h"
+#include "../../reconstructed/Matrix4.h"
 
-#include "../../reconstructed/FileStream.h"
+struct Vector3;
 
-// src/reconstructed/Parameterblocks.h declares the full class; only the members
-// soultree.cpp calls are listed (same mangled names).
-class ParameterBlock {
-public:
-    ParameterBlock();                                                     // 0x004b7130
-    ~ParameterBlock();                                                    // 0x004b7190
-    void Attach(FileStream* stream, int offset, int index); // 0x004b77a0
-    int BeginRows(const char* name);                                 // 0x004b7f70
-    int ReadRow(char* raw);                                        // 0x004b8010
-    int GetRowFloat(int index, float* out);                            // 0x004b81c0
-    int GetRowString(int index, char* out);                             // 0x004b8200
-    char field_0x00[0x5c4];        // operator new(0x5c4) at 0x004fdb83 (tier 1)
-};
-#endif
-
-#ifdef SOULTREE_OBJECT_WITH_BASES
 class SoultreeObject : public QuadTreeObject, public GameObject {
-#else
-class SoultreeObject {
-#endif
 public:
     // 0x004fb2b0, thiscall, ret 4 (tier 1). SoultreePhysicsBaseObject slot 2 passes 1.
     // The argument's meaning is unknown.
@@ -204,6 +188,12 @@ public:
     // function; this declaration exists only so those callers keep that call shape.
     void SetPositionVec3(Vec3 p);
 
+    // The rendering code's Vector3 spellings of 0x004fd660, 0x004fc690 and 0x004fc630
+    // (see the header comment); each is linked to the Vec3 definition above.
+    Vector3 LocalToWorldPoint(const Vector3& p);
+    void TranslateIn(SoultreeObject* frame, Vector3 delta);
+    void SetPositionVec3(Vector3 p);
+
     // 0x004fedb0, thiscall, plain ret (soultree.cpp, __FILE__ line 0x49b): appends this node to the global node
     // array (0x00689ec4, count 0x00689ec8, capacity 0x00689ecc) unless it is already listed. Name tier 3.
     void RegisterNode();
@@ -217,7 +207,7 @@ public:
 
     // ---- callees of SoultreePhysicsBaseObject (formerly SoultreePhysicsCallees.h) ----
 
-    // 0x004fe850. thiscall, ret 8: *center / *extents = subtreeBoundsA / subtreeBoundsB, after
+    // 0x004fe850. thiscall, ret 8: *center / *extents = subtreeBoundsCenter / subtreeBoundsHalfExtent, after
     // UpdateSubtreeBounds when subtreeDirty is set (SoultreePhysicsBaseObject slot 2 derives the
     // box inertia from the extents).
     void GetSubtreeBounds(Vec3* center, Vec3* extents);
@@ -270,7 +260,7 @@ public:
     // localBoundsValid is 0.
     void GetLocalBounds(Vec3* center, Vec3* halfExtent);
 
-    // 0x004fe0f0: refreshes subtreeBoundsA/B (center and half extents) from this node's
+    // 0x004fe0f0: refreshes subtreeBoundsCenter and subtreeBoundsHalfExtent from this node's
     // local bounds (when boundsFound is set) and every child's 0x004fe2e0.
     void UpdateSubtreeBounds();
 
@@ -292,8 +282,7 @@ public:
 
     // 0x004fefb0 is the out-of-line copy of an inline 3x3 transpose (cdecl, Matrix4*).
 
-#ifdef SOULTREE_OBJECT_WITH_BASES
-    // ---- virtual functions (soultree.cpp only; see the header comment) ----
+    // ---- virtual functions ----
     // GameObject slot 0 (secondary vtable 0x00557c40): scalar deleting dtor 0x004fb400,
     // body 0x004fb430. 'this' is the GameObject subobject (+12).
     virtual ~SoultreeObject();
@@ -310,12 +299,8 @@ public:
     // GameObject slot 25 override 0x004fec30: forwards to every node of the sibling chain at
     // +0x140 (GameObject view +0x134) before GameObject's own slot 25 (0x00469720).
     virtual int AttachRenderContext(void* context);
-#endif
 
     // ---- layout (offsets tier 1 from the constructor/helpers; names tier 3) ----
-#ifndef SOULTREE_OBJECT_WITH_BASES
-    char pad_0x000[0x38];          // QuadTreeObject vptr (+0), GameObject vptr (+12)...
-#endif
     char name[0x80];               // 0x038, compared by FindByName (size unknown)
     Matrix4 localMatrix;           // 0x0b8, identity after construction
     Matrix4 worldMatrix;           // 0x0f8, local * parent world
@@ -334,8 +319,8 @@ public:
     Vec3 localBoundsCenter;        // 0x158, returned by 0x004fe0a0
     Vec3 localBoundsHalfExtent;    // 0x164, half size per axis
     int subtreeBoundsValid;        // 0x170
-    Vec3 subtreeBoundsA;           // 0x174, returned by 0x004fe850 (refreshed when subtreeDirty)
-    Vec3 subtreeBoundsB;           // 0x180
+    Vec3 subtreeBoundsCenter;      // 0x174, returned by 0x004fe850 (refreshed when subtreeDirty)
+    Vec3 subtreeBoundsHalfExtent;  // 0x180
     int subtreeDirty;              // 0x18c, set on self and all ancestors by 0x004fdab0
     int drawsItself;               // 0x190, 1 after construction; cleared while the quadtree renderer owns the node, D3DIMSoultreeObject slot 12 only prepares it when set. Tier 3
     int inQuadtree;                // 0x194, nonzero while inserted in the quadtree (0x004fed70 tests and clears it)

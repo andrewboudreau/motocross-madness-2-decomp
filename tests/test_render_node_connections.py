@@ -66,8 +66,8 @@ class RenderNodeConnections(unittest.TestCase):
                 self.assertFalse(any(s.startswith('?' + method + '@D3DIMSoultreeObject@@')
                                      for s in names))
             # Those two distinct unresolved boundaries are deliberately unchanged.
-            self.assertIn('?SetPositionVec3@D3DIMSoultreeObject@@QAEXUVector3@@@Z', names)
-            self.assertIn('?Scale@D3DIMSoultreeObject@@QAEXMMM@Z', names)
+            self.assertIn('?SetPositionVec3@SoultreeObject@@QAEXUVector3@@@Z', names)
+            self.assertIn('?Scale@SoultreeObject@@QAEXMMM@Z', names)
             definitions = {s.name for s in objects['soultree'].symbols
                            if s.section_number > 0 and s.storage_class == 2}
             self.assertTrue(set(PROVIDERS) <= definitions)

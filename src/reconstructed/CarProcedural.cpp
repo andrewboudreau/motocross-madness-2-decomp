@@ -104,7 +104,7 @@ CarProcedural::~CarProcedural()
 CarProcedural* CarProcedural::Create(void* renderContext, const char* name, const char* collisionFile,
                                      int lights, int options, void* ground, const char* pathFile,
                                      const Vector3* offset, float speed, int steerFront, float trail,
-                                     int a11, unsigned int wheelCount, float a13,
+                                     float a11, unsigned int wheelCount, float a13,
                                      float a14, float a15)
 {
     GameObject::SetRenderContext(renderContext);

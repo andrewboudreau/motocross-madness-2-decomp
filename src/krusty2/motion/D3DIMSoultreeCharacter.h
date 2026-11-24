@@ -174,8 +174,8 @@ public:
     // --- slot 11, introduced here ---
     // path/desc types follow SoultreePhysicsCharacter slot 40, which passes its name string and
     // descriptor here (tier 2).  context and unused go to SetCharacterRenderContext; desc is
-    // kept at d3d_field_0x1a4+0x60, a copy of the 0x18-byte loadInfo block (when nonzero) at
-    // +0x64 and useOptions at +0x68 (tier 1 decode).
+    // kept in loadDesc (+0x204), a copy of the 0x18-byte loadInfo block (when nonzero) in
+    // loadInfoCopy (+0x208) and useOptions in loadUseOptions (+0x20c) (tier 1 decode).
     // Returns the GameObject subobject (this converted to GameObject*) on success, 0 when the
     // resource could not be found and the object released itself (tier 1 decode of 0x00445680).
     virtual GameObject* LoadCharacter(int context, const char* path, const SoultreeLoadDesc* desc,
@@ -186,7 +186,15 @@ public:
     // absolute offset 0x3bc (0x21c + 0x1a0); its type is shared with
     // SoultreePhysicsBaseObject::sceneNode in the collision area (tier 3).
     SoultreeObject* modelNode;
-    char d3d_field_0x1a4[0x6c];
+    char sltFileName[0x50];          // +0x1a4 slot 11 reads "SLTFile" (General info) into it; BuildModel appends it to contentDirectory; Scene 0x004eaec0 compares it up to its '.'
+    // +0x1f4: four dwords the constructor and Disable (slot 4) zero in order; no
+    // reader found. One array rather than four ints: both spellings fit the
+    // code, and only this one keeps SceneManager.cpp's ReadLight (0x004eb570)
+    // exact (VC6's declaration-count tie-break).
+    int d3d_field_0x1f4[4];
+    const SoultreeLoadDesc* loadDesc;   // +0x204 slot 11's desc; BuildModel passes it to both model loads
+    struct LoadDescCopy* loadInfoCopy;  // +0x208 slot 11's 0x18-byte copy of loadInfo (DebugMalloc line 0x64); freed by the destructor
+    int loadUseOptions;              // +0x20c slot 11's useOptions; BuildModel's second model load gets it
 };
 
 #endif

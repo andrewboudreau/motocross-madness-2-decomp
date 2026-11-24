@@ -4,7 +4,7 @@
 #include "../../src/reconstructed/D3DIMSoulTree.h"
 #include "../physics/helpers/SoultreeScaleProduct.h"
 
-void D3DIMSoultreeObject::Scale(float x, float y, float z)
+void SoultreeObject::Scale(float x, float y, float z)
 {
     Matrix4* local = &localMatrix;
     Matrix4 s;

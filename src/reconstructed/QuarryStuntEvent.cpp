@@ -8,6 +8,7 @@
 #include "QuarryEvent.h"
 
 #include "AuralScape.h"
+#include "CarProcedural.h"
 #include "ControlInterface.h"
 #include "DebugAlloc.h"
 #include "DebugOverlay.h"
@@ -33,6 +34,7 @@
 #include "TerrainShadow.h"
 #include "TextureMapManager.h"
 #include "../krusty2/collision/CollisionObject.h"
+#include "../krusty2/motion/CollisionCharacter.h"
 #include "../krusty2/effects/ParticleManager.h"
 #include "../krusty2/shadow/ProjectedShadow.h"
 #include "../krusty2/soultree/SoultreeQuadTreeRenderer.h"
@@ -161,13 +163,6 @@ struct QuarryLoadPhysicsObjectView {
 struct QuarryLoadTerrainView {
     unsigned char field_0x00[0x40];
     void* worldScale;                          // +0x40 SoultreeProbe::worldScale
-};
-
-// CarProcedural's terrain pointer (Scene's SceneCarProceduralView
-// leaves +0x20c unnamed).
-struct QuarryLoadCarProceduralView {
-    unsigned char field_0x000[0x20c];
-    OverlayTerrainView* groundProvider;            // +0x20c CarProcedural.h
 };
 
 // A racer as the loader reads it.
@@ -679,55 +674,55 @@ int BaseQuarryEvent::LoadEventObjects(LoadProgressFn progress) {
     if (eventScene->animationTable) {
         for (int i = 0; i < eventScene->animationTable->entryCount; i++) {
             if (eventScene->animationTable->entries[i].keyFramed) {
-                SceneCollisionCharacterView* character = eventScene->animationTable->entries[i].character;
+                CollisionCharacter* character = eventScene->animationTable->entries[i].character;
                 if (character->collisionObject) {
-                    ((CollisionObject*)character->collisionObject)->SnapPlacement();
-                    ((CollisionObject*)character->collisionObject)->SetUseBroadphase(1);
-                    ((CollisionObject*)character->collisionObject)->SetIgnoreListMode(0);
+                    character->collisionObject->SnapPlacement();
+                    character->collisionObject->SetUseBroadphase(1);
+                    character->collisionObject->SetIgnoreListMode(0);
                     if (i != ((BikeRace*)raceView)->thirtySecondManEntry && i != ((BikeRace*)raceView)->startGateEntry) {
                         int iterator = 0;
                         for (QuarryLoadKrustyBikeView* racer = (QuarryLoadKrustyBikeView*)((BikeRace*)raceView)->NextBike(&iterator);
                              racer; racer = (QuarryLoadKrustyBikeView*)((BikeRace*)raceView)->NextBike(&iterator)) {
                             if (!racer->isRemote) {
-                                ((CollisionObject*)character->collisionObject)->AddIgnoredOwner(racer->bikeCollision);
-                                ((CollisionObject*)character->collisionObject)->AddIgnoredOwner(racer->bikeAndRiderCollision);
-                                ((CollisionObject*)character->collisionObject)->AddIgnoredOwner(racer->frontWheel);
-                                ((CollisionObject*)character->collisionObject)->AddIgnoredOwner(racer->rearWheel);
-                                ((CollisionObject*)character->collisionObject)
+                                character->collisionObject->AddIgnoredOwner(racer->bikeCollision);
+                                character->collisionObject->AddIgnoredOwner(racer->bikeAndRiderCollision);
+                                character->collisionObject->AddIgnoredOwner(racer->frontWheel);
+                                character->collisionObject->AddIgnoredOwner(racer->rearWheel);
+                                character->collisionObject
                                     ->AddIgnoredOwner(racer->wrecker->collisionModel);
                             }
                         }
                     } else if (character->collisionObject) {
-                        ((CollisionObject*)character->collisionObject)->Release();
+                        character->collisionObject->Release();
                         character->collisionObject = 0;
                     }
                 }
             } else {
-                SceneCarProceduralView* car = eventScene->animationTable->entries[i].proceduralObject;
-                ((QuarryLoadCarProceduralView*)car)->groundProvider = eventTerrain;
-                ((CollisionObject*)car->sensorCollider)->SetIgnoreListMode(1);
+                CarProcedural* car = eventScene->animationTable->entries[i].proceduralObject;
+                car->groundProvider = eventTerrain;
+                car->sensorCollider->SetIgnoreListMode(1);
                 for (int j = 0; j < eventScene->animationTable->entryCount; j++) {
                     SceneAnimation* entry = &eventScene->animationTable->entries[j];
                     if (entry->keyFramed)
-                        ((CollisionObject*)car->sensorCollider)
-                            ->AddIgnoredOwner((CollisionObject*)entry->character->collisionObject);
+                        car->sensorCollider
+                            ->AddIgnoredOwner(entry->character->collisionObject);
                     else
-                        ((CollisionObject*)car->sensorCollider)
-                            ->AddIgnoredOwner((CollisionObject*)entry->proceduralObject->bodyCollider);
+                        car->sensorCollider
+                            ->AddIgnoredOwner(entry->proceduralObject->bodyCollider);
                 }
-                ((CollisionObject*)car->bodyCollider)->SnapPlacement();
-                ((CollisionObject*)car->bodyCollider)->SetUseBroadphase(1);
-                ((CollisionObject*)car->bodyCollider)->SetOwner(car, 0x69);
-                ((CollisionObject*)car->bodyCollider)->SetIgnoreListMode(0);
+                car->bodyCollider->SnapPlacement();
+                car->bodyCollider->SetUseBroadphase(1);
+                car->bodyCollider->SetOwner(car, 0x69);
+                car->bodyCollider->SetIgnoreListMode(0);
                 int iterator = 0;
                 for (QuarryLoadKrustyBikeView* racer = (QuarryLoadKrustyBikeView*)((BikeRace*)raceView)->NextBike(&iterator); racer;
                      racer = (QuarryLoadKrustyBikeView*)((BikeRace*)raceView)->NextBike(&iterator)) {
                     if (!racer->isRemote) {
-                        ((CollisionObject*)car->bodyCollider)->AddIgnoredOwner(racer->bikeCollision);
-                        ((CollisionObject*)car->bodyCollider)->AddIgnoredOwner(racer->bikeAndRiderCollision);
-                        ((CollisionObject*)car->bodyCollider)->AddIgnoredOwner(racer->frontWheel);
-                        ((CollisionObject*)car->bodyCollider)->AddIgnoredOwner(racer->rearWheel);
-                        ((CollisionObject*)car->bodyCollider)->AddIgnoredOwner(racer->wrecker->collisionModel);
+                        car->bodyCollider->AddIgnoredOwner(racer->bikeCollision);
+                        car->bodyCollider->AddIgnoredOwner(racer->bikeAndRiderCollision);
+                        car->bodyCollider->AddIgnoredOwner(racer->frontWheel);
+                        car->bodyCollider->AddIgnoredOwner(racer->rearWheel);
+                        car->bodyCollider->AddIgnoredOwner(racer->wrecker->collisionModel);
                     }
                 }
             }

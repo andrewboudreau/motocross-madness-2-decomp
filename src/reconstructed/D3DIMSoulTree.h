@@ -16,10 +16,10 @@
 // overrides primary slots 2..8, adds slot 9 and overrides GameObject slots
 // 0, 4, 5, 10, 12 and 14. operator new size 0x2d8 (0x004440c8).
 //
-// SoultreeObject and QuadTreeObject are declared here only as far as this
-// file needs them; their code is soultree.cpp's (0x004fb2b0..) and
-// QuadTree's. src/krusty2/core/SoultreeObject.h is the physics code's flat
-// view of the same class. Member names are provisional (tier 3).
+// SoultreeObject (src/krusty2/core/SoultreeObject.h) and QuadTreeObject
+// (src/krusty2/broadphase/QuadTreeObject.h) are the shared declarations;
+// their code is soultree.cpp's (0x004fb2b0..) and Quadtree.cpp's. Member
+// names are provisional (tier 3).
 // LightEmitter.h includes this header, so LightEmitter.cpp,
 // ArcadeObject.cpp, D3DIMSoultreeModifier.cpp, MorphBastardModifier.cpp and
 // QuarryStuntEvent.cpp see the same class.
@@ -36,98 +36,9 @@ class TextureMapManager;
 class ParameterBlock;
 class FileStream;
 
-// RTTI QuadTreeObject (vtable 0x005511c4: 0x004dc610 `or ax, 0xffff; ret`,
-// 0x00434ce0 `mov eax, 0xf; ret 4`). The return types and the one stack
-// argument follow those bodies, so a caller through QuadTreeObject slot 1
-// (EventManager passes the collision quadtree) stays stack-balanced.
-class UnknownSoultreeQuadTreeObject {
-public:
-    virtual short QuadTreeVirtualSlot0();
-    virtual unsigned int QuadTreeVirtualSlot1(void* tree);
-
-    short queryStamp;
-    short sortKey;
-    char objectTypeId;
-};
-
-// RTTI SoultreeObject: constructor 0x004fb2b0 (ret 4), destructor core
-// 0x004fb430 (`this` is the GameObject subobject). Slot argument counts
-// come from each body's `ret N`.
-class SoultreeObject : public UnknownSoultreeQuadTreeObject, public GameObject {
-public:
-    explicit SoultreeObject(int flags);
-    virtual ~SoultreeObject();
-    virtual void LoadHierarchy(FileStream* stream);   // 0x004fdc00 (ret 4): reads a saved node
-    virtual void LoadHierarchyFromParameters();                                  // 0x004fddc0: reads the .slt keys
-    virtual void SoultreeVirtualSlot4(SoultreeObject** out);              // 0x004fe020 (ret 4): clone
-    virtual void SoultreeVirtualSlot5();                                  // 0x00464e90 (shared `ret`)
-    virtual void ResetLocalMatrices();                                  // 0x004fec70
-    virtual void CloneFrom(SoultreeObject* source);            // 0x004feb10 (ret 4): copies `source`
-    virtual void CopySubtree(SoultreeObject* source, SoultreeObject* target); // 0x004feb30 (ret 8)
-    // GameObject slot 25 (0x004fec30, defined in soultree.cpp): hands the
-    // context to every child first. Retail SoultreeObject and
-    // D3DIMSoultreeObject GameObject vtables (+12) both hold it.
-    virtual int AttachRenderContext(void* context);
-
-    // soultree.cpp helpers (thiscall).
-    // Same complete-node pointer (+0), shared with the physics declaration.
-    // Explicit Vec3 output buffers, as in the existing soultree.cpp providers.
-    void GetPositionIn(SoultreeObject* frame, Vec3* out);          // 0x004fc9a0
-    Vec3* GetPosition(Vec3* out);                                 // 0x004fc970
-    void GetAxes(Vec3* first, Vec3* second);                      // 0x004fc4f0
-    void SetPosition(const Vec3& position);                      // 0x004fc660
-    void GetSubtreeBounds(Vec3* center, Vec3* extents);            // 0x004fe850
-    void SetAxes(float zx, float zy, float zz, float yx, float yy, float yz,
-                 int orthogonalize, int keepZ);                   // 0x004fbd10
-    void SetAxesPtr(const Vec3* z, const Vec3* y, int orthogonalize, int keepZ); // 0x004fbd70
-    void Rotate(Vec3 axis, float angle);                         // 0x004fceb0
-    void GetLocalMatrix(Matrix4* out);                            // 0x004fca60
-    void GetMatrixIn(SoultreeObject* frame, Matrix4* out);          // 0x004fca80
-    SoultreeObject* FindByName(const char* name);                  // 0x004fdae0
-    int CountNodes();                                   // 0x004fda30: node count of the subtree
-    void CollectDescendants(int* index, SoultreeObject** nodes);    // 0x004fda60: collects the subtree
-    void SetFlag14c();                                  // 0x004fdb40
-    void ClearFlag14c();                                  // 0x004fdb50
-    void LoadFromParameters(FileStream* stream, int offset); // 0x004fdb60: reads a .slt stream
-    void GetLocalBounds(Vec3* center, Vec3* halfExtent);            // 0x004fe0a0
-    void UpdateSubtreeBounds();                                  // 0x004fe0f0
-    void InvalidateWorldMatrix();                                 // 0x004fb850: invalidate dependent caches
-    void UpdateWorldMatrix();                                      // 0x004fb4f0: world matrix
-    Vector3 LocalToWorldPoint(const Vector3& p);               // 0x004fd660: local -> world point
-    void RegisterNode();                                           // 0x004fedb0: registers the node
-    // Seen from Krusty3DObjects.cpp (src/krusty2/core/SoultreeObject.h
-    // describes the same functions): 0x004fc690 (ret 0x10) moves the node
-    // by `delta` in `frame`, 0x004fd090 (ret 0x10) sets the rotation about
-    // the axis (x, y, z), 0x004fd910 (ret 4) appends `child`, 0x004fd990
-    // (ret 4) unlinks `child`.
-    void TranslateIn(SoultreeObject* frame, Vector3 delta);
-    void SetRotation(float x, float y, float z, float angle);
-    void AddChild(SoultreeObject* child);
-    void RemoveChild(SoultreeObject* child);
-
-    char nodeName[0x80];                       // +0x038 name (krusty2 SoultreeObject::FindByName compares it)
-    Matrix4 localMatrix;                       // local matrix
-    Matrix4 worldMatrix;                       // world matrix
-    int worldValid;                            // world matrix valid
-    SoultreeObject* parent;                    // parent
-    SoultreeObject* firstChild;                // first child
-    SoultreeObject* nextSibling;               // next sibling
-    unsigned char prevSibling[0x14c - 0x148]; // +0x148: SoultreeObject::prevSibling (bytes kept)
-    int hidden;                                // +0x14c (Krusty3DObjects.cpp; provisional)
-    int boundsFound;                           // bounds found (slot 5)
-    int localBoundsValid;                      // +0x154 local bounds valid
-    Vector3 localBoundsCenter;                 // +0x158 local bounds centre
-    Vector3 localBoundsHalfExtent;             // +0x164 local bounds half extent
-    int subtreeBoundsValid;                    // Krusty3DObjects.cpp 0x0048c8a0 sets 1
-    Vector3 subtreeBoundsCenter;               // +0x174 subtree bounds centre (0x004fe0f0; Krusty3DObjects.cpp 0x0048c8a0)
-    Vector3 subtreeBoundsHalfExtent;           // +0x180 subtree bounds half extent (0x004fe0f0)
-    int subtreeDirty;                          // +0x18c subtree bounds dirty (set up the parent chain by 0x004fdab0)
-    int drawsItself;                           // +0x190 slot 12 tests it before the visibility test; the quadtree renderer clears it (core/SoultreeObject.h). Tier 3
-    int inQuadtree;                           // +0x194 SoultreeObject inQuadtree
-    int quadtreeCell;                         // +0x198 SoultreeObject quadtreeCell (15 = none)
-    int loadedNodeCount;                      // +0x19c SoultreeObject loadedNodeCount
-    ParameterBlock* parameterBlock;     // .slt reader
-};
+// RTTI SoultreeObject : QuadTreeObject (+0), GameObject (+0x0c): constructor
+// 0x004fb2b0, code in soultree.cpp. One declaration for every unit.
+#include "../krusty2/core/SoultreeObject.h"
 
 // One 0x20-byte vertex in the D3DLVERTEX layout (drawn with FVF 0x1e2):
 // position, reserved, colour, specular, texture coordinates.
@@ -220,8 +131,8 @@ public:
     virtual ~D3DIMSoultreeObject();                // 0x0043f2b0 (deleting wrapper 0x0043f280)
     virtual void LoadHierarchy(FileStream* stream); // 0x0043f950
     virtual void LoadHierarchyFromParameters();                               // 0x0043fe40
-    virtual void SoultreeVirtualSlot4(SoultreeObject** out);           // 0x004440a0
-    virtual void SoultreeVirtualSlot5();                               // 0x00444140
+    virtual void CreateNode(SoultreeObject** out);           // 0x004440a0
+    virtual void UpdateLocalBounds();                        // 0x00444140
     virtual void ResetLocalMatrices();                               // 0x004450c0
     virtual void CloneFrom(SoultreeObject* source);         // 0x00444560
     virtual void CopySubtree(SoultreeObject* source, SoultreeObject* target); // 0x00444b60
@@ -243,8 +154,6 @@ public:
     virtual int PrepareGeometry();                 // 0x00443aa0
     virtual int Render3D();            // 0x00444030
 
-    void SetPositionVec3(Vector3 position);  // 0x004fc630: sets the local translation
-    void Scale(float x, float y, float z); // 0x004fd340
     void AddModifier(GameObject* modifier);        // 0x00444d80: appends to the first list (+0x264)
     // Seen from D3DIMSoultreeModifier.cpp: 0x00444de0 and 0x00444f10 (both
     // ret 4) remove a modifier from the first (+0x264) or second (+0x26c)

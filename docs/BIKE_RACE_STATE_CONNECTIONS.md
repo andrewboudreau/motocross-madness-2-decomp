@@ -118,6 +118,11 @@ character and car model nodes as `D3DIMSoultreeObject*` (a forward declaration) 
 two-method `SceneSoultreeObjectView`. The proof over the 32 affected units found only CreateRacers'
 six bytes changed; the pins carry the 13,394 fingerprints again.
 
+Replacing the remaining Scene views with the real classes moved it back to 13,400 with retail's
+order. SceneManager.h's entries now point at `CollisionCharacter` and `CarProcedural`, and the
+scene loader constructs `SoultreePhysicsObject`. The proof found CreateRacers' six bytes as the only
+BikeRace.cpp change, and the resolved digests are again the earlier 13,400 ones.
+
 | Complete CreateRacers fingerprint | Before | After |
 |---|---|---|
 | Raw body SHA-256 | `1a2b16687fa89e9a0ed33dba31a1e46452caaaefa3ad73ce630b317a32bf07c4` | `9c7483a4d5ff8514f8a350f528dbe11d8d82d4d694439f87d069fd6fbf9e748b` |

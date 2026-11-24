@@ -81,8 +81,9 @@ static void Run(int reference,unsigned rounding,unsigned precision) {
     _controlfp(rounding|precision,_MCW_RC|_MCW_PC);
     __try {
         if(reference==1) {
-            void(SoultreeObject::*method)(Vec3);DWORD address=0x4fc630;
-            if(sizeof(method)!=4)ExitProcess(12);memcpy(&method,&address,4);
+            // SoultreeObject has two bases: {code address, this adjustment 0}.
+            void(SoultreeObject::*method)(Vec3);DWORD words[2]={0x4fc630,0};
+            if(sizeof(method)!=8)ExitProcess(12);memcpy(&method,words,8);
             (receiver->*method)(*input);
         } else if(reference==2)RenderingPositionBoundary(receiver,input);
         else receiver->SetPositionVec3(*input);

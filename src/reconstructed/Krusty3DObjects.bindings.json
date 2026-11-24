@@ -115,7 +115,7 @@
   "?TranslateIn@SoultreeObject@@QAEXPAV1@UVector3@@@Z": "0x004fc690",
   "?GetPosition@BonusSoultreeObjectView@@QAEXPAUVector3@@@Z": "0x004fc970",
   "?SetRotation@SoultreeObject@@QAEXMMMM@Z": "0x004fd090",
-  "?Scale@D3DIMSoultreeObject@@QAEXMMM@Z": "0x004fd340",
+  "?Scale@SoultreeObject@@QAEXMMM@Z": "0x004fd340",
   "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
   "__real@4@40008000000000000000": "0x0055074c",
   "__real@4@4001a000000000000000": "0x00550794",

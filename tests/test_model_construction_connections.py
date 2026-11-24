@@ -79,7 +79,7 @@ class ModelConstructionConnectionsTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix='mcm2-model-connections-') as directory:
             output = Path(directory)
             extracted = output / 'soultree.cpp'
-            extracted.write_text('#define SOULTREE_OBJECT_WITH_BASES\n#include <string.h>\n'
+            extracted.write_text('#include <string.h>\n'
                 '#include "math/Math3D.h"\n' + '\n\n'.join(
                     function_text((ROOT / NODE).read_text(), row[0]) for row in HELPERS))
             fixture = 'tests/fixtures/model_node_routes.cpp'

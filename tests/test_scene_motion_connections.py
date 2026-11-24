@@ -22,10 +22,8 @@ ROOT = Path(__file__).resolve().parents[1]
 SCENE = 'src/reconstructed/SceneManager.cpp'
 MOTION = 'src/krusty2/motion/Motnctrl.cpp'
 FIXTURE = 'tests/fixtures/scene_motion_compare.cpp'
-RENAMES = {
-    '?SetMotion@SceneCollisionCharacterView@@QAEXPAX@Z': '?SetMotion@Character@@QAEXPAUMotion@@@Z',
-    '?AdvanceMotion@SceneCollisionCharacterView@@QAEHMHH@Z': '?AdvanceMotion@Character@@QAEHMHH@Z',
-}
+# RestartEntry's two Character calls, made directly on the entry's CollisionCharacter.
+CHARACTER_CALLS = ('?SetMotion@Character@@QAEXPAUMotion@@@Z', '?AdvanceMotion@Character@@QAEHMHH@Z')
 
 
 def object_fingerprint(obj, root, renames=None):
@@ -124,7 +122,7 @@ class SceneMotionConnectionsTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix='mcm2-scene-motion-') as directory:
             output = Path(directory)
             extracted = {
-                'restart': '#include "SceneManager.h"\n#include "motion/D3DIMSoultreeCharacter.h"\n' +
+                'restart': '#include "SceneManager.h"\n#include "CarProcedural.h"\n#include "motion/CollisionCharacter.h"\n' +
                     extract(ROOT/SCENE, 'int Scene::RestartEntry('),
                 'motion': '#include "motion/Motnctrl.h"\n' + '\n'.join(extract(ROOT/MOTION, start) for start in (
                     'int AdvanceLooping(', 'inline void ClampFloat(', 'inline float SmoothStep(',
@@ -149,8 +147,8 @@ class SceneMotionConnectionsTests(unittest.TestCase):
                 paths[key], objects[key] = obj, CoffObject(obj)
             self.assertEqual(object_fingerprint(objects[SCENE], ROOT), baseline[SCENE], SCENE)
             imports = {s.name for s in objects[SCENE].symbols if s.section_number == 0}
-            self.assertFalse(set(RENAMES) & imports)
-            self.assertTrue(set(RENAMES.values()) <= imports)
+            self.assertTrue(set(CHARACTER_CALLS) <= imports)
+            self.assertFalse([name for name in imports if 'SceneCollisionCharacterView' in name])
             strict = 0
             cases = [c for c in CASES if c['source'] == SCENE]
             self.assertEqual(len(cases), 52)
@@ -178,8 +176,8 @@ class SceneMotionConnectionsTests(unittest.TestCase):
             joined = [(0x4eb040+r.virtual_address-entry.value-1,
                        objects[SCENE].symbol_by_index[r.symbol_index].name)
                       for r in relocs if r.type == 20 and
-                      objects[SCENE].symbol_by_index[r.symbol_index].name in RENAMES.values()]
-            self.assertEqual(joined, list(zip((0x4eb0f1, 0x4eb108), RENAMES.values())))
+                      objects[SCENE].symbol_by_index[r.symbol_index].name in CHARACTER_CALLS]
+            self.assertEqual(joined, list(zip((0x4eb0f1, 0x4eb108), CHARACTER_CALLS)))
             # This is the sole reference patch: original AdvanceLooping's CRT
             # conversion calls the authentic VC6 _ftol in the test executable.
             self.assertEqual(decoded(0x4a56d0, 121)[0x4a56ed], ('call', '0x534a88'))

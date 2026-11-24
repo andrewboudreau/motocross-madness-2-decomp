@@ -1,6 +1,5 @@
 // Bring-up definitions (best-guess-unreviewed) on the real soultree.cpp view
-// of SoultreeObject (SOULTREE_OBJECT_WITH_BASES, as src/krusty2/soultree/soultree.cpp).
-#define SOULTREE_OBJECT_WITH_BASES
+// of SoultreeObject (core/SoultreeObject.h, as src/krusty2/soultree/soultree.cpp).
 #include "math/Math3D.h"
 
 // Primary vtable 0x00557c18 slot 5 is 0x00464e90, the shared one-instruction

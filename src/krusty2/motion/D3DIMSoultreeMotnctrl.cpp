@@ -59,10 +59,10 @@ int FillNodeNames(int index, NodeNameEntry* table, SoultreeObject* node)
 void D3DIMSoultreeCharacter::CopyStateFrom(int other)
 {
     D3DIMSoultreeCharacter* src = (D3DIMSoultreeCharacter*)other;
-    int len = strlen(src->d3d_field_0x1a4);
+    int len = strlen(src->sltFileName);
     int copyLength = len > 0x4f ? 0x4f : len;
-    strncpy(d3d_field_0x1a4, src->d3d_field_0x1a4, copyLength);
-    d3d_field_0x1a4[copyLength] = 0;
+    strncpy(sltFileName, src->sltFileName, copyLength);
+    sltFileName[copyLength] = 0;
     Character::CopyStateFrom(other);
 }
 
@@ -225,8 +225,8 @@ void D3DIMSoultreeCharacter::CaptureRestPose()
 // owned by this object, then runs Character's destructor.
 D3DIMSoultreeCharacter::~D3DIMSoultreeCharacter()
 {
-    if (*(void**)(d3d_field_0x1a4 + 0x64))
-        DebugFree(*(void**)(d3d_field_0x1a4 + 0x64), __FILE__, 0xc4);
+    if (loadInfoCopy)
+        DebugFree(loadInfoCopy, __FILE__, 0xc4);
     if (nodeNames)
         operator delete(nodeNames);
     void* entry = g_ResourceManager->FindItemByObject(this);
@@ -239,10 +239,10 @@ D3DIMSoultreeCharacter::~D3DIMSoultreeCharacter()
 void D3DIMSoultreeCharacter::Disable()
 {
     GameObject::Disable();
-    *(int*)(d3d_field_0x1a4 + 0x50) = 0;
-    *(int*)(d3d_field_0x1a4 + 0x54) = 0;
-    *(int*)(d3d_field_0x1a4 + 0x58) = 0;
-    *(int*)(d3d_field_0x1a4 + 0x5c) = 0;
+    d3d_field_0x1f4[0] = 0;
+    d3d_field_0x1f4[1] = 0;
+    d3d_field_0x1f4[2] = 0;
+    d3d_field_0x1f4[3] = 0;
 }
 
 // GameObject slot 5 override (0x00446620, thunk 0x004466d0): forwards to GameObject's slot 5.
@@ -257,12 +257,12 @@ void D3DIMSoultreeCharacter::Enable()
 D3DIMSoultreeCharacter::D3DIMSoultreeCharacter(int flags) : GameObject(1), Character(flags)
 {
     modelNode = 0;
-    d3d_field_0x1a4[0] = 0;
-    *(int*)(d3d_field_0x1a4 + 0x50) = 0;
-    *(int*)(d3d_field_0x1a4 + 0x54) = 0;
-    *(int*)(d3d_field_0x1a4 + 0x58) = 0;
-    *(int*)(d3d_field_0x1a4 + 0x5c) = 0;
-    *(int*)(d3d_field_0x1a4 + 0x64) = 0;
+    sltFileName[0] = 0;
+    d3d_field_0x1f4[0] = 0;
+    d3d_field_0x1f4[1] = 0;
+    d3d_field_0x1f4[2] = 0;
+    d3d_field_0x1f4[3] = 0;
+    loadInfoCopy = 0;
     nodeNames = 0;
 }
 
@@ -326,11 +326,11 @@ void D3DIMSoultreeCharacter::BuildModel()
     int copyLength = len > 0x103 ? 0x103 : len;
     strncpy(name, contentDirectory, copyLength);
     name[copyLength] = 0;
-    strcat(name, d3d_field_0x1a4);
+    strcat(name, sltFileName);
 
     ModelObject* frame = reinterpret_cast<ModelObject*>(new(__FILE__, 0xd6) D3DIMSoultreeObject(isEnabled));
     modelNode = (SoultreeObject*)frame;
-    frame->Load(renderContext, "", *(int*)(d3d_field_0x1a4 + 0x60), *(int*)(d3d_field_0x1a4 + 0x64), 1);
+    frame->Load(renderContext, "", (int)loadDesc, (int)loadInfoCopy, 1);
     GameObject* frameChild = (ModelObject*)modelNode;
     AppendChild(frameChild, -1);
     modelNode->RegisterNode();
@@ -340,8 +340,7 @@ void D3DIMSoultreeCharacter::BuildModel()
     modelNode->name[copyLength] = 0;
 
     ModelObject* loaded = reinterpret_cast<ModelObject*>(new(__FILE__, 0xdf) D3DIMSoultreeObject(isEnabled));
-    loaded->Load(renderContext, name, *(int*)(d3d_field_0x1a4 + 0x60), *(int*)(d3d_field_0x1a4 + 0x64),
-                 *(int*)(d3d_field_0x1a4 + 0x68));
+    loaded->Load(renderContext, name, (int)loadDesc, (int)loadInfoCopy, loadUseOptions);
     ((SoultreeObject*)loaded)->UnregisterNode();
     void* owner = g_ResourceManager->FindItemByObject(loaded);
     if (owner)
@@ -394,11 +393,11 @@ GameObject* D3DIMSoultreeCharacter::LoadCharacter(int context, const char* path,
     char dir[0x100];
     ReadClock();
     SetCharacterRenderContext(context, unused);
-    *(const SoultreeLoadDesc**)(d3d_field_0x1a4 + 0x60) = desc;
-    *(int*)(d3d_field_0x1a4 + 0x68) = useOptions;
+    loadDesc = desc;
+    loadUseOptions = useOptions;
     if (loadInfo) {
         LoadDescCopy* copy = (LoadDescCopy*)DebugMalloc(0x18, __FILE__, 0x64);
-        *(LoadDescCopy**)(d3d_field_0x1a4 + 0x64) = copy;
+        loadInfoCopy = copy;
         *copy = *(LoadDescCopy*)loadInfo;
     }
     FileStream* file = new(__FILE__, 0x68) FileStream(g_ResourceManager);
@@ -430,7 +429,7 @@ GameObject* D3DIMSoultreeCharacter::LoadCharacter(int context, const char* path,
     sltFile = new(__FILE__, 0xa5) ParameterBlock();
     sltFile->Attach((FileStream*)file, 0, 1);
     sltFile->SelectSection("General info");
-    sltFile->ReadString("SLTFile", d3d_field_0x1a4, -1);
+    sltFile->ReadString("SLTFile", sltFileName, -1);
     LoadFromSlt();
     delete sltFile;
     g_ResourceManager->SetItemObject(entry, this);

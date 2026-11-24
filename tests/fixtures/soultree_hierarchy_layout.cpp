@@ -1,6 +1,5 @@
 #include <stddef.h>
 #ifdef PHYSICS_VIEW
-#define SOULTREE_OBJECT_WITH_BASES
 #include "../../src/krusty2/math/Math3D.h"
 #else
 #include "../../src/reconstructed/D3DIMSoulTree.h"

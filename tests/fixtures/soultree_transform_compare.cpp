@@ -69,9 +69,19 @@ Vec3 Vec3Normalize(const Vec3& v) {
     return ((Vec3(__cdecl*)(const Vec3&))0x5087b0)(v);
 }
 
+// SoultreeObject has two bases (QuadTreeObject, GameObject), so its member
+// pointers are {code address, this adjustment}; these methods adjust by 0.
 template<class T> static DWORD MethodAddress(T method) {
-    if (sizeof(method)!=sizeof(DWORD)) ExitProcess(83);
-    DWORD address; memcpy(&address,&method,4); return address;
+    DWORD words[2]={0,0};
+    if (sizeof(method)!=sizeof(DWORD) && sizeof(method)!=sizeof(words)) ExitProcess(83);
+    memcpy(words,&method,sizeof(method));
+    if (words[1]) ExitProcess(83);
+    return words[0];
+}
+template<class T> static void MethodFromAddress(T* method, DWORD address) {
+    DWORD words[2]={address,0};
+    if (sizeof(*method)!=sizeof(DWORD) && sizeof(*method)!=sizeof(words)) ExitProcess(83);
+    memcpy(method,words,sizeof(*method));
 }
 static int MapReference(const char* path,const char* patches) {
     // The private fixture's large BSS reserves this range before process heaps
@@ -150,7 +160,7 @@ static void Invoke(int method,DWORD address,int frame,int alias,int flags,int re
     if (method==0) {
         // Spell the hidden result-buffer ABI explicitly to test output aliases.
         typedef Vec3*(SoultreeObject::*Fn)(Vec3*,const Vec3&);
-        Fn fn; memcpy(&fn,&address,4);
+        Fn fn; MethodFromAddress(&fn,address);
         Vec3* input=AxisInput(alias,0);
         int shift=seedValue%2+1;
         if (alias && seedValue%4>=2) shift=-shift;
@@ -159,10 +169,10 @@ static void Invoke(int method,DWORD address,int frame,int alias,int flags,int re
         if ((Node(0)->*fn)(out,*input)!=out) ExitProcess(84);
     } else if (method==1) {
         typedef void(SoultreeObject::*Fn)(SoultreeObject*,Matrix4*);
-        Fn fn; memcpy(&fn,&address,4); (Node(0)->*fn)(f,MatrixInput(alias));
+        Fn fn; MethodFromAddress(&fn,address); (Node(0)->*fn)(f,MatrixInput(alias));
     } else {
         typedef void(SoultreeObject::*Fn)(SoultreeObject*,const Vec3*,const Vec3*,int,int);
-        Fn fn; memcpy(&fn,&address,4);
+        Fn fn; MethodFromAddress(&fn,address);
         Vec3* z=AxisInput(alias,0);
         Vec3* y=seedValue%5==2?z:seedValue%5==3?(Vec3*)((float*)z+1):
             AxisInput(seedValue%5==4?(alias+3)%7:alias,1);

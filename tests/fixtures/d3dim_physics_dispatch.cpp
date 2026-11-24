@@ -17,8 +17,8 @@ extern "C" void DISPATCH(void* owner, int slot, void* first, void* second)
     switch (slot) {
     case 2: object->LoadHierarchy(static_cast<FileStream*>(first)); break;
     case 3: object->LoadHierarchyFromParameters(); break;
-    case 4: object->SoultreeVirtualSlot4(static_cast<SoultreeObject**>(first)); break;
-    case 5: object->SoultreeVirtualSlot5(); break;
+    case 4: object->CreateNode(static_cast<SoultreeObject**>(first)); break;
+    case 5: object->UpdateLocalBounds(); break;
     case 6: object->ResetLocalMatrices(); break;
     case 7: object->CloneFrom(static_cast<SoultreeObject*>(first)); break;
     case 8: object->CopySubtree(static_cast<SoultreeObject*>(first),static_cast<SoultreeObject*>(second)); break;

@@ -10,17 +10,17 @@
   "renames": {
     "?D3DIMObjectVirtualSlot2@D3DIMSoultreeObject@@UAEXXZ": "?LoadHierarchy@D3DIMSoultreeObject@@UAEXPAVFileStream@@@Z",
     "?D3DIMObjectVirtualSlot3@D3DIMSoultreeObject@@UAEXXZ": "?LoadHierarchyFromParameters@D3DIMSoultreeObject@@UAEXXZ",
-    "?D3DIMObjectVirtualSlot4@D3DIMSoultreeObject@@UAEXXZ": "?SoultreeVirtualSlot4@D3DIMSoultreeObject@@UAEXPAPAVSoultreeObject@@@Z",
-    "?D3DIMObjectVirtualSlot5@D3DIMSoultreeObject@@UAEXXZ": "?SoultreeVirtualSlot5@D3DIMSoultreeObject@@UAEXXZ",
+    "?D3DIMObjectVirtualSlot4@D3DIMSoultreeObject@@UAEXXZ": "?CreateNode@D3DIMSoultreeObject@@UAEXPAPAVSoultreeObject@@@Z",
+    "?D3DIMObjectVirtualSlot5@D3DIMSoultreeObject@@UAEXXZ": "?UpdateLocalBounds@D3DIMSoultreeObject@@UAEXXZ",
     "?D3DIMObjectVirtualSlot6@D3DIMSoultreeObject@@UAEXXZ": "?ResetLocalMatrices@D3DIMSoultreeObject@@UAEXXZ",
     "?D3DIMObjectVirtualSlot7@D3DIMSoultreeObject@@UAEXXZ": "?CloneFrom@D3DIMSoultreeObject@@UAEXPAVSoultreeObject@@@Z",
     "?D3DIMObjectVirtualSlot8@D3DIMSoultreeObject@@UAEXXZ": "?CopySubtree@D3DIMSoultreeObject@@UAEXPAVSoultreeObject@@0@Z"
   },
   "objects": {
     "src/krusty2/soultree/SoulTreePhysics.cpp": {
-      "sections": 161,
-      "relocations": 784,
-      "sha256": "b7fc90dc2239b8374a665fafdf06e5cc702cd82ec11a1e74e50c2a2ffb57cfdb"
+      "sections": 163,
+      "relocations": 787,
+      "sha256": "5dec96409e0bb45ef138b8ba5488586183c9df164d29b61daa8b25c83f3e71d9"
     },
     "src/krusty2/vehicle/Vehicle.cpp": {
       "sections": 151,
@@ -72,14 +72,14 @@
     },
     {
       "source": "src/reconstructed/D3DIMSoulTree.cpp",
-      "symbol": "?SoultreeVirtualSlot4@D3DIMSoultreeObject@@UAEXPAPAVSoultreeObject@@@Z",
+      "symbol": "?CreateNode@D3DIMSoultreeObject@@UAEXPAPAVSoultreeObject@@@Z",
       "target_va": "0x004440a0",
       "target_size": 146,
       "bindings": "src/reconstructed/D3DIMSoulTree.bindings.json"
     },
     {
       "source": "src/reconstructed/D3DIMSoulTree.cpp",
-      "symbol": "?SoultreeVirtualSlot5@D3DIMSoultreeObject@@UAEXXZ",
+      "symbol": "?UpdateLocalBounds@D3DIMSoultreeObject@@UAEXXZ",
       "target_va": "0x00444140",
       "target_size": 763,
       "bindings": "src/reconstructed/D3DIMSoulTree.bindings.json"

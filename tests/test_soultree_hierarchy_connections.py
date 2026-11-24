@@ -75,7 +75,7 @@ class SoultreeHierarchyConnectionsTests(unittest.TestCase):
             for method, slot, base_va, base_size, derived_va, derived_size in METHODS:
                 for source, class_name, va, size, table, suffix in (
                     (NODE, 'SoultreeObject', base_va, base_size, 0x557c18, 'QuadTreeObject'),
-                    (MODEL, 'D3DIMSoultreeObject', derived_va, derived_size, 0x5513ec, 'UnknownSoultreeQuadTreeObject')):
+                    (MODEL, 'D3DIMSoultreeObject', derived_va, derived_size, 0x5513ec, 'QuadTreeObject')):
                     obj = objects[source]
                     entry = obj.find_symbol('?' + method + '@' + class_name + '@@')
                     self.assertEqual((entry.function_size, entry.extent_source), (size, 'coff_function_aux'))

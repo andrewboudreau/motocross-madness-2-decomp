@@ -75,20 +75,21 @@ type, member and function names are provisional.
 
 - `SceneLight`, `SceneEnvironment`: the light and environment
   records; offsets from the readers, names from the section keys.
-- `SceneCollisionCharacterView` is the key-framed entry's CollisionCharacter. It has
-  its own vfptr at +0, a vbptr at +4, the GameObject virtual base at +0x268
-  and fields +0x0c, +0x10, +0x1a0, +0x1a4 and +0x210. It stays a `struct`
-  so the bound mangled names keep `PAU`.
-- `SceneCarProceduralView` is the procedural entry's CarProcedural: a
-  GameObject with +0x34, +0x38/+0x3c, +0x5c and +0x194, plus slot 27.
-  Naming +0x20c as well changes VC6's code for `0x004eb570`.
-- The character (+0x1a0) and car (+0x34) model nodes are `D3DIMSoultreeObject*`.
+- The entries hold the real classes: the key-framed entry's
+  `CollisionCharacter` (src/krusty2/motion) and the procedural entry's
+  `CarProcedural` (CarProcedural.h). Scene reads the character's
+  `sltFileName` (+0x1a4) and model node (+0x1a0), and the car's model (+0x34),
+  collision objects and slot 27 `Tick`.
+- The model nodes are cast to `D3DIMSoultreeObject*` at the use site: the
+  character's node is declared `SoultreeObject*`, the car's `CarProceduralModel*`.
   The scene calls `0x004444c0` and `0x004451e0` on them, and the SoultreeObject
   methods `0x004fbd70` and `0x004fc660` with the `Vector3` arguments cast to `Vec3`.
 - `ReadStaticModels` constructs the real DustParticleEmitter, DirtChunkParticleEmitter,
-  DirtSprayParticleEmitter (ParticleEmitters.h) and CollisionObject
-  (src/krusty2/collision); only the physics object stays a view, because
-  SoultreePhysicsObject.h declares its own `D3DIMSoultreeObject` base.
+  DirtSprayParticleEmitter (ParticleEmitters.h), CollisionObject
+  (src/krusty2/collision) and SoultreePhysicsObject (src/krusty2/soultree).
+- `D3DIMSoultreeCharacter` keeps the four zeroed dwords at +0x1f4 as one array:
+  four separate ints change VC6's code for `0x004eb570` (ReadLight) through the
+  declaration-count tie-break.
 
   Together they are what the entry functions touch of the Soultree classes.
 - `SceneAnimation` types +0x08 (the procedural object), +0x0c (a
@@ -160,8 +161,7 @@ and the two `fileName` buffers (animation entry +0x2c, static model +0x10)
 are named. The section pointers `+0xa4..+0xbc`, the table, caster, light
 and entry fields keep their placeholders because `QuarryStuntEvent.cpp` and
 its loader sample read them too; renaming them is a joint change with that
-unit. `SceneCollisionCharacterView::field_0x10` cannot take a name without the
-member lookup resolving to the virtual base's protected `field_0x10`.
+unit.
 
 ## The model and animation readers
 

@@ -125,7 +125,7 @@ against retail, 600 runs with 0 mismatches):
     An all-double sum scores 6625 only because its longer x87 code
     realigns the stream. It is not retail's float code.
 - `0x00419970` (`CreateRacers`, the racer loader; 13428 bytes; ret 0x14;
-  frame 0xab0): 13394 of 13428 bytes; linked 1.0. The body is decoded
+  frame 0xab0): 13400 of 13428 bytes; linked 1.0. The body is decoded
   completely: pro circuit, network, offline, ghost and AI racers, collision
   pairing, and the 10 EH states. The facts that put every buffer and scalar
   at retail's offset:
@@ -164,8 +164,9 @@ against retail, 600 runs with 0 mismatches):
   KrustyBikeCore.h gained for `KrustyBike::Load`'s game types put them in the
   swapped window (13394); moving `EventAiRacerRecord` into EventManager.h
   and retiring the podium views moved them back (13400); typing the scene
-  model nodes in SceneManager.h swapped them again (13394;
-  BIKE_RACE_STATE_CONNECTIONS.md).
+  model nodes in SceneManager.h swapped them again (13394); replacing the
+  Scene views with CollisionCharacter, CarProcedural and SoultreePhysicsObject
+  moved them back (13400; BIKE_RACE_STATE_CONNECTIONS.md).
 
 Facts the two loaders establish:
 - Racers are KrustyBike (constructor `0x0048fa60`, 0x1638 bytes, the

@@ -20,96 +20,12 @@ struct DS3DBuffer;
 // (0x004451e0) and the loader its position and axes (0x004fc660, 0x004fbd70).
 class D3DIMSoultreeObject;
 
-// The object a key-framed scene entry holds: CollisionCharacter (0x294
-// bytes, constructor 0x004318d0, src/krusty2/motion), a
-// D3DIMSoultreeCharacter with its own vtable at +0, a vbptr at +4 and the
-// GameObject virtual base at +0x268. Tier 2: 0x004eb040 calls 0x004a8b40
-// (D3DIMSoultreeCharacter::SetMotion in src/krusty2/motion) on it, whose
-// +0x1a4 buffer 0x004eaec0 compares as the name. Only what the scene uses is
-// declared.
-struct SceneCollisionCharacterView : public virtual GameObject {
-public:
-    explicit SceneCollisionCharacterView(int flags);            // 0x004318d0
-    virtual void UnknownVirtualSlot0();
-
-    // 0x004319c0: loads the character and returns the GameObject to add
-    // (CollisionCharacter::Load, src/krusty2/motion).
-    GameObject* Load(void* owner, const char* name, const char* colPath,
-                     LightManager* lights, int loadInfo, int useOptions, int unused);
-    void* FindMotion(const char* name, int unused); // 0x004a6b30 (FindMotion)
-    void SetMotion(void* motion);          // 0x004a8b40 (SetMotion)
-    int AdvanceMotion(float time, int mirror, int mask); // 0x004a6bb0: advances the motion
-
-    unsigned char sltFile[0x0c - 0x08];  // +0x08 Character sltFile (bytes kept)
-    int motionStopped;                        // +0xC  Character +0x0c (D3DIMSoultreeCharacter.h motionStopped): set when a non-looping motion ends, cleared by SetMotion 0x004a8b40; AdvanceMotion returns 0 while set
-    int motionTime;  // +0x10  Character +0x10: motion time (slot 7 adds time to it); RestartEntry zeroes it before AdvanceMotion
-    unsigned char field_0x014[0x1a0 - 0x14];
-    D3DIMSoultreeObject* modelNode;           // +0x1a0
-    char fileName[0x6c];  // +0x1A4  FindEntryByFileName (0x004eaec0) compares it, up to its '.', with the path's file name
-    void* collisionObject;                // +0x210 CollisionCharacter's CollisionObject (QuarryStuntEvent.cpp)
-    unsigned char field_0x214[0x268 - 0x214];
-};
-
-// What SceneAnimation::proceduralObject holds for procedural entries (without
-// bit 3): CarProcedural (0x22c bytes), a GameObject whose slot 10 0x004eb040
-// calls. Only what the scene uses is declared.
-class SceneCarProceduralView : public GameObject {
-public:
-    explicit SceneCarProceduralView(int flags);    // 0x0042f390 (CarProcedural)
-    // Slot 27 (0x0042f600, CarProcedural.h): loads the model and its path;
-    // returns the object to add.
-    virtual GameObject* Create(void* owner, const char* name, const char* colPath,
-                               LightManager* lights, int options, int ground, const char* vuePath,
-                               const Vector3* position, float fps, int frontWheelsTurn,
-                               float lagDistance, float a11, int tires, float a13,
-                               float a14, float a15);
-
-    int drawColor;                            // +0x2c GraphicsTest drawColor (CarProcedural's base)
-    int specularColor;                        // +0x30 GraphicsTest specularColor
-    D3DIMSoultreeObject* carModel;      // +0x34  CarProcedural +0x34 carModel; SetDetailLevel/BikeRace use it as the model node
-    void* sensorCollider;  // +0x38  CarProcedural +0x38 sensorCollider (QuarryStuntEvent sets collision ignore lists)
-    void* bodyCollider;  // +0x3C  CarProcedural +0x3c bodyCollider
-    Vector3 pathVelocity;                     // +0x40 CarProcedural pathVelocity
-    float groundSpeed;                        // +0x4c CarProcedural groundSpeed
-    int steersFrontWheels;                    // +0x50 CarProcedural steersFrontWheels
-    int started;                              // +0x54 CarProcedural started
-    unsigned char field_0x58[0x5c - 0x58];
-    int skipSmoothing;                        // +0x5C  CarProcedural +0x5c; RestartEntry sets it unless the restart time was clamped
-    unsigned int numWheels;                   // +0x60 CarProcedural numWheels
-    unsigned int currentPathKey;              // +0x64 CarProcedural currentPathKey
-    unsigned char field_0x68[0x6c - 0x68];
-    unsigned int pathKeyCount;                // +0x6c CarProcedural pathKeyCount
-    char carName[0x100];                      // +0x70 CarProcedural carName
-    float pathSpeed;                          // +0x170 CarProcedural pathSpeed
-    float inversePathSpeed;                   // +0x174 CarProcedural inversePathSpeed
-    unsigned char field_0x178[0x184 - 0x178];
-    float inverseWheelRadius;                 // +0x184 CarProcedural inverseWheelRadius
-    float sensorHalfHeight;                   // +0x188 CarProcedural sensorHalfHeight
-    float wheelSpinAngle;                     // +0x18c CarProcedural wheelSpinAngle
-    float steeringAngle;                      // +0x190 CarProcedural steeringAngle
-    float pathTime;  // +0x194  CarProcedural +0x194 pathTime; RestartEntry (0x004eb040) sets it to the restart time
-    float frontWheelZ;                        // +0x198 CarProcedural frontWheelZ
-    float trailDistance;                      // +0x19c CarProcedural trailDistance
-    float trailTimeOffset;                    // +0x1a0 CarProcedural trailTimeOffset
-    float lookAheadTime;                      // +0x1a4 CarProcedural lookAheadTime
-    float velocityScale;                      // +0x1a8 CarProcedural velocityScale
-    float backBlend;                          // +0x1ac CarProcedural backBlend
-    float normalBlend;                        // +0x1b0 CarProcedural normalBlend
-    void* pathKeys;                           // +0x1b4 CarProcedural pathKeys (a CarProceduralKey*)
-    unsigned char field_0x1b8[0x1c4 - 0x1b8];
-    Vector3 pathPosition;                     // +0x1c4 CarProcedural pathPosition
-    Vector3 pathOffset;                       // +0x1d0 CarProcedural pathOffset
-    Vector3 bodyOffset;                       // +0x1dc CarProcedural bodyOffset
-    unsigned char field_0x1e8[0x1f4 - 0x1e8];
-    Vector3 smoothedBack;                     // +0x1f4 CarProcedural smoothedBack
-    Vector3 smoothedNormal;                   // +0x200 CarProcedural smoothedNormal
-    // +0x20c (the terrain) stays unnamed here: naming it together with
-    // +0x38/+0x3c changes VC6's code for 0x004eb570.
-    unsigned char field_0x20c[0x210 - 0x20c];
-    void** wheelNodes;                        // +0x210 CarProcedural wheelNodes (CarProceduralNode**)
-    Vector3 bodyContactPoint;                 // +0x214 CarProcedural bodyContactPoint
-    Vector3 bodyContactNormal;                // +0x220 CarProcedural bodyContactNormal
-};
+// What a scene entry holds: a key-framed entry (bit 3) a CollisionCharacter
+// (0x294 bytes, constructor 0x004318d0, src/krusty2/motion/CollisionCharacter.h),
+// any other entry a CarProcedural (0x22c bytes, constructor 0x0042f390,
+// CarProcedural.h).
+class CollisionCharacter;
+class CarProcedural;
 
 // 0x44-byte element of SceneAnimationTable::entries (an "Animation<n>"
 // section). The flag byte at +0 is read and written as single bits
@@ -123,8 +39,8 @@ struct SceneAnimation {
     unsigned char excludeFromCameraIteration : 1; // +0x00 bit 4: the "ExcludeFromCameraIteration" parameter; bikerace.cpp's camera (0x0041f1d0) skips it
     unsigned char animatesWhileHeld : 1;      // +0x00 bit 5 (provisional): Scene slot 10 still advances the entry while holdAnimations is set; cleared by 0x004edfe0, bikerace.cpp sets it for the 30SecMan
     unsigned char field_0x01[3];
-    SceneCollisionCharacterView* character;            // +0x04 key-framed (bit 3)
-    SceneCarProceduralView* proceduralObject; // +0x08 procedural
+    CollisionCharacter* character;            // +0x04 key-framed (bit 3)
+    CarProcedural* proceduralObject;          // +0x08 procedural
     Vector3 position;                     // "Position" (or "Offset")
     int motionFrame;                          // +0x18  the frame number AdvanceMotion 0x004a6bb0 returned (RestartEntry, Scene slot 10 0x004eae7d)
     int motionCount;                      // "NumberOfMotions" (1 for procedural entries)
@@ -158,8 +74,9 @@ struct SceneAnimationTable {
 class ShadowCaster;
 class ProjectedShadow;
 
-// Views declared in SceneManager.cpp (0x004ecd60).
-class SceneSoultreePhysicsObjectView;
+// A "PhysicsObject" model's physics part (0x004ecd60):
+// src/krusty2/soultree/SoultreePhysicsObject.h.
+class SoultreePhysicsObject;
 class CollisionObject;
 
 // 0x28-byte element of SceneStaticModels::casters: a static model
@@ -170,7 +87,7 @@ struct SceneStaticModel {
     unsigned char useLighting : 1;        // bit 1: "UseLighting"
     unsigned char field_0x01[3];
     ShadowCaster* model;                      // +0x04 the model (a D3DIMSoultreeObject)
-    SceneSoultreePhysicsObjectView* physicsObject; // +0x08
+    SoultreePhysicsObject* physicsObject;     // +0x08
     CollisionObject* collisionObject;         // +0x0c
     char fileName[0x18];                      // +0x10 the model's file name, at most 0x14 characters
 };
@@ -281,7 +198,7 @@ public:
     Scene* AttachSceneManager(SceneArchiveFinder* manager, int value, int unused,
                                  char probeMask);
     // 0x004eaec0: the entry object named like `path`'s file name.
-    SceneCollisionCharacterView* FindEntryByFileName(const char* path, int* index);
+    CollisionCharacter* FindEntryByFileName(const char* path, int* index);
     void EnableAutomaticSequence(int index);  // 0x004eafd0: sets entry `index`'s automaticSequence
     void SetDetailLevel(int level);           // 0x004eff30: detail level (QuarryStuntEvent.cpp)
     void RestartAllEntries(float time);       // 0x004eb000: RestartEntry(i, time, 1, 0) for every entry

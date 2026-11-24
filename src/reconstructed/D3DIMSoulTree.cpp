@@ -1520,7 +1520,7 @@ int D3DIMSoultreeObject::Render3D()
 }
 
 // 0x004440a0
-void D3DIMSoultreeObject::SoultreeVirtualSlot4(SoultreeObject** out)
+void D3DIMSoultreeObject::CreateNode(SoultreeObject** out)
 {
     D3DIMSoultreeObject* copy = new (__FILE__, 0x7d5) D3DIMSoultreeObject(isEnabled);
     *out = copy;
@@ -1543,7 +1543,7 @@ static inline void Lower(float& bound, float value)
 // level of detail (zero when it owns none). The centre sum is written per
 // component: through operator+ VC6 adds y and z high-first, retail
 // low-first; the valid flag is stored last.
-void D3DIMSoultreeObject::SoultreeVirtualSlot5()
+void D3DIMSoultreeObject::UpdateLocalBounds()
 {
     D3DIMSoultreeObject* model = this;
     while (!model->lodTable)
@@ -1574,8 +1574,8 @@ void D3DIMSoultreeObject::SoultreeVirtualSlot5()
         low = Vector3(0.0f, 0.0f, 0.0f);
         high = Vector3(0.0f, 0.0f, 0.0f);
     }
-    localBoundsCenter = Vector3(low.x + high.x, low.y + high.y, low.z + high.z) * 0.5f;
-    localBoundsHalfExtent = (high - low) * 0.5f;
+    reinterpret_cast<Vector3&>(localBoundsCenter) = Vector3(low.x + high.x, low.y + high.y, low.z + high.z) * 0.5f;
+    reinterpret_cast<Vector3&>(localBoundsHalfExtent) = (high - low) * 0.5f;
     localBoundsValid = 1;
 }
 
@@ -1588,7 +1588,7 @@ void D3DIMSoultreeObject::ComputeAllBounds()
     nodes[0] = this;
     CollectDescendants(&index, nodes);
     for (int i = 0; i < count; i++)
-        nodes[i]->SoultreeVirtualSlot5();
+        nodes[i]->UpdateLocalBounds();
     DebugFree(nodes, __FILE__, 0x812);
     UpdateSubtreeBounds();
 }

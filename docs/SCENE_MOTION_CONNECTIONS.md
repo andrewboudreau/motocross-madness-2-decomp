@@ -12,10 +12,10 @@ retain their layouts. No provider body, virtual slot or object allocation change
 | Character::AdvanceMotion | `0x004a6bb0` | 1,293 bytes |
 | AdvanceLooping | `0x004a56d0` | 121 bytes |
 
-All four complete source bodies match retail strictly. The two retired external
-names belong to `SceneCollisionCharacterView`; the actual providers remain in
-`src/krusty2/motion/Motnctrl.cpp`. No aliases or additional provider definitions
-are introduced.
+All four complete source bodies match retail strictly. RestartEntry calls the
+providers in `src/krusty2/motion/Motnctrl.cpp` directly on the entry's
+`CollisionCharacter`; no aliases or additional provider definitions are
+introduced.
 
 ## Receiver and argument evidence
 

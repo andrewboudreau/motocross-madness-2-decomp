@@ -4,8 +4,7 @@
 // Scene::Tick advances every "Animation<n>" entry of the scene's animation
 // table, then (unless holdAnimations is set) the "RandomSet<n>" picks, and
 // finally runs GameObject::Tick. The scene entries keep their characters as
-// SceneCollisionCharacterView (SceneManager.h); like SceneManager.cpp, this unit uses
-// the real Character methods on them through reinterpret_cast.
+// CollisionCharacter (src/krusty2/motion), so the Character methods apply directly.
 //
 // Audited against the retail disassembly on 2026-11-11 for the linked game: no
 // behavioural difference (flag bits, the fild/fidiv remaining-time test, the
@@ -30,7 +29,7 @@
 
 #include "../reconstructed/TrackGame.h"
 #include "../reconstructed/SceneManager.h"
-#include "../krusty2/motion/D3DIMSoultreeCharacter.h"
+#include "../krusty2/motion/CollisionCharacter.h"
 #include "../krusty2/motion/Motnctrl.h"
 #include "../../samples/common/FistpFloatToInt.h"
 
@@ -55,7 +54,7 @@ int Scene::Tick(float frameTime)
             if (holdAnimations && !animationTable->entries[i].animatesWhileHeld) {
                 continue;
             }
-            Character* character = reinterpret_cast<Character*>(animationTable->entries[i].character);
+            Character* character = animationTable->entries[i].character;
             if (animationTable->entries[i].inRandomSet || !animationTable->entries[i].automaticSequence) {
                 continue;
             }
@@ -115,8 +114,8 @@ int Scene::Tick(float frameTime)
             if (!animationTable->entries[j].keyFramed) {
                 continue;
             }
-            SceneCollisionCharacterView* object = entry->character;
-            if (!object->isEnabled || reinterpret_cast<Character*>(object)->motionStopped) {
+            CollisionCharacter* object = entry->character;
+            if (!object->isEnabled || object->motionStopped) {
                 // Swap in a random member of the set.
                 object->Disable();
                 // Retail's fistp helper (0x004eadf1): floor() of the scaled rand except at ties.
@@ -127,10 +126,10 @@ int Scene::Tick(float frameTime)
                 object = entry->character;
                 object->Enable();
                 animationTable->randomSets[j].entry = entry;
-                reinterpret_cast<Character*>(object)->SetMotion(
+                object->SetMotion(
                     (Motion*)entry->motions[entry->currentMotion]);
             }
-            Character* character = reinterpret_cast<Character*>(object);
+            Character* character = object;
             if (entry->useBlendedKeys) {
                 entry->motionFrame = character->AdvanceMotionInterpolated(dt, 0, 0);
             } else {

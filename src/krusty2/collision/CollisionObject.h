@@ -35,16 +35,8 @@ struct Matrix4;
 // No vbptr/vtordisp here; GameObject members are at their plain offsets from the GraphicsTest
 // subobject at +12.
 
-class QuadTreeObject {
-public:
-    virtual short ComputeSortKey();        // 0x004dc610 (`or ax, 0xffff`; Quadtree.cpp); NextObjectSorted calls it and ignores the result
-    virtual unsigned int ComputeQuadTreeCode(QuadTree* tree) { return 15; }  // 0x00434ce0 (ret 4); Vegetation overrides it with the object's quadtree code (0x00456720)
-
-    QuadTreeObject() { queryStamp = 0; objectTypeId = (char)0xff; }
-    short queryStamp;  // +0x04 Quadtree query code (NextObject) skips an object whose short at +4 equals the query counter (queryStamp) and otherwise stores the counter there (Quadtree.cpp lines 568/612/676); Insert zeroes it
-    short sortKey;                           // +0x06 not touched by the inlined ctor; keeps objectTypeId at +8
-    char objectTypeId;  // +0x08 ctor 0x00431e70 stores TypeRegistry::FindTypeId(CollisionObject) (0x00521ea0) here; 0x00438e70 compares [candidate+8] with the cached CollisionObject (0x568610) and Vegetation (0x568611) ids
-};
+// QuadTreeObject, the +0 base: broadphase/QuadTreeObject.h.
+#include "../broadphase/QuadTreeObject.h"
 
 // Shape payloads hung off CollisionObject::shape, discriminated by shapeType.
 // Sizes come from the allocation sizes in the shape setup functions; member names

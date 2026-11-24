@@ -1,6 +1,5 @@
 // Executes unchanged, separately compiled production helpers. The Python test
 // proves both the full production and extracted bodies strict before linking.
-#define SOULTREE_OBJECT_WITH_BASES
 #include "math/Math3D.h"
 #include <stddef.h>
 #include <stdio.h>

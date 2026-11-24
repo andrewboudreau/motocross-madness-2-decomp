@@ -817,7 +817,6 @@ clearly more faithful, the game now links the sample's text:
 
   | Retail | View name | Provider |
   |---|---|---|
-  | 0x004318d0, 0x004319c0 | `SceneCollisionCharacterView` constructor and `Load` | `CollisionCharacter` |
   | 0x004328b0, 0x004329a0, 0x00432a20 | `CollisionObject` hull, sphere and capsule shapes taking `Vector3` | the `CollisionVec3` forms |
   | 0x00507c10, 0x00508970 | `EcoTerrainView::QueryGround`, `GetHeightRange` | `Terrain` |
   | 0x0048fa60 | `BikeRaceKrustyBikeView` constructor (0x1638 bytes) | `KrustyBike` |
@@ -1317,7 +1316,7 @@ hull/model pairs and their swept forms 0x00436af0..0x00438550,
 (400), `ShadowFillTriangle` 0x00461e60 (400), `CarProcedural::PositionAtTime`
 0x00430b10 (800), `DrawableGridNode::ComputeViewerDetail` 0x004815e0 (1000),
 `UIButton`/`UIMultiState::ContainsPoint` 0x004734c0/0x00478e10 (600 each),
-`D3DIMSoultreeObject::Scale` 0x004fd340 (800),
+`SoultreeObject::Scale` 0x004fd340 (800),
 `ProjectedShadow::ComputeBounds` 0x004db0d0 (600),
 `KrustyBike::IsSpeedGainBelowLimit` 0x004919a0, `SendStateDelta` and `Vegetation::GetCollisionObject` 0x004570a0
 (1000 each).

@@ -104,11 +104,13 @@ public:
     explicit CarProcedural(int flags);                               // 0x0042f390 (ret 4)
     virtual ~CarProcedural();                                        // 0x0042f590 (slot 0 0x0042f570)
     virtual int Tick(float frameTime);                               // 0x0042fd80
-    // Slot 27 (0x0042f600, ret 0x40): sets the car up; returns this.
+    // Slot 27 (0x0042f600, ret 0x40): sets the car up; returns this. a11 is
+    // unused here; Scene's loader passes it 1.0f (`push 0x3f800000` at
+    // 0x004ee7a9), so it is a float.
     virtual CarProcedural* Create(void* renderContext, const char* name, const char* collisionFile,
                                   int lights, int options, void* ground, const char* pathFile,
                                   const Vector3* offset, float speed, int steerFront, float trail,
-                                  int a11, unsigned int wheelCount, float a13, float a14,
+                                  float a11, unsigned int wheelCount, float a13, float a14,
                                   float a15);
 
     void ReadPath(const char* pathFile, const char* name); // 0x0042fa00 (ret 8)

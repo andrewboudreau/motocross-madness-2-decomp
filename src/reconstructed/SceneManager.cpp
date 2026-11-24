@@ -10,7 +10,8 @@
 #include "TextureMap.h"
 #include "Tgafile.h"
 #include "SceneManager.h"
-#include "../krusty2/motion/D3DIMSoultreeCharacter.h"
+#include "../krusty2/motion/CollisionCharacter.h"
+#include "CarProcedural.h"
 
 float FastInvSqrt(float x); // 0x00460c00
 
@@ -386,7 +387,7 @@ void Scene::OnEnable()
 }
 
 // 0x004eaec0
-SceneCollisionCharacterView* Scene::FindEntryByFileName(const char* path, int* index)
+CollisionCharacter* Scene::FindEntryByFileName(const char* path, int* index)
 {
     char name[0x104];
 
@@ -398,8 +399,8 @@ SceneCollisionCharacterView* Scene::FindEntryByFileName(const char* path, int* i
     _splitpath(path, 0, 0, name, 0);
     for (int i = 0; i < animationTable->entryCount; i++) {
         if (animationTable->entries[i].keyFramed &&
-            !_strnicmp(animationTable->entries[i].character->fileName, name,
-                       strcspn(animationTable->entries[i].character->fileName, "."))) {
+            !_strnicmp(animationTable->entries[i].character->sltFileName, name,
+                       strcspn(animationTable->entries[i].character->sltFileName, "."))) {
             if (index)
                 *index = i;
             return animationTable->entries[i].character;
@@ -440,7 +441,7 @@ int Scene::RestartEntry(int index, float time, int force, int motion)
         }
         SceneAnimation* entry = &animationTable->entries[index];
         if (entry->keyFramed) {
-            SceneCollisionCharacterView* object = entry->character;
+            CollisionCharacter* object = entry->character;
             if (object->motionStopped || force) {
                 if (motion >= entry->sequenceLength)
                     entry->sequenceIndex = 0;
@@ -448,19 +449,18 @@ int Scene::RestartEntry(int index, float time, int force, int motion)
                     entry->sequenceIndex = motion;
                 animationTable->entries[index].currentMotion =
                     animationTable->entries[index].motionSequence[animationTable->entries[index].sequenceIndex] - 1;
-                reinterpret_cast<Character*>(object)->SetMotion(
-                    reinterpret_cast<Motion*>(animationTable->entries[index].motions[animationTable->entries[index].currentMotion]));
+                object->SetMotion(
+                    (Motion*)animationTable->entries[index].motions[animationTable->entries[index].currentMotion]);
                 object->motionTime = 0;
-                animationTable->entries[index].motionFrame = reinterpret_cast<Character*>(object)->AdvanceMotion(time, 0, 0);
+                animationTable->entries[index].motionFrame = object->AdvanceMotion(time, 0, 0);
                 return 1;
             }
         } else {
-            SceneCarProceduralView* object = (SceneCarProceduralView*)entry->proceduralObject;
+            CarProcedural* object = entry->proceduralObject;
             object->pathTime = time;
             object->skipSmoothing = running;
             if (running)
-                ((SceneCarProceduralView*)animationTable->entries[index].proceduralObject)
-                    ->Tick(0.0001f);
+                animationTable->entries[index].proceduralObject->Tick(0.0001f);
         }
     }
     return 0;
@@ -987,155 +987,9 @@ void Scene::ReadStadium()
 #include "../krusty2/collision/CollisionObject.h"
 
 // The physics part of a "PhysicsObject" model (0x524 bytes, constructor
-// 0x005037c0; src/krusty2/soultree's SoultreePhysicsObject family). Only the
-// slots and fields 0x004ecd60 uses are declared: slot 37 attaches a particle
-// emitter, slot 40 loads the model and returns the GameObject to add.
-class SceneSoultreePhysicsBaseObjectView {
-public:
-    virtual void UpdateMass();
-    virtual void ResetDynamicState();
-    virtual void InitializePhysics();
-    virtual void ApplyStaticContactImpulse();
-    virtual void ApplyBodyContactImpulse();
-    virtual void ShouldRefreshContacts();
-    virtual void ApplyDrag();
-    virtual void DistributeContactForce();
-    virtual void UpdateLocalCenterOfMass();
-    virtual void ComputeFrameSteps();
-    virtual void IsAtBaseWeight();
-    virtual void FindPlacement();
-    virtual void ClassifyOutOfBounds();
-    virtual void AccumulateContactForces();
-    virtual void IntegrateMotion();
-    virtual void ApplyWorldTorque();
-    virtual void LocalTorqueToAngularAcceleration();
-    virtual void AverageAttachmentPosition();
-    virtual void UpdateContactEffect();
-    virtual void UpdateSlideEffect();
-    virtual void UpdateScrapeEffect();
-    virtual void UpdateAttachmentEffects();
-    virtual void ShouldUpdateShadowLight();
-    virtual void ShouldEmitMovingEffects();
-    virtual void ShouldRestartSteamEffect();
-    virtual void ShouldBurstSteamEffect();
-    virtual void OnPhysicsStep();
-    virtual void StartWreck();
-    virtual void ResolveSubstepCollisions();
-    virtual void SaveBodyOrientation();
-    virtual void ClearContactEffectFlags();
-    virtual void UpdateContactStates();
-    virtual void EffectiveLoadWeight();
-    virtual void ResetToPlacement();
-    virtual void LoadBodyAxes();
-    virtual void StoreBodyAxes();
-    virtual void ResetBodyOrientation();
-    virtual void AddAttachment(int type, GameObject* emitter, void* point, int a);
-    virtual void ApplyCollisionEvent();
-    virtual void ApplyPendingRespawn();
-    virtual GameObject* LoadPhysicsModel(void* owner, const char* name, LightManager* lights, int options,
-                                             Vector3 position, Vector3 look, Vector3 up, int terrainProbe, int a9,
-                                             float weight, int points, int emitters, Scene* scene, float fixedStep,
-                                             int maxSteps, float drag, float elasticity, float radius, int shape,
-                                             int minPoints, char probeMask, int createCollision);
-
-    int vbptr;                            // +0x04: vbtable 0x557ff8 (ctor 0x005037c0), compiler generated
-    void* followedNode;                   // +0x08: the scene node the collision points follow
-    Vector3 position;                         // +0x00c SoultreePhysicsBaseObject position
-    Vector3 centerOfMass;                     // +0x018 SoultreePhysicsBaseObject centerOfMass
-    float invMass;                            // +0x024 SoultreePhysicsBaseObject invMass
-    float inverseLoadMass;                    // +0x028 SoultreePhysicsBaseObject inverseLoadMass
-    float bodyRoll;                           // +0x02c SoultreePhysicsBaseObject bodyRoll
-    float bodyPitch;                          // +0x030 SoultreePhysicsBaseObject bodyPitch
-    float bodyYaw;                            // +0x034 SoultreePhysicsBaseObject bodyYaw
-    float bodySinRoll;                        // +0x038 SoultreePhysicsBaseObject bodySinRoll
-    float bodyCosRoll;                        // +0x03c SoultreePhysicsBaseObject bodyCosRoll
-    float bodySinPitch;                       // +0x040 SoultreePhysicsBaseObject bodySinPitch
-    float bodyCosPitch;                       // +0x044 SoultreePhysicsBaseObject bodyCosPitch
-    float savedRoll;                          // +0x048 SoultreePhysicsBaseObject savedRoll
-    float savedPitch;                         // +0x04c SoultreePhysicsBaseObject savedPitch
-    float savedYaw;                           // +0x050 SoultreePhysicsBaseObject savedYaw
-    float savedSinRoll;                       // +0x054 SoultreePhysicsBaseObject savedSinRoll
-    float savedCosRoll;                       // +0x058 SoultreePhysicsBaseObject savedCosRoll
-    float savedSinPitch;                      // +0x05c SoultreePhysicsBaseObject savedSinPitch
-    float savedCosPitch;                      // +0x060 SoultreePhysicsBaseObject savedCosPitch
-    Vector3 velocity;                         // +0x064 SoultreePhysicsBaseObject velocity
-    Vector3 acceleration;                     // +0x070 SoultreePhysicsBaseObject acceleration
-    Vector3 prevVelocity;                     // +0x07c SoultreePhysicsBaseObject prevVelocity
-    Vector3 bodyForward;                      // +0x088 SoultreePhysicsBaseObject bodyForward
-    Vector3 bodyUp;                           // +0x094 SoultreePhysicsBaseObject bodyUp
-    Vector3 savedForward;                     // +0x0a0 SoultreePhysicsBaseObject savedForward
-    Vector3 savedUp;                          // +0x0ac SoultreePhysicsBaseObject savedUp
-    float prevSpeed;                          // +0x0b8 SoultreePhysicsBaseObject prevSpeed
-    float linearSpeed;                        // +0x0bc SoultreePhysicsBaseObject linearSpeed
-    Vector3 angularAcceleration;              // +0x0c0 SoultreePhysicsBaseObject angularAcceleration
-    Vector3 worldAngularVelocity;             // +0x0cc SoultreePhysicsBaseObject worldAngularVelocity
-    Vector3 angularVelocity;                  // +0x0d8 SoultreePhysicsBaseObject angularVelocity
-    Vector3 invInertia;                       // +0x0e4 SoultreePhysicsBaseObject invInertia
-    Vector3 shapeInvInertia;                  // +0x0f0 SoultreePhysicsBaseObject shapeInvInertia
-    unsigned char field_0x0fc[0x108 - 0xfc];
-    char airborne;                            // +0x108 SoultreePhysicsBaseObject airborne
-    char respawnPending;                      // +0x109 SoultreePhysicsBaseObject respawnPending
-    char asleep;                              // +0x10a SoultreePhysicsBaseObject asleep
-    unsigned char field_0x10b[0x10c - 0x10b];
-    Vector3 respawnPosition;                  // +0x10c SoultreePhysicsBaseObject respawnPosition
-    Vector3 respawnHeading;                   // +0x118 SoultreePhysicsBaseObject respawnHeading
-    GameObject* particleManager;              // +0x124 SoultreePhysicsBaseObject particleManager
-    void* collisionObject;                    // +0x128 SoultreePhysicsBaseObject collisionObject
-    void** collisionPoints;               // +0x12c
-    int collisionPointCount;              // +0x130
-    int lastCollisionType;                    // +0x134 SoultreePhysicsBaseObject lastCollisionType
-    char wreckPending;                        // +0x138 SoultreePhysicsBaseObject wreckPending
-    unsigned char field_0x139[0x13c - 0x139];
-    float stepTime;                           // +0x13c SoultreePhysicsBaseObject stepTime
-    float invStepTime;                        // +0x140 SoultreePhysicsBaseObject invStepTime
-    float frameTime;                          // +0x144 SoultreePhysicsBaseObject frameTime
-    float dragCoefficient;                    // +0x148 SoultreePhysicsBaseObject dragCoefficient
-    float restitution;                        // +0x14c SoultreePhysicsBaseObject restitution
-    float baseWeight;                         // +0x150 SoultreePhysicsBaseObject baseWeight
-    float totalWeight;                        // +0x154 SoultreePhysicsBaseObject totalWeight
-    float bodyMass;                           // +0x158 SoultreePhysicsBaseObject bodyMass
-    float loadWeight;                         // +0x15c SoultreePhysicsBaseObject loadWeight
-    float collisionRadius;                    // +0x160 SoultreePhysicsBaseObject collisionRadius
-    unsigned char field_0x164[0x188 - 0x164];
-    Vector3 weightForce;                      // +0x188 SoultreePhysicsBaseObject weightForce
-    Vector3 rotationPivot;                    // +0x194 SoultreePhysicsBaseObject rotationPivot
-    Vector3 localCenterOfMass;                // +0x1a0 SoultreePhysicsBaseObject localCenterOfMass
-    Vector3 scratchVector;                    // +0x1ac SoultreePhysicsBaseObject scratchVector
-    Vector3 scratchVector2;                   // +0x1b8 SoultreePhysicsBaseObject scratchVector2
-    int collisionShape;                       // +0x1c4 SoultreePhysicsBaseObject collisionShape
-    int collisionPointCapacity;               // +0x1c8 SoultreePhysicsBaseObject collisionPointCapacity
-    int touchingPointCount;                   // +0x1cc SoultreePhysicsBaseObject touchingPointCount
-    char pointsTouching;                      // +0x1d0 SoultreePhysicsBaseObject pointsTouching
-    unsigned char field_0x1d1[0x1d4 - 0x1d1];
-    void* attachments;                        // +0x1d4 SoultreePhysicsBaseObject attachments
-    int attachmentCapacity;                   // +0x1d8 SoultreePhysicsBaseObject attachmentCapacity
-    int attachmentCount;                      // +0x1dc SoultreePhysicsBaseObject attachmentCount
-    float stepRemainder;                      // +0x1e0 SoultreePhysicsBaseObject stepRemainder
-    float fixedStepTime;                      // +0x1e4 SoultreePhysicsBaseObject fixedStepTime
-    float lastStepTime;                       // +0x1e8 SoultreePhysicsBaseObject lastStepTime
-    int maxStepsPerFrame;                     // +0x1ec SoultreePhysicsBaseObject maxStepsPerFrame
-    void* track;                              // +0x1f0 SoultreePhysicsBaseObject track
-    void* terrain;                            // +0x1f4 SoultreePhysicsBaseObject terrain
-    float terrainScale;                       // +0x1f8 SoultreePhysicsBaseObject terrainScale
-    char inShadow;                            // +0x1fc SoultreePhysicsBaseObject inShadow
-    unsigned char field_0x1fd[0x200 - 0x1fd];
-    void* shadowLight;                        // +0x200 SoultreePhysicsBaseObject shadowLight
-    int staggerPhase;                         // +0x204 SoultreePhysicsBaseObject staggerPhase
-    int staggerCounter;                       // +0x208 SoultreePhysicsBaseObject staggerCounter
-    char attachmentResetPending;              // +0x20c SoultreePhysicsBaseObject attachmentResetPending
-    char justReset;                           // +0x20d SoultreePhysicsBaseObject justReset
-    char settledLastFrame;                    // +0x20e SoultreePhysicsBaseObject settledLastFrame
-    unsigned char groundProbeMask;            // +0x20f SoultreePhysicsBaseObject groundProbeMask
-    int restContactThreshold;                 // +0x210 SoultreePhysicsBaseObject restContactThreshold
-    float restTimer;                          // +0x214 SoultreePhysicsBaseObject restTimer
-    void* centerNode;                         // +0x218 SoultreePhysicsBaseObject centerNode
-};
-class SceneSoultreePhysicsObjectView : public SceneSoultreePhysicsBaseObjectView, public D3DIMSoultreeObject {
-public:
-    SceneSoultreePhysicsObjectView(int a, int b);         // 0x005037c0
-
-    unsigned char field_0x4f4[0x524 - 0x4f4];
-};
+// 0x005037c0): slot 37 attaches a particle emitter, slot 40 loads the model and
+// returns the GameObject to add.
+#include "../krusty2/soultree/SoultreePhysicsObject.h"
 
 // 0x0043a330 (cdecl, CollisionPoint.cpp): adds a collision point at
 // `position` to `points` (`*count` of `capacity`).
@@ -1271,9 +1125,11 @@ int Scene::ReadStaticModels(LightManager* lights, int particleManager, int textu
             int shape = FindShape(text, shapes);
             if (minPoints >= points - 1)
                 minPoints = points - 1;
-            SceneSoultreePhysicsObjectView* object = new(__FILE__, 1845) SceneSoultreePhysicsObjectView(1, 1);
-            AppendChild(object->LoadPhysicsModel(renderContext, sltPath, lights, modelTextures, position, look, up,
-                                                               0, particleManager, 5.0f, points, emitters, this,
+            SoultreePhysicsObject* object = new(__FILE__, 1845) SoultreePhysicsObject(1);
+            AppendChild(object->LoadPhysicsModel((int)renderContext, sltPath, (const SoultreeLoadDesc*)lights,
+                                                               modelTextures, *reinterpret_cast<Vec3*>(&position),
+                                                               *reinterpret_cast<Vec3*>(&look), *reinterpret_cast<Vec3*>(&up),
+                                                               0, (void*)particleManager, 5.0f, points, emitters, (SoultreeSlot1f0*)this,
                                                                0.033333f, 10, 0.025f, 0.05f, radius, shape,
                                                                minPoints, groundProbeMask, 1),
                                   -1);
@@ -1286,8 +1142,8 @@ int Scene::ReadStaticModels(LightManager* lights, int particleManager, int textu
                     ReadVector(&position, model, key, "0.0,0.0,0.0", 0, 0);
                     sprintf(key, "FrictionCoefficient%d", p + 1);
                     parameters.GetFloat(key, 0.6f, &friction);
-                    AddCollisionPoint(points, object->collisionPoints, &position,
-                                      object->SceneSoultreePhysicsBaseObjectView::followedNode, 0,
+                    AddCollisionPoint(points, (void**)object->collisionPoints, &position,
+                                      object->SoultreePhysicsBaseObject::sceneNode, 0,
                                       &object->collisionPointCount,
                                       friction, (int)this);
                 }
@@ -1313,7 +1169,7 @@ int Scene::ReadStaticModels(LightManager* lights, int particleManager, int textu
                             DustParticleEmitter* emitter = new(__FILE__, 1917) DustParticleEmitter(1);
                             D3DIMSoultreeObject* node = object;
                             node->AppendChild((GameObject*)emitter->Create(renderContext, (ParticleManager*)particleManager), -1);
-                            object->AddAttachment(1, emitter, *object->collisionPoints, 0);
+                            object->AddAttachment(1, emitter, (SoultreeAttachTarget*)*object->collisionPoints, 0);
                             dust = 1;
                         }
                         break;
@@ -1325,7 +1181,7 @@ int Scene::ReadStaticModels(LightManager* lights, int particleManager, int textu
                             DirtChunkParticleEmitter* emitter = new(__FILE__, 1927) DirtChunkParticleEmitter(1);
                             D3DIMSoultreeObject* node = object;
                             node->AppendChild((GameObject*)emitter->Create(renderContext, (ParticleManager*)particleManager), -1);
-                            object->AddAttachment(2, emitter, *object->collisionPoints, 0);
+                            object->AddAttachment(2, emitter, (SoultreeAttachTarget*)*object->collisionPoints, 0);
                             chunk = 1;
                         }
                         break;
@@ -1337,7 +1193,7 @@ int Scene::ReadStaticModels(LightManager* lights, int particleManager, int textu
                             DirtSprayParticleEmitter* emitter = new(__FILE__, 1937) DirtSprayParticleEmitter(1);
                             D3DIMSoultreeObject* node = object;
                             node->AppendChild((GameObject*)emitter->Create(renderContext, (ParticleManager*)particleManager), -1);
-                            object->AddAttachment(3, emitter, *object->collisionPoints, 0);
+                            object->AddAttachment(3, emitter, (SoultreeAttachTarget*)*object->collisionPoints, 0);
                             spray = 1;
                         }
                         break;
@@ -1576,9 +1432,9 @@ int Scene::ReadAnimations(LightManager* lights, int textureManager, int modelTex
         if (!ReadVector(&animationTable->entries[i].position, name, "Position", "0.0,0.0,0.0", 0, 0))
             ReadVector(&animationTable->entries[i].position, name, "Offset", "0.0,0.0,0.0", 0, 0);
         if (animationTable->entries[i].keyFramed) {
-            SceneCollisionCharacterView* character = new(__FILE__, 2300) SceneCollisionCharacterView(1);
+            CollisionCharacter* character = new(__FILE__, 2300) CollisionCharacter(1);
             animationTable->entries[i].character = character;
-            if (!AppendChild(character->Load(renderContext, sltPath, colPath, lights, modelTextures, 1, 1),
+            if (!AppendChild(character->Load((int)renderContext, sltPath, colPath, (const SoultreeLoadDesc*)lights, modelTextures, 1, 1),
                                        -1)) {
                 sprintf(message, "\nScene: Cannot create character from %s.\n\n", file);
                 LogMessage(message);
@@ -1586,9 +1442,9 @@ int Scene::ReadAnimations(LightManager* lights, int textureManager, int modelTex
             }
         }
         if (!animationTable->entries[i].keyFramed) {
-            SceneCarProceduralView* car = new(__FILE__, 2305) SceneCarProceduralView(1);
+            CarProcedural* car = new(__FILE__, 2305) CarProcedural(1);
             animationTable->entries[i].proceduralObject = car;
-            if (!AppendChild(car->Create(renderContext, sltPath, colPath, lights, modelTextures, 0, vuePath,
+            if (!AppendChild(car->Create(renderContext, sltPath, colPath, (int)lights, modelTextures, 0, vuePath,
                                                                  &animationTable->entries[i].position, fps,
                                                                  frontWheelsTurn, lagDistance, 1.0f, tires, 0, 0, 0),
                                        -1)) {
@@ -1616,7 +1472,7 @@ int Scene::ReadAnimations(LightManager* lights, int textureManager, int modelTex
             animationTable->entries[i].character->modelNode->SetPosition(*reinterpret_cast<const Vec3*>(&animationTable->entries[i].position));
             if (axes)
                 animationTable->entries[i].character->modelNode->SetAxesPtr(reinterpret_cast<const Vec3*>(&look), reinterpret_cast<const Vec3*>(&up), 1, 0);
-            animationTable->entries[i].character->modelNode->SetUseLighting(useLighting);
+            static_cast<D3DIMSoultreeObject*>(animationTable->entries[i].character->modelNode)->SetUseLighting(useLighting);
             parameters.GetInt("UseBlendedKeys", 1, &automatic);
             animationTable->entries[i].useBlendedKeys = automatic;
             parameters.GetInt("NumberOfMotions", 0, &animationTable->entries[i].motionCount);
@@ -1672,9 +1528,9 @@ int Scene::ReadAnimations(LightManager* lights, int textureManager, int modelTex
         } else {
             LogParameter(name, "SLT", sltPath);
             animationTable->entries[i].motionCount = 1;
-            animationTable->entries[i].proceduralObject->carModel->SetUseLighting(useLighting);
+            reinterpret_cast<D3DIMSoultreeObject*>(animationTable->entries[i].proceduralObject->carModel)->SetUseLighting(useLighting);
             if (axes)
-                animationTable->entries[i].proceduralObject->carModel->SetAxesPtr(reinterpret_cast<const Vec3*>(&look), reinterpret_cast<const Vec3*>(&up), 1, 0);
+                reinterpret_cast<D3DIMSoultreeObject*>(animationTable->entries[i].proceduralObject->carModel)->SetAxesPtr(reinterpret_cast<const Vec3*>(&look), reinterpret_cast<const Vec3*>(&up), 1, 0);
         }
         if (animationTable->entries[i].motionCount > 0) {
             if (auralScape) {
@@ -1690,9 +1546,9 @@ int Scene::ReadAnimations(LightManager* lights, int textureManager, int modelTex
                     parameters.GetString("SoundAttachToObject", "", attach, 0x40);
                     D3DIMSoultreeObject* node;
                     if (animationTable->entries[i].keyFramed)
-                        node = animationTable->entries[i].character->modelNode;
+                        node = static_cast<D3DIMSoultreeObject*>(animationTable->entries[i].character->modelNode);
                     else
-                        node = animationTable->entries[i].proceduralObject->carModel;
+                        node = reinterpret_cast<D3DIMSoultreeObject*>(animationTable->entries[i].proceduralObject->carModel);
                     SoultreeSoundEmitter* emitter =
                         (new(__FILE__, 2433)
                              SoultreeSoundEmitter((AuralScape*)auralScape, soundGroup, 1, isEnabled))
@@ -1982,16 +1838,16 @@ void Scene::SetDetailLevel(int level)
         int i;
         for (i = 0; i < animationTable->entryCount; i++) {
             if (animationTable->entries[i].keyFramed)
-                animationTable->entries[i].character->modelNode->ApplyLodSettings(level);
+                static_cast<D3DIMSoultreeObject*>(animationTable->entries[i].character->modelNode)->ApplyLodSettings(level);
             else
-                animationTable->entries[i].proceduralObject->carModel->ApplyLodSettings(level);
+                reinterpret_cast<D3DIMSoultreeObject*>(animationTable->entries[i].proceduralObject->carModel)->ApplyLodSettings(level);
         }
         for (i = 0; i < animationTable->randomSetCount; i++) {
             SceneAnimation* entry = animationTable->randomSets[i].entry;
             if (entry->keyFramed)
-                entry->character->modelNode->ApplyLodSettings(level);
+                static_cast<D3DIMSoultreeObject*>(entry->character->modelNode)->ApplyLodSettings(level);
             else
-                entry->proceduralObject->carModel->ApplyLodSettings(level);
+                reinterpret_cast<D3DIMSoultreeObject*>(entry->proceduralObject->carModel)->ApplyLodSettings(level);
         }
     }
     if (staticModels) {
@@ -2115,7 +1971,7 @@ int CountModelTextures(const char* path, UnknownSceneResourceManager* resources,
         entry->archive->Read(&count, 4, 1);
         SoultreeObject* node = new(__FILE__, 3447) SoultreeObject(0);
         for (int i = 0; i < count; i++) {
-            entry->archive->Read(node->nodeName, 0x80, 1);
+            entry->archive->Read(node->name, 0x80, 1);
             entry->archive->Read(&node->localMatrix, 0x40, 1);
             entry->archive->Read(&node->hidden, 4, 1);
             entry->archive->Read(&node->localBoundsValid, 4, 1);

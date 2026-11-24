@@ -132,7 +132,7 @@ def setup(ctx, c):
     ctx.stub_at(0x00507c10, 'Terrain::QueryGround', pop=16, nargs=4, ret=query_ground, log=False)
     ctx.stub_at(0x00401520, 'ArcadeObject::SetAxes', pop=16, nargs=4, log=False,
                 ret=lambda cx, e, a: cx.note('SetAxes', e, vec(cx, a[0]), vec(cx, a[1]), a[2], a[3]))
-    ctx.stub_at(0x004fd340, 'D3DIMSoultreeObject::Scale', pop=12, nargs=3)
+    ctx.stub_at(0x004fd340, 'SoultreeObject::Scale', pop=12, nargs=3)
 
     def get_position(cx, e, a):
         cx.note('GetPosition', e)

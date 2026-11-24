@@ -5,7 +5,7 @@
 
 // 0x004fc630, 38 bytes, thiscall ret12. Retain the by-value copy boundary
 // used by LightEmitter and share the actual hierarchy-cache implementation.
-void D3DIMSoultreeObject::SetPositionVec3(Vector3 position)
+void SoultreeObject::SetPositionVec3(Vector3 position)
 {
     localMatrix._41 = position.x;
     localMatrix._42 = position.y;

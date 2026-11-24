@@ -25,7 +25,7 @@ MOTION = 'src/krusty2/motion/D3DIMSoultreeMotnctrl.cpp'
 TREE = 'src/krusty2/soultree/soultree.cpp'
 RENDER = 'src/reconstructed/D3DIMSoulTree.cpp'
 VIEW = '?SetPositionVec3@SoultreeObject@@QAEXUVec3@@@Z'
-OLD = '?SetPositionVec3@D3DIMSoultreeObject@@QAEXUVector3@@@Z'
+OLD = '?SetPositionVec3@SoultreeObject@@QAEXUVector3@@@Z'
 FIXTURE = 'tests/fixtures/soultree_position_compare.cpp'
 HELPERS = (('InvalidateWorldMatrix', 0x4fb850, 45), ('InvalidateSiblingChain', 0x4fb880, 50),
            ('MarkSubtreeDirty', 0x4fdab0, 38))

@@ -36,7 +36,7 @@
   "?SetAxesPtr@SoultreeObject@@QAEXPBUVec3@@0HH@Z": "0x004fbd70",
   "?SetPosition@SoultreeObject@@QAEXABUVec3@@@Z": "0x004fc660",
   "?Rotate@SoultreeObject@@QAEXUVec3@@M@Z": "0x004fceb0",
-  "?Scale@D3DIMSoultreeObject@@QAEXMMM@Z": "0x004fd340",
+  "?Scale@SoultreeObject@@QAEXMMM@Z": "0x004fd340",
   "?GetSubtreeBounds@SoultreeObject@@QAEXPAUVec3@@0@Z": "0x004fe850",
   "?Tick@ArcadeObject@@UAEHM@Z": "0x00401800",
   "?Tick@GameObject@@UAEHM@Z": "0x004693d0",

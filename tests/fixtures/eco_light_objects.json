@@ -12,12 +12,12 @@
     "src/reconstructed/LightEmitter.cpp": {
       "sections": 57,
       "relocations": 172,
-      "sha256": "be05f881f96ba98b5f46faceb6db24b447f96838a8e906962553ef6b2f80a8be"
+      "sha256": "85f50cbaa264327417d72e531d4d34c84ef1e14ffa376ede0b95df84cb065f8e"
     },
     "src/reconstructed/SceneManager.cpp": {
       "sections": 335,
       "relocations": 1757,
-      "sha256": "24bd76de6b61e099d3f597e79bc9fb1d7bdaa4b8b8c9140a486a392ab2a5ea15"
+      "sha256": "3496f54c80908b13359c49a276eb7b82c1d203c93472c7da77ab952cf4ce1f70"
     },
     "src/reconstructed/KrustyUI.cpp": {
       "sections": 317,
@@ -32,7 +32,7 @@
     "src/reconstructed/ArcadeObject.cpp": {
       "sections": 32,
       "relocations": 127,
-      "sha256": "c00e7e1ef6dc61536aa9c0e9ba6a0214b71c091fb77c4df590bf64205b93ee5f"
+      "sha256": "acb471c10cfaee7d4723f665c7b4e901eedd25a700d450ec3d8e88f8d8c47112"
     },
     "src/reconstructed/D3DIMSoultreeModifier.cpp": {
       "sections": 23,

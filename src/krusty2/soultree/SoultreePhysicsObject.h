@@ -25,64 +25,16 @@
 //    12 (0x00443aa0), 14 (0x00444030) and 25 (0x004fec30, SoultreeObject's); the
 //    SoultreePhysicsObject vtable 0x00557eb8 (@552) keeps 4, 5, 12, 14 and 25.
 //
-// Deliberate simplification (listed in hierarchy/MIGRATION.md): the SoultreeObject level is
-// folded into D3DIMSoultreeObject, because core/SoultreeObject.h is the flat,
-// non-polymorphic view of that class ("do not derive from it").  The base offsets and
-// vtable shapes are the same. Primary slots 2..8 use the existing rendering
-// provider declarations; this does not unify the two complete class views.
-// Slot 9 retains its provisional declaration and remains a separate dependency.
+// D3DIMSoultreeObject (and SoultreeObject, its base) are the single declarations of
+// src/reconstructed/D3DIMSoulTree.h and core/SoultreeObject.h; the former folded
+// physics view of D3DIMSoultreeObject is merged into them.
 #ifndef SOULTREE_PHYSICS_OBJECT_H
 #define SOULTREE_PHYSICS_OBJECT_H
 
-#include "math/Math3D.h"
-#include "motion/D3DIMSoultreeCharacter.h"   // SoultreePhysicsBaseObject, SoultreeLoadDesc
-#include "collision/CollisionObject.h"       // QuadTreeObject, GameObject
-#include "soultree/SoultreePhysicsBaseObject.h"
-
-class FileStream;
-
-class D3DIMSoultreeObject : public QuadTreeObject, public GameObject {
-public:
-    int NodeMovesVertices(SoultreeObject* node, int lod); // 0x00445060
-    explicit D3DIMSoultreeObject(int flags);          // 0x0043f160 (thiscall, ret 4)
-    virtual ~D3DIMSoultreeObject();               // core 0x0043f2b0, deleting 0x0043f280
-    virtual void Disable();                       // 0x00444540
-    virtual void Enable();                        // 0x00444520
-    virtual int Tick(float dt);                    // 0x00443490
-    virtual int PrepareGeometry();                 // 0x00443aa0 (D3DIMSoulTree.cpp)
-    virtual int Render3D();                        // 0x00444030 (D3DIMSoulTree.cpp)
-    // 0x004fec30 is SoultreeObject::AttachRenderContext (soultree.cpp); with the
-    // SoultreeObject level folded into this view the build links this name to it
-    // through config/game_build.json link_aliases.
-    virtual int AttachRenderContext(void* context);
-    virtual void LoadHierarchy(FileStream* stream); // 0x0043f950, ret 4
-    virtual void LoadHierarchyFromParameters();       // 0x0043fe40
-    virtual void SoultreeVirtualSlot4(SoultreeObject** out); // 0x004440a0, ret 4
-    virtual void SoultreeVirtualSlot5();       // 0x00444140
-    virtual void ResetLocalMatrices();       // 0x004450c0
-    virtual void CloneFrom(SoultreeObject* source); // 0x00444560, ret 4
-    virtual void CopySubtree(SoultreeObject* source, SoultreeObject* target); // 0x00444b60, ret 8
-    // 0x0043f4b0, `ret 0x14`.  SoultreePhysicsObject slot 40 passes (a1, name, desc, a4, 1);
-    // the argument types follow that caller, the names D3DIMSoultreeObject::LoadModel (tier 2).
-    virtual void D3DIMObjectVirtualSlot9(int owner, const char* name, const SoultreeLoadDesc* lights,
-                                         int options, int useOptions);
-
-    // Existing D3DIMSoulTree.cpp helpers; the receiver is the primary model pointer.
-    void AddModifier(GameObject* modifier);          // 0x00444d80
-    void RemoveModifier(GameObject* modifier);       // 0x00444de0
-    void AddSecondModifier(GameObject* modifier);    // 0x00444eb0
-
-    // Existing primary-model render-state helpers in D3DIMSoulTree.cpp.
-    void SetUseLighting(int value);             // 0x004444c0
-    void ClearScreenRects();                   // 0x004444e0
-    void SetLod(int lod);                       // 0x00444d00
-    void SetLowestLod(int lod);                 // 0x00444d40
-    void ApplyLodSettings(int index);           // 0x004451e0
-
-    // QuadTreeObject (12) + GameObject (0x2c) = 0x38; the rest runs to the vtordisp at
-    // 0x4f4 - 0x21c = 0x2d8 (extent only, tier 2).
-    char d3do_field_0x38[0x2d8 - 0x38];
-};
+#include "../math/Vec3.h"
+#include "../motion/D3DIMSoultreeCharacter.h"   // SoultreeLoadDesc
+#include "SoultreePhysicsBaseObjectCore.h"
+#include "../../reconstructed/D3DIMSoulTree.h"
 
 class SoultreePhysicsObject : public SoultreePhysicsBaseObject, public D3DIMSoultreeObject {
 public:
@@ -93,8 +45,8 @@ public:
     virtual ~SoultreePhysicsObject();             // core 0x005038d0, deleting 0x00503890
     virtual int Tick(float dt);                    // 0x00503c50 (vbase thunk 0x00504270)
     // Slot 40 (0x00503970, `ret 0x70` = 28 argument dwords, tier 1).  Grouping (tier 2):
-    //  * renderContext, modelPath, desc and options (a1..a4) go to D3DIMObjectVirtualSlot9 as
-    //    (a1, a2, a3, a4, 1); modelPath is also the name the ".col" path is built from, desc
+    //  * renderContext, modelPath, desc and options (a1..a4) go to D3DIMSoultreeObject::LoadModel
+    //    (slot 9) as (a1, a2, a3, a4, 1); modelPath is also the name the ".col" path is built from, desc
     //    is tested at +0x25.
     //  * a5..a7 are three Vec3 by value (struct-copy shape) and a8..a22 are forwarded
     //    unchanged to slot 2 as its a6..a20, so their types and names are slot 2's.  Slot 2

@@ -1139,7 +1139,9 @@ GameObject* SoultreePhysicsObject::LoadPhysicsModel(int renderContext, const cha
     char name[0x104];
     char colPath[0x104];
 
-    D3DIMSoultreeObject::D3DIMObjectVirtualSlot9(renderContext, modelPath, desc, options, 1);
+    // Slot 9 takes the five dwords unchanged; its third (the light manager in
+    // D3DIMSoulTree.cpp's reading) is this loader's desc.
+    D3DIMSoultreeObject::LoadModel((void*)renderContext, modelPath, (int)desc, options, 1);
     SoultreePhysicsBaseObject::InitializePhysics(renderContext, 1, startPosition, startForward, startUp, terrainProbe, linkedObject, weight, contactCapacity, attachmentSlots,
                                                    trackObject, fixedStep, maxSteps, drag, elasticity, radius, shapeMode, restThreshold,
                                                    probeMask, createCollision);

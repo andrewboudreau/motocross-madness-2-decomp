@@ -2188,7 +2188,7 @@ ResolveContactImpulse (`0x00500220`) and PlaceWheels (`0x00528eb0`).
 | Function | Old | New | Tier | Evidence |
 | --- | --- | --- | --- | --- |
 | `Vehicle::LoadVehicle` | `arg18` | `suspensionScale` | 2 | It is stored in suspensionWeightScale, which slot 0 multiplies into the suspension mass. Bike passes 0.9f. |
-| `D3DIMSoultreeCharacter::LoadCharacter` | `a5` | `useOptions` | 2 | It is stored at character +0x20c (d3d_field_0x1a4+0x68). BuildModel (`0x00445c17`) passes it to LoadModel as useOptions. Every caller passes 1. |
+| `D3DIMSoultreeCharacter::LoadCharacter` | `a5` | `useOptions` | 2 | It is stored at character +0x20c (`loadUseOptions`). BuildModel (`0x00445c17`) passes it to LoadModel as useOptions. Every caller passes 1. |
 | `CollisionCharacter::Load`, SceneManager.h's character Load view | `a6`, `a5` | `useOptions` | 2 | Both forward it to LoadCharacter unchanged. |
 | `D3DIMSoultreeObject::GetPart` | `a6` | `unused` | 2 | The body ignores it, and the callers pass 0. |
 | The GetPart views in Group5_ShadowBridges.cpp and ProjectedShadow.h | `c`, `d` | `unused`, `lod` | 2 | D3DIMSoultreeObject::GetPart's names. |
@@ -2441,7 +2441,8 @@ Left as placeholders:
 - Overlay::Attach's `a12` and TextService::Create's `a10`: forwarded, never
   interpreted.
 - D3DIMSoultreeCharacter `d3d_field_0x1a4[0x6c]`: a 0x50-byte name followed
-  by ints; naming it would need a split.
+  by ints; naming it would need a split. Split since into `sltFileName[0x50]`,
+  `d3d_field_0x1f4[4]`, `loadDesc`, `loadInfoCopy` and `loadUseOptions`.
 - The sound and graphics option blocks' `field_0x0c`/`field_0x24`/`field_0x14`,
   RaceSound `field_0x40`, Cube `field_0x10`, RacerStanding +0x04/+0x08,
   UIDialog `field_0x180` and `field_0xd4`, GridTerrain `field_0xc9c`/`0xca0`,
@@ -2544,7 +2545,8 @@ Left for later:
   `UnknownSceneKeyword` and its sample siblings, and `UnknownSoultreeClipper`
   (the extern `g_visibilityClipper`).
 - `UnknownSoultreeQuadTreeObject`: its RTTI type descriptor is emitted, so a
-  rename changes `.data` (see above).
+  rename changes `.data` (see above). Merged since into `QuadTreeObject`
+  (src/krusty2/broadphase/QuadTreeObject.h), whose descriptor is retail's.
 - Shared stubs and folded helpers (`UnknownFunction4de580`,
   `UnknownFunction464e80`, `UnknownFunction464e90`, `UnknownFolded4de580`)
   and `Scene::UnknownFunction4ea7e0`.
@@ -2655,7 +2657,7 @@ Left for later:
 | --- | --- | --- | --- | --- |
 | `UnknownQuarryPhysicsObject` | `QuarryLoadPhysicsObjectView` | 2 | 12 | PhysicsObject members the loader reads |
 | `UnknownQuarryTerrain` | `QuarryLoadTerrainView` | 2 | 4 | Terrain (QueryGround 0x00507c10) |
-| `UnknownQuarryCar` | `QuarryLoadCarProceduralView` | 2 | 4 | CarProcedural fields the loader sets |
+| `UnknownQuarryCar` | `QuarryLoadCarProceduralView` | 2 | 4 | CarProcedural fields the loader sets Merged into `CarProcedural` (CarProcedural.h); the loader sets `groundProvider` directly. |
 | `UnknownQuarryRacerRider` | `QuarryLoadRiderView` | 3 | 4 | rider member of the racer as the loader reads it |
 | `UnknownQuarryRacerState` | `QuarryLoadWreckerView` | 2 | 4 | Wrecker offsets on the racer |
 | `UnknownQuarryRaceView` | `QuarryLoadLodBikeRaceView` | 2 | 4 | LodBikeRace members |
@@ -2717,8 +2719,8 @@ Left for later:
 | --- | --- | --- | --- | --- |
 | `UnknownFollowCameraSubject` | `FollowCameraTerrainView` | 2 | 15 | Terrain QueryGround 0x00507c10 |
 | `UnknownSceneCollisionObject` | `SceneCollisionObjectView` | 2 | 16 | CollisionObject members SceneManager reads Merged into `CollisionObject` (src/krusty2/collision). |
-| `UnknownSceneAnimatedObject` | `SceneCarProceduralView` | 2 | 20 | CarProcedural members |
-| `UnknownSceneObject` | `SceneCollisionCharacterView` | 2 | 29 | CollisionCharacter ctor 0x004318d0 (0x294 bytes); SetMotion 0x004a8b40 |
+| `UnknownSceneAnimatedObject` | `SceneCarProceduralView` | 2 | 20 | CarProcedural members Merged into `CarProcedural` (CarProcedural.h). |
+| `UnknownSceneObject` | `SceneCollisionCharacterView` | 2 | 29 | CollisionCharacter ctor 0x004318d0 (0x294 bytes); SetMotion 0x004a8b40 Merged into `CollisionCharacter` (src/krusty2/motion). |
 | `UnknownKrustyUICharacter` | `KrustyUID3DIMSoultreeCharacterView` | 2 | 13 | RTTI D3DIMSoultreeCharacter |
 | `UnknownWreckerParticles` | `WreckerParticleManagerView` | 2 | 7 | RTTI ParticleManager |
 | `UnknownCubeVertex` | `CubeLitVertex` | 2 | 7 | D3DLVERTEX layout |
@@ -2793,7 +2795,7 @@ passes.
 | `UnknownSoultreeMesh` (MorphBastardModifier.h) | `field_0x20` | `materials` | 2 | The pair above; CopyMesh copies it as one value. |
 | `UnknownSoultreeMesh` (MorphBastardModifier.h) | `field_0x2c`, `field_0x30`, `field_0x34` | `mappingScale`, `mappingOffsetU`, `mappingOffsetV` | 2 | The 0x38-byte mesh is the SoultreeSurface that slot 27 receives (the draw casts the surface to it), and Wave 24 named SoultreeSurface's +0x2c..+0x34 so. The int types are kept. Nothing reads them through this view. |
 | `MorphBastardChannel` (MorphBastardModifier.h) | `field_0x64`, `field_0x68` | `currentValue1`, `currentValue2` | 2 | ModifyMesh (`0x004a4c60`) reads `currentValue` for axis 0 and these two for axes 1 and 2; the controller update stores `-angleX`, `-angleZ` and `-angleY` into the three. |
-| `UnknownSoultreeQuadTreeObject` (D3DIMSoulTree.h) | `field_0x04`, `field_0x06`, `field_0x08` | `queryStamp`, `sortKey`, `objectTypeId` | 2 | The RTTI QuadTreeObject base (vtable `0x005511c4`), whose CollisionObject.h declaration names the same offsets and sizes. The type keeps its name (Wave 25: its type descriptor is emitted). |
+| `UnknownSoultreeQuadTreeObject` (D3DIMSoulTree.h) | `field_0x04`, `field_0x06`, `field_0x08` | `queryStamp`, `sortKey`, `objectTypeId` | 2 | The RTTI QuadTreeObject base (vtable `0x005511c4`), whose CollisionObject.h declaration names the same offsets and sizes. The type keeps its name (Wave 25: its type descriptor is emitted). Merged into `QuadTreeObject` (src/krusty2/broadphase/QuadTreeObject.h). |
 | `RaceGate` (BikeRaceNode.h) | `field_0x28` | `height` | 2 | The crossing test (GameUiHelpers.cpp) compares the crossing point's height above the gate centre with it, read as a float; AppendNode (`0x0041d0d0`) stores its int argument there. |
 | `RaceGateObject` (BikeRace.h) | `field_0x54` | `height` | 2 | BuildNodeList (`0x0041d170`) passes it to AppendNode as the value stored at RaceGate+0x28. |
 | `BikeRace::AppendNode` (BikeRace.cpp, BikeRaceCore.h) | `value` | `height` | 2 | The argument stored in RaceGate's `height`. |
@@ -3056,7 +3058,7 @@ Nothing uses these members. All are tier 2.
 | `EventBikeRaceView` (RaceView.h) | BikeRace | `field_0x1e0[0x1e4 - 0x1e0]` | `appliedReplayMode` | +0x1e0 `appliedReplayMode` |
 | `NumberCameraView` (Krusty3DObjects.h) | Camera | `field_0x194[0x198 - 0x194]` | `roll` | +0x194 `roll` |
 | `VisualCueBikeRaceView` (Krusty3DObjects.h) | BikeRace | `field_0x04c[0x50 - 0x4c]` | `raceTerrain` | +0x4c `raceTerrain` |
-| `SceneCollisionCharacterView` (SceneManager.h) | CollisionCharacter | `field_0x008[0x0c - 0x08]` | `sltFile` | +0x08 `sltFile` (Character) |
+| `SceneCollisionCharacterView` (SceneManager.h) | CollisionCharacter | `field_0x008[0x0c - 0x08]` | `sltFile` | +0x08 `sltFile` (Character) Merged into `CollisionCharacter`. |
 | `InstrumentKrustyBikeView` (TrackOverlay.h) | KrustyBike | `field_0x7a2[0x7a4 - 0x7a2]` | `prevLapCount` | +0x7a2 `prevLapCount` |
 | `EcoRenderTargetView` (EcoSystem.h) | RenderTarget | `field_0x04[4]` | `targetDisplay` | +0x04 `targetDisplay` |
 | `GuiControlView` (GUIManager.h) | UIControl | `field_0x2c[0x3c - 0x2c]` | `screenArea` | +0x2c `screenArea` |
@@ -3565,9 +3567,6 @@ several members of the class it views, so naming it would split an array:
 
 - the emitter views' `field_0x2c` (DustParticleEmitter +0x2c firstUpdate,
   +0x30 manager and the rest, ParticleEmitters.h);
-- SceneSoultreePhysicsBaseObjectView `field_0x0c` and `field_0x134`;
-- SceneSoultreePhysicsObjectView `field_0x4f4` (the vtordisp and the
-  virtual GameObject);
 - SceneCollisionObjectView `field_0x38` and `field_0x64` (CollisionObject.h
   members +0x38..+0x5c, and +0x64 ownerType..+0xb4).
 
@@ -3659,8 +3658,8 @@ tools/static_check.py passes.
 | `UnknownSceneShapeKeyword` | `SceneObjectShapeKeyword` | 1 | The 0x24-byte {name, value} record of ReadStaticModels' shape table, {"Box", 0} and {"Sphere", 1}, looked up with the model's "ObjectShape" string (`0x005734f0`) |
 | `UnknownSceneEmitterKeyword` | `SceneEmitterTypeKeyword` | 1 | The 0x1c-byte record of the "EmitterType%d" table (`0x005734a8`): "DustEmitter", "DirtChunkEmitter", "DirtSprayEmitter", "ExhaustEmitter"; the default case prints "Unknown EmitterType (%s) for [%s]." (`0x00573418`) |
 | `UnknownSceneLodObject` | `SceneSoultreeObjectView` | 2 | Its methods SetAxesPtr `0x004fbd70` and SetPosition `0x004fc660` are SoultreeObject methods; config/game_build.json aliases both to `SoultreeObject`. The objects behind it (character +0x1a0, CarProcedural +0x34 carModel) are D3DIMSoultreeObjects, whose primary base is SoultreeObject at +0 (RTTI). Ready since Wave 28. Merged into `D3DIMSoultreeObject`: SceneManager.h types the character and car model nodes as `D3DIMSoultreeObject*`, and the aliases are gone. |
-| `UnknownScenePhysicsObject` | `SceneSoultreePhysicsObjectView` | 2 | Constructor `0x005037c0` is bound as `SoultreePhysicsObject` (SoulTreePhysics.bindings.json) and aliased to it in config/game_build.json; slot 40 LoadPhysicsModel `0x00503970`; bases SoultreePhysicsBaseObject (+0) and D3DIMSoultreeObject (+0x21c), as RTTI gives them |
-| `UnknownScenePhysicsBody` | `SceneSoultreePhysicsBaseObjectView` | 2 | The +0 base of that view: RTTI SoultreePhysicsObject : SoultreePhysicsBaseObject (+0), D3DIMSoultreeObject (mdisp 540 = 0x21c, the view's extent); its 41 slots end with slot 37 AddAttachment and slot 40, the SoultreePhysicsObject primary vtable `0x00557f54` |
+| `UnknownScenePhysicsObject` | `SceneSoultreePhysicsObjectView` | 2 | Constructor `0x005037c0` is bound as `SoultreePhysicsObject` (SoulTreePhysics.bindings.json) and aliased to it in config/game_build.json; slot 40 LoadPhysicsModel `0x00503970`; bases SoultreePhysicsBaseObject (+0) and D3DIMSoultreeObject (+0x21c), as RTTI gives them Merged into `SoultreePhysicsObject` (src/krusty2/soultree). |
+| `UnknownScenePhysicsBody` | `SceneSoultreePhysicsBaseObjectView` | 2 | The +0 base of that view: RTTI SoultreePhysicsObject : SoultreePhysicsBaseObject (+0), D3DIMSoultreeObject (mdisp 540 = 0x21c, the view's extent); its 41 slots end with slot 37 AddAttachment and slot 40, the SoultreePhysicsObject primary vtable `0x00557f54` Merged into `SoultreePhysicsObject`'s `SoultreePhysicsBaseObject` base. |
 | `UnknownSceneDustEmitter` | `SceneDustParticleEmitterView` | 2 | Constructor `0x004b8a00` is DustParticleEmitter's (RTTI, vtable `0x00555ab8`, Bike.bindings.json) and the game_build alias target; created for "DustEmitter" Merged into `DustParticleEmitter` (ParticleEmitters.h); ReadStaticModels constructs it directly. |
 | `UnknownSceneChunkEmitter` | `SceneDirtChunkParticleEmitterView` | 2 | Constructor `0x004b8df0` is DirtChunkParticleEmitter's (vtable `0x00555b34`); created for "DirtChunkEmitter" Merged into `DirtChunkParticleEmitter` (ParticleEmitters.h); ReadStaticModels constructs it directly. |
 | `UnknownSceneSprayEmitter` | `SceneDirtSprayParticleEmitterView` | 2 | Constructor `0x004b9310` is DirtSprayParticleEmitter's (vtable `0x00555ba8`); created for "DirtSprayEmitter" Merged into `DirtSprayParticleEmitter` (ParticleEmitters.h); ReadStaticModels constructs it directly. |
@@ -4357,7 +4356,7 @@ Vehicle base that the canonical layout puts at those offsets.
 | SelectGameD3DIMSoultreeCharacterView | `field_0x010[0x1a0 - 0x10]` | motionTime .. vutLoaded (21 members, `field_0x038` kept, poseList bytes kept) | 2 | D3DIMSoultreeCharacter layout |
 | ProCircuitRacerResultView (ProCircuitProcs.h) | `field_0x08[0x28 - 0x08]` | fastestLap, largestStuntPoints, totalTrickTime, totalRunningTime, bestTagRun, totalTagRun, finished, outOfRace | 2 | RacerResult layout |
 | ProCircuitRacerResultView | `field_0x2c[0x34 - 0x2c]` | score, `field_0x30[4]` | 2 | RacerResult score |
-| SceneCarProceduralView (SceneManager.h) | `field_0x2c`, `field_0x40`, `field_0x60`, `field_0x198` | drawColor, specularColor; pathVelocity, groundSpeed, steersFrontWheels, started; numWheels .. smoothedNormal; wheelNodes, bodyContactPoint, bodyContactNormal (pads kept at +0x58, +0x68, +0x178, +0x1b8, +0x1e8, +0x20c) | 2 | CarProcedural and SoultreeObject layouts |
+| SceneCarProceduralView (SceneManager.h) | `field_0x2c`, `field_0x40`, `field_0x60`, `field_0x198` | drawColor, specularColor; pathVelocity, groundSpeed, steersFrontWheels, started; numWheels .. smoothedNormal; wheelNodes, bodyContactPoint, bodyContactNormal (pads kept at +0x58, +0x68, +0x178, +0x1b8, +0x1e8, +0x20c) | 2 | CarProcedural and SoultreeObject layouts Merged into `CarProcedural`. |
 | SceneManager.cpp SPBO view | `field_0x0c[0x12c - 0x0c]`, `field_0x134[0x21c - 0x134]` | position .. collisionObject; lastCollisionType .. centerNode | 2 | SPBO layout |
 | SceneManager.cpp SceneCollisionObjectView | `field_0x38[0x60 - 0x38]`, `field_0x64[0xb8 - 0x64]` | drawColor .. contactRecord; ownerType .. hitNormal | 2 | CollisionObject layout Merged into `CollisionObject`. |
 | EventKrustyBikeView (RaceView.h) | `field_0x054[0x64 - 0x54]` | savedSinRoll, savedCosRoll, savedSinPitch, savedCosPitch | 2 | SPBO |

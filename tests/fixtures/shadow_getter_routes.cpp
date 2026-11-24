@@ -32,8 +32,8 @@ static void Setup(int seed,int valid,int boxes) {
         n[i].boundsFound=(boxes>>(i%2))&1;
         n[i].localBoundsCenter=Vec3((float)(i-2),(float)(seed%5),(float)(i+seed%3));
         n[i].localBoundsHalfExtent=Vec3((float)(i+1),2.0f,3.0f);
-        n[i].subtreeBoundsA=Vec3(101.0f,102.0f,103.0f);
-        n[i].subtreeBoundsB=Vec3(201.0f,202.0f,203.0f);
+        n[i].subtreeBoundsCenter=Vec3(101.0f,102.0f,103.0f);
+        n[i].subtreeBoundsHalfExtent=Vec3(201.0f,202.0f,203.0f);
         Matrix(n[i].localMatrix,seed,i); Matrix(n[i].worldMatrix,seed+5,i+1);
     }
     n[0].parent=&n[1];n[0].firstChild=&n[2];
@@ -88,7 +88,7 @@ static void Bounds() {
     int have=e[0].boundsFound!=0;double lo[3]={0,0,0},hi[3]={0,0,0};
     if(have)for(k=0;k<3;k++) {lo[k]=e[0].localBoundsCenter[k]-e[0].localBoundsHalfExtent[k];hi[k]=e[0].localBoundsCenter[k]+e[0].localBoundsHalfExtent[k];}
     for(SoultreeObject* child=e[0].firstChild;child;child=e[Index(child)].nextSibling)Grow(Index(child),have,lo,hi);
-    for(k=0;k<3;k++) {e[0].subtreeBoundsA[k]=(float)((hi[k]+lo[k])*0.5);e[0].subtreeBoundsB[k]=(float)((hi[k]-lo[k])*0.5);}
+    for(k=0;k<3;k++) {e[0].subtreeBoundsCenter[k]=(float)((hi[k]+lo[k])*0.5);e[0].subtreeBoundsHalfExtent[k]=(float)((hi[k]-lo[k])*0.5);}
 }
 int main() {
     for(int seed=0;seed<32;seed++)for(int valid=0;valid<8;valid++)for(int boxes=0;boxes<4;boxes++) {
@@ -104,8 +104,8 @@ int main() {
             if(dirty)Bounds();
             ShadowVec3* center=(ShadowVec3*)(out.bytes+16);
             ShadowVec3* extent=(ShadowVec3*)(out.bytes+(alias?16:40));
-            memcpy(wantedOut.bytes+16,&e[0].subtreeBoundsA,12);
-            memcpy(wantedOut.bytes+(alias?16:40),&e[0].subtreeBoundsB,12);
+            memcpy(wantedOut.bytes+16,&e[0].subtreeBoundsCenter,12);
+            memcpy(wantedOut.bytes+(alias?16:40),&e[0].subtreeBoundsHalfExtent,12);
             n[0].GetSubtreeBounds(reinterpret_cast<Vec3*>(center),reinterpret_cast<Vec3*>(extent));
             CHECK(memcmp(&actual,&expected,sizeof(actual))==0);CHECK(memcmp(&out,&wantedOut,sizeof(out))==0);cases++;
         }

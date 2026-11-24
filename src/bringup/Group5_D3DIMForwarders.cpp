@@ -1,36 +1,17 @@
-// Group5 bring-up definitions (best-guess, link frontier). Not strict matches.
+// Group5 bring-up definition (best-guess, link frontier). Not a strict match.
 //
-// Two D3DIMSoultreeObject views name retail functions that
-// src/reconstructed/D3DIMSoulTree.cpp already defines under its own names:
-//   0x0043f4b0 D3DIMObjectVirtualSlot9 (SoultreePhysicsObject.h)
-//              -> LoadModel (the loader; `ret 0x14`, `this` is the
-//                 full object in both views, retail does not adjust ecx)
-//   0x00443de0 SelectLod(int, int) (SoultreeQuadTreeRenderer.h)
-//              -> SelectLod(Vector3*, Vector3*) (`ret 8`, null bounds pick
-//                 the node's own)
-// The class is declared only as far as these calls need; the provider calls
-// are qualified, so they bind directly (no vtable is referenced).
-class GameObject;
-struct SoultreeLoadDesc;
+// SoultreeQuadTreeRenderer.h names 0x00443de0 SelectLod(int, int); the retail
+// function is D3DIMSoulTree.cpp's SelectLod(Vector3*, Vector3*) (`ret 8`, null
+// bounds pick the node's own). The class is declared only as far as this
+// forwarder needs; the provider call is qualified, so it binds directly (no
+// vtable is referenced).
 struct Vector3;
 
 class D3DIMSoultreeObject {
 public:
-    virtual GameObject* LoadModel(void* owner, const char* name, int lights, int options,
-                                  int useOptions);  // 0x0043f4b0
-    virtual void D3DIMObjectVirtualSlot9(int owner, const char* name, const SoultreeLoadDesc* lights, int options, int useOptions);
     void SelectLod(Vector3* center, Vector3* extents);  // 0x00443de0
     void SelectLod(int center, int extents);
 };
-
-// best guess: SoultreePhysicsObject passes (renderContext, modelPath, desc,
-// a4, 1); the loader reads the same five dwords as (owner, path, lights,
-// options, useOptions), so they are handed over unchanged.
-void D3DIMSoultreeObject::D3DIMObjectVirtualSlot9(int owner, const char* name, const SoultreeLoadDesc* lights, int options,
-                                                  int useOptions)
-{
-    D3DIMSoultreeObject::LoadModel((void*)owner, name, (int)lights, options, useOptions);
-}
 
 void D3DIMSoultreeObject::SelectLod(int center, int extents)
 {

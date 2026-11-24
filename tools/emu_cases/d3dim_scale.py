@@ -1,4 +1,4 @@
-"""D3DIMSoultreeObject::Scale 0x004fd340, local matrix times a scale (tools/emu_diff.py case).
+"""SoultreeObject::Scale 0x004fd340, local matrix times a scale (tools/emu_diff.py case).
 
 Random, rotation-like and integer local matrices (+0xb8) scaled by uniform, per-axis,
 zero, negative and tiny factors; the whole object is compared after the call.
@@ -7,7 +7,7 @@ InvalidateWorldMatrix (0x004fb850) is stubbed at its retail address and logged.
 import math
 
 RETAIL_VA = 0x004fd340
-SYMBOL = '?Scale@D3DIMSoultreeObject@@QAEXMMM@Z'
+SYMBOL = '?Scale@SoultreeObject@@QAEXMMM@Z'
 SOURCE = 'samples/render/D3DIMScale.cpp'
 
 

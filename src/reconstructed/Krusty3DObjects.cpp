@@ -610,12 +610,12 @@ int BonusObjectManager::CreateFrameNode(void* context, int lights, int options) 
     baseFrame = new (__FILE__, 0x326) D3DIMSoultreeObject(1);
     if (!AppendChild(baseFrame->LoadModel(context, "", lights, options, 1), -1))
         return 0;
-    strcpy(baseFrame->nodeName, "Base Bonus Frame");
-    baseFrame->subtreeBoundsCenter = kVec3Zero;
-    baseFrame->subtreeBoundsHalfExtent = Vector3(0.9f, 0.22f, 0.09f);
+    strcpy(baseFrame->name, "Base Bonus Frame");
+    reinterpret_cast<Vector3&>(baseFrame->subtreeBoundsCenter) = kVec3Zero;
+    reinterpret_cast<Vector3&>(baseFrame->subtreeBoundsHalfExtent) = Vector3(0.9f, 0.22f, 0.09f);
     baseFrame->subtreeBoundsValid = 1;
-    baseFrame->localBoundsCenter = kVec3Zero;
-    baseFrame->localBoundsHalfExtent = Vector3(0.9f, 0.22f, 0.09f);
+    reinterpret_cast<Vector3&>(baseFrame->localBoundsCenter) = kVec3Zero;
+    reinterpret_cast<Vector3&>(baseFrame->localBoundsHalfExtent) = Vector3(0.9f, 0.22f, 0.09f);
     baseFrame->localBoundsValid = 1;
     frameWidth = baseFrame->localBoundsHalfExtent.x + baseFrame->localBoundsHalfExtent.x;
     return 1;
