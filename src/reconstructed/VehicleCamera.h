@@ -74,13 +74,11 @@ struct VehicleCameraVehicleView {
     }
 };
 
-// Optional targets at VehicleCamera+0x384 / +0x388 (slot 33).
-struct VehicleCameraCharacterTargetView {
-    unsigned char field_0x000[0x1a0];
-    SoultreeObject* modelNode;       // +0x1a0 0x0052bb60; the characters' model node (krusty2 Character)
-    unsigned char field_0x1a4[0x224 - 0x1a4];
-    Vector3 nodeVelocity;                // +0x224 krusty2 CollisionCharacter::nodeVelocity
-};
+// Optional targets at VehicleCamera+0x384 / +0x388 (slot 33). The character
+// target is a scene CollisionCharacter (krusty2/motion/CollisionCharacter.h):
+// slot 33 tracks its nodeVelocity (+0x224), and 0x0052bb60 reads its modelNode
+// (+0x1a0).
+class CollisionCharacter;
 
 // The camera's car target is a scene procedural car (CarProcedural.h); slot 33
 // tracks its pathVelocity (+0x40), and the position and heading come from its
@@ -140,7 +138,7 @@ public:
     }
 
 protected:
-    VehicleCameraCharacterTargetView* targetCharacter;  // +0x384  BikeRace TargetCharacter stores a key-framed scene character; slots 33/41/TargetPoint read its node
+    CollisionCharacter* targetCharacter;  // +0x384  BikeRace TargetCharacter stores a key-framed scene character; slots 33/41/TargetPoint read its node
     CarProcedural* targetCar;  // +0x388  BikeRace TargetObject stores a scene procedural object (CarProcedural)
     SoultreeObject* targetCaster;  // +0x38C  BikeRace view +0x38c shadowCaster (TargetCaster); TargetPoint takes its translation
     bool vehicleMode;                    // +0x390, vehicle mode

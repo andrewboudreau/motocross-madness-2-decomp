@@ -2,6 +2,7 @@
 #include "VehicleCamera.h"
 #include "D3DIMSoulTree.h"
 #include "CarProcedural.h"
+#include "../krusty2/motion/CollisionCharacter.h"
 #include "TrackGame.h"
 
 // The four Math3D vector constants (.CRT$XCU 336-339, initialisers
@@ -43,7 +44,7 @@ Vector3 VehicleCamera::GetTargetVelocity() {
     if (vehicleMode)
         return vehicle->velocity;
     if (targetCharacter)
-        return targetCharacter->nodeVelocity;
+        return *reinterpret_cast<const Vector3*>(&targetCharacter->nodeVelocity);
     if (targetCar)
         return targetCar->pathVelocity;
     return kVec3Zero;
