@@ -28,10 +28,11 @@ primary and secondary vptrs. The compiler still uses the primary model address
 for construction, lookup and geometry calls. Existing GameObject child-list
 insertion retains its separate `+0xc` conversion.
 
-CarProceduralModel and the motion source's local ModelObject remain limited
-views for their other accesses. The newly allocated canonical model is cast
-back to the appropriate view without changing the pointer. Their allocation
-size and base conversion agree with the canonical declarations. The motion
+CarProcedural keeps the canonical model: `carModel` is a `D3DIMSoultreeObject*`
+and its wheel nodes are `SoultreeObject*`. The motion source's local ModelObject
+remains a limited view for its other accesses; the newly allocated canonical
+model is cast back to it without changing the pointer. Its allocation size and
+base conversion agree with the canonical declarations. The motion
 view's texture manager, LOD count and LOD table remain at `+0x240`, `+0x274`
 and `+0x28c`. Its existing virtual CopyFrom/Load calls and ownership transfers
 are unchanged. This does not assert equivalence of every provisional method

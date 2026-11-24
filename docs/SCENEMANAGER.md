@@ -80,8 +80,8 @@ type, member and function names are provisional.
   `CarProcedural` (CarProcedural.h). Scene reads the character's
   `sltFileName` (+0x1a4) and model node (+0x1a0), and the car's model (+0x34),
   collision objects and slot 27 `Tick`.
-- The model nodes are cast to `D3DIMSoultreeObject*` at the use site: the
-  character's node is declared `SoultreeObject*`, the car's `CarProceduralModel*`.
+- The car's model is a `D3DIMSoultreeObject*`; the character's node is declared
+  `SoultreeObject*` and is cast to `D3DIMSoultreeObject*` at the use site.
   The scene calls `0x004444c0` and `0x004451e0` on them, and the SoultreeObject
   methods `0x004fbd70` and `0x004fc660` with the `Vector3` arguments cast to `Vec3`.
 - `ReadStaticModels` constructs the real DustParticleEmitter, DirtChunkParticleEmitter,

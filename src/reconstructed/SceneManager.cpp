@@ -1528,9 +1528,9 @@ int Scene::ReadAnimations(LightManager* lights, int textureManager, int modelTex
         } else {
             LogParameter(name, "SLT", sltPath);
             animationTable->entries[i].motionCount = 1;
-            reinterpret_cast<D3DIMSoultreeObject*>(animationTable->entries[i].proceduralObject->carModel)->SetUseLighting(useLighting);
+            animationTable->entries[i].proceduralObject->carModel->SetUseLighting(useLighting);
             if (axes)
-                reinterpret_cast<D3DIMSoultreeObject*>(animationTable->entries[i].proceduralObject->carModel)->SetAxesPtr(reinterpret_cast<const Vec3*>(&look), reinterpret_cast<const Vec3*>(&up), 1, 0);
+                animationTable->entries[i].proceduralObject->carModel->SetAxesPtr(reinterpret_cast<const Vec3*>(&look), reinterpret_cast<const Vec3*>(&up), 1, 0);
         }
         if (animationTable->entries[i].motionCount > 0) {
             if (auralScape) {
@@ -1548,7 +1548,7 @@ int Scene::ReadAnimations(LightManager* lights, int textureManager, int modelTex
                     if (animationTable->entries[i].keyFramed)
                         node = static_cast<D3DIMSoultreeObject*>(animationTable->entries[i].character->modelNode);
                     else
-                        node = reinterpret_cast<D3DIMSoultreeObject*>(animationTable->entries[i].proceduralObject->carModel);
+                        node = animationTable->entries[i].proceduralObject->carModel;
                     SoultreeSoundEmitter* emitter =
                         (new(__FILE__, 2433)
                              SoultreeSoundEmitter((AuralScape*)auralScape, soundGroup, 1, isEnabled))
@@ -1840,14 +1840,14 @@ void Scene::SetDetailLevel(int level)
             if (animationTable->entries[i].keyFramed)
                 static_cast<D3DIMSoultreeObject*>(animationTable->entries[i].character->modelNode)->ApplyLodSettings(level);
             else
-                reinterpret_cast<D3DIMSoultreeObject*>(animationTable->entries[i].proceduralObject->carModel)->ApplyLodSettings(level);
+                animationTable->entries[i].proceduralObject->carModel->ApplyLodSettings(level);
         }
         for (i = 0; i < animationTable->randomSetCount; i++) {
             SceneAnimation* entry = animationTable->randomSets[i].entry;
             if (entry->keyFramed)
                 static_cast<D3DIMSoultreeObject*>(entry->character->modelNode)->ApplyLodSettings(level);
             else
-                reinterpret_cast<D3DIMSoultreeObject*>(entry->proceduralObject->carModel)->ApplyLodSettings(level);
+                entry->proceduralObject->carModel->ApplyLodSettings(level);
         }
     }
     if (staticModels) {

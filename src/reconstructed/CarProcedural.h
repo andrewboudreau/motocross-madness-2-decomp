@@ -22,45 +22,11 @@
 #include "MatrixUtil.h"
 #include "Wrecker.h"   // GraphicsTest
 
-// Scene-graph node methods as CarProcedural calls them (the model, its
-// "Body" node and the wheels). Tier 2 from the call sites; see
-// src/krusty2/core/SoultreeObject.h for the canonical view.
-class CarProceduralNode {
-public:
-    virtual void ComputeSortKey();
-    virtual void ComputeQuadTreeCode();
-    virtual void LoadHierarchy();
-    virtual void LoadHierarchyFromParameters();
-    virtual void CreateNode();
-    virtual void UpdateLocalBounds();
-    virtual void ResetLocalMatrices();
-    virtual void CloneFrom();
-    virtual void CopySubtree();
-    // Slot 9 (+0x24): loads the model (CarProcedural passes its slot 27
-    // arguments 0, 1, 3 and 4, then 1).
-    virtual void LoadModel(void* owner, const char* name, int lights, int options, int useOptions);
-
-    // Frame-relative helpers slot 10 uses (src/krusty2/core/SoultreeObject.h
-    // documents them): position in `frame` space, placement there, the
-    // local<->world direction maps and the two-axis orientation setter.
-    void GetPositionIn(CarProceduralNode* frame, Vector3* position);   // 0x004fc9a0 (ret 8)
-    void SetPositionInFrame(CarProceduralNode* frame, Vector3* position);   // 0x004fc740 (ret 8)
-    Vector3 WorldToLocalDirection(const Vector3& direction);                  // 0x004fd710 (ret 8) world -> local
-    Vector3 LocalToWorldDirection(const Vector3& direction);                  // 0x004fd5c0 (ret 8) local -> world
-    void SetAxesPtr(const Vector3* axisZ, const Vector3* axisY, int orthogonalize, int keepZ); // 0x004fbd70
-
-    short queryStamp;// +0x04 QuadTreeObject queryStamp
-    short sortKey;  // +0x06 QuadTreeObject sortKey
-    int objectTypeId;   // +0x08 QuadTreeObject objectTypeId (a char there)
-};
-
-// D3DIMSoultreeObject (constructor 0x0043f160, new 0x2d8 at line 0x63): a
-// node with a GameObject base at +0xc.
-class CarProceduralModel : public CarProceduralNode, public GameObject {
-public:
-    char nodeName[0x80];                      // +0x38 SoultreeObject nodeName: the model name (0x0042fa00)
-    char field_0xb8[0x2d8 - 0xb8];
-};
+// The car model is a D3DIMSoultreeObject (D3DIMSoulTree.h; constructor
+// 0x0043f160, new 0x2d8 at line 0x63), and its "Body" and wheel nodes are
+// SoultreeObjects (src/krusty2/core/SoultreeObject.h) found by name.
+class SoultreeObject;
+class D3DIMSoultreeObject;
 
 // Rigid body reached through CarProceduralCollision::shape.
 struct CarProceduralBody {
@@ -119,7 +85,7 @@ public:
     // 0x00430e60 (ret 0x14): the four cubic Hermite basis weights of t.
     void HermiteWeights(float t, float* h0, float* h1, float* h2, float* h3);
 
-    CarProceduralModel* carModel;             // +0x34 the car model (slot 27)
+    D3DIMSoultreeObject* carModel;            // +0x34 the car model (slot 27)
     CarProceduralCollision* sensorCollider;   // +0x38 two-point mesh collider that finds the ground (slot 10)
     CarProceduralCollision* bodyCollider;     // +0x3c the body's hull collider (slot 27's collision file)
     Vector3 pathVelocity;                     // +0x40 flat path direction times velocityScale
@@ -159,7 +125,7 @@ public:
     Vector3 smoothedBack;                     // +0x1f4 smoothed direction to the path behind
     Vector3 smoothedNormal;                   // +0x200 smoothed ground normal
     void* groundProvider;                     // +0x20c the ground query provider (CarProceduralTerrain in slot 10)
-    CarProceduralNode** wheelNodes;           // +0x210 wheels
+    SoultreeObject** wheelNodes;              // +0x210 wheels
     Vector3 bodyContactPoint;                 // +0x214  slot 10 copies the body collider's contact record +0x18 (not read in this unit)
     Vector3 bodyContactNormal;                // +0x220  slot 10 copies the body collider's contact record +0x0c (not read in this unit)
 };

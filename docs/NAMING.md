@@ -2983,7 +2983,7 @@ tools/static_check.py passes.
 | KbGame (KrustyBikeTypes.h) | `field_0xc50` | `wreckResetOnTrack` | 2 | KbGame is a TrackGame view (frameTime, bajaEnduroEvent, mode +0x578 and difficulty agree); TrackGame.h names mode +0x6d8 wreckResetOnTrack after the retail string ChkWreckResetOnTrack (Tier 1 backing). FindPlacement 0x00491e31 respawns at the stored position when it is set. |
 | KbChild (KrustyBikeTypes.h) | `field_0x4` | `ownerNode` | 2 | The collisionPoints (+0x12c) elements are CollisionPoint objects; CollisionPoint+0x04 is ownerNode. ClearCrashState tests it before clearing the contact. |
 | KbChild (KrustyBikeTypes.h) | `field_0xa4` | `inContact` | 2 | CollisionPoint+0xa4 inContact (SoultreeContact calls it touching, VehicleContact contactActive); ClearCrashState clears it. |
-| CarProceduralNode (CarProcedural.h) | `field_0x08` | `objectTypeId` | 2 | The QuadTreeObject head (+0x08 objectTypeId char); the int type is kept. |
+| CarProceduralNode (CarProcedural.h) | `field_0x08` | `objectTypeId` | 2 | The QuadTreeObject head (+0x08 objectTypeId char); the int type is kept. Merged into `SoultreeObject`. |
 | CarProceduralSensorContact (Group2_CarProcedural.cpp, CarProceduralNearMisses.cpp) | `field_0x00` | `fraction` | 2 | The sensor collider's contact record is a CollisionBoxResult (fraction +0, point +4, normal +8); Tick reads 1 - fraction. |
 | CarProceduralSensorContact (Group2_CarProcedural.cpp, CarProceduralNearMisses.cpp) | `field_0x04` | `point` | 2 | CollisionBoxResult +4 is point; the float type is kept. No uses. |
 | CarProceduralSensorContact (CarProceduralNearMisses.cpp) | `field_0x08` | `normal` | 2 | The bringup view of the same struct already names +0x08 normal (CollisionBoxResult normal); the samples Tick copies it into its local normal. |
@@ -3422,15 +3422,15 @@ tools/static_check.py passes.
 | GUIManager | `UnknownFunction464e90` | `OnPaletteChanged` | 3 | GUIManager::Tick 0x00485870 calls it after clearing paletteChanged (+0x1f0); ~UIDialog 0x0046a070 calls it in 8-bit mode unless the palette is locked |
 | DrawableGridNode | `UnknownFunction464e90` | `OnMaskCleared` | 3 | Griddraw: all three calls follow childMask becoming 0 (child->childMask = 0, or oldMask != 0 && childMask == 0) |
 | ManagedTextureGroup | `UnknownFunction464e90` | `OnOutOfPageSpace` | 3 | placement loop calls it when cachePages.Next() returns no page; TextureMapManager.h already notes "out of page space" |
-| CarProceduralNode | `UnknownNodeVirtualSlot0` | `ComputeSortKey` | 3 | QuadTreeObject slot 0 (EcoQuadTreeObject.h) |
-| CarProceduralNode | `UnknownNodeVirtualSlot1` | `ComputeQuadTreeCode` | 3 | QuadTreeObject slot 1 (EcoQuadTreeObject.h) |
-| CarProceduralNode | `UnknownNodeVirtualSlot2` | `LoadHierarchy` | 3 | SoultreeObject slot 2, 0x004fdc00 |
-| CarProceduralNode | `UnknownNodeVirtualSlot3` | `LoadHierarchyFromParameters` | 3 | SoultreeObject slot 3, 0x004fddc0 |
-| CarProceduralNode | `UnknownNodeVirtualSlot4` | `CreateNode` | 3 | SoultreeObject slot 4, 0x004fe020 |
-| CarProceduralNode | `UnknownNodeVirtualSlot5` | `UpdateLocalBounds` | 3 | SoultreeObject slot 5 (shared empty 0x00464e90) |
-| CarProceduralNode | `UnknownNodeVirtualSlot6` | `ResetLocalMatrices` | 3 | SoultreeObject slot 6, 0x004fec70 |
-| CarProceduralNode | `UnknownNodeVirtualSlot7` | `CloneFrom` | 3 | SoultreeObject slot 7, 0x004feb10 |
-| CarProceduralNode | `UnknownNodeVirtualSlot8` | `CopySubtree` | 3 | SoultreeObject slot 8, 0x004feb30 |
+| CarProceduralNode | `UnknownNodeVirtualSlot0` | `ComputeSortKey` | 3 | QuadTreeObject slot 0 (EcoQuadTreeObject.h) Merged into `SoultreeObject`. |
+| CarProceduralNode | `UnknownNodeVirtualSlot1` | `ComputeQuadTreeCode` | 3 | QuadTreeObject slot 1 (EcoQuadTreeObject.h) Merged into `SoultreeObject`. |
+| CarProceduralNode | `UnknownNodeVirtualSlot2` | `LoadHierarchy` | 3 | SoultreeObject slot 2, 0x004fdc00 Merged into `SoultreeObject`. |
+| CarProceduralNode | `UnknownNodeVirtualSlot3` | `LoadHierarchyFromParameters` | 3 | SoultreeObject slot 3, 0x004fddc0 Merged into `SoultreeObject`. |
+| CarProceduralNode | `UnknownNodeVirtualSlot4` | `CreateNode` | 3 | SoultreeObject slot 4, 0x004fe020 Merged into `SoultreeObject`. |
+| CarProceduralNode | `UnknownNodeVirtualSlot5` | `UpdateLocalBounds` | 3 | SoultreeObject slot 5 (shared empty 0x00464e90) Merged into `SoultreeObject`. |
+| CarProceduralNode | `UnknownNodeVirtualSlot6` | `ResetLocalMatrices` | 3 | SoultreeObject slot 6, 0x004fec70 Merged into `SoultreeObject`. |
+| CarProceduralNode | `UnknownNodeVirtualSlot7` | `CloneFrom` | 3 | SoultreeObject slot 7, 0x004feb10 Merged into `SoultreeObject`. |
+| CarProceduralNode | `UnknownNodeVirtualSlot8` | `CopySubtree` | 3 | SoultreeObject slot 8, 0x004feb30 Merged into `SoultreeObject`. |
 
 ### Fields
 
@@ -4374,7 +4374,7 @@ Vehicle base that the canonical layout puts at those offsets.
 | BikeRaceKrustyBikeView | `field_0x5f8[0x604 - 0x5f8]` | leftBarContact, rightBarContact, tailContact | 2 | Bike layout |
 | RacerStateMessage (BikeRace.h) | `field_0x02[2]`, `int field_0x04` | short elapsedMs, short lapCount, short gatesPassed | 2 | KbBikeMessage (KrustyBikeRecords.h), which the message is |
 | RacerStateMessage | `field_0x20[0x28 - 0x20]` | lastLapTime, `field_0x24[4]` | 2 | KbBikeMessage +0x20 |
-| CarProceduralModel (CarProcedural.h; a real class, offsets and size kept) | `char field_0x38[0x2d8 - 0x38]` | nodeName[0x80], `field_0xb8` | 2 | SoultreeObject nodeName at +0x38; the old comment said it starts with the model name (0x0042fa00) |
+| CarProceduralModel (CarProcedural.h; a real class, offsets and size kept) | `char field_0x38[0x2d8 - 0x38]` | nodeName[0x80], `field_0xb8` | 2 | SoultreeObject nodeName at +0x38; the old comment said it starts with the model name (0x0042fa00) Merged into `D3DIMSoultreeObject` (`name`). |
 | DDSurfaceDesc (MediaControl.h) | `field_0x10[0x6c - 0x10]` | pitch, backBufferCount, mipMapCount, alphaBitDepth, reserved, surface, `field_0x28[0x6c - 0x28]` | 2 | DDSURFACEDESC (ddraw.h) |
 
 ### Reverted or trimmed edits

@@ -113,7 +113,7 @@ CarProcedural* CarProcedural::Create(void* renderContext, const char* name, cons
     strncpy(carName, name, length);
     carName[length] = 0;
 
-    carModel = reinterpret_cast<CarProceduralModel*>(new (__FILE__, 99) D3DIMSoultreeObject(1));
+    carModel = new (__FILE__, 99) D3DIMSoultreeObject(1);
     carModel->LoadModel(renderContext, name, lights, options, 1);
     AppendChild(carModel, -1);
     pathOffset = *offset;
@@ -122,27 +122,27 @@ CarProcedural* CarProcedural::Create(void* renderContext, const char* name, cons
     smoothedBack = kVec3Zero;
     steersFrontWheels = steerFront;
     wheelSpinAngle = 0.0f;
-    CarProceduralNode* body = reinterpret_cast<CarProceduralNode*>(reinterpret_cast<SoultreeObject*>(carModel)->FindByName("Body"));
-    reinterpret_cast<SoultreeObject*>(body)->GetPosition(reinterpret_cast<Vec3*>(&bodyOffset));
+    SoultreeObject* body = carModel->FindByName("Body");
+    body->GetPosition(reinterpret_cast<Vec3*>(&bodyOffset));
 
     numWheels = wheelCount;
     if (numWheels > 0) {
-        wheelNodes = new (__FILE__, 126) CarProceduralNode*[numWheels];
+        wheelNodes = new (__FILE__, 126) SoultreeObject*[numWheels];
         if (numWheels > 0)
-            wheelNodes[0] = reinterpret_cast<CarProceduralNode*>(reinterpret_cast<SoultreeObject*>(carModel)->FindByName("TireFrontL"));
+            wheelNodes[0] = carModel->FindByName("TireFrontL");
         if (numWheels > 1)
-            wheelNodes[1] = reinterpret_cast<CarProceduralNode*>(reinterpret_cast<SoultreeObject*>(carModel)->FindByName("TireFrontR"));
+            wheelNodes[1] = carModel->FindByName("TireFrontR");
         if (numWheels > 2)
-            wheelNodes[2] = reinterpret_cast<CarProceduralNode*>(reinterpret_cast<SoultreeObject*>(carModel)->FindByName("TireBackL"));
+            wheelNodes[2] = carModel->FindByName("TireBackL");
         if (numWheels > 3)
-            wheelNodes[3] = reinterpret_cast<CarProceduralNode*>(reinterpret_cast<SoultreeObject*>(carModel)->FindByName("TireBackR"));
+            wheelNodes[3] = carModel->FindByName("TireBackR");
         if (numWheels > 4)
-            wheelNodes[4] = reinterpret_cast<CarProceduralNode*>(reinterpret_cast<SoultreeObject*>(carModel)->FindByName("TireMidL"));
+            wheelNodes[4] = carModel->FindByName("TireMidL");
         if (numWheels > 5)
-            wheelNodes[5] = reinterpret_cast<CarProceduralNode*>(reinterpret_cast<SoultreeObject*>(carModel)->FindByName("TireMidR"));
+            wheelNodes[5] = carModel->FindByName("TireMidR");
         Vector3 center;
         Vector3 halfExtent;
-        reinterpret_cast<SoultreeObject*>(wheelNodes[0])->GetLocalBounds(
+        wheelNodes[0]->GetLocalBounds(
             reinterpret_cast<Vec3*>(&center), reinterpret_cast<Vec3*>(&halfExtent));
         inverseWheelRadius = 1.0f / halfExtent.y;
     }
@@ -168,7 +168,7 @@ CarProcedural* CarProcedural::Create(void* renderContext, const char* name, cons
     sensorCollider->AddIgnoredOwner(bodyCollider);
     g_MemTagStack->Pop(tag);
 
-    ReadPath(pathFile, carModel->nodeName);
+    ReadPath(pathFile, carModel->name);
     pathSpeed = speed;
     if (speed > 0.0)
         inversePathSpeed = 1.0f / speed;
@@ -334,7 +334,7 @@ int CarProcedural::Tick(float frameTime)
         sensorCollider->SetMeshShape(1, box);
         for (unsigned int i = 0; i < numWheels; i++) {
             Vector3 position;
-            reinterpret_cast<SoultreeObject*>(wheelNodes[i])->GetPosition(reinterpret_cast<Vec3*>(&position));
+            wheelNodes[i]->GetPosition(reinterpret_cast<Vec3*>(&position));
             if (position.z > 0.0)
                 frontWheelZ = position.z;
         }
@@ -356,7 +356,7 @@ int CarProcedural::Tick(float frameTime)
     forward.y = 0.0f;
     pathVelocity = forward * velocityScale;
     groundSpeed = CarLength(pathVelocity);
-    Vector3 local = carModel->WorldToLocalDirection(forward);
+    Vec3 local = carModel->WorldToLocalDirection(*reinterpret_cast<const Vec3*>(&forward));
     if (numWheels > 0)
         wheelSpinAngle = (float)fmod(inverseWheelRadius * velocityScale * local.z * frameTime + wheelSpinAngle, 6.2831855f);
     float behind = FindOffsetAtDistance(t, -1.0f);
@@ -369,12 +369,12 @@ int CarProcedural::Tick(float frameTime)
     if (steersFrontWheels && numWheels > 0) {
         float wheelbase = FindOffsetAtDistance(t, -frontWheelZ);
         Vector3 side = PositionAtTime(t - wheelbase) - pathPosition;
-        Vector3 steer = carModel->WorldToLocalDirection(side);
+        Vec3 steer = carModel->WorldToLocalDirection(*reinterpret_cast<const Vec3*>(&side));
         steeringAngle = (float)atan2(steer.x, steer.z);
         steeringAngle = CarClamp(steeringAngle, -0.52359873f, 0.52359873f);
     }
     Vector3 position;
-    carModel->GetPositionIn(0, &position);
+    carModel->GetPositionIn(0, reinterpret_cast<Vec3*>(&position));
     Vector3 ground = position;
     Vector3 normal;
     ((CarProceduralTerrain*)groundProvider)->QueryGround(&ground, &normal, 0, 0);
@@ -396,11 +396,11 @@ int CarProcedural::Tick(float frameTime)
     else
         smoothedNormal = smoothedNormal * normalBlend + normal * (1.0f - normalBlend);
     Vector3 flat = smoothedBack - smoothedNormal * CarDot(smoothedBack, smoothedNormal);
-    carModel->SetAxesPtr(&flat, &smoothedNormal, 0, 1);
+    carModel->SetAxesPtr(reinterpret_cast<const Vec3*>(&flat), reinterpret_cast<const Vec3*>(&smoothedNormal), 0, 1);
     Vector3 target(pathOffset.x + pathPosition.x, ground.y, pathOffset.z + pathPosition.z);
-    Vector3 offset = carModel->LocalToWorldDirection(bodyOffset);
-    Vector3 placement = target - offset;
-    carModel->SetPositionInFrame(0, &placement);
+    Vec3 offset = carModel->LocalToWorldDirection(*reinterpret_cast<const Vec3*>(&bodyOffset));
+    Vector3 placement = target - *reinterpret_cast<const Vector3*>(&offset);
+    carModel->SetPositionInFrame(0, reinterpret_cast<const Vec3*>(&placement));
     for (unsigned int i = 0; i < numWheels; i++) {
         Vector3 axisB;
         if (steersFrontWheels && i < 2) {
@@ -413,7 +413,7 @@ int CarProcedural::Tick(float frameTime)
             axisB.y = axisA.z;
             axisB.z = -axisA.y;
         }
-        wheelNodes[i]->SetAxesPtr(&axisA, &axisB, 0, 1);
+        wheelNodes[i]->SetAxesPtr(reinterpret_cast<const Vec3*>(&axisA), reinterpret_cast<const Vec3*>(&axisB), 0, 1);
     }
     bodyCollider->UpdatePlacement();
     if (bodyCollider->QueryCollisions()) {

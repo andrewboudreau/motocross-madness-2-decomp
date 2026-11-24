@@ -1800,7 +1800,7 @@ int BikeRace::Tick(float frameTime) {
                 if (entry->keyFramed) {
                     model = ((BikeRaceRiderView*)entry->character)->modelNode;
                 } else {
-                    model = (D3DIMSoultreeObject*)entry->proceduralObject->carModel;
+                    model = entry->proceduralObject->carModel;
                 }
             }
             do {

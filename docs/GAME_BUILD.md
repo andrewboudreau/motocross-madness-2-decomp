@@ -1866,8 +1866,8 @@ The scanner could not pair the trees of bodies where retail calls a helper the b
 inline, or the reverse. Those were then checked by hand: every sum of products, retail against
 the source, including inline header helpers and the bound COMDATs. All are clean and none
 needed a fix. The emu counts below are at 0x007f with seed 11.
-- Forwarders to the soultree.obj transforms, which are strict-exact: CarProceduralNode
-  0x004fd5c0 and 0x004fd710, ConNode 0x004fd660, SoultreeObject 0x004fd7f0. The forwarders are
+- Forwarders to the soultree.obj transforms, which are strict-exact: 0x004fd5c0 and
+  0x004fd710 (CarProcedural now calls them on SoultreeObject directly), ConNode 0x004fd660, SoultreeObject 0x004fd7f0. The forwarders are
   `TireNode::LocalToWorldDirection`, `KbXform::WorldToLocalDirection`, the
   `DrawSoultreeObjectView` views, Group4_SoultreeBridge and `Group4Veh_LocalToWorldPoint`. They
   call those bodies and copy the result back, with no arithmetic of their own.
