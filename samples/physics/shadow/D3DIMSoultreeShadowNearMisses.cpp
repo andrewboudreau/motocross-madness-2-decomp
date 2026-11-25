@@ -141,15 +141,6 @@ static ShadowVec3* s_shadowPoints;
 int g_d3dimShadowOutcodes[3000];
 extern float g_d3dimShadowTexel;      // 0x0057efa4 (slot 28)
 
-struct D3DIMShadowVertexView {
-    float x, y, z;
-    int reserved;
-    unsigned int diffuse;
-    unsigned int specular;
-    float tu, tv;
-};
-extern D3DIMShadowVertexView g_d3dimShadowVertexArray[3000];   // 0x00581eb8
-
 // 0x00446f40 (slot 30): when the shadow is visible (inShadowView), rasterises the caster's
 // triangles that lie in front of the shadow's depth into the shadow texture (update frames
 // only) and turns the others, when inCameraView is set, into textured vertices of the receiver
@@ -256,14 +247,14 @@ void D3DIMSoultreeShadow::BuildShadowVertices()
                 for (int k = 0; k < 3; k++) {
                     int idx = (unsigned short)corner[k];
                     const SoultreeVertex* src = mesh->vertices + idx;
-                    g_d3dimShadowVertexArray[vertexCount].x = src->position.x;
-                    g_d3dimShadowVertexArray[vertexCount].y = src->position.y;
-                    g_d3dimShadowVertexArray[vertexCount].z = src->position.z;
-                    g_d3dimShadowVertexArray[vertexCount].diffuse = color;
-                    g_d3dimShadowVertexArray[vertexCount].reserved = 0;
-                    g_d3dimShadowVertexArray[vertexCount].specular = 0;
-                    g_d3dimShadowVertexArray[vertexCount].tu = s_shadowPoints[idx].x * g_d3dimShadowTexel;
-                    g_d3dimShadowVertexArray[vertexCount].tv = s_shadowPoints[idx].y * g_d3dimShadowTexel;
+                    g_d3dimShadowVertices[vertexCount].x = src->position.x;
+                    g_d3dimShadowVertices[vertexCount].y = src->position.y;
+                    g_d3dimShadowVertices[vertexCount].z = src->position.z;
+                    g_d3dimShadowVertices[vertexCount].diffuse = color;
+                    g_d3dimShadowVertices[vertexCount].reserved = 0;
+                    g_d3dimShadowVertices[vertexCount].specular = 0;
+                    g_d3dimShadowVertices[vertexCount].tu = s_shadowPoints[idx].x * g_d3dimShadowTexel;
+                    g_d3dimShadowVertices[vertexCount].tv = s_shadowPoints[idx].y * g_d3dimShadowTexel;
                     if (++vertexCount == 3000)
                         goto done;
                 }

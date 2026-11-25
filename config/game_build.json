@@ -60,7 +60,6 @@
     "?LargestRecentSample@UnknownTimer@@QAEHXZ": "?Peak@PeakHold@@QAEHXZ",
     "?RecordSample@UnknownTimer@@QAEXH@Z": "?Record@PeakHold@@QAEXH@Z",
     "?ShadowTransformPointsProjective@@YAXPAUShadowVec3@@PBXPBUShadowMatrix@@HHH@Z": "?ProjectPoints@@YAXPAXPBXPBUMatrix4@@HHH@Z",
-    "?g_d3dimShadowVertexArray@@3PAUD3DIMShadowVertexView@@A": "?g_d3dimShadowVertices@@3PAUD3DIMShadowVertex@@A",
     "?SphereInFrustum@EcoVisibilityClipperView@@QAEHPBVCamera@@PBXPBUVector3@@MPAH@Z": "?SphereInFrustum@VisibilityClipper@@QAEHPBUVisibilityCamera@@PBUVisibilityMatrix@@PBUVisibilityBoxVec@@MPAH@Z",
     "??0BikeAIVec3Call@@QAE@MMM@Z": "??0Vec3@@QAE@MMM@Z",
     "?BikeAIVec3Scale@@YA?AUVec3@@ABU1@M@Z": "??D@YA?AUVec3@@ABU0@M@Z",

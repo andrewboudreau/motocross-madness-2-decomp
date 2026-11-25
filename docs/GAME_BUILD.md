@@ -1068,8 +1068,6 @@ slots 29 and 30. Before linking, two sample bugs were fixed:
   0x00581eb8 (0x2ee4 bytes). It is now `int[3000]`; the extent is inferred
   from the neighbouring symbol, since nothing else in retail references it.
 
-`link_aliases` binds `g_d3dimShadowVertexArray` to `g_d3dimShadowVertices` (0x00581eb8).
-
 TerrainShadow's old `TerrainShadowFloatToInt` corrected the `__ftol`
 truncation to round-to-nearest-even in software. That equals retail in the
 default rounding mode, so its behaviour does not change; the shape does

@@ -13,7 +13,7 @@
   "?g_clipRectangle@@3PAVClipRectangle@@A": "0x0056852c",
   "?g_d3dimShadowOutcodes@@3PAHA": "0x0057efd4",
   "?g_d3dimShadowTexel@@3MA": "0x0057efa4",
-  "?g_d3dimShadowVertexArray@@3PAUD3DIMShadowVertexView@@A": "0x00581eb8",
+  "?g_d3dimShadowVertices@@3PAUD3DIMShadowVertex@@A": "0x00581eb8",
   "?g_visibilityClipper@@3PAVVisibilityClipper@@A": "0x00575a98",
   "_s_shadowPointCapacity": "0x0059ad28",
   "_s_shadowPoints": "0x0059ad2c",

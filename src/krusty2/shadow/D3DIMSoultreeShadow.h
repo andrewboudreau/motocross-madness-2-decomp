@@ -15,6 +15,18 @@
 
 #include "ProjectedShadow.h"
 
+// One lit receiver vertex (FVF 0x1e2, the D3DLVERTEX layout: position, reserved, diffuse,
+// specular, texture coordinates; 32 bytes).  Slot 30 writes them and slot 14 draws them.
+struct D3DIMShadowVertex {
+    float x, y, z;
+    int reserved;
+    unsigned int diffuse;
+    unsigned int specular;
+    float tu, tv;
+    D3DIMShadowVertex() {}
+};
+extern D3DIMShadowVertex g_d3dimShadowVertices[3000];   // 0x00581eb8 (D3DIMSoultreeShadow.cpp)
+
 class D3DIMSoultreeShadow : public ShadowReceiver {
 public:
     explicit D3DIMSoultreeShadow(int flags);                       // 0x00446840
