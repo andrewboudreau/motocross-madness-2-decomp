@@ -1,8 +1,8 @@
 // BoundingBoxTreeBuild.h -- types shared by the bounding-box tree builder
 // (D:\aardvark\VC\krusty2\BoundingBoxTreeBuild.cpp, src/reconstructed/BoundingBoxTreeBuild.cpp).
 // Header name and all type names are ours (tier 3); the layouts come from the decoded accesses
-// noted on each member.  Promoted from src/krusty2/bvh/BoundingBoxTreeBuild.h; the scene-graph
-// and model types are local stand-ins seen from this file only.
+// noted on each member.  The scene-graph and model types are local stand-ins seen from this
+// file only.
 //
 // The trees are the ones CollisionObject's hull/model/mesh payloads hang off (+0x188 triangle
 // tree, +0x18c point tree; see collision/CollisionObject.h and the collision samples'

@@ -5,8 +5,8 @@ Shared headers stay here. See [physics validation](../../../docs/PHYSICS_VALIDAT
 # BoundingBoxTreeBuild.cpp (bvh)
 
 The builder itself is now matched in `src/reconstructed/BoundingBoxTreeBuild.cpp`
-(calibration; see docs/BOUNDINGBOXTREE.md). This header stays here for the
-physics samples.
+(calibration; see docs/BOUNDINGBOXTREE.md), with its types in
+`src/reconstructed/BoundingBoxTreeBuild.h`.
 
 Evidence
 - `__FILE__` string `D:\aardvark\VC\krusty2\BoundingBoxTreeBuild.cpp` at VA 0x005682bc. Its own

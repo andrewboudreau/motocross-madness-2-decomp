@@ -139,7 +139,7 @@ struct ModifierSoultreeSurfaceView {
 };
 
 // The D3DIMSoultreeObject passed to slot 27, seen from this file: only its
-// current level of detail at +0x27c (src/krusty2/bvh/BoundingBoxTreeBuild.h).
+// current level of detail at +0x27c (src/reconstructed/BoundingBoxTreeBuild.h).
 struct MorphBastardSoultreeView {
     unsigned char field_0x000[0x27c];
     int drawUnchanged;                // nonzero: draw the mesh unchanged
