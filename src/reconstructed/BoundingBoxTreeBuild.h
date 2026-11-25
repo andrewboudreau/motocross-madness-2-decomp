@@ -13,6 +13,7 @@
 
 #include "DebugAlloc.h"
 #include "BoundingBoxTreeFunctions.h"
+#include "../krusty2/core/SoultreeObject.h"
 
 // Three consecutive floats; copies are three dword moves (tier 1).  A local type, because
 // this TU has none of the per-TU $E vector-constant initialisers that common/Math3D.h adds;
@@ -122,18 +123,6 @@ class FileStream;
 void TriangleNormal(const TreeVec3* a, const TreeVec3* b, const TreeVec3* c, TreeVec3* normal,
                     float* planeOffset);
 
-// Scene-graph node (soultree.cpp's SoultreeObject; see src/krusty2/core/SoultreeObject.h,
-// which promoted code may not include).  Local stand-in with only the methods called here.
-// Method names follow that header (tier 3).
-class TreeSceneNode {
-public:
-    void SetMatrixIn(TreeSceneNode* frame, TreeMatrix4* m);     // 0x004fb8c0
-    void SetAxesIn(TreeSceneNode* frame, const TreeVec3* axisZ, const TreeVec3* axisY,
-                   int orthogonalize, int keepZ);                // 0x004fc050
-    void SetPositionIn(TreeSceneNode* frame, const TreeVec3* p);  // 0x004fc740
-    void MarkSubtreeDirty();                                    // 0x004fdab0
-};
-
 // Vertex of a render mesh, 0x20 bytes (D3DVERTEX-sized: part ranges are byte offsets divided by
 // sizeof); only the position is read here.
 struct TreeModelVertex {
@@ -143,7 +132,7 @@ struct TreeModelVertex {
 
 // Vertex range of a mesh that belongs to one frame, 0x14 bytes (stride in 0x0042d390).
 struct TreeModelPart {
-    TreeSceneNode* frame;       // +0x00 compared with the frame argument of 0x0042d390/0x0042c260
+    SoultreeObject* frame;      // +0x00 compared with the frame argument of 0x0042d390/0x0042c260
     int vertexCount;            // +0x04 length of the range
     TreeModelVertex* firstVertex;  // +0x08 start of the range inside the mesh's vertices
     int transformedVertices;
@@ -175,10 +164,10 @@ struct TreeModelLod {
     TreeModelMesh* meshes;      // +0x04
 };
 
-// Render model (D3DIMSoulTree.CPP; derives from the scene node, see 0x00440d40's this).  Stand-in.
-class TreeModelSource : public TreeSceneNode {
+// Render model: the D3DIMSoultreeObject (D3DIMSoulTree.CPP) seen from this file.  The scene node
+// part is the real SoultreeObject (0x1a4 bytes); the LOD tables are the views above.
+class TreeModelSource : public SoultreeObject {
 public:
-    char pad_0x000[0x1a4];
     int useLighting;            // +0x1a4 saved, cleared around TransformVertexGroups(-1) and restored by
                                 // 0x0042c260
     char pad_0x1a8[0x27c - 0x1a8];
@@ -197,7 +186,7 @@ extern const TreeVec3 kVec3ZAxis;
 // 0x0042c260: the triangles of `model`'s current LOD (only those whose three corners lie in
 // `frame`'s vertex ranges when `frame` is non-null) as a deduplicated vertex list and three
 // indices per triangle.
-void GatherModelTriangles(TreeModelSource* model, TreeSceneNode* frame, int* triCount,
+void GatherModelTriangles(TreeModelSource* model, SoultreeObject* frame, int* triCount,
                           int* vertCount, int** indices, TreeVec3** verts);
 
 // Partition and bounds helpers (0x0042ad30..0x0042b5eb), the first functions of this file.

@@ -22,9 +22,9 @@ MODEL = 'src/reconstructed/D3DIMSoulTree.cpp'
 SCENE = 'src/krusty2/soultree/soultree.cpp'
 PROVIDERS = (
     (MATRIX, '?IdentityMatrix@@YA?AUMatrix4@@XZ', 0x4a1410, 71),
-    (TREE, '?BuildModelTriangleTree@@YAXPAUBoxTreeNode@@PAUTreeMatrix4@@PAVTreeModelSource@@PAPAUTreeVec3@@PAVTreeSceneNode@@H@Z', 0x42c8c0, 928),
+    (TREE, '?BuildModelTriangleTree@@YAXPAUBoxTreeNode@@PAUTreeMatrix4@@PAVTreeModelSource@@PAPAUTreeVec3@@PAVSoultreeObject@@H@Z', 0x42c8c0, 928),
     (TREE, '?BuildTriangleMeshTree@@YAXPAUBoxTreeNode@@PAUTreeMatrix4@@PAUTreeVec3@@PBHHHH@Z', 0x42cc60, 831),
-    (TREE, '?BuildModelPointTree@@YAXPAUBoxTreeNode@@PAUTreeMatrix4@@PAVTreeModelSource@@PAVTreeSceneNode@@@Z', 0x42d390, 1608),
+    (TREE, '?BuildModelPointTree@@YAXPAUBoxTreeNode@@PAUTreeMatrix4@@PAVTreeModelSource@@PAVSoultreeObject@@@Z', 0x42d390, 1608),
     (TREE, '?BuildModelBoxTree@@YAXPAUBoxTreeNode@@PBUTreeMatrix4@@PAUTreeVec3@@H@Z', 0x42dc90, 501),
     (MODEL, '?TransformVertexGroups@D3DIMSoultreeObject@@QAEXH@Z', 0x440d40, 486),
     (SCENE, '?GetMatrixIn@SoultreeObject@@QAEXPAV1@PAUMatrix4@@@Z', 0x4fca80, 494),

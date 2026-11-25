@@ -399,14 +399,14 @@ void CollisionObject::SetModelShape(void* nodeArg, int buildPointTrees, int swep
                                    reinterpret_cast<TreeMatrix4*>(&model->elements[index].localTransform),
                                    reinterpret_cast<TreeModelSource*>(node),
                                    reinterpret_cast<TreeVec3**>(&model->elements[index].vertices),
-                                   reinterpret_cast<TreeSceneNode*>(list[j]), d);
+                                   reinterpret_cast<SoultreeObject*>(list[j]), d);
             model->elements[index].pointTree = 0;
             if (buildPointTrees) {
                 model->elements[index].pointTree = operator new(0x24, __FILE__, 0x107);
                 BuildModelPointTree(reinterpret_cast<BoxTreeNode*>(model->elements[index].pointTree),
                                    reinterpret_cast<TreeMatrix4*>(&model->elements[index].localTransform),
                                    reinterpret_cast<TreeModelSource*>(node),
-                                   reinterpret_cast<TreeSceneNode*>(list[j]));
+                                   reinterpret_cast<SoultreeObject*>(list[j]));
             }
             index++;
         }

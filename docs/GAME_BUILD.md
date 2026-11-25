@@ -818,7 +818,6 @@ clearly more faithful, the game now links the sample's text:
   | Retail | View name | Provider |
   |---|---|---|
   | 0x0048fa60 | `BikeRaceKrustyBikeView` constructor (0x1638 bytes) | `KrustyBike` |
-  | 0x004fc050, 0x004fc740, 0x004fdab0, 0x004fb8c0 | `TreeSceneNode` axes, position, dirty mark, matrix | `SoultreeObject` (`SetAxesIn`, `SetPositionInFrame`, `MarkSubtreeDirty`, `SetMatrixIn`) |
   | 0x00505600 | `Grid1Terrain::AcquireOwnedObject` | `Terrain::AcquireOwnedObject` |
   | 0x00404e60, 0x0040ae30, 0x00421cb0, 0x005015b0 | Wrecker and shadow vector call views | `Vec3Call`, `Vec3DotCall`, `Vec3AddCall`, `Vec3ScaleCall` |
   | 0x004a1860 | `ShadowMatrixMultiplyInto` | `MatrixMult` |

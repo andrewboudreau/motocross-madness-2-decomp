@@ -490,7 +490,7 @@ void BuildTriangleNode(BoxTreeNode* node, TreeBuildTriangle* tris, int count,
 // Not exact (1626 of 1627 bytes: one SIB byte, the remap pass reads keep[corners[k]] as
 // [keep + offset] where VC6 gives [offset + keep]; `remap = 0;` at the top gives retail's
 // reload order before the 0x348 allocation; docs/BOUNDINGBOXTREE.md forms tried)
-void GatherModelTriangles(TreeModelSource* model, TreeSceneNode* frame, int* triCount,
+void GatherModelTriangles(TreeModelSource* model, SoultreeObject* frame, int* triCount,
                           int* vertCount, int** indices, TreeVec3** verts)
 {
     TreeMatrix4 saved;
@@ -518,9 +518,9 @@ void GatherModelTriangles(TreeModelSource* model, TreeSceneNode* frame, int* tri
 
     remap = 0;
     numTris = 0;
-    reinterpret_cast<SoultreeObject*>(model)->GetMatrixIn(0, reinterpret_cast<Matrix4*>(&saved));
-    model->SetAxesIn(0, &kVec3ZAxis, &kVec3YAxis, 0, 1);
-    model->SetPositionIn(0, &kVec3Zero);
+    model->GetMatrixIn(0, reinterpret_cast<Matrix4*>(&saved));
+    model->SetAxesIn(0, reinterpret_cast<const Vec3*>(&kVec3ZAxis), reinterpret_cast<const Vec3*>(&kVec3YAxis), 0, 1);
+    model->SetPositionInFrame(0, reinterpret_cast<const Vec3*>(&kVec3Zero));
     savedField = model->useLighting;
     model->useLighting = 0;
     model->MarkSubtreeDirty();
@@ -659,13 +659,13 @@ void GatherModelTriangles(TreeModelSource* model, TreeSceneNode* frame, int* tri
     *indices = corners;
     *vertCount = numUnique;
     *triCount = numTris;
-    model->SetMatrixIn(0, &saved);
+    model->SetMatrixIn(0, reinterpret_cast<Matrix4*>(&saved));
 }
 
 // 0x0042c8c0.  BuildTriangleMeshTree for a render model: GatherModelTriangles supplies the
 // indices and the vertices (returned through `verts`).  The sixth argument is never read.
 void BuildModelTriangleTree(BoxTreeNode* root, TreeMatrix4* m, TreeModelSource* model,
-                            TreeVec3** verts, TreeSceneNode* frame, int unused)
+                            TreeVec3** verts, SoultreeObject* frame, int unused)
 {
     int* indices;
     int triCount;
@@ -828,7 +828,7 @@ const TreeVec3 kVec3ZAxis = TreeVec3(0.0f, 0.0f, 1.0f);
 // loop reads [vertices+offset] for retail's [offset+vertices]: 1601/1608; the local in only
 // one loop gives 1604 or 1601).
 void BuildModelPointTree(BoxTreeNode* root, TreeMatrix4* m, TreeModelSource* model,
-                         TreeSceneNode* frame)
+                         SoultreeObject* frame)
 {
     TreeVec3* points;
     TreeMatrix4 frameInverse;

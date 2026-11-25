@@ -20,7 +20,7 @@ import random
 import struct
 
 RETAIL_VA = 0x0042c260
-SYMBOL = '?GatherModelTriangles@@YAXPAVTreeModelSource@@PAVTreeSceneNode@@PAH2PAPAHPAPAUTreeVec3@@@Z'
+SYMBOL = '?GatherModelTriangles@@YAXPAVTreeModelSource@@PAVSoultreeObject@@PAH2PAPAHPAPAUTreeVec3@@@Z'
 SOURCE = 'src/reconstructed/BoundingBoxTreeBuild.cpp'
 PROBES = {0x0042c309: 'frame count', 0x0042c6af: 'keep alloc', 0x0042c8ab: 'restore'}
 GRID = [0.0, -0.0, 1.0, -1.0, 0.5, 2.0]
