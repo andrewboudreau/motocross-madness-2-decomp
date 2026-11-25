@@ -8,8 +8,9 @@
 // its origin).  This file used to carry a second, equivalent copy of that body with its own
 // corner array; it now forwards every argument unchanged, as Group1_ShadowClipper.cpp does
 // for D3DIMSoultreeShadow.cpp's view.  GridCamera and VisibilityCamera are the same camera
-// object (matrix at +0xec, viewport at +0x1a0..+0x1ac).  The seventh argument is unused
-// by the body; Griddraw.h declares it as a pointer, VisibilityClipper.h as an int.
+// object (matrix at +0xec, viewport at +0x1a0..+0x1ac).  The seventh argument is an unused
+// pointer.  Griddraw.h keeps its own declaration: Terrain.cpp's exact Render3D reaches
+// Griddraw.h and is sensitive to its declaration count.
 //
 // The linked body rounds its six screen-rectangle values through FistpFloatToIntChecked
 // compiled with /QIfist (Group4_Visibility.cpp; 516 against retail's 464 instructions,
@@ -24,5 +25,5 @@ int GridVisibilityClipper::TestBox(GridCamera* camera, const float* matrix, cons
 {
     return reinterpret_cast<VisibilityClipper*>(this)->TestBox(
         reinterpret_cast<VisibilityCamera*>(camera), matrix, center, extent, screenRect,
-        cornersInside, reinterpret_cast<int>(unused));
+        cornersInside, unused);
 }

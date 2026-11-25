@@ -42,17 +42,17 @@
     "src/krusty2/shadow/D3DIMSoultreeShadow.cpp": {
       "sections": 47,
       "relocations": 132,
-      "sha256": "857271ad59db8aaf73589f813b826fe3c169194957b7749510b90b751c69b6c9"
+      "sha256": "2db1b5af2f33a9fdc933ff4ca2e6c2d7c738d74b98dff402030fc8b62405c010"
     },
     "src/krusty2/visibility/VisibilityQuadTree.cpp": {
       "sections": 89,
       "relocations": 395,
-      "sha256": "bf32fd68f85ab48aabd7644101a8e56f8c099fbe14a77ce33c6d0a3354ce8c10"
+      "sha256": "585ec426c72ad24a68a1972ac3b13f7fc9f90df6b3eefb344d9dc5281ea8b0b5"
     },
     "samples/physics/shadow/D3DIMSoultreeShadowNearMisses.cpp": {
       "sections": 7,
       "relocations": 53,
-      "sha256": "5a46d2ddfa168fb0e5ed3b94953047deb9fe40ec7ca3c0115e91f2b164a50167"
+      "sha256": "34ab1b83c462cc8d982c5adcfc5fe097980937f022762d0d0c478c3c51fbb401"
     },
     "src/krusty2/broadphase/Terrain.cpp": {
       "sections": 87,

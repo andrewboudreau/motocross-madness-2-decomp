@@ -67,7 +67,7 @@ static inline int Group4Vis_ViewportY(const VisibilityCamera* camera) {
 // pragma keeps the frame pointer for it alone (docs/GAME_BUILD.md#frame-pointer-units).
 #pragma optimize("y", off)
 int VisibilityClipper::TestBox(VisibilityCamera* camera, const float* matrix, const float* center,
-                               const float* extent, int* screenRect, int* cornersInside, int unused) {
+                               const float* extent, int* screenRect, int* cornersInside, int* unused) {
     const float* m = matrix;
     unsigned int code = 0;
     int inside = 0;

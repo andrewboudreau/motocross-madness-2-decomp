@@ -40,7 +40,7 @@
   "?ReadClock@@YAIXZ": "0x4bfa80",
   "?Reset@QuadTree@@QAEXXZ": "0x4dc620",
   "?Title@DebugOverlay@@QAAXHPBDZZ": "0x447fa0",
-  "?TestBox@VisibilityClipper@@QAEHPAUVisibilityCamera@@PBM11PAH2H@Z": "0x52f570",
+  "?TestBox@VisibilityClipper@@QAEHPAUVisibilityCamera@@PBM11PAH22@Z": "0x52f570",
   "?TestDot@VisibilityClipper@@QAEHPBUVisibilityCamera@@PBUVisibilityBoxVec@@1@Z": "0x0052f140",
   "?TransformVectors@VisibilityClipper@@QAEXPBUVisibilityBoxVec@@PAU2@PBUVisibilityMatrix@@H@Z": "0x0052f0a0",
   "?Traverse@VisibilityQuadTreeNode@@QAEPAUQuadTreeResultLink@@HHPAU2@HHHPAUVisibilityCamera@@@Z": "0x52d610",

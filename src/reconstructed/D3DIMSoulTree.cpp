@@ -592,7 +592,7 @@ struct VisibilityCamera;
 class VisibilityClipper {
 public:
     int TestBox(VisibilityCamera* camera, const float* matrix, const float* center,
-                const float* extent, int* screenRect, int* cornersInside, int unused);
+                const float* extent, int* screenRect, int* cornersInside, int* unused);
 };
 extern VisibilityClipper* g_visibilityClipper;   // 0x00575a98
 
@@ -1427,7 +1427,7 @@ int D3DIMSoultreeObject::PrepareGeometry()
         view._44 = world.m[3][0] * projection.m[0][3] + world.m[3][1] * projection.m[1][3] + world.m[3][2] * projection.m[2][3] + world.m[3][3] * projection.m[3][3];
         if (g_visibilityClipper->TestBox((VisibilityCamera*)((RenderTarget*)renderContext)->currentCamera,
                                          view.m[0], &center.x, &extents.x, (int*)&screenRect, 0,
-                                         (int)&field_0x260)) {
+                                         &field_0x260)) {
             visible = 1;
             SelectLod(&center, &extents);
         }

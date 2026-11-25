@@ -4522,4 +4522,5 @@ finds every edited file still CRLF.
 | --- | --- | --- | --- |
 | `EcoVisibilityClipperView::SphereInFrustum` | `VisibilityClipper::SphereInFrustum` 0x0052fbb0 | 2 | Same pointer cell 0x00575a98 and VA; the link alias is gone. Proof: 43 units, no game-object byte change. |
 | `CubeVisibilityClipperView`, `FollowCameraVisibilityClipperView`, `OverlayVisibilityClipperView` | removed | 1 | No users left; their calls already name `VisibilityClipper` methods. Overlay's `float* depth` was wrong: 0x0052f340 stores a dword code (`mov [eax], esi` at 0x0052f4b5). |
+| `VisibilityClipper::TestBox` `int unused` | `int* unused` | 1 | The seventh argument is a pointer. The body never reads ebp+0x20, but callers push addresses (lea at 0x00443d74 and 0x004822f2), and D3DIMSoulTree.cpp had to pass `(int)&field_0x260`. Griddraw.h's `GridVisibilityClipper` view stays: removing it moves the declaration count that Terrain::Render3D's exact relocation order depends on. |
 | `ShadowTransformPointsOrtho` / `ShadowTransformPointsProjective` | `TransformPoints` 0x004a1b00 / `ProjectPoints` 0x004a1a50 | 2 | Same VAs in MatrixUtil's range; the shadow passes call them by name. |

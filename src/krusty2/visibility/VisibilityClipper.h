@@ -16,10 +16,12 @@ struct VisibilityCullPoint;
 //    and half extents (3 floats each), an optional screen rect (always 0 here) and returns
 //    the number of box corners inside the frustum through its sixth argument.  The result is
 //    0 when all 8 corners fail one plane.  It rounds with inline x87 code (excluded).
+//    The body never reads the seventh argument; callers pass an address there
+//    (lea at 0x00443d74 and 0x004822f2), so it is a pointer.
 class VisibilityClipper {
 public:
     int TestBox(VisibilityCamera* camera, const float* matrix, const float* center,
-                const float* extent, int* screenRect, int* cornersInside, int unused);
+                const float* extent, int* screenRect, int* cornersInside, int* unused);
     void TransformVectors(const VisibilityBoxVec* src, VisibilityBoxVec* dst,
                           const VisibilityMatrix* m, int count);               // 0x0052f0a0
     int TestDot(const VisibilityCamera* camera, const VisibilityBoxVec* a,

@@ -9,7 +9,7 @@ clip-space corners to 0x0068abc8, the screen rectangle and the inside count.
 import math
 
 RETAIL_VA = 0x0052f570
-SYMBOL = '?TestBox@VisibilityClipper@@QAEHPAUVisibilityCamera@@PBM11PAH2H@Z'
+SYMBOL = '?TestBox@VisibilityClipper@@QAEHPAUVisibilityCamera@@PBM11PAH22@Z'
 SOURCE = 'src/bringup/Group4_Visibility.cpp'
 BINDINGS = {'_s_group4BoxCorners': 0x0068abc8}
 PROBES = {0x0052f92a: 'first corner x fistp', 0x0052f9b8: 'corner loop fistp'}
