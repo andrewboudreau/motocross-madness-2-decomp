@@ -817,8 +817,6 @@ clearly more faithful, the game now links the sample's text:
 
   | Retail | View name | Provider |
   |---|---|---|
-  | 0x004328b0, 0x004329a0, 0x00432a20 | `CollisionObject` hull, sphere and capsule shapes taking `Vector3` | the `CollisionVec3` forms |
-  | 0x00507c10, 0x00508970 | `EcoTerrainView::QueryGround`, `GetHeightRange` | `Terrain` |
   | 0x0048fa60 | `BikeRaceKrustyBikeView` constructor (0x1638 bytes) | `KrustyBike` |
   | 0x004b5d00 | `OrientationAxesFromAngles` (`Vector3`/`int` and `Vec3`/`void` forms) | `src/reconstructed/OrientationAxes.cpp` |
   | 0x004fc050, 0x004fc740, 0x004fdab0, 0x004fb8c0 | `TreeSceneNode` axes, position, dirty mark, matrix | `SoultreeObject` (`SetAxesIn`, `SetPositionInFrame`, `MarkSubtreeDirty`, `SetMatrixIn`) |
