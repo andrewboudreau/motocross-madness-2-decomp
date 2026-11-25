@@ -70,8 +70,8 @@ class GuiConnectionTests(unittest.TestCase):
             self.assertTrue(connected <= production)
             self.assertTrue(connected <= providers)
             # The canonical provider now supplies the shared dialog entry.
-            self.assertIn('?ShowDialog@GUIManager@@QAEPAVUIDialog@@PAV2@HHH0HHH@Z', production)
-            self.assertIn('?ShowDialog@GUIManager@@QAEPAVUIDialog@@PAV2@HHH0HHH@Z', providers)
+            self.assertIn('?ShowDialog@GUIManager@@QAEPAVUIDialog@@PAV2@HHPAUCameraRect@@0HPBDH@Z', production)
+            self.assertIn('?ShowDialog@GUIManager@@QAEPAVUIDialog@@PAV2@HHPAUCameraRect@@0HPBDH@Z', providers)
             startup = {
                 '??0GUIManager@@QAE@H@Z',
                 '?SetUp@GUIManager@@QAEPAV1@PAXPAVPalette8@@PAVTextureMapManager@@PAVBackgroundImage@@HPAVSoundGroup@@PBDF5H@Z',

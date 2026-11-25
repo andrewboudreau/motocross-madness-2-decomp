@@ -1429,7 +1429,7 @@ void MultiPlayerDlg::ReportReadyCleared(int reason) {
 
 // 0x004f5a00
 void MultiPlayerDlg::ShowPage(int page) {
-    RECT area = {0x11, 0x23, 0x1aa, 0x111};
+    CameraRect area = {0x11, 0x23, 0x1aa, 0x111};
     if (eventPage && page != 0) {
         eventPage->Release();
         eventPage = 0;
@@ -1450,28 +1450,28 @@ void MultiPlayerDlg::ShowPage(int page) {
     case 0:
         if (!eventPage) {
             eventPage = new(__FILE__, 0x7a4) MPEventDlg;
-            g_TrackGame->ui->gui->ShowDialog(eventPage, 0, 1, (int)&area, (UIDialog*)this,
+            g_TrackGame->ui->gui->ShowDialog(eventPage, 0, 1, &area, (UIDialog*)this,
                                                                          0, 0, 1);
         }
         break;
     case 1:
         if (!bikeRiderPage) {
             bikeRiderPage = new(__FILE__, 0x7aa) MPBikeRiderDlg;
-            g_TrackGame->ui->gui->ShowDialog(bikeRiderPage, 0, 1, (int)&area, (UIDialog*)this,
+            g_TrackGame->ui->gui->ShowDialog(bikeRiderPage, 0, 1, &area, (UIDialog*)this,
                                                                          0, 0, 1);
         }
         break;
     case 2:
         if (!raceInfoPage) {
             raceInfoPage = new(__FILE__, 0x7b0) MPRaceInfoDlg;
-            g_TrackGame->ui->gui->ShowDialog(raceInfoPage, 0, 1, (int)&area, (UIDialog*)this,
+            g_TrackGame->ui->gui->ShowDialog(raceInfoPage, 0, 1, &area, (UIDialog*)this,
                                                                          0, 0, 1);
         }
         break;
     case 3:
         if (!optionsPage) {
             optionsPage = new(__FILE__, 0x7b6) MPOptionsDlg;
-            g_TrackGame->ui->gui->ShowDialog(optionsPage, 0, 1, (int)&area, (UIDialog*)this,
+            g_TrackGame->ui->gui->ShowDialog(optionsPage, 0, 1, &area, (UIDialog*)this,
                                                                          0, 0, 1);
         }
         break;

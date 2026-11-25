@@ -239,7 +239,7 @@
   "?PickAtCursor@ObjectPicker@@QAEHXZ": "0x004b04c0",
   "?HandleChatInput@ChatOverlay@@QAEHPAUControlEvent@@PAUInputButtonState@@PAH@Z": "0x0051dce0",
   "?OnControlPress@BikeRace@@UAEHPAUControlEvent@@PAUInputButtonState@@@Z$ehhandler": "0x00549cd4",
-  "?ShowDialog@GUIManager@@QAEPAVUIDialog@@PAV2@HHH0HHH@Z": "0x00485a70",
+  "?ShowDialog@GUIManager@@QAEPAVUIDialog@@PAV2@HHPAUCameraRect@@0HPBDH@Z": "0x00485a70",
   "?ShowCursors@GUIManager@@QAEXH@Z": "0x00486630",
   "?GetUser@GUIManager@@QAEPAVGUIUser@@H@Z": "0x00486540",
   "?CreateCursors@GUIManager@@QAEXPBDH@Z": "0x00486590",

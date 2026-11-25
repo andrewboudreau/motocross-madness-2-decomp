@@ -181,14 +181,14 @@ static void Run(int reference) {
     lookupCount = 0;
     UIDialog* parent = scenario.parent == 0 ? 0 : Dialog(scenario.parent == 1 ? 0 : 1);
     union {
-        UIDialog* (GUIManager::*method)(UIDialog*,int,int,int,UIDialog*,int,int,int);
+        UIDialog* (GUIManager::*method)(UIDialog*,int,int,CameraRect*,UIDialog*,int,const char*,int);
         DWORD address;
     } call;
     call.method = &GUIManager::ShowDialog;
     if (reference) call.address = referenceAddress;
     observed.result = (int)(Manager()->*call.method)(Dialog(0), scenario.seed * 37 - 911,
-        scenario.flags, scenario.seed & 1 ? (int)&callerRect : 0, parent,
-        scenario.seed * -131, (int)(pointerTokens + 72), scenario.wait);
+        scenario.flags, scenario.seed & 1 ? &callerRect : 0, parent,
+        scenario.seed * -131, (const char*)(pointerTokens + 72), scenario.wait);
     memcpy(observed.manager, managerSpace.data, sizeof(managerSpace.data));
     memcpy(observed.dialogs, dialogSpace.data, sizeof(dialogSpace.data));
     memcpy(observed.target, targetSpace.data, sizeof(targetSpace.data));

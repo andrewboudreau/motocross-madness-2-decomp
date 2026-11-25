@@ -91,9 +91,9 @@ public:
                       BackgroundImage* background, int startSound, SoundGroup* sound,
                       const char* font, short fontSize, const char* cursor,
                       int callback);
-    // 0x00485a70: shows `dialog`.
-    UIDialog* ShowDialog(UIDialog* dialog, int menu, int flags, int area,
-                         UIDialog* parent, int initParam, int name, int wait);
+    // 0x00485a70: shows `dialog`; `area` and `name` go to UIDialog::Create.
+    UIDialog* ShowDialog(UIDialog* dialog, int menu, int flags, CameraRect* area,
+                         UIDialog* parent, int initParam, const char* name, int wait);
     // 0x00485bd0: adds a shown dialog to its container.
     void AttachDialog(UIDialog* dialog, int initParam, int wait);
     int OpenDialogResource(const char* resource); // 0x00485c80: opens a dialog resource

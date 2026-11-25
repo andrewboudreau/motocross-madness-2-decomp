@@ -520,19 +520,19 @@ void PCCentralDlg::OpenPage(int page)
     case 0:
         if (!nextPage) {
             nextPage = new(__FILE__, 584) PCCentralNextDlg;
-            guiManager->ShowDialog((UIDialog*)nextPage, 0, 1, (int)&area, (UIDialog*)this, 0, 0, 1);
+            guiManager->ShowDialog((UIDialog*)nextPage, 0, 1, &area, (UIDialog*)this, 0, 0, 1);
         }
         break;
     case 1:
         if (!bikeRiderPage) {
             bikeRiderPage = new(__FILE__, 590) PCCentralBikeRiderDlg;
-            guiManager->ShowDialog((UIDialog*)bikeRiderPage, 0, 1, (int)&area, (UIDialog*)this, 0, 0, 1);
+            guiManager->ShowDialog((UIDialog*)bikeRiderPage, 0, 1, &area, (UIDialog*)this, 0, 0, 1);
         }
         break;
     case 2:
         if (!standingsPage) {
             standingsPage = new(__FILE__, 596) PCCentralStandingsDlg;
-            guiManager->ShowDialog((UIDialog*)standingsPage, 0, 1, (int)&area, (UIDialog*)this, 0, 0, 1);
+            guiManager->ShowDialog((UIDialog*)standingsPage, 0, 1, &area, (UIDialog*)this, 0, 0, 1);
         }
         break;
     }

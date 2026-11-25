@@ -114,7 +114,7 @@
   "?SetUp@GUIManager@@QAEPAV1@PAXPAVPalette8@@PAVTextureMapManager@@PAVBackgroundImage@@HPAVSoundGroup@@PBDF5H@Z": "0x004853b0",
   "?SetUp@GUIManager@@QAEPAV1@PAXPAVPalette8@@PAVTextureMapManager@@PAVBackgroundImage@@HPAVSoundGroup@@PBDF5H@Z$ehhandler": "0x0054b7ba",
   "?ShowCursors@GUIManager@@QAEXH@Z": "0x00486630",
-  "?ShowDialog@GUIManager@@QAEPAVUIDialog@@PAV2@HHH0HHH@Z": "0x00485a70",
+  "?ShowDialog@GUIManager@@QAEPAVUIDialog@@PAV2@HHPAUCameraRect@@0HPBDH@Z": "0x00485a70",
   "?ShowText@ToolTip@@QAEXPBDPAHM@Z": "0x00486b80",
   "?AllocRegion@BackgroundImage@@QAEHH@Z": "0x004040f0",
   "?ReleaseRegion@BackgroundImage@@QAEXH@Z": "0x00404200",

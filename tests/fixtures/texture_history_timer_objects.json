@@ -13,7 +13,7 @@
     "src/reconstructed/ProCircuitProcs.cpp": {
       "sections": 365,
       "relocations": 2327,
-      "sha256": "d1b34955c869d6e2c114753f12c92e900f35f2f54cdaf4ad236a829a34c71726"
+      "sha256": "791a81b191d2740dc3d28950505fe5581c9f930f7a645145352c81fa6b8f78b7"
     }
   },
   "note": "Four same-path old objects independently preserved with no symbol joins. Portable pins normalize only these four source filenames and the two exact canonical/sample-relative ContainerList.h spellings; old private pins were reproduced before the exact header-filename portability repair, and all four live-root objects equal the private mirror under this normalization. ManagedTextureGroup near-miss merge: the sample and its bring-up were folded into ManagedTextureGroup.cpp (both repacks, in retail order), whose pin is renewed; the sample pin is removed. Every calibration case stays exact. ProCircuitProcs near-miss merge: the sample's four bodies were folded into ProCircuitProcs.cpp and the unit put in retail order (365 sections, 2327 relocations); every calibration case stays exact."

@@ -842,19 +842,19 @@ void SinglePlayerDlg::OpenPage(int page) {
     case 0:
         if (!eventPage) {
             eventPage = new(__FILE__, 1401) SPEventDlg;
-            g_TrackGame->ui->gui->ShowDialog((UIDialog*)eventPage, 0, 1, (int)&area, (UIDialog*)this, 0, 0, 1);
+            g_TrackGame->ui->gui->ShowDialog((UIDialog*)eventPage, 0, 1, &area, (UIDialog*)this, 0, 0, 1);
         }
         break;
     case 1:
         if (!bikeRiderPage) {
             bikeRiderPage = new(__FILE__, 1407) SPBikeRiderDlg;
-            g_TrackGame->ui->gui->ShowDialog((UIDialog*)bikeRiderPage, 0, 1, (int)&area, (UIDialog*)this, 0, 0, 1);
+            g_TrackGame->ui->gui->ShowDialog((UIDialog*)bikeRiderPage, 0, 1, &area, (UIDialog*)this, 0, 0, 1);
         }
         break;
     case 2:
         if (!raceInfoPage) {
             raceInfoPage = new(__FILE__, 1413) SPRaceInfoDlg;
-            g_TrackGame->ui->gui->ShowDialog((UIDialog*)raceInfoPage, 0, 1, (int)&area, (UIDialog*)this, 0, 0, 1);
+            g_TrackGame->ui->gui->ShowDialog((UIDialog*)raceInfoPage, 0, 1, &area, (UIDialog*)this, 0, 0, 1);
         }
         break;
     }
@@ -2811,13 +2811,13 @@ void GhostReplayDlg::OpenPage(int page) {
     case 0:
         if (!ghostPage) {
             ghostPage = new(__FILE__, 4498) GhostFilesDlg;
-            g_TrackGame->ui->gui->ShowDialog((UIDialog*)ghostPage, 0, 1, (int)&area, (UIDialog*)this, 0, 0, 1);
+            g_TrackGame->ui->gui->ShowDialog((UIDialog*)ghostPage, 0, 1, &area, (UIDialog*)this, 0, 0, 1);
         }
         break;
     case 1:
         if (!replayPage) {
             replayPage = new(__FILE__, 4504) ReplayFilesDlg;
-            g_TrackGame->ui->gui->ShowDialog((UIDialog*)replayPage, 0, 1, (int)&area, (UIDialog*)this, 0, 0, 1);
+            g_TrackGame->ui->gui->ShowDialog((UIDialog*)replayPage, 0, 1, &area, (UIDialog*)this, 0, 0, 1);
         }
         break;
     }

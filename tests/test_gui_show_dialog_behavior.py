@@ -18,7 +18,7 @@ from mcm2tool.toolchain import find_child_ci, find_vc6_bin, infer_vc98_root
 
 ROOT = Path(__file__).resolve().parents[1]
 START, SIZE = 0x485a70, 341
-SYMBOL = '?ShowDialog@GUIManager@@QAEPAVUIDialog@@PAV2@HHH0HHH@Z'
+SYMBOL = '?ShowDialog@GUIManager@@QAEPAVUIDialog@@PAV2@HHPAUCameraRect@@0HPBDH@Z'
 DEPENDENCIES = {0x485df0, 0x4860f0, 0x470070, 0x4860a0, 0x4865e0, 0x485bd0}
 
 

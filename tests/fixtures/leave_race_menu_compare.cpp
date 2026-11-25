@@ -102,7 +102,7 @@ void GUIManager::CreateBackground(){EventAt(8,GuiIndex(this));ownsBackground^=0x
 GUIUser* GUIManager::GetUser(int index){int n=GuiIndex(this);if(index)Fail(89);EventAt(9,n,index);return scenario.invalid==1?0:User(n);}
 void KrustyUI::RecordRaceResults(){EventAt(10,Which(this,UI(0),UI(1)));}
 void GUIManager::ShowCursors(int value){if(value!=1)Fail(89);EventAt(11,GuiIndex(this),value);}
-UIDialog* GUIManager::ShowDialog(UIDialog* dialog,int a,int flags,int b,UIDialog* parent,int c,int d,int wait){
+UIDialog* GUIManager::ShowDialog(UIDialog* dialog,int a,int flags,CameraRect* b,UIDialog* parent,int c,const char* d,int wait){
     if(a || flags!=2 || b || parent || c || d || wait!=1 || (dialog && (void*)dialog!=world.transition))Fail(90);
     if(dialog && *(DWORD*)dialog!=(retailActive?0x552624:sourceTable))Fail(91);
     EventAt(14,GuiIndex(this),dialog!=0,flags,wait);return scenario.callbackReturn?dialog:0;

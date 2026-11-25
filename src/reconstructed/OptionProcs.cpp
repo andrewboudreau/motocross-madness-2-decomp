@@ -871,37 +871,37 @@ void OptionsDlg::OpenPage(int page)
     case 0:
         if (!gameSettingsPage) {
             gameSettingsPage = new(__FILE__, 1066) OptGameSettingsDlg;
-            g_TrackGame->ui->gui->ShowDialog((UIDialog*)gameSettingsPage, 0, 1, (int)&area, (UIDialog*)this, 0, 0, 1);
+            g_TrackGame->ui->gui->ShowDialog((UIDialog*)gameSettingsPage, 0, 1, &area, (UIDialog*)this, 0, 0, 1);
         }
         break;
     case 1:
         if (!graphicsPage) {
             graphicsPage = new(__FILE__, 1072) OptGraphicsDlg;
-            g_TrackGame->ui->gui->ShowDialog((UIDialog*)graphicsPage, 0, 1, (int)&area, (UIDialog*)this, 0, 0, 1);
+            g_TrackGame->ui->gui->ShowDialog((UIDialog*)graphicsPage, 0, 1, &area, (UIDialog*)this, 0, 0, 1);
         }
         break;
     case 2:
         if (!soundPage) {
             soundPage = new(__FILE__, 1078) OptSoundDlg;
-            g_TrackGame->ui->gui->ShowDialog((UIDialog*)soundPage, 0, 1, (int)&area, (UIDialog*)this, 0, 0, 1);
+            g_TrackGame->ui->gui->ShowDialog((UIDialog*)soundPage, 0, 1, &area, (UIDialog*)this, 0, 0, 1);
         }
         break;
     case 3:
         if (!controlsPage) {
             controlsPage = new(__FILE__, 1084) OptControlsDlg;
-            g_TrackGame->ui->gui->ShowDialog((UIDialog*)controlsPage, 0, 1, (int)&area, (UIDialog*)this, 0, 0, 1);
+            g_TrackGame->ui->gui->ShowDialog((UIDialog*)controlsPage, 0, 1, &area, (UIDialog*)this, 0, 0, 1);
         }
         break;
     case 4:
         if (!messagesPage) {
             messagesPage = new(__FILE__, 1090) OptMessagesDlg;
-            g_TrackGame->ui->gui->ShowDialog((UIDialog*)messagesPage, 0, 1, (int)&area, (UIDialog*)this, 0, 0, 1);
+            g_TrackGame->ui->gui->ShowDialog((UIDialog*)messagesPage, 0, 1, &area, (UIDialog*)this, 0, 0, 1);
         }
         break;
     case 5:
         if (!garagePage) {
             garagePage = new(__FILE__, 1096) OptGarageDlg;
-            g_TrackGame->ui->gui->ShowDialog((UIDialog*)garagePage, 0, 1, (int)&area, (UIDialog*)this, 0, 0, 1);
+            g_TrackGame->ui->gui->ShowDialog((UIDialog*)garagePage, 0, 1, &area, (UIDialog*)this, 0, 0, 1);
         }
         break;
     }

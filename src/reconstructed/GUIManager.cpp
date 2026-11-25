@@ -347,8 +347,8 @@ int GUIManager::RenderPost3D() {
 }
 
 // 0x00485a70
-UIDialog* GUIManager::ShowDialog(UIDialog* dialog, int menu, int flags, int area,
-                                 UIDialog* parent, int initParam, int name, int wait) {
+UIDialog* GUIManager::ShowDialog(UIDialog* dialog, int menu, int flags, CameraRect* area,
+                                 UIDialog* parent, int initParam, const char* name, int wait) {
     CameraRect screen;
     CameraRect* rect;
 
@@ -370,9 +370,9 @@ UIDialog* GUIManager::ShowDialog(UIDialog* dialog, int menu, int flags, int area
     }
     if (wait)
         RecreateCursors(waitCursorImage, paletteChanged == 0);
-    if (dialog->Create(renderContext, (CameraRect*)area, menu, flags, guiSoundGroup, guiTextures, dialogDirectory,
+    if (dialog->Create(renderContext, area, menu, flags, guiSoundGroup, guiTextures, dialogDirectory,
                                      parent, guiBackground, dialogFontName, dialogFontSize, this, users[0],
-                                     (const char*)name)) {
+                                     name)) {
         dialog->showFlags = flags;
         AttachDialog(dialog, initParam, wait);
         return dialog;

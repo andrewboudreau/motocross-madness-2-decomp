@@ -8513,7 +8513,7 @@ CASES = [
         'name': 'GUIManager.cpp GUIManager show dialog 0x00485a70',
         'bindings': 'src/reconstructed/GUIManager.bindings.json',
         'source': 'src/reconstructed/GUIManager.cpp',
-        'symbol': '?ShowDialog@GUIManager@@QAEPAVUIDialog@@PAV2@HHH0HHH@Z',
+        'symbol': '?ShowDialog@GUIManager@@QAEPAVUIDialog@@PAV2@HHPAUCameraRect@@0HPBDH@Z',
         'target_va': '0x00485a70',
         'target_size': 341,
         'reason': 'reachable retail CFG ends at 0x00485bc5; 11 NOPs precede AttachDialog',
