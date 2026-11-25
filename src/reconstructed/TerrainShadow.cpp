@@ -9,6 +9,7 @@
 // near misses in samples/physics/shadow/TerrainShadow.cpp, which the game build admits.
 #include "TerrainShadow.h"
 #include "PCTextureMap.h"
+#include "PCRenderTarget.h"
 
 // 0x00508ae0 (ret 4).
 TerrainShadow::TerrainShadow(int flags)
@@ -76,27 +77,6 @@ int TerrainShadow::NeedsShadowRender()
     return cellCount > 0;
 }
 
-// The render target at GameObject::renderContext as slot 14 uses it (RTTI PCRenderTarget; the
-// same local view D3DIMSoultreeShadow.cpp keeps).  Tier 3.
-class TerrainShadowRenderTarget {
-public:
-    virtual void Slot0(); virtual void Slot1(); virtual void Slot2(); virtual void Slot3();
-    virtual void Slot4(); virtual void Slot5();
-    virtual long GetTextureStageState(int stage, int type, int* value);  // slot 6
-    virtual long SetTextureStageState(int stage, int type, int value);   // slot 7
-    virtual void SetRenderState(int state, int value, int force);        // slot 8
-    virtual long GetRenderState(int state, int* value);                  // slot 9
-    virtual void Slot10(); virtual void Slot11(); virtual void Slot12(); virtual void Slot13();
-    virtual void Slot14();
-    // slot 15: indexed draw (type, FVF, vertices, vertex count, indices, index count, flags).
-    virtual int DrawIndexed(int type, int fvf, void* vertices, int vertexCount, short* indices,
-                            int indexCount, int flags);
-    virtual void Slot16(); virtual void Slot17();
-    virtual void Slot18(int value);
-    char pad_0x04[0x1c8 - 0x04];
-    unsigned char triTextureBlendCaps;           // bit 2 tested by slot 14
-};
-
 // 0x0050a1a0 (slot 14): draws the collected terrain vertices (+0x34, vertexCount of them) with the
 // shadow texture and modulating texture stages; D3DIMSoultreeShadow slot 14 without the world
 // matrix.  The address mode and render state 4 are restored afterwards; format 0x613 textures
@@ -106,43 +86,43 @@ int TerrainShadow::Render3D()
     if (vertexCount) {
         shadow->texture->Bind();
         int address;
-        ((TerrainShadowRenderTarget*)renderContext)->GetTextureStageState(0, 0xc, &address);
+        ((PCRenderTarget*)renderContext)->GetTextureStageState(0, 0xc, &address);
         if (address != 3)
-            ((TerrainShadowRenderTarget*)renderContext)->SetTextureStageState(0, 0xc, 3);
+            ((PCRenderTarget*)renderContext)->SetTextureStageState(0, 0xc, 3);
         if (shadow->surfaceFormat == 0x613) {
-            ((TerrainShadowRenderTarget*)renderContext)->SetRenderState(0x21, 1, 0);
-            ((TerrainShadowRenderTarget*)renderContext)->SetRenderState(0x1b, 1, 0);
-            if (((TerrainShadowRenderTarget*)renderContext)->triTextureBlendCaps & 4) {
-                ((TerrainShadowRenderTarget*)renderContext)->SetTextureStageState(0, 1, 4);
-                ((TerrainShadowRenderTarget*)renderContext)->SetTextureStageState(0, 2, 2);
-                ((TerrainShadowRenderTarget*)renderContext)->SetTextureStageState(0, 3, 0);
-                ((TerrainShadowRenderTarget*)renderContext)->SetTextureStageState(0, 4, 4);
-                ((TerrainShadowRenderTarget*)renderContext)->SetTextureStageState(0, 5, 2);
-                ((TerrainShadowRenderTarget*)renderContext)->SetTextureStageState(0, 6, 0);
+            ((PCRenderTarget*)renderContext)->SetRenderState(0x21, 1, 0);
+            ((PCRenderTarget*)renderContext)->SetRenderState(0x1b, 1, 0);
+            if (((PCRenderTarget*)renderContext)->triTextureBlendCaps & 4) {
+                ((PCRenderTarget*)renderContext)->SetTextureStageState(0, 1, 4);
+                ((PCRenderTarget*)renderContext)->SetTextureStageState(0, 2, 2);
+                ((PCRenderTarget*)renderContext)->SetTextureStageState(0, 3, 0);
+                ((PCRenderTarget*)renderContext)->SetTextureStageState(0, 4, 4);
+                ((PCRenderTarget*)renderContext)->SetTextureStageState(0, 5, 2);
+                ((PCRenderTarget*)renderContext)->SetTextureStageState(0, 6, 0);
             }
         } else {
-            ((TerrainShadowRenderTarget*)renderContext)->SetRenderState(0x1b, 1, 0);
-            ((TerrainShadowRenderTarget*)renderContext)->SetTextureStageState(0, 1, 4);
-            ((TerrainShadowRenderTarget*)renderContext)->SetTextureStageState(0, 2, 2);
-            ((TerrainShadowRenderTarget*)renderContext)->SetTextureStageState(0, 3, 0);
-            ((TerrainShadowRenderTarget*)renderContext)->SetTextureStageState(0, 4, 4);
-            ((TerrainShadowRenderTarget*)renderContext)->SetTextureStageState(0, 5, 2);
-            ((TerrainShadowRenderTarget*)renderContext)->SetTextureStageState(0, 6, 0);
+            ((PCRenderTarget*)renderContext)->SetRenderState(0x1b, 1, 0);
+            ((PCRenderTarget*)renderContext)->SetTextureStageState(0, 1, 4);
+            ((PCRenderTarget*)renderContext)->SetTextureStageState(0, 2, 2);
+            ((PCRenderTarget*)renderContext)->SetTextureStageState(0, 3, 0);
+            ((PCRenderTarget*)renderContext)->SetTextureStageState(0, 4, 4);
+            ((PCRenderTarget*)renderContext)->SetTextureStageState(0, 5, 2);
+            ((PCRenderTarget*)renderContext)->SetTextureStageState(0, 6, 0);
         }
         int blend;
-        ((TerrainShadowRenderTarget*)renderContext)->GetRenderState(4, &blend);
-        ((TerrainShadowRenderTarget*)renderContext)->SetRenderState(4, 1, 0);
-        ((TerrainShadowRenderTarget*)renderContext)->SetRenderState(0xe, 0, 0);
-        ((TerrainShadowRenderTarget*)renderContext)->Slot18(0);
-        ((TerrainShadowRenderTarget*)renderContext)->DrawIndexed(4, 0x1e2, vertices, vertexCount, indexTable,
-                                                              vertexCount, 0);
-        ((TerrainShadowRenderTarget*)renderContext)->SetRenderState(0xe, 1, 0);
-        ((TerrainShadowRenderTarget*)renderContext)->SetRenderState(0x1b, 0, 0);
+        ((PCRenderTarget*)renderContext)->GetRenderState(4, &blend);
+        ((PCRenderTarget*)renderContext)->SetRenderState(4, 1, 0);
+        ((PCRenderTarget*)renderContext)->SetRenderState(0xe, 0, 0);
+        ((PCRenderTarget*)renderContext)->SetAlphaTest(0);
+        ((PCRenderTarget*)renderContext)->DrawIndexedPrimitive(4, 0x1e2, (int)vertices, vertexCount, (int)indexTable,
+                                                           vertexCount, 0);
+        ((PCRenderTarget*)renderContext)->SetRenderState(0xe, 1, 0);
+        ((PCRenderTarget*)renderContext)->SetRenderState(0x1b, 0, 0);
         if (address != 3)
-            ((TerrainShadowRenderTarget*)renderContext)->SetTextureStageState(0, 0xc, address);
-        ((TerrainShadowRenderTarget*)renderContext)->SetRenderState(4, blend, 0);
+            ((PCRenderTarget*)renderContext)->SetTextureStageState(0, 0xc, address);
+        ((PCRenderTarget*)renderContext)->SetRenderState(4, blend, 0);
         if (shadow->surfaceFormat == 0x613)
-            ((TerrainShadowRenderTarget*)renderContext)->SetRenderState(0x21, 0, 0);
+            ((PCRenderTarget*)renderContext)->SetRenderState(0x21, 0, 0);
     }
     return 1;
 }

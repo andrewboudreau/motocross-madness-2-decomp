@@ -7,6 +7,8 @@
 #include "math/Vec3.h"
 #include "../../reconstructed/Matrix4.h"
 #include "core/SoultreeObject.h"
+#include "../../reconstructed/PCRenderTarget.h"
+#include "../../reconstructed/Camera.h"
 #include "../../reconstructed/PCTextureMap.h"
 
 // Per-TU vector constants (tier 2): 0x004477d0..0x004478d0 are the four VC6 dynamic initializers
@@ -174,42 +176,6 @@ struct D3DIMShadowVertex {
 };
 D3DIMShadowVertex g_d3dimShadowVertices[3000];
 
-// The render target at GameObject::renderContext as slot 14 uses it (RTTI PCRenderTarget; the
-// src/reconstructed RenderTarget.h slot names).  Local view, tier 3.
-class D3DIMShadowCamera {
-public:
-    virtual void Slot0(); virtual void Slot1(); virtual void Slot2(); virtual void Slot3();
-    virtual void Slot4(); virtual void Slot5(); virtual void Slot6(); virtual void Slot7();
-    virtual void Slot8(); virtual void Slot9(); virtual void Slot10(); virtual void Slot11();
-    virtual void Slot12(); virtual void Slot13(); virtual void Slot14(); virtual void Slot15();
-    virtual void Slot16(); virtual void Slot17(); virtual void Slot18(); virtual void Slot19();
-    virtual void Slot20(); virtual void Slot21(); virtual void Slot22(); virtual void Slot23();
-    virtual void Slot24(); virtual void Slot25(); virtual void Slot26(); virtual void Slot27();
-    virtual void Slot28(); virtual void Slot29();
-    virtual void SetWorldMatrix(const ShadowMatrix* m);           // slot 30 (0x78)
-};
-
-class D3DIMShadowRenderTarget {
-public:
-    virtual void Slot0(); virtual void Slot1(); virtual void Slot2(); virtual void Slot3();
-    virtual void Slot4(); virtual void Slot5();
-    virtual long GetTextureStageState(int stage, int type, int* value);  // slot 6
-    virtual long SetTextureStageState(int stage, int type, int value);   // slot 7
-    virtual void SetRenderState(int state, int value, int force);        // slot 8
-    virtual long GetRenderState(int state, int* value);                  // slot 9
-    virtual void Slot10(); virtual void Slot11(); virtual void Slot12(); virtual void Slot13();
-    virtual void Slot14();
-    // slot 15: indexed draw (type, FVF, vertices, vertex count, indices, index count, flags).
-    virtual int DrawIndexed(int type, int fvf, void* vertices, int vertexCount, short* indices,
-                            int indexCount, int flags);
-    virtual void Slot16(); virtual void Slot17();
-    virtual void Slot18(int value);
-    void* display;                               // +0x04
-    D3DIMShadowCamera* camera;                   // +0x08
-    char pad_0x0c[0x1c8 - 0x0c];
-    unsigned char triTextureBlendCaps;           // bit 2 tested by slot 14
-};
-
 // Slot 14 (0x00447540): draws the receiver's shadow triangles (vertexCount vertices and indices)
 // with the shadow texture, an identity world matrix and modulating texture stages; the address
 // mode and render state 4 are restored afterwards.  Format 0x613 textures also switch render
@@ -223,46 +189,46 @@ int D3DIMSoultreeShadow::Render3D()
         world.m[2][2] = 1.0f;
         world.m[1][1] = 1.0f;
         world.m[0][0] = 1.0f;
-        ((D3DIMShadowRenderTarget*)renderContext)->camera->SetWorldMatrix(&world);
+        ((PCRenderTarget*)renderContext)->currentCamera->SetWorldMatrix((const Matrix4*)&world);
         shadow->texture->Bind();
         int address;
-        ((D3DIMShadowRenderTarget*)renderContext)->GetTextureStageState(0, 0xc, &address);
+        ((PCRenderTarget*)renderContext)->GetTextureStageState(0, 0xc, &address);
         if (address != 3)
-            ((D3DIMShadowRenderTarget*)renderContext)->SetTextureStageState(0, 0xc, 3);
+            ((PCRenderTarget*)renderContext)->SetTextureStageState(0, 0xc, 3);
         if (shadow->surfaceFormat == 0x613) {
-            ((D3DIMShadowRenderTarget*)renderContext)->SetRenderState(0x21, 1, 0);
-            ((D3DIMShadowRenderTarget*)renderContext)->SetRenderState(0x1b, 1, 0);
-            if (((D3DIMShadowRenderTarget*)renderContext)->triTextureBlendCaps & 4) {
-                ((D3DIMShadowRenderTarget*)renderContext)->SetTextureStageState(0, 1, 4);
-                ((D3DIMShadowRenderTarget*)renderContext)->SetTextureStageState(0, 2, 2);
-                ((D3DIMShadowRenderTarget*)renderContext)->SetTextureStageState(0, 3, 0);
-                ((D3DIMShadowRenderTarget*)renderContext)->SetTextureStageState(0, 4, 4);
-                ((D3DIMShadowRenderTarget*)renderContext)->SetTextureStageState(0, 5, 2);
-                ((D3DIMShadowRenderTarget*)renderContext)->SetTextureStageState(0, 6, 0);
+            ((PCRenderTarget*)renderContext)->SetRenderState(0x21, 1, 0);
+            ((PCRenderTarget*)renderContext)->SetRenderState(0x1b, 1, 0);
+            if (((PCRenderTarget*)renderContext)->triTextureBlendCaps & 4) {
+                ((PCRenderTarget*)renderContext)->SetTextureStageState(0, 1, 4);
+                ((PCRenderTarget*)renderContext)->SetTextureStageState(0, 2, 2);
+                ((PCRenderTarget*)renderContext)->SetTextureStageState(0, 3, 0);
+                ((PCRenderTarget*)renderContext)->SetTextureStageState(0, 4, 4);
+                ((PCRenderTarget*)renderContext)->SetTextureStageState(0, 5, 2);
+                ((PCRenderTarget*)renderContext)->SetTextureStageState(0, 6, 0);
             }
         } else {
-            ((D3DIMShadowRenderTarget*)renderContext)->SetRenderState(0x1b, 1, 0);
-            ((D3DIMShadowRenderTarget*)renderContext)->SetTextureStageState(0, 1, 4);
-            ((D3DIMShadowRenderTarget*)renderContext)->SetTextureStageState(0, 2, 2);
-            ((D3DIMShadowRenderTarget*)renderContext)->SetTextureStageState(0, 3, 0);
-            ((D3DIMShadowRenderTarget*)renderContext)->SetTextureStageState(0, 4, 4);
-            ((D3DIMShadowRenderTarget*)renderContext)->SetTextureStageState(0, 5, 2);
-            ((D3DIMShadowRenderTarget*)renderContext)->SetTextureStageState(0, 6, 0);
+            ((PCRenderTarget*)renderContext)->SetRenderState(0x1b, 1, 0);
+            ((PCRenderTarget*)renderContext)->SetTextureStageState(0, 1, 4);
+            ((PCRenderTarget*)renderContext)->SetTextureStageState(0, 2, 2);
+            ((PCRenderTarget*)renderContext)->SetTextureStageState(0, 3, 0);
+            ((PCRenderTarget*)renderContext)->SetTextureStageState(0, 4, 4);
+            ((PCRenderTarget*)renderContext)->SetTextureStageState(0, 5, 2);
+            ((PCRenderTarget*)renderContext)->SetTextureStageState(0, 6, 0);
         }
         int blend;
-        ((D3DIMShadowRenderTarget*)renderContext)->GetRenderState(4, &blend);
-        ((D3DIMShadowRenderTarget*)renderContext)->SetRenderState(4, 1, 0);
-        ((D3DIMShadowRenderTarget*)renderContext)->SetRenderState(0xe, 0, 0);
-        ((D3DIMShadowRenderTarget*)renderContext)->Slot18(0);
-        ((D3DIMShadowRenderTarget*)renderContext)->DrawIndexed(4, 0x1e2, g_d3dimShadowVertices, vertexCount,
-                                                            g_d3dimShadowIndexTable, vertexCount, 0);
-        ((D3DIMShadowRenderTarget*)renderContext)->SetRenderState(0xe, 1, 0);
-        ((D3DIMShadowRenderTarget*)renderContext)->SetRenderState(0x1b, 0, 0);
+        ((PCRenderTarget*)renderContext)->GetRenderState(4, &blend);
+        ((PCRenderTarget*)renderContext)->SetRenderState(4, 1, 0);
+        ((PCRenderTarget*)renderContext)->SetRenderState(0xe, 0, 0);
+        ((PCRenderTarget*)renderContext)->SetAlphaTest(0);
+        ((PCRenderTarget*)renderContext)->DrawIndexedPrimitive(4, 0x1e2, (int)g_d3dimShadowVertices, vertexCount,
+                                                              (int)g_d3dimShadowIndexTable, vertexCount, 0);
+        ((PCRenderTarget*)renderContext)->SetRenderState(0xe, 1, 0);
+        ((PCRenderTarget*)renderContext)->SetRenderState(0x1b, 0, 0);
         if (address != 3)
-            ((D3DIMShadowRenderTarget*)renderContext)->SetTextureStageState(0, 0xc, address);
-        ((D3DIMShadowRenderTarget*)renderContext)->SetRenderState(4, blend, 0);
+            ((PCRenderTarget*)renderContext)->SetTextureStageState(0, 0xc, address);
+        ((PCRenderTarget*)renderContext)->SetRenderState(4, blend, 0);
         if (shadow->surfaceFormat == 0x613)
-            ((D3DIMShadowRenderTarget*)renderContext)->SetRenderState(0x21, 0, 0);
+            ((PCRenderTarget*)renderContext)->SetRenderState(0x21, 0, 0);
     }
     return 1;
 }
