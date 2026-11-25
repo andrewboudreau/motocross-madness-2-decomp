@@ -2611,7 +2611,7 @@ Left for later:
 | `UnknownFunctionTargetObject` | `TargetSceneObject` | 2 | 4 | Inline: stores a scene procedural object as targetCar and clears the others. |
 | `UnknownFunctionFreeNodes` | `FreeGateList` | 2 | 4 | Inline: frees each RaceGate of gateList (DebugFree at bikerace.cpp line 0xd3) and clears it. |
 | `UnknownVisualCueRacer` | `VisualCueKrustyBikeView` | 2 | 11 | The racers BikeRace::NextBike (0x004204e0) returns: vfptr at +0, GameObject through the vbptr at +4 (KrustyBike RTTI). |
-| `UnknownNumberCamera` | `NumberCameraView` | 2 | 11 | NumberObjectManager+0x34: Camera's +0x170 position, +0x17c/+0x188 axes and +0x198 focal length. |
+| `UnknownNumberCamera` | `NumberCameraView` | 2 | 11 | NumberObjectManager+0x34: Camera's +0x170 position, +0x17c/+0x188 axes and +0x198 focal length. Merged into `Camera`: NumberObjectManager::SetupDigits takes a `Camera*` (BikeRace passes its KrustyBikeCamera). |
 | `UnknownNumberRacerState` | `NumberKrustyBikeView` | 2 | 2 | BikeRace's localRacer; +0x76c is the racer's offTrackTime. |
 | `UnknownNumberRacer` | `NumberBikeRaceView` | 2 | 10 | NumberObjectManager+0x2c: BikeRace's localRacer (+0x38), 30SecMan (+0x6c) and startCountdown (+0x15c). |
 | `UnknownRunwayTrackPos` | `RunwayTrackPos` | 2 | 11 | Track.h's TrackPos (node, segment, t), as Track::PointAt (0x00518080) takes it. |
@@ -2626,8 +2626,8 @@ Left for later:
 | `UnknownBonusRacerModel` | `BonusBikeWheelView` | 2 | 2 | The racer's rearWheel (Bike +0x5f4); +0x230 is BikeWheel rollDirection. |
 | `UnknownBonusRacerState` | `BonusKrustyBikeView` | 2 | 2 | BikeRace's localRacer: model node +0x3bc, crashState +0x444, rearWheel +0x5f4. |
 | `UnknownBonusRacer` | `BonusBikeRaceView` | 2 | 9 | BonusObjectManager+0x2c, read only for BikeRace's localRacer (+0x38). |
-| `UnknownBonusCamera` | `BonusCameraView` | 2 | 11 | The render target's current camera: Camera's +0x16c field of view, +0x170 position, +0x198 focal length. |
-| `UnknownBonusRenderTarget` | `BonusRenderTargetView` | 2 | 2 | g_TrackGame+0x10, the render target; +0x08 is its current camera. |
+| `UnknownBonusCamera` | `BonusCameraView` | 2 | 11 | The render target's current camera: Camera's +0x16c field of view, +0x170 position, +0x198 focal length. Merged into `Camera`: BonusObjectManager::SetupCounter takes a `Camera*`. |
+| `UnknownBonusRenderTarget` | `BonusRenderTargetView` | 2 | 2 | g_TrackGame+0x10, the render target; +0x08 is its current camera. Merged into `RenderTarget`. |
 | `UnknownKrustyRacerRef` | `CueGateKrustyBikeView` | 2 | 3 | The camera's followed racer; +0x7b8 is the racer's lapGate. |
 | `UnknownKrustyCamera` | `CueKrustyBikeCameraView` | 2 | 2 | BikeRace's raceCamera (KrustyBikeCamera); +0x3b4 is its followed racer. |
 | `UnknownKrustyCameraHolder` | `CueBikeRaceView` | 2 | 2 | The course event's +0x34 race view (BikeRace), read for raceCamera (+0x50). |
@@ -2676,7 +2676,7 @@ Left for later:
 | `UnknownProgressCallback` | `LoadProgressFn` | 2 | 8 | BaseQuarryEvent.h typedef; LoadProgressCallback 0x0045cb20 is the function passed |
 | `UnknownQuarryCamera` | `QuarryEventKrustyBikeCameraView` | 2 | 14 | KrustyBikeCamera offsets |
 | `UnknownQuarryCameraSubject` | `QuarryEventKrustyBikeView` | 2 | 2 | KrustyBike offsets |
-| `UnknownArcadeView` | `ArcadeCameraView` | 2 | 20 | arcade camera fields |
+| `UnknownArcadeView` | `ArcadeCameraView` | 2 | 20 | arcade camera fields Merged into `Camera`: ArcadeObject::Create and VisualCue::LoadVisualCue take a `Camera*`. |
 | `UnknownRaceSoundCamera` | `RaceSoundKrustyBikeCameraView` | 2 | 13 | KrustyBikeCamera offsets |
 | `UnknownRaceStatusCamera` | `RaceStatusKrustyBikeCameraView` | 2 | 2 | KrustyBikeCamera offsets |
 | `UnknownCameraBikeState` | `BikeCameraWreckerView` | 2 | 5 | Wrecker offsets |
@@ -3342,7 +3342,7 @@ tools/static_check.py passes.
 | `UnknownKrustyUISoultree` | `KrustyUISoultreeObjectView` | 2 | SetPosition 0x004fc660 / SetAxes 0x004fbd10 are SoultreeObject methods. Merged into `SoultreeObject` (D3DIMSoultreeCharacter::modelNode). |
 | `UnknownKrustyUIToolTipView` | `KrustyUIToolTipView` | 2 | +0x5c enabled is GUIManager.h ToolTip::enabled; GUIManagerCore.h +0xc0 userToolTip is a ToolTip* |
 | `UnknownModelTexture` | `DialogSoultreeObjectView` | 2 | DlgProcs.h: ReplaceMaterialTexture joined to D3DIMSoultreeObject::ReplaceMaterialTexture (tests/fixtures/garage_material_objects.json); the object is the bike/rider model |
-| `UnknownNumberOwner` | `NumberRenderTargetView` | 2 | GameObject+0x18 renderContext is a RenderTarget; +0x08 is RenderTarget currentCamera (RenderTarget.h:48) |
+| `UnknownNumberOwner` | `NumberRenderTargetView` | 2 | GameObject+0x18 renderContext is a RenderTarget; +0x08 is RenderTarget currentCamera (RenderTarget.h:48) Merged into `RenderTarget`: NumberObjectManager::Tick casts `renderContext` to `RenderTarget*`. |
 | `UnknownOptKrustyUIRecord` | `OptionsBikeRecord` | 2 | KrustyUI+0x50 0x94-byte bike records (KrustyUI.h 'each manufacturer's bikes'); +0x8c engineSize as BikeRace.h BikeRaceBikeRecord |
 | `UnknownPickCamera` | `PickerCameraView` | 2 | ObjectPicker.h view; its offsets are Camera.h members (Camera +0xac viewMatrix, +0x170 eyePosition, +0x1a0 viewport) |
 | `UnknownPodiumArcade` | `PodiumArcadeObjectView` | 2 | SetPosition 0x004014f0 / SetAxes 0x00401520 are ArcadeObject.h methods. Merged into `ArcadeObject` (EventManager::podiumObject is one); CreatePodiumScene calls it directly and Group1_PodiumViews.cpp is gone. |

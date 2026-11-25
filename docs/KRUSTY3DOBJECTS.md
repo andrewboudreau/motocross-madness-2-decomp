@@ -85,7 +85,7 @@ with every relocation resolved by the bindings. The near miss
   field read loads `+0x1e4` first.
 - RunwayLights slot 10 normalizes with `z*z + (x*x + y*y)` and a free
   `operator*=(Vector3&, float)`.
-- ArcadeObject.h gained the camera fields of ArcadeCameraView, and the
+- ArcadeObject.h gained the camera fields (since merged into `Camera`), and the
   parameter types below. D3DIMSoulTree.h gained SoultreeObject `+0x14c`,
   `+0x170..+0x180`, and `0x004fc690`, `0x004fd090`, `0x004fd910` and
   `0x004fd990`.

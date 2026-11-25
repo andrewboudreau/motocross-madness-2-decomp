@@ -1,4 +1,5 @@
 #include "ArcadeObject.h"
+#include "Camera.h"
 
 #include <string.h>
 
@@ -44,7 +45,7 @@ ArcadeObject::~ArcadeObject() {
 
 // 0x00401310
 ArcadeObject* ArcadeObject::Create(void* context, int lights, int options, const char* name,
-                                                  Vector3 position, int pixels, ArcadeCameraView* view,
+                                                  Vector3 position, int pixels, Camera* view,
                                                   float size, float screenXFraction, float screenYFraction, unsigned char alpha) {
     Vector3 low;
     Vector3 extent;

@@ -889,7 +889,7 @@ int BaseQuarryEvent::Create3DObjects(int value) {
     visualCue = (new(__FILE__, 1369) VisualCue(g_TrackGame->mode.visualCuesOn))
                      ->LoadVisualCue(renderContext, (int)lightManager, value, (RunwayTerrainView*)eventTerrain,
                                      Vector3(0.0f, 0.0f, 0.0f), (VisualCueBikeRaceView*)raceView, 45,
-                                     (ArcadeCameraView*)raceCamera, 3.0f, 0.1f, 0.85f);
+                                     (Camera*)raceCamera, 3.0f, 0.1f, 0.85f);
     if (!AppendChild(visualCue, -1)) {
         sprintf(message, "Visual Cue not loaded.\n");
         return 0;

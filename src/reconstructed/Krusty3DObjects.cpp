@@ -5,6 +5,7 @@
 #include "../krusty2/broadphase/Terrain.h"
 #include "BikeRaceCore.h"
 #include "Krusty3DObjects.h"
+#include "Camera.h"
 
 #include <math.h>
 #include <stdio.h>
@@ -178,7 +179,7 @@ VisualCue::VisualCue(int flags) : ArcadeObject(flags) {
 // 0x0048adf0
 VisualCue* VisualCue::LoadVisualCue(void* context, int lights, int options, RunwayTerrainView* terrain,
                                     Vector3 position, VisualCueBikeRaceView* view, int pixels,
-                                    ArcadeCameraView* camera, float size, float screenXFraction,
+                                    Camera* camera, float size, float screenXFraction,
                                     float screenYFraction) {
     char name[0x104];
 
@@ -249,7 +250,7 @@ int VisualCue::OnControlPress(ControlEvent* event, InputButtonState* entry) {
 // The owner a VisualCue compares its camera with (its +0x18).
 struct VisualCueRenderTargetView {
     unsigned char field_0x00[0x08];
-    ArcadeCameraView* currentCamera;          // +0x08
+    Camera* currentCamera;          // +0x08
 };
 
 // Places the cue at its screen position in front of the camera, rebuilding
@@ -257,19 +258,19 @@ struct VisualCueRenderTargetView {
 // into the caller's `direction`, which then holds the direction to the target.
 #define UNKNOWN_PLACE_CUE() \
     { \
-    direction.x = arcadeView->cameraMatrix[0][2]; \
-    direction.y = arcadeView->cameraMatrix[1][2]; \
-    direction.z = arcadeView->cameraMatrix[2][2]; \
-    Vector3 up = Vector3(arcadeView->cameraMatrix[0][1], arcadeView->cameraMatrix[1][1], arcadeView->cameraMatrix[2][1]); \
-    Vector3 right = Vector3(arcadeView->cameraMatrix[0][0], arcadeView->cameraMatrix[1][0], arcadeView->cameraMatrix[2][0]); \
+    direction.x = arcadeView->viewMatrix.m[0][2]; \
+    direction.y = arcadeView->viewMatrix.m[1][2]; \
+    direction.z = arcadeView->viewMatrix.m[2][2]; \
+    Vector3 up = Vector3(arcadeView->viewMatrix.m[0][1], arcadeView->viewMatrix.m[1][1], arcadeView->viewMatrix.m[2][1]); \
+    Vector3 right = Vector3(arcadeView->viewMatrix.m[0][0], arcadeView->viewMatrix.m[1][0], arcadeView->viewMatrix.m[2][0]); \
     if (arcadeView->fieldOfView != builtFieldOfView) { \
         builtFieldOfView = arcadeView->fieldOfView; \
         float half = (float)tan(UNKNOWN_DEGREES_TO_RADIANS(builtFieldOfView * 0.5f)) * viewDistance; \
         screenOffsetX = (ScreenXFraction() - 0.5f) * half * 2.0f; \
-        screenOffsetY = (0.5f - ScreenYFraction()) * arcadeView->aspectRatio * half * 2.0f; \
+        screenOffsetY = (0.5f - ScreenYFraction()) * arcadeView->heightWidthRatio * half * 2.0f; \
         modelScale = targetPixels * viewDistance / (arcadeView->focalLength * modelSize); \
     } \
-    Vector3 position = arcadeView->cameraPosition; \
+    Vector3 position = arcadeView->eyePosition; \
     position += direction * viewDistance; \
     position += right * screenOffsetX; \
     position += up * screenOffsetY; \
@@ -314,7 +315,7 @@ int VisualCue::Tick(float frameTime) {
         else
             target = cueView->ownRacer->trackPoint;
         reinterpret_cast<Terrain*>(groundTerrain)->QueryGround(reinterpret_cast<TerrainVec3*>(&target), 0, 0, 0);
-        direction = target - arcadeView->cameraPosition;
+        direction = target - arcadeView->eyePosition;
         SetAxes(&direction, &kVec3YAxis, 1, 1);
         scale = modelScale;
         arcadeModel->Scale(scale, scale, scale);
@@ -327,7 +328,7 @@ int VisualCue::Tick(float frameTime) {
         if (!ref)
             return 1;
         direction =
-            reinterpret_cast<CueTrackGameView*>(g_TrackGame)->bajaEnduroEvent->gates[ref->gateIndex].position - arcadeView->cameraPosition;
+            reinterpret_cast<CueTrackGameView*>(g_TrackGame)->bajaEnduroEvent->gates[ref->gateIndex].position - arcadeView->eyePosition;
         SetAxes(&direction, &kVec3YAxis, 1, 1);
         scale = modelScale;
         break;
@@ -344,7 +345,7 @@ int VisualCue::Tick(float frameTime) {
                 break;
             }
         }
-        direction = target - arcadeView->cameraPosition;
+        direction = target - arcadeView->eyePosition;
         SetAxes(&direction, &kVec3YAxis, 1, 1);
         scale = modelScale;
         arcadeModel->Scale(scale, scale, scale);
@@ -355,7 +356,7 @@ int VisualCue::Tick(float frameTime) {
         if (reinterpret_cast<CueTrackGameView*>(g_TrackGame)->tagBall) {
             Vector3 target;
             reinterpret_cast<CueTrackGameView*>(g_TrackGame)->tagEvent->ball->sceneObject.GetPosition(&target);
-            direction = target - arcadeView->cameraPosition;
+            direction = target - arcadeView->eyePosition;
             SetAxes(&direction, &kVec3YAxis, 1, 1);
             scale = modelScale;
         } else {
@@ -366,7 +367,7 @@ int VisualCue::Tick(float frameTime) {
                 return 1;
             if (followed == reinterpret_cast<CueTrackGameView*>(g_TrackGame)->tagEvent->followedRacer)
                 { isVisible = 0; return 1; }
-            direction = reinterpret_cast<CueTrackGameView*>(g_TrackGame)->tagEvent->followedRacer->position - arcadeView->cameraPosition;
+            direction = reinterpret_cast<CueTrackGameView*>(g_TrackGame)->tagEvent->followedRacer->position - arcadeView->eyePosition;
             SetAxes(&direction, &kVec3YAxis, 1, 1);
             scale = modelScale;
         }
@@ -420,7 +421,7 @@ NumberObjectManager::NumberObjectManager(int flags) : GameObject(flags) {
 
 // 0x0048bd00
 NumberObjectManager* NumberObjectManager::SetupDigits(void* context, int options, NumberBikeRaceView* racer,
-                                                      int pixels, NumberCameraView* camera,
+                                                      int pixels, Camera* camera,
                                                       float size) {
     char name[0x104];
 
@@ -438,7 +439,7 @@ NumberObjectManager* NumberObjectManager::SetupDigits(void* context, int options
         sprintf(name, "%s\\%s", "Res", names[i]);
         digitModels[i] = (new (__FILE__, 0x240) ArcadeObject(1))
                             ->Create(context, 0, options, name, position, pixels,
-                                                    (ArcadeCameraView*)camera, size, 0.5f, 0.1f, 0);
+                                                    (Camera*)camera, size, 0.5f, 0.1f, 0);
         if (!AppendChild(digitModels[i], -1)) {
             Release();
             return 0;
@@ -449,19 +450,13 @@ NumberObjectManager* NumberObjectManager::SetupDigits(void* context, int options
     return this;
 }
 
-// The owner a NumberObjectManager compares its camera with (its +0x18).
-struct NumberRenderTargetView {
-    unsigned char field_0x00[0x08];
-    NumberCameraView* currentCamera;        // +0x08
-};
-
 // 0x0048bfc0
 int NumberObjectManager::Tick(float frameTime) {
     GameObject::Tick(frameTime);
     for (int i = 0; i < 5; i++)
         if (digitModels[i])
             digitModels[i]->isVisible = 0;
-    if (((NumberRenderTargetView*)renderContext)->currentCamera == digitCamera) {
+    if (((RenderTarget*)renderContext)->currentCamera == digitCamera) {
         int counting = countdownRacer->countdown > 0.0f && countdownRacer->thirtySecondMan == 0;
         if (!(countdownRacer->localRacer->offTrackTime > 1.0f) && !counting)
             return 1;
@@ -623,7 +618,7 @@ int BonusObjectManager::CreateFrameNode(void* context, int lights, int options) 
 
 // 0x0048ca60
 BonusObjectManager* BonusObjectManager::SetupCounter(void* context, int lights, int options,
-                                                     BonusBikeRaceView* racer, BonusCameraView* camera) {
+                                                     BonusBikeRaceView* racer, Camera* camera) {
     GameObject::SetRenderContext(context);
     raceView = racer;
     this->camera = camera;
@@ -658,7 +653,7 @@ void BonusObjectManager::NextKey() {
 // The camera's +0x198 value read by value: VC6 then multiplies
 // `fld [camera+0x198]; fmul [this+0x1e4]` as retail does (a plain
 // camera->focalLength loads this+0x1e4 first).
-static inline float CameraZoom(const BonusCameraView* camera) {
+static inline float CameraZoom(const Camera* camera) {
     return camera->focalLength;
 }
 

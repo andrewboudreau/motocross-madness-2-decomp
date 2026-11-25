@@ -31,6 +31,7 @@
 // the reference (0.816), the y,x,z and x,y,z sum orders (0.816). Remaining: the asm fistp
 // helper, and retail's places = 5 block placed at the function end.
 #include "../reconstructed/Krusty3DObjects.h"
+#include "../reconstructed/Camera.h"
 #include "../../samples/common/FistpFloatToInt.h"
 
 float FastSqrt(float x); // 0x00460b50

@@ -78,6 +78,10 @@ protected:
     friend class Fog;               // Fog.cpp: projection matrix (+0x6c) and viewport (+0x1a0)
     friend class FogOff;            // Fog.cpp: projection matrix (+0x6c)
 
+public:
+    // The camera state is read directly by the 3D objects (ArcadeObject.cpp,
+    // Krusty3DObjects.cpp: view matrix, eye, directions, focal length).
+
     // Provisional Direct3D semantics: PCCamera submits these with transform
     // kinds 1 (world), 3 (projection), and 2 (view), respectively.
     Matrix4 worldMatrix;       // +0x2c, set by slot 30
