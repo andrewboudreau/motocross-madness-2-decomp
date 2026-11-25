@@ -12,6 +12,7 @@
 // RenderShadow and TintCasterVertices round with inline-asm fistp (excluded); all five are in
 // samples/physics/shadow/ProjectedShadowNearMisses.cpp, which includes this file.
 #include "shadow/ProjectedShadow.h"
+#include "../../reconstructed/ShadowCamera.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -216,7 +217,7 @@ int ProjectedShadow::SetLight(const ShadowVec3* pos, const ShadowVec3* dir, int 
     if (newMode == 1) {
         lightDir = ShadowNormalize(*dir);
         lightVec2 = *pos;
-        camera->SetLookAt(pos, 0, 0, 0, 0);
+        camera->SetFrame((const Vector3*)pos, 0, 0, 0, 0);
     } else if (newMode == 3) {
         lightDir = ShadowNormalize(*dir);
     } else {

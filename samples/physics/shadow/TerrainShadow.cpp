@@ -7,6 +7,7 @@
 // closes Terrain.cpp (docs/INITIALIZERS.md), so this code starts a unit of its own or continues
 // Terrain.cpp (tier 3).
 #include "../../../src/reconstructed/TerrainShadow.h"
+#include "../../../src/reconstructed/ShadowCamera.h"
 #include "../../../src/reconstructed/AgeManager.h"
 #include "../../../src/reconstructed/ClipRectangle.h"
 #include "../../common/FistpFloatToInt.h"
@@ -57,12 +58,12 @@ int TerrainShadow::UpdateTexelSize()
             ShadowMatrix projection;
             fov = (float)atan2((float)(shadow->texture->size * shadow->texture->size) / extent * 0.5,
                                shadow->camera->focalLength) * 114.59156f;
-            shadow->camera->SetLookAt(&shadow->camera->eyePosition, 0, 0, 0, &fov);
+            shadow->camera->SetFrame(&shadow->camera->eyePosition, 0, 0, 0, &fov);
             shadow->camera->UpdateMatrices();
             projection = *TerrainMatrixIdentityInto(&projection);
             projection.m[0][0] = projection.m[1][1] = (float)shadow->texture->size;
             shadow->lightMatrix = *TerrainMatrixMultiplyInto(&projection, projection,
-                                                             shadow->camera->matrix_0xec);
+                                                             *(ShadowMatrix*)&shadow->camera->screenMatrix[0]);
         } else {
             ShadowMatrix projection;
             projection = *TerrainMatrixIdentityInto(&projection);
@@ -71,7 +72,7 @@ int TerrainShadow::UpdateTexelSize()
             projection.m[1][1] = -projection.m[0][0];
             projection.m[3][1] = projection.m[3][0] = half;
             shadow->lightMatrix = *TerrainMatrixMultiplyInto(&projection, projection,
-                                                             shadow->camera->matrix_0xac);
+                                                             *(ShadowMatrix*)&shadow->camera->viewMatrix);
         }
         return 1;
     }

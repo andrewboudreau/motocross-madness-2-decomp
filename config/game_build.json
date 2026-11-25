@@ -48,8 +48,6 @@
     "?AddParticle@WreckerParticleManagerView@@QAEHMPBUVector3@@HMMMIH@Z": "?AddParticle@ParticleManager@@QAEHMPBUParticleVec3@@HMMMIH@Z",
     "?Init@UnknownKrustyUIShadow@@QAEPAV1@PAXPAVTextureMapManager@@@Z": "?Init@ProjectedShadow@@QAEPAV1@PAVShadowRenderTarget@@PAX@Z",
     "??0ShadowTexture@@QAE@PAXH@Z": "??0PCTextureMap@@QAE@PAVTextureMapManager@@H@Z",
-    "??0ShadowCameraProxy@@QAE@H@Z": "??0ShadowCamera@@QAE@H@Z",
-    "?SetLensScale@ShadowCameraProxy@@QAEXM@Z": "?SetFieldOfView@Camera@@QAEXM@Z",
     "?SetOwner@ShadowRenderTarget@@QAEXPAUShadowOwner@@@Z": "?SetCamera@RenderTarget@@QAEXPAVCamera@@@Z",
     "?ShadowMatrixMultiplyInto@@YAPAUShadowMatrix@@PAU1@U1@1@Z": "?MatrixMult@@YA?AUMatrix4@@U1@0@Z",
     "??0ShadowVec3Call@@QAE@MMM@Z": "??0Vec3Call@@QAE@MMM@Z",

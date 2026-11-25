@@ -1,5 +1,5 @@
 {
-  "??0ShadowCameraProxy@@QAE@H@Z": "0x004da520",
+  "??0ShadowCamera@@QAE@H@Z": "0x004da520",
   "??0ShadowTexture@@QAE@PAXH@Z": "0x004c5f00",
   "??0ShadowVec3Call@@QAE@MMM@Z": "0x00404e60",
   "??2@YAPAXIPBDH@Z": "0x004a3010",
@@ -14,8 +14,8 @@
   "?Present@ProjectedShadow@@QAEXXZ": "0x004dbd30",
   "?ReleaseParts@ShadowCaster@@QAEXXZ": "0x004fdab0",
   "?RenderShadow@ProjectedShadow@@QAEXXZ": "0x004db8c0",
-  "?SetLensScale@ShadowCameraProxy@@QAEXM@Z": "0x0042e930",
-  "?SetLookAt@ShadowCameraProxy@@QAEXPBUShadowVec3@@HHHPAM@Z": "0x0042e9b0",
+  "?SetFieldOfView@Camera@@QAEXM@Z": "0x0042e930",
+  "?SetFrame@Camera@@QAEXPBUVector3@@00PBM1@Z": "0x0042e9b0",
   "?SetOwner@ShadowRenderTarget@@QAEXPAUShadowOwner@@@Z": "0x004e8cf0",
   "?SetRenderContext@GameObject@@UAEPAV1@H@Z": "0x004692f0",
   "?ShadowFillTriangle@@YAXHPAFFPAHH@Z": "0x00461e60",

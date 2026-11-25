@@ -116,25 +116,9 @@ public:
     char pad_0x78[0x80 - 0x78];  // allocated with operator new(0x80) in Init
 };
 
-// PROVISIONAL stand-in for the ShadowCamera-like object at ProjectedShadow+0x58 (Init
-// allocates 0x220 bytes and runs the ShadowCamera ctor 0x004da520 on it).
-class ShadowCameraProxy : public GameObject {
-public:
-    ShadowCameraProxy(int flags);                         // 0x004da520
-    void SetLensScale(float scale);                       // 0x0042e930
-    void SetLookAt(const ShadowVec3* eye, int a, int b, int c, float* fov);  // 0x0042e9b0 (tier 3)
-    virtual int TakeScreenshot();                   // vtable +0x6c (placeholder, not called here)
-    virtual void UpdateMatrices();                  // vtable +0x70 called by 0x004db0d0 after slot 29
-    virtual void LookAt(ShadowVec3 center); // vtable +0x74 called by 0x004db0d0 with the bounds centre
-    char pad_0x2c[0xac - 0x2c];
-    ShadowMatrix matrix_0xac;                             // +0xac pushed by value by 0x004db0d0 in mode 3
-    ShadowMatrix matrix_0xec;                             // +0xec pushed by value by 0x004db0d0 in mode 1
-    char pad_0x12c[0x170 - 0x12c];
-    ShadowVec3 eyePosition;                               // +0x170 TerrainShadow slot 28 passes its address as the first SetLookAt argument
-    char pad_0x17c[0x198 - 0x17c];
-    float focalLength;                                    // +0x198 Camera::focalLength (RTTI ShadowCamera : PCCamera : Camera); TerrainShadow slot 28 feeds it to atan2 as x
-    char pad_0x19c[0x220 - 0x19c];                        // allocated with operator new(0x220) in Init
-};
+// The light camera at ProjectedShadow+0x58 (src/reconstructed/ShadowCamera.h: ShadowCamera :
+// PCCamera : Camera; Init allocates 0x220 bytes and runs its constructor 0x004da520).
+class ShadowCamera;
 
 // Settings object at *0x0056e26c; slot 22 (0x58) reads a named flag.  PROVISIONAL.
 class ShadowSettings {
@@ -307,7 +291,7 @@ public:
     ShadowVec3 lightVec2;         // +0x44 ctor zero vector; 0x004dae50 (mode 1) copies its 1st argument
     int field_0x50;               // +0x50 ctor 0
     ShadowTexture* texture;       // +0x54 created in Init, released by dtor
-    ShadowCameraProxy* camera;    // +0x58 created in Init, released by dtor
+    ShadowCamera* camera;         // +0x58 created in Init, released by dtor
     int renderTarget;             // +0x5c Init stores its first argument (the render target)
     void* texturePixels;          // +0x60 Init stores texture->pixels
     short* heightMap;             // +0x64 ctor 0

@@ -23,7 +23,7 @@
   "?ReleaseParts@ShadowCaster@@QAEXXZ": "0x004fdab0",
   "?RenderShadow@ProjectedShadow@@QAEXXZ": "0x004db8c0",
   "?ResizeVertexBuffer@ProjectedShadow@@QAEXXZ": "0x004dac50",
-  "?SetLookAt@ShadowCameraProxy@@QAEXPBUShadowVec3@@HHHPAM@Z": "0x0042e9b0",
+  "?SetFrame@Camera@@QAEXPBUVector3@@00PBM1@Z": "0x0042e9b0",
   "?ShadowFillTriangle@@YAXHPAFFPAHH@Z": "0x00461e60",
   "?ShadowMatrixIdentity@@YA?AUShadowMatrix@@XZ": "0x004a1410",
   "?ShadowMatrixMultiply@@YA?AUShadowMatrix@@U1@0@Z": "0x004a1860",

@@ -6,6 +6,7 @@
 #include <string.h>
 #include "shadow/D3DIMSoultreeShadow.h"
 #include "../../src/reconstructed/MatrixUtil.h"
+#include "../../src/reconstructed/ShadowCamera.h"
 
 typedef char ShadowSize[(sizeof(ProjectedShadow) == 0x134) ? 1 : -1];
 typedef char LinkSize[(sizeof(D3DIMSoultreeShadow) == 0x48) ? 1 : -1];
@@ -21,7 +22,7 @@ static int cases, allocations, reallocations, lookCalls, vertexCalls;
 static int lastLine;
 static unsigned int lastSize;
 static const ShadowVec3* lookPosition;
-static ShadowCameraProxy* lookReceiver;
+static Camera* lookReceiver;
 static void Require(int ok, int line) {
     if (!ok) { printf("garage shadow failure at %d, case %d\n", line, cases); exit(1); }
 }
@@ -36,9 +37,10 @@ void* DebugRealloc(void* old, unsigned int size, const char* file, int line) {
     void* p = realloc(old, size ? size : 1); CHECK(p != 0); return p;
 }
 int ShadowCaster::GetVertexCount() { vertexCalls++; return currentLod; }
-void ShadowCameraProxy::SetLookAt(const ShadowVec3* position, int a, int b, int c, float* fov) {
+void Camera::SetFrame(const Vector3* position, const Vector3* a, const Vector3* b, const float* c,
+                      const float* fov) {
     CHECK(a == 0 && b == 0 && c == 0 && fov == 0);
-    lookCalls++; lookPosition = position; lookReceiver = this;
+    lookCalls++; lookPosition = (const ShadowVec3*)position; lookReceiver = this;
 }
 // All directions below are signed unit axes. Reaching the unexercised
 // normalization helper is an error, not a replacement for real normalization.
@@ -51,7 +53,7 @@ int main() {
     unsigned long shadowWords[0x134 / 4], expectedWords[0x134 / 4];
     unsigned long linkWords[0x48 / 4], linkBefore[0x48 / 4];
     unsigned long casterWords[3][sizeof(ShadowCaster) / 4];
-    unsigned long cameraWords[sizeof(ShadowCameraProxy) / 4];
+    unsigned long cameraWords[sizeof(ShadowCamera) / 4];
     ProjectedShadow* s = reinterpret_cast<ProjectedShadow*>(shadowWords);
     ProjectedShadow* expected = reinterpret_cast<ProjectedShadow*>(expectedWords);
     D3DIMSoultreeShadow* link = reinterpret_cast<D3DIMSoultreeShadow*>(linkWords);
@@ -143,7 +145,7 @@ int main() {
         s->ResizeVertexBuffer(); CHECK(s->vertexBuffer == old && reallocations == calls);
         free(s->casters); free(s->vertexBuffer); cases++;
         for (mode = -1; mode <= 4; mode++) {
-            memset(s, seed, sizeof(*s)); s->camera = reinterpret_cast<ShadowCameraProxy*>(cameraWords);
+            memset(s, seed, sizeof(*s)); s->camera = reinterpret_cast<ShadowCamera*>(cameraWords);
             memcpy(expected, s, sizeof(*s)); lookCalls = 0;
             ShadowVec3 position = { (float)seed, -2.0f, 5.0f };
             ShadowVec3 direction = { 0.0f, 0.0f, 0.0f };

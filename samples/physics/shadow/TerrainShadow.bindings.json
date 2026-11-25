@@ -38,7 +38,7 @@
   "?LookupCell@TerrainShutdownObject@@QAEPAUTerrainCell@@HH@Z": "0x00484d70",
   "?MarkUsed@AgeManager@@QAEXPAUAgeEntry@@@Z": "0x00401250",
   "?Set@ClipRectangle@@QAEXMMMM@Z": "0x00431350",
-  "?SetLookAt@ShadowCameraProxy@@QAEXPBUShadowVec3@@HHHPAM@Z": "0x0042e9b0",
+  "?SetFrame@Camera@@QAEXPBUVector3@@00PBM1@Z": "0x0042e9b0",
   "?ShadowFillTriangle@@YAXHPAFFPAHH@Z": "0x00461e60",
   "?ShadowTransformPointsOrtho@@YAXPAUShadowVec3@@PBXPBUShadowMatrix@@HHH@Z": "0x004a1b00",
   "?ShadowTransformPointsProjective@@YAXPAUShadowVec3@@PBXPBUShadowMatrix@@HHH@Z": "0x004a1a50",

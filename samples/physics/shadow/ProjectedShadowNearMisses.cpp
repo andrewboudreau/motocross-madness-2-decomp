@@ -69,14 +69,14 @@ ProjectedShadow* ProjectedShadow::Init(ShadowRenderTarget* target, void* texture
             Host()->surface = texture->pixels;
             ShadowOwner* owner = Host()->owner;
 
-            camera = new(__FILE__, 0xcd) ShadowCameraProxy(1);
+            camera = new(__FILE__, 0xcd) ShadowCamera(1);
             if (camera && camera->SetRenderContext((void*)Host())) {
                 Host()->surface = savedSurface;
                 Host()->width = savedWidth;
                 Host()->height = savedHeight;
                 Host()->SetOwner(owner);
                 Host()->device->SetTransformLike(owner->block_0x1a0);
-                camera->SetLensScale(0.3f);
+                camera->SetFieldOfView(0.3f);
                 for (int bits = 0x40; bits; bits >>= 1)
                     sizeShift++;
                 clipRect.left = 0;
@@ -229,7 +229,7 @@ static inline void ShadowTransformExtents(ShadowVec3* out, ShadowVec3 h, const S
 // temporary (30 uses) at 0, fov 0xc, a second temporary 0x10, the z extent copy 0x18,
 // casterCenter 0x1c, boundsMin 0x28, boundsMax 0x34, ext 0x40, the by-value centre copy / eye
 // 0x4c, hi 0x58, projection 0x64 (the nine products overlay it at 0x64..0x84, contiguous),
-// the SetLookAt eye 0xa4, the y extent copy 0xa8, sq 0xb0, the x extent copy 0xb4.  Here fov
+// the SetFrame eye 0xa4, the y extent copy 0xa8, sq 0xb0, the x extent copy 0xb4.  Here fov
 // is at 0 ahead of the temporary, hi shares the second temporary, the three extent copies are
 // one contiguous 12-byte temporary (0x5c) and the products are scattered scalars.  A
 // `float a[3][3]` or `ShadowVec3 r[3]` product array stores the first product too
@@ -268,16 +268,16 @@ int ProjectedShadow::ComputeBounds()
         projection.m[3][0] = half;
         projection.m[3][1] = half;
         ShadowVec3 eye = ShadowDifference(center, ShadowScale(lightDir, 1000.0f));
-        camera->SetLookAt(&eye, 0, 0, 0, 0);
-        camera->LookAt(center);
+        camera->SetFrame((const Vector3*)&eye, 0, 0, 0, 0);
+        camera->LookAt(*(Vector3*)&center);
         camera->UpdateMatrices();
-        ShadowMatrixProduct(&lightMatrix, projection, camera->matrix_0xac);
+        ShadowMatrixProduct(&lightMatrix, projection, *(ShadowMatrix*)&camera->viewMatrix);
         return 1;
     } else if (mode == 1) {
         lightDir = ShadowDifference(center, lightVec2);
         float dist = ShadowMagnitude(lightDir);
         float fov = (float)atan2(lensScale, dist) * 114.59156f;
-        camera->SetLookAt(&lightVec2, 0, 0, 0, &fov);
+        camera->SetFrame((const Vector3*)&lightVec2, 0, 0, 0, &fov);
         ShadowVec3& dir = lightDir;
         float y = dir.y, x = dir.x, z = dir.z;
         float sq = z * z + (x * x + y * y);
@@ -289,12 +289,12 @@ int ProjectedShadow::ComputeBounds()
             unitDir = ShadowVec3Call(dir.x * inv, dir.y * inv, dir.z * inv);
         }
         dir = unitDir;
-        camera->LookAt(center);
+        camera->LookAt(*(Vector3*)&center);
         camera->UpdateMatrices();
         ShadowMatrix projection = ShadowMatrixIdentity();
         projection.m[0][0] = (float)texture->size;
         projection.m[1][1] = (float)texture->size;
-        ShadowMatrixProduct(&lightMatrix, projection, camera->matrix_0xec);
+        ShadowMatrixProduct(&lightMatrix, projection, *(ShadowMatrix*)&camera->screenMatrix[0]);
     }
     return 1;
 }

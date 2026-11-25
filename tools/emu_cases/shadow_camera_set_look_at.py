@@ -1,4 +1,4 @@
-"""ShadowCameraProxy::SetLookAt 0x0042e9b0, eye/forward/up/fov setter (tools/emu_diff.py case).
+"""Camera::SetFrame 0x0042e9b0, eye/forward/up/roll/fov setter (tools/emu_diff.py case).
 
 Retail normalises each direction with lengthSq = (x*x + y*y) + z*z, compares it unrounded with
 1.0 (copy when equal) and otherwise scales by FastInvSqrt (0x00460c00, run as retail code via
@@ -7,8 +7,8 @@ the binding). Cases: every argument independently null or set, unit axes and nea
 counter bump only).
 """
 RETAIL_VA = 0x0042e9b0
-SYMBOL = '?SetLookAt@ShadowCameraProxy@@QAEXPBUShadowVec3@@HHHPAM@Z'
-SOURCE = 'src/bringup/Group2_ShadowCameraLookAt.cpp'
+SYMBOL = '?SetFrame@Camera@@QAEXPBUVector3@@00PBM1@Z'
+SOURCE = 'src/reconstructed/Camera.cpp'
 
 UNIT = [(1.0, 0.0, 0.0), (0.0, 1.0, 0.0), (0.0, 0.0, -1.0), (0.6, 0.8, 0.0), (0.0, 0.28, 0.96)]
 

@@ -89,7 +89,7 @@ class GarageShadowConnectionsTests(unittest.TestCase):
             texts = {source: (ROOT / source).read_text() for source in SOURCES}
             text = texts[SOURCES[1]]
             vector = text[text.index('struct ShadowConstVec3'):text.index('};', text.index('struct ShadowConstVec3')) + 2]
-            extracted.write_text('#include "shadow/D3DIMSoultreeShadow.h"\n' + vector + '\n' +
+            extracted.write_text('#include "shadow/D3DIMSoultreeShadow.h"\n#include "../reconstructed/ShadowCamera.h"\n' + vector + '\n' +
                 function_text(text, 'static inline ShadowVec3 ShadowNormalize(') + '\n' + '\n\n'.join(
                     function_text(texts[source], signature) for signature, _, _, _, source in NATIVE))
             fixture = 'tests/fixtures/garage_shadow_routes.cpp'

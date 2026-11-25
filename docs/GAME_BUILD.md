@@ -822,8 +822,8 @@ clearly more faithful, the game now links the sample's text:
   | 0x00505600 | `Grid1Terrain::AcquireOwnedObject` | `Terrain::AcquireOwnedObject` |
   | 0x00404e60, 0x0040ae30, 0x00421cb0, 0x005015b0 | Wrecker and shadow vector call views | `Vec3Call`, `Vec3DotCall`, `Vec3AddCall`, `Vec3ScaleCall` |
   | 0x004da7b0 | `UnknownKrustyUIShadow::Init` | `ProjectedShadow::Init` |
-  | 0x004c5f00, 0x004da520 | `ShadowTexture`, `ShadowCameraProxy` constructors | `PCTextureMap`, `ShadowCamera` |
-  | 0x0042e930, 0x004e8cf0 | `SetLensScale`, `ShadowRenderTarget::SetOwner` | `Camera::SetFieldOfView`, `RenderTarget::SetCamera` |
+  | 0x004c5f00 | `ShadowTexture` constructor | `PCTextureMap` |
+  | 0x004e8cf0 | `ShadowRenderTarget::SetOwner` | `RenderTarget::SetCamera` |
   | 0x004a1860 | `ShadowMatrixMultiplyInto` | `MatrixMult` |
 
   Each alias was checked against both `*.bindings.json` files. The view's
@@ -1020,8 +1020,6 @@ address:
 | 0x004a1860 | `ShadowMatrixMultiplyInto` | `MatrixMult` |
 | 0x00404e60 | `ShadowVec3Call` constructor | `Vec3Call` constructor |
 | 0x004c5f00 | `ShadowTexture` constructor | `PCTextureMap` constructor |
-| 0x004da520 | `ShadowCameraProxy` constructor | `ShadowCamera` constructor |
-| 0x0042e930 | `ShadowCameraProxy::SetLensScale` | `Camera::SetFieldOfView` |
 | 0x004e8cf0 | `ShadowRenderTarget::SetOwner` | `RenderTarget::SetCamera` |
 
 Linked-body scores (`tools/linked_accuracy.py`, masked):
@@ -1862,9 +1860,9 @@ needed a fix. The emu counts below are at 0x007f with seed 11.
   `TireNode::LocalToWorldDirection`, `KbXform::WorldToLocalDirection`, the
   `DrawSoultreeObjectView` views, Group4_SoultreeBridge and `Group4Veh_LocalToWorldPoint`. They
   call those bodies and copy the result back, with no arithmetic of their own.
-- `ShadowCameraProxy::SetLookAt` 0x0042e9b0 (retail `Camera::SetFrame`). The inline normalise
+- `Camera::SetFrame` 0x0042e9b0 (ProjectedShadow now calls it on its `ShadowCamera`). The inline normalise
   at 0x0042e9e1..0x0042ea03 sums (x\*x + y\*y) + z\*z and compares the unrounded sum with 1.0,
-  the same as the file-local `StoreNormalised`. `FastInvSqrt` is bound to 0x00460c00. New case
+  as src/reconstructed/Camera.cpp writes it. `FastInvSqrt` is bound to 0x00460c00. Case
   `shadow_camera_set_look_at`: 0 of 1500 differ. A reassociated x\*x + (y\*y + z\*z) differs in
   112 of 1500, so the case sees the order.
 - `TransformPoints` 0x004a1b00: every row is ((x + y) + z) + t (0x004a1b43..0x004a1bb0).
