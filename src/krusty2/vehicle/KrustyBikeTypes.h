@@ -161,7 +161,7 @@ struct KbMessage { char data[0x8C]; KbMessage(const char* text, float seconds); 
 unsigned int ReadClock();
 // 0x004B5D00 (cdecl): forward/up axes from yaw, pitch and roll (tier 3 names; 0x00493660
 // pushes the message +0x14 angle last).
-void OrientationAxesFromAngles(Vec3* forward, Vec3* up, float yaw, float pitch, float roll);
+int OrientationAxesFromAngles(Vector3* forward, Vector3* up, float yaw, float pitch, float roll);
 // 0x00460C70: 1/sqrt estimate (name from src/reconstructed/FastMath.bindings.json).
 float FastInvSqrtEstimate(float v);
 // Network smoothing settings 0x00493660 reads; 0x0048fc80 loads them from the game config.
@@ -179,7 +179,6 @@ extern int g_kbInterpolate;          // 0x0056CB60
 extern float g_kbStallThreshold;     // 0x0056CB64  interval time at which slot 50 holds
 extern float g_kbStallHoldSec;       // 0x0056CB68  length of that hold
 // BikeWheel view for 0x00513560 (tier 3 name).
-struct KbWheel { void SetRollDistance(float d); };
 
 // Part table at Vehicle+0x1f0 -> +0xb4 (tier 3): count at +0, 0x44-byte records at +4.  A record
 // with flag bit 3 clear owns a collision object at record+8 -> +0x3c.

@@ -76,10 +76,6 @@ int KbRaceSub::DistanceToStripEdge(Vec3 p, int segment, float* out, int mode)
                                               out, mode);
 }
 
-// KbWheel::SetRollDistance (0x00513560) is the strict-exact Tire::SetRollDistance of
-// src/krusty2/tire/Tire.cpp; a link_aliases entry binds the view name to it (same receiver,
-// one float argument, no this adjustment).
-
 // ---------------------------------------------------------------------------------------
 // BikeQ: the wheel's shock (InlineShock at BikeWheel+0x2b0, RotatingShock at +0x2ac).  The
 // layout is the Shock of src/reconstructed/Suspension.h (MovingPart at +0x04 with its local

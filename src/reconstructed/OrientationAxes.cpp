@@ -13,9 +13,8 @@
 // test, an `int result` local, other return expressions, a block-scoped or
 // split last temporary, swapped sum operands, and the /G6 and /ML profiles.
 //
-// The game links this definition directly; link_aliases bind the Scene readers'
-// `void (Vector3*, Vector3*, float, float, int)` and KrustyBike's `Vec3` declarations to
-// it (the int 0 they pass is the same zero dword as a 0.0f roll; they ignore the result).
+// The game links this definition directly; SceneManager and KrustyBike declare it
+// locally and ignore the result.
 // The file is named for the function, not for an original translation unit.
 #include <math.h>
 

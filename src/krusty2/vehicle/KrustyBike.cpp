@@ -32,6 +32,7 @@
 #include "../../reconstructed/TrackGame.h"
 #include "math/FastMath.h"
 #include "collision/CollisionObject.h"
+#include "tire/Tire.h"
 #include "../../reconstructed/Wrecker.h"
 #include "broadphase/Quadtree.h"
 #include "core/MemTag.h"
@@ -2233,11 +2234,11 @@ void KrustyBike::InterpolateNetworkState(float dt, int copyRaceProgress)
 
         // orientation
         if (!g_kbInterpolate) {
-            OrientationAxesFromAngles(&bodyForward, &bodyUp, states[0]->yaw, states[0]->pitch, states[0]->roll);
-            OrientationAxesFromAngles(&localFwd, &localUp, states[1]->yaw, states[1]->pitch, states[1]->roll);
+            OrientationAxesFromAngles((Vector3*)&bodyForward, (Vector3*)&bodyUp, states[0]->yaw, states[0]->pitch, states[0]->roll);
+            OrientationAxesFromAngles((Vector3*)&localFwd, (Vector3*)&localUp, states[1]->yaw, states[1]->pitch, states[1]->roll);
         } else {
-            OrientationAxesFromAngles(&bodyForward, &bodyUp, interpTarget->yaw, interpTarget->pitch, interpTarget->roll);
-            OrientationAxesFromAngles(&localFwd, &localUp, interpSource->yaw, interpSource->pitch, interpSource->roll);
+            OrientationAxesFromAngles((Vector3*)&bodyForward, (Vector3*)&bodyUp, interpTarget->yaw, interpTarget->pitch, interpTarget->roll);
+            OrientationAxesFromAngles((Vector3*)&localFwd, (Vector3*)&localUp, interpSource->yaw, interpSource->pitch, interpSource->roll);
         }
         if (!g_kbInterpolate) {
             if (g_kbLatencyHiding) {
@@ -2308,8 +2309,8 @@ void KrustyBike::InterpolateNetworkState(float dt, int copyRaceProgress)
                 roll = 1.0f;
             else
                 roll = FastSqrt(speedSq);
-            ((KbWheel*)frontWheel)->SetRollDistance(roll * g_TrackGame->frameTime);
-            ((KbWheel*)rearWheel)->SetRollDistance(roll * g_TrackGame->frameTime);
+            ((Tire*)frontWheel)->SetRollDistance(roll * g_TrackGame->frameTime);
+            ((Tire*)rearWheel)->SetRollDistance(roll * g_TrackGame->frameTime);
         }
         if (!g_kbInterpolate)
             turnRate = states[0]->angularVelocity.y;

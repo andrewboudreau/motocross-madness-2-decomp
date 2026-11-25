@@ -35,7 +35,7 @@
     "src/krusty2/vehicle/KrustyBike.cpp": {
       "sections": 271,
       "relocations": 1443,
-      "sha256": "08620735323b22fe34b39480e65d73f2b47e7dba02e2729adeeebcf413e1f25d"
+      "sha256": "b8200ee2d2db1ed590c9a475e1a5121acfb2315371222cad50512077b8d4970c"
     },
     "src/krusty2/collision/CollisionObject.cpp": {
       "sections": 136,

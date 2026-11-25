@@ -28,6 +28,7 @@
 #include "../../reconstructed/GearRatios.h"
 #include "../../reconstructed/Wrecker.h"
 #include "collision/CollisionObject.h"
+#include "tire/Tire.h"
 #include "broadphase/Quadtree.h"
 #include "../../reconstructed/Vegetation.h"
 #include <math.h>
@@ -1672,13 +1673,13 @@ int KrustyBike::SimulateAIFrame(float dt)
     else
         movingForward = 0;
     if (frontWheel->inContact)
-        ((KbWheel*)frontWheel)->SetRollDistance(forwardSpeed / frontWheel->wheelRadius * dt);
+        ((Tire*)frontWheel)->SetRollDistance(forwardSpeed / frontWheel->wheelRadius * dt);
     else
-        ((KbWheel*)frontWheel)->SetRollDistance(forwardSpeed / frontWheel->wheelRadius * dt);
+        ((Tire*)frontWheel)->SetRollDistance(forwardSpeed / frontWheel->wheelRadius * dt);
     if (rearWheel->inContact)
-        ((KbWheel*)rearWheel)->SetRollDistance(forwardSpeed / rearWheel->wheelRadius * dt);
+        ((Tire*)rearWheel)->SetRollDistance(forwardSpeed / rearWheel->wheelRadius * dt);
     else
-        ((KbWheel*)rearWheel)->SetRollDistance(forwardSpeed / rearWheel->wheelRadius * dt);
+        ((Tire*)rearWheel)->SetRollDistance(forwardSpeed / rearWheel->wheelRadius * dt);
     modelNode->SetPosition(position);
     UpdateAirborneState(airborneOut);
     airborne = airborneOut;

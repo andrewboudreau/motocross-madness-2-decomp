@@ -996,7 +996,7 @@ void Scene::ReadStadium()
 void* AddCollisionPoint(int capacity, void** points, const Vector3* position, void* owner, float threshold,
                         int* count, float friction, int surfaceOwner);
 // 0x004b5d00 (cdecl): the look and up vectors of a heading and pitch.
-void OrientationAxesFromAngles(Vector3* look, Vector3* up, float heading, float pitch, int a);
+int OrientationAxesFromAngles(Vector3* look, Vector3* up, float heading, float pitch, float roll);
 
 // An "ObjectShape" (0x24 bytes) or "EmitterType<n>" (0x1c bytes) keyword.
 struct SceneObjectShapeKeyword {
@@ -1108,7 +1108,7 @@ int Scene::ReadStaticModels(LightManager* lights, int particleManager, int textu
         ReadVector(&position, model, "Position", "0.0,0.0,0.0", 0, 0);
         if (parameters.GetFloat("Heading", -999.0f, &heading)) {
             parameters.GetFloat("Pitch", 0, &pitch);
-            OrientationAxesFromAngles(&look, &up, heading * 0.01745329f, pitch * 0.01745329f, 0);
+            OrientationAxesFromAngles(&look, &up, heading * 0.01745329f, pitch * 0.01745329f, 0.0f);
         } else {
             ReadVector(&look, model, "LookVector", "0.0,0.0,1.0", 0, 0);
             ReadVector(&up, model, "UpVector", "0.0,1.0,0.0", 0, 0);
@@ -1458,7 +1458,7 @@ int Scene::ReadAnimations(LightManager* lights, int textureManager, int modelTex
         int axes = 0;
         if (parameters.GetFloat("Heading", -999.0f, &heading)) {
             parameters.GetFloat("Pitch", 0, &pitch);
-            OrientationAxesFromAngles(&look, &up, heading * 0.01745329f, pitch * 0.01745329f, 0);
+            OrientationAxesFromAngles(&look, &up, heading * 0.01745329f, pitch * 0.01745329f, 0.0f);
             axes = 1;
         } else if (ReadVector(&look, name, "LookVector", "0.0,0.0,1.0", 0, 0)) {
             ReadVector(&up, name, "UpVector", "0.0,1.0,0.0", 0, 0);
