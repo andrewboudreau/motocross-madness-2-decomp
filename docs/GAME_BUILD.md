@@ -1865,8 +1865,8 @@ needed a fix. The emu counts below are at 0x007f with seed 11.
   exact. `kb_select_rider_pose`: 0 of 1500 differ.
 - `BonusObjectManager::Tick` 0x0048ccc0: strict-exact. Its position read forwards to
   `SoultreeObject::GetPosition`.
-- The `QueryGround` variants: `CollisionFrameHelper`, `TireWorld` and `ConGroundQuery` forward
-  to `Terrain::QueryGround` 0x00507c10.
+- `Terrain::QueryGround` 0x00507c10: CollisionPoint, Tire, the constraint collision model and
+  CarProcedural call it on the real Terrain.
   - The height interpolations match.
   - The `operator/`, `operator*` and `operator+` COMDATs are byte-identical to retail's
     0x0043c890, 0x005015b0 and 0x00421cb0.
@@ -2207,7 +2207,7 @@ control word.
 
 | VA | Function | Cases | Behavior found | Linked before | After | Built/retail insns |
 |---|---|---|---|---|---|---|
-| 0x00507c10 | `Terrain::QueryGround` (via the `TireWorld` view) | 6000 | two bugs, fixed | 0.864 | 0.899 | 1009 → 995 / 970 |
+| 0x00507c10 | `Terrain::QueryGround` (called from Tire) | 6000 | two bugs, fixed | 0.864 | 0.899 | 1009 → 995 / 970 |
 | 0x00435830 | `CollisionObject::SetTransform` | 3000 | none | 0.833 | 0.833 | 513 / 512 |
 | 0x00483d40 | `GridNode::IntersectSegment` | 6000 | none | 0.832 | 0.832 (0.916 with the [frame pragma](#frame-pointer-units)) | 1349 / 1387 (now 1369) |
 

@@ -11,6 +11,8 @@
 #include "../collision/CollisionObject.h"   // canonical CollisionObject chain (MIGRATION.md)
 #include "ConstraintTypes.h"
 
+class Terrain;
+
 // One probe point (32 bytes), see AddProbePoint / Step.
 struct ConstraintProbe {
     ConVec3 localPoint;    // +0x00 point in the owner node's space
@@ -45,7 +47,7 @@ public:
     int field_0xd8;
     int field_0xdc;
     int field_0xe0;
-    ConGroundQuery* groundQuery;     // 0xe4
+    Terrain* terrain;  // +0xe4 the probes' ground (Terrain::QueryGround 0x00507c10); 0 skips them
     int manualStep;  // +0xe8 slot 10 0x0043ba40 only calls slot 11 itself when this is 0
     int shapeCollisionEnabled;                  // +0xec 1 after the constructor
     float damping;                   // 0xf0, velocity *= 1 - dt*damping

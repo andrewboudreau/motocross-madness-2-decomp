@@ -30,7 +30,7 @@
   "?HandleContact@Tire@@QAEXHHPAVCollisionObject@@@Z": "0x00512e80",
   "?LocalToWorldDirection@TireNode@@QAEPAUCollisionVec3@@PAU2@PBU2@@Z": "0x004fd5c0",
   "?QueryCollisions@CollisionObject@@QAEHXZ": "0x00438e70",
-  "?QueryGround@TireWorld@@QAEHPAUCollisionVec3@@0HPAE@Z": "0x00507c10",
+  "?QueryGround@Terrain@@QAEXPAUTerrainVec3@@0HPAE@Z": "0x00507c10",
   "?Rotate@TireNode@@QAEXUCollisionVec3@@M@Z": "0x004fceb0",
   "?RotateAbout@TireNode@@QAEXMMMM@Z": "0x004fcce0",
   "?SetLocalMatrix@TireNode@@QAEXPBUCollisionMatrix4@@@Z": "0x004fca30",

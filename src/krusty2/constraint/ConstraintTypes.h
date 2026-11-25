@@ -74,12 +74,4 @@ public:
     ConNode* node;                // 0x234
 };
 
-// Ground/terrain query object stored at ConstraintMethodCollisionModel+0xe4.
-class ConGroundQuery {
-public:
-    // 0x00507c10 (thiscall, ret 0x10): snaps *point to the surface height under it
-    // (in/out) and writes the surface normal. Semantics tier 3.
-    void QueryPoint(ConVec3* point, ConVec3* normalOut, int a, int b);
-};
-
 #endif

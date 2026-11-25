@@ -14,35 +14,13 @@
 class SoultreeContact;
 struct VehicleContact;
 struct SoultreeProbe;
-struct TerrainVec3;
-
-// The terrain ground query 0x00507c10 (broadphase/Terrain.h, not includable
-// beside these headers): snaps pos->y to the surface under (x, z), writes the
-// surface normal and, when given, the cell's surface byte.
-class Terrain {
-public:
-    void QueryGround(TerrainVec3* pos, TerrainVec3* normal, int flatShaded, unsigned char* surface);
-};
-
-// CollisionPoint.cpp (matched) calls the same query through its own provisional view of the
-// frame object; the object is the Terrain, so the call forwards to it.
-class CollisionFrameHelper {
-public:
-    void QueryGround(CollisionVec3* v, const CollisionVec3* n, int a, char* flagOut);
-};
-
-void CollisionFrameHelper::QueryGround(CollisionVec3* v, const CollisionVec3* n, int a, char* flagOut)
-{
-    reinterpret_cast<Terrain*>(this)->QueryGround(reinterpret_cast<TerrainVec3*>(v),
-                                                  reinterpret_cast<TerrainVec3*>(const_cast<CollisionVec3*>(n)), a,
-                                                  reinterpret_cast<unsigned char*>(flagOut));
-}
+class Terrain;   // broadphase/Terrain.h; the contact refresh queries its ground
 
 // The exact bodies (src/krusty2/collision/CollisionPoint.cpp, strict exact in calibration).
 // The views below forward to them, so the game links retail's logic once instead of a
 // bring-up paraphrase. Both signatures are provisional (cdecl, tier 3 names).
 int SoultreeRefreshContacts(void* enabled, int* penetrating, int count, CollisionPoint** points,
-                            CollisionFrameHelper* frame, CollisionVec3* offset, int mode, float k);
+                            Terrain* terrain, CollisionVec3* offset, int mode, float k);
 int SoultreeMergeContacts(int count, CollisionPoint** points, const CollisionVec3* scaleA,
                           const CollisionVec3* scaleB, const CollisionVec3* bias, CollisionVec3* origin,
                           CollisionVec3* linA, CollisionVec3* delta, CollisionVec3* normal,
@@ -58,14 +36,14 @@ int SoultreeRefreshContacts(int enabled, int* activeCount, int count, SoultreeCo
                             SoultreeProbe* terrain, Vec3* center, int mode, float radius)
 {
     return SoultreeRefreshContacts((void*)enabled, activeCount, count, (CollisionPoint**)contacts,
-                                   (CollisionFrameHelper*)terrain, (CollisionVec3*)center, mode, radius);
+                                   (Terrain*)terrain, (CollisionVec3*)center, mode, radius);
 }
 
 int __cdecl VehContactsA(int enabled, int* activeCount, int count, VehicleContact** contacts,
                          SoultreeProbe* terrain, Vec3* center, int mode, float radius)
 {
     return SoultreeRefreshContacts((void*)enabled, activeCount, count, (CollisionPoint**)contacts,
-                                   (CollisionFrameHelper*)terrain, (CollisionVec3*)center, mode, radius);
+                                   (Terrain*)terrain, (CollisionVec3*)center, mode, radius);
 }
 
 // ---------------------------------------------------------------------------

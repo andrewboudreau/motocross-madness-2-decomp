@@ -10,7 +10,7 @@
 //     class names. Each shim forwards to the Tire member at the same address; the
 //     constructor builds the Tire in the storage Bike's loader allocated.
 //   * Tire.cpp calls its callees through provisional area-local views (TireNode,
-//     TireWorld, TireDot ...). Each is forwarded to the existing provider at the
+//     TireDot ...). Each is forwarded to the existing provider at the
 //     address its binding names (Tire.bindings.json). The shock views TireAttachA/B
 //     are forwarded to the canonical Shock family in Group4_VehicleShock.cpp.
 // Arguments are passed through positionally, so the retail argument order is kept
@@ -96,18 +96,6 @@ void TireNode::Rotate(CollisionVec3 axis, float angle)                    // 0x0
     AsNode(this)->Rotate(*AsVec3(&axis), angle);
 }
 
-// The ground query 0x00507c10 (src/krusty2/broadphase/Terrain.h); the world the vehicle
-// passes is the Terrain. Tire.cpp ignores the result.
-struct TerrainVec3;
-class Terrain {
-public:
-    void QueryGround(TerrainVec3* pos, TerrainVec3* outNormal, int flags, unsigned char* outSurface);
-};
-int TireWorld::QueryGround(CollisionVec3* pos, CollisionVec3* outNormal, int flags, unsigned char* outSurface)
-{
-    ((Terrain*)this)->QueryGround((TerrainVec3*)pos, (TerrainVec3*)outNormal, flags, outSurface);
-    return 0;
-}
 
 // ---------------------------------------------------------------------------------------
 // The vehicle code's view of the wheel (Vehicle.h VehicleWheel): same storage, so each
@@ -187,7 +175,7 @@ void VehicleWheel::UpdateSuspensionProbe(SoultreeProbe* world, const Vec3* veloc
                                          float radiusScale, float yaw, const Vec3* forward,
                                          const Vec3* up, SoultreeObject* node)   // 0x00514550
 {
-    AsTire(this)->UpdateSuspensionProbe((TireWorld*)world, (const CollisionVec3*)velocity, angle,
+    AsTire(this)->UpdateSuspensionProbe((Terrain*)world, (const CollisionVec3*)velocity, angle,
                                         radiusScale, yaw, (const CollisionVec3*)forward,
                                         (const CollisionVec3*)up, (TireNode*)node);
 }

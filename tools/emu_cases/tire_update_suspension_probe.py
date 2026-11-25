@@ -20,7 +20,7 @@ import random
 import struct
 
 RETAIL_VA = 0x00514550
-SYMBOL = '?UpdateSuspensionProbe@Tire@@QAEXPAVTireWorld@@PBUCollisionVec3@@MMM11PAVTireNode@@@Z'
+SYMBOL = '?UpdateSuspensionProbe@Tire@@QAEXPAVTerrain@@PBUCollisionVec3@@MMM11PAVTireNode@@@Z'
 SOURCE = 'src/krusty2/tire/Tire.cpp'
 # File-static axis constants (Tire.bindings.json); retail builds them at start-up (.bss).
 AXES = {'_kVec3ZAxis': (0x0068a3c0, (0.0, 0.0, 1.0)), '_kVec3Zero': (0x0068a3d0, (0.0, 0.0, 0.0)),

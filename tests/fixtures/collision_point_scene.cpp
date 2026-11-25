@@ -21,9 +21,10 @@ float CollisionLength(const CollisionVec3*) { ExitProcess(92); return 0; }
 float FastSqrt(float) { ExitProcess(93); return 0; }
 float FastInvSqrt(float) { ExitProcess(94); return 0; }
 CollisionVec3* Vec3Normalize(CollisionVec3*,const CollisionVec3*) { ExitProcess(96); return 0; }
-// The contact refresh 0x0043ad80's frame view (declared in CollisionPoint.cpp); not exercised.
-class CollisionFrameHelper { public: void QueryGround(CollisionVec3*,const CollisionVec3*,int,char*); };
-void CollisionFrameHelper::QueryGround(CollisionVec3*,const CollisionVec3*,int,char*) { ExitProcess(97); }
+// The contact refresh 0x0043ad80's ground query (Terrain::QueryGround 0x00507c10); not exercised.
+struct TerrainVec3;
+class Terrain { public: void QueryGround(TerrainVec3*,TerrainVec3*,int,unsigned char*); };
+void Terrain::QueryGround(TerrainVec3*,TerrainVec3*,int,unsigned char*) { ExitProcess(97); }
 
 struct GuardedContact { DWORD before[2]; DWORD value[0xc4/4]; DWORD after[2]; };
 struct GuardedNode { DWORD before[2]; DWORD value[0x1a4/4]; DWORD after[2]; };

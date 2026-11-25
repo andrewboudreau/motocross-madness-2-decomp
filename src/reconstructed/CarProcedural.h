@@ -46,13 +46,6 @@ struct CarProceduralContact {
     Vector3 contactPoint;                     // +0x18  CollisionSweepQuery::contact
 };
 
-// Ground query provider at CarProcedural::groundProvider (0x00507c10, thiscall,
-// ret 0x10: snaps *position to the surface and writes its normal; other
-// units declare the same function on their own views of the terrain).
-class CarProceduralTerrain {
-public:
-    void QueryGround(Vector3* position, Vector3* normal, int a, int b);
-};
 
 
 // The two owned colliders use the canonical 0xb8-byte layout; their
@@ -124,7 +117,7 @@ public:
     Vector3 field_0x1e8;
     Vector3 smoothedBack;                     // +0x1f4 smoothed direction to the path behind
     Vector3 smoothedNormal;                   // +0x200 smoothed ground normal
-    void* groundProvider;                     // +0x20c the ground query provider (CarProceduralTerrain in slot 10)
+    void* groundProvider;                     // +0x20c the Terrain whose ground QueryGround 0x00507c10 reads (slot 10)
     SoultreeObject** wheelNodes;              // +0x210 wheels
     Vector3 bodyContactPoint;                 // +0x214  slot 10 copies the body collider's contact record +0x18 (not read in this unit)
     Vector3 bodyContactNormal;                // +0x220  slot 10 copies the body collider's contact record +0x0c (not read in this unit)

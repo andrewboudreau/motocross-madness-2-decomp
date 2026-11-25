@@ -88,7 +88,7 @@
   "?GetPositionIn@SoultreeObject@@QAEXPAV1@PAUVec3@@@Z": "0x004fc9a0",
   "?LocalToWorldDirection@SoultreeObject@@QAE?AUVec3@@ABU2@@Z": "0x004fd5c0",
   "?WorldToLocalDirection@SoultreeObject@@QAE?AUVec3@@ABU2@@Z": "0x004fd710",
-  "?QueryGround@CarProceduralTerrain@@QAEXPAUVector3@@0HH@Z": "0x00507c10",
+  "?QueryGround@Terrain@@QAEXPAUTerrainVec3@@0HPAE@Z": "0x00507c10",
   "?Tick@CarProcedural@@UAEHM@Z": "0x0042fd80",
   "?Tick@GameObject@@UAEHM@Z": "0x004693d0",
   "__CIfmod": "0x0053538a",

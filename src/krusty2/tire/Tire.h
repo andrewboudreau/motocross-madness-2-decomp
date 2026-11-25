@@ -63,10 +63,7 @@ public:
     void SetLocalMatrix(const CollisionMatrix4* m);                                // 0x004fca30
     void Rotate(CollisionVec3 axis, float angle);                                  // 0x004fceb0
 };
-class TireWorld {                                      // world/terrain query object (arg 1 of 0x00514550)
-public:
-    int QueryGround(CollisionVec3* pos, CollisionVec3* outNormal, int flags, unsigned char* outSurface);
-};
+class Terrain;                                         // broadphase/Terrain.h (arg 1 of 0x00514550)
 
 // The vehicle passed to 0x00513f90 (Vehicle.cpp 0x00525d.. passes `this`): only the
 // members read there are declared (provisional view of Vehicle).
@@ -159,7 +156,7 @@ public:
     // the wheel axes (wheelForwardAxis/0x230/0x23c), probes the world/terrain for the contact point
     // and normal, builds the wheel frame and reports the contact through CollisionPoint's
     // penetration.  Callers 0x00528f65 and 0x00528fd8 pass body +0x0c, +0x4c, +0x54, +0x50, +0xa0, +0xac, +0x42c.
-    void UpdateSuspensionProbe(TireWorld* world, const CollisionVec3* position, float pitch,
+    void UpdateSuspensionProbe(Terrain* terrain, const CollisionVec3* position, float pitch,
                                float sinRoll, float yaw, const CollisionVec3* forward,
                                const CollisionVec3* up, TireNode* node);
     // 0x00513560: sets the roll angle from a rolled distance (times 1 / radius) and

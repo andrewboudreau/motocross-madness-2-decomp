@@ -92,7 +92,7 @@ class CollisionPointStorageTests(unittest.TestCase):
         targets=[t for t in json.loads((ROOT/'src/krusty2/collision/targets.json').read_text())
                  if t.get('source')=='CollisionPoint.cpp']
         self.assertEqual(len(targets),18)
-        baseline={POINT:(32,128,'314e4fb0b8512f64177abb5018549d1c6d4729f3c1055b17785dd734a863e058')}
+        baseline={POINT:(32,128,'4ffd763ef11cb123d5699f7ad8278385913fc89a859ada0065d9aaa4ddda7e3a')}
         with tempfile.TemporaryDirectory(prefix='mcm2-contact-storage-') as directory:
             for index,source in enumerate((POINT,)):
                 output=Path(directory)/('unit%d.obj'%index)

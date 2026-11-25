@@ -12,6 +12,7 @@
 #include "TextureMap.h"
 #include "ResourceEntry.h"
 #include "D3DIMSoulTree.h"
+#include "../krusty2/broadphase/Terrain.h"
 
 // Per-TU vector constants (the shape documented in docs/LZW.md): four
 // dynamic initializers (0x00430eb0..0x00430feb, .CRT$XCU 0x005660d8..
@@ -377,7 +378,8 @@ int CarProcedural::Tick(float frameTime)
     carModel->GetPositionIn(0, reinterpret_cast<Vec3*>(&position));
     Vector3 ground = position;
     Vector3 normal;
-    ((CarProceduralTerrain*)groundProvider)->QueryGround(&ground, &normal, 0, 0);
+    ((Terrain*)groundProvider)->QueryGround(reinterpret_cast<TerrainVec3*>(&ground),
+                                           reinterpret_cast<TerrainVec3*>(&normal), 0, 0);
     // The sensor collider's frame: the world axes orthonormalised.
     Matrix4 transform;
     CarFrame(&transform, kVec3ZAxis, kVec3YAxis, position);

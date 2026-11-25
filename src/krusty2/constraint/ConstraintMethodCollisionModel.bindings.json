@@ -14,7 +14,7 @@
   "?LoadShape@CollisionObject@@QAEXPAXPBD@Z": "0x00432800",
   "?LocalToWorldPoint@SoultreeObject@@QAE?AUVec3@@ABU2@@Z": "0x004fd660",
   "?QueryCollisions@CollisionObject@@QAEHXZ": "0x00438e70",
-  "?QueryPoint@ConGroundQuery@@QAEXPAUConVec3@@0HH@Z": "0x00507c10",
+  "?QueryGround@Terrain@@QAEXPAUTerrainVec3@@0HPAE@Z": "0x00507c10",
   "?SetModelShape@CollisionObject@@QAEXPAXHHHH@Z": "0x004324b0",
   "?SetPositionInFrame@SoultreeObject@@QAEXPAV1@PBUVec3@@@Z": "0x004fc740",
   "?SnapPlacement@CollisionObject@@QAEXXZ": "0x00435fe0",

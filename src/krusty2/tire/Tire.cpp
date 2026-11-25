@@ -1,5 +1,6 @@
 // Tire.cpp -- Tire (CollisionObject + MovingPart + CollisionPoint), see Tire.h.
 #include "Tire.h"
+#include "broadphase/Terrain.h"
 #include "math/Vec3.h"
 #include <float.h>
 #include <math.h>
@@ -625,7 +626,7 @@ static inline CollisionVec3 TireScaledCtorCopyYZ(const CollisionVec3& v, float s
     return CollisionVec3(v.x * s, y * s, z * s);
 }
 
-void Tire::UpdateSuspensionProbe(TireWorld* world, const CollisionVec3* position, float pitch,
+void Tire::UpdateSuspensionProbe(Terrain* terrain, const CollisionVec3* position, float pitch,
                                  float sinRoll, float yaw, const CollisionVec3* forward,
                                  const CollisionVec3* up, TireNode* node)
 {
@@ -633,7 +634,9 @@ void Tire::UpdateSuspensionProbe(TireWorld* world, const CollisionVec3* position
 
     ((TireNode*)MovingPart::node)->GetPositionIn(0, &origin);
     this->CollisionPoint::surfacePosition = origin;
-    world->QueryGround(&this->CollisionPoint::surfacePosition, &this->CollisionPoint::surfaceNormal, 0, TireSurfaceByte(this));
+    terrain->QueryGround(reinterpret_cast<TerrainVec3*>(&this->CollisionPoint::surfacePosition),
+                         reinterpret_cast<TerrainVec3*>(&this->CollisionPoint::surfaceNormal), 0,
+                         TireSurfaceByte(this));
 
     if (MovingPart::ownerRef) {
         CollisionVec3 nodeY;
@@ -671,7 +674,8 @@ void Tire::UpdateSuspensionProbe(TireWorld* world, const CollisionVec3* position
     this->CollisionPoint::worldPosition = firstProbe;
     this->CollisionPoint::surfacePosition = firstProbe;
     CollisionVec3 n1;
-    world->QueryGround(&this->CollisionPoint::surfacePosition, &n1, 0, TireSurfaceByte(this));
+    terrain->QueryGround(reinterpret_cast<TerrainVec3*>(&this->CollisionPoint::surfacePosition),
+                         reinterpret_cast<TerrainVec3*>(&n1), 0, TireSurfaceByte(this));
     this->CollisionPoint::penetration = (this->CollisionPoint::surfacePosition.y - this->CollisionPoint::worldPosition.y) * n1.y;
 
     // Second probe position pt: on the wheel rim, in the direction selected by `pitch`.
@@ -716,7 +720,7 @@ void Tire::UpdateSuspensionProbe(TireWorld* world, const CollisionVec3* position
     // Second probe at pt, then a refinement using the axes found there.
     CollisionVec3 n2;
     unsigned char kind;
-    world->QueryGround(&pt, &n2, 0, &kind);
+    terrain->QueryGround(reinterpret_cast<TerrainVec3*>(&pt), reinterpret_cast<TerrainVec3*>(&n2), 0, &kind);
     CollisionVec3 probeRoll = TireNormalizeOr(TireCross(n2, sideAxis), wheelForwardAxis);
     CollisionVec3 probeLateral = TireCrossGrouped(probeRoll, sideAxis);
     CollisionVec3 lateral2 = probeLateral;
@@ -732,7 +736,7 @@ void Tire::UpdateSuspensionProbe(TireWorld* world, const CollisionVec3* position
     CollisionVec3 rimPoint = CollisionVec3(scaled.x + origin.x, scaled.y + origin.y, scaled.z + origin.z);
     pt = rimPoint;
     CollisionVec3 n3;
-    world->QueryGround(&pt, &n3, 0, &kind);
+    terrain->QueryGround(reinterpret_cast<TerrainVec3*>(&pt), reinterpret_cast<TerrainVec3*>(&n3), 0, &kind);
     // delta is assigned inside the score expression: retail keeps it with `fst` and the
     // score on the x87 stack for the penetration store.  The score is a statement before the
     // test, which compares it with `fcom` as retail does (assigned inside the test, VC6

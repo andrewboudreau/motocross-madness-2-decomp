@@ -39,6 +39,7 @@
 #include "math/Vec3.h"
 #include "../../reconstructed/Matrix4.h"
 #include "core/SoultreeObject.h"
+#include "broadphase/Terrain.h"
 
 #include "core/DebugAlloc.h"   // DebugRealloc
 
@@ -94,7 +95,7 @@ ConstraintMethodCollisionModel::ConstraintMethodCollisionModel(int flags) : Coll
     applyImpulses = 1;
     body = 0;
     probeCount = 0;
-    groundQuery = 0;
+    terrain = 0;
     probes = 0;
     manualStep = 0;
     damping = 0;
@@ -177,7 +178,7 @@ int ConstraintMethodCollisionModel::Step(float t)
             0, reinterpret_cast<const Vec3*>(&pos));
         UpdatePlacement();
     }
-    if (groundQuery) {
+    if (terrain) {
         float maxPenetration = 0.0f;
         int anyHit = 0;
         ConVec3 bestNormal;
@@ -192,7 +193,8 @@ int ConstraintMethodCollisionModel::Step(float t)
                 reinterpret_cast<SoultreeObject*>(probes[i].node)->LocalToWorldPoint(
                     reinterpret_cast<const Vec3&>(probes[i].localPoint))));
             probeY = surfacePoint.y;
-            groundQuery->QueryPoint(&surfacePoint, &surfaceNormal, 0, 0);
+            terrain->QueryGround(reinterpret_cast<TerrainVec3*>(&surfacePoint),
+                                 reinterpret_cast<TerrainVec3*>(&surfaceNormal), 0, 0);
             if (probeY < surfacePoint.y) {
                 anyHit = 1;
                 probes[i].hit = 1;

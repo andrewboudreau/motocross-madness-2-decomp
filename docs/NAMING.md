@@ -20,6 +20,13 @@ A function whose behaviour does not support a name unambiguously keeps its
 placeholder. Old names appear only in this table; the rest of the tree uses
 the new name and keeps the VA. Later waves append rows.
 
+`tools/check_signatures.py` checks bound signatures against retail. A
+thiscall/stdcall body must pop exactly the declared parameter bytes, and a
+parameter declared `const T*` must not be stored through. A const pointer that
+retail writes is an output, so its name and the names around it are usually
+backwards. `tests/test_check_signatures.py` runs the check when `MCM2_EXE` is
+set.
+
 ## Wave 1
 
 | Old name | New name | VA | Tier | Evidence |
@@ -3011,6 +3018,8 @@ tools/static_check.py passes.
 | SoultreeSurface (src/reconstructed/D3DIMSoulTree.h) | `drawnVertices` (+0x14) | `localVertices` | 2 | Earlier names had the roles reversed. The loader reads the file's vertices into +0x14 (D3DIMSoulTree.cpp: `stream->Read(surface->localVertices, 0x20, surface->vertexCount)`) and only allocates +0x10, and both DrawIndexedPrimitive calls draw +0x10 `vertices`. TransformPoints 0x004a1b00 stores through its first pointer (decoded `fstp [ebx+ecx]`, ebx = arg1 + count*arg5) and reads its second, so TransformVertexGroups 0x00440d40 writes +0x10's ranges from +0x14's. |
 | SoultreeVertexGroup (src/reconstructed/D3DIMSoulTree.h) | `sourceVertices` (+0x08), `transformedVertices` (+0x0c) | `vertices`, `localVertices` | 2 | Same evidence: TransformVertexGroups passes +0x08 as TransformPoints' destination and +0x0c as its source. DrawCurrentLod subtracts the node-local eye (`WorldToLocalPoint`) from +0x0c positions and writes generated texture coordinates into +0x08. The loader points them into SoultreeSurface +0x10 and +0x14. |
 | TransformPoints 0x004a1b00 (D3DIMSoulTree.h) | `(source, target, .., sourceStride, targetStride)` | `(target, source, .., targetStride, sourceStride)` | 1 | Decoded: stores go through arg1 with stride arg5, loads through arg2 with stride arg6, and arg6 0 takes arg5. The const qualifier moved to the source pointer. |
+| ConstraintMethodCollisionModel (src/krusty2/constraint/ConstraintMethodCollisionModel.h) | `groundQuery` (+0xe4, type ConGroundQuery*) | `terrain` (Terrain*) | 2 | The probe loop calls 0x00507c10, Terrain::QueryGround (a nonvirtual Terrain member), on the object, so it is the Terrain. The CollisionPoint (CollisionFrameHelper), Tire (TireWorld) and CarProcedural (CarProceduralTerrain) views of the same call were retired too, and all four call sites now cast to TerrainVec3 where they make the call. |
+| CollisionFrameHelper::QueryGround (retired) | `const CollisionVec3* n` | Terrain::QueryGround's `TerrainVec3* normal` | 1 | Decoded: 0x00507c10 stores the negated face normal through its second argument (0x00507f5f..0x00507f6c), so the view's `const` was wrong. tools/check_const_params.py found it. |
 | PCRenderTarget (src/reconstructed/PCRenderTarget.h; was the D3DIMSoultreeShadow.cpp view D3DIMShadowRenderTarget) | `field_0x1c8` | `triTextureBlendCaps` | 2 | SDK position: the render target embeds D3DDEVICEDESC7, and +0x1c8 falls on dpcTriCaps.dwTextureBlendCaps. Slot 14 tests bit 2 (D3DPTBLENDCAPS_MODULATE) to choose the blend path. Group C gives TerrainShadowRenderTarget +0x1c8 the same name. |
 | ProjectedShadow (src/krusty2/shadow/ProjectedShadow.h) | `field_0x60` | `textureSurface` | 2 | Init copies the PCTextureMap's texture surface (+0x74 `textureSurface`) here after CreateTextureSurface, and tests it before PageLock on the system surface (ProjectedShadowNearMisses.cpp:60-62). Earlier name `texturePixels`. |
 | shadow camera view (src/bringup/Group2_ShadowCameraLookAt.cpp) | `field_0x194` | `roll` | 2 | This is a view of the Camera: lensScale +0x16c and eyePosition +0x170 agree with Camera.h. Camera +0x194 is roll (Camera.h:93; the setter's `const float* roll` argument). 0x0042e930 copies *c there. |
