@@ -749,15 +749,15 @@ void EcoSystem::BuildCollisionObjects(VegetationDefinition* definition) {
                 hull[j].z = definition->modelVertices[0][j].position.z;
             }
             definition->collisionObjects[i]->ownerType = 0x3e9;
-            definition->collisionObjects[i]->SetTriangleMeshHullShape(hull, hullIndices, definition->modelIndexCount[0] / 3,
+            definition->collisionObjects[i]->SetTriangleMeshHullShape((CollisionVec3*)hull, hullIndices, definition->modelIndexCount[0] / 3,
                                                                definition->modelVertexCount[0]);
             EcoSetIdentity(&((EcoHullShape*)definition->collisionObjects[i]->shapeData)->transform);
             delete hull;
             delete hullIndices;
         } else if (shape->type == 2) {
-            definition->collisionObjects[i]->SetSphereShape(shape->start, shape->radius);
+            definition->collisionObjects[i]->SetSphereShape(*(CollisionVec3*)&shape->start, shape->radius);
         } else if (shape->type == 3) {
-            definition->collisionObjects[i]->SetCapsuleShape(shape->start, shape->end, shape->radius);
+            definition->collisionObjects[i]->SetCapsuleShape(*(CollisionVec3*)&shape->start, *(CollisionVec3*)&shape->end, shape->radius);
         } else if (shape->type == 1) {
             definition->collisionObjects[i]->ownerType = 0x3e9;
             for (j = 0; j < 16; j++) {
@@ -780,7 +780,7 @@ void EcoSystem::BuildCollisionObjects(VegetationDefinition* definition) {
                 indices[j * 6 + 4] = next + 16;
                 indices[j * 6 + 5] = j + 16;
             }
-            definition->collisionObjects[i]->SetTriangleMeshHullShape(vertices, indices, 32, 32);
+            definition->collisionObjects[i]->SetTriangleMeshHullShape((CollisionVec3*)vertices, indices, 32, 32);
             EcoSetIdentity(&((EcoHullShape*)definition->collisionObjects[i]->shapeData)->transform);
         }
     }

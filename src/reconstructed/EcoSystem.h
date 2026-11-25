@@ -59,14 +59,15 @@ struct EcoSphereShape {              // type 4
     float centreScale;                        // +0x18: centre scale
     Matrix4 transform;                        // +0x1c
 };
+#include "../krusty2/collision/CollisionTypes.h"
 class CollisionObject : public QuadTreeObject, public GameObject {
 public:
     explicit CollisionObject(int flags);      // 0x00431e70
     void Configure(void* context, int useBroadphase, int collisionEnabled, int collidable); // 0x004320f0
-    void SetTriangleMeshHullShape(const Vector3* vertices, const int* indices, int triangleCount,
+    void SetTriangleMeshHullShape(const CollisionVec3* vertices, const int* indices, int triangleCount,
                                int vertexCount);                       // 0x004328b0: hull
-    void SetSphereShape(Vector3 center, float radius);          // 0x004329a0: sphere
-    void SetCapsuleShape(Vector3 p0, Vector3 p1, float radius);  // 0x00432a20: capsule
+    void SetSphereShape(CollisionVec3 center, float radius);    // 0x004329a0: sphere
+    void SetCapsuleShape(CollisionVec3 p0, CollisionVec3 p1, float radius); // 0x00432a20: capsule
     void SetTransform(const Matrix4* m);                      // 0x00435830: SetTransform
 
     unsigned char field_0x38[0x50 - 0x38];
