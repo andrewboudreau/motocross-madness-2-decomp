@@ -63,17 +63,6 @@ struct CubeCameraView {
     Vector3 position;                         // position
 };
 
-// The object at 0x00575a98 (TrackOverlay.h and Griddraw.h view other
-// members of it). Tier 3 semantics.
-class CubeVisibilityClipperView {
-public:
-    // 0x0052f0a0: transforms `count` points of `source` by `matrix`.
-    void TransformPoints(Vector3* destination, Vector3* source, Matrix4* matrix, int count);
-    // 0x0052f140: whether a face with `normal` can face the camera looking along `forward`.
-    int CanFaceCamera(Camera* camera, Vector3* forward, Vector3* normal);
-    // 0x0052f4d0: whether the quad of `points` a, b, c, d is on screen.
-    int IsQuadOnScreen(Camera* camera, Vector3* points, int a, int b, int c, int d);
-};
 #include "../krusty2/visibility/VisibilityClipperGlobal.h"   // 0x00575a98 (VisibilityClipper, src/krusty2/visibility)
 
 class DrawableCube : public GameObject {

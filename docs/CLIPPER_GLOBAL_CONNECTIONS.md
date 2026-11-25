@@ -11,8 +11,11 @@ The retired pointer types are `D3DIMShadowClipper`, `CubeVisibilityClipperView`,
 `GridVisibilityClipper`, and `OverlayVisibilityClipperView`. The last view used the variable
 name `g_UnknownGlobal575a98`; the other five used `g_visibilityClipper`.
 All now import `?g_visibilityClipper@@3PAVVisibilityClipper@@A`.
-The provisional classes remain separate. Shared pointer storage does not prove
-their complete C++ type identity.
+Shared pointer storage alone did not prove their type identity. The Cube,
+FollowCamera and Overlay views lost their last users when their calls moved to
+`VisibilityClipper` methods (docs/VISIBILITY_CONNECTIONS.md), and their
+declarations are gone. EcoSystem calls `VisibilityClipper::SphereInFrustum`
+`0x0052fbb0` directly; its view and link alias are gone too.
 
 ## Pointer and receiver evidence
 
@@ -25,8 +28,8 @@ This establishes the direct pointer loads and receiver bits; it does not
 exclude arbitrary indirect writes.
 
 Calls already using the canonical clipper methods keep their existing
-boundaries. Calls to the remaining provisional `SphereInFrustum` and `TestBox`
-declarations retain explicit casts at the call site. There are no new method
+boundaries. Griddraw's calls to the remaining provisional `TestBox` declaration
+(`GridVisibilityClipper`) retain explicit casts at the call site. There are no new method
 joins, wrappers, pointer adjustments or copied object storage. The complete
 object comparison checks those casts generate the same instructions and call
 destinations.

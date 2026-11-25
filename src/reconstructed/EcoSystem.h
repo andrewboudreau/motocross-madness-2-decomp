@@ -189,12 +189,6 @@ int EvictGeometry(void* object, int context);
 int WriteXorEncoded(const unsigned char* data, int size, int count, FILE* file, unsigned char* key);
 int ReadXorDecoded(unsigned char* data, int size, int count, FILE* file, unsigned char* key);
 
-// Griddraw.h / VisibilityQuadTree.h: the visibility clipper 0x00575a98.
-class EcoVisibilityClipperView {
-public:
-    int SphereInFrustum(const Camera* camera, const void* matrix, const Vector3* center,
-                        float radius, int* fullyInside);       // 0x0052fbb0
-};
 #include "../krusty2/visibility/VisibilityClipperGlobal.h"        // 0x00575a98
 
 // TrackGame.h: the game object 0x0056e26c, as far as this file reads it

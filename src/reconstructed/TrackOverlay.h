@@ -98,13 +98,8 @@ public:
 
 class Camera;
 
-// The object at 0x00575a98. 0x0052f340 (thiscall) projects `point` with the
-// camera and its matrix (+0xec); nonzero when it is on screen.
-class OverlayVisibilityClipperView {
-public:
-    int ProjectPoint(Camera* camera, const void* matrix, const Vector3* point,
-                              Vector3* screen, float* depth);
-};
+// The visibility clipper 0x00575a98 (VisibilityClipper.h): ProjectPoint
+// 0x0052f340 is nonzero when the point is on screen.
 #include "../krusty2/visibility/VisibilityClipperGlobal.h"
 
 // NameOverlay+0x12c: only +0x4c (the terrain) is read.

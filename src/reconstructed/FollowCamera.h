@@ -107,15 +107,8 @@ public:
     virtual bool GetPovDirection(int index, float* x, float* y);
 };
 
-// The object at 0x00575a98 (TrackOverlay.h's OverlayVisibilityClipperView views the same
-// pointer). 0x0052f340 projects `point` with the camera and its +0xec matrix
-// into `screen`; slot 38 switches on the int it writes through `code` when it
-// returns 0. Names and the meaning of `code` are provisional.
-class FollowCameraVisibilityClipperView {
-public:
-    int ProjectPoint(Camera* camera, const void* matrix, const Vector3* point,
-                              Vector3* screen, int* code);
-};
+// The visibility clipper 0x00575a98 (VisibilityClipper.h). Slot 38 switches on
+// the code ProjectPoint 0x0052f340 writes when it returns 0 (meaning provisional).
 #include "../krusty2/visibility/VisibilityClipperGlobal.h"   // 0x00575a98 (VisibilityClipper, src/krusty2/visibility)
 
 // d3drm.dll's D3DRMVectorRotate (import thunk 0x0053304c, the module's only

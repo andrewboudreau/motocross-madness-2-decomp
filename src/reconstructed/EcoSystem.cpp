@@ -13,6 +13,7 @@
 #include <windows.h>
 
 #include "EcoSystem.h"
+#include "../krusty2/visibility/VisibilityClipper.h"
 
 #include "MemTag.h"
 #include "Parameterblocks.h"
@@ -1579,8 +1580,10 @@ int EcoSystem::PrepareGeometry() {
                 center.x = object->quantizedPosition.x * g_EcoSystem->unitsPerCoordinate;
                 center.y = object->quantizedPosition.y * g_EcoSystem->unitsPerCoordinate + height;
                 center.z = object->quantizedPosition.z * g_EcoSystem->unitsPerCoordinate;
-                visible = reinterpret_cast<EcoVisibilityClipperView*>(g_visibilityClipper)->SphereInFrustum(ECO_VIEW->currentCamera, &ECO_VIEW->currentCamera->screenMatrix,
-                                                               &center, radius, 0);
+                visible = g_visibilityClipper->SphereInFrustum(
+                    reinterpret_cast<const VisibilityCamera*>(ECO_VIEW->currentCamera),
+                    reinterpret_cast<const VisibilityMatrix*>(&ECO_VIEW->currentCamera->screenMatrix),
+                    reinterpret_cast<const VisibilityBoxVec*>(&center), radius, 0);
             }
             if (visible) {
                 object->SetBillboard(billboard, fade);
