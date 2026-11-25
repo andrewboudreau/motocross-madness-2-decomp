@@ -8,6 +8,7 @@
 // Terrain.cpp (tier 3).
 #include "../../../src/reconstructed/TerrainShadow.h"
 #include "../../../src/reconstructed/ShadowCamera.h"
+#include "../../../src/reconstructed/PCTextureMap.h"
 #include "../../../src/reconstructed/AgeManager.h"
 #include "../../../src/reconstructed/ClipRectangle.h"
 #include "../../common/FistpFloatToInt.h"
@@ -44,7 +45,7 @@ int TerrainShadow::UpdateTexelSize()
         texelScale = 0.5f;
     else
         texelScale = 1.0f;
-    texelSize = texelScale / shadow->texture->size;
+    texelSize = texelScale / shadow->texture->textureWidth;
     float extentX = screenMaxX - screenMinX;
     float extentZ = screenMaxY - screenMinY;
     float extent;
@@ -52,22 +53,22 @@ int TerrainShadow::UpdateTexelSize()
         extent = extentX;
     else
         extent = extentZ;
-    if (shadow->texture->size > extent) {
+    if (shadow->texture->textureWidth > extent) {
         float fov;
         if (shadow->mode == 1) {
             ShadowMatrix projection;
-            fov = (float)atan2((float)(shadow->texture->size * shadow->texture->size) / extent * 0.5,
+            fov = (float)atan2((float)(shadow->texture->textureWidth * shadow->texture->textureWidth) / extent * 0.5,
                                shadow->camera->focalLength) * 114.59156f;
             shadow->camera->SetFrame(&shadow->camera->eyePosition, 0, 0, 0, &fov);
             shadow->camera->UpdateMatrices();
             projection = *TerrainMatrixIdentityInto(&projection);
-            projection.m[0][0] = projection.m[1][1] = (float)shadow->texture->size;
+            projection.m[0][0] = projection.m[1][1] = (float)shadow->texture->textureWidth;
             shadow->lightMatrix = *TerrainMatrixMultiplyInto(&projection, projection,
                                                              *(ShadowMatrix*)&shadow->camera->screenMatrix[0]);
         } else {
             ShadowMatrix projection;
             projection = *TerrainMatrixIdentityInto(&projection);
-            float half = (float)shadow->texture->size * 0.5f;
+            float half = (float)shadow->texture->textureWidth * 0.5f;
             projection.m[0][0] = 0.5f / shadow->lensScale * extent;
             projection.m[1][1] = -projection.m[0][0];
             projection.m[3][1] = projection.m[3][0] = half;
@@ -122,7 +123,7 @@ void TerrainShadow::BuildShadowVertices()
     ClipPoint tri[4];  // ClipPolygon stores points[count] = points[0], so a triangle needs a fourth slot
     int points[6];
     short corner[3];
-    int pitch;
+    long pitch;
 
     if (cellCount > 0) {
         if (shadow->updateThisFrame)
@@ -132,7 +133,7 @@ void TerrainShadow::BuildShadowVertices()
             g_clipRectangle->Set((float)shadow->clipRect.left * 2.0f, (float)shadow->clipRect.top * 2.0f,
                                  (float)shadow->clipRect.right * 2.0f,
                                  (float)shadow->clipRect.bottom * 2.0f);
-        short* pixels = shadow->texture->LockPixels(0, &pitch, 0);
+        short* pixels = (short*)shadow->texture->LockSurface(0, &pitch, 0);
         unsigned int color;
         if (shadow->surfaceFormat == 0x613)
             color = 0x7fffffff;
@@ -256,7 +257,7 @@ void TerrainShadow::BuildShadowVertices()
             if (vertexCount == 0x300)
                 break;
         }
-        shadow->texture->UnlockPixels(0);
+        shadow->texture->UnlockSurface(0);
     } else {
         vertexCount = 0;
     }
@@ -424,7 +425,7 @@ int TerrainShadow::IsShadowVisible()
     TerrainShadowVec up;
     if (shadow->mode == 1) {
         eye += TERRAIN_SHADOW_CAMERA()->look * TERRAIN_SHADOW_CAMERA()->focalLength;
-        float half = (float)shadow->texture->size * 0.5f;
+        float half = (float)shadow->texture->textureWidth * 0.5f;
         right = TerrainShadowCross(TERRAIN_SHADOW_CAMERA()->look, TERRAIN_SHADOW_CAMERA()->up) * half;
         up = TERRAIN_SHADOW_CAMERA()->up * half;
         TerrainShadowVec corners[4];

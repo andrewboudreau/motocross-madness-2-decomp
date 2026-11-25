@@ -113,6 +113,12 @@ struct DirectDrawSurface {
     virtual long __stdcall SetOverlayPosition();
     virtual long __stdcall SetPalette(void* palette);                             // 31
     virtual long __stdcall Unlock(void* rect);                                    // 32
+    virtual long __stdcall UpdateOverlay();
+    virtual long __stdcall UpdateOverlayDisplay();
+    virtual long __stdcall UpdateOverlayZOrder();
+    virtual long __stdcall GetDDInterface();
+    virtual long __stdcall PageLock(unsigned long flags);                         // 37
+    virtual long __stdcall PageUnlock(unsigned long flags);                       // 38
 };
 
 // 16-byte surface capabilities (the DDSCAPS2 layout).

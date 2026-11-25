@@ -53,6 +53,7 @@
 #include "math/Vec3.h"
 #include "../../../src/reconstructed/Matrix4.h"
 #include "core/SoultreeObject.h"
+#include "../../../src/reconstructed/PCTextureMap.h"
 #include "../../../src/reconstructed/ClipRectangle.h"
 #include "../../common/FistpFloatToInt.h"
 
@@ -211,8 +212,8 @@ void D3DIMSoultreeShadow::BuildShadowVertices()
     ProjectedShadow* projected = shadow;
     g_clipRectangle->Set((float)projected->clipRect.left, (float)projected->clipRect.top,
                          (float)projected->clipRect.right, (float)projected->clipRect.bottom);
-    int pitch;
-    short* pixels = shadow->texture->LockPixels(0, &pitch, 0);
+    long pitch;
+    short* pixels = (short*)shadow->texture->LockSurface(0, &pitch, 0);
     unsigned int color;
     if (shadow->surfaceFormat == 0x613)
         color = 0x7fffffff;
@@ -318,6 +319,6 @@ void D3DIMSoultreeShadow::BuildShadowVertices()
         }
     }
 done:
-    shadow->texture->UnlockPixels(0);
+    shadow->texture->UnlockSurface(0);
 }
 #pragma optimize("", on)

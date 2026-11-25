@@ -52,21 +52,21 @@ ProjectedShadow* ProjectedShadow::Init(ShadowRenderTarget* target, void* texture
         return 0;
     }
 
-    texture = new(__FILE__, 0xaa) ShadowTexture(textureOwner, 1);
+    texture = new(__FILE__, 0xaa) PCTextureMap((TextureMapManager*)textureOwner, 1);
     if (texture
-        && texture->Create(0, 0x80, 0x80, 0x80, 0x80, surfaceFormat, surfaceFormat, 0, 8, 0, 0, 0,
+        && texture->CreateSurface(0, 0x80, 0x80, 0x80, 0x80, surfaceFormat, surfaceFormat, 0, 8, 0, 0, 0,
                            formatA, formatB, 0, 0x80, 0xff00ff)) {
         texture->CreateTextureSurface(1, 0, 1);
-        texturePixels = texture->pixels;
-        if (texturePixels) {
-            texture->surface->PageLock(0);
+        textureSurface = texture->textureSurface;
+        if (textureSurface) {
+            texture->systemSurface->PageLock(0);
 
             int savedHeight = Host()->height;
             void* savedSurface = Host()->surface;
             int savedWidth = Host()->width;
-            Host()->width = texture->size;
-            Host()->height = texture->height;
-            Host()->surface = texture->pixels;
+            Host()->width = texture->textureWidth;
+            Host()->height = texture->textureHeight;
+            Host()->surface = texture->textureSurface;
             ShadowOwner* owner = Host()->owner;
 
             camera = new(__FILE__, 0xcd) ShadowCamera(1);
@@ -80,9 +80,9 @@ ProjectedShadow* ProjectedShadow::Init(ShadowRenderTarget* target, void* texture
                 for (int bits = 0x40; bits; bits >>= 1)
                     sizeShift++;
                 clipRect.left = 0;
-                clipRect.right = texture->size - 1;
+                clipRect.right = texture->textureWidth - 1;
                 clipRect.top = 0;
-                clipRect.bottom = texture->size - 1;
+                clipRect.bottom = texture->textureWidth - 1;
                 return this;
             }
         }
@@ -140,7 +140,7 @@ void ProjectedShadow::TintCasterVertices()
                 int x, y;
                 ProjectedShadowFloatToInt(&x, vertexBuffer[totalVertices + i].x - 0.5f);
                 ProjectedShadowFloatToInt(&y, vertexBuffer[totalVertices + i].y - 0.5f);
-                if (x >= 0 && y >= 0 && x <= texture->size && y <= texture->size
+                if (x >= 0 && y >= 0 && x <= texture->textureWidth && y <= texture->textureWidth
                     && heightMap[(y << sizeShift) + x] == colorKeyLow)
                     *(unsigned int*)(vertices + i * 0x20 + 0x10) = shadowColor;
             }
@@ -262,7 +262,7 @@ int ProjectedShadow::ComputeBounds()
 
     if (mode == 3) {
         ShadowMatrix projection = ShadowMatrixIdentity();
-        float half = (float)texture->size * 0.5f;
+        float half = (float)texture->textureWidth * 0.5f;
         projection.m[0][0] = half / lensScale;
         projection.m[1][1] = -(half / lensScale);
         projection.m[3][0] = half;
@@ -292,8 +292,8 @@ int ProjectedShadow::ComputeBounds()
         camera->LookAt(*(Vector3*)&center);
         camera->UpdateMatrices();
         ShadowMatrix projection = ShadowMatrixIdentity();
-        projection.m[0][0] = (float)texture->size;
-        projection.m[1][1] = (float)texture->size;
+        projection.m[0][0] = (float)texture->textureWidth;
+        projection.m[1][1] = (float)texture->textureWidth;
         ShadowMatrixProduct(&lightMatrix, projection, *(ShadowMatrix*)&camera->screenMatrix[0]);
     }
     return 1;
@@ -360,21 +360,21 @@ static inline void FillShortsUnrolled(short* p, int count, short value, unsigned
 void ProjectedShadow::RenderShadow()
 {
     int vertexBase = 0;
-    heightMap = texture->LockPixels(0, 0, 0);
+    heightMap = (short*)texture->LockSurface(0, 0, 0);
     if (!heightMap)
         return;
 
     if (clipRect.right >= clipRect.left) {
-        short* row = heightMap + clipRect.top * texture->size + clipRect.left;
+        short* row = heightMap + clipRect.top * texture->textureWidth + clipRect.left;
         for (int y = clipRect.top; y <= clipRect.bottom; y++) {
             FillShortsUnrolled(row, clipRect.right - clipRect.left + 1, colorKeyLow, colorKeyPair);
-            row += texture->size;
+            row += texture->textureWidth;
         }
     }
 
-    clipRect.left = texture->size - 1;
+    clipRect.left = texture->textureWidth - 1;
     clipRect.right = 0;
-    clipRect.top = texture->size - 1;
+    clipRect.top = texture->textureWidth - 1;
     clipRect.bottom = 0;
     minDepth = 3.4028235e38f;
 
@@ -405,8 +405,8 @@ void ProjectedShadow::RenderShadow()
                     ShadowVec3* vertex = &vertexBuffer[*(indices + i + k) + vertexBase];
                     ProjectedShadowFloatToInt(&points[k * 2], vertex->x - 0.5f);
                     ProjectedShadowFloatToInt(&points[k * 2 + 1], vertex->y - 0.5f);
-                    if (points[k * 2] <= 1 || points[k * 2] >= texture->size - 1
-                        || points[k * 2 + 1] <= 1 || points[k * 2 + 1] >= texture->size - 1) {
+                    if (points[k * 2] <= 1 || points[k * 2] >= texture->textureWidth - 1
+                        || points[k * 2 + 1] <= 1 || points[k * 2 + 1] >= texture->textureWidth - 1) {
                         inside = false;
                         break;
                     }
@@ -431,7 +431,7 @@ void ProjectedShadow::RenderShadow()
         if (casters[c]->currentLod != -1)
             casters[c]->ReleaseParts();
     }
-    texture->UnlockPixels(0);
+    texture->UnlockSurface(0);
 }
 
 // 0x004dbd30 (1218 B plus three 15-entry jump tables): after rendering, halves the dirty
@@ -453,7 +453,7 @@ void ProjectedShadow::Present()
     if (!downsampleOnPresent)
         return;
 
-    heightMap = texture->LockPixels(0, 0, 0);
+    heightMap = (short*)texture->LockSurface(0, 0, 0);
     int oldBottom = clipRect.bottom;
     int oldLeft = clipRect.left;
     int oldRight = clipRect.right;
@@ -464,7 +464,7 @@ void ProjectedShadow::Present()
     clipRect.top = oldTop >> 1;
     clipRect.right = oldRight >> 1;
 
-    int index = clipRect.left + texture->size * clipRect.top;
+    int index = clipRect.left + texture->textureWidth * clipRect.top;
     short* dstRow = heightMap + index;
     unsigned short* srcRow = (unsigned short*)heightMap + index * 2;
     int rowTail = oldRight - clipRect.right;
@@ -483,7 +483,7 @@ void ProjectedShadow::Present()
         unsigned short outMixC = (unsigned short)(keyLevel * 0x111 - quarterShade * 0x111);
         for (y = clipRect.top; y <= clipRect.bottom; y++) {
             unsigned short* srcTop = srcRow;
-            unsigned short* srcBottom = srcRow + texture->size;
+            unsigned short* srcBottom = srcRow + texture->textureWidth;
             short* dst = dstRow;
             int span = clipRect.right - clipRect.left;
             for (int x = 0; x <= span; x++) {
@@ -502,13 +502,13 @@ void ProjectedShadow::Present()
                 srcBottom += 2;
             }
             FillShortsUnrolled(dst, rowTail, colorKeyLow, colorKeyPair);
-            dstRow += texture->size;
-            srcRow += texture->size * 2;
+            dstRow += texture->textureWidth;
+            srcRow += texture->textureWidth * 2;
         }
     } else {
         for (y = clipRect.top; y <= clipRect.bottom; y++) {
             unsigned short* srcTop = srcRow;
-            unsigned short* srcBottom = srcRow + texture->size;
+            unsigned short* srcBottom = srcRow + texture->textureWidth;
             short* dst = dstRow;
             int span = clipRect.right - clipRect.left;
             for (int x = 0; x <= span; x++) {
@@ -517,8 +517,8 @@ void ProjectedShadow::Present()
                 srcBottom += 2;
             }
             FillShortsUnrolled(dst, rowTail, colorKeyLow, colorKeyPair);
-            dstRow += texture->size;
-            srcRow += texture->size * 2;
+            dstRow += texture->textureWidth;
+            srcRow += texture->textureWidth * 2;
         }
     }
 
@@ -526,7 +526,7 @@ void ProjectedShadow::Present()
     int clearCount = oldRight - oldLeft + 1;
     for (; y <= oldBottom; y++) {
         FillShortsUnrolled(clearRow, clearCount, colorKeyLow, colorKeyPair);
-        clearRow += texture->size;
+        clearRow += texture->textureWidth;
     }
-    texture->UnlockPixels(0);
+    texture->UnlockSurface(0);
 }

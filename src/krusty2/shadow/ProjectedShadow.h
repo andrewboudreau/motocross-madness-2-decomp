@@ -37,84 +37,10 @@ struct ShadowVec3 {
     float x, y, z;
 };
 
-// DirectDraw-style surface reached through a texture's +0x70 member (tier 2: slot 37 is
-// called with (this, 0) in Init, slot 38 with (this, 0) in the dtor, which fit IDirectDrawSurface7
-// PageLock / PageUnlock).  The leading slots are unknown placeholders.
-class ShadowSurface {
-public:
-    virtual long __stdcall Slot0();
-    virtual long __stdcall Slot1();
-    virtual long __stdcall Slot2();
-    virtual long __stdcall Slot3();
-    virtual long __stdcall Slot4();
-    virtual long __stdcall Slot5();
-    virtual long __stdcall Slot6();
-    virtual long __stdcall Slot7();
-    virtual long __stdcall Slot8();
-    virtual long __stdcall Slot9();
-    virtual long __stdcall Slot10();
-    virtual long __stdcall Slot11();
-    virtual long __stdcall Slot12();
-    virtual long __stdcall Slot13();
-    virtual long __stdcall Slot14();
-    virtual long __stdcall Slot15();
-    virtual long __stdcall Slot16();
-    virtual long __stdcall Slot17();
-    virtual long __stdcall Slot18();
-    virtual long __stdcall Slot19();
-    virtual long __stdcall Slot20();
-    virtual long __stdcall Slot21();
-    virtual long __stdcall Slot22();
-    virtual long __stdcall Slot23();
-    virtual long __stdcall Slot24();
-    virtual long __stdcall Slot25();
-    virtual long __stdcall Slot26();
-    virtual long __stdcall Slot27();
-    virtual long __stdcall Slot28();
-    virtual long __stdcall Slot29();
-    virtual long __stdcall Slot30();
-    virtual long __stdcall Slot31();
-    virtual long __stdcall Slot32();
-    virtual long __stdcall Slot33();
-    virtual long __stdcall Slot34();
-    virtual long __stdcall Slot35();
-    virtual long __stdcall Slot36();
-    virtual long __stdcall PageLock(unsigned long flags);    // slot 37 (tier 3)
-    virtual long __stdcall PageUnlock(unsigned long flags);  // slot 38 (tier 3)
-};
-
-// The shadow texture: allocated 0x80 bytes and built by 0x004c5f00(owner, 1), PCTextureMap's
-// constructor (src/reconstructed/PCTextureMap.h).  This is an ABI view declaring only what
-// the shadow code touches; argument names follow PCTextureMap's slots.
-class ShadowTexture : public BaseObject {
-public:
-    ShadowTexture(void* owner, int flag);               // 0x004c5f00
-    // vtable slot 4 (0x10, CreateSurface): 17 stack words, nonzero on success (Init).
-    virtual int Create(int bits, int width, int height, int stride, int minimumSize,
-                       int sourceFormat, int format, int palette, int flags, int surfacePalette,
-                       int checkMemory, int unused, int addressU, int addressV, int choice,
-                       int alphaThreshold, int key);
-    virtual void LoadSurface();
-    virtual void Clone();
-    virtual void IsResident();
-    // 0x20 (CreateTextureSurface): (1, 0, 1) in Init
-    virtual int CreateTextureSurface(int upload, int asRenderTarget, int localVideo);
-    virtual int Upload(int* rect, int mode);          // 0x24 (Upload): (rect, -1) in slot 13
-    virtual void ReleaseTextureSurface();
-    virtual void SetAsTexture();
-    virtual void RecreateIfLost();
-    // 0x34 (slot 13, LockSurface): (0,0,0) in 0x004db8c0, result stored at +0x64; TerrainShadow
-    // slot 30 passes a local for the pitch.
-    virtual short* LockPixels(int rect, int* pitch, int flags);
-    virtual void UnlockPixels(int rect);  // 0x38 (slot 14, UnlockSurface): (0) at the end of 0x004db8c0
-    char pad_0x08[0x14 - 0x08];
-    int size;                    // +0x14 texture edge (the clip rect is 0..size-1)
-    int height;                  // +0x18 copied to the render target's +0x10 by Init
-    char pad_0x1c[0x70 - 0x1c];
-    ShadowSurface* surface;      // +0x70
-    void* pixels;                // +0x74
-    char pad_0x78[0x80 - 0x78];  // allocated with operator new(0x80) in Init
-};
+// The shadow texture at ProjectedShadow+0x54: Init allocates 0x80 bytes and runs PCTextureMap's
+// constructor 0x004c5f00(owner, 1) (src/reconstructed/PCTextureMap.h).
+class PCTextureMap;
+struct DirectDrawSurface;
 
 // The light camera at ProjectedShadow+0x58 (src/reconstructed/ShadowCamera.h: ShadowCamera :
 // PCCamera : Camera; Init allocates 0x220 bytes and runs its constructor 0x004da520).
@@ -290,10 +216,10 @@ public:
     ShadowVec3 lightDir;          // +0x38 ctor zero vector; 0x004dae50 stores the normalised direction
     ShadowVec3 lightVec2;         // +0x44 ctor zero vector; 0x004dae50 (mode 1) copies its 1st argument
     int field_0x50;               // +0x50 ctor 0
-    ShadowTexture* texture;       // +0x54 created in Init, released by dtor
+    PCTextureMap* texture;        // +0x54 created in Init, released by dtor
     ShadowCamera* camera;         // +0x58 created in Init, released by dtor
     int renderTarget;             // +0x5c Init stores its first argument (the render target)
-    void* texturePixels;          // +0x60 Init stores texture->pixels
+    DirectDrawSurface* textureSurface; // +0x60 Init copies texture->textureSurface (+0x74)
     short* heightMap;             // +0x64 ctor 0
     ShadowRect clipRect;          // +0x68 left/top/right/bottom ints (ctor 0, Init 0,0,size-1,size-1)
     int prevMinX;                 // +0x78 ctor 0x7fffffff

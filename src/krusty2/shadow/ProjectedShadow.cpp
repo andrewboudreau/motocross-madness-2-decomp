@@ -13,6 +13,7 @@
 // samples/physics/shadow/ProjectedShadowNearMisses.cpp, which includes this file.
 #include "shadow/ProjectedShadow.h"
 #include "../../reconstructed/ShadowCamera.h"
+#include "../../reconstructed/PCTextureMap.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -75,8 +76,8 @@ ProjectedShadow::~ProjectedShadow()
     if (camera)
         camera->Release();
     if (texture) {
-        if (texture->surface)
-            texture->surface->PageUnlock(0);
+        if (texture->systemSurface)
+            texture->systemSurface->PageUnlock(0);
         texture->Release();
     }
     if (vertexBuffer)
@@ -270,7 +271,7 @@ int ProjectedShadow::RenderPre3D()
         rect[2] = prevMaxX + 1 > clipRect.right ? prevMaxX + 1 : clipRect.right;
         rect[1] = prevMinY < clipRect.top ? prevMinY : clipRect.top;
         rect[3] = prevMaxY + 1 > clipRect.bottom ? prevMaxY + 1 : clipRect.bottom;
-        texture->Upload(rect, -1);
+        texture->Upload((Win32Rect*)rect, -1);
         prevMinX = clipRect.left;
         prevMaxX = clipRect.right;
         prevMinY = clipRect.top;

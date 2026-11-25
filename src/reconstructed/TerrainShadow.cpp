@@ -8,6 +8,7 @@
 // TerrainShadow vtable.  Not here: slots 27 (0x00508bc0), 28 (0x005097d0) and 30 (0x00509aa0),
 // near misses in samples/physics/shadow/TerrainShadow.cpp, which the game build admits.
 #include "TerrainShadow.h"
+#include "PCTextureMap.h"
 
 // 0x00508ae0 (ret 4).
 TerrainShadow::TerrainShadow(int flags)
@@ -96,17 +97,6 @@ public:
     unsigned char triTextureBlendCaps;           // bit 2 tested by slot 14
 };
 
-// The shadow texture's slot 19 (0x4c) binds it to texture stage 0 (PCTextureMap slot 19).  Tier 3.
-class TerrainShadowTextureView {
-public:
-    virtual void Slot0(); virtual void Slot1(); virtual void Slot2(); virtual void Slot3();
-    virtual void Slot4(); virtual void Slot5(); virtual void Slot6(); virtual void Slot7();
-    virtual void Slot8(); virtual void Slot9(); virtual void Slot10(); virtual void Slot11();
-    virtual void Slot12(); virtual void Slot13(); virtual void Slot14(); virtual void Slot15();
-    virtual void Slot16(); virtual void Slot17(); virtual void Slot18();
-    virtual void Bind();                                          // slot 19
-};
-
 // 0x0050a1a0 (slot 14): draws the collected terrain vertices (+0x34, vertexCount of them) with the
 // shadow texture and modulating texture stages; D3DIMSoultreeShadow slot 14 without the world
 // matrix.  The address mode and render state 4 are restored afterwards; format 0x613 textures
@@ -114,7 +104,7 @@ public:
 int TerrainShadow::Render3D()
 {
     if (vertexCount) {
-        ((TerrainShadowTextureView*)shadow->texture)->Bind();
+        shadow->texture->Bind();
         int address;
         ((TerrainShadowRenderTarget*)renderContext)->GetTextureStageState(0, 0xc, &address);
         if (address != 3)

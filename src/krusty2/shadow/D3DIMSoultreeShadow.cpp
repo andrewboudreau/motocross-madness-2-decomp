@@ -7,6 +7,7 @@
 #include "math/Vec3.h"
 #include "../../reconstructed/Matrix4.h"
 #include "core/SoultreeObject.h"
+#include "../../reconstructed/PCTextureMap.h"
 
 // Per-TU vector constants (tier 2): 0x004477d0..0x004478d0 are the four VC6 dynamic initializers
 // that many retail TUs have, as in ProjectedShadow.cpp: jmp thunks $E2/$E5/$E8/$E11 into bodies
@@ -152,7 +153,7 @@ int D3DIMSoultreeShadow::UpdateTexelSize()
         numerator = 0.5f;
     else
         numerator = 1.0f;
-    g_d3dimShadowTexel = numerator / projected->texture->size;
+    g_d3dimShadowTexel = numerator / projected->texture->textureWidth;
     return 0;
 }
 
@@ -186,17 +187,6 @@ public:
     virtual void Slot24(); virtual void Slot25(); virtual void Slot26(); virtual void Slot27();
     virtual void Slot28(); virtual void Slot29();
     virtual void SetWorldMatrix(const ShadowMatrix* m);           // slot 30 (0x78)
-};
-// The shadow texture's slot 19 (0x4c): binds it to texture stage 0 (PCTextureMap slot 19 in
-// src/reconstructed/PCTextureMap.h).  Local view, tier 3.
-class D3DIMShadowTextureView {
-public:
-    virtual void Slot0(); virtual void Slot1(); virtual void Slot2(); virtual void Slot3();
-    virtual void Slot4(); virtual void Slot5(); virtual void Slot6(); virtual void Slot7();
-    virtual void Slot8(); virtual void Slot9(); virtual void Slot10(); virtual void Slot11();
-    virtual void Slot12(); virtual void Slot13(); virtual void Slot14(); virtual void Slot15();
-    virtual void Slot16(); virtual void Slot17(); virtual void Slot18();
-    virtual void Bind();                                          // slot 19
 };
 
 class D3DIMShadowRenderTarget {
@@ -234,7 +224,7 @@ int D3DIMSoultreeShadow::Render3D()
         world.m[1][1] = 1.0f;
         world.m[0][0] = 1.0f;
         ((D3DIMShadowRenderTarget*)renderContext)->camera->SetWorldMatrix(&world);
-        ((D3DIMShadowTextureView*)shadow->texture)->Bind();
+        shadow->texture->Bind();
         int address;
         ((D3DIMShadowRenderTarget*)renderContext)->GetTextureStageState(0, 0xc, &address);
         if (address != 3)
