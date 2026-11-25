@@ -135,9 +135,8 @@ inline Vec3 UnitVector(const Vec3& v)
 }
 
 // 0x0042de90 (BoundingBoxTreeBuild.cpp): rotation of 'angle' radians about (x, y, z), row-vector
-// convention, no translation. Its provider uses the identical 64-byte tree matrix.
-struct TreeMatrix4;
-void AxisAngleMatrix(TreeMatrix4* m, float x, float y, float z, float angle);
+// convention, no translation.
+void AxisAngleMatrix(Matrix4* m, float x, float y, float z, float angle);
 
 // owner: bracket only
 // 0x004a7dc0 (cdecl, called twice by slot 7 when the angle is nonzero): *dst = *src rotated by
@@ -193,7 +192,7 @@ void RotatePose(CharacterPose* src, CharacterPose* dst, Vec3 axis, float angle)
     position.y = pose._42;
     position.z = pose._43;
     pose._44 = 1.0f;
-    AxisAngleMatrix(reinterpret_cast<TreeMatrix4*>(&rotation), axis.x, axis.y, axis.z, angle);
+    AxisAngleMatrix(&rotation, axis.x, axis.y, axis.z, angle);
     MatrixMultiply(&pose, pose, rotation);
     dst->axisZ.x = pose._31;
     dst->axisZ.y = pose._32;

@@ -35,9 +35,8 @@ exposed precision differences in the earlier candidate:
   integer above `2^24`; the earlier float conversion changed the rotation.
   The blend rotation also preserves its different `(angle * time) * fps` order.
 
-`AxisAngleMatrix` now names the existing provider's `TreeMatrix4` signature.
-The local matrix and provider both use sixteen consecutive floats; a narrow
-pointer cast connects them without importing conflicting complete headers.
+`AxisAngleMatrix` takes the shared `Matrix4`, so the call passes the local
+rotation matrix directly.
 The three explicit vector call views also occur in canonical motion,
 Soultree, Vehicle and BVH source. Their complete strict implementations now
 live in `src/reconstructed/VectorCalls.cpp`; both native playback and pose

@@ -15,7 +15,7 @@
   "??_C@_09ECBO@TRANSFORM?$AA@": "0x0056e0a8",
   "??_C@_0BD@GALG@Unable?5to?5open?5?$CFs?6?$AA@": "0x0056e090",
   "?AdvanceClamped@@YAHPAUMotion@@PAPAUMotionPoseList@@11PAM2@Z": "0x004a5750",
-  "?AxisAngleMatrix@@YAXPAUTreeMatrix4@@MMMM@Z": "0x0042de90",
+  "?AxisAngleMatrix@@YAXPAUMatrix4@@MMMM@Z": "0x0042de90",
   "?BlendToMotion@Character@@QAEXPAUMotion@@@Z": "0x004a8b60",
   "?ClampFloat@@YAXMMPAM@Z": "0x004a8440",
   "?CrossProduct@@YA?AUVec3@@ABU1@0@Z": "0x00515600",

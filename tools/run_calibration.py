@@ -18096,7 +18096,7 @@ CASES = [
         'name': 'BoundingBoxTreeBuild.cpp AxisAngleMatrix',
         'bindings': 'src/reconstructed/BoundingBoxTreeBuild.bindings.json',
         'source': 'src/reconstructed/BoundingBoxTreeBuild.cpp',
-        'symbol': '?AxisAngleMatrix@@YAXPAUTreeMatrix4@@MMMM@Z',
+        'symbol': '?AxisAngleMatrix@@YAXPAUMatrix4@@MMMM@Z',
         'target_va': '0x0042de90',
         'target_size': 270,
         'reason': 'between BoundingBoxTreeBuild.cpp __FILE__ functions',

@@ -6,7 +6,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include "motion/Motnctrl.h"
-struct TreeMatrix4;
 
 extern "C" double __cdecl _CIacos();
 extern "C" long __cdecl _ftol();
@@ -56,8 +55,8 @@ void Character::BlendToMotion(Motion* m) {
 void MatrixMultiply(Matrix4* out,Matrix4 a,Matrix4 b) {
     ((void(__cdecl*)(Matrix4*,Matrix4,Matrix4))0x42a1a0)(out,a,b);
 }
-void AxisAngleMatrix(TreeMatrix4* out,float x,float y,float z,float a) {
-    ((void(__cdecl*)(TreeMatrix4*,float,float,float,float))0x42de90)(out,x,y,z,a);
+void AxisAngleMatrix(Matrix4* out,float x,float y,float z,float a) {
+    ((void(__cdecl*)(Matrix4*,float,float,float,float))0x42de90)(out,x,y,z,a);
 }
 Vec3 CrossProductCall(const Vec3& a,const Vec3& b) {
     return ((Vec3(__cdecl*)(const Vec3&,const Vec3&))0x515600)(a,b);

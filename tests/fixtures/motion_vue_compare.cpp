@@ -15,9 +15,8 @@ ResourceManager* g_ResourceManager = (ResourceManager*)0x12345000;
 // VC6 requires the other functions in the full sample object to resolve too.
 // Those functions are outside this test. Any accidental traversal fails, rather
 // than substituting an arithmetic or animation result and concealing coverage.
-struct TreeMatrix4;
 void MatrixMultiply(Matrix4*,Matrix4,Matrix4) { ExitProcess(111); }
-void AxisAngleMatrix(TreeMatrix4*,float,float,float,float) { ExitProcess(112); }
+void AxisAngleMatrix(Matrix4*,float,float,float,float) { ExitProcess(112); }
 Vec3 CrossProductCall(const Vec3&,const Vec3&) { ExitProcess(113);return Vec3(); }
 Vec3 Vec3Normalize(const Vec3&) { ExitProcess(114);return Vec3(); }
 float FastInvSqrt(float) { ExitProcess(115);return 0; }

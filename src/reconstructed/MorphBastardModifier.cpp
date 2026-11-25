@@ -25,8 +25,8 @@ static const Vector3 kVec3ZAxis = Vector3(0.0f, 0.0f, 1.0f);
 // (Their first uses, in the x axis block, are expanded inline in retail;
 // ControllerAngles writes that block out the same way.)  The defined providers are
 // VectorCalls.cpp's Vec3DotCall, CrossProduct.cpp's CrossProductCall,
-// MovingPart.cpp's GetMatrixRow, BoundingBoxTreeBuild.cpp's AxisAngleMatrix (a
-// TreeMatrix4, the same 64 bytes) and CollisionObject.cpp's CollisionMatrixMultiply;
+// MovingPart.cpp's GetMatrixRow, BoundingBoxTreeBuild.cpp's AxisAngleMatrix and
+// CollisionObject.cpp's CollisionMatrixMultiply;
 // config/game_build.json's link_aliases bind the names whose types differ (same cdecl
 // ABI: a reference and a pointer are both one address, and the Vector3/Vec3 views are
 // both three floats returned through a hidden pointer).

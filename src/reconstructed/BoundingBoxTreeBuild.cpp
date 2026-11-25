@@ -982,7 +982,7 @@ void BuildModelBoxTree(BoxTreeNode* root, const TreeMatrix4* m, TreeVec3* boxes,
 // 0x0042de90.  Rotation of `angle` radians about the axis (x, y, z) (normalised here), in the
 // row-vector convention, with no translation.  Only the rotation block, the zero column/row
 // and _44 are written.
-void AxisAngleMatrix(TreeMatrix4* m, float x, float y, float z, float angle)
+void AxisAngleMatrix(Matrix4* m, float x, float y, float z, float angle)
 {
     float length;
     float c;
