@@ -11,6 +11,9 @@
 #include "../../../src/reconstructed/PCTextureMap.h"
 #include "../../../src/reconstructed/AgeManager.h"
 #include "../../../src/reconstructed/ClipRectangle.h"
+#include "../../../src/reconstructed/PCRenderTarget.h"
+#include "../../../src/reconstructed/Camera.h"
+#include "../../../src/krusty2/visibility/VisibilityClipper.h"   // g_visibilityClipper 0x00575a98
 #include "../../common/FistpFloatToInt.h"
 #include <math.h>
 
@@ -304,8 +307,7 @@ struct TerrainShadowVec {
 // Views of the objects slot 27 reaches (tier 2 from the call sites; the canonical
 // declarations are src/krusty2/visibility/VisibilityQuadTree.h and broadphase/Terrain.h):
 // the light camera's eye, look and up vectors behind ProjectedShadow::camera, the terrain's
-// segment cast with the hit cell as its fourth argument, and the visibility clipper's
-// vertex projection.
+// segment cast with the hit cell as its fourth argument.
 struct TerrainShadowCamera {
     char pad_0x00[0x170];
     TerrainShadowVec eye;          // +0x170
@@ -314,24 +316,11 @@ struct TerrainShadowCamera {
     float pad_0x194;
     float focalLength;             // +0x198 Camera::focalLength; the look distance in mode 1
 };
-struct TerrainShadowViewer {       // GameObject::renderContext of the receiver
-    char pad_0x00[8];
-    void* camera;                  // +0x08 the visibility camera (matrix at +0xec)
-    int width;                     // +0x0c
-    int height;                    // +0x10
-};
 class TerrainShadowCaster {
 public:
     int CastSegment(const TerrainShadowVec* from, const TerrainShadowVec* to, TerrainShadowVec* hit,
                               TerrainCell** cell, int a, int b);              // 0x00506e90 (ret 0x18)
 };
-class TerrainShadowClipper {
-public:
-    // 0x0052f190: VisibilityClipper::ProjectVertices (src/krusty2/visibility).
-    void ProjectVertices(const void* camera, const void* matrix, int count,
-                         const TerrainShadowVec* vertices, TerrainShadowVec* screen, int* codes);
-};
-extern TerrainShadowClipper* g_terrainShadowClipper;                               // 0x00575a98
 
 // Out-of-line call views (docs/VC6_INLINE_BUDGET.md): the far corners of mode 2 are built
 // with the COMDAT constructor, difference and sum.  The sum and difference return by value:
@@ -388,21 +377,21 @@ static inline TerrainShadowVec TerrainShadowAddCtorCall(const TerrainShadowVec& 
     maxX = TERRAIN_SHADOW_MAX(maxX, (cell)->gridX);                                                   \
     minZ = TERRAIN_SHADOW_MIN(minZ, (cell)->gridZ);                                                   \
     maxZ = TERRAIN_SHADOW_MAX(maxZ, (cell)->gridZ);                                                   \
-    g_terrainShadowClipper->ProjectVertices(TERRAIN_SHADOW_VIEWER()->camera,                   \
-                                                  (char*)TERRAIN_SHADOW_VIEWER()->camera + 0xec, 1,  \
-                                                  &(hit), &screen, &code);                           \
+    g_visibilityClipper->ProjectVertices((VisibilityCamera*)TERRAIN_SHADOW_VIEWER()->currentCamera,      \
+        (VisibilityMatrix*)&TERRAIN_SHADOW_VIEWER()->currentCamera->screenMatrix[0], 1,                    \
+        (VisibilityVertex*)&(hit), (VisibilityBoxVec*)&screen, &code);                                     \
     screenMinX = TERRAIN_SHADOW_MIN(screenMinX, screen.x);                                           \
     screenMaxX = TERRAIN_SHADOW_MAX(screenMaxX, screen.x);                                           \
     screenMinY = TERRAIN_SHADOW_MIN(screenMinY, screen.y);                                           \
     screenMaxY = TERRAIN_SHADOW_MAX(screenMaxY, screen.y)
-#define TERRAIN_SHADOW_VIEWER() ((TerrainShadowViewer*)renderContext)
+#define TERRAIN_SHADOW_VIEWER() ((PCRenderTarget*)renderContext)
 
 // The footprint is usable when its screen rectangle overlaps the viewport and is at least
 // 10 x 5 pixels.  Each mode repeats the test (the inline budget needs both copies); both fall
 // through to one shared exit that drops the cell list and the vertices.
 #define TERRAIN_SHADOW_RETURN_IF_VISIBLE()                                                                      \
-    if ((float)TERRAIN_SHADOW_VIEWER()->width > screenMinX && screenMaxX > 0.0f                       \
-        && (float)TERRAIN_SHADOW_VIEWER()->height > screenMinY && screenMaxY > 0.0f                   \
+    if ((float)TERRAIN_SHADOW_VIEWER()->targetWidth > screenMinX && screenMaxX > 0.0f                       \
+        && (float)TERRAIN_SHADOW_VIEWER()->targetHeight > screenMinY && screenMaxY > 0.0f                   \
         && screenMaxX - screenMinX > 10.0f && screenMaxY - screenMinY > 5.0f)                        \
         return 1
 

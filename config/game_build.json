@@ -4,7 +4,6 @@
     "src"
   ],
   "link_aliases": {
-    "?g_terrainShadowClipper@@3PAVTerrainShadowClipper@@A": "?g_visibilityClipper@@3PAVVisibilityClipper@@A",
     "?g_CollisionScratchPoints@@3PAUCollisionVec3@@A": "?g_CollisionScratchPoints@@3PAUVec3@@A",
     "??0Vector3Call@@QAE@MMM@Z": "??0Vec3Call@@QAE@MMM@Z",
     "?BikeRaceAddCall@@YA?AUVector3@@ABU1@0@Z": "?Vec3AddCall@@YAPAUVec3@@PAU1@PBU1@1@Z",

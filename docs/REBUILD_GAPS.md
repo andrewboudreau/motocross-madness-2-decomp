@@ -868,9 +868,8 @@ Vtables, RTTI and EH tables are skipped. Binding evidence: 3,035 bindings,
 - Fixed: `g_terrainShadowClipper` (0x00575a98). Retail has one pointer, the
   same one `g_visibilityClipper` names, initialised to 0x0068acd4. The bring-up
   copy in `Group6_TerrainShadow.cpp` was a second global with a dynamic
-  initializer (zero in the load image). A `link_aliases` weak external now
-  binds the sample's name to `g_visibilityClipper`'s statically initialised
-  cell.
+  initializer (zero in the load image). The sample now calls
+  `g_visibilityClipper` itself, so neither the copy nor an alias remains.
 - Size checks: `s_g3TrickFrame` (128 B, which reaches into `s_kbTimeTo60Armed`)
   is the documented chained-trick overread. No bound table
   is shorter than retail's extent, apart from `kbSecondsPerMillisecond`, whose

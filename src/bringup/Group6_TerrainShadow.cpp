@@ -10,12 +10,9 @@
 //   0x00421cb0 TerrainShadowSum           -> Vec3AddCall
 //   0x00421d00 TerrainShadowDifference    -> Vec3SubtractCall
 //   0x00404e60 TerrainShadowVecCall ctor  -> written out (Vec3::Vec3 is inline everywhere)
-//   0x0052f190 TerrainShadowClipper::ProjectVertices -> VisibilityClipper::ProjectVertices
 //   0x00506e90 TerrainShadowCaster::CastSegment      -> Terrain::CastSegment
-//   0x00575a98 g_terrainShadowClipper     -> the same object as g_visibilityClipper
 #include "broadphase/Terrain.h"
 #include "shadow/ProjectedShadow.h"
-#include "visibility/VisibilityClipper.h"
 
 // The sample's local views, redeclared with its class keys so the mangled names agree.
 struct TerrainShadowVec {
@@ -30,11 +27,6 @@ class TerrainShadowCaster {
 public:
     int CastSegment(const TerrainShadowVec* from, const TerrainShadowVec* to, TerrainShadowVec* hit,
                     TerrainCell** cell, int a, int b);                             // 0x00506e90
-};
-class TerrainShadowClipper {
-public:
-    void ProjectVertices(const void* camera, const void* matrix, int count,
-                         const TerrainShadowVec* vertices, TerrainShadowVec* screen, int* codes);
 };
 ShadowMatrix* TerrainMatrixIdentityInto(ShadowMatrix* out);                         // 0x004a1410
 ShadowMatrix* TerrainMatrixMultiplyInto(ShadowMatrix* out, ShadowMatrix a, ShadowMatrix b);  // 0x004a1860
@@ -122,26 +114,6 @@ TerrainShadowVecCall::TerrainShadowVecCall(float x_, float y_, float z_)
 }
 
 // ---------------------------------------------------------------------------------------------
-// 0x0052f190 (thiscall): VisibilityClipper::ProjectVertices.  The sample passes the viewer's
-// camera and camera + 0xec (the same arguments VisibilityQuadTree.cpp passes) and count 1, so
-// the 0x20-byte VisibilityVertex stride never applies to the 12-byte TerrainShadowVec.
-// best guess: forwarding unchanged to the canonical method at the same VA.
-void TerrainShadowClipper::ProjectVertices(const void* camera, const void* matrix, int count,
-                                           const TerrainShadowVec* vertices,
-                                           TerrainShadowVec* screen, int* codes)
-{
-    reinterpret_cast<VisibilityClipper*>(this)->ProjectVertices(
-        reinterpret_cast<const VisibilityCamera*>(camera),
-        reinterpret_cast<const VisibilityMatrix*>(matrix), count,
-        reinterpret_cast<const VisibilityVertex*>(vertices),
-        reinterpret_cast<VisibilityBoxVec*>(screen), codes);
-}
-
-// 0x00575a98: g_terrainShadowClipper is the pointer VisibilityClipperGlobal.h names
-// g_visibilityClipper (storage: src/bringup/Group1_Globals.cpp, statically initialised to the
-// object at 0x0068acd4).  A `link_aliases` weak external in config/game_build.json binds the
-// sample's spelling to that one cell, as retail has one pointer there.
-
 // ---------------------------------------------------------------------------------------------
 // 0x00506e90 (thiscall, ret 0x18): Terrain::CastSegment.  The sample's caster is the
 // TerrainShadow's Terrain; its fourth argument (the hit cell out-pointer) is Terrain's first
