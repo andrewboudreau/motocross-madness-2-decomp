@@ -7,6 +7,7 @@
 #include "math/Vec3.h"
 #include "../../reconstructed/Matrix4.h"
 #include "core/SoultreeObject.h"
+#include "../../reconstructed/D3DIMSoulTree.h"
 #include "../../reconstructed/PCRenderTarget.h"
 #include "../../reconstructed/Camera.h"
 #include "../../reconstructed/ShadowCamera.h"
@@ -74,15 +75,6 @@ struct D3DIMShadowMatrix4 {
     };
 };
 
-// The caster as slot 27 uses it (a D3DIMSoultreeObject; BoundingBoxTreeBuild.h
-// TreeModelSource).  Local view, tier 3.
-class D3DIMShadowCasterView {
-public:
-    void GetMatrixIn(void* frame, D3DIMShadowMatrix4* out);           // 0x004fca80
-    void GetBounds(ShadowVec3* center, ShadowVec3* halfExtents);      // 0x004fe850
-    char pad_0x00[0x14c];
-    int hidden;                     // +0x14c (D3DIMSoulTree.h): nonzero skips the visibility test
-};
 #include "../visibility/VisibilityClipper.h"   // g_visibilityClipper 0x00575a98
 
 static inline void D3DIMShadowMatrixProduct(D3DIMShadowMatrix4* out, const D3DIMShadowMatrix4& a,
@@ -116,15 +108,15 @@ static inline void D3DIMShadowMatrixProduct(D3DIMShadowMatrix4* out, const D3DIM
 // samples/physics/shadow/D3DIMSoultreeShadowNearMisses.cpp.
 int D3DIMSoultreeShadow::IsShadowVisible()
 {
-    D3DIMShadowCasterView* casterView = (D3DIMShadowCasterView*)caster;
+    D3DIMSoultreeObject* model = caster;
     inCameraView = 0;
     inShadowView = 0;
-    if (!casterView->hidden) {
+    if (!model->hidden) {
         D3DIMShadowMatrix4 local;
         ShadowVec3 center, extent;
         D3DIMShadowMatrix4 m;
-        reinterpret_cast<SoultreeObject*>(casterView)->GetMatrixIn(0, reinterpret_cast<Matrix4*>(&local));
-        reinterpret_cast<SoultreeObject*>(caster)->GetSubtreeBounds(reinterpret_cast<Vec3*>(&center), reinterpret_cast<Vec3*>(&extent));
+        model->GetMatrixIn(0, (Matrix4*)&local);
+        caster->GetSubtreeBounds((Vec3*)&center, (Vec3*)&extent);
         const D3DIMShadowMatrix4& view = *(const D3DIMShadowMatrix4*)&shadow->camera->screenMatrix[0];
         D3DIMShadowMatrixProduct(&m, local, view);
         if (g_visibilityClipper->TestBox((VisibilityCamera*)shadow->camera, &m._11, &center.x,

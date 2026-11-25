@@ -53,6 +53,7 @@
 #include "math/Vec3.h"
 #include "../../../src/reconstructed/Matrix4.h"
 #include "core/SoultreeObject.h"
+#include "../../../src/reconstructed/D3DIMSoulTree.h"
 #include "../../../src/reconstructed/PCRenderTarget.h"
 #include "../../../src/reconstructed/Camera.h"
 #include "../../../src/reconstructed/PCTextureMap.h"
@@ -74,39 +75,6 @@ struct D3DIMShadowMatrix4 {
     };
 };
 
-// Triangle mesh of a render-model LOD, 0x38 bytes (BoundingBoxTreeBuild.h TreeModelMesh).
-struct D3DIMShadowMesh {
-    int partCount;                  // +0x00
-    void* parts;                    // +0x04
-    int vertexCount;                // +0x08
-    int triangleCount;              // +0x0c
-    float* vertices;                // +0x10 0x20-byte vertices, position first
-    void* drawnVertices;
-    int normals;
-    unsigned short* triangles;      // +0x1c three indices per triangle
-    char pad_0x20[0x38 - 0x20];
-};
-struct D3DIMShadowLod {
-    int meshCount;                  // +0x00
-    D3DIMShadowMesh* meshes;        // +0x04
-};
-
-// The caster as slots 27, 29 and 30 use it (a D3DIMSoultreeObject; BoundingBoxTreeBuild.h
-// TreeModelSource).  Local view, tier 3.
-class D3DIMShadowCasterView {
-public:
-    void GetMatrixIn(void* frame, D3DIMShadowMatrix4* out);           // 0x004fca80
-    void GetBounds(ShadowVec3* center, ShadowVec3* halfExtents);      // 0x004fe850
-    void TransformVertexGroups(int lod);                              // 0x00440d40 (D3DIMSoulTree.h)
-    char pad_0x00[0x14c];
-    int hidden;                     // +0x14c (D3DIMSoulTree.h): nonzero skips the visibility test
-    char pad_0x150[0x18c - 0x150];
-    int subtreeDirty;               // +0x18c nonzero: slot 30 calls TransformVertexGroups(-1) first
-    char pad_0x190[0x27c - 0x190];
-    int currentLod;                 // +0x27c
-    char pad_0x280[0x28c - 0x280];
-    D3DIMShadowLod* lods;           // +0x28c
-};
 #include "../../../src/krusty2/visibility/VisibilityClipper.h"   // g_visibilityClipper 0x00575a98
 
 static inline void D3DIMShadowMatrixProduct(D3DIMShadowMatrix4* out, const D3DIMShadowMatrix4& a,
@@ -142,14 +110,14 @@ static inline void D3DIMShadowMatrixProduct(D3DIMShadowMatrix4* out, const D3DIM
 // decides inCameraView (the flag slot 14 draws with); returns inCameraView.
 int D3DIMSoultreeShadow::NeedsShadowRender()
 {
-    D3DIMShadowCasterView* casterView = (D3DIMShadowCasterView*)caster;
+    D3DIMSoultreeObject* model = caster;
     inCameraView = 0;
-    if (!casterView->hidden && inShadowView) {
+    if (!model->hidden && inShadowView) {
         D3DIMShadowMatrix4 local;
         ShadowVec3 center, extent;
         D3DIMShadowMatrix4 localToView;
-        reinterpret_cast<SoultreeObject*>(casterView)->GetMatrixIn(0, reinterpret_cast<Matrix4*>(&local));
-        reinterpret_cast<SoultreeObject*>(caster)->GetSubtreeBounds(reinterpret_cast<Vec3*>(&center), reinterpret_cast<Vec3*>(&extent));
+        model->GetMatrixIn(0, (Matrix4*)&local);
+        caster->GetSubtreeBounds((Vec3*)&center, (Vec3*)&extent);
         PCRenderTarget* host = (PCRenderTarget*)renderContext;
         Camera* camera = host->currentCamera;
         const D3DIMShadowMatrix4& view = *(const D3DIMShadowMatrix4*)&camera->screenMatrix[0];
@@ -204,11 +172,11 @@ void D3DIMSoultreeShadow::BuildShadowVertices()
     else
         color = ((0xff - (shadow->shadowColor & 0xff)) << 24) | 0xffffff;
     vertexCount = 0;
-    D3DIMShadowCasterView* casterView = (D3DIMShadowCasterView*)caster;
-    if (casterView->subtreeDirty)
-        casterView->TransformVertexGroups(-1);
-    for (int i = 0; i < ((D3DIMShadowCasterView*)caster)->lods[((D3DIMShadowCasterView*)caster)->currentLod].meshCount; i++) {
-        D3DIMShadowMesh* mesh = &((D3DIMShadowCasterView*)caster)->lods[((D3DIMShadowCasterView*)caster)->currentLod].meshes[i];
+    D3DIMSoultreeObject* model = caster;
+    if (model->subtreeDirty)
+        model->TransformVertexGroups(-1);
+    for (int i = 0; i < caster->lodTable[caster->currentLod].surfaceCount; i++) {
+        SoultreeSurface* mesh = &caster->lodTable[caster->currentLod].surfaces[i];
         if (mesh->vertexCount > s_shadowPointCapacity) {
             if (s_shadowPoints) {
                 DebugFree(s_shadowPoints, __FILE__, 0xaa);
@@ -249,9 +217,9 @@ void D3DIMSoultreeShadow::BuildShadowVertices()
             code++;
         }
 
-        for (int t = 0; t < mesh->triangleCount; t++) {
+        for (int t = 0; t < mesh->faceCount; t++) {
             short corner[3];
-            const unsigned short* index = mesh->triangles + t * 3;
+            const unsigned short* index = mesh->indices + t * 3;
             corner[0] = index[0];
             corner[1] = index[1];
             corner[2] = index[2];
@@ -287,10 +255,10 @@ void D3DIMSoultreeShadow::BuildShadowVertices()
             } else if (inCameraView) {
                 for (int k = 0; k < 3; k++) {
                     int idx = (unsigned short)corner[k];
-                    const float* src = mesh->vertices + idx * 8;
-                    g_d3dimShadowVertexArray[vertexCount].x = src[0];
-                    g_d3dimShadowVertexArray[vertexCount].y = src[1];
-                    g_d3dimShadowVertexArray[vertexCount].z = src[2];
+                    const SoultreeVertex* src = mesh->vertices + idx;
+                    g_d3dimShadowVertexArray[vertexCount].x = src->position.x;
+                    g_d3dimShadowVertexArray[vertexCount].y = src->position.y;
+                    g_d3dimShadowVertexArray[vertexCount].z = src->position.z;
                     g_d3dimShadowVertexArray[vertexCount].diffuse = color;
                     g_d3dimShadowVertexArray[vertexCount].reserved = 0;
                     g_d3dimShadowVertexArray[vertexCount].specular = 0;

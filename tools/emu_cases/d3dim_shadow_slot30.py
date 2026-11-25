@@ -26,7 +26,7 @@ CAPACITY, POINTS = 0x0059ad28, 0x0059ad2c
 ORTHO = 0x004a1b00           # ShadowTransformPointsOrtho, cdecl, 6 args
 PROJECTIVE = 0x004a1a50      # ShadowTransformPointsProjective, cdecl, 6 args
 FILL = 0x00461e60            # ShadowFillTriangle(shift, buffer, value, points, flag), cdecl
-TRANSFORM_GROUPS = 0x00440d40   # D3DIMShadowCasterView::TransformVertexGroups(int), thiscall ret 4
+TRANSFORM_GROUPS = 0x00440d40   # D3DIMSoultreeObject::TransformVertexGroups(int), thiscall ret 4
 DEBUG_MALLOC = 0x004a2e20    # DebugMalloc(size, file, line), cdecl
 DEBUG_FREE = 0x004a2e60      # DebugFree(p, file, line), cdecl
 

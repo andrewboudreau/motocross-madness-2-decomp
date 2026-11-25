@@ -86,11 +86,9 @@ class ShadowGetterConnectionsTests(unittest.TestCase):
                 '#include "../reconstructed/Matrix4.h"\n#include "core/SoultreeObject.h"\n'
                 'struct ShadowVec3 { float x,y,z; };\n' +
                 function_text(caller_text, 'struct D3DIMShadowMatrix4 {') + ';\n' +
-                function_text(caller_text, 'class D3DIMShadowCasterView {') + ';\n' +
                 'typedef char MatrixSize[(sizeof(D3DIMShadowMatrix4)==sizeof(Matrix4) && sizeof(Matrix4)==64)?1:-1];\n'
                 'typedef char Translation[(offsetof(D3DIMShadowMatrix4,_41)==offsetof(Matrix4,_41) && offsetof(Matrix4,_41)==48)?1:-1];\n'
-                'typedef char LastComponent[(offsetof(D3DIMShadowMatrix4,_44)==offsetof(Matrix4,_44) && offsetof(Matrix4,_44)==60)?1:-1];\n'
-                'typedef char SkipField[(offsetof(D3DIMShadowCasterView,hidden)==offsetof(SoultreeObject,hidden))?1:-1];\n')
+                'typedef char LastComponent[(offsetof(D3DIMShadowMatrix4,_44)==offsetof(Matrix4,_44) && offsetof(Matrix4,_44)==60)?1:-1];\n')
             fixture = 'tests/fixtures/shadow_getter_routes.cpp'
             sources = (SHADOW, SAMPLE, TREE, COLLISION)
             paths, objects = {}, {}
