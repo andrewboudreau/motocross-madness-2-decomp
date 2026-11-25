@@ -37,6 +37,11 @@ struct ShadowVec3 {
     float x, y, z;
 };
 
+// The render target the shadow renders into (GameObject::renderContext, set in Init; RTTI
+// PCRenderTarget, src/reconstructed/PCRenderTarget.h) and the texture manager Init builds with.
+class PCRenderTarget;
+class TextureMapManager;
+
 // The shadow texture at ProjectedShadow+0x54: Init allocates 0x80 bytes and runs PCTextureMap's
 // constructor 0x004c5f00(owner, 1) (src/reconstructed/PCTextureMap.h).
 class PCTextureMap;
@@ -72,69 +77,6 @@ public:
     virtual void Slot20();
     virtual void Slot21();
     virtual int QueryFlag(const char* name, int defaultValue);   // slot 22 (0x58), ret 8 (tier 3)
-};
-
-// Direct3D-style device at the render target's +0x50.  PROVISIONAL: only slot 13 (0x34).
-class ShadowDevice {
-public:
-    virtual long __stdcall Slot0();
-    virtual long __stdcall Slot1();
-    virtual long __stdcall Slot2();
-    virtual long __stdcall Slot3();
-    virtual long __stdcall Slot4();
-    virtual long __stdcall Slot5();
-    virtual long __stdcall Slot6();
-    virtual long __stdcall Slot7();
-    virtual long __stdcall Slot8();
-    virtual long __stdcall Slot9();
-    virtual long __stdcall Slot10();
-    virtual long __stdcall Slot11();
-    virtual long __stdcall Slot12();
-    virtual long __stdcall SetTransformLike(void* arg);   // slot 13 (0x34) (tier 3)
-};
-
-struct ShadowDisplay {
-    char pad_0x00[0x4bc];
-    char driverName[1];           // +0x4bc used in the DriverInfo\%s\DestColorShadow key
-};
-
-struct ShadowOwner {
-    char pad_0x00[0x1a0];
-    char block_0x1a0[1];          // +0x1a0 address handed to the device slot 13
-};
-
-// The render target ProjectedShadow renders into (GameObject::renderContext, set by slot 8 in Init;
-// RTTI says PCRenderTarget, see src/reconstructed/PCRenderTarget.h).  PROVISIONAL stand-in.
-class ShadowRenderTarget {
-public:
-    virtual void Slot0();
-    virtual void Slot1();
-    virtual void Slot2();
-    virtual void Slot3();
-    virtual void Slot4();
-    virtual void Slot5();
-    virtual void Slot6();
-    virtual void Slot7();
-    virtual void Slot8();
-    virtual void Slot9();
-    virtual void Slot10();
-    virtual void Slot11();
-    virtual void Slot12();
-    virtual int IsFormatSupported(int format);   // slot 13 (0x34), ret 4 (tier 3)
-    void SetOwner(ShadowOwner* owner);           // 0x004e8cf0
-    ShadowDisplay* display;       // +0x04
-    ShadowOwner* owner;           // +0x08
-    int width;                    // +0x0c texture size is written here during Init
-    int height;                   // +0x10
-    char pad_0x14[0x48 - 0x14];
-    void* surface;                // +0x48
-    char pad_0x4c[4];
-    ShadowDevice* device;         // +0x50
-    char pad_0x54[0x1b0 - 0x54];
-    unsigned int capsA;           // +0x1b0 capability bits tested in Init (0x1, 0x10, 0x100, 0x800)
-    unsigned int capsB;           // +0x1b4 (0x1, 0x10, 0x20)
-    char pad_0x1b8[4];
-    unsigned int capsC;           // +0x1bc (0x2000)
 };
 
 // Caster entry (pointers stored at ProjectedShadow+0x2c).  PROVISIONAL.
@@ -194,8 +136,8 @@ public:
     virtual int RenderPre3D();                      // 0x004dc410
     virtual int OnControlPress(ControlEvent* event, InputButtonState* entry);  // 0x004dc4c0: returns 0
 
-    ProjectedShadow* Init(ShadowRenderTarget* target, void* textureOwner);  // 0x004da7b0
-    ShadowRenderTarget* Host() const { return (ShadowRenderTarget*)renderContext; }  // GameObject::renderContext set by Init
+    ProjectedShadow* Init(PCRenderTarget* target, TextureMapManager* textures);  // 0x004da7b0
+    PCRenderTarget* Host() const { return (PCRenderTarget*)renderContext; }  // GameObject::renderContext set by Init
     void AddCaster(ShadowCaster* caster);           // 0x004dab00
     void ClearCasters();                            // 0x004dab90
     void AddReceiver(ShadowReceiver* receiver);       // 0x004daba0
@@ -218,7 +160,7 @@ public:
     int field_0x50;               // +0x50 ctor 0
     PCTextureMap* texture;        // +0x54 created in Init, released by dtor
     ShadowCamera* camera;         // +0x58 created in Init, released by dtor
-    int renderTarget;             // +0x5c Init stores its first argument (the render target)
+    PCRenderTarget* renderTarget; // +0x5c Init stores its first argument (the render target)
     DirectDrawSurface* textureSurface; // +0x60 Init copies texture->textureSurface (+0x74)
     short* heightMap;             // +0x64 ctor 0
     ShadowRect clipRect;          // +0x68 left/top/right/bottom ints (ctor 0, Init 0,0,size-1,size-1)

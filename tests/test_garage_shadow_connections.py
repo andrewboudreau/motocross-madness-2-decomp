@@ -112,8 +112,7 @@ class GarageShadowConnectionsTests(unittest.TestCase):
             imports = {s.name for s in objects[SOURCES[0]].symbols if s.section_number == 0}
             for symbol, _, _, source in ROUTES:
                 self.assertIn(objects[source].find_symbol(symbol).name, imports)
-            self.assertEqual([s for s in imports if 'UnknownKrustyUIShadow' in s],
-                ['?Init@UnknownKrustyUIShadow@@QAEPAV1@PAXPAVTextureMapManager@@@Z'])
+            self.assertIn('?Init@ProjectedShadow@@QAEPAV1@PAVPCRenderTarget@@PAVTextureMapManager@@@Z', imports)
             # Test extraction has no substituted function statements. Only its
             # compiler-generated __FILE__ literal relocation has a new name.
             bindings = {}

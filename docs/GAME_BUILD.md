@@ -821,8 +821,6 @@ clearly more faithful, the game now links the sample's text:
   | 0x004fc050, 0x004fc740, 0x004fdab0, 0x004fb8c0 | `TreeSceneNode` axes, position, dirty mark, matrix | `SoultreeObject` (`SetAxesIn`, `SetPositionInFrame`, `MarkSubtreeDirty`, `SetMatrixIn`) |
   | 0x00505600 | `Grid1Terrain::AcquireOwnedObject` | `Terrain::AcquireOwnedObject` |
   | 0x00404e60, 0x0040ae30, 0x00421cb0, 0x005015b0 | Wrecker and shadow vector call views | `Vec3Call`, `Vec3DotCall`, `Vec3AddCall`, `Vec3ScaleCall` |
-  | 0x004da7b0 | `UnknownKrustyUIShadow::Init` | `ProjectedShadow::Init` |
-  | 0x004e8cf0 | `ShadowRenderTarget::SetOwner` | `RenderTarget::SetCamera` |
   | 0x004a1860 | `ShadowMatrixMultiplyInto` | `MatrixMult` |
 
   Each alias was checked against both `*.bindings.json` files. The view's
@@ -1000,8 +998,8 @@ Now `samples/physics/shadow/ProjectedShadowNearMisses.cpp` is a
 reviewed candidate source compiled with `/QIfist`. It includes the
 canonical `src/krusty2/shadow/ProjectedShadow.cpp` (an `included_sources`
 entry), and the bring-up file was deleted. The sample also provides
-`ProjectedShadow::Init` (0x004da7b0), which the `UnknownKrustyUIShadow::Init`
-view is aliased to.
+`ProjectedShadow::Init` (0x004da7b0), which KrustyUI's garage and
+QuarryStuntEvent call.
 
 `ProjectedShadowFloatToInt` copies its argument through `memcpy`. That makes
 VC6 store and reload it as binary32, as retail's helper does. It then casts to
@@ -1018,7 +1016,6 @@ address:
 |---|---|---|
 | 0x004a1860 | `ShadowMatrixMultiplyInto` | `MatrixMult` |
 | 0x00404e60 | `ShadowVec3Call` constructor | `Vec3Call` constructor |
-| 0x004e8cf0 | `ShadowRenderTarget::SetOwner` | `RenderTarget::SetCamera` |
 
 Linked-body scores (`tools/linked_accuracy.py`, masked):
 

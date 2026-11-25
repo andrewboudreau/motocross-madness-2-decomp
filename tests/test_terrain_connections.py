@@ -62,7 +62,7 @@ PARTIAL = (
     # the body bytes and the other 64 relocation records are identical.
     # Naming wave 32's view-pad splits renumber it again ($L6435 -> $L6468);
     # the body bytes and the other 64 relocation records are identical.
-    ('?Load@Terrain@@', 2117, 'a0b43e98c152098129fc11467f582a51d4cec7060da4d7b8535652ade158cbee'),
+    ('?Load@Terrain@@', 2117, '942e5bf78c4bc83fcc893d2fcb17219dec4c4acd2dc7589eb30c0e3e67646721'),
     # Intentional cell-conversion repair, verified at the actual first-cell
     # boundary in test_terrain_cell_conversion; full interpolation remains partial.
     # The sampler, dot and triangle provider names are now canonical, with

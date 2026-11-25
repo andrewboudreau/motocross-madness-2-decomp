@@ -112,7 +112,7 @@ class GarageSetterConnectionsTests(unittest.TestCase):
             self.assertIn(BODIES[2][1], imports)
             self.assertIn(BODIES[4][1], imports)
             self.assertFalse(any('KrustyUISoultreeObjectView@@' in name for name in imports))
-            self.assertIn('?Init@UnknownKrustyUIShadow@@QAEPAV1@PAXPAVTextureMapManager@@@Z', imports)
+            self.assertIn('?Init@ProjectedShadow@@QAEPAV1@PAVPCRenderTarget@@PAVTextureMapManager@@@Z', imports)
             cases = [(c['source'], c['symbol'], int(c['target_va'], 0), c['target_size'], ROOT / c['bindings'])
                      for c in CASES if c['source'] in sources]
             for base in ('src/krusty2', 'samples/physics'):

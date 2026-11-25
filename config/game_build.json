@@ -46,8 +46,6 @@
     "?SetPosition@VehicleImpactSink@@QAEXUVec3@@M@Z": "?SetPosition@DustParticleEmitter@@QAEXUParticleVec3@@M@Z",
     "?SetPosition@VehicleImpactSink@@QAEXUVec3@@@Z": "?SetPosition@SparkParticleEmitter@@QAEXUParticleVec3@@@Z",
     "?AddParticle@WreckerParticleManagerView@@QAEHMPBUVector3@@HMMMIH@Z": "?AddParticle@ParticleManager@@QAEHMPBUParticleVec3@@HMMMIH@Z",
-    "?Init@UnknownKrustyUIShadow@@QAEPAV1@PAXPAVTextureMapManager@@@Z": "?Init@ProjectedShadow@@QAEPAV1@PAVShadowRenderTarget@@PAX@Z",
-    "?SetOwner@ShadowRenderTarget@@QAEXPAUShadowOwner@@@Z": "?SetCamera@RenderTarget@@QAEXPAVCamera@@@Z",
     "?ShadowMatrixMultiplyInto@@YAPAUShadowMatrix@@PAU1@U1@1@Z": "?MatrixMult@@YA?AUMatrix4@@U1@0@Z",
     "??0ShadowVec3Call@@QAE@MMM@Z": "??0Vec3Call@@QAE@MMM@Z",
     "?CarCrossCall@@YA?AUVector3@@ABU1@0@Z": "?CrossProductCall@@YA?AUVec3@@ABU1@0@Z",

@@ -59,15 +59,6 @@ static inline void KrustyUIAddLight(LightManager* lights, LightEmitter* light) {
         lights->AddLight(light);
 }
 
-// Init remains a partial provider (0x004da7b0). Keep this view only for
-// that unconnected boundary and its GameObject primary base. Construction
-// and the verified shadow methods use the canonical classes below.
-class UnknownKrustyUIShadow : public GameObject {
-public:
-    UnknownKrustyUIShadow* Init(void* owner, TextureMapManager* textures);
-    unsigned char field_0x2c[0x134 - 0x2c];
-};
-
 // The garage scene's static vectors have an empty destructor: retail
 // registers six empty atexit handlers (0x00499920..0x00499970).
 struct UnknownKrustyUIVector : public Vector3 {
@@ -245,7 +236,7 @@ void KrustyUI::BuildGarageScene(int value) {
     static UnknownKrustyUIVector s488;
     static LightManager* lights;
     static LightEmitter* light;
-    static UnknownKrustyUIShadow* shadow;
+    static ProjectedShadow* shadow;
     static GameObject* shadowLink;
     static int pending;
     static int done;
@@ -323,10 +314,10 @@ void KrustyUI::BuildGarageScene(int value) {
         garageCharacter->modelNode->SetAxes(0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0, 1);
         garageCharacter->SetMotionByName("Spin");
         garageCharacter->AdvanceMotion(0.03f, 0, 0);
-        UnknownKrustyUIShadow* projected = reinterpret_cast<UnknownKrustyUIShadow*>(new(__FILE__, 0x182) ProjectedShadow(1));
-        shadow = projected->Init(renderContext, g_TrackGame->textureManager);
+        ProjectedShadow* projected = new(__FILE__, 0x182) ProjectedShadow(1);
+        shadow = projected->Init(KRUSTYUI_TARGET, g_TrackGame->textureManager);
         D3DIMSoultreeShadow* link = new(__FILE__, 0x186) D3DIMSoultreeShadow(1);
-        shadowLink = link->Attach(reinterpret_cast<int>(renderContext), reinterpret_cast<ShadowCaster*>(garageCharacter->modelNode), reinterpret_cast<ProjectedShadow*>(shadow));
+        shadowLink = link->Attach(reinterpret_cast<int>(renderContext), reinterpret_cast<ShadowCaster*>(garageCharacter->modelNode), shadow);
         garageScene->AppendChild(shadowLink, -1);
         if (shadow)
             garageScene->AppendChild(shadow, -1);
@@ -360,16 +351,16 @@ void KrustyUI::BuildGarageScene(int value) {
             painter.PaintNumber(reinterpret_cast<D3DIMSoultreeObject*>(bike->modelNode), g_TrackGame->mode.plateNumber);
         }
         if (shadow) {
-            reinterpret_cast<ProjectedShadow*>(shadow)->AddCaster(reinterpret_cast<ShadowCaster*>(manufacturers[0].uiModel->modelNode));
-            reinterpret_cast<ProjectedShadow*>(shadow)->AddCaster(reinterpret_cast<ShadowCaster*>(riderPreview->modelNode));
+            shadow->AddCaster(reinterpret_cast<ShadowCaster*>(manufacturers[0].uiModel->modelNode));
+            shadow->AddCaster(reinterpret_cast<ShadowCaster*>(riderPreview->modelNode));
             s468 = garageFocus;
             s468.y += 40.0f;
             s468.x += 15.0f;
             s478 = garageFocus - s468;
             // Retail passes the key light's vectors here, not the two just set.
-            reinterpret_cast<ProjectedShadow*>(shadow)->SetLight(reinterpret_cast<const ShadowVec3*>(&s488), reinterpret_cast<const ShadowVec3*>(&s408), 3);
-            reinterpret_cast<ProjectedShadow*>(shadow)->SetShadowStrength(0x20);
-            reinterpret_cast<ProjectedShadow*>(shadow)->SetShadowGrey(0x20);
+            shadow->SetLight(reinterpret_cast<const ShadowVec3*>(&s488), reinterpret_cast<const ShadowVec3*>(&s408), 3);
+            shadow->SetShadowStrength(0x20);
+            shadow->SetShadowGrey(0x20);
             pending = 0;
             done = 1;
         }

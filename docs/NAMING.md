@@ -607,12 +607,12 @@ Blocked merges:
   - The merge needs an access decision or a recovered inline setter chain
     (the store order looks like inlined VehicleCamera, BikeCamera and
     KrustyBikeCamera setters). It is not a name-only change.
-- KrustyUI.cpp's `UnknownKrustyUIShadow` to `ProjectedShadow`. The
-  function-local static `shadow` is mangled with its pointee type. Renaming
-  that type moves the static within `.bss` (0x2ec to 0x44; `.bss` shrinks
-  from 0x2f0 to 0x2ec), which changes `BuildGarageScene`'s relocation
-  addends. Neither layout follows retail's order (0x0067c3f8..0x0067c4a4).
-  The view and the `config/game_build.json` Init link alias therefore stay.
+- KrustyUI.cpp's `UnknownKrustyUIShadow` to `ProjectedShadow` (done
+  2026-11-25). The function-local static `shadow` is mangled with its
+  pointee type, so renaming that type moves the static within KrustyUI's
+  `.bss`. Neither layout follows retail's order (0x0067c3f8..0x0067c4a4),
+  and with relocations resolved through the bindings `BuildGarageScene`
+  stays exact. The view and its Init link alias are retired.
 - `UnknownQuarryRace` to `BikeRace` was not retried (Wave 8 blocker).
 
 ## Wave 10: placeholder types
@@ -3443,7 +3443,7 @@ tools/static_check.py passes.
 | TrackGameViewOwner | `field_0x38[0x3c - 0x38]` | `visualCue[0x3c - 0x38] (bytes kept)` | 2 | Exact-size view pad of BaseQuarryEvent +0x38 visualCue (VisualCue*); same view agreement as skyCube. |
 | QuerySweepRecord | `field_0x0c[0x0c]` | `contactNormal[0x0c] (bytes kept)` | 2 | The struct comment names it CollisionShapeTests.h's CollisionSweepQuery (same pointer as g_CollisionBoxResult); that struct has +0x0c contactNormal and agrees at +0x00 offset/contactOffset, +0x18 contact, +0x28 count/contactCount. |
 | KbTrackRec | `field_0x00` | `position` | 2 | bajaEnduroEvent[lapGate + 9] is gates[lapGate] at +0xd8 (24-byte records, KrustyBikeTypes.h:219 comment); the gate record is Krusty3DObjects.h CueCourseGate, whose +0x0 is Vector3 position. KbTrackRec has no methods. |
-| ProjectedShadow | `field_0x5c` | `renderTarget` | 2 | Write-only. Init 0x004da7b0 stores its ShadowRenderTarget* argument here right after SetRenderContext(target); the ctor clears it; no retail reader. Named like wave 27's Overlay pixelFormat (write-only copy of a named value). Not `target` (Init's parameter); no renderTarget identifier in the shadow units and ProjectedShadow has no derived classes. |
+| ProjectedShadow | `field_0x5c` | `renderTarget` | 2 | Write-only. Init 0x004da7b0 stores its PCRenderTarget* argument here right after SetRenderContext(target); the ctor clears it; no retail reader. Named like wave 27's Overlay pixelFormat (write-only copy of a named value). Not `target` (Init's parameter); no renderTarget identifier in the shadow units and ProjectedShadow has no derived classes. |
 
 ### What remains and why
 

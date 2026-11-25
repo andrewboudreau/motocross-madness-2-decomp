@@ -16,7 +16,7 @@ success path restores the target and stores the clip rectangle and size shift. f
 import random
 
 RETAIL_VA = 0x004da7b0
-SYMBOL = '?Init@ProjectedShadow@@QAEPAV1@PAVShadowRenderTarget@@PAX@Z'
+SYMBOL = '?Init@ProjectedShadow@@QAEPAV1@PAVPCRenderTarget@@PAVTextureMapManager@@@Z'
 SOURCE = 'samples/physics/shadow/ProjectedShadowNearMisses.cpp'
 PROBES = {0x004da82e: 'dest colour', 0x004da89c: 'caps 0x800', 0x004da8f1: 'format 0x613',
           0x004daa5b: 'camera ok', 0x004daacd: 'format fail', 0x004daad6: 'release'}

@@ -4,6 +4,8 @@
 // differs; the scores are in targets.json and docs/NEAR_MISS_INDEX.md.
 #include "../../../src/reconstructed/TrackGameGlobal.h"
 #include "shadow/ProjectedShadow.cpp"
+#include "../../../src/reconstructed/PCRenderTarget.h"
+#include "../../../src/reconstructed/PCVideoCard.h"
 
 // 0x004da7b0: binds the shadow to its render target, picks a surface format from the device
 // capabilities (and the DriverInfo\<driver>\DestColorShadow setting), creates the shadow
@@ -15,22 +17,22 @@
 // surface-format failure keeps its own copy).  Left: register choice in the sprintf/QueryFlag
 // argument set-up and the saved render-target fields (retail keeps width in ebx, surface in
 // ebp and spills height; VC6 here spills width), 841 bytes against 842.
-ProjectedShadow* ProjectedShadow::Init(ShadowRenderTarget* target, void* textureOwner)
+ProjectedShadow* ProjectedShadow::Init(PCRenderTarget* target, TextureMapManager* textures)
 {
     GameObject::SetRenderContext((void*)target);
-    renderTarget = (int)target;
+    renderTarget = target;
 
     char name[0x100];
-    sprintf(name, "DriverInfo\\%s\\DestColorShadow", Host()->display->driverName);
-    if (reinterpret_cast<ShadowSettings*>(g_TrackGame)->QueryFlag(name, 0) && (Host()->capsA & 0x100) && (Host()->capsB & 1)) {
+    sprintf(name, "DriverInfo\\%s\\DestColorShadow", Host()->targetDisplay->driverGuidText);
+    if (reinterpret_cast<ShadowSettings*>(g_TrackGame)->QueryFlag(name, 0) && (Host()->triSrcBlendCaps & 0x100) && (Host()->triDestBlendCaps & 1)) {
         formatA = 9;
         formatB = 1;
     } else {
-        unsigned int caps = Host()->capsA;
-        if ((caps & 0x10) && (Host()->capsB & 0x20)) {
+        unsigned int caps = Host()->triSrcBlendCaps;
+        if ((caps & 0x10) && (Host()->triDestBlendCaps & 0x20)) {
             formatA = 5;
             formatB = 6;
-        } else if ((caps & 1) && (Host()->capsB & 0x10)) {
+        } else if ((caps & 1) && (Host()->triDestBlendCaps & 0x10)) {
             formatA = 1;
             formatB = 5;
         } else if (caps & 0x800) {
@@ -42,9 +44,9 @@ ProjectedShadow* ProjectedShadow::Init(ShadowRenderTarget* target, void* texture
         }
     }
 
-    if (Host()->IsFormatSupported(0x115c)) {
+    if (Host()->SupportsTextureFormat(0x115c)) {
         surfaceFormat = 0x115c;
-    } else if (Host()->IsFormatSupported(0x613) && (Host()->capsC & 0x2000)) {
+    } else if (Host()->SupportsTextureFormat(0x613) && (Host()->triShadeCaps & 0x2000)) {
         surfaceFormat = 0x613;
         downsampleOnPresent = 0;
     } else {
@@ -52,7 +54,7 @@ ProjectedShadow* ProjectedShadow::Init(ShadowRenderTarget* target, void* texture
         return 0;
     }
 
-    texture = new(__FILE__, 0xaa) PCTextureMap((TextureMapManager*)textureOwner, 1);
+    texture = new(__FILE__, 0xaa) PCTextureMap(textures, 1);
     if (texture
         && texture->CreateSurface(0, 0x80, 0x80, 0x80, 0x80, surfaceFormat, surfaceFormat, 0, 8, 0, 0, 0,
                            formatA, formatB, 0, 0x80, 0xff00ff)) {
@@ -61,21 +63,21 @@ ProjectedShadow* ProjectedShadow::Init(ShadowRenderTarget* target, void* texture
         if (textureSurface) {
             texture->systemSurface->PageLock(0);
 
-            int savedHeight = Host()->height;
-            void* savedSurface = Host()->surface;
-            int savedWidth = Host()->width;
-            Host()->width = texture->textureWidth;
-            Host()->height = texture->textureHeight;
-            Host()->surface = texture->textureSurface;
-            ShadowOwner* owner = Host()->owner;
+            int savedHeight = Host()->targetHeight;
+            DirectDrawSurface* savedSurface = Host()->renderSurface;
+            int savedWidth = Host()->targetWidth;
+            Host()->targetWidth = texture->textureWidth;
+            Host()->targetHeight = texture->textureHeight;
+            Host()->renderSurface = texture->textureSurface;
+            Camera* owner = Host()->currentCamera;
 
             camera = new(__FILE__, 0xcd) ShadowCamera(1);
             if (camera && camera->SetRenderContext((void*)Host())) {
-                Host()->surface = savedSurface;
-                Host()->width = savedWidth;
-                Host()->height = savedHeight;
-                Host()->SetOwner(owner);
-                Host()->device->SetTransformLike(owner->block_0x1a0);
+                Host()->renderSurface = savedSurface;
+                Host()->targetWidth = savedWidth;
+                Host()->targetHeight = savedHeight;
+                Host()->SetCamera(owner);
+                Host()->device->SetViewport(owner->viewport);
                 camera->SetFieldOfView(0.3f);
                 for (int bits = 0x40; bits; bits >>= 1)
                     sizeShift++;

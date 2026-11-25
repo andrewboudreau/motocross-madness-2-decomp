@@ -22,12 +22,12 @@
     "src/reconstructed/KrustyUI.cpp": {
       "sections": 317,
       "relocations": 1847,
-      "sha256": "0d64d4ff6f6fee96b4579461d9e0a99f4357e7f0092b6f3ce87b43a9b91096dc"
+      "sha256": "416414787d72b08d0153598eab22d51808709fe0276a3b58c0f5db12c88d3043"
     },
     "src/reconstructed/QuarryStuntEvent.cpp": {
       "sections": 145,
       "relocations": 923,
-      "sha256": "af447ab3201e5afd1bcebff0c9dc57f1b494a90aebb98ffa82c045fecc4c826a"
+      "sha256": "94152456bde0cdbf6e974d21c10b66e25e05dbc53e232ad4d39ebf55cafec1bb"
     },
     "src/reconstructed/ArcadeObject.cpp": {
       "sections": 32,

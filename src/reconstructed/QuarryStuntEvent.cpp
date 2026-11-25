@@ -531,7 +531,7 @@ int BaseQuarryEvent::LoadEventObjects(LoadProgressFn progress) {
     }
     if (shadowLight) {
         projectedShadow = new(__FILE__, 698) ProjectedShadow(g_TrackGame->mode.shadowsOn);
-        projectedShadow = ((ProjectedShadow*)projectedShadow)->Init((ShadowRenderTarget*)renderContext, g_TrackGame->textureManager);
+        projectedShadow = ((ProjectedShadow*)projectedShadow)->Init((PCRenderTarget*)renderContext, g_TrackGame->textureManager);
     }
     if (!preloaded)
         stream = new(__FILE__, 713) FileStream(g_ResourceManager);

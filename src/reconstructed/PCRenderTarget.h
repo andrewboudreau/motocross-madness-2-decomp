@@ -76,12 +76,15 @@ public:
     unsigned int deviceCaps;                   // +0x164
     unsigned char field_0x168[0x1a8 - 0x168];
     unsigned int triRasterCaps;          // dpcTriCaps.dwRasterCaps: dither, fog vertex/table/range, antialias
-    unsigned char field_0x1ac[0x1b8 - 0x1ac];
+    unsigned int triZCmpCaps;            // dpcTriCaps.dwZCmpCaps
+    unsigned int triSrcBlendCaps;        // dpcTriCaps.dwSrcBlendCaps (ProjectedShadow::Init: 0x100 DESTCOLOR, 0x10 SRCALPHA, 1 ZERO, 0x800 BOTHSRCALPHA)
+    unsigned int triDestBlendCaps;       // dpcTriCaps.dwDestBlendCaps (ProjectedShadow::Init: 1 ZERO, 0x20 INVSRCALPHA, 0x10 SRCALPHA)
     unsigned int triAlphaCmpCaps;        // dpcTriCaps.dwAlphaCmpCaps: GREATER, NOTEQUAL (slot 18)
-    unsigned char field_0x1bc[0x1c0 - 0x1bc];
+    unsigned int triShadeCaps;           // dpcTriCaps.dwShadeCaps (ProjectedShadow::Init tests 0x2000 ALPHAFLATSTIPPLED)
     unsigned int triTextureCaps;         // dpcTriCaps.dwTextureCaps (0x8 TRANSPARENCY before colour keying)
     unsigned int triTextureFilterCaps;   // dpcTriCaps.dwTextureFilterCaps (LINEAR, LINEARMIPLINEAR)
-    unsigned char field_0x1c8[0x250 - 0x1c8];
+    unsigned int triTextureBlendCaps;    // dpcTriCaps.dwTextureBlendCaps (the shadow draws test 4 MODULATE)
+    unsigned char field_0x1cc[0x250 - 0x1cc];
     int fillMode;                        // D3DRENDERSTATE_FILLMODE value: 3 solid, 2 wireframe (PCGame key toggles)
     int textureFormatCount;
     DDPixelFormat* textureFormats;  // EnumTextureFormats results (DebugRealloc'd; freed by the destructor)

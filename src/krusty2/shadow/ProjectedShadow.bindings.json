@@ -17,7 +17,7 @@
   "?GetBounds@ShadowCaster@@QAEXPAUShadowVec3@@0@Z": "0x004fe850",
   "?GetPart@ShadowCaster@@QAEXHPAPAXPAHPAPAG1HH@Z": "0x004433f0",
   "?GetVertexCount@ShadowCaster@@QAEHXZ": "0x00444fe0",
-  "?Init@ProjectedShadow@@QAEPAV1@PAVShadowRenderTarget@@PAX@Z$ehhandler": "0x0054d2f4",
+  "?Init@ProjectedShadow@@QAEPAV1@PAVPCRenderTarget@@PAVTextureMapManager@@@Z$ehhandler": "0x0054d2f4",
   "?PartCount@ShadowCaster@@QAEHH@Z": "0x00445030",
   "?Present@ProjectedShadow@@QAEXXZ": "0x004dbd30",
   "?ReleaseParts@ShadowCaster@@QAEXXZ": "0x004fdab0",

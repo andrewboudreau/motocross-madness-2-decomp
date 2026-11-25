@@ -98,9 +98,9 @@ remain part of the fingerprint. Private evidence is
 
 ## Remaining boundary
 
-`UnknownKrustyUIShadow::Init` stays unresolved. The corresponding
-`ProjectedShadow::Init` body remains an unadmitted nonexact sample; changing
-its call spelling would not supply a provider. Its texture/camera allocation,
+The garage now calls `ProjectedShadow::Init` directly (the `UnknownKrustyUIShadow`
+view is retired). That body remains an unadmitted nonexact sample
+(samples/physics/shadow/ProjectedShadowNearMisses.cpp). Its texture/camera allocation,
 renderer-state changes and cleanup paths require their own complete review.
 Neither these setter connections nor strict neighboring shadow methods prove
 that initialization path or complete startup, menus and racing.

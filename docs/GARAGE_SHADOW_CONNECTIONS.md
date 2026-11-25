@@ -47,9 +47,9 @@ to three consecutive floats and an integer mode. Native layout checks cover
 all three `Vector3`/`ShadowVec3` component offsets and their 12-byte sizes.
 Its actual integer return is ignored by this caller, as in retail.
 
-The existing `UnknownKrustyUIShadow` view is retained only for its still-missing
-`Init` boundary and primary `GameObject` relationship. Its retired method
-declarations and the unused local shadow-link class have been removed.
+The garage builds and initialises a real `ProjectedShadow`: `Init(PCRenderTarget*,
+TextureMapManager*)` is provided by samples/physics/shadow/ProjectedShadowNearMisses.cpp.
+The former `UnknownKrustyUIShadow` view and its link alias are retired.
 `ProjectedShadow.h` uses relative transitive includes so the garage caller
 also compiles without an extra physics include directory.
 
