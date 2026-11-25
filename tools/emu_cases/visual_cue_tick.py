@@ -120,11 +120,11 @@ def setup(ctx, c):
     ctx.stub_at(0x004014f0, 'ArcadeObject::SetPosition', pop=4, log=False,
                 ret=lambda cx, e, a: cx.note('SetPosition', e, vec(cx, a[0])))
 
-    def point_at(cx, e, a):            # thiscall (RunwayTrackPos by value, Vector3* out)
+    def point_at(cx, e, a):            # thiscall (TrackPos by value, TrackVec3* out)
         cx.note('PointAt', e, a[0], a[1], a[2])
         cx.pack(a[3], '3f', *[cx.rng.uniform(-50, 50) for _ in range(3)])
         return 1
-    ctx.stub_at(0x00518080, 'RunwayTrackView::PointAt', pop=16, nargs=4, ret=point_at, log=False)
+    ctx.stub_at(0x00518080, 'Track::PointAt', pop=16, nargs=4, ret=point_at, log=False)
 
     def query_ground(cx, e, a):
         cx.note('QueryGround', e, vec(cx, a[0]), a[1], a[2], a[3])

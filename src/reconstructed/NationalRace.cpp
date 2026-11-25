@@ -19,18 +19,18 @@
 // Krusty3DObjects.h's RunwayLights, as this file uses it. That header and
 // QuarryEvent.h cannot be included together (both declare VisualCue), so
 // the three members are redeclared here with the same signatures.
-struct RunwayTerrainView;
+class Terrain;
 struct RunwayKrustyBikeView;
 
 class RunwayLights : public GameObject {
 public:
     explicit RunwayLights(int flags);          // 0x0048a5b0
-    RunwayLights* SetupLights(void* value, int a, int b, RunwayTerrainView* terrain); // 0x0048a600
+    RunwayLights* SetupLights(void* value, int a, int b, Terrain* terrain); // 0x0048a600
     void SetRacer(RunwayKrustyBikeView* racer); // 0x0048ad50
 
     float blinkTimer;                          // +0x2c blink timer
     RunwayKrustyBikeView* trackedRacer;          // +0x30
-    RunwayTerrainView* groundTerrain;       // +0x34
+    Terrain* groundTerrain;                 // +0x34
     ArcadeObject* lightModels[5];              // +0x38
 };
 
@@ -57,7 +57,7 @@ int NationalRace::Create3DObjects(int value) {
     if (!BaseQuarryEvent::Create3DObjects(value))
         return 0;
     runwayLights = (new (__FILE__, 53) RunwayLights(g_TrackGame->mode.visualCuesOn))
-                     ->SetupLights(renderContext, (int)lightManager, value, (RunwayTerrainView*)eventTerrain);
+                     ->SetupLights(renderContext, (int)lightManager, value, (Terrain*)eventTerrain);
     if (!AppendChild(runwayLights, -1)) {
         sprintf(message, "Runway Lights not loaded.\n");
         return 0;

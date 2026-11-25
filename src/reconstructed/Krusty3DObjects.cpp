@@ -4,6 +4,7 @@
 
 #include "../krusty2/broadphase/Terrain.h"
 #include "BikeRaceCore.h"
+#include "RaceView.h"
 #include "Krusty3DObjects.h"
 #include "Camera.h"
 
@@ -63,7 +64,7 @@ RunwayLights::RunwayLights(int flags) : GameObject(flags) {
 
 // 0x0048a600
 RunwayLights* RunwayLights::SetupLights(void* context, int lights, int options,
-                                        RunwayTerrainView* terrain) {
+                                        Terrain* terrain) {
     char name[0x104];
 
     GameObject::SetRenderContext(context);
@@ -101,8 +102,8 @@ int RunwayLights::Tick(float frameTime) {
     Vector3 position;
     Vector3 next;
     if (trackedRacer->bikeView->raceTrack) {
-        trackedRacer->bikeView->raceTrack->PointAt(trackedRacer->statusNode->placedPos, &position);
-        trackedRacer->bikeView->raceTrack->PointAt(trackedRacer->statusNode->progressPos, &next);
+        trackedRacer->bikeView->raceTrack->PointAt(trackedRacer->statusNode->placedPos, (TrackVec3*)&position);
+        trackedRacer->bikeView->raceTrack->PointAt(trackedRacer->statusNode->progressPos, (TrackVec3*)&next);
         direction = position - next;
     } else {
         position = trackedRacer->trackPoint;
@@ -129,27 +130,27 @@ int RunwayLights::Tick(float frameTime) {
     Vector3 point;
     Vector3 normal;
     point = position + direction * 6.0f;
-    reinterpret_cast<Terrain*>(groundTerrain)->QueryGround(reinterpret_cast<TerrainVec3*>(&point), reinterpret_cast<TerrainVec3*>(&normal), 0, 0);
+    groundTerrain->QueryGround(reinterpret_cast<TerrainVec3*>(&point), reinterpret_cast<TerrainVec3*>(&normal), 0, 0);
     point.y += 4.0f;
     lightModels[0]->SetPosition(&point);
     lightModels[0]->SetAxes(&direction, &normal, 1, 0);
     point = position + direction * 3.0f;
-    reinterpret_cast<Terrain*>(groundTerrain)->QueryGround(reinterpret_cast<TerrainVec3*>(&point), reinterpret_cast<TerrainVec3*>(&normal), 0, 0);
+    groundTerrain->QueryGround(reinterpret_cast<TerrainVec3*>(&point), reinterpret_cast<TerrainVec3*>(&normal), 0, 0);
     point.y += 4.0f;
     lightModels[1]->SetPosition(&point);
     lightModels[1]->SetAxes(&direction, &normal, 1, 0);
     point = position;
-    reinterpret_cast<Terrain*>(groundTerrain)->QueryGround(reinterpret_cast<TerrainVec3*>(&point), reinterpret_cast<TerrainVec3*>(&normal), 0, 0);
+    groundTerrain->QueryGround(reinterpret_cast<TerrainVec3*>(&point), reinterpret_cast<TerrainVec3*>(&normal), 0, 0);
     point.y += 4.0f;
     lightModels[2]->SetPosition(&point);
     lightModels[2]->SetAxes(&direction, &normal, 1, 0);
     point = position - direction * 3.0f;
-    reinterpret_cast<Terrain*>(groundTerrain)->QueryGround(reinterpret_cast<TerrainVec3*>(&point), reinterpret_cast<TerrainVec3*>(&normal), 0, 0);
+    groundTerrain->QueryGround(reinterpret_cast<TerrainVec3*>(&point), reinterpret_cast<TerrainVec3*>(&normal), 0, 0);
     point.y += 4.0f;
     lightModels[3]->SetPosition(&point);
     lightModels[3]->SetAxes(&direction, &normal, 1, 0);
     point = position - direction * 6.0f;
-    reinterpret_cast<Terrain*>(groundTerrain)->QueryGround(reinterpret_cast<TerrainVec3*>(&point), reinterpret_cast<TerrainVec3*>(&normal), 0, 0);
+    groundTerrain->QueryGround(reinterpret_cast<TerrainVec3*>(&point), reinterpret_cast<TerrainVec3*>(&normal), 0, 0);
     point.y += 4.0f;
     lightModels[4]->SetPosition(&point);
     lightModels[4]->SetAxes(&direction, &normal, 1, 0);
@@ -177,7 +178,7 @@ VisualCue::VisualCue(int flags) : ArcadeObject(flags) {
 }
 
 // 0x0048adf0
-VisualCue* VisualCue::LoadVisualCue(void* context, int lights, int options, RunwayTerrainView* terrain,
+VisualCue* VisualCue::LoadVisualCue(void* context, int lights, int options, Terrain* terrain,
                                     Vector3 position, VisualCueBikeRaceView* view, int pixels,
                                     Camera* camera, float size, float screenXFraction,
                                     float screenYFraction) {
@@ -311,10 +312,10 @@ int VisualCue::Tick(float frameTime) {
         UNKNOWN_PLACE_CUE();
         Vector3 target;
         if (cueView->raceTrack)
-            cueView->raceTrack->PointAt(cueView->ownRacer->statusNode->progressPos, &target);
+            cueView->raceTrack->PointAt(cueView->ownRacer->statusNode->progressPos, (TrackVec3*)&target);
         else
             target = cueView->ownRacer->trackPoint;
-        reinterpret_cast<Terrain*>(groundTerrain)->QueryGround(reinterpret_cast<TerrainVec3*>(&target), 0, 0, 0);
+        groundTerrain->QueryGround(reinterpret_cast<TerrainVec3*>(&target), 0, 0, 0);
         direction = target - arcadeView->eyePosition;
         SetAxes(&direction, &kVec3YAxis, 1, 1);
         scale = modelScale;

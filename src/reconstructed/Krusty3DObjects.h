@@ -26,8 +26,12 @@
 // same function).
 float FastSqrt(float value);
 
+class BikeRace;
 class Camera;
 class RenderTarget;
+class Terrain;
+class Track;
+struct RaceStatusNode;
 struct ControlEvent;
 struct InputButtonState;
 
@@ -61,31 +65,6 @@ struct NumberBikeRaceView {
 // 0x00460c00 (cdecl): 1/sqrt of `value` (table driven).
 float FastInvSqrt(float value);
 
-// A track position (RaceView.h's TrackPos: node, segment, t).
-struct RunwayTrackPos {
-    void* node;  // +0x0  RaceView.h/Track.h TrackPos: node
-    void* segment;  // +0x4  Track.h TrackPos: segment
-    float t;  // +0x8  Track.h TrackPos: t, 0..1 along the segment
-};
-
-// The track a racer's view holds at +0x48 (Track.h's Track).
-struct RunwayTrackView {
-    // 0x00518080: the world point of `pos`.
-    int PointAt(RunwayTrackPos pos, Vector3* out);
-};
-
-struct RunwayBikeRaceView {
-    unsigned char field_0x00[0x48];
-    RunwayTrackView* raceTrack;            // +0x48 BikeRace's raceTrack
-};
-
-// The racer's race status node (RaceView.h's RaceStatusNode).
-struct RunwayRaceStatusNodeView {
-    unsigned char field_0x00[0x38];
-    RunwayTrackPos placedPos;          // +0x38 (RaceView.h)
-    RunwayTrackPos progressPos;        // +0x44 (RaceView.h)
-};
-
 // The racer the lights point for (NationalRace.cpp passes its view's
 // +0x38; RaceView.h's EventKrustyBikeView).
 struct RunwayKrustyBikeView {
@@ -93,17 +72,13 @@ struct RunwayKrustyBikeView {
     Vector3 trackPoint;                       // +0x10c
     Vector3 trackDirection;                   // +0x118 track direction there
     unsigned char field_0x124[0x740 - 0x124];
-    RunwayBikeRaceView* bikeView;              // +0x740 (RaceView.h)
-    RunwayRaceStatusNodeView* statusNode;       // +0x744 race status node (RaceView.h)
+    BikeRace* bikeView;                        // +0x740 (RaceView.h)
+    RaceStatusNode* statusNode;                 // +0x744 race status node (RaceView.h)
     unsigned char field_0x748[0x78c - 0x748];
     int onTrack;                              // +0x78c RaceView.h's racer onTrack
     unsigned char field_0x790[0x7a4 - 0x790];
     char finished;                            // +0x7a4
 };
-
-// The terrain (NationalRace.cpp's +0x40); the lights and the cue drop points
-// onto it with Terrain::QueryGround (0x00507c10).
-struct RunwayTerrainView;
 
 // 0x4c bytes (NationalRace.cpp 0x004aa8cd): five "pointer.slt" models.
 class RunwayLights : public GameObject {
@@ -112,12 +87,12 @@ public:
     virtual int Tick(float frameTime);                 // 0x0048a760
 
     // 0x0048a600 (ret 0x10): slot 8, then loads the five lights (line 0x40).
-    RunwayLights* SetupLights(void* context, int lights, int options, RunwayTerrainView* terrain);
+    RunwayLights* SetupLights(void* context, int lights, int options, Terrain* terrain);
     void SetRacer(RunwayKrustyBikeView* racer); // 0x0048ad50: sets +0x30
 
     float blinkTimer;                          // blink timer
     RunwayKrustyBikeView* trackedRacer;          // +0x30 the lights stand on its track (SetRacer)
-    RunwayTerrainView* groundTerrain;       // +0x34 grounds the lights (SetupLights)
+    Terrain* groundTerrain;                 // +0x34 grounds the lights (SetupLights)
     ArcadeObject* lightModels[5];
 };
 
@@ -136,7 +111,7 @@ struct VisualCueBikeRaceView {
     unsigned char field_0x000[0x38];
     RunwayKrustyBikeView* ownRacer;             // +0x38 its own racer
     unsigned char field_0x03c[0x48 - 0x3c];
-    RunwayTrackView* raceTrack;            // +0x48 BikeRace's raceTrack
+    Track* raceTrack;                      // +0x48 BikeRace's raceTrack
     unsigned char raceTerrain[0x50 - 0x4c];  // +0x4c BikeRace raceTerrain (bytes kept)
     VisualCueKrustyBikeCameraView* raceCamera;       // +0x50 BikeRace's raceCamera
     unsigned char field_0x054[0x18a - 0x54];
@@ -154,7 +129,7 @@ public:
     virtual int OnControlPress(ControlEvent* event, InputButtonState* entry);       // 0x0048afa0
 
     // 0x0048adf0 (ret 0x34): loads "viscue.slt"; returns this, or 0.
-    VisualCue* LoadVisualCue(void* context, int lights, int options, RunwayTerrainView* terrain,
+    VisualCue* LoadVisualCue(void* context, int lights, int options, Terrain* terrain,
                              Vector3 position, VisualCueBikeRaceView* view, int pixels,
                              Camera* camera, float size, float screenXFraction,
                              float screenYFraction);
@@ -170,7 +145,7 @@ public:
     void PlaceCue();
 
     VisualCueBikeRaceView* cueView;
-    RunwayTerrainView* groundTerrain;  // +0xAC  LoadVisualCue's terrain argument; slot 10 drops the cue target onto it with QueryGround
+    Terrain* groundTerrain;            // +0xAC  LoadVisualCue's terrain argument; slot 10 drops the cue target onto it with QueryGround
     float builtFieldOfView;                          // field of view the offsets were built for
     float screenOffsetX;                          // screen offset along the camera's x axis
     float screenOffsetY;                          // screen offset along the camera's y axis

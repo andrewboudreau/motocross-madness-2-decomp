@@ -60,7 +60,7 @@
   "?DisableByClassName@GameObject@@IAEXPBD@Z": "0x00468dd0",
   "?EnableByClassName@GameObject@@IAEXPBD@Z": "0x00468f10",
   "?AppendChild@GameObject@@QAEHPAV1@H@Z": "0x00469190",
-  "?LoadVisualCue@VisualCue@@QAEPAV1@PAXHHPAURunwayTerrainView@@UVector3@@PAUVisualCueBikeRaceView@@HPAVCamera@@MMM@Z": "0x0048adf0",
+  "?LoadVisualCue@VisualCue@@QAEPAV1@PAXHHPAVTerrain@@UVector3@@PAUVisualCueBikeRaceView@@HPAVCamera@@MMM@Z": "0x0048adf0",
   "?NextCueIndex@VisualCue@@QAEHXZ": "0x0048bc30",
   "?CanCycleCues@VisualCue@@QAEHXZ": "0x0048bc80",
   "?ReportTotals@MemTagStack@@QAEXPBD@Z": "0x004a2bc0",

@@ -2614,12 +2614,12 @@ Left for later:
 | `UnknownNumberCamera` | `NumberCameraView` | 2 | 11 | NumberObjectManager+0x34: Camera's +0x170 position, +0x17c/+0x188 axes and +0x198 focal length. Merged into `Camera`: NumberObjectManager::SetupDigits takes a `Camera*` (BikeRace passes its KrustyBikeCamera). |
 | `UnknownNumberRacerState` | `NumberKrustyBikeView` | 2 | 2 | BikeRace's localRacer; +0x76c is the racer's offTrackTime. |
 | `UnknownNumberRacer` | `NumberBikeRaceView` | 2 | 10 | NumberObjectManager+0x2c: BikeRace's localRacer (+0x38), 30SecMan (+0x6c) and startCountdown (+0x15c). |
-| `UnknownRunwayTrackPos` | `RunwayTrackPos` | 2 | 11 | Track.h's TrackPos (node, segment, t), as Track::PointAt (0x00518080) takes it. |
-| `UnknownRunwayTrack` | `RunwayTrackView` | 2 | 9 | BikeRace's raceTrack (+0x48); 0x00518080 is Track::PointAt. |
-| `UnknownRunwayView` | `RunwayBikeRaceView` | 2 | 2 | A racer's +0x740 BikeRace, read only for raceTrack (+0x48). |
-| `UnknownRunwayRacerPart` | `RunwayRaceStatusNodeView` | 2 | 2 | A racer's +0x744 RaceStatusNode: placedPos (+0x38) and progressPos (+0x44). |
+| `UnknownRunwayTrackPos` | `RunwayTrackPos` | 2 | 11 | Track.h's TrackPos (node, segment, t), as Track::PointAt (0x00518080) takes it. Merged into `TrackPos` (Track.h). |
+| `UnknownRunwayTrack` | `RunwayTrackView` | 2 | 9 | BikeRace's raceTrack (+0x48); 0x00518080 is Track::PointAt. Merged into `Track`: the lights and the cue call Track::PointAt directly, and the Group5 bring-up forwarder is gone. |
+| `UnknownRunwayView` | `RunwayBikeRaceView` | 2 | 2 | A racer's +0x740 BikeRace, read only for raceTrack (+0x48). Merged into `BikeRace`. |
+| `UnknownRunwayRacerPart` | `RunwayRaceStatusNodeView` | 2 | 2 | A racer's +0x744 RaceStatusNode: placedPos (+0x38) and progressPos (+0x44). Merged into `RaceStatusNode` (RaceView.h). |
 | `UnknownRunwayRacer` | `RunwayKrustyBikeView` | 2 | 13 | The racer NationalRace passes (its view's +0x38): trackPoint, bikeView, statusNode, onTrack, hasFinished at the KrustyBike offsets of RaceView.h. |
-| `UnknownRunwayTerrain` | `RunwayTerrainView` | 2 | 25 | NationalRace+0x40; 0x00507c10 is Terrain::QueryGround. |
+| `UnknownRunwayTerrain` | `RunwayTerrainView` | 2 | 25 | NationalRace+0x40; 0x00507c10 is Terrain::QueryGround. Merged into `Terrain`: SetupLights and LoadVisualCue take a `Terrain*`. |
 | `UnknownVisualCueCamera` | `VisualCueKrustyBikeCameraView` | 2 | 2 | BikeRace's raceCamera (+0x50), a KrustyBikeCamera; +0x3b0 is BikeCamera's followed bike. |
 | `UnknownVisualCueView` | `VisualCueBikeRaceView` | 2 | 17 | VisualCue+0xa8: BikeRace::NextBike (0x004204e0), localRacer +0x38, raceTrack +0x48, raceCamera +0x50, racing +0x18a. |
 | `UnknownBonusRacerPart` | `BonusSoultreeObjectView` | 2 | 8 | A racer's +0x3bc model node; 0x004fc970 is SoultreeObject::GetPosition. |

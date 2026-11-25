@@ -887,7 +887,7 @@ int BaseQuarryEvent::EstimateRaceBytes() {
 int BaseQuarryEvent::Create3DObjects(int value) {
     char message[388];
     visualCue = (new(__FILE__, 1369) VisualCue(g_TrackGame->mode.visualCuesOn))
-                     ->LoadVisualCue(renderContext, (int)lightManager, value, (RunwayTerrainView*)eventTerrain,
+                     ->LoadVisualCue(renderContext, (int)lightManager, value, (Terrain*)eventTerrain,
                                      Vector3(0.0f, 0.0f, 0.0f), (VisualCueBikeRaceView*)raceView, 45,
                                      (Camera*)raceCamera, 3.0f, 0.1f, 0.85f);
     if (!AppendChild(visualCue, -1)) {
