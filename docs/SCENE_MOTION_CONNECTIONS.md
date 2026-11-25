@@ -1,7 +1,7 @@
 # Scene motion connections
 
 `Scene::RestartEntry` now calls the existing `Character::SetMotion(Motion*)`
-and `Character::AdvanceMotion(float,int,int)` implementations through explicit
+and `Character::AdvanceMotion(float,int,const int*)` implementations through explicit
 primary-receiver casts. The provisional Scene entry and object declarations
 retain their layouts. No provider body, virtual slot or object allocation changes.
 

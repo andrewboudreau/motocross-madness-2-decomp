@@ -13,7 +13,7 @@ import struct
 from tools.emu_cases.rotate_pose import pack_pose, random_pose
 
 RETAIL_VA = 0x004a70c0
-SYMBOL = '?AdvanceMotionInterpolated@Character@@UAEHMHH@Z'
+SYMBOL = '?AdvanceMotionInterpolated@Character@@UAEHMHPBH@Z'
 SOURCE = 'samples/physics/motion/Motnctrl.cpp'
 PROBES = {0x004a7dc0: 'RotatePose (extrapolation)', 0x004a8470: 'InterpolatePose (blend)',
           0x004a8b60: 'BlendToMotion (looping end)'}

@@ -140,7 +140,7 @@ CASES = [
     {'name': 'Character primary virtual default slot 3',
      'source': 'src/reconstructed/CharacterDefaults.cpp',
      'bindings': 'src/reconstructed/CharacterDefaults.bindings.json',
-     'symbol': '?CaptureFramePoses@Character@@UAEXH@Z',
+     'symbol': '?CaptureFramePoses@Character@@UAEXPAUMotionPoseList@@@Z',
      'target_va': '0x00464e80',
      'target_size': 3,
      'reason': 'individual primary RTTI/vtable slot and full RET body; virtual GameObject base remains separate, '

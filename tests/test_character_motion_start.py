@@ -21,7 +21,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SOURCE = 'samples/physics/motion/CharacterMotionStart.cpp'
 CANONICAL = 'src/krusty2/motion/Motnctrl.cpp'
 SYMBOL = '?ApplyMotionAtPhase@Character@@QAEXHM@Z'
-HELPER = '?ApplyPoseList@Character@@QAEXPAUMotionPoseList@@H@Z'
+HELPER = '?ApplyPoseList@Character@@QAEXPAUMotionPoseList@@PBH@Z'
 CONVERSION = '?FloatToInt@@YAXPAHM@Z'
 
 

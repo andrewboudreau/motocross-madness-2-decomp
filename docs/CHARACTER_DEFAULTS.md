@@ -10,7 +10,7 @@ unproven. Shared return instructions alone do not establish method identity.
 | --- | --- | --- | --- |
 | 0 | `BuildModel()` | 0x00464e90 | 1, `ret` |
 | 2 | `CaptureRestPose()` | 0x00464e90 | 1, `ret` |
-| 3 | `CaptureFramePoses(int)` | 0x00464e80 | 3, `ret 4` |
+| 3 | `CaptureFramePoses(MotionPoseList*)` | 0x00464e80 | 3, `ret 4` |
 | 9 | `CopyModelFrom(int)` | 0x00464e80 | 3, `ret 4` |
 | 10 | `DumpNodeTransforms()` | 0x00464e90 | 1, `ret` |
 

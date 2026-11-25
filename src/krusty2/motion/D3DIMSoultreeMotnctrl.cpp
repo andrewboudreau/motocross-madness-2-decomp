@@ -67,12 +67,10 @@ void D3DIMSoultreeCharacter::CopyStateFrom(int other)
 }
 
 // slot 6 (0x00446480, ret 8): applies a pose record to its node.  'rowMask' is an optional per-row
-// enable mask indexed by the record's node index.  Argument types are tier 3 (the header uses int).
-void D3DIMSoultreeCharacter::ApplyFullPose(int poseRecord, int rowMask)
+// enable mask indexed by the record's node index.
+void D3DIMSoultreeCharacter::ApplyFullPose(const CharacterPose* pose, const int* rowMask)
 {
-    const CharacterPose* pose = (const CharacterPose*)poseRecord;
-    const int* mask = (const int*)rowMask;
-    if (mask && mask[pose->nodeIndex] == 0)
+    if (rowMask && rowMask[pose->nodeIndex] == 0)
         return;
     SoultreeObject* node = nodeNames[pose->nodeIndex].node;
     if (pose->hasPose) {
@@ -86,11 +84,10 @@ void D3DIMSoultreeCharacter::ApplyFullPose(int poseRecord, int rowMask)
 
 // slot 3 (0x00446110, ret 4): refreshes every record of the list from the live nodes.  The records are
 // first passed (last to first) to slot 4, then each is overwritten with its node's current pose.
-void D3DIMSoultreeCharacter::CaptureFramePoses(int records)
+void D3DIMSoultreeCharacter::CaptureFramePoses(MotionPoseList* list)
 {
-    MotionPoseList* list = (MotionPoseList*)records;
     for (int i = list->count - 1; i >= 0; i--)
-        ApplyPose((int)&list->poses[i], 0);
+        ApplyPose(&list->poses[i], 0);
     for (int j = 0; j < list->count; j++) {
         SoultreeObject* node = nodeNames[list->poses[j].nodeIndex].node;
         Vec3 position;
@@ -106,11 +103,9 @@ void D3DIMSoultreeCharacter::CaptureFramePoses(int records)
 }
 
 // slot 4 (0x00446210, ret 8): like slot 6 but honours the per-row applyRotation / applyTranslation enables.
-void D3DIMSoultreeCharacter::ApplyPose(int poseRecord, int rowMask)
+void D3DIMSoultreeCharacter::ApplyPose(const CharacterPose* pose, const int* rowMask)
 {
-    const CharacterPose* pose = (const CharacterPose*)poseRecord;
-    const int* mask = (const int*)rowMask;
-    if (mask && mask[pose->nodeIndex] == 0)
+    if (rowMask && rowMask[pose->nodeIndex] == 0)
         return;
     SoultreeObject* node = nodeNames[pose->nodeIndex].node;
     if (pose->hasPose) {
@@ -129,11 +124,9 @@ void D3DIMSoultreeCharacter::ApplyPose(int poseRecord, int rowMask)
 // slot 5 (0x00446300, ret 8): mirrored variant of slot 4.  The target node comes from the mirror map
 // (+0x18c, indexed by the record's node index) and the x components of both axes and the position are
 // negated.  The per-row enables are still read from the unmapped row.
-void D3DIMSoultreeCharacter::ApplyMirroredPose(int poseRecord, int rowMask)
+void D3DIMSoultreeCharacter::ApplyMirroredPose(const CharacterPose* pose, const int* rowMask)
 {
-    const CharacterPose* pose = (const CharacterPose*)poseRecord;
-    const int* mask = (const int*)rowMask;
-    if (mask && mask[pose->nodeIndex] == 0)
+    if (rowMask && rowMask[pose->nodeIndex] == 0)
         return;
     NodeNameEntry* table = nodeNames;
     int mirrored = mirrorMap[pose->nodeIndex];

@@ -28,7 +28,8 @@ SLOT_NAMES = {0: 'BuildModel', 2: 'CaptureRestPose', 3: 'CaptureFramePoses', 9: 
 
 
 def symbol(slot, owner='Character'):
-    return '?%s@%s@@UAEX%s' % (SLOT_NAMES[slot], owner, 'H@Z' if slot in (3, 9) else 'XZ')
+    arguments = {3: 'PAUMotionPoseList@@@Z', 9: 'H@Z'}
+    return '?%s@%s@@UAEX%s' % (SLOT_NAMES[slot], owner, arguments.get(slot, 'XZ'))
 
 
 @unittest.skipUnless(os.name == 'nt' and os.environ.get('VC6_ROOT') and os.environ.get('MCM2_EXE'),

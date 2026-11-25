@@ -394,7 +394,7 @@ void Character::CaptureMotion(Motion* motion)
     ApplyRestPose();
     motion->captured = 1;
     for (int i = 0; i < motion->frameCount; i++)
-        CaptureFramePoses((int)&motion->frames[i]);
+        CaptureFramePoses(&motion->frames[i]);
 }
 
 // owner: bracket only
@@ -434,15 +434,15 @@ unsigned char Character::FindNode(const char* name)
 
 // owner: bracket only
 // slots 4, 5 and 6 (0x004a6ba0, one body after identical-COMDAT folding): empty in Character.
-void Character::ApplyPose(int poseRecord, int rowMask)
+void Character::ApplyPose(const CharacterPose* pose, const int* rowMask)
 {
 }
 
-void Character::ApplyMirroredPose(int poseRecord, int rowMask)
+void Character::ApplyMirroredPose(const CharacterPose* pose, const int* rowMask)
 {
 }
 
-void Character::ApplyFullPose(int poseRecord, int rowMask)
+void Character::ApplyFullPose(const CharacterPose* pose, const int* rowMask)
 {
 }
 
@@ -505,7 +505,7 @@ inline void BlendPose(CharacterPose* a, CharacterPose* b, CharacterPose* out, fl
 // motionStopped and returns 0), then applies every pose of the current frame through slot 4
 // (mirror == 0) or slot 5.  While a blend is active each pose is interpolated from the frame
 // applied last with a smoothstep weight over blendDuration.  Returns the frame number.
-int Character::AdvanceMotion(float dt, int mirror, int mask)
+int Character::AdvanceMotion(float dt, int mirror, const int* rowMask)
 {
     if (motionStopped)
         return 0;
@@ -520,9 +520,9 @@ int Character::AdvanceMotion(float dt, int mirror, int mask)
         lastFrameTime = motionTime;
         for (int i = 0; i < currentFrame->count; i++) {
             if (mirror == 0)
-                ApplyPose((int)&currentFrame->poses[i], mask);
+                ApplyPose(&currentFrame->poses[i], rowMask);
             else
-                ApplyMirroredPose((int)&currentFrame->poses[i], mask);
+                ApplyMirroredPose(&currentFrame->poses[i], rowMask);
         }
     } else {
         blendFromTime += dt;
@@ -537,9 +537,9 @@ int Character::AdvanceMotion(float dt, int mirror, int mask)
             CharacterPose pose;
             BlendPose(&lastFrame->poses[j], &currentFrame->poses[j], &pose, blendWeight);
             if (mirror == 0)
-                ApplyPose((int)&pose, mask);
+                ApplyPose(&pose, rowMask);
             else
-                ApplyMirroredPose((int)&pose, mask);
+                ApplyMirroredPose(&pose, rowMask);
         }
         if (blendFromTime >= blendDuration)
             blendActive = 0;
@@ -592,18 +592,18 @@ void InterpolatePose(CharacterPose* a, CharacterPose* b, CharacterPose* out, flo
 
 // owner: bracket only
 // 0x004a8a80: passes every record of 'list' to slot 4.
-void Character::ApplyPoseList(MotionPoseList* list, int mask)
+void Character::ApplyPoseList(MotionPoseList* list, const int* rowMask)
 {
     for (int i = 0; i < list->count; i++)
-        ApplyPose((int)&list->poses[i], mask);
+        ApplyPose(&list->poses[i], rowMask);
 }
 
 // owner: bracket only
 // 0x004a8ac0: passes every record of 'list' to slot 6.
-void Character::ApplyFullPoseList(MotionPoseList* list, int mask)
+void Character::ApplyFullPoseList(MotionPoseList* list, const int* rowMask)
 {
     for (int i = 0; i < list->count; i++)
-        ApplyFullPose((int)&list->poses[i], mask);
+        ApplyFullPose(&list->poses[i], rowMask);
 }
 
 // owner: bracket only

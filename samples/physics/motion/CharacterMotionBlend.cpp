@@ -65,7 +65,7 @@ void Character::ApplyMotionBlendAtPhase(int firstHandle, int secondHandle, float
         BlendFirst(&firstFrame->poses[i], &firstNext->poses[i], &firstPose, firstWeight);
         InterpolatePose(&secondFrame->poses[i], &secondNext->poses[i], &secondPose, secondWeight);
         InterpolatePose(&firstPose, &secondPose, &result, finalWeight);
-        ApplyPose((int)&result, 0);
+        ApplyPose(&result, 0);
     }
 }
 #pragma optimize("", on)

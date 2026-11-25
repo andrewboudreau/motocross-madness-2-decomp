@@ -592,7 +592,7 @@
   {
     "class": "Motnctrl",
     "source": "Motnctrl.cpp",
-    "candidate_symbol_contains": "?AdvanceMotion@Character@@QAEHMHH@Z",
+    "candidate_symbol_contains": "?AdvanceMotion@Character@@QAEHMHPBH@Z",
     "target_va": "0x004a6bb0",
     "target_size": 1293,
     "expect": "exact",

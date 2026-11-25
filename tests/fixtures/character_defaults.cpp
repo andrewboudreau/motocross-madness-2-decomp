@@ -14,7 +14,7 @@ static void Call(Character* object, int slot, int argument)
     switch (slot) {
     case 0: object->Character::BuildModel(); break;
     case 2: object->Character::CaptureRestPose(); break;
-    case 3: object->Character::CaptureFramePoses(argument); break;
+    case 3: object->Character::CaptureFramePoses(reinterpret_cast<MotionPoseList*>(argument)); break;
     case 9: object->Character::CopyModelFrom(argument); break;
     case 10: object->Character::DumpNodeTransforms(); break;
     }

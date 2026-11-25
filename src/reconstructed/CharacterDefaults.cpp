@@ -9,5 +9,5 @@ void Character::CaptureRestPose() {}
 void Character::DumpNodeTransforms() {}
 
 // Primary slots 3 and 9: complete 0x00464e80, return popping one argument.
-void Character::CaptureFramePoses(int) {}
+void Character::CaptureFramePoses(MotionPoseList*) {}
 void Character::CopyModelFrom(int) {}

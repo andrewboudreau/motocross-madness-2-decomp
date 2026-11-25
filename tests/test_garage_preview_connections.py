@@ -23,7 +23,7 @@ SOURCES = tuple('src/reconstructed/' + name + '.cpp' for name in (
     'src/reconstructed/BikeRace.cpp',
     'src/krusty2/motion/D3DIMSoultreeMotnctrl.cpp', 'src/krusty2/motion/Motnctrl.cpp')
 CHARACTER = '??0D3DIMSoultreeCharacter@@QAE@H@Z'
-ADVANCE = '?AdvanceMotion@Character@@QAEHMHH@Z'
+ADVANCE = '?AdvanceMotion@Character@@QAEHMHPBH@Z'
 PAINTER = '??0BikeNumberPainter@@QAE@PAVTextureMapManager@@@Z'
 DESTROY = '??1BikeNumberPainter@@QAE@XZ'
 PAINT = '?PaintNumber@BikeNumberPainter@@QAEXPAVD3DIMSoultreeObject@@H@Z'

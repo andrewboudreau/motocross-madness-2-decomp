@@ -9,22 +9,22 @@
     "src/krusty2/vehicle/Bike.cpp": {
       "sections": 243,
       "relocations": 1105,
-      "sha256": "19462ba56d07f1f1da5cca26e13a92c7eecc9afe12813111d4097622bfde0ef4"
+      "sha256": "11f5c463cb3b57c31977ce7aef5e1b758f33e25ee23b1b0b41d0ddaef83f0287"
     },
     "src/krusty2/vehicle/KrustyBike.cpp": {
       "sections": 271,
       "relocations": 1443,
-      "sha256": "b8200ee2d2db1ed590c9a475e1a5121acfb2315371222cad50512077b8d4970c"
+      "sha256": "c205295310475c8419f3cfca2c6a589989e1c2d77511dbc980e9987810e2cf71"
     },
     "samples/physics/motion/Motnctrl.cpp": {
       "sections": 35,
       "relocations": 218,
-      "sha256": "bcc2cc6e180736adaf215563f05c80da43ad9e2f8f4ec22043a395ae978cbe3c"
+      "sha256": "13b9b51c51f305fba04f8ab9caf666e876c95bb852f86aa706f7687d0941e805"
     },
     "samples/physics/motion/CharacterMotionStart.cpp": {
       "sections": 14,
       "relocations": 24,
-      "sha256": "2f3cfec33c1dcef1908346db378a64628e2368a047dfc26afd7f6381e79c569f"
+      "sha256": "744ab04a80ecafae27742b9312a54646b8b209a7d8b483c8e05a5bf5b2928390"
     }
   },
   "before": {

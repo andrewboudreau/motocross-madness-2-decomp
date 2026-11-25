@@ -116,7 +116,7 @@ void Character::ApplyFourMotionBlendAtPhase(int aHandle, int bHandle, int cHandl
         InterpolatePose(&aPose, &bPose, &abPose, pairWeight);
         InterpolatePose(&cPose, &dPose, &cdPose, pairWeight);
         InterpolatePose(&abPose, &cdPose, &result, leanWeight);
-        ApplyPose((int)&result, 0);
+        ApplyPose(&result, 0);
     }
 }
 #pragma optimize("", on)

@@ -23,7 +23,7 @@ SCENE = 'src/reconstructed/SceneManager.cpp'
 MOTION = 'src/krusty2/motion/Motnctrl.cpp'
 FIXTURE = 'tests/fixtures/scene_motion_compare.cpp'
 # RestartEntry's two Character calls, made directly on the entry's CollisionCharacter.
-CHARACTER_CALLS = ('?SetMotion@Character@@QAEXPAUMotion@@@Z', '?AdvanceMotion@Character@@QAEHMHH@Z')
+CHARACTER_CALLS = ('?SetMotion@Character@@QAEXPAUMotion@@@Z', '?AdvanceMotion@Character@@QAEHMHPBH@Z')
 
 
 def object_fingerprint(obj, root, renames=None):

@@ -378,7 +378,7 @@ inline void ExtrapolatePose7(CharacterPose* a, CharacterPose* b, CharacterPose* 
 // `== 1`, a named copy and the time-add spellings do not change either), and the blend loop's
 // unused sums and cross/normalise calls. Its extrapolation uses the explicit vector-call
 // declarations to retain retail's rounding between subtraction, two scales and addition.
-int Character::AdvanceMotionInterpolated(float time, int mirror, int mask)
+int Character::AdvanceMotionInterpolated(float time, int mirror, const int* rowMask)
 {
     MotionPoseList* from;
     MotionPoseList* to;
@@ -404,9 +404,9 @@ int Character::AdvanceMotionInterpolated(float time, int mirror, int mask)
                 CharacterPose pose;
                 BlendPose7(&from->poses[i], &to->poses[i], &pose, weight);
                 if (mirror == 0)
-                    ApplyPose((int)&pose, mask);
+                    ApplyPose(&pose, rowMask);
                 else
-                    ApplyMirroredPose((int)&pose, mask);
+                    ApplyMirroredPose(&pose, rowMask);
             }
         } else {
             for (int i = 0; i < from->count; i++) {
@@ -418,9 +418,9 @@ int Character::AdvanceMotionInterpolated(float time, int mirror, int mask)
                 CharacterPose out;
                 ExtrapolatePose7(fromPose, toPose, &out, flag, frameTime, fps);
                 if (mirror == 0)
-                    ApplyPose((int)&out, mask);
+                    ApplyPose(&out, rowMask);
                 else
-                    ApplyMirroredPose((int)&out, mask);
+                    ApplyMirroredPose(&out, rowMask);
             }
         }
     } else {
@@ -484,9 +484,9 @@ int Character::AdvanceMotionInterpolated(float time, int mirror, int mask)
             else
                 InterpolatePose(&pose2, &out, &result, blendWeight);
             if (mirror == 0)
-                ApplyPose((int)&result, mask);
+                ApplyPose(&result, rowMask);
             else
-                ApplyMirroredPose((int)&result, mask);
+                ApplyMirroredPose(&result, rowMask);
         }
         if (blendFromTime >= blendDuration) {
             blendActive = 0;

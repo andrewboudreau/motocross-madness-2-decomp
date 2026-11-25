@@ -199,7 +199,7 @@
   "?AppendChild@GameObject@@QAEHPAV1@H@Z": "0x00469190",
   "?Create@LightEmitter@@QAEPAV1@PAXHIPBUVector3@@1MHHHHH@Z": "0x0049e230",
   "?AddLight@LightManager@@QAEXPAVLightEmitter@@@Z": "0x0049e470",
-  "?AdvanceMotion@Character@@QAEHMHH@Z": "0x004a6bb0",
+  "?AdvanceMotion@Character@@QAEHMHPBH@Z": "0x004a6bb0",
   "?SetMotion@Character@@QAEXPAUMotion@@@Z": "0x004a8b40",
   "?OpenFromArchives@ParameterBlock@@QAEXPAVFileStream@@PBD1H@Z": "0x004b7220",
   "?Attach@ParameterBlock@@QAEXPAVFileStream@@HH@Z": "0x004b77a0",

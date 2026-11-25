@@ -68,14 +68,15 @@ public:
     // slot 2: stores every node's current pose in poseList (the rest pose)
     virtual void CaptureRestPose();         // 0x00464e90 (ret)
     // slot 3: CaptureMotion's per-frame call; D3DIM overwrites the frame's records with the live node poses
-    virtual void CaptureFramePoses(int records); // 0x00464e80 (ret 4; shared empty stub)
+    virtual void CaptureFramePoses(MotionPoseList* frame); // 0x00464e80 (ret 4; shared empty stub)
     // slots 4/5/6: apply one pose record to its node (5 mirrored through mirrorMap; 6 ignores the
-    // per-row applyRotation/applyTranslation enables and is the rest-pose path)
-    virtual void ApplyPose(int poseRecord, int rowMask);   // 0x004a6ba0 (ret 8; shared by 4..6)
-    virtual void ApplyMirroredPose(int poseRecord, int rowMask);   // 0x004a6ba0
-    virtual void ApplyFullPose(int poseRecord, int rowMask);   // 0x004a6ba0
+    // per-row applyRotation/applyTranslation enables and is the rest-pose path).  A nonzero
+    // rowMask skips the records whose mask[nodeIndex] is 0; every retail caller passes 0.
+    virtual void ApplyPose(const CharacterPose* pose, const int* rowMask);   // 0x004a6ba0 (ret 8; shared by 4..6)
+    virtual void ApplyMirroredPose(const CharacterPose* pose, const int* rowMask);   // 0x004a6ba0
+    virtual void ApplyFullPose(const CharacterPose* pose, const int* rowMask);   // 0x004a6ba0
     // slot 7: per-frame playback with sub-frame interpolation (time added to motionTime, +0x10)
-    virtual int AdvanceMotionInterpolated(float time, int a, int b);  // 0x004a70c0 (ret 0xc): fld of the first argument, added to +0x10
+    virtual int AdvanceMotionInterpolated(float time, int mirror, const int* rowMask);  // 0x004a70c0 (ret 0xc): fld of the first argument, added to +0x10
     // slot 8: copies another character's motion state, names and rest pose (calls slot 9)
     virtual void CopyStateFrom(int other); // 0x004a98b0 (ret 4)
     // slot 9: D3DIM clones the other character's node model
@@ -104,13 +105,13 @@ public:
     void SortMotion(Motion* motion);                        // 0x004a6ab0, ret 4
     Motion* FindMotion(const char* name, int unused);            // 0x004a6b30, ret 8
     unsigned char FindNode(const char* name);               // 0x004a6b50, ret 4
-    void ApplyPoseList(MotionPoseList* list, int mask);  // 0x004a8a80, ret 8
-    void ApplyFullPoseList(MotionPoseList* list, int mask);  // 0x004a8ac0, ret 8
+    void ApplyPoseList(MotionPoseList* list, const int* rowMask);  // 0x004a8a80, ret 8
+    void ApplyFullPoseList(MotionPoseList* list, const int* rowMask);  // 0x004a8ac0, ret 8
     void SetMotionByName(const char* name);                 // 0x004a8b10, ret 4
     void SetMotion(Motion* motion);                         // 0x004a8b40, ret 4
     void BlendToMotion(Motion* motion);                     // 0x004a8b60, ret 4
     void BlendToMotion(Motion* motion, float time);         // 0x004a8b80, ret 8
-    int AdvanceMotion(float dt, int mirror, int mask);      // 0x004a6bb0, ret 0xc: per-frame playback, returns the frame number
+    int AdvanceMotion(float dt, int mirror, const int* rowMask);      // 0x004a6bb0, ret 0xc: per-frame playback, returns the frame number
     void ApplyMotionAtPhase(int motion, float phase);       // 0x004a8bf0, ret 8: current motion and frame at phase (docs/NAMING.md)
     void ApplyMotionBlendAtPhase(int firstHandle, int secondHandle, float phase, float weight); // 0x004a8c50, ret 0x10
     void ApplyFourMotionBlendAtPhase(int aHandle, int bHandle, int cHandle, int dHandle, float phase, float weight, float lean); // 0x004a9050, ret 0x1c (KrustyBike slot 102)
@@ -164,10 +165,10 @@ public:
     // --- vtable 0x00551530 (offset 0): overrides of Character slots ---
     virtual void BuildModel();         // 0x00445a70
     virtual void CaptureRestPose();         // 0x00445fc0
-    virtual void CaptureFramePoses(int records); // 0x00446110
-    virtual void ApplyPose(int poseRecord, int rowMask);   // 0x00446210
-    virtual void ApplyMirroredPose(int poseRecord, int rowMask);   // 0x00446300
-    virtual void ApplyFullPose(int poseRecord, int rowMask);   // 0x00446480
+    virtual void CaptureFramePoses(MotionPoseList* frame); // 0x00446110
+    virtual void ApplyPose(const CharacterPose* pose, const int* rowMask);   // 0x00446210
+    virtual void ApplyMirroredPose(const CharacterPose* pose, const int* rowMask);   // 0x00446300
+    virtual void ApplyFullPose(const CharacterPose* pose, const int* rowMask);   // 0x00446480
     virtual void CopyStateFrom(int other); // 0x00445e70
     virtual void CopyModelFrom(int other); // 0x00445ec0
     virtual void DumpNodeTransforms();        // 0x00446520
