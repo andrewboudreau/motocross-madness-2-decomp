@@ -32,7 +32,7 @@
     "src/reconstructed/ArcadeObject.cpp": {
       "sections": 32,
       "relocations": 127,
-      "sha256": "acb471c10cfaee7d4723f665c7b4e901eedd25a700d450ec3d8e88f8d8c47112"
+      "sha256": "8d8074273f8d6935e1c8402943d1edfd5670e359ca9432a22b58bbced1152fe7"
     },
     "src/reconstructed/D3DIMSoultreeModifier.cpp": {
       "sections": 23,
