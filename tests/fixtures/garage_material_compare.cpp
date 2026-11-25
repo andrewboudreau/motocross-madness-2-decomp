@@ -64,7 +64,7 @@ static int Filter(EXCEPTION_POINTERS *p) {
 static void Run(int retail, D3DIMSoultreeObject *self, int index, const char *name, int arg) {
     memset(&current, 0, sizeof(current));
     __try {
-        typedef int (D3DIMSoultreeObject::*Fn)(int, const char *, int);
+        typedef int (D3DIMSoultreeObject::*Fn)(int, const char *, TextureContext *);
         union {
             Fn method;
             DWORD words[2];
@@ -74,7 +74,7 @@ static void Run(int retail, D3DIMSoultreeObject *self, int index, const char *na
             ExitProcess(21);
         if (retail)
             f.words[0] = 0x444c70;
-        current.result = (self->*f.method)(index, name, arg);
+        current.result = (self->*f.method)(index, name, reinterpret_cast<TextureContext *>(arg));
         current.complete = 1;
     } __except (Filter(GetExceptionInformation())) {
     }

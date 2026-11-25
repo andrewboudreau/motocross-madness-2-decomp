@@ -694,7 +694,7 @@ int EventManager::CreatePodiumScene() {
             if (racer) {
                 SoultreeMaterial** texture = ((PodiumKrustyBikeView*)racer)->riderCharacter->modelNode->materialTable;
                 if (texture)
-                    PODIUM_MODEL(character)->ReplaceMaterialTexture(0, (*texture)->textureName, (int)&context);
+                    PODIUM_MODEL(character)->ReplaceMaterialTexture(0, (*texture)->textureName, reinterpret_cast<TextureContext*>(&context));
             }
         }
     }

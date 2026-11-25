@@ -79,13 +79,6 @@ class SPEventDlg;
 class SPBikeRiderDlg;
 class SPRaceInfoDlg;
 
-// The texture a bike or rider model object holds at +0x1a0 (0x00444c70
-// names it from `name`).
-class DialogSoultreeObjectView {
-public:
-    void ReplaceMaterialTexture(int index, const char* name, TextureMapManager** textures);
-};
-
 // RTTI: SinglePlayerDlg : UIDialog (vtable 0x00551a94; 0x7f64 bytes, the
 // size KrustyUI 0x00499b20 allocates). It hosts three pages.
 class SinglePlayerDlg : public UIDialog {

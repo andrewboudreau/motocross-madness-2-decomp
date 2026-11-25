@@ -18861,7 +18861,7 @@ CASES = [
         'name': 'D3DIMSoulTree.CPP D3DIMSoulTree material texture 0x444c70',
         'bindings': 'src/reconstructed/D3DIMSoulTree.bindings.json',
         'source': 'src/reconstructed/D3DIMSoulTree.cpp',
-        'symbol': '?ReplaceMaterialTexture@D3DIMSoultreeObject@@QAEHHPBDH@Z',
+        'symbol': '?ReplaceMaterialTexture@D3DIMSoultreeObject@@QAEHHPBDPAUTextureContext@@@Z',
         'target_va': '0x00444c70',
         'target_size': 133,
         'reason': 'ret 0xc; calls 0x4ff620',

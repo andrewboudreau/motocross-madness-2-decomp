@@ -2512,7 +2512,7 @@ int MPBikeRiderDlg::RenderPre3D()
         int bike = list->GetRowData(-1);
         KrustyUIBikeRecord* entry = &ui->bikes[bike];
         reinterpret_cast<D3DIMSoultreeObject*>(ui->manufacturers[entry->manufacturer].uiModel->modelNode)
-            ->ReplaceMaterialTexture(0, entry->texture, reinterpret_cast<int>(&g_TrackGame->textureContext));
+            ->ReplaceMaterialTexture(0, entry->texture, reinterpret_cast<TextureContext*>(&g_TrackGame->textureContext));
         bikeChanged = 0;
     }
     if (riderChanged) {
@@ -2520,7 +2520,7 @@ int MPBikeRiderDlg::RenderPre3D()
         KrustyUI* ui = g_TrackGame->ui;
         KrustyUIModelRecord* rider = &ui->riders[list->GetRowData(-1)];
         reinterpret_cast<D3DIMSoultreeObject*>(ui->riderPreview->modelNode)
-            ->ReplaceMaterialTexture(0, rider->modelFile, reinterpret_cast<int>(&g_TrackGame->textureContext));
+            ->ReplaceMaterialTexture(0, rider->modelFile, reinterpret_cast<TextureContext*>(&g_TrackGame->textureContext));
         riderChanged = 0;
     }
     return UIDialog::RenderPre3D();

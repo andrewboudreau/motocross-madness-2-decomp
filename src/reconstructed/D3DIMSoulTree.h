@@ -25,6 +25,7 @@
 // QuarryStuntEvent.cpp see the same class.
 
 #include "GameObject.h"
+struct TextureContext;
 #include "MatrixUtil.h"
 #include "SoultreeLodSettings.h"
 
@@ -182,7 +183,7 @@ public:
     void SetUseLighting(int value);         // 0x004444c0: sets useLighting and the dirty flag
     void ClearScreenRects();                  // 0x004444e0: zeroes screenRect and +0x2a8, then SetFlag14c
     void CopyMaterials(D3DIMSoultreeObject* source); // 0x00444a40: new materials copied from source
-    int ReplaceMaterialTexture(int index, const char* name, int unused); // 0x00444c70
+    int ReplaceMaterialTexture(int index, const char* name, TextureContext* textures); // 0x00444c70 (textures unused)
     void SetLod(int lod);           // 0x00444d00
     void SetLowestLod(int lod);           // 0x00444d40
     void SetLodThreshold(float value);             // 0x00444d60

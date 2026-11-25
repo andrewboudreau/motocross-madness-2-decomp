@@ -63,13 +63,6 @@ struct CircuitPointsRank {
 // 0x004d8c20: qsort order of CircuitPointsRank rows, most points first.
 int CompareRankPoints(const void* a, const void* b);
 
-// The skinned models the garage shows (a bike model's +0xc0->+0x1a0, and the
-// object KrustyUI+0x46c points to): 0x00444c70 (among D3DIMSoulTree.CPP's
-// literals) applies the skin `name` with the game's textures.
-class UnknownProCircuitSkinned {
-public:
-    void ReplaceMaterialTexture(int index, const char* name, TextureMapManager** textures);
-};
 
 // RTTI: PCBonusTrackDlg : UIDialog (vtable 0x00557434; 0x7f58 bytes).
 class PCBonusTrackDlg : public UIDialog {

@@ -1,19 +1,19 @@
 {
   "baseline": "Published5e51cf31 DlgProcs pair and publishedfb7a9b22 ProCircuit pair: all same-path nondebug section bytes, flags, addends and resolved destinations preserved under the two listed method names. Portable pins normalize only enumerated canonical/sample source paths plus the prior ContainerList.h and GuiScreenTexture.cpp paths; no omitted section or partial extent. ProCircuitProcs near-miss merge: the sample's four bodies were folded into ProCircuitProcs.cpp and the unit put in retail order (365 sections, 2327 relocations); every calibration case stays exact. The sample pin is removed. DlgProcs.cpp now holds the four former sample bodies in retail order; its pin replaces both.",
   "renames": {
-    "?ReplaceMaterialTexture@DialogSoultreeObjectView@@QAEXHPBDPAPAVTextureMapManager@@@Z": "?ReplaceMaterialTexture@D3DIMSoultreeObject@@QAEHHPBDH@Z",
-    "?ReplaceMaterialTexture@UnknownProCircuitSkinned@@QAEXHPBDPAPAVTextureMapManager@@@Z": "?ReplaceMaterialTexture@D3DIMSoultreeObject@@QAEHHPBDH@Z"
+    "?ReplaceMaterialTexture@DialogSoultreeObjectView@@QAEXHPBDPAPAVTextureMapManager@@@Z": "?ReplaceMaterialTexture@D3DIMSoultreeObject@@QAEHHPBDPAUTextureContext@@@Z",
+    "?ReplaceMaterialTexture@UnknownProCircuitSkinned@@QAEXHPBDPAPAVTextureMapManager@@@Z": "?ReplaceMaterialTexture@D3DIMSoultreeObject@@QAEHHPBDPAUTextureContext@@@Z"
   },
   "objects": {
     "src/reconstructed/DlgProcs.cpp": {
       "sections": 557,
       "relocations": 4155,
-      "sha256": "79cfcd8795018cae3772b88824affdc4df62e9395fe6a3ef6e2954a6316946b8"
+      "sha256": "0ddb5c2cb0a6228cd04e6b485664e6c49181c1a56dc73a6fd5443b566f26a472"
     },
     "src/reconstructed/ProCircuitProcs.cpp": {
       "sections": 365,
       "relocations": 2327,
-      "sha256": "65a29534ea4e78685c4231bc862abd950f5b375d7a2dea7492ed209c27dd6e46"
+      "sha256": "bb4674e3909e6ef304ebb26d894dc4baaba96e4810b8a0b0e8460e4e41d5fac4"
     }
   }
 }

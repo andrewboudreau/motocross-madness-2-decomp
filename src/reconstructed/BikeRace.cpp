@@ -763,11 +763,11 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, TextureContext* te
                                            replayVcr, 0, !(circuit->careerFlags & 2));
         AppendChild(localRacer, -1);
         g_TrackGame->ui->ResolveBikeFile(circuit->racers[0].bikeName, ownBikeTexture, 0x3f);
-        localRacer->modelNode->ReplaceMaterialTexture(0, ownBikeTexture, (int)textures);
+        localRacer->modelNode->ReplaceMaterialTexture(0, ownBikeTexture, textures);
         if (!(circuit->careerFlags & 2)) {
             g_TrackGame->ui->ResolveRiderFile(circuit->racers[0].riderModel, ownRiderTexture,
                                                              0x3f);
-            localRacer->riderCharacter->modelNode->ReplaceMaterialTexture(0, ownRiderTexture, (int)textures);
+            localRacer->riderCharacter->modelNode->ReplaceMaterialTexture(0, ownRiderTexture, textures);
         }
         if (g_TrackGame->mode.raceSettings.raceMode == 1) {
             id = 1;
@@ -803,9 +803,9 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, TextureContext* te
                                                           racer->racerName, 0, id, (const KbBikeSetup*)&setup, 1, 1, particleManager,
                                                           raceScene, replayVcr, skill, 1);
                 AppendChild(aiRacers[n - 1], -1);
-                aiRacers[n - 1]->modelNode->ReplaceMaterialTexture(0, racer->bikeName, (int)textures);
+                aiRacers[n - 1]->modelNode->ReplaceMaterialTexture(0, racer->bikeName, textures);
                 aiRacers[n - 1]->riderCharacter->modelNode->ReplaceMaterialTexture(0, racer->riderModel,
-                                                                                     (int)textures);
+                                                                                     textures);
                 id++;
             }
         }
@@ -875,8 +875,8 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, TextureContext* te
             Release();
             return 0;
         }
-        localRacer->modelNode->ReplaceMaterialTexture(0, bikeTexture, (int)textures);
-        localRacer->riderCharacter->modelNode->ReplaceMaterialTexture(0, riderTexture, (int)textures);
+        localRacer->modelNode->ReplaceMaterialTexture(0, bikeTexture, textures);
+        localRacer->riderCharacter->modelNode->ReplaceMaterialTexture(0, riderTexture, textures);
         if (!g_TrackGame->mode.raceSettings.treeCollision) {
             localRacer->collisionObject->ignoreVegetation = 1;
             localRacer->frontWheel->ignoreVegetation = 1;
@@ -935,8 +935,8 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, TextureContext* te
                     racerSlots[j]->frontWheel->ignoreVegetation = 1;
                     racerSlots[j]->rearWheel->ignoreVegetation = 1;
                 }
-                racerSlots[j]->modelNode->ReplaceMaterialTexture(0, ownBikeTexture, (int)textures);
-                racerSlots[j]->riderCharacter->modelNode->ReplaceMaterialTexture(0, ownRiderTexture, (int)textures);
+                racerSlots[j]->modelNode->ReplaceMaterialTexture(0, ownBikeTexture, textures);
+                racerSlots[j]->riderCharacter->modelNode->ReplaceMaterialTexture(0, ownRiderTexture, textures);
                 racerSlots[j]->plateNumber = g_TrackGame->mode.plateNumber;
                 if (replayVcr && g_TrackGame->useReplayTape && !g_TrackGame->playingReplay) {
                     replayVcr->SetRacer(playerId, 0, recordIndex++, g_TrackGame->mode.profileName,
@@ -981,12 +981,12 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, TextureContext* te
                 sprintf(message, "Net Bike%d not loaded\n", j);
             }
             g_TrackGame->ui->ResolveBikeFile(g_TrackGame->mode.racers[j].bikeName, bikeTexture, 0x3f);
-            racerSlots[j]->modelNode->ReplaceMaterialTexture(0, bikeTexture, (int)textures);
+            racerSlots[j]->modelNode->ReplaceMaterialTexture(0, bikeTexture, textures);
             if (g_TrackGame->GetRegistryInt("MPR", 0) == 123 && g_TrackGame->mode.racers[j].hasMprSkin) {
-                racerSlots[j]->riderCharacter->modelNode->ReplaceMaterialTexture(0, "MPR.tga", (int)textures);
+                racerSlots[j]->riderCharacter->modelNode->ReplaceMaterialTexture(0, "MPR.tga", textures);
             } else {
                 g_TrackGame->ui->ResolveRiderFile(g_TrackGame->mode.racers[j].riderName, riderTexture, 0x3f);
-                racerSlots[j]->riderCharacter->modelNode->ReplaceMaterialTexture(0, riderTexture, (int)textures);
+                racerSlots[j]->riderCharacter->modelNode->ReplaceMaterialTexture(0, riderTexture, textures);
             }
             if (!g_TrackGame->mode.raceSettings.treeCollision) {
                 racerSlots[j]->collisionObject->ignoreVegetation = 1;
@@ -1033,8 +1033,8 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, TextureContext* te
                                        -1)) {
                 sprintf(message, "Net Bike%d not loaded\n", j);
             }
-            racerSlots[j]->modelNode->ReplaceMaterialTexture(0, g_TrackGame->mode.racers[j].bikeName, (int)textures);
-            racerSlots[j]->riderCharacter->modelNode->ReplaceMaterialTexture(0, g_TrackGame->mode.racers[j].riderName, (int)textures);
+            racerSlots[j]->modelNode->ReplaceMaterialTexture(0, g_TrackGame->mode.racers[j].bikeName, textures);
+            racerSlots[j]->riderCharacter->modelNode->ReplaceMaterialTexture(0, g_TrackGame->mode.racers[j].riderName, textures);
             if (!g_TrackGame->mode.raceSettings.treeCollision) {
                 racerSlots[j]->collisionObject->ignoreVegetation = 1;
                 racerSlots[j]->frontWheel->ignoreVegetation = 1;
@@ -1152,24 +1152,24 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, TextureContext* te
                     char text[0x40];
                     COPY_TEXT(text, bikeTexture, 0x40);
                     g_TrackGame->ui->ResolveBikeFile(text, bikeTexture, 0x3f);
-                    aiRacers[n]->modelNode->ReplaceMaterialTexture(0, bikeTexture, (int)textures);
+                    aiRacers[n]->modelNode->ReplaceMaterialTexture(0, bikeTexture, textures);
                     COPY_TEXT(text, riderTexture, 0x40);
                     g_TrackGame->ui->ResolveRiderFile(text, riderTexture, 0x3f);
-                    aiRacers[n]->riderCharacter->modelNode->ReplaceMaterialTexture(0, riderTexture, (int)textures);
+                    aiRacers[n]->riderCharacter->modelNode->ReplaceMaterialTexture(0, riderTexture, textures);
                     aiRacers[n]->plateNumber = plate;
                     recordIndex++;
                 } else if (fromEvent) {
                     g_TrackGame->ui->ResolveBikeFile(EventAi(n).bikeTexture, bikeTexture, 0x3f);
-                    aiRacers[n]->modelNode->ReplaceMaterialTexture(0, bikeTexture, (int)textures);
+                    aiRacers[n]->modelNode->ReplaceMaterialTexture(0, bikeTexture, textures);
                     g_TrackGame->ui->ResolveRiderFile(EventAi(n).riderTexture, riderTexture, 0x3f);
-                    aiRacers[n]->riderCharacter->modelNode->ReplaceMaterialTexture(0, riderTexture, (int)textures);
+                    aiRacers[n]->riderCharacter->modelNode->ReplaceMaterialTexture(0, riderTexture, textures);
                     aiRacers[n]->plateNumber = plate;
                 } else {
                     g_TrackGame->ui->ResolveBikeFile(UiBike(bikes[n]).texture, bikeTexture, 0x3f);
-                    aiRacers[n]->modelNode->ReplaceMaterialTexture(0, bikeTexture, (int)textures);
+                    aiRacers[n]->modelNode->ReplaceMaterialTexture(0, bikeTexture, textures);
                     g_TrackGame->ui->ResolveRiderFile(UiRider(riders[n]).modelFile, riderTexture,
                                                                      0x3f);
-                    aiRacers[n]->riderCharacter->modelNode->ReplaceMaterialTexture(0, riderTexture, (int)textures);
+                    aiRacers[n]->riderCharacter->modelNode->ReplaceMaterialTexture(0, riderTexture, textures);
                     aiRacers[n]->plateNumber = plate;
                 }
                 if (!g_TrackGame->mode.raceSettings.treeCollision) {
@@ -1232,8 +1232,8 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, TextureContext* te
                                            -1)) {
                     sprintf(message, "Net Bike%d not loaded\n", j);
                 }
-                racerSlots[j]->modelNode->ReplaceMaterialTexture(0, g_TrackGame->mode.racers[j].bikeName, (int)textures);
-                racerSlots[j]->riderCharacter->modelNode->ReplaceMaterialTexture(0, g_TrackGame->mode.racers[j].riderName, (int)textures);
+                racerSlots[j]->modelNode->ReplaceMaterialTexture(0, g_TrackGame->mode.racers[j].bikeName, textures);
+                racerSlots[j]->riderCharacter->modelNode->ReplaceMaterialTexture(0, g_TrackGame->mode.racers[j].riderName, textures);
                 if (!g_TrackGame->mode.raceSettings.treeCollision) {
                     racerSlots[j]->collisionObject->ignoreVegetation = 1;
                     racerSlots[j]->frontWheel->ignoreVegetation = 1;

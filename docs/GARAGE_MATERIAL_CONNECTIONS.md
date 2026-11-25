@@ -47,9 +47,9 @@ retain 1,675 sections and 11,596 relocations:
 
 ```
 ?ReplaceMaterialTexture@DialogSoultreeObjectView@@QAEXHPBDPAPAVTextureMapManager@@@Z
-  -> ?ReplaceMaterialTexture@D3DIMSoultreeObject@@QAEHHPBDH@Z
+  -> ?ReplaceMaterialTexture@D3DIMSoultreeObject@@QAEHHPBDPAUTextureContext@@@Z
 ?ReplaceMaterialTexture@UnknownProCircuitSkinned@@QAEXHPBDPAPAVTextureMapManager@@@Z
-  -> ?ReplaceMaterialTexture@D3DIMSoultreeObject@@QAEHHPBDH@Z
+  -> ?ReplaceMaterialTexture@D3DIMSoultreeObject@@QAEHHPBDPAUTextureContext@@@Z
 ```
 
 The same-path before/after proof retains every section byte, flag, relocation

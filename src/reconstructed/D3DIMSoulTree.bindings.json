@@ -62,7 +62,7 @@
   "?ClearScreenRects@D3DIMSoultreeObject@@QAEXXZ": "0x004444e0",
   "?CopyMaterials@D3DIMSoultreeObject@@QAEXPAV1@@Z": "0x00444a40",
   "?CopyMaterials@D3DIMSoultreeObject@@QAEXPAV1@@Z$ehhandler": "0x0054a147",
-  "?ReplaceMaterialTexture@D3DIMSoultreeObject@@QAEHHPBDH@Z": "0x00444c70",
+  "?ReplaceMaterialTexture@D3DIMSoultreeObject@@QAEHHPBDPAUTextureContext@@@Z": "0x00444c70",
   "?SetLod@D3DIMSoultreeObject@@QAEXH@Z": "0x00444d00",
   "?SetLowestLod@D3DIMSoultreeObject@@QAEXH@Z": "0x00444d40",
   "?SetLodThreshold@D3DIMSoultreeObject@@QAEXM@Z": "0x00444d60",
