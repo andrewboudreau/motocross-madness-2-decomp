@@ -1,6 +1,6 @@
 #include "../krusty2/broadphase/Terrain.h"
 #include "GUIManagerCore.h"
-#include "../krusty2/motion/D3DIMSoultreeCharacter.h"
+#include "../krusty2/motion/CollisionCharacter.h"
 #include "BikeRace.h"
 #include "TrackOverlay.h"
 
@@ -334,7 +334,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
                     point = position;
                 }
                 terrain->QueryGround(reinterpret_cast<TerrainVec3*>(&point), reinterpret_cast<TerrainVec3*>(&normal), 0, 0);
-                thirtySecondMan = (StartObjectCharacterView*)raceScene->FindEntryByFileName("30SecMan.slt", &thirtySecondManEntry);
+                thirtySecondMan = raceScene->FindEntryByFileName("30SecMan.slt", &thirtySecondManEntry);
                 if (thirtySecondMan) {
                     raceScene->RestartEntry(thirtySecondManEntry, 0, 0, 0);
                     raceScene->animationTable->entries[thirtySecondManEntry].animatesWhileHeld = 1;
@@ -345,8 +345,8 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
                 }
                 if (g_TrackGame->mode.raceSettings.raceMode != 0 &&
                     g_TrackGame->mode.raceSettings.raceMode != 4 && thirtySecondMan) {
-                    thirtySecondMan->model->SetPositionVec3(point);
-                    thirtySecondMan->model->SetAxesPtr((const Vec3*)&direction, (const Vec3*)&kVec3YAxis, 1, 0);
+                    thirtySecondMan->modelNode->SetPositionVec3(point);
+                    thirtySecondMan->modelNode->SetAxesPtr((const Vec3*)&direction, (const Vec3*)&kVec3YAxis, 1, 0);
                 }
                 if (thirtySecondMan)
                     thirtySecondMan->Disable();
@@ -361,7 +361,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
                 terrain->QueryGround(reinterpret_cast<TerrainVec3*>(&point), reinterpret_cast<TerrainVec3*>(&normal), 0, 0);
                 if (g_TrackGame->mode.raceSettings.eventType == 3) {
                     startGate =
-                        (StartObjectCharacterView*)raceScene->FindEntryByFileName("StartGate.slb", &startGateEntry);
+                        raceScene->FindEntryByFileName("StartGate.slb", &startGateEntry);
                     if (startGate) {
                         raceScene->RestartEntry(startGateEntry, 0, 0, 0);
                         if (startGate->collisionObject) {
@@ -372,8 +372,8 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
                     if (g_TrackGame->mode.raceSettings.raceMode != 0 &&
                         g_TrackGame->mode.raceSettings.raceMode != 4) {
                         if (startGate) {
-                            startGate->model->SetPositionVec3(point);
-                            startGate->model->SetAxesPtr((const Vec3*)&direction, (const Vec3*)&kVec3YAxis, 1, 0);
+                            startGate->modelNode->SetPositionVec3(point);
+                            startGate->modelNode->SetAxesPtr((const Vec3*)&direction, (const Vec3*)&kVec3YAxis, 1, 0);
                         }
                     } else if (startGate) {
                         startGate->Disable();
@@ -516,7 +516,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
             point.z += localRacer->heading.z * 15.0f;
         }
         terrain->QueryGround(reinterpret_cast<TerrainVec3*>(&point), 0, 0, 0);
-        thirtySecondMan->model->SetPositionVec3(point);
+        thirtySecondMan->modelNode->SetPositionVec3(point);
     }
     if (g_TrackGame->playingReplay && g_TrackGame->mode.raceSettings.raceMode != 4 &&
         g_TrackGame->useReplayTape) {
@@ -1615,7 +1615,7 @@ int BikeRace::Tick(float frameTime) {
             } else {
                 Vector3 position;
                 if (isRacing) {
-                    if (startGate != 0 && ((BikeRaceSceneCharacterView*)startGate)->isEnabled &&
+                    if (startGate != 0 && startGate->isEnabled &&
                         startGateTimer > 0.0f) {
                         startGateTimer -= g_TrackGame->frameTime;
                         if (startGateTimer <= 0.0f) {
@@ -1712,7 +1712,7 @@ int BikeRace::Tick(float frameTime) {
                     restartPending = false;
                     isRacing = false;
                 }
-                if (youIndicator != 0 && ((BikeRaceGameObjectFlags*)youIndicator)->isEnabled) {
+                if (youIndicator != 0 && youIndicator->isEnabled) {
                     position = localRacer->centerOfMass;
                     position.y += 4.25f;
                     ((ArcadeObject*)youIndicator)->SetPosition(&position);
@@ -2003,16 +2003,15 @@ int BikeRace::AimCamera(int caster) {
             }
             SceneAnimation* entry = &raceScene->animationTable->entries[targetEntry];
             if (entry->keyFramed) {
-                BikeRaceSceneCharacterView* character =
-                    (BikeRaceSceneCharacterView*)entry->character;
+                CollisionCharacter* character = entry->character;
                 if (character->isEnabled) {
                     RaceCameraView()->TargetSceneCharacter(character);
                 } else {
                     return 0;
                 }
             } else {
-                GameObject* object = (GameObject*)entry->proceduralObject;
-                if (((BikeRaceGameObjectFlags*)object)->isEnabled) {
+                CarProcedural* object = entry->proceduralObject;
+                if (object->isEnabled) {
                     RaceCameraView()->TargetSceneObject(object);
                 } else {
                     return 0;
@@ -2118,12 +2117,12 @@ void BikeRace::NextCameraTarget(int forward, int racers, int objects) {
             }
             SceneAnimation* entry = &scene->animationTable->entries[targetEntry];
             if (entry->keyFramed) {
-                if (((BikeRaceSceneCharacterView*)entry->character)->isEnabled) {
+                if (entry->character->isEnabled) {
                     hidden = entry->excludeFromCameraIteration;
                 } else {
                     hidden = 1;
                 }
-            } else if (((BikeRaceGameObjectFlags*)entry->proceduralObject)->isEnabled) {
+            } else if (entry->proceduralObject->isEnabled) {
                 hidden = entry->excludeFromCameraIteration;
             } else {
                 hidden = 1;
@@ -2135,11 +2134,11 @@ void BikeRace::NextCameraTarget(int forward, int racers, int objects) {
                 }
                 entry = &scene->animationTable->entries[targetEntry];
                 if (entry->keyFramed) {
-                    if (!((BikeRaceSceneCharacterView*)entry->character)->isEnabled) {
+                    if (!entry->character->isEnabled) {
                         view->followingRacer = 1;
                         return;
                     }
-                } else if (!((BikeRaceGameObjectFlags*)entry->proceduralObject)->isEnabled) {
+                } else if (!entry->proceduralObject->isEnabled) {
                     view->followingRacer = 1;
                     return;
                 }
@@ -2386,8 +2385,7 @@ int BikeRace::OnControlPress(ControlEvent* event, InputButtonState* entry) {
                 if (g_TrackGame->ui->gui->GetUser(0)->userCursor == 0) {
                     g_TrackGame->ui->gui->CreateCursors("ui\\cursor.tga", 0);
                 }
-                if (!((BikeRaceGameObjectFlags*)g_TrackGame->ui->gui
-                          ->GetUser(0)->userCursor)->isEnabled) {
+                if (!g_TrackGame->ui->gui->GetUser(0)->userCursor->isEnabled) {
                     if (objectPicker == 0) {
                         ObjectPicker* picker = new (__FILE__, 0xed2) ObjectPicker(1);
                         objectPicker = picker;

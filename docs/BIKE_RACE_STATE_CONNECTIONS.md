@@ -123,6 +123,11 @@ order. SceneManager.h's entries now point at `CollisionCharacter` and `CarProced
 scene loader constructs `SoultreePhysicsObject`. The proof found CreateRacers' six bytes as the only
 BikeRace.cpp change, and the resolved digests are again the earlier 13,400 ones.
 
+Retiring BikeRace.h's scene views swapped it again (13,394). The start gate, 30-second man and
+camera targets are now `CollisionCharacter*` and `CarProcedural*`, and their colliders
+`CollisionObject*`. The proof over the 23 units including BikeRace.h found the two instructions
+at +538 as the only change; the pins carry the 13,394 fingerprints of the Scene-view step again.
+
 | Complete CreateRacers fingerprint | Before | After |
 |---|---|---|
 | Raw body SHA-256 | `1a2b16687fa89e9a0ed33dba31a1e46452caaaefa3ad73ce630b317a32bf07c4` | `9c7483a4d5ff8514f8a350f528dbe11d8d82d4d694439f87d069fd6fbf9e748b` |

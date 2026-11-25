@@ -48,10 +48,8 @@ class LightManager;
 struct TextureContext;
 struct BikeEngineSetup;
 struct LodBikeRaceView;
-struct BikeRaceSceneCharacterView;
 struct ReceivedRacerState;
 struct RacerDeltaMessage;
-struct StartObjectCharacterView;
 
 // One of KrustyVCR's eight 8-byte records at +0x25c (cleared by its inline
 // constructor).
@@ -510,41 +508,11 @@ struct RaceGateEvent {
     RaceGateObject* gateEntries[1];  // +0x420  BuildNodeList reads entry i's width and value
 };
 
-// The object at +0x210 of BikeRace+0x6c's object (the 30SecMan): a second base at +0xc
-// holds the GameObject part that 0x00421050 releases (slot 2).
-class StartObjectColliderBase {
-public:
-    virtual void UnknownVirtualSlot0();
-    short queryStamp;                         // +0x004 QuadTreeObject queryStamp
-    short sortKey;                            // +0x006 QuadTreeObject sortKey
-    int objectTypeId;                       // +0x08 QuadTreeObject objectTypeId (a char there)
-};
-
-class StartObjectCollider : public StartObjectColliderBase, public GameObject {
-};
-
-// The object at BikeRace+0x64/+0x6c (StartGate.slb, 30SecMan.slt): like a racer, it reaches GameObject through
-// a vbptr at +4 (0x00421050 calls slot 5 there).
-struct StartObjectCharacterView : virtual public GameObject {
-    virtual void UnknownVirtualSlot0();
-    unsigned char field_0x008[0x1a0 - 0x08];
-    D3DIMSoultreeObject* model;                // +0x1a0 model (the setup places it)
-    unsigned char field_0x1a4[0x210 - 0x1a4];
-    StartObjectCollider* collisionObject; // +0x210 krusty2 CollisionCharacter::collisionObject
-};
-
-// A GameObject's +0x25 flags, which GameObject.h keeps protected
-// (0x0041eb20 tests bit 0 of scene objects).
-struct BikeRaceGameObjectFlags {
-    unsigned char field_0x00[0x25];
-    unsigned char isEnabled : 1;              // +0x25
-};
-
-// A scene character (Scene+0xb4 entries with bit 3 set): it reaches its
-// GameObject part, seen here only for its flags, through a vbptr at +4.
-struct BikeRaceSceneCharacterView : virtual public BikeRaceGameObjectFlags {
-    virtual void UnknownVirtualSlot0();
-};
+// BikeRace+0x64/+0x6c (StartGate.slb, 30SecMan.slt) and the camera's
+// character target are scene CollisionCharacters (Scene::FindEntryByFileName,
+// SceneAnimation::character); their GameObject part, whose +0x25 isEnabled
+// bit this file tests, is a virtual base reached through the vbptr at +4. The
+// colliders at +0x210 are CollisionObjects (GameObject part at +0xc).
 
 // The members of BikeRace+0x50's KrustyBikeCamera that bikerace.cpp
 // reads and writes (FollowCamera's +0x244 and +0x274, VehicleCamera's
@@ -559,8 +527,8 @@ struct BikeRaceKrustyBikeCameraView {
     unsigned char field_0x26c[0x274 - 0x26c];
     unsigned char isSettled;  // +0x274  FollowCamera isSettled (the comment above names FollowCamera's +0x274)
     unsigned char field_0x275[0x384 - 0x275];
-    BikeRaceSceneCharacterView* targetCharacter;  // +0x384  VehicleCamera+0x384 target; TargetSceneCharacter stores its scene character
-    GameObject* targetCar;  // +0x388  VehicleCamera+0x388 targetCar; TargetSceneObject stores its scene procedural object
+    CollisionCharacter* targetCharacter;  // +0x384  VehicleCamera+0x384 target; TargetSceneCharacter stores its scene character
+    CarProcedural* targetCar;  // +0x388  VehicleCamera+0x388 targetCar; TargetSceneObject stores its scene procedural object
     void* shadowCaster;                       // +0x38c a scene shadow caster
     unsigned char followingRacer;             // +0x390 following a racer
     unsigned char targetPointCached;          // +0x391 VehicleCamera 0x0052bc50; cleared on a new target
@@ -613,7 +581,7 @@ struct BikeRaceKrustyBikeCameraView {
         targetCharacter = 0;
         targetCar = 0;
     }
-    void TargetSceneCharacter(BikeRaceSceneCharacterView* character) {
+    void TargetSceneCharacter(CollisionCharacter* character) {
         targetCharacter = character;
         isSettled = 0;
         targetPointCached = 0;
@@ -622,7 +590,7 @@ struct BikeRaceKrustyBikeCameraView {
         targetCar = 0;
         shadowCaster = 0;
     }
-    void TargetSceneObject(GameObject* object) {
+    void TargetSceneObject(CarProcedural* object) {
         targetCar = object;
         isSettled = 0;
         targetPointCached = 0;

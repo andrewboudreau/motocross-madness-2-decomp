@@ -246,13 +246,6 @@ struct QuarryLoadKrustyBikeCameraView {
     }
 };
 
-// BikeRace's start gate and 30-second man (BikeRace.h's StartObjectCharacterView) as the
-// loader reads them: the krusty2 CollisionCharacter's collision object.
-struct QuarryLoadStartObjectView {
-    unsigned char field_0x000[0x210];
-    CollisionObject* collisionObject; // +0x210 krusty2 CollisionCharacter::collisionObject
-};
-
 // The bytes the render target's colour buffers take.
 static inline int FrameBufferBytes(RenderTarget* target) {
     return PixelFormatBytesPerPixel(target->surfacePixelFormat) * (target->frameModulus + 1) * target->targetHeight *
@@ -663,13 +656,13 @@ int BaseQuarryEvent::LoadEventObjects(LoadProgressFn progress) {
             }
         }
     }
-    if (((BikeRace*)raceView)->thirtySecondMan && ((QuarryLoadStartObjectView*)((BikeRace*)raceView)->thirtySecondMan)->collisionObject) {
-        ((QuarryLoadStartObjectView*)((BikeRace*)raceView)->thirtySecondMan)->collisionObject->Release();
-        ((QuarryLoadStartObjectView*)((BikeRace*)raceView)->thirtySecondMan)->collisionObject = 0;
+    if (((BikeRace*)raceView)->thirtySecondMan && ((BikeRace*)raceView)->thirtySecondMan->collisionObject) {
+        ((BikeRace*)raceView)->thirtySecondMan->collisionObject->Release();
+        ((BikeRace*)raceView)->thirtySecondMan->collisionObject = 0;
     }
-    if (((BikeRace*)raceView)->startGate && ((QuarryLoadStartObjectView*)((BikeRace*)raceView)->startGate)->collisionObject) {
-        ((QuarryLoadStartObjectView*)((BikeRace*)raceView)->startGate)->collisionObject->Release();
-        ((QuarryLoadStartObjectView*)((BikeRace*)raceView)->startGate)->collisionObject = 0;
+    if (((BikeRace*)raceView)->startGate && ((BikeRace*)raceView)->startGate->collisionObject) {
+        ((BikeRace*)raceView)->startGate->collisionObject->Release();
+        ((BikeRace*)raceView)->startGate->collisionObject = 0;
     }
     if (eventScene->animationTable) {
         for (int i = 0; i < eventScene->animationTable->entryCount; i++) {

@@ -20,7 +20,7 @@ struct BikeRaceKrustyBikeCameraView;
 struct RaceGateEvent;
 struct RaceGatePose;
 struct BikeRaceRaceSoundView;
-struct StartObjectCharacterView;
+class CollisionCharacter;
 struct RaceStatusNode;
 
 class BikeRace : public GraphicsTest {
@@ -116,9 +116,9 @@ public:
     Scene* raceScene;
     ProjectedShadow* raceShadow;  // +0x5C  Create's shadow argument (ProjectedShadow); camera targeting clears it and adds the target's casters
     GameObject* youIndicator;                 // +0x60 the spinning "youind.slt" marker over the local racer
-    StartObjectCharacterView* startGate;         // +0x64 the scene's "StartGate.slb" entry; reset by a restart (slot 5)
+    CollisionCharacter* startGate;         // +0x64 the scene's "StartGate.slb" entry; reset by a restart (slot 5)
     int startGateEntry;                       // +0x68 its scene animation entry index
-    StartObjectCharacterView* thirtySecondMan;   // +0x6c the scene's "30SecMan.slt" entry
+    CollisionCharacter* thirtySecondMan;   // +0x6c the scene's "30SecMan.slt" entry
     int thirtySecondManEntry;                 // +0x70 its scene animation entry index
     BikeRaceD3DIMSoultreeCharacterView* flagGirl;    // the flag girl (0x0041ea60's argument)
     int flagGirlState;  // +0x78  flag girl motion state: 0 Stand, 1 first FlagStart, 3 second FlagStart, 4 FlagLoop (slot 10)
