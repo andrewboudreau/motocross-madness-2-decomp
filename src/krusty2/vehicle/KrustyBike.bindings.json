@@ -181,7 +181,7 @@
   "?SetLod@D3DIMSoultreeObject@@QAEXH@Z": "0x00444d00",
   "?SetLowestLod@D3DIMSoultreeObject@@QAEXH@Z": "0x00444d40",
   "?AddSecondModifier@D3DIMSoultreeObject@@QAEXPAVGameObject@@@Z": "0x00444eb0",
-  "?LoadParameterFile@KbMorphMod@@QAEPAU1@PAXPBDPAVSoultreeObject@@@Z": "0x004a33b0",
+  "?LoadParameterFile@MorphBastardModifier@@QAEPAV1@PAXPBDPAVSoultreeObject@@@Z": "0x004a33b0",
   "?OrientationAxesFromAngles@@YAXPAUVec3@@0MMM@Z": "0x004b5d00",
   "?ReadClock@@YAIXZ": "0x004bfa80",
   "?ClassifyOutOfBounds@KrustyBike@@UAEHH@Z": "0x0048de20",

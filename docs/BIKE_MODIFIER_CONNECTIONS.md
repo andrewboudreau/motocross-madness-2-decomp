@@ -42,8 +42,8 @@ expose the same declarations. This keeps the physics caller from importing the
 separate complete rendering SoultreeObject declaration. Class fields, bases,
 virtual order and method signatures are unchanged.
 
-`KbMorphMod::LoadParameterFile` still has no emitted complete source provider;
-its call and provisional return view remain unresolved. The morph's virtual
+KrustyBike.cpp calls `MorphBastardModifier::LoadParameterFile` (`0x4a33b0`)
+directly; that loader is a near miss in MorphBastardModifier.cpp. The morph's virtual
 deformation and controller-angle dependencies also remain missing. This slice
 does not establish complete rider deformation, ghost rendering or racing.
 

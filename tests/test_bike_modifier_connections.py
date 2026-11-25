@@ -148,7 +148,7 @@ class BikeModifierConnectionsTests(unittest.TestCase):
                 self.assertEqual(sum(s.startswith(name) for s in imports), 1)
             self.assertFalse(any('Modifier@KbXform' in s or 'StartFade@KbObj128' in s or
                                  '??0KbGhostMod' in s or '??0KbMorphMod' in s for s in imports))
-            self.assertTrue(any(s.startswith('?LoadParameterFile@KbMorphMod@@') for s in imports))
+            self.assertTrue(any(s.startswith('?LoadParameterFile@MorphBastardModifier@@') for s in imports))
             for name in ('_GhostPrimary', '_MorphPrimary'):
                 self.assertEqual(objects[fixtures[1]].symbol_extent(objects[fixtures[1]].find_symbol(name)),
                                  (bytes.fromhex('8b442404c3'), 5, []))

@@ -14,7 +14,7 @@
     "src/krusty2/vehicle/KrustyBike.cpp": {
       "sections": 271,
       "relocations": 1443,
-      "sha256": "041ea351e4e6bb8f5a19cc135619fdd62177dba943221707a2a017561609854d"
+      "sha256": "08620735323b22fe34b39480e65d73f2b47e7dba02e2729adeeebcf413e1f25d"
     },
     "samples/physics/motion/Motnctrl.cpp": {
       "sections": 35,

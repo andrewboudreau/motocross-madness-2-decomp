@@ -68,7 +68,6 @@
     "?CrossProduct@@YA?AUVector3@@PBU1@0@Z": "?CrossProductCall@@YA?AUVec3@@ABU1@0@Z",
     "?AxisAngleMatrix@@YAXPAUMatrix4@@MMMM@Z": "?AxisAngleMatrix@@YAXPAUTreeMatrix4@@MMMM@Z",
     "??0MbVector3Call@@QAE@MMM@Z": "??0Vec3Call@@QAE@MMM@Z",
-    "?LoadParameterFile@KbMorphMod@@QAEPAU1@PAXPBDPAVSoultreeObject@@@Z": "?LoadParameterFile@MorphBastardModifier@@QAEPAV1@PAXPBDPAVSoultreeObject@@@Z",
     "?LargestRecentSample@UnknownTimer@@QAEHXZ": "?Peak@PeakHold@@QAEHXZ",
     "?RecordSample@UnknownTimer@@QAEXH@Z": "?Record@PeakHold@@QAEXH@Z",
     "?ShadowTransformPointsProjective@@YAXPAUShadowVec3@@PBXPBUShadowMatrix@@HHH@Z": "?ProjectPoints@@YAXPAXPBXPBUMatrix4@@HHH@Z",

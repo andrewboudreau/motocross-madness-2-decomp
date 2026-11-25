@@ -1264,10 +1264,10 @@ GameObject* KrustyBike::Load(void* context, const char* engineName, const char* 
         Vec3 axisY(0.0f, 1.0f, 0.0f);
         Vec3 axisZ(0.0f, 0.0f, 1.0f);
         ((SoultreeObject*)riderCharacter->c_0x1a0)->SetAxesIn(0, &axisZ, &axisY, 0, 1);
-        KbMorphMod* morph = (KbMorphMod*)new(__FILE__, 0x891) MorphBastardModifier(1);
+        MorphBastardModifier* morph = new(__FILE__, 0x891) MorphBastardModifier(1);
         morph->LoadParameterFile(context, "RiderMorph.mbf", (SoultreeObject*)riderCharacter->c_0x1a0);
-        GameObject::AppendChild((GameObject*)morph, -1);
-        ((D3DIMSoultreeObject*)riderCharacter->c_0x1a0)->AddSecondModifier((GameObject*)morph);
+        GameObject::AppendChild(morph, -1);
+        ((D3DIMSoultreeObject*)riderCharacter->c_0x1a0)->AddSecondModifier(morph);
     }
     UpdateRiderPose(0.001f);
     return this;

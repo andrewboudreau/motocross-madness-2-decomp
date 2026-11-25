@@ -29,8 +29,7 @@ its deleting wrapper, the qsort comparator `0x004a3bb0`, the vector angle
 
 Near misses (in the unit in retail order, each with a `// Not exact` status
 comment; they moved in from a sample and two bring-up copies, and
-`KbMorphMod::LoadParameterFile`, KrustyBike.cpp's view, links to the unit's
-loader through a link alias):
+KrustyBike.cpp calls the loader directly):
 - The 2046-byte parameter-file loader `LoadParameterFile` `0x004a33b0` (1950 of 2046): an
   existing channel records the target index `j`; the stack homes of the loop
   scalars and the operand order of the channel inverse's products differ.

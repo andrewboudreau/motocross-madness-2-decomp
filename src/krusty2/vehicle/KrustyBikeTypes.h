@@ -328,7 +328,6 @@ struct KbSink {                    // view of the wheel Shock (vtable: 0 Reset, 
 
 // Matrix-like helper at +0x3bc (D3DIMSoultreeCharacter::d3d_field_0x1a0); 0x004FD710
 // transforms a vector.
-struct KbMorphMod;
 struct KbXform {
     Vec3 WorldToLocalDirection(const Vec3* v);
     // D3DIMSoultreeObject setters (names from src/reconstructed/D3DIMSoulTree.h): 0x0048fc80 calls
@@ -424,11 +423,6 @@ struct KbBikeSetup {
     int firstBand;               // +0x50 -> LoadBike rpmLow
     int lastBand;                // +0x54 KrustyUI "RPMUpperLimit" -> rpmHigh
     int bandStep;                // +0x58 -> rpmStep
-};
-// 0x58-byte rider morph (src/reconstructed MorphBastardModifier: ctor 0x004a3150, loader 0x004a33b0).
-struct KbMorphMod {
-    char pad_0x00[0x58];
-    KbMorphMod* LoadParameterFile(void* a, const char* path, SoultreeObject* node);
 };
 // 0x004a2fc0 (cdecl): zeroed debug-heap allocation of count x size bytes tagged with the source line.
 void* DebugCalloc(unsigned int count, unsigned int size, const char* file, int line);
