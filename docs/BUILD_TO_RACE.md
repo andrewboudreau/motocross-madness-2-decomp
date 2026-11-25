@@ -80,7 +80,7 @@ Score is the masked linked score from `linked_accuracy.py`. "Emu" means a
 | `KrustyBike::SimulateFrame`, `Vehicle::SimulateFrame` | 0x496790, 0x52a940 | near miss 0.999, 0.998 | |
 | Bike AI | 0x40eca0, 0x414370, 0x517340 | bring-up 0.957, 0.951, 0.842 | 34,965 B unit. |
 | `SceneTick` | 0x4eab00 | bring-up 0.941 | |
-| Visibility walk, `TestBox` | 0x481de0, 0x52f570 | near miss 0.733, bring-up 0.796 | Decide what is drawn. `TestBox`: emu cases `visibility_testbox`, `shadow_clipper_testbox` (item 9). |
+| Visibility walk, `TestBox` | 0x481de0, 0x52f570 | near miss 0.733, bring-up 0.796 | Decide what is drawn. `TestBox`: emu case `visibility_testbox` (item 9; D3DIMSoultreeShadow now calls it directly). |
 | `LightVertices`, `TransformPoints` | 0x49e4a0, 0x4a1b00 | bring-up 0.754, 0.336 | Low scores come mostly from inline-asm retail bodies. Emu cases agree with retail on every reached branch (item 9). |
 | `DrawCurrentLod` | 0x440f30 | bring-up 0.901 (7,851 B) | Reads a local retail leaves uninitialised; source sets it to 0. |
 | Particles, projected shadow | 0x4bac60, 0x4db8c0, 0x4dbd30, 0x4dc2b0 | bring-up 0.712; near miss 0.738-0.837 | |

@@ -53,6 +53,8 @@
 #include "math/Vec3.h"
 #include "../../../src/reconstructed/Matrix4.h"
 #include "core/SoultreeObject.h"
+#include "../../../src/reconstructed/PCRenderTarget.h"
+#include "../../../src/reconstructed/Camera.h"
 #include "../../../src/reconstructed/PCTextureMap.h"
 #include "../../../src/reconstructed/ClipRectangle.h"
 #include "../../common/FistpFloatToInt.h"
@@ -105,25 +107,7 @@ public:
     char pad_0x280[0x28c - 0x280];
     D3DIMShadowLod* lods;           // +0x28c
 };
-class D3DIMShadowCameraView {
-public:
-    char pad_0x00[0xec];
-    D3DIMShadowMatrix4 matrix_0xec; // +0xec
-};
-// The render target at GameObject::renderContext (slot 29 tests against its camera at +8).
-class D3DIMShadowHostView {
-public:
-    void* vtable;                   // +0x00
-    void* display;                  // +0x04
-    D3DIMShadowCameraView* camera;  // +0x08
-};
-// The object at 0x00575a98 (src/krusty2/visibility/VisibilityQuadTree.h VisibilityClipper).
-class D3DIMShadowClipper {
-public:
-    int TestBox(D3DIMShadowCameraView* camera, const float* matrix, const float* center,
-                const float* extent, int* screenRect, int* cornersInside, int unused);  // 0x0052f570
-};
-#include "../../../src/krusty2/visibility/VisibilityClipperGlobal.h"   // 0x00575a98
+#include "../../../src/krusty2/visibility/VisibilityClipper.h"   // g_visibilityClipper 0x00575a98
 
 static inline void D3DIMShadowMatrixProduct(D3DIMShadowMatrix4* out, const D3DIMShadowMatrix4& a,
                                             const D3DIMShadowMatrix4& b)
@@ -166,12 +150,12 @@ int D3DIMSoultreeShadow::NeedsShadowRender()
         D3DIMShadowMatrix4 localToView;
         reinterpret_cast<SoultreeObject*>(casterView)->GetMatrixIn(0, reinterpret_cast<Matrix4*>(&local));
         reinterpret_cast<SoultreeObject*>(caster)->GetSubtreeBounds(reinterpret_cast<Vec3*>(&center), reinterpret_cast<Vec3*>(&extent));
-        D3DIMShadowHostView* host = (D3DIMShadowHostView*)renderContext;
-        D3DIMShadowCameraView* camera = host->camera;
-        const D3DIMShadowMatrix4& view = camera->matrix_0xec;
+        PCRenderTarget* host = (PCRenderTarget*)renderContext;
+        Camera* camera = host->currentCamera;
+        const D3DIMShadowMatrix4& view = *(const D3DIMShadowMatrix4*)&camera->screenMatrix[0];
         D3DIMShadowMatrixProduct(&localToView, local, view);
-        if (reinterpret_cast<D3DIMShadowClipper*>(g_visibilityClipper)->TestBox(
-                host->camera, &localToView._11, &center.x, &extent.x, 0, 0, 0))
+        if (g_visibilityClipper->TestBox(
+                (VisibilityCamera*)host->currentCamera, &localToView._11, &center.x, &extent.x, 0, 0, 0))
             inCameraView = 1;
     }
     return inCameraView;

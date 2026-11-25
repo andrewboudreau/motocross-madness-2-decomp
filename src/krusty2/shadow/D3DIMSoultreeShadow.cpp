@@ -9,6 +9,7 @@
 #include "core/SoultreeObject.h"
 #include "../../reconstructed/PCRenderTarget.h"
 #include "../../reconstructed/Camera.h"
+#include "../../reconstructed/ShadowCamera.h"
 #include "../../reconstructed/PCTextureMap.h"
 
 // Per-TU vector constants (tier 2): 0x004477d0..0x004478d0 are the four VC6 dynamic initializers
@@ -82,18 +83,7 @@ public:
     char pad_0x00[0x14c];
     int hidden;                     // +0x14c (D3DIMSoulTree.h): nonzero skips the visibility test
 };
-class D3DIMShadowCameraView {
-public:
-    char pad_0x00[0xec];
-    D3DIMShadowMatrix4 matrix_0xec; // +0xec
-};
-// The object at 0x00575a98 (src/krusty2/visibility/VisibilityQuadTree.h VisibilityClipper).
-class D3DIMShadowClipper {
-public:
-    int TestBox(D3DIMShadowCameraView* camera, const float* matrix, const float* center,
-                const float* extent, int* screenRect, int* cornersInside, int unused);  // 0x0052f570
-};
-#include "../visibility/VisibilityClipperGlobal.h"   // 0x00575a98
+#include "../visibility/VisibilityClipper.h"   // g_visibilityClipper 0x00575a98
 
 static inline void D3DIMShadowMatrixProduct(D3DIMShadowMatrix4* out, const D3DIMShadowMatrix4& a,
                                             const D3DIMShadowMatrix4& b)
@@ -135,9 +125,9 @@ int D3DIMSoultreeShadow::IsShadowVisible()
         D3DIMShadowMatrix4 m;
         reinterpret_cast<SoultreeObject*>(casterView)->GetMatrixIn(0, reinterpret_cast<Matrix4*>(&local));
         reinterpret_cast<SoultreeObject*>(caster)->GetSubtreeBounds(reinterpret_cast<Vec3*>(&center), reinterpret_cast<Vec3*>(&extent));
-        const D3DIMShadowMatrix4& view = ((D3DIMShadowCameraView*)shadow->camera)->matrix_0xec;
+        const D3DIMShadowMatrix4& view = *(const D3DIMShadowMatrix4*)&shadow->camera->screenMatrix[0];
         D3DIMShadowMatrixProduct(&m, local, view);
-        if (reinterpret_cast<D3DIMShadowClipper*>(g_visibilityClipper)->TestBox((D3DIMShadowCameraView*)shadow->camera, &m._11, &center.x,
+        if (g_visibilityClipper->TestBox((VisibilityCamera*)shadow->camera, &m._11, &center.x,
                                          &extent.x, 0, 0, 0))
             inShadowView = 1;
     }

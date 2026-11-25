@@ -136,7 +136,6 @@ CLEAN_CASES = {
     'grid_vertex_cache_get_vertex': 150,
     'shadow_caster_vertex_count': 100,
     'grid_light_vertices': 200,
-    'shadow_clipper_testbox': 400,
     'light_manager_light_vertices': 200,
     'shadow_transform_ortho': 100,
     'net_receive_messages': 100,
