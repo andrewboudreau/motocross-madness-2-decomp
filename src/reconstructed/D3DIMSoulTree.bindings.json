@@ -100,7 +100,7 @@
   "?UpdateSubtreeBounds@SoultreeObject@@QAEXXZ": "0x004fe0f0",
   "?GetSubtreeBounds@SoultreeObject@@QAEXPAUVec3@@0@Z": "0x004fe850",
   "?RegisterNode@SoultreeObject@@QAEXXZ": "0x004fedb0",
-  "?Attach@SoultreeMaterial@@QAEPAV1@PAVRenderTarget@@PBUSoultreeTextureOptions@@PAVTextureMapManager@@H@Z": "0x004ff0b0",
+  "?Attach@SoultreeMaterial@@QAEPAV1@PAVRenderTarget@@PBUTextureContext@@PAVTextureMapManager@@H@Z": "0x004ff0b0",
   "?ReadSaved@SoultreeMaterial@@QAEXPAVFileStream@@@Z": "0x004ff450",
   "?LoadTexture@SoultreeMaterial@@QAEXXZ": "0x004ff620",
   "?ReadKeys@SoultreeMaterial@@QAEXPAVParameterBlock@@H@Z": "0x004ff9e0",

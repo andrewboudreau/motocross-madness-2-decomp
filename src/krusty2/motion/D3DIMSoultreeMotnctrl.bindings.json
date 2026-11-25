@@ -45,7 +45,7 @@
   "?GetAxesIn@SoultreeObject@@QAEXPAV1@PAUVec3@@1@Z": "0x004fc540",
   "?GetPosition@SoultreeObject@@QAEPAUVec3@@PAU2@@Z": "0x004fc970",
   "?GetPositionIn@SoultreeObject@@QAEXPAV1@PAUVec3@@@Z": "0x004fc9a0",
-  "?Attach@SoultreeMaterial@@QAEPAV1@PAVRenderTarget@@PBUSoultreeTextureOptions@@PAVTextureMapManager@@H@Z": "0x004ff0b0",
+  "?Attach@SoultreeMaterial@@QAEPAV1@PAVRenderTarget@@PBUTextureContext@@PAVTextureMapManager@@H@Z": "0x004ff0b0",
   "?AddLooseFile@ResourceManager@@QAEHPBD0@Z": "0x004e9430",
   "?LoadMir@Character@@QAEXXZ": "0x004a6500",
   "?LoadVut@Character@@QAEXXZ": "0x004a62d0",

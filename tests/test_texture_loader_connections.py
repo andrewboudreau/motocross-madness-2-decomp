@@ -17,7 +17,7 @@ ROOT=Path(__file__).resolve().parents[1]
 EXE=Path(os.environ.get('MCM2_EXE',ROOT/'work/game/mcm2.exe'))
 LOADER='?TerrainLoadTexture@@YAPAVTextureMap@@PAVTextureMapManager@@PBDHPAVPalette8@@HHHPAUTextureContext@@HIHH@Z'
 MATERIAL={'??0SoultreeMaterial@@QAE@H@Z',
- '?Attach@SoultreeMaterial@@QAEPAV1@PAVRenderTarget@@PBUSoultreeTextureOptions@@PAVTextureMapManager@@H@Z',
+ '?Attach@SoultreeMaterial@@QAEPAV1@PAVRenderTarget@@PBUTextureContext@@PAVTextureMapManager@@H@Z',
  '?CopyFrom@SoultreeMaterial@@QAEXPBV1@@Z'}
 @unittest.skipUnless(os.environ.get('VC6_ROOT') and EXE.is_file(),'requires VC6_ROOT and private retail image')
 class TextureLoaderConnections(unittest.TestCase):

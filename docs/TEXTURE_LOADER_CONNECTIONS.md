@@ -13,9 +13,10 @@ calling the same retail address. Canonical and retained sample binding keys
 now use the provider's signature, including `Palette8*` and
 `TextureContext*`.
 
-The six-word `SoultreeTextureOptions` view remains local to material code.
-The compile-time fixture checks its size and every corresponding field offset
-against `TextureContext`; the call explicitly converts the pointer.
+`TextureContext` is defined beside the loader in `TextureLoader.h`.
+SoultreeMaterial keeps one at +0x74 (it was the identical six-word
+`SoultreeTextureOptions` view) and passes it to the loader directly; the
+compile-time fixture checks the struct offsets and the material member.
 FontTexture retains its integer-valued options parameter and explicitly
 converts those bits at the boundary. EcoSystem, Particles and Terrain retain
 their provisional texture return views with explicit conversions. These

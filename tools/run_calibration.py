@@ -11690,7 +11690,7 @@ CASES = [
         'name': 'SoultreeMaterial.cpp SoultreeMaterial attach target/options',
         'bindings': 'src/reconstructed/SoultreeMaterial.bindings.json',
         'source': 'src/reconstructed/SoultreeMaterial.cpp',
-        'symbol': '?Attach@SoultreeMaterial@@QAEPAV1@PAVRenderTarget@@PBUSoultreeTextureOptions@@PAVTextureMapManager@@H@Z',
+        'symbol': '?Attach@SoultreeMaterial@@QAEPAV1@PAVRenderTarget@@PBUTextureContext@@PAVTextureMapManager@@H@Z',
         'target_va': '0x004ff0b0',
         'target_size': 103,
         'reason': 'contiguous member; returns this',

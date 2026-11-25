@@ -41,7 +41,7 @@ SoultreeMaterial::SoultreeMaterial(int flags)
 }
 
 // 0x004ff0b0: returns this, like GameObject slot 8.
-SoultreeMaterial* SoultreeMaterial::Attach(RenderTarget* target, const SoultreeTextureOptions* options,
+SoultreeMaterial* SoultreeMaterial::Attach(RenderTarget* target, const TextureContext* options,
                                              TextureMapManager* manager, int format)
 {
     GameObject::SetRenderContext(target);
@@ -170,7 +170,7 @@ void SoultreeMaterial::ReadSaved(FileStream* stream)
     int position = stream->Tell();
     char mode = stream->GetTextMode();
     if (!_stricmp(textureName, "PROCEDURAL"))
-        textureOptions.opaqueTextures = textureOptions.alphaTextures = 0;
+        textureOptions.opaqueGroup = textureOptions.alphaGroup = 0;
     if (hasTextureName)
         LoadTexture();
     stream->Seek(position, 0, 0);
@@ -189,7 +189,7 @@ void SoultreeMaterial::LoadTexture()
     int format = textureFormat;
     if (hasColorKey) {
         PCRenderTarget* target = (PCRenderTarget*)renderContext;
-        if ((target->triTextureCaps & 8) && textureOptions.opaqueTextures) {
+        if ((target->triTextureCaps & 8) && textureOptions.opaqueGroup) {
             format = target->surfacePixelFormat;
             colorKey = (g_ColorKeyRed << 8 | g_ColorKeyGreen) << 8 | g_ColorKeyBlue;
         } else {
@@ -197,9 +197,9 @@ void SoultreeMaterial::LoadTexture()
         }
     }
     if (format == 1555) {
-        textureOptions.format = 1555;
-        textureOptions.opaqueTextures = 0;
-        textureOptions.alphaTextures = 0;
+        textureOptions.opaqueFormat = 1555;
+        textureOptions.opaqueGroup = 0;
+        textureOptions.alphaGroup = 0;
     }
     int procedural = 0;
     if (!_stricmp(textureName, "PROCEDURAL"))
@@ -207,19 +207,19 @@ void SoultreeMaterial::LoadTexture()
     int alpha = IsFormat4444Or8888(format);
     TextureMap* texture;
     if (procedural) {
-        if (textureOptions.opaqueTextures && textureOptions.alphaTextures) {
-            texture = new(__FILE__, 0x165) ManagedTexture(textureOptions.textureManager);
+        if (textureOptions.opaqueGroup && textureOptions.alphaGroup) {
+            texture = new(__FILE__, 0x165) ManagedTexture(textureOptions.manager);
             texture->CreateSurface(0, 0x40, 0x40, 0x40, 1, 0, format, 0, mipMapped ? 2 : 0, 0, 0, 0,
                                    hasSourceBlend ? sourceBlend : 5, hasDestBlend ? destBlend : 6, 0,
                                    0x80, 0xff00ff);
             if (alpha) {
-                if (textureOptions.alphaTextures)
-                    textureOptions.alphaTextures->AddTexture((ManagedTexture*)texture);
-            } else if (textureOptions.opaqueTextures) {
-                textureOptions.opaqueTextures->AddTexture((ManagedTexture*)texture);
+                if (textureOptions.alphaGroup)
+                    textureOptions.alphaGroup->AddTexture((ManagedTexture*)texture);
+            } else if (textureOptions.opaqueGroup) {
+                textureOptions.opaqueGroup->AddTexture((ManagedTexture*)texture);
             }
         } else {
-            texture = new(__FILE__, 0x17a) PCTextureMap(textureOptions.textureManager, 1);
+            texture = new(__FILE__, 0x17a) PCTextureMap(textureOptions.manager, 1);
             texture->CreateSurface(0, 0x40, 0x40, 0x40, 1, 0, format, 0, mipMapped ? 2 : 0, 0, 0, 0,
                                    hasSourceBlend ? sourceBlend : 5, hasDestBlend ? destBlend : 6, 0,
                                    0x80, 0xff00ff);
@@ -227,7 +227,7 @@ void SoultreeMaterial::LoadTexture()
     } else {
         texture = TerrainLoadTexture(textureManager, textureName, format, 0, mipMapped ? 2 : 0,
                                         hasSourceBlend ? sourceBlend : 5, hasDestBlend ? destBlend : 6,
-                                        reinterpret_cast<TextureContext*>(&textureOptions), 0x80, 0xff00ff, 1, 1);
+                                        &textureOptions, 0x80, 0xff00ff, 1, 1);
     }
     if (!texture) {
         char message[256];
@@ -263,7 +263,7 @@ void SoultreeMaterial::ReadKeys(ParameterBlock* block, int load)
     materialAlpha = 1.0f;
     if (block->ReadString("TextureMap", textureName, -1))
         hasTextureName = 1;
-    int managed = textureOptions.opaqueTextures || (textureOptions.alphaTextures && hasTextureName);
+    int managed = textureOptions.opaqueGroup || (textureOptions.alphaGroup && hasTextureName);
     block->ReadInt("TextureFormat", &textureFormat);
     block->ReadInt("UseVertexColor", &useVertexColor);
     block->ReadInt("MipMapped", &mipMapped);
@@ -292,8 +292,8 @@ void SoultreeMaterial::ReadKeys(ParameterBlock* block, int load)
             mappingType = 9;
     }
     if (!managed) {
-        textureOptions.opaqueTextures = 0;
-        textureOptions.alphaTextures = 0;
+        textureOptions.opaqueGroup = 0;
+        textureOptions.alphaGroup = 0;
     }
     if (block->ReadString("ColorKey", value, -1)) {
         hasColorKey = 1;

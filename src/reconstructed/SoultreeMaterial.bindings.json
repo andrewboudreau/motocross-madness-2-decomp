@@ -67,7 +67,7 @@
   "?ReadInt@ParameterBlock@@QAEHPBDPAH@Z": "0x004b7cf0",
   "?ReadFloat@ParameterBlock@@QAEHPBDPAM@Z": "0x004b7e70",
   "?GetInt@ParameterBlock@@QAEHPBDHPAH@Z": "0x004b7f10",
-  "?Attach@SoultreeMaterial@@QAEPAV1@PAVRenderTarget@@PBUSoultreeTextureOptions@@PAVTextureMapManager@@H@Z": "0x004ff0b0",
+  "?Attach@SoultreeMaterial@@QAEPAV1@PAVRenderTarget@@PBUTextureContext@@PAVTextureMapManager@@H@Z": "0x004ff0b0",
   "?RestoreRenderStates@SoultreeMaterial@@QAEXXZ": "0x004ff410",
   "?ReadSaved@SoultreeMaterial@@QAEXPAVFileStream@@@Z": "0x004ff450",
   "?LoadTexture@SoultreeMaterial@@QAEXXZ": "0x004ff620",

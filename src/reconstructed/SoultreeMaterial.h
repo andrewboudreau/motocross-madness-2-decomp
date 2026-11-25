@@ -20,21 +20,9 @@
 
 #include "SurfaceMap.h"
 
-// The six dwords at +0x74, handed to the texture loader as its format
-// choice (+0x80 is the format TextureContext calls opaqueFormat).
-// The two ManagedTextureGroups at +0x04/+0x08 receive the procedural managed
-// textures (0x0050c6c0), by whether the format has alpha (0x00511ad0).
-struct SoultreeTextureOptions {
-    TextureMapManager* textureManager; // creates procedural textures
-    ManagedTextureGroup* opaqueTextures; // textures without alpha
-    ManagedTextureGroup* alphaTextures; // textures with alpha
-    int format;                               // format; 1555 when colour keyed
-    int alphaFormat;
-    int halvings;
-};
-
-// 0x0050a590 (Texmap.cpp, cdecl): loads the texture file `name`; 0 on failure.
-// The local six-word options view is converted at the shared call boundary.
+// The material's texture context (+0x74) goes to the texture loader; its
+// ManagedTextureGroups receive the procedural managed textures (0x0050c6c0)
+// by whether the format has alpha (0x00511ad0).
 #include "TextureLoader.h"
 
 class SoultreeMaterial : public GameObject {
@@ -43,7 +31,7 @@ public:
     virtual ~SoultreeMaterial();               // 0x004ff120 (deleting wrapper 0x004ff090)
 
     // 0x004ff0b0: attaches the render target and the texture options.
-    SoultreeMaterial* Attach(RenderTarget* target, const SoultreeTextureOptions* options,
+    SoultreeMaterial* Attach(RenderTarget* target, const TextureContext* options,
                                TextureMapManager* manager, int format);
     void ApplyRenderStates();                 // 0x004ff180: sets the render states
     void RestoreRenderStates();               // 0x004ff410: restores them
@@ -57,7 +45,7 @@ public:
     char textureName[0x40];                   // texture name ("TextureMap")
     TextureMapManager* textureManager;        // loads named textures
     SurfaceMap* surfaceMap;                   // +0x70 holds the loaded texture (LoadTexture)
-    SoultreeTextureOptions textureOptions;    // +0x74 copied by Attach; passed to the texture loader
+    TextureContext textureOptions;            // +0x74 copied by Attach; passed to the texture loader
     int textureFormat;                        // "TextureFormat"
     unsigned int colorKey;                    // colour key, 0x00rrggbb ("ColorKey")
     int sourceBlend;                          // "SourceBlend" (1 ZERO .. 13 BOTHINVSRCALPHA)

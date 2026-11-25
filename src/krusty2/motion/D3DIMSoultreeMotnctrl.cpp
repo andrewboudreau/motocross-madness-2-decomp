@@ -344,7 +344,7 @@ void D3DIMSoultreeCharacter::BuildModel()
     for (int i = 0; i < ((ModelObject*)modelNode)->itemCount; i++) {
         ((ModelObject*)modelNode)->items[i] = new(__FILE__, 0xed) SceneItem(1);
         ((ModelObject*)modelNode)->items[i]->Attach(static_cast<RenderTarget*>(renderContext),
-                reinterpret_cast<const SoultreeTextureOptions*>(((ModelObject*)modelNode)->textureOptions),
+                reinterpret_cast<const TextureContext*>(((ModelObject*)modelNode)->textureOptions),
                 reinterpret_cast<TextureMapManager*>(((ModelObject*)modelNode)->textureManager),
                                                   ((ModelObject*)modelNode)->textureFormat);
         AppendChild(((ModelObject*)modelNode)->items[i], -1);

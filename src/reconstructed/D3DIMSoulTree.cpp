@@ -191,7 +191,7 @@ void D3DIMSoultreeObject::LoadHierarchy(FileStream* stream)
         materialTable = (SoultreeMaterial**)DebugMalloc(materialCount * 4, __FILE__, 0x156);
         for (int i = 0; i < materialCount; i++) {
             materialTable[i] = new (__FILE__, 0x158) SoultreeMaterial(1);
-            materialTable[i]->Attach((RenderTarget*)renderContext, (const SoultreeTextureOptions*)textureOptions,
+            materialTable[i]->Attach((RenderTarget*)renderContext, (const TextureContext*)textureOptions,
                                                   textureManager, textureFormat);
             AppendChild(materialTable[i], -1);
             materialTable[i]->ReadSaved((FileStream*)stream);
@@ -267,7 +267,7 @@ void D3DIMSoultreeObject::LoadHierarchyFromParameters()
     materialTable = (SoultreeMaterial**)DebugMalloc(materialCount * 4, __FILE__, 0x1c0);
     for (int i = 0; i < count; i++) {
         materialTable[i] = new (__FILE__, 0x1c5) SoultreeMaterial(1);
-        materialTable[i]->Attach((RenderTarget*)renderContext, (const SoultreeTextureOptions*)textureOptions,
+        materialTable[i]->Attach((RenderTarget*)renderContext, (const TextureContext*)textureOptions,
                                               textureManager, textureFormat);
         AppendChild(materialTable[i], -1);
         char section[0x80];
@@ -277,7 +277,7 @@ void D3DIMSoultreeObject::LoadHierarchyFromParameters()
     }
     if (untextured) {
         materialTable[count] = new (__FILE__, 0x1ce) SoultreeMaterial(1);
-        materialTable[count]->Attach((RenderTarget*)renderContext, (const SoultreeTextureOptions*)textureOptions,
+        materialTable[count]->Attach((RenderTarget*)renderContext, (const TextureContext*)textureOptions,
                                                   textureManager, textureFormat);
         AppendChild(materialTable[count], -1);
         materialTable[count]->MakeUntextured();
@@ -1724,7 +1724,7 @@ void D3DIMSoultreeObject::CopyMaterials(D3DIMSoultreeObject* source)
     materialTable = (SoultreeMaterial**)DebugMalloc(materialCount * 4, __FILE__, 0x8ed);
     for (int i = 0; i < materialCount; i++) {
         materialTable[i] = new (__FILE__, 0x8ef) SoultreeMaterial(1);
-        materialTable[i]->Attach((RenderTarget*)renderContext, (const SoultreeTextureOptions*)textureOptions,
+        materialTable[i]->Attach((RenderTarget*)renderContext, (const TextureContext*)textureOptions,
                                               textureManager, textureFormat);
         AppendChild(materialTable[i], -1);
         materialTable[i]->CopyFrom(source->materialTable[i]);
