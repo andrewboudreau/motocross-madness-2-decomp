@@ -179,7 +179,7 @@
   "??_C@_0P@MBF@TerrainBreadth?$AA@": "0x00573198",
   "??_GScene@@UAEPAXI@Z": "0x004ea7c0",
   "?AddRef@BaseObject@@UAEHXZ": "0x00405160",
-  "?Attach@D3DIMSoultreeShadow@@QAEPAV1@HPAVShadowCaster@@PAVProjectedShadow@@@Z": "0x004468b0",
+  "?Attach@D3DIMSoultreeShadow@@QAEPAV1@HPAVD3DIMSoultreeObject@@PAVProjectedShadow@@@Z": "0x004468b0",
   "?FastInvSqrt@@YAMM@Z": "0x00460c00",
   "?GetRefCount@BaseObject@@UAEHXZ": "0x00401940",
   "?Release@GameObject@@UAEHXZ": "0x004696c0",

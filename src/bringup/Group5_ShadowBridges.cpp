@@ -1,13 +1,9 @@
 // Group5 bring-up definitions (best-guess, link frontier). Not strict matches.
 //
 // ProjectedShadow.h names the shadow pass's providers with its own tier-3
-// views (ShadowCaster, ShadowMatrix*, ShadowTransformPoints*, ShadowFillTriangle).
+// views (ShadowMatrix*, ShadowTransformPoints*, ShadowFillTriangle).
 // Where the retail VA already has a definition under its owner's name, the
 // view forwards to it:
-//   0x00445030 ShadowCaster::PartCount  -> D3DIMSoultreeObject::GetSurfaceCount
-//   0x004433f0 ShadowCaster::GetPart    -> D3DIMSoultreeObject::GetPart
-//   0x004fe850 ShadowCaster::GetBounds  -> SoultreeObject::GetSubtreeBounds
-//   0x004fdab0 ShadowCaster::ReleaseParts -> SoultreeObject::MarkSubtreeDirty
 //   0x004a1410 ShadowMatrixIdentity     -> IdentityMatrix
 //   0x004a1860 ShadowMatrixMultiply     -> MatrixMult
 //   0x004a1b00 ShadowTransformPointsOrtho -> TransformPoints
@@ -17,52 +13,13 @@
 
 // The providers, declared only as far as these calls need (the parameter
 // types keep the providers' mangled names).
-struct Vec3;
 struct Matrix4 {
     float m[4][4];
 };
-struct SoultreeVertex;
-
-class D3DIMSoultreeObject {
-public:
-    int GetSurfaceCount(int lod);  // 0x00445030
-    void GetPart(int index, SoultreeVertex** vertices, int* vertexCount, unsigned short** indices,
-                 int* indexCount, int unused, int lod);  // 0x004433f0
-};
-
-class SoultreeObject {
-public:
-    void GetSubtreeBounds(Vec3* center, Vec3* halfExtents);  // 0x004fe850
-    void MarkSubtreeDirty();                                 // 0x004fdab0
-};
-
 Matrix4 IdentityMatrix();                    // 0x004a1410
 Matrix4 MatrixMult(Matrix4 a, Matrix4 b);    // 0x004a1860
 void TransformPoints(const void* destinationPoints, void* sourcePoints, const Matrix4* matrix, int count,
                      int destinationStride, int sourceStride);  // 0x004a1b00
-
-int ShadowCaster::PartCount(int which)
-{
-    return reinterpret_cast<D3DIMSoultreeObject*>(this)->GetSurfaceCount(which);
-}
-
-void ShadowCaster::GetPart(int index, void** vertices, int* vertexCount, unsigned short** indices, int* indexCount,
-                           int unused, int lod)
-{
-    reinterpret_cast<D3DIMSoultreeObject*>(this)->GetPart(
-        index, reinterpret_cast<SoultreeVertex**>(vertices), vertexCount, indices, indexCount, unused, lod);
-}
-
-void ShadowCaster::GetBounds(ShadowVec3* center, ShadowVec3* halfExtents)
-{
-    reinterpret_cast<SoultreeObject*>(this)->GetSubtreeBounds(reinterpret_cast<Vec3*>(center),
-                                                              reinterpret_cast<Vec3*>(halfExtents));
-}
-
-void ShadowCaster::ReleaseParts()
-{
-    reinterpret_cast<SoultreeObject*>(this)->MarkSubtreeDirty();
-}
 
 ShadowMatrix ShadowMatrixIdentity()
 {

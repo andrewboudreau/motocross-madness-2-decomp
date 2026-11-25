@@ -1550,7 +1550,7 @@ both control words. These agreed with retail in every run (runs in brackets):
   (200).
 - Terrain, shadows and grid: `ShadowTransformPointsProjective` 0x004a1a50,
   `TerrainShutdownObject::LookupCell` 0x00484d70, `GridVertexCache::GetVertex`
-  0x0047de90, `ShadowCaster::GetVertexCount` 0x00444fe0 (600 each),
+  0x0047de90, `D3DIMSoultreeObject::GetVertexCount` 0x00444fe0 (600 each),
   `DrawableGridNode::WalkVisibilityQuadrants` 0x00481de0 (400),
   `GridVertexSink::LightVertices` 0x0049e4a0 with its three workers linked
   (600).

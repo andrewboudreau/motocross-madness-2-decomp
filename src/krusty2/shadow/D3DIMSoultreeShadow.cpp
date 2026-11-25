@@ -45,7 +45,7 @@ D3DIMSoultreeShadow::D3DIMSoultreeShadow(int flags)
 }
 
 // 0x004468b0 (ret 0xc).
-D3DIMSoultreeShadow* D3DIMSoultreeShadow::Attach(int host, ShadowCaster* c, ProjectedShadow* s)
+D3DIMSoultreeShadow* D3DIMSoultreeShadow::Attach(int host, D3DIMSoultreeObject* c, ProjectedShadow* s)
 {
     if (s) {
         GameObject::SetRenderContext((void*)host);

@@ -134,7 +134,7 @@ CLEAN_CASES = {
     'terrain_lookup_cell': 100,
     'grid_walk_visibility': 40,
     'grid_vertex_cache_get_vertex': 150,
-    'shadow_caster_vertex_count': 100,
+    'soultree_vertex_count': 100,
     'grid_light_vertices': 200,
     'light_manager_light_vertices': 200,
     'shadow_transform_ortho': 100,

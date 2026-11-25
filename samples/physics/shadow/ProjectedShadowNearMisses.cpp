@@ -130,14 +130,14 @@ void ProjectedShadow::TintCasterVertices()
 {
     int totalVertices = 0;
     for (int c = 0; c < casterCount; c++) {
-        if (!casters[c]->mesh)
+        if (!casters[c]->useLighting)
             continue;
-        for (int part = 0; part < casters[c]->PartCount(-1); part++) {
+        for (int part = 0; part < casters[c]->GetSurfaceCount(-1); part++) {
             char* vertices;
             int count;
             unsigned short* indices;
             int indexCount;
-            casters[c]->GetPart(part, (void**)&vertices, &count, &indices, &indexCount, 0, -1);
+            casters[c]->GetPart(part, (SoultreeVertex**)&vertices, &count, &indices, &indexCount, 0, -1);
             for (int i = 0; i < count; i++) {
                 int x, y;
                 ProjectedShadowFloatToInt(&x, vertexBuffer[totalVertices + i].x - 0.5f);
@@ -186,17 +186,17 @@ static inline void ShadowMatrixProduct(ShadowMatrix* out, const ShadowMatrix& a,
 }
 static inline float AbsF(float v) { return v < 0.0f ? -v : v; }
 
-static inline void ShadowTransformExtents(ShadowVec3* out, ShadowVec3 h, const ShadowCaster* k)
+static inline void ShadowTransformExtents(ShadowVec3* out, ShadowVec3 h, const D3DIMSoultreeObject* k)
 {
-    float a00 = h.x * k->world.m[0][0];
-    float a01 = h.x * k->world.m[0][1];
-    float a02 = h.x * k->world.m[0][2];
-    float a10 = h.y * k->world.m[1][0];
-    float a11 = h.y * k->world.m[1][1];
-    float a12 = h.y * k->world.m[1][2];
-    float a20 = h.z * k->world.m[2][0];
-    float a21 = h.z * k->world.m[2][1];
-    float a22 = h.z * k->world.m[2][2];
+    float a00 = h.x * k->worldMatrix.m[0][0];
+    float a01 = h.x * k->worldMatrix.m[0][1];
+    float a02 = h.x * k->worldMatrix.m[0][2];
+    float a10 = h.y * k->worldMatrix.m[1][0];
+    float a11 = h.y * k->worldMatrix.m[1][1];
+    float a12 = h.y * k->worldMatrix.m[1][2];
+    float a20 = h.z * k->worldMatrix.m[2][0];
+    float a21 = h.z * k->worldMatrix.m[2][1];
+    float a22 = h.z * k->worldMatrix.m[2][2];
     out->x = AbsF(a00) + AbsF(a10) + AbsF(a20);
     out->y = AbsF(a01) + AbsF(a11) + AbsF(a21);
     out->z = AbsF(a02) + AbsF(a12) + AbsF(a22);
@@ -246,9 +246,9 @@ int ProjectedShadow::ComputeBounds()
     boundsMax.x = boundsMax.y = boundsMax.z = -3.4028235e38f;
     for (int i = 0; i < casterCount; i++) {
         ShadowVec3 casterCenter, ext;
-        casters[i]->GetBounds(&casterCenter, &ext);
+        casters[i]->GetSubtreeBounds((Vec3*)&casterCenter, (Vec3*)&ext);
         ShadowTransformExtents(&ext, ShadowConstVec3(ext.x, ext.y, ext.z), casters[i]);
-        ShadowTransformCoord(&casterCenter, casterCenter, casters[i]->world);
+        ShadowTransformCoord(&casterCenter, casterCenter, *(const ShadowMatrix*)&casters[i]->worldMatrix);
         ShadowVec3 lo = ShadowDifference(casterCenter, ext);
         ShadowVec3 hi = ShadowSum(casterCenter, ext);
         if (lo.x < boundsMin.x) boundsMin.x = lo.x;
@@ -381,13 +381,13 @@ void ProjectedShadow::RenderShadow()
     minDepth = 3.4028235e38f;
 
     for (int c = 0; c < casterCount; c++) {
-        int partCount = casters[c]->PartCount(-1);
+        int partCount = casters[c]->GetSurfaceCount(-1);
         for (int part = 0; part < partCount; part++) {
             char* vertices;
             int count;
             unsigned short* indices;
             int indexCount;
-            casters[c]->GetPart(part, (void**)&vertices, &count, &indices, &indexCount, 0, -1);
+            casters[c]->GetPart(part, (SoultreeVertex**)&vertices, &count, &indices, &indexCount, 0, -1);
             if (mode == 3)
                 ShadowTransformPointsOrtho(vertexBuffer + vertexBase, vertices, &lightMatrix, count, 0xc, 0x20);
             else
@@ -431,7 +431,7 @@ void ProjectedShadow::RenderShadow()
             vertexBase += count;
         }
         if (casters[c]->currentLod != -1)
-            casters[c]->ReleaseParts();
+            casters[c]->MarkSubtreeDirty();
     }
     texture->UnlockSurface(0);
 }

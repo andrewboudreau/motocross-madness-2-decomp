@@ -42,7 +42,7 @@
     "src/krusty2/shadow/D3DIMSoultreeShadow.cpp": {
       "sections": 47,
       "relocations": 132,
-      "sha256": "c774c8dd8b90fbb0ccaf9561579a323730e0c2f4a86d6cfbf2120d30de945903"
+      "sha256": "857271ad59db8aaf73589f813b826fe3c169194957b7749510b90b751c69b6c9"
     },
     "src/krusty2/visibility/VisibilityQuadTree.cpp": {
       "sections": 89,

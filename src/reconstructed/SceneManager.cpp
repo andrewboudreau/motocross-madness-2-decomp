@@ -1134,7 +1134,7 @@ int Scene::ReadStaticModels(LightManager* lights, int particleManager, int textu
                                                                minPoints, groundProbeMask, 1),
                                   -1);
             staticModels->casters[i].physicsObject = object;
-            staticModels->casters[i].model = (ShadowCaster*)(D3DIMSoultreeObject*)object;
+            staticModels->casters[i].model = (D3DIMSoultreeObject*)object;
             staticModels->casters[i].physics = 1;
             if (points > 0) {
                 for (int p = 0; p < points; p++) {
@@ -1210,7 +1210,7 @@ int Scene::ReadStaticModels(LightManager* lights, int particleManager, int textu
         } else {
             staticModels->casters[i].physicsObject = 0;
             D3DIMSoultreeObject* object = new(__FILE__, 1956) D3DIMSoultreeObject(1);
-            staticModels->casters[i].model = (ShadowCaster*)object;
+            staticModels->casters[i].model = object;
             AppendChild(object->LoadModel(renderContext, sltPath, (int)lights, modelTextures, 1), -1);
             int length = strcspn(sltPath, ".");
             count = length < 0x14 ? length : 0x14;

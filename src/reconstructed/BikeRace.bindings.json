@@ -352,7 +352,7 @@
   "?SetAxesPtr@SoultreeObject@@QAEXPBUVec3@@0HH@Z": "0x004fbd70",
   "?SetPositionVec3@SoultreeObject@@QAEXUVector3@@@Z": "0x004fc630",
   "?ReplaceMaterialTexture@D3DIMSoultreeObject@@QAEHHPBDH@Z": "0x00444c70",
-  "?AddCaster@ProjectedShadow@@QAEXPAVShadowCaster@@@Z": "0x004dab00",
+  "?AddCaster@ProjectedShadow@@QAEXPAVD3DIMSoultreeObject@@@Z": "0x004dab00",
   "?SetLod@D3DIMSoultreeObject@@QAEXH@Z": "0x00444d00",
   "?SetLowestLod@D3DIMSoultreeObject@@QAEXH@Z": "0x00444d40",
   "?ClearFlag14c@SoultreeObject@@QAEXXZ": "0x004fdb50",

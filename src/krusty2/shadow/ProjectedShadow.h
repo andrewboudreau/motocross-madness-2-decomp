@@ -20,6 +20,11 @@
 #include "../math/FastMath.h"
 #include "../core/DebugAlloc.h"
 
+// The casters are soultree models (src/reconstructed/D3DIMSoulTree.h): the calls on them are
+// D3DIMSoultreeObject::GetVertexCount 0x00444fe0, GetSurfaceCount 0x00445030 and GetPart
+// 0x004433f0, and SoultreeObject::GetSubtreeBounds 0x004fe850 and MarkSubtreeDirty 0x004fdab0.
+class D3DIMSoultreeObject;
+
 // Stand-in for the shared Vec3 (the real one lives in src/krusty2/math/Math3D.h, which
 // is not included here: every includer would get its static const Vec3 objects and their
 // $E initializers).  The zero vector read by the ctor (0x00689b48) is one of
@@ -79,24 +84,6 @@ public:
     virtual int QueryFlag(const char* name, int defaultValue);   // slot 22 (0x58), ret 8 (tier 3)
 };
 
-// Caster entry (pointers stored at ProjectedShadow+0x2c).  PROVISIONAL.
-class ShadowCaster {
-public:
-    int GetVertexCount();                        // 0x00444fe0 (tier 3 name)
-    int PartCount(int which);                    // 0x00445030 (tier 3 name; called with -1 in 0x004dc2b0)
-    // 0x004433f0: seven stack args, callee-cleaned (ret 0x1c in retail call shape).
-    void GetPart(int index, void** vertices, int* vertexCount, unsigned short** indices, int* indexCount, int unused, int lod);
-    // 0x004fe850: writes the local-space bounds centre and half extents (3 floats each).
-    void GetBounds(ShadowVec3* center, ShadowVec3* halfExtents);
-    char pad_0x00[0xf8];
-    ShadowMatrix world;                          // +0xf8 row-vector transform applied to the bounds by 0x004db0d0
-    char pad_0x138[0x1a4 - 0x138];
-    void* mesh;                                  // +0x1a4 tested non-null by 0x004dc2b0 before the part loop
-    char pad_0x1a8[0x27c - 0x1a8];
-    int currentLod;                              // +0x27c D3DIMSoulTree.h's name at this offset; compared with -1 by 0x004db8c0 before calling 0x004fdab0. Tier 2
-    void ReleaseParts();                         // 0x004fdab0 (tier 3 name)
-};
-
 struct ShadowRect {
     int left, top, right, bottom;
     void Set(int l, int t, int r, int b) { left = l; top = t; right = r; bottom = b; }
@@ -138,7 +125,7 @@ public:
 
     ProjectedShadow* Init(PCRenderTarget* target, TextureMapManager* textures);  // 0x004da7b0
     PCRenderTarget* Host() const { return (PCRenderTarget*)renderContext; }  // GameObject::renderContext set by Init
-    void AddCaster(ShadowCaster* caster);           // 0x004dab00
+    void AddCaster(D3DIMSoultreeObject* caster);           // 0x004dab00
     void ClearCasters();                            // 0x004dab90
     void AddReceiver(ShadowReceiver* receiver);       // 0x004daba0
     void ResizeVertexBuffer();                      // 0x004dac50
@@ -152,7 +139,7 @@ public:
     void Present();                                 // 0x004dbd30
     void TintCasterVertices();                           // 0x004dc2b0
 
-    ShadowCaster** casters;       // +0x2c pointer array (dtor frees at line 0x5f; AddCaster appends)
+    D3DIMSoultreeObject** casters; // +0x2c pointer array (dtor frees at line 0x5f; AddCaster appends)
     int casterCount;              // +0x30 number of entries in casters
     int casterCapacity;           // +0x34 allocated entries of casters
     ShadowVec3 lightDir;          // +0x38 ctor zero vector; 0x004dae50 stores the normalised direction

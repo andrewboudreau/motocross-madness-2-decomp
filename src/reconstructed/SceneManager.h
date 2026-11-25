@@ -71,7 +71,6 @@ struct SceneAnimationTable {
     SceneRandomSet* randomSets;
 };
 
-class ShadowCaster;
 class ProjectedShadow;
 
 // A "PhysicsObject" model's physics part (0x004ecd60):
@@ -86,7 +85,7 @@ struct SceneStaticModel {
     unsigned char physics : 1;            // bit 0: has a physics object
     unsigned char useLighting : 1;        // bit 1: "UseLighting"
     unsigned char field_0x01[3];
-    ShadowCaster* model;                      // +0x04 the model (a D3DIMSoultreeObject)
+    D3DIMSoultreeObject* model;               // +0x04 the model
     SoultreePhysicsObject* physicsObject;     // +0x08
     CollisionObject* collisionObject;         // +0x0c
     char fileName[0x18];                      // +0x10 the model's file name, at most 0x14 characters
@@ -104,7 +103,7 @@ struct SceneStaticModels {
 class D3DIMSoultreeShadow : public GameObject {
 public:
     explicit D3DIMSoultreeShadow(int flags);                       // 0x00446840
-    D3DIMSoultreeShadow* Attach(int host, ShadowCaster* caster, ProjectedShadow* shadow); // 0x004468b0
+    D3DIMSoultreeShadow* Attach(int host, D3DIMSoultreeObject* caster, ProjectedShadow* shadow); // 0x004468b0
 
     unsigned char field_0x2c[0x48 - 0x2c];
 };

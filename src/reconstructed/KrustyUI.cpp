@@ -317,7 +317,7 @@ void KrustyUI::BuildGarageScene(int value) {
         ProjectedShadow* projected = new(__FILE__, 0x182) ProjectedShadow(1);
         shadow = projected->Init(KRUSTYUI_TARGET, g_TrackGame->textureManager);
         D3DIMSoultreeShadow* link = new(__FILE__, 0x186) D3DIMSoultreeShadow(1);
-        shadowLink = link->Attach(reinterpret_cast<int>(renderContext), reinterpret_cast<ShadowCaster*>(garageCharacter->modelNode), shadow);
+        shadowLink = link->Attach(reinterpret_cast<int>(renderContext), (D3DIMSoultreeObject*)garageCharacter->modelNode, shadow);
         garageScene->AppendChild(shadowLink, -1);
         if (shadow)
             garageScene->AppendChild(shadow, -1);
@@ -351,8 +351,8 @@ void KrustyUI::BuildGarageScene(int value) {
             painter.PaintNumber(reinterpret_cast<D3DIMSoultreeObject*>(bike->modelNode), g_TrackGame->mode.plateNumber);
         }
         if (shadow) {
-            shadow->AddCaster(reinterpret_cast<ShadowCaster*>(manufacturers[0].uiModel->modelNode));
-            shadow->AddCaster(reinterpret_cast<ShadowCaster*>(riderPreview->modelNode));
+            shadow->AddCaster((D3DIMSoultreeObject*)manufacturers[0].uiModel->modelNode);
+            shadow->AddCaster((D3DIMSoultreeObject*)riderPreview->modelNode);
             s468 = garageFocus;
             s468.y += 40.0f;
             s468.x += 15.0f;

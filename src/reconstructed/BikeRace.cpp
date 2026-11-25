@@ -1943,8 +1943,8 @@ int BikeRace::AimCamera(int caster) {
             RaceCameraView()->StartFollowing(racerSlots[targetRacer]);
             if (raceShadow != 0) {
                 raceShadow->ClearCasters();
-                raceShadow->AddCaster((ShadowCaster*)racerSlots[targetRacer]->modelNode);
-                raceShadow->AddCaster((ShadowCaster*)racerSlots[targetRacer]->riderCharacter->modelNode);
+                raceShadow->AddCaster(racerSlots[targetRacer]->modelNode);
+                raceShadow->AddCaster(racerSlots[targetRacer]->riderCharacter->modelNode);
             }
             if (g_TrackGame->bajaEnduroEvent != 0) {
                 BikeRaceKrustyBikeView* racer = racerSlots[targetRacer];
@@ -1957,8 +1957,8 @@ int BikeRace::AimCamera(int caster) {
             RaceCameraView()->StartFollowing(localRacer);
             if (raceShadow != 0) {
                 raceShadow->ClearCasters();
-                raceShadow->AddCaster((ShadowCaster*)localRacer->modelNode);
-                raceShadow->AddCaster((ShadowCaster*)localRacer->riderCharacter->modelNode);
+                raceShadow->AddCaster(localRacer->modelNode);
+                raceShadow->AddCaster(localRacer->riderCharacter->modelNode);
             }
             if (g_TrackGame->bajaEnduroEvent != 0) {
                 BikeRaceKrustyBikeView* racer = localRacer;
@@ -1972,8 +1972,8 @@ int BikeRace::AimCamera(int caster) {
             RaceCameraView()->StartFollowing(aiRacers[index]);
             if (raceShadow != 0) {
                 raceShadow->ClearCasters();
-                raceShadow->AddCaster((ShadowCaster*)aiRacers[index]->modelNode);
-                raceShadow->AddCaster((ShadowCaster*)aiRacers[index]->riderCharacter->modelNode);
+                raceShadow->AddCaster(aiRacers[index]->modelNode);
+                raceShadow->AddCaster(aiRacers[index]->riderCharacter->modelNode);
             }
             if (g_TrackGame->bajaEnduroEvent != 0) {
                 BikeRaceKrustyBikeView* racer = aiRacers[index];

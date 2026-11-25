@@ -857,7 +857,8 @@ probe use the new names.
 | `TerrainShadow::field_0x6668`..`field_0x6674` | `screenMinX`, `screenMaxX`, `screenMinY`, `screenMaxY` | 2 | Slot 27 resets them to FLT_MAX/-FLT_MAX and keeps the min/max of each projected hit's screen x and y. The visibility test compares them with the viewer's width and height and requires a 10 x 5 extent. |
 | `TerrainShadow::field_0x677c` | `texelSize` | 2 | Slot 28 sets it to 0.5 or 1.0 over the texture size, the value D3DIMSoultreeShadow's slot 28 keeps in `g_d3dimShadowTexel`. Slot 30 scales tu and tv by it. |
 | `ProjectedShadow::field_0x98` | `downsampleOnPresent` | 2 | The constructor sets 1 and Init clears it for surface format 0x613. Present (0x004dbd30) returns unless it is set, then halves the clip rectangle and box-filters 2x2 texels. The receivers' slot 28 uses 0.5 / size when it is set. |
-| `ShadowCaster::field_0x27c` | `currentLod` | 2 | ShadowCaster is a D3DIMSoultreeObject view: its methods are 0x00444fe0 and 0x00445030 (`GetVertexCount`, `GetSurfaceCount`), and D3DIMSoulTree.h names +0x27c `currentLod`. 0x004db8c0 calls ReleaseParts unless it is -1. |
+| `ShadowCaster::field_0x27c` (view retired; ProjectedShadow holds D3DIMSoultreeObject*) | `currentLod` | 2 | ShadowCaster was a D3DIMSoultreeObject view: its methods are 0x00444fe0 and 0x00445030 (`GetVertexCount`, `GetSurfaceCount`), and D3DIMSoulTree.h names +0x27c `currentLod`. 0x004db8c0 calls ReleaseParts (SoultreeObject::MarkSubtreeDirty 0x004fdab0) unless it is -1. |
+| `ShadowCaster::mesh` (+0x1a4) | `useLighting` | 2 | D3DIMSoulTree.h's name at this offset: SetUseLighting 0x004444c0 writes it, and TintCasterVertices 0x004dc2b0 skips casters where it is zero. The old name assumed a pointer. |
 | `SoultreeObject::field_0x150` (core view) | `boundsFound` | 2 | D3DIMSoulTree.h's name at +0x150. UpdateSubtreeBounds (0x004fe0f0) and AccumulateBounds (0x004fe2e0) include the local bounds only when it is set. |
 | `SoultreeObject::field_0x190` (core and quadtree views), `D3DIMSoultreeObject::field_0x190` | `drawsItself` | 3 | 1 after construction. InsertNodesInQuadtree (0x005046e0) clears it and RemoveNodesFromQuadtree (0x005047f0) sets it again. D3DIMSoultreeObject's slot 12 (PrepareGeometry) does its work only when it is set. |
 | `D3DIMSoultreeObject::field_0x28c`, `field_0x2d4` (quadtree view) | `lodTable`, `visible` | 2 | D3DIMSoulTree.h's names at the same offsets of the same class. The view keeps its `int` types. |
@@ -2190,7 +2191,7 @@ ResolveContactImpulse (`0x00500220`) and PlaceWheels (`0x00528eb0`).
 | `D3DIMSoultreeCharacter::LoadCharacter` | `a5` | `useOptions` | 2 | It is stored at character +0x20c (`loadUseOptions`). BuildModel (`0x00445c17`) passes it to LoadModel as useOptions. Every caller passes 1. |
 | `CollisionCharacter::Load`, SceneManager.h's character Load view | `a6`, `a5` | `useOptions` | 2 | Both forward it to LoadCharacter unchanged. |
 | `D3DIMSoultreeObject::GetPart` | `a6` | `unused` | 2 | The body ignores it, and the callers pass 0. |
-| The GetPart views in Group5_ShadowBridges.cpp and ProjectedShadow.h | `c`, `d` | `unused`, `lod` | 2 | D3DIMSoultreeObject::GetPart's names. |
+| The GetPart views (retired; ProjectedShadow calls D3DIMSoultreeObject::GetPart) | `c`, `d` | `unused`, `lod` | 2 | D3DIMSoultreeObject::GetPart's names. |
 | D3DIMSoulTreeNearMisses.cpp's TestBox view | `a7` | `unused` | 2 | VisibilityClipper.h's name. |
 
 Left as placeholders:

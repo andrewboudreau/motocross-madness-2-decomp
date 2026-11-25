@@ -7,6 +7,7 @@
 #include "shadow/D3DIMSoultreeShadow.h"
 #include "../../src/reconstructed/MatrixUtil.h"
 #include "../../src/reconstructed/ShadowCamera.h"
+#include "../../src/reconstructed/D3DIMSoulTree.h"
 
 typedef char ShadowSize[(sizeof(ProjectedShadow) == 0x134) ? 1 : -1];
 typedef char LinkSize[(sizeof(D3DIMSoultreeShadow) == 0x48) ? 1 : -1];
@@ -36,7 +37,7 @@ void* DebugRealloc(void* old, unsigned int size, const char* file, int line) {
     CHECK(file && *file); reallocations++; lastSize = size; lastLine = line;
     void* p = realloc(old, size ? size : 1); CHECK(p != 0); return p;
 }
-int ShadowCaster::GetVertexCount() { vertexCalls++; return currentLod; }
+int D3DIMSoultreeObject::GetVertexCount() { vertexCalls++; return currentLod; }
 void Camera::SetFrame(const Vector3* position, const Vector3* a, const Vector3* b, const float* c,
                       const float* fov) {
     CHECK(a == 0 && b == 0 && c == 0 && fov == 0);
@@ -52,12 +53,12 @@ extern "C" GameObject* ReceiverPrimary(D3DIMSoultreeShadow* value) { return valu
 int main() {
     unsigned long shadowWords[0x134 / 4], expectedWords[0x134 / 4];
     unsigned long linkWords[0x48 / 4], linkBefore[0x48 / 4];
-    unsigned long casterWords[3][sizeof(ShadowCaster) / 4];
+    unsigned long casterWords[3][sizeof(D3DIMSoultreeObject) / 4];
     unsigned long cameraWords[sizeof(ShadowCamera) / 4];
     ProjectedShadow* s = reinterpret_cast<ProjectedShadow*>(shadowWords);
     ProjectedShadow* expected = reinterpret_cast<ProjectedShadow*>(expectedWords);
     D3DIMSoultreeShadow* link = reinterpret_cast<D3DIMSoultreeShadow*>(linkWords);
-    ShadowCaster* caster = reinterpret_cast<ShadowCaster*>(casterWords[0]);
+    D3DIMSoultreeObject* caster = reinterpret_cast<D3DIMSoultreeObject*>(casterWords[0]);
     CHECK(ShadowPrimary(s) == reinterpret_cast<GameObject*>(s));
     CHECK(ReceiverPrimary(link) == reinterpret_cast<GameObject*>(link));
     int mode, value, seed;
@@ -96,7 +97,7 @@ int main() {
             CHECK(memcmp(s, expected, sizeof(*s)) == 0 && allocations == 0);
             int count = mode + 1;
             for (int n = 0; n < count; n++) {
-                ShadowCaster* selected = n & 1 ? 0 : caster;
+                D3DIMSoultreeObject* selected = n & 1 ? 0 : caster;
                 memcpy(expected, s, sizeof(*s)); memcpy(linkBefore, link, sizeof(*link));
                 CHECK(link->Attach(0x12340000 + seed, selected, s) == link);
                 CHECK(linkWords[0x18 / 4] == (unsigned long)(0x12340000 + seed));
@@ -130,7 +131,7 @@ int main() {
         memset(s, 0, sizeof(*s)); allocations = reallocations = vertexCalls = 0;
         int total = 0;
         for (int k = 0; k < 3; k++) {
-            ShadowCaster* c = reinterpret_cast<ShadowCaster*>(casterWords[k]);
+            D3DIMSoultreeObject* c = reinterpret_cast<D3DIMSoultreeObject*>(casterWords[k]);
             c->currentLod = seed % 7 + k; total += c->currentLod;
             memcpy(expected, s, sizeof(*s));
             s->AddCaster(c);

@@ -62,7 +62,7 @@ def setup(ctx, case):
         c.pack(a[0], '3f', *centre)
         c.pack(a[1], '3f', *ext)
     data = {}
-    ctx.stub_at(0x004fe850, 'ShadowCaster::GetBounds', pop=8, ret=get_bounds)
+    ctx.stub_at(0x004fe850, 'SoultreeObject::GetSubtreeBounds', pop=8, ret=get_bounds)
 
     def look_at(c, ecx, a):
         c.note('eye', c.read(a[0], 12).hex(), c.read(a[4], 4).hex() if a[4] else None)

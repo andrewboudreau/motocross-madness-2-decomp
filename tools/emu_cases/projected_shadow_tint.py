@@ -14,8 +14,8 @@ SYMBOL = '?TintCasterVertices@ProjectedShadow@@QAEXXZ'
 SOURCE = 'samples/physics/shadow/ProjectedShadowNearMisses.cpp'
 PROBES = {0x004dc351: 'x fistp', 0x004dc3b4: 'tint store'}
 
-PART_COUNT = 0x00445030   # ShadowCaster::PartCount(int), thiscall ret 4
-GET_PART = 0x004433f0     # ShadowCaster::GetPart(...), thiscall ret 0x1c
+PART_COUNT = 0x00445030   # D3DIMSoultreeObject::GetSurfaceCount(int), thiscall ret 4
+GET_PART = 0x004433f0     # D3DIMSoultreeObject::GetPart(...), thiscall ret 0x1c
 
 
 def bump(x, ulps):

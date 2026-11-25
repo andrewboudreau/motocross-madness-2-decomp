@@ -14,6 +14,7 @@
 #include "shadow/ProjectedShadow.h"
 #include "../../reconstructed/ShadowCamera.h"
 #include "../../reconstructed/PCTextureMap.h"
+#include "../../reconstructed/D3DIMSoulTree.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -90,13 +91,13 @@ ProjectedShadow::~ProjectedShadow()
 
 // 0x004dab00: appends a caster, growing the pointer array by one entry at a time (debug
 // alloc at line 0xfe, realloc at 0x102), then resizes the vertex buffer.
-void ProjectedShadow::AddCaster(ShadowCaster* caster)
+void ProjectedShadow::AddCaster(D3DIMSoultreeObject* caster)
 {
     if (!casters) {
-        casters = (ShadowCaster**)DebugMalloc(casterCount * 4 + 4, __FILE__, 0xfe);
+        casters = (D3DIMSoultreeObject**)DebugMalloc(casterCount * 4 + 4, __FILE__, 0xfe);
         casterCapacity = casterCount + 1;
     } else if (casterCapacity < casterCount + 1) {
-        casters = (ShadowCaster**)DebugRealloc(casters, (casterCount + 1) * 4, __FILE__, 0x102);
+        casters = (D3DIMSoultreeObject**)DebugRealloc(casters, (casterCount + 1) * 4, __FILE__, 0x102);
         casterCapacity = casterCount + 1;
     }
     casters[casterCount] = caster;

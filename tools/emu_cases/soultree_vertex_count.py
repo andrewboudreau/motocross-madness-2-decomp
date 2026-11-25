@@ -1,6 +1,6 @@
-"""ShadowCaster::GetVertexCount 0x00444fe0 (tools/emu_diff.py case).
+"""D3DIMSoultreeObject::GetVertexCount 0x00444fe0 (tools/emu_diff.py case).
 
-Linked from src/bringup/Group1_ShadowCaster.cpp (retail D3DIMSoultreeObject::GetVertexCount).
+ProjectedShadow::ResizeVertexBuffer sums it over the casters.
 A null or real LOD table (+0x28c) of 8-byte {surface count, surfaces} records, an LOD count
 (+0x274) of -1..6, surface counts of -1..5 and 0x38-byte surfaces whose vertex counts (+8)
 are small, negative or near the int limits, so the signed compares and wrap decide.
@@ -9,8 +9,8 @@ import random
 import struct
 
 RETAIL_VA = 0x00444fe0
-SYMBOL = '?GetVertexCount@ShadowCaster@@QAEHXZ'
-SOURCE = 'src/bringup/Group1_ShadowCaster.cpp'
+SYMBOL = '?GetVertexCount@D3DIMSoultreeObject@@QAEHXZ'
+SOURCE = 'src/reconstructed/D3DIMSoulTree.cpp'
 
 
 def cases(rng, n):

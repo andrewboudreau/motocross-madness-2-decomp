@@ -756,9 +756,9 @@ int BaseQuarryEvent::LoadEventObjects(LoadProgressFn progress) {
     g_MemTagStack->Push("Shadow");
     if (projectedShadow) {
         AppendChild((GameObject*)projectedShadow, -1);
-        ((ProjectedShadow*)projectedShadow)->AddCaster((ShadowCaster*)((QuarryLoadKrustyBikeView*)((BikeRace*)raceView)->localRacer)->modelNode);
+        ((ProjectedShadow*)projectedShadow)->AddCaster(((QuarryLoadKrustyBikeView*)((BikeRace*)raceView)->localRacer)->modelNode);
         ((ProjectedShadow*)projectedShadow)
-            ->AddCaster((ShadowCaster*)((QuarryLoadKrustyBikeView*)((BikeRace*)raceView)->localRacer)->riderCharacter->modelNode);
+            ->AddCaster(((QuarryLoadKrustyBikeView*)((BikeRace*)raceView)->localRacer)->riderCharacter->modelNode);
         ((ProjectedShadow*)projectedShadow)->SetLight((const ShadowVec3*)&shadowLight->position,
                                                 (const ShadowVec3*)&shadowLight->look, 3);
         ((ProjectedShadow*)projectedShadow)->SetShadowStrength(0x80);

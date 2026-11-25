@@ -233,7 +233,7 @@
   "??_C@_0L@DDDP@podium?4slt?$AA@": "0x00572200",
   "??_C@_0N@NLHA@TextureCache?$AA@": "0x005721c4",
   "??_C@_0P@DAK@Teraform?2Skies?$AA@": "0x0057236c",
-  "?AddCaster@ProjectedShadow@@QAEXPAVShadowCaster@@@Z": "0x004dab00",
+  "?AddCaster@ProjectedShadow@@QAEXPAVD3DIMSoultreeObject@@@Z": "0x004dab00",
   "?AddIgnoredOwner@CollisionObject@@QAEXPAX@Z": "0x00439410",
   "?AddListener@AuralScape@@QAEHHMM@Z": "0x00403010",
   "?Attach@TerrainShadow@@QAEPAV1@HPAVTerrain@@PAVProjectedShadow@@@Z": "0x00508b80",
