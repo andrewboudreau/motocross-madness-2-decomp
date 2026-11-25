@@ -31,7 +31,7 @@
 // interleaves them with fxch; VC6 finishes one sum at a time whatever the
 // statement order (also tried: retail's product order, nine named products,
 // translation added in the store).
-void TransformPoints(const void* destinationPoints, void* sourcePoints, const Matrix4* matrix,
+void TransformPoints(void* destinationPoints, const void* sourcePoints, const Matrix4* matrix,
                      int count, int destinationStride, int sourceStride)
 {
     if (count == 0)

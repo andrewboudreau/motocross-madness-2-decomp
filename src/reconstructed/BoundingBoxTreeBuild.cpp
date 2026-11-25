@@ -570,7 +570,7 @@ void GatherModelTriangles(TreeModelSource* model, SoultreeObject* frame, int* tr
         if (frame == 0)
             source = mesh->vertices;
         else
-            source = mesh->drawnVertices;
+            source = mesh->localVertices;
         first = 0;
         end = 0;
         if (frame != 0) {

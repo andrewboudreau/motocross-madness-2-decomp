@@ -6,7 +6,7 @@ and 0x20 on either side, a zero source stride (the destination stride is reused)
 strides on both sides (one point), and in-place transforms (destination == source).
 """
 RETAIL_VA = 0x004a1b00
-SYMBOL = '?TransformPoints@@YAXPBXPAXPBUMatrix4@@HHH@Z'
+SYMBOL = '?TransformPoints@@YAXPAXPBXPBUMatrix4@@HHH@Z'
 SOURCE = 'src/bringup/Group0_Math.cpp'
 
 

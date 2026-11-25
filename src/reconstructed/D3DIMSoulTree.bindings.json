@@ -173,7 +173,7 @@
   "??_C@_0CK@LMJJ@LOD?5?$CFi?5?9?5Surface?5?$CFi?5?9?5Object?5Poi@": "0x00568a00",
   "?UpdateWorldMatrix@SoultreeObject@@QAEXXZ": "0x004fb4f0",
   "?LightVertices@LightManager@@QAEXPAXH00H0@Z": "0x0049e4a0",
-  "?TransformPoints@@YAXPBXPAXPBUMatrix4@@HHH@Z": "0x004a1b00",
+  "?TransformPoints@@YAXPAXPBXPBUMatrix4@@HHH@Z": "0x004a1b00",
   "?CloneFrom@SoultreeObject@@UAEXPAV1@@Z": "0x004feb10",
   "??0Vector3Call@@QAE@MMM@Z": "0x00404e60",
   "?ReflectAndNormalize@@YAXPBUVector3@@0PAU1@@Z": "0x004a10e0",

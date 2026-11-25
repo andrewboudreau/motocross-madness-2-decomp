@@ -76,7 +76,7 @@ D3DIMSoultreeObject::~D3DIMSoultreeObject()
                 DebugFree(lodTable[i].surfaces[j].indices, __FILE__, 0x67);
                 DebugFree(lodTable[i].surfaces[j].groups, __FILE__, 0x68);
                 DebugFree(lodTable[i].surfaces[j].vertices, __FILE__, 0x69);
-                DebugFree(lodTable[i].surfaces[j].drawnVertices, __FILE__, 0x6a);
+                DebugFree(lodTable[i].surfaces[j].localVertices, __FILE__, 0x6a);
                 DebugFree(lodTable[i].surfaces[j].normals, __FILE__, 0x6b);
                 DebugFree(lodTable[i].surfaces[j].uvs, __FILE__, 0x6c);
                 DebugFree(lodTable[i].surfaces[j].materialIndices, __FILE__, 0x6d);
@@ -223,8 +223,8 @@ void D3DIMSoultreeObject::LoadHierarchy(FileStream* stream)
                 surface->mappingScale = 1.0f;
                 surface->vertices = (SoultreeVertex*)DebugMalloc(surface->vertexCount * 0x20, __FILE__, 0x181);
                 stream->Read(surface->vertices, 0x20, surface->vertexCount);
-                surface->drawnVertices = (SoultreeVertex*)DebugMalloc(surface->vertexCount * 0x20, __FILE__, 0x184);
-                stream->Read(surface->drawnVertices, 0x20, surface->vertexCount);
+                surface->localVertices = (SoultreeVertex*)DebugMalloc(surface->vertexCount * 0x20, __FILE__, 0x184);
+                stream->Read(surface->localVertices, 0x20, surface->vertexCount);
                 surface->normals = (Vector3*)DebugMalloc(surface->vertexCount * 0xc, __FILE__, 0x187);
                 stream->Read(surface->normals, 0xc, surface->vertexCount);
                 surface->indices = (unsigned short*)DebugMalloc(surface->faceCount * 6, __FILE__, 0x18a);
@@ -241,8 +241,8 @@ void D3DIMSoultreeObject::LoadHierarchy(FileStream* stream)
                     stream->Read(&node, 4, 1);
                     stream->Read(&first, 4, 1);
                     surface->groups[j].node = nodes[node];
-                    surface->groups[j].sourceVertices = &surface->vertices[first];
-                    surface->groups[j].transformedVertices = &surface->drawnVertices[first];
+                    surface->groups[j].vertices = &surface->vertices[first];
+                    surface->groups[j].localVertices = &surface->localVertices[first];
                     surface->groups[j].normals = &surface->normals[first];
                 }
             }
@@ -346,7 +346,7 @@ int D3DIMSoultreeObject::ReadLods()
                 surface->materialCount = 1;
             }
             surface->vertices = (SoultreeVertex*)DebugMalloc(surface->vertexCount * 0x20, __FILE__, 0x223);
-            surface->drawnVertices = (SoultreeVertex*)DebugMalloc(surface->vertexCount * 0x20, __FILE__, 0x224);
+            surface->localVertices = (SoultreeVertex*)DebugMalloc(surface->vertexCount * 0x20, __FILE__, 0x224);
             surface->normals = (Vector3*)DebugMalloc(surface->vertexCount * 0xc, __FILE__, 0x225);
             surface->indices = (unsigned short*)DebugMalloc(surface->faceCount * 6, __FILE__, 0x226);
             surface->uvs = (SoultreeUV*)DebugMalloc(surface->vertexCount * 8, __FILE__, 0x227);
@@ -358,23 +358,23 @@ int D3DIMSoultreeObject::ReadLods()
                 float green;
                 float blue;
                 parameterBlock->ReadRow(0);
-                parameterBlock->GetRowFloat(0, &surface->drawnVertices[v].position.x);
-                parameterBlock->GetRowFloat(1, &surface->drawnVertices[v].position.y);
-                parameterBlock->GetRowFloat(2, &surface->drawnVertices[v].position.z);
+                parameterBlock->GetRowFloat(0, &surface->localVertices[v].position.x);
+                parameterBlock->GetRowFloat(1, &surface->localVertices[v].position.y);
+                parameterBlock->GetRowFloat(2, &surface->localVertices[v].position.z);
                 parameterBlock->GetRowFloat(3, &surface->normals[v].x);
                 parameterBlock->GetRowFloat(4, &surface->normals[v].y);
                 parameterBlock->GetRowFloat(5, &surface->normals[v].z);
-                parameterBlock->GetRowFloat(6, &surface->drawnVertices[v].tu);
-                parameterBlock->GetRowFloat(7, &surface->drawnVertices[v].tv);
+                parameterBlock->GetRowFloat(6, &surface->localVertices[v].tu);
+                parameterBlock->GetRowFloat(7, &surface->localVertices[v].tv);
                 parameterBlock->GetRowFloat(12, &red);
                 parameterBlock->GetRowFloat(13, &green);
                 parameterBlock->GetRowFloat(14, &blue);
                 long r = (long)(red * 255.0);
                 long g = (long)(green * 255.0);
                 long b = (long)(blue * 255.0);
-                surface->drawnVertices[v].diffuse = 0xff000000 | (r << 16) | (g << 8) | b;
-                surface->drawnVertices[v].specular = 0;
-                surface->vertices[v] = surface->drawnVertices[v];
+                surface->localVertices[v].diffuse = 0xff000000 | (r << 16) | (g << 8) | b;
+                surface->localVertices[v].specular = 0;
+                surface->vertices[v] = surface->localVertices[v];
                 surface->uvs[v].u = surface->vertices[v].tu;
                 surface->uvs[v].v = surface->vertices[v].tv;
             }
@@ -402,8 +402,8 @@ int D3DIMSoultreeObject::ReadLods()
                 parameterBlock->GetRowInt(0, &first);
                 parameterBlock->GetRowInt(1, &vertices);
                 groups[i].vertexCount = vertices;
-                groups[i].sourceVertices = &surface->vertices[first];
-                groups[i].transformedVertices = &surface->drawnVertices[first];
+                groups[i].vertices = &surface->vertices[first];
+                groups[i].localVertices = &surface->localVertices[first];
                 groups[i].normals = &surface->normals[first];
                 if (vertices > 0)
                     used++;
@@ -554,17 +554,17 @@ void D3DIMSoultreeObject::TransformVertexGroups(int lod)
             int count = group->vertexCount;
             if (count) {
                 group->node->UpdateWorldMatrix();
-                void* target = group->transformedVertices;
-                void* vertices = source->sourceVertices;
+                void* localVertices = group->localVertices;
+                void* worldVertices = source->vertices;
                 if (useLighting) {
                     if (colored)
                         lightManager->LightVertices(&group->node->worldMatrix, count,
-                                                   group->normals, vertices, 0xc, target);
+                                                   group->normals, worldVertices, 0xc, localVertices);
                     else
                         lightManager->LightVertices(&group->node->worldMatrix, count,
-                                                   group->normals, vertices, 0xc, 0);
+                                                   group->normals, worldVertices, 0xc, 0);
                 }
-                TransformPoints(vertices, target, &group->node->worldMatrix, count, 0x20, 0x20);
+                TransformPoints(worldVertices, localVertices, &group->node->worldMatrix, count, 0x20, 0x20);
             }
         }
     }
@@ -761,12 +761,12 @@ void D3DIMSoultreeObject::DrawCurrentLod()
                 modified = 1;
                 restore = 1;
                 for (int v = 0; v < count; v++) {
-                    if (surface->drawnVertices[v].position.x > 0.0f) {
-                        surface->vertices[v].tv = Remap(surface->drawnVertices[v].position.y, -1.0f, 3.0f);
-                        surface->vertices[v].tu = RemapDown(surface->drawnVertices[v].position.z, 1.0f, -2.4f);
+                    if (surface->localVertices[v].position.x > 0.0f) {
+                        surface->vertices[v].tv = Remap(surface->localVertices[v].position.y, -1.0f, 3.0f);
+                        surface->vertices[v].tu = RemapDown(surface->localVertices[v].position.z, 1.0f, -2.4f);
                     } else {
-                        surface->vertices[v].tv = Remap(surface->drawnVertices[v].position.y, -1.0f, 3.0f);
-                        surface->vertices[v].tu = RemapDown(surface->drawnVertices[v].position.z, -1.0f, 1.4f);
+                        surface->vertices[v].tv = Remap(surface->localVertices[v].position.y, -1.0f, 3.0f);
+                        surface->vertices[v].tu = RemapDown(surface->localVertices[v].position.z, -1.0f, 1.4f);
                     }
                 }
                 break;
@@ -799,10 +799,10 @@ void D3DIMSoultreeObject::DrawCurrentLod()
                     direction = ((DrawSoultreeObjectView*)group->node)->WorldToLocalDirection(&direction);
                     for (int v = 0; v < vertices; v++) {
                         const Vector3& normal = group->normals[v];
-                        group->sourceVertices[v].tu =
+                        group->vertices[v].tu =
                             1.0f - ((direction.y * normal.y + direction.x * normal.x) +
                                     direction.z * normal.z + 1.0f) * 0.5f;
-                        group->sourceVertices[v].tv = 0;
+                        group->vertices[v].tv = 0;
                     }
                 }
                 modified = 1;
@@ -820,10 +820,10 @@ void D3DIMSoultreeObject::DrawCurrentLod()
                     direction = ((DrawSoultreeObjectView*)group->node)->WorldToLocalDirection(&direction);
                     for (int v = 0; v < vertices; v++) {
                         const Vector3& normal = group->normals[v];
-                        group->sourceVertices[v].tu =
+                        group->vertices[v].tu =
                             1.0f - ((direction.y * normal.y + direction.x * normal.x) +
                                     direction.z * normal.z + 1.0f) * 0.5f;
-                        group->sourceVertices[v].tv = 0;
+                        group->vertices[v].tv = 0;
                     }
                 }
                 modified = 1;
@@ -848,28 +848,28 @@ void D3DIMSoultreeObject::DrawCurrentLod()
                         continue;
                     for (int v = 0; v < group->vertexCount; v++) {
                         Vector3 direction;
-                        direction.x = group->transformedVertices[v].position.x - localEye.x;
-                        direction.y = group->transformedVertices[v].position.y - localEye.y;
-                        direction.z = group->transformedVertices[v].position.z - localEye.z;
+                        direction.x = group->localVertices[v].position.x - localEye.x;
+                        direction.y = group->localVertices[v].position.y - localEye.y;
+                        direction.z = group->localVertices[v].position.z - localEye.z;
                         direction = NormalizedCallingConstructor(direction);
                         Vector3 reflected;
                         ReflectAndNormalize(&direction, &group->normals[v], &reflected);
                         if (drawReflections) {
                             Vector3 world = ((DrawSoultreeObjectView*)group->node)->LocalToWorldDirection(&reflected);
-                            line[0].position.x = group->sourceVertices[v].position.x;
-                            line[0].position.y = group->sourceVertices[v].position.y;
-                            line[0].position.z = group->sourceVertices[v].position.z;
-                            line[1].position.x = world.x + group->sourceVertices[v].position.x;
-                            line[1].position.y = world.y + group->sourceVertices[v].position.y;
-                            line[1].position.z = world.z + group->sourceVertices[v].position.z;
+                            line[0].position.x = group->vertices[v].position.x;
+                            line[0].position.y = group->vertices[v].position.y;
+                            line[0].position.z = group->vertices[v].position.z;
+                            line[1].position.x = world.x + group->vertices[v].position.x;
+                            line[1].position.y = world.y + group->vertices[v].position.y;
+                            line[1].position.z = world.z + group->vertices[v].position.z;
                             ((RenderTarget*)renderContext)->DrawPrimitive(D3DPT_LINELIST, D3DFVF_LVERTEX, (int)line, 2, 0);
                         }
-                        group->sourceVertices[v].tv = ((float)asin(reflected.y) + 1.5707964f) * -0.31830987f;
-                        group->sourceVertices[v].tv = -((reflected.y + 1.0f) * 0.5f);
-                        group->sourceVertices[v].tv = 0.25f;
+                        group->vertices[v].tv = ((float)asin(reflected.y) + 1.5707964f) * -0.31830987f;
+                        group->vertices[v].tv = -((reflected.y + 1.0f) * 0.5f);
+                        group->vertices[v].tv = 0.25f;
                         reflected.y = 0.0f;
                         reflected = NormalizedCallingConstructor(reflected);
-                        group->sourceVertices[v].tu =
+                        group->vertices[v].tu =
                             ((float)atan(reflected.x / reflected.z) + 1.5707964f) * 0.31830987f;
                     }
                 }
@@ -895,7 +895,7 @@ void D3DIMSoultreeObject::DrawCurrentLod()
                     group->node->UpdateWorldMatrix();
                     Matrix4* world = &group->node->worldMatrix;
                     for (int v = 0; v < count; v++) {
-                        Vector3 direction = NormalizedCallingConstructor(group->sourceVertices[v].position - eye);
+                        Vector3 direction = NormalizedCallingConstructor(group->vertices[v].position - eye);
                         Vector3 normal = group->normals[v];
                         // One statement per component: VC6 then adds the y row as retail does,
                         // (x m01 + z m21) + y m11 (0x00441cf8..0x00441d18); the constructor
@@ -911,8 +911,8 @@ void D3DIMSoultreeObject::DrawCurrentLod()
                         Vector3 reflected = twice * facing - direction;
                         float halfX = reflected.x * 0.5f;
                         float halfY = reflected.y * 0.5f;
-                        group->sourceVertices[v].tu = halfX + 0.5f;
-                        group->sourceVertices[v].tv = halfY + 0.5f - scroll;
+                        group->vertices[v].tu = halfX + 0.5f;
+                        group->vertices[v].tv = halfY + 0.5f - scroll;
                     }
                 }
                 restore = 1;
@@ -968,7 +968,7 @@ void D3DIMSoultreeObject::DrawCurrentLod()
                     group->node->UpdateWorldMatrix();
                     Matrix4* world = &group->node->worldMatrix;
                     for (int v = 0; v < count; v++) {
-                        Vector3 position = group->sourceVertices[v].position;
+                        Vector3 position = group->vertices[v].position;
                         Vector3 segment[2];
                         segment[0] = position;
                         Vector3 direction = Normalized(position - viewPosition);
@@ -1008,18 +1008,18 @@ void D3DIMSoultreeObject::DrawCurrentLod()
                         }
                         float fresnel = 1.0f - (float)fabs(facing);
                         segment[1] = hit;
-                        group->sourceVertices[v].tv = hit.y * 0.01f;
-                        if (group->sourceVertices[v].tv > 1.0f)
-                            group->sourceVertices[v].tv = 1.0f;
-                        group->sourceVertices[v].tv = 1.0f - group->sourceVertices[v].tv;
+                        group->vertices[v].tv = hit.y * 0.01f;
+                        if (group->vertices[v].tv > 1.0f)
+                            group->vertices[v].tv = 1.0f;
+                        group->vertices[v].tv = 1.0f - group->vertices[v].tv;
                         Vector3 around = hit - center;
                         around.y = 0.0f;
                         around = Normalized(around);
                         float angle = (float)acos(around.z);
                         if (around.x < 0.0f)
                             angle = -angle;
-                        group->sourceVertices[v].tu = angle * 0.15915494f;
-                        group->sourceVertices[v].diffuse = ((long)(fresnel * 255.0f) << 24) | 0xffffff;
+                        group->vertices[v].tu = angle * 0.15915494f;
+                        group->vertices[v].diffuse = ((long)(fresnel * 255.0f) << 24) | 0xffffff;
                         for (i = 0; i < 2; i++) {
                             lines[i * 2].position = segment[i];
                             lines[i * 2 + 1].position = segment[i + 1];
@@ -1047,7 +1047,7 @@ void D3DIMSoultreeObject::DrawCurrentLod()
                     Vector3 eye = ((DrawSoultreeObjectView*)group->node)->WorldToLocalDirection(
                         &((D3DIMSoultreeCameraView*)((RenderTarget*)renderContext)->currentCamera)->position);
                     for (int v = 0; v < group->vertexCount; v++) {
-                        Vector3 position = group->sourceVertices[v].position;
+                        Vector3 position = group->vertices[v].position;
                         Vector3 toLight = Normalized(position - lightPosition);
                         Vector3 toEye = Normalized(eye - position);
                         Vector3& normal = group->normals[v];
@@ -1059,7 +1059,7 @@ void D3DIMSoultreeObject::DrawCurrentLod()
                         specular += toEye.z * reflected.z;
                         if (specular < 0.0f)
                             specular = 0.0f;
-                        group->sourceVertices[v].diffuse = ((long)(pow(specular, exponent) * 255.0) << 24) | 0xffffff;
+                        group->vertices[v].diffuse = ((long)(pow(specular, exponent) * 255.0) << 24) | 0xffffff;
                     }
                 }
                 modified = 1;
@@ -1147,9 +1147,9 @@ void D3DIMSoultreeObject::DrawNormals(SoultreeSurface* surface)
     SoultreeVertex line[2];
     for (int i = 0; i < surface->groupCount; i++) {
         for (int j = 0; j < surface->groups[i].vertexCount; j++) {
-            from.x = surface->groups[i].transformedVertices[j].position.x;
-            from.y = surface->groups[i].transformedVertices[j].position.y;
-            from.z = surface->groups[i].transformedVertices[j].position.z;
+            from.x = surface->groups[i].localVertices[j].position.x;
+            from.y = surface->groups[i].localVertices[j].position.y;
+            from.z = surface->groups[i].localVertices[j].position.z;
             Vector3 to = from + length * surface->groups[i].normals[j];
             from = surface->groups[i].node->LocalToWorldPoint(from);
             to = surface->groups[i].node->LocalToWorldPoint(to);
@@ -1207,9 +1207,9 @@ void D3DIMSoultreeObject::DrawVertexCrosses(SoultreeSurface* surface)
         for (int j = 0; j < surface->groups[i].vertexCount; j++) {
             for (k = 0; k < 6; k++) {
                 Vector3 point;
-                point.x = surface->groups[i].transformedVertices[j].position.x;
-                point.y = surface->groups[i].transformedVertices[j].position.y;
-                point.z = surface->groups[i].transformedVertices[j].position.z;
+                point.x = surface->groups[i].localVertices[j].position.x;
+                point.y = surface->groups[i].localVertices[j].position.y;
+                point.z = surface->groups[i].localVertices[j].position.z;
                 point += offsets[k];
                 point = surface->groups[i].node->LocalToWorldPoint(point);
                 cross[k].position.x = point.x;
@@ -1555,7 +1555,7 @@ void D3DIMSoultreeObject::UpdateLocalBounds()
         for (int i = 0; i < model->lodTable[lod].surfaceCount; i++) {
             for (int j = 0; j < model->lodTable[lod].surfaces[i].groupCount; j++) {
                 if (model->lodTable[lod].surfaces[i].groups[j].node == this) {
-                    SoultreeVertex* vertex = model->lodTable[lod].surfaces[i].groups[j].transformedVertices;
+                    SoultreeVertex* vertex = model->lodTable[lod].surfaces[i].groups[j].localVertices;
                     int count = model->lodTable[lod].surfaces[i].groups[j].vertexCount;
                     for (int k = 0; k < count; k++) {
                         Raise(high.x, vertex[k].position.x);
@@ -1681,13 +1681,13 @@ void D3DIMSoultreeObject::CloneFrom(SoultreeObject* sourceNode)
                 toSurface->mappingOffsetV = fromSurface->mappingOffsetV;
                 toSurface->vertices =
                     (SoultreeVertex*)DebugMalloc(toSurface->vertexCount * 0x20, __FILE__, 0x8bd);
-                toSurface->drawnVertices =
+                toSurface->localVertices =
                     (SoultreeVertex*)DebugMalloc(toSurface->vertexCount * 0x20, __FILE__, 0x8be);
                 toSurface->normals = (Vector3*)DebugMalloc(toSurface->vertexCount * 0xc, __FILE__, 0x8bf);
                 toSurface->indices = (unsigned short*)DebugMalloc(toSurface->faceCount * 6, __FILE__, 0x8c0);
                 toSurface->uvs = (SoultreeUV*)DebugMalloc(toSurface->vertexCount * 8, __FILE__, 0x8c1);
                 memcpy(toSurface->vertices, fromSurface->vertices, toSurface->vertexCount * 0x20);
-                memcpy(toSurface->drawnVertices, fromSurface->drawnVertices, toSurface->vertexCount * 0x20);
+                memcpy(toSurface->localVertices, fromSurface->localVertices, toSurface->vertexCount * 0x20);
                 memcpy(toSurface->normals, fromSurface->normals, toSurface->vertexCount * 0xc);
                 memcpy(toSurface->indices, fromSurface->indices, toSurface->faceCount * 6);
                 memcpy(toSurface->uvs, fromSurface->uvs, toSurface->vertexCount * 8);
@@ -1702,8 +1702,8 @@ void D3DIMSoultreeObject::CloneFrom(SoultreeObject* sourceNode)
                             toSurface->groups[j].node = nodes[index];
                     }
                     toSurface->groups[j].vertexCount = fromSurface->groups[j].vertexCount;
-                    toSurface->groups[j].sourceVertices = &toSurface->vertices[first];
-                    toSurface->groups[j].transformedVertices = &toSurface->drawnVertices[first];
+                    toSurface->groups[j].vertices = &toSurface->vertices[first];
+                    toSurface->groups[j].localVertices = &toSurface->localVertices[first];
                     toSurface->groups[j].normals = &toSurface->normals[first];
                     first += toSurface->groups[j].vertexCount;
                 }
@@ -1910,11 +1910,11 @@ void D3DIMSoultreeObject::ResetLocalMatrices()
         TransformVertexGroups(-1);
         for (int i = 0; i < lodTable[lod].surfaceCount; i++) {
             for (int j = 0; j < lodTable[lod].surfaces[i].vertexCount; j++) {
-                lodTable[lod].surfaces[i].drawnVertices[j].position.x =
+                lodTable[lod].surfaces[i].localVertices[j].position.x =
                     lodTable[lod].surfaces[i].vertices[j].position.x;
-                lodTable[lod].surfaces[i].drawnVertices[j].position.y =
+                lodTable[lod].surfaces[i].localVertices[j].position.y =
                     lodTable[lod].surfaces[i].vertices[j].position.y;
-                lodTable[lod].surfaces[i].drawnVertices[j].position.z =
+                lodTable[lod].surfaces[i].localVertices[j].position.z =
                     lodTable[lod].surfaces[i].vertices[j].position.z;
             }
         }

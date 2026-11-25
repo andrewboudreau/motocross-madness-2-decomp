@@ -340,10 +340,10 @@ PRE_FIX_SHAPES = [
     # mode 5's world normal; and mode 5's ray, whose dx/dz retail keeps on the x87 stack (53-bit).
     ('soultree_draw_current_lod',
      [('                        const Vector3& normal = group->normals[v];\n'
-       '                        group->sourceVertices[v].tu =\n'
+       '                        group->vertices[v].tu =\n'
        '                            1.0f - ((direction.y * normal.y + direction.x * normal.x) +\n'
        '                                    direction.z * normal.z + 1.0f) * 0.5f;\n',
-       '                        group->sourceVertices[v].tu =\n'
+       '                        group->vertices[v].tu =\n'
        '                            1.0f - (direction.y * group->normals[v].y + direction.x * group->normals[v].x +\n'
        '                                    direction.z * group->normals[v].z + 1.0f) * 0.5f;\n')], 30),
     ('soultree_draw_current_lod',

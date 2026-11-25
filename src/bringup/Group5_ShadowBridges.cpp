@@ -18,7 +18,7 @@ struct Matrix4 {
 };
 Matrix4 IdentityMatrix();                    // 0x004a1410
 Matrix4 MatrixMult(Matrix4 a, Matrix4 b);    // 0x004a1860
-void TransformPoints(const void* destinationPoints, void* sourcePoints, const Matrix4* matrix, int count,
+void TransformPoints(void* destinationPoints, const void* sourcePoints, const Matrix4* matrix, int count,
                      int destinationStride, int sourceStride);  // 0x004a1b00
 
 ShadowMatrix ShadowMatrixIdentity()
@@ -38,7 +38,7 @@ ShadowMatrix ShadowMatrixMultiply(ShadowMatrix a, ShadowMatrix b)
 void ShadowTransformPointsOrtho(ShadowVec3* dst, const void* src, const ShadowMatrix* m, int count, int dstStride,
                                 int srcStride)
 {
-    TransformPoints(dst, const_cast<void*>(src), reinterpret_cast<const Matrix4*>(m), count, dstStride, srcStride);
+    TransformPoints(dst, src, reinterpret_cast<const Matrix4*>(m), count, dstStride, srcStride);
 }
 
 // 0x004a1a50 (ShadowTransformPointsProjective) is MatrixUtil.cpp's

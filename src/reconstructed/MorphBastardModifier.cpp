@@ -93,7 +93,7 @@ MorphBastardModifier::~MorphBastardModifier()
     DebugFree(deltaMaximums, __FILE__, 42);
     if (meshCopy) {
         delete meshCopy->vertices;
-        delete meshCopy->drawnVertices;
+        delete meshCopy->localVertices;
         delete meshCopy->normals;
         delete meshCopy->indices;
         delete meshCopy->uvs;
@@ -465,7 +465,7 @@ void MorphBastardModifier::ModifyMesh(D3DIMSoultreeObject* object, ModifierSoult
     }
     if (!meshCopy)
         CopyMesh(mesh);
-    memcpy(meshCopy->drawnVertices, mesh->drawnVertices, meshCopy->vertexCount * sizeof(MorphBastardVertex));
+    memcpy(meshCopy->localVertices, mesh->localVertices, meshCopy->vertexCount * sizeof(MorphBastardVertex));
 
     float value;
     for (int i = 0; i < objectCount; i++) {
@@ -485,7 +485,7 @@ void MorphBastardModifier::ModifyMesh(D3DIMSoultreeObject* object, ModifierSoult
             deltaMinimums = new (__FILE__, 542) Vector3[mesh->vertexCount];
             deltaMaximums = new (__FILE__, 543) Vector3[mesh->vertexCount];
         }
-        int base = ((int)group->sourceVertices - (int)mesh->vertices) / 32;
+        int base = ((int)group->vertices - (int)mesh->vertices) / 32;
         memset(deltaSums, 0, group->vertexCount * sizeof(Vector3));
         memset(deltaMinimums, 0, group->vertexCount * sizeof(Vector3));
         memset(deltaMaximums, 0, group->vertexCount * sizeof(Vector3));
@@ -570,9 +570,9 @@ void MorphBastardModifier::ModifyMesh(D3DIMSoultreeObject* object, ModifierSoult
 
         for (int v = 0; v < group->vertexCount; v++) {
             Vector3 offset = deltaSums[v];
-            meshCopy->drawnVertices[base + v].x = offset.x + mesh->drawnVertices[base + v].x;
-            meshCopy->drawnVertices[base + v].y = offset.y + mesh->drawnVertices[base + v].y;
-            meshCopy->drawnVertices[base + v].z = offset.z + mesh->drawnVertices[base + v].z;
+            meshCopy->localVertices[base + v].x = offset.x + mesh->localVertices[base + v].x;
+            meshCopy->localVertices[base + v].y = offset.y + mesh->localVertices[base + v].y;
+            meshCopy->localVertices[base + v].z = offset.z + mesh->localVertices[base + v].z;
         }
     }
     *out = meshCopy;
@@ -586,13 +586,13 @@ void MorphBastardModifier::CopyMesh(ModifierSoultreeSurfaceView* mesh)
     meshCopy->vertexCount = mesh->vertexCount;
     meshCopy->faceCount = mesh->faceCount;
     meshCopy->vertices = new (__FILE__, 858) MorphBastardVertex[meshCopy->vertexCount];
-    meshCopy->drawnVertices = new (__FILE__, 859) MorphBastardVertex[meshCopy->vertexCount];
+    meshCopy->localVertices = new (__FILE__, 859) MorphBastardVertex[meshCopy->vertexCount];
     meshCopy->normals = new (__FILE__, 860) Vector3[meshCopy->vertexCount];
     meshCopy->indices = new (__FILE__, 861) MorphBastardFace[meshCopy->faceCount];
     meshCopy->materials = mesh->materials;
     meshCopy->uvs = new (__FILE__, 863) int[meshCopy->vertexCount * 2];
     memcpy(meshCopy->vertices, mesh->vertices, meshCopy->vertexCount * sizeof(MorphBastardVertex));
-    memcpy(meshCopy->drawnVertices, mesh->drawnVertices, meshCopy->vertexCount * sizeof(MorphBastardVertex));
+    memcpy(meshCopy->localVertices, mesh->localVertices, meshCopy->vertexCount * sizeof(MorphBastardVertex));
     memcpy(meshCopy->normals, mesh->normals, meshCopy->vertexCount * sizeof(Vector3));
     memcpy(meshCopy->indices, mesh->indices, meshCopy->faceCount * sizeof(MorphBastardFace));
     memcpy(meshCopy->uvs, mesh->uvs, meshCopy->vertexCount * sizeof(int));
@@ -601,8 +601,8 @@ void MorphBastardModifier::CopyMesh(ModifierSoultreeSurfaceView* mesh)
     for (int i = 0; i < meshCopy->groupCount; i++) {
         meshCopy->groups[i].node = mesh->groups[i].node;
         meshCopy->groups[i].vertexCount = mesh->groups[i].vertexCount;
-        meshCopy->groups[i].sourceVertices = meshCopy->vertices + offset;
-        meshCopy->groups[i].transformedVertices = meshCopy->drawnVertices + offset;
+        meshCopy->groups[i].vertices = meshCopy->vertices + offset;
+        meshCopy->groups[i].localVertices = meshCopy->localVertices + offset;
         meshCopy->groups[i].normals = meshCopy->normals + offset;
         offset += meshCopy->groups[i].vertexCount;
     }

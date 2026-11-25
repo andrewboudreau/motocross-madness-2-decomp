@@ -135,7 +135,7 @@ struct TreeModelPart {
     SoultreeObject* frame;      // +0x00 compared with the frame argument of 0x0042d390/0x0042c260
     int vertexCount;            // +0x04 length of the range
     TreeModelVertex* firstVertex;  // +0x08 start of the range inside the mesh's vertices
-    int transformedVertices;
+    int localVertices;
     int normals;
 };
 
@@ -151,8 +151,8 @@ struct TreeModelMesh {
     int vertexCount;            // +0x08 summed for the point list size; loop bound over vertices
     int triangleCount;          // +0x0c summed by 0x0042c260; loop bound over triangles
     TreeModelVertex* vertices;  // +0x10 base of the parts' firstVertex ranges
-    TreeModelVertex* drawnVertices;  // +0x14 0x0042c260 reads positions from here instead of
-                                     // +0x10 when it gathers a single frame's triangles
+    TreeModelVertex* localVertices;  // +0x14 0x0042c260 reads node-space positions from here
+                                     // instead of +0x10 when it gathers a single frame's triangles
     int normals;
     TreeModelTriangle* triangles;  // +0x1c read by 0x0042c260
     char pad_0x20[0x38 - 0x20];

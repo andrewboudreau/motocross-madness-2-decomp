@@ -52,12 +52,12 @@ struct SoultreeVertex {
 };
 
 // One 0x14-byte vertex group of a surface: the vertices one node moves.
-// 0x00440d40 transforms vertexCount vertices by the node's world matrix.
+// 0x00440d40 transforms vertexCount local vertices by the node's world matrix into vertices.
 struct SoultreeVertexGroup {
     SoultreeObject* node;                      // node
     int vertexCount;                           // vertex count
-    SoultreeVertex* sourceVertices;            // source vertices
-    SoultreeVertex* transformedVertices;       // transformed vertices
+    SoultreeVertex* vertices;                  // this group's range of the surface's drawn vertices
+    SoultreeVertex* localVertices;             // the same range of its local (node-space) vertices
     Vector3* normals;                          // normals
 };
 
@@ -74,8 +74,8 @@ struct SoultreeSurface {
     SoultreeVertexGroup* groups;
     int vertexCount;                           // vertex count
     int faceCount;                             // face count
-    SoultreeVertex* vertices;                  // vertices
-    SoultreeVertex* drawnVertices;             // drawn vertices
+    SoultreeVertex* vertices;                  // drawn vertices (world space; DrawIndexedPrimitive)
+    SoultreeVertex* localVertices;             // node-space vertices as loaded; 0x00440d40 transforms them into vertices
     Vector3* normals;                          // normals
     unsigned short* indices;                   // indices, three per face
     int materialCount;                         // material count
@@ -121,9 +121,10 @@ struct D3DIMSoultreeCameraView {
 };
 
 
-// 0x004a1b00 (cdecl): transforms `count` points by `matrix`.
-void TransformPoints(const void* source, void* target, const Matrix4* matrix, int count,
-                           int sourceStride, int targetStride);
+// 0x004a1b00 (cdecl): transforms `count` points from `source` by `matrix` into `target`;
+// `sourceStride` 0 means `targetStride` (MatrixUtil.h's ProjectPoints takes the same arguments).
+void TransformPoints(void* target, const void* source, const Matrix4* matrix, int count,
+                     int targetStride, int sourceStride);
 
 class D3DIMSoultreeObject : public SoultreeObject {
 public:

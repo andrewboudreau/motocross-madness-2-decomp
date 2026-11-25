@@ -142,18 +142,18 @@ void BikeNumberPainter::PaintNumber(D3DIMSoultreeObject* model, int number) {
             if (!uses)
                 continue;
             for (int v = 0; v < model->lodTable[lod].surfaces[s].vertexCount; v++) {
-                if (model->lodTable[lod].surfaces[s].drawnVertices[v].position.z < -0.5f)
+                if (model->lodTable[lod].surfaces[s].localVertices[v].position.z < -0.5f)
                     continue;
-                model->lodTable[lod].surfaces[s].drawnVertices[v].tu = model->lodTable[lod].surfaces[s].uvs[v].u;
-                model->lodTable[lod].surfaces[s].drawnVertices[v].tv = model->lodTable[lod].surfaces[s].uvs[v].v;
+                model->lodTable[lod].surfaces[s].localVertices[v].tu = model->lodTable[lod].surfaces[s].uvs[v].u;
+                model->lodTable[lod].surfaces[s].localVertices[v].tv = model->lodTable[lod].surfaces[s].uvs[v].v;
                 model->lodTable[lod].surfaces[s].vertices[v].tu = model->lodTable[lod].surfaces[s].uvs[v].u;
                 model->lodTable[lod].surfaces[s].vertices[v].tv = model->lodTable[lod].surfaces[s].uvs[v].v;
-                model->lodTable[lod].surfaces[s].drawnVertices[v].tu *= scale;
-                model->lodTable[lod].surfaces[s].drawnVertices[v].tu += offsetU;
+                model->lodTable[lod].surfaces[s].localVertices[v].tu *= scale;
+                model->lodTable[lod].surfaces[s].localVertices[v].tu += offsetU;
                 model->lodTable[lod].surfaces[s].vertices[v].tu *= scale;
                 model->lodTable[lod].surfaces[s].vertices[v].tu += offsetU;
-                model->lodTable[lod].surfaces[s].drawnVertices[v].tv *= scale;
-                model->lodTable[lod].surfaces[s].drawnVertices[v].tv += offsetV;
+                model->lodTable[lod].surfaces[s].localVertices[v].tv *= scale;
+                model->lodTable[lod].surfaces[s].localVertices[v].tv += offsetV;
                 model->lodTable[lod].surfaces[s].vertices[v].tv *= scale;
                 model->lodTable[lod].surfaces[s].vertices[v].tv += offsetV;
             }

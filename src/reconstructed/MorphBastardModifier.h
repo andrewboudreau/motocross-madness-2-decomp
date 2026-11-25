@@ -111,8 +111,8 @@ struct MorphBastardFace {
 struct MorphBastardMeshGroup {
     MorphBastardNode* node;           // the node the group belongs to
     int vertexCount;                  // vertex count
-    MorphBastardVertex* sourceVertices;
-    MorphBastardVertex* transformedVertices;
+    MorphBastardVertex* vertices;
+    MorphBastardVertex* localVertices;
     Vector3* normals;
 };
 
@@ -128,7 +128,7 @@ struct ModifierSoultreeSurfaceView {
     int vertexCount;                  // vertex count
     int faceCount;                    // face count
     MorphBastardVertex* vertices;  // +0x10  SoultreeSurface+0x10 vertices
-    MorphBastardVertex* drawnVertices;  // +0x14  SoultreeSurface+0x14 drawn vertices
+    MorphBastardVertex* localVertices;  // +0x14  SoultreeSurface+0x14 local (node-space) vertices
     Vector3* normals;  // +0x18  SoultreeSurface+0x18 normals
     MorphBastardFace* indices;  // +0x1C  SoultreeSurface+0x1c indices, three per face
     MorphBastardMeshPair materials;  // +0x20 SoultreeSurface materialCount/materialIndices, copied as one 8-byte value
