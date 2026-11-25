@@ -116,13 +116,13 @@ class EcoLightConnections(unittest.TestCase):
             self.assertNotIn(OLD, {s.name for s in caller.symbols})
             for address in (0x45a9ab,0x45a9ea,0x45a9f8):
                 instruction(address, 'call', '0x4a0190')
-            # The two existing declarations are compiled separately: only their accessed
-            # primary prefixes agree; these are not interchangeable full class definitions.
+            # EcoSystem.h includes LightEmitter.h; LightingChanged reads the
+            # emitter's ambient colour (+0x54) and direction (+0x70).
             layout = out/'eco_layout.cpp'
             layout.write_text('#include "EcoSystem.h"\n#include <stddef.h>\n'
                 'typedef char E[(offsetof(EcoSystem,lightManager)==0x4c && '
-                'offsetof(EcoLightEmitterView,colour)==0x54 && '
-                'offsetof(EcoLightEmitterView,direction)==0x70)?1:-1];\n')
+                'offsetof(LightEmitter,ambientRGBA)==0x54 && '
+                'offsetof(LightEmitter,lightDirection)==0x70)?1:-1];\n')
             compile_source('layout', layout)
             code = (ROOT/'src/reconstructed/LightEmitter.cpp').read_text()
             helpers = out/'helpers.cpp'

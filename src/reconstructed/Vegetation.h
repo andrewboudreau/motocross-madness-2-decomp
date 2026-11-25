@@ -4,7 +4,7 @@
 #include "EcoCoordinates.h"
 
 class TextureMapManager;
-class EcoRenderTargetView;
+class RenderTarget;
 class CollisionObject;
 struct Vector3;
 
@@ -26,7 +26,7 @@ public:
     void TestDistance(int* billboard, int* fade);
     // 0x00456a10: switches between the 3D geometry and the billboard.
     void SetBillboard(int billboard, int fade);
-    void DrawGeometry(EcoRenderTargetView* target);          // 0x00457000: draws the geometry
+    void DrawGeometry(RenderTarget* target);          // 0x00457000: draws the geometry
     int GetCollisionCount();                  // 0x00457080: the definition's collision count
     // 0x004570a0: the definition's collision object `index`, placed here.
     CollisionObject* GetCollisionObject(int index);

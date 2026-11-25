@@ -601,7 +601,7 @@ int BaseQuarryEvent::LoadEventObjects(LoadProgressFn progress) {
     } else {
         ecoSystem = (new(__FILE__, 870) EcoSystem(1))
                          ->Create(renderContext, g_TrackGame->textureManager,
-                                                 (EcoTerrainView*)eventTerrain, lightManager,
+                                                 (Terrain*)eventTerrain, lightManager,
                                                  (char*)eventScene->environment, stream, 0x115c,
                                                  g_TrackGame->mode.raceSettings.treeCollision,
                                                  g_TrackGame->mode.videoSettings[1]);

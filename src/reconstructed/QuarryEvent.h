@@ -16,7 +16,7 @@ class Scene;
 class StatsOverlay;
 class TextureMapManager;
 class TextQueueOverlay;
-class EcoTerrainView;
+class Terrain;
 class OverlayTerrainView;
 class FileStream;
 struct EventBikeRaceView;
@@ -46,7 +46,7 @@ struct QuarryEventKrustyBikeCameraView {
 class EcoSystem {
 public:
     explicit EcoSystem(int flags);      // 0x00457250
-    EcoSystem* Create(void* view, TextureMapManager* textures, EcoTerrainView* terrain,
+    EcoSystem* Create(void* view, TextureMapManager* textures, Terrain* terrain,
                       LightManager* lights, char* environment, FileStream* stream, int format,
                       int collisions, int level); // 0x004594d0
     void SetDetailLevel(int level);    // 0x004594c0: detail level

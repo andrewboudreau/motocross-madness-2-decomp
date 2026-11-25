@@ -2698,13 +2698,13 @@ Left for later:
 | `UnknownGroundFogShader` | `GroundFogCacheOwner` | 3 | 9 | object whose first member caches the fog (0x00484f10) |
 | `UnknownFogVertex` | `GroundFogVertex` | 2 | 11 | D3DLVERTEX layout the fog pass edits |
 | `UnknownEcoQuadTree` | `EcoQuadTreeView` | 2 | 15 | QuadTree global 0x0068aba4; Insert 0x004dcac0 |
-| `UnknownEcoTerrain` | `EcoTerrainView` | 2 | 24 | Terrain QueryGround 0x00507c10 |
+| `UnknownEcoTerrain` | `EcoTerrainView` | 2 | 24 | Terrain QueryGround 0x00507c10 Merged into `Terrain`: EcoSystem::Create takes a `Terrain*` and GetHeightRange is Terrain's 0x00508970. |
 | `UnknownEcoHullShape` | `EcoHullShape` | 3 | 6 | CollisionObject shapeType 0 data |
 | `UnknownEcoCapsuleShape` | `EcoCapsuleShape` | 3 | 2 | CollisionObject shapeType 3 data |
 | `UnknownEcoSphereShape` | `EcoSphereShape` | 3 | 2 | CollisionObject shapeType 4 data |
-| `UnknownEcoLight` | `EcoLightEmitterView` | 2 | 16 | LightManager::FindLightOfType 0x004a0190 result |
-| `UnknownEcoCamera` | `EcoCameraView` | 2 | 13 | Camera slots 27-32, RenderTarget+0x08 |
-| `UnknownEcoRenderTarget` | `EcoRenderTargetView` | 2 | 14 | GameObject+0x18 render target; IDirect3DDevice7 forwards |
+| `UnknownEcoLight` | `EcoLightEmitterView` | 2 | 16 | LightManager::FindLightOfType 0x004a0190 result Merged into `LightEmitter`: LightingChanged reads ambientRGBA (+0x54) and lightDirection (+0x70); EcoSystem.h's partial LightManager is replaced by LightEmitter.h. |
+| `UnknownEcoCamera` | `EcoCameraView` | 2 | 13 | Camera slots 27-32, RenderTarget+0x08 Merged into `Camera`: eyePosition, viewDirection, focalLength, farPlane, viewMatrix and screenMatrix. |
+| `UnknownEcoRenderTarget` | `EcoRenderTargetView` | 2 | 14 | GameObject+0x18 render target; IDirect3DDevice7 forwards Merged into `RenderTarget` (currentCamera, targetWidth, verticesDrawn, trianglesDrawn; slot 18 is SetAlphaTest). |
 | `UnknownEcoTexture` | `EcoTextureMapView` | 2 | 9 | TextureMap slots 4-19; 0x0050a590 returns TextureMap |
 | `UnknownEcoModelVertex` | `EcoModelVertex` | 2 | 5 | .slt loader vertex (8 floats) |
 | `UnknownEcoVertex` | `EcoLitVertex` | 2 | 9 | D3DLVERTEX FVF 0x1e2 |

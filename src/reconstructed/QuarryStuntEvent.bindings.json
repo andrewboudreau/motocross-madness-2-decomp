@@ -247,7 +247,7 @@
   "?Create@ArcadeObject@@QAEPAV1@PAXHHPBDUVector3@@HPAVCamera@@MMME@Z": "0x00401310",
   "?Create@AuralScape@@QAEPAV1@PAXH@Z": "0x00402f00",
   "?Create@BikeRace@@QAEPAV1@PAX0PAVLightManager@@PAUTextureContext@@PAVTerrain@@PAVKrustyBikeCamera@@PAVScene@@PAURaceGateEvent@@PAVProjectedShadow@@@Z": "0x00417ed0",
-  "?Create@EcoSystem@@QAEPAV1@PAXPAVTextureMapManager@@PAVEcoTerrainView@@PAVLightManager@@PADPAVFileStream@@HHH@Z": "0x004594d0",
+  "?Create@EcoSystem@@QAEPAV1@PAXPAVTextureMapManager@@PAVTerrain@@PAVLightManager@@PADPAVFileStream@@HHH@Z": "0x004594d0",
   "?Create@Fog@@QAEPAV1@PAXIMMMMM@Z": "0x00462680",
   "?Create@FogOn@@QAEPAVGameObject@@PAXPAVFog@@@Z": "0x00486a10",
   "?Create@SkyCube@@QAEPAV1@PAXPAVFileStream@@PAUCubeTextureContextView@@M@Z": "0x004fb230",

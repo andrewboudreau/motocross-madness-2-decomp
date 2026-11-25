@@ -7,7 +7,7 @@
     "src/reconstructed/EcoSystem.cpp": {
       "sections": 207,
       "relocations": 1143,
-      "sha256": "bc20be893900fcc890690d22ebbde7ebc85bd88177bb530ac2383393a5483418"
+      "sha256": "2546ed4dffb2efc361d67d132ebef79c4bca8687fb59203637a98c26dd968898"
     },
     "src/reconstructed/LightEmitter.cpp": {
       "sections": 57,
@@ -27,7 +27,7 @@
     "src/reconstructed/QuarryStuntEvent.cpp": {
       "sections": 145,
       "relocations": 923,
-      "sha256": "9c7aeb3982139868f43f675a7dc170331b8208d8034616ea057f6a2229d6f647"
+      "sha256": "af447ab3201e5afd1bcebff0c9dc57f1b494a90aebb98ffa82c045fecc4c826a"
     },
     "src/reconstructed/ArcadeObject.cpp": {
       "sections": 32,
@@ -282,7 +282,7 @@
     },
     {
       "source": "src/reconstructed/EcoSystem.cpp",
-      "symbol": "?DrawGeometry@Vegetation@@QAEXPAVEcoRenderTargetView@@@Z",
+      "symbol": "?DrawGeometry@Vegetation@@QAEXPAVRenderTarget@@@Z",
       "va": "0x00457000",
       "size": 125
     },
@@ -336,7 +336,7 @@
     },
     {
       "source": "src/reconstructed/EcoSystem.cpp",
-      "symbol": "?Create@EcoSystem@@QAEPAV1@PAXPAVTextureMapManager@@PAVEcoTerrainView@@PAVLightManager@@PADPAVFileStream@@HHH@Z",
+      "symbol": "?Create@EcoSystem@@QAEPAV1@PAXPAVTextureMapManager@@PAVTerrain@@PAVLightManager@@PADPAVFileStream@@HHH@Z",
       "va": "0x004594d0",
       "size": 859
     },

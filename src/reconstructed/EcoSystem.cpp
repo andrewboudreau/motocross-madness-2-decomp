@@ -71,7 +71,7 @@ static inline float EcoSquareMagnitude(const Vector3* v) {
 
 // The view (RenderTarget.h) the object was attached to, GameObject+0x18.
 
-#define ECO_VIEW ((EcoRenderTargetView*)renderContext)
+#define ECO_VIEW ((RenderTarget*)renderContext)
 
 #define ECO_RGBA(r, g, b, a) ((unsigned int)(((a) << 24) | ((r) << 16) | ((g) << 8) | (b)))
 
@@ -340,9 +340,9 @@ float FastSqrt(float value);  // 0x00460b50
 // Not exact (356 of 369 bytes in place; docs/ECOSYSTEM.md).
 void Vegetation::TestDistance(int* billboard, int* fade) {
     VegetationDefinition* definition = g_EcoSystem->definitionTable[definitionIndex];
-    EcoCameraView* camera = ((EcoRenderTargetView*)g_EcoSystem->renderContext)->camera;
-    float dx = camera->position.x - quantizedPosition.x * g_EcoSystem->unitsPerCoordinate;
-    float dz = camera->position.z - quantizedPosition.z * g_EcoSystem->unitsPerCoordinate;
+    Camera* camera = ((RenderTarget*)g_EcoSystem->renderContext)->currentCamera;
+    float dx = camera->eyePosition.x - quantizedPosition.x * g_EcoSystem->unitsPerCoordinate;
+    float dz = camera->eyePosition.z - quantizedPosition.z * g_EcoSystem->unitsPerCoordinate;
     *billboard = 0;
     float outer = (float)g_UnknownGlobal59af14[g_EcoSystem->detailLevel].geometryDistance;
     float inner = (float)g_UnknownGlobal59af14[g_EcoSystem->detailLevel].fadeStartDistance;
@@ -374,7 +374,7 @@ void Vegetation::TestDistance(int* billboard, int* fade) {
 // AgeManager for eviction. The min/max of x are computed but unused.
 void Vegetation::SetBillboard(int billboard, int fade) {
     VegetationDefinition* definition = g_EcoSystem->definitionTable[definitionIndex];
-    EcoCameraView* camera = ((EcoRenderTargetView*)g_EcoSystem->renderContext)->camera;
+    Camera* camera = ((RenderTarget*)g_EcoSystem->renderContext)->currentCamera;
     fadeLevel = (unsigned char)fade;
     if (billboard == isBillboard)
         return;
@@ -396,11 +396,11 @@ void Vegetation::SetBillboard(int billboard, int fade) {
         float heightScale = definition->HeightForParameter(heightParam) * definition->modelHeightScale;
         float c;
         float s;
-        if (camera->direction.z != 0.0f) {
-            float inverse = FastInvSqrtEstimate(camera->direction.x * camera->direction.x
-                                                  + camera->direction.z * camera->direction.z) * radiusScale;
-            c = inverse * camera->direction.z;
-            s = -(inverse * camera->direction.x);
+        if (camera->viewDirection.z != 0.0f) {
+            float inverse = FastInvSqrtEstimate(camera->viewDirection.x * camera->viewDirection.x
+                                                  + camera->viewDirection.z * camera->viewDirection.z) * radiusScale;
+            c = inverse * camera->viewDirection.z;
+            s = -(inverse * camera->viewDirection.x);
         } else {
             c = radiusScale;
             s = 0.0f;
@@ -500,12 +500,12 @@ void Vegetation::SetBillboard(int billboard, int fade) {
 }
 
 // 0x00457000
-void Vegetation::DrawGeometry(EcoRenderTargetView* target) {
+void Vegetation::DrawGeometry(RenderTarget* target) {
     VegetationDefinition* definition = g_EcoSystem->definitionTable[definitionIndex];
     definition->modelTexture->Bind();
     int vertexCount = definition->modelVertexCount[isBillboard];
     int indexCount = definition->modelIndexCount[isBillboard];
-    target->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, D3DFVF_LVERTEX, geometryBlock, vertexCount, (EcoLitVertex*)geometryBlock + vertexCount,
+    target->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, D3DFVF_LVERTEX, (int)geometryBlock, vertexCount, (int)((EcoLitVertex*)geometryBlock + vertexCount),
                                  indexCount, 0);
     g_EcoSystem->ageManager->MarkUsed(
         (AgeEntry*)((int*)geometryBlock + vertexCount * 8 + (indexCount + 1) / 2));
@@ -1074,7 +1074,7 @@ void EcoSystem::SetDetailLevel(int level) {
 }
 
 // 0x004594d0
-EcoSystem* EcoSystem::Create(void* view, TextureMapManager* textures, EcoTerrainView* terrain,
+EcoSystem* EcoSystem::Create(void* view, TextureMapManager* textures, Terrain* terrain,
                                             LightManager* lights, char* path, FileStream* stream,
                                             int textureFormat, int collisions, int level) {
     int i;
@@ -1504,19 +1504,19 @@ int EcoSystem::GenerateObjects(int checkCodes) {
 
 // 0x0045a9a0
 void EcoSystem::LightingChanged() {
-    EcoLightEmitterView* light = reinterpret_cast<EcoLightEmitterView*>(lightManager->FindLightOfType(6));
+    LightEmitter* light = lightManager->FindLightOfType(6);
     if (light) {
-        ambientLight.x = light->colour[0];
-        ambientLight.y = light->colour[1];
-        ambientLight.z = light->colour[2];
+        ambientLight.x = light->ambientRGBA[0];
+        ambientLight.y = light->ambientRGBA[1];
+        ambientLight.z = light->ambientRGBA[2];
     } else {
         ambientLight.z = 0.0f;
         ambientLight.y = 0.0f;
         ambientLight.x = 0.0f;
     }
-    light = reinterpret_cast<EcoLightEmitterView*>(lightManager->FindLightOfType(4));
+    light = lightManager->FindLightOfType(4);
     if (!light) {
-        light = reinterpret_cast<EcoLightEmitterView*>(lightManager->FindLightOfType(2));
+        light = lightManager->FindLightOfType(2);
         if (!light) {
             lightColor.z = 0.0f;
             lightColor.y = 0.0f;
@@ -1524,12 +1524,12 @@ void EcoSystem::LightingChanged() {
             return;
         }
     }
-    lightColor.x = light->colour[0];
-    lightColor.y = light->colour[1];
-    lightColor.z = light->colour[2];
-    lightDirection.x = light->direction.x;
+    lightColor.x = light->ambientRGBA[0];
+    lightColor.y = light->ambientRGBA[1];
+    lightColor.z = light->ambientRGBA[2];
+    lightDirection.x = light->lightDirection.x;
     lightDirection.y = 0.0f;
-    lightDirection.z = light->direction.z;
+    lightDirection.z = light->lightDirection.z;
     float length = EcoSquareMagnitude(&lightDirection);
     if (length == 0.0f) {
         lightDirection = kVec3Zero;
@@ -1556,9 +1556,9 @@ int EcoSystem::PrepareGeometry() {
             ageManager->EvictStale(total - stale);
         ageManager->AdvanceAge();
     }
-    g_UnknownGlobal59af00 = &ECO_VIEW->camera->viewMatrix;
-    depthScale = 65535.0f / ECO_VIEW->camera->farDistance;
-    depthUnit = ECO_VIEW->camera->farDistance * (1.0f / 65535.0f);
+    g_UnknownGlobal59af00 = &ECO_VIEW->currentCamera->viewMatrix;
+    depthScale = 65535.0f / ECO_VIEW->currentCamera->farPlane;
+    depthUnit = ECO_VIEW->currentCamera->farPlane * (1.0f / 65535.0f);
     billboardCount = 0;
     geometryCount = 0;
     g_collisionQuadTree->RestartQuery();
@@ -1579,7 +1579,7 @@ int EcoSystem::PrepareGeometry() {
                 center.x = object->quantizedPosition.x * g_EcoSystem->unitsPerCoordinate;
                 center.y = object->quantizedPosition.y * g_EcoSystem->unitsPerCoordinate + height;
                 center.z = object->quantizedPosition.z * g_EcoSystem->unitsPerCoordinate;
-                visible = reinterpret_cast<EcoVisibilityClipperView*>(g_visibilityClipper)->SphereInFrustum(ECO_VIEW->camera, &ECO_VIEW->camera->screenMatrix,
+                visible = reinterpret_cast<EcoVisibilityClipperView*>(g_visibilityClipper)->SphereInFrustum(ECO_VIEW->currentCamera, &ECO_VIEW->currentCamera->screenMatrix,
                                                                &center, radius, 0);
             }
             if (visible) {
@@ -1631,7 +1631,7 @@ void EcoSystem::SetRenderStates(int format) {
         ECO_VIEW->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, 0, 0);
         ECO_VIEW->SetRenderState(D3DRENDERSTATE_COLORKEYENABLE, 1, 0);
     }
-    ECO_VIEW->SetAlphaReference((int)alphaReference);
+    ECO_VIEW->SetAlphaTest((int)alphaReference);
     if (g_UnknownGlobal59af14[detailLevel].stageLighting) {
         ECO_VIEW->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
         ECO_VIEW->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
@@ -1751,9 +1751,9 @@ int EcoSystem::Render3D() {
     unsigned int start = ReadClock();
     int category = g_MemTagStack->Push("EcoSystem");
     int verticesBefore = ECO_VIEW->verticesDrawn;
-    EcoCameraView* camera = ECO_VIEW->camera;
+    Camera* camera = ECO_VIEW->currentCamera;
     int trianglesBefore = ECO_VIEW->trianglesDrawn;
-    float projectionScale = camera->projectionScale;
+    float projectionScale = camera->focalLength;
     identity(0, 0) = 1.0f;
     identity(0, 1) = 0.0f;
     identity(0, 2) = 0.0f;
@@ -1770,17 +1770,17 @@ int EcoSystem::Render3D() {
     identity(3, 1) = 0.0f;
     identity(3, 2) = 0.0f;
     identity(3, 3) = 1.0f;
-    ECO_VIEW->camera->SetWorldMatrix(&identity);
+    ECO_VIEW->currentCamera->SetWorldMatrix(&identity);
     ECO_VIEW->GetRenderState(D3DRENDERSTATE_TEXTUREPERSPECTIVE, &savedPerspective);
     ECO_VIEW->GetRenderState(D3DRENDERSTATE_SHADEMODE, &savedShadeMode);
     // The three face normals: the quad's two sides and the face towards
     // the camera, the sides leaned back by a tenth of it.
-    right.x = -camera->direction.z;
-    right.z = camera->direction.x;
-    left.x = camera->direction.z;
-    left.z = -camera->direction.x;
-    back.x = -camera->direction.x;
-    back.z = -camera->direction.z;
+    right.x = -camera->viewDirection.z;
+    right.z = camera->viewDirection.x;
+    left.x = camera->viewDirection.z;
+    left.z = -camera->viewDirection.x;
+    back.x = -camera->viewDirection.x;
+    back.z = -camera->viewDirection.z;
     EcoLean(&right, EcoScaleXZ(back, 0.1f));
     EcoLean(&left, EcoScaleXZ(back, 0.1f));
     EcoNormalizeXZ(&right);
@@ -1799,10 +1799,10 @@ int EcoSystem::Render3D() {
     unsigned int backColor = EcoLitColor(this, backLight);
     unsigned int rightColor = EcoLitColor(this, rightLight);
     unsigned int leftColor = EcoLitColor(this, leftLight);
-    float inverse = FastInvSqrtEstimate(camera->direction.x * camera->direction.x
-                                          + camera->direction.z * camera->direction.z);
-    float sine = inverse * camera->direction.x;
-    float cosine = inverse * camera->direction.z;
+    float inverse = FastInvSqrtEstimate(camera->viewDirection.x * camera->viewDirection.x
+                                          + camera->viewDirection.z * camera->viewDirection.z);
+    float sine = inverse * camera->viewDirection.x;
+    float cosine = inverse * camera->viewDirection.z;
     s_billboardsDrawn = 0;
     s_geometryDrawn = 0;
     if (reinterpret_cast<EcoTrackGameView*>(g_TrackGame)->bladeRenderer)
@@ -1823,7 +1823,7 @@ int EcoSystem::Render3D() {
         SetRenderStates(definitionTable[vegetation[0].definitionIndex]->billboardTexture->pixelFormat);
         int next = 0;
         int remaining = billboardCount;
-        float widthScale = (float)(15.0 / ECO_VIEW->width);
+        float widthScale = (float)(15.0 / ECO_VIEW->targetWidth);
         int stageLighting = g_UnknownGlobal59af14[detailLevel].stageLighting;
         float billboardRange = (float)g_UnknownGlobal59af14[detailLevel].billboardRange;
         int billboardLimit = g_UnknownGlobal59af14[detailLevel].billboardLimit;
@@ -1942,8 +1942,8 @@ int EcoSystem::Render3D() {
                 }
             }
             if (s_drawEnabled && vertexCount)
-                ECO_VIEW->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, D3DFVF_LVERTEX, billboardVertices, vertexCount,
-                                               billboardIndices, indexCount, 0);
+                ECO_VIEW->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, D3DFVF_LVERTEX, (int)billboardVertices, vertexCount,
+                                               (int)billboardIndices, indexCount, 0);
             remaining -= i;
         }
     }

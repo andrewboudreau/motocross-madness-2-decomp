@@ -53,11 +53,7 @@ public:
 };
 #include "../krusty2/broadphase/QuadTreeDeclarations.h"
 
-// src/krusty2/broadphase/Terrain.h: Terrain.
-class EcoTerrainView {
-public:
-    void GetHeightRange(float* outMin, float* outMax); // 0x00508970
-};
+class Terrain;
 
 // src/krusty2/collision/CollisionObject.h: CollisionObject (0xb8 bytes,
 // QuadTreeObject at +0, GraphicsTest : GameObject at +0xc).
@@ -95,106 +91,9 @@ public:
     unsigned char field_0x68[0xb8 - 0x68];    // 0xb8 bytes (operator new at 0x00457f74)
 };
 
-// LightEmitter.h: LightEmitter and LightManager, as far as the lighting
-// update reads them.
-class EcoLightEmitterView {
-public:
-    unsigned char field_0x00[0x54];
-    float colour[4];                          // +0x54
-    unsigned char lightPosition[0x70 - 0x64]; // +0x64: LightEmitter::lightPosition, a Vector3 (bytes kept)
-    Vector3 direction;                        // +0x70
-};
-class LightEmitter;
-class LightManager {
-public:
-    LightEmitter* FindLightOfType(int type); // 0x004a0190: first light of `type`
-};
+#include "LightEmitter.h"
 
-// RenderTarget.h: the view at GameObject+0x18 and its Camera (+0x08).
-// Slots 27-32 carry Camera.h's names (Camera introduces slots 27-32).
-class EcoCameraView {
-public:
-    virtual void UnknownVirtualSlot0();
-    virtual void AddRef();
-    virtual void Release();
-    virtual void GetRefCount();
-    virtual void Disable();
-    virtual void Enable();
-    virtual void OnDisable();
-    virtual void OnEnable();
-    virtual void SetRenderContext();
-    virtual void PreTick();
-    virtual void Tick();
-    virtual void Step();
-    virtual void PrepareGeometry();
-    virtual void RenderPre3D();
-    virtual void Render3D();
-    virtual void RenderPost3D();
-    virtual void SetPaused();
-    virtual void OnDeactivate();
-    virtual void OnActivate();
-    virtual void OnInputEvent();
-    virtual void OnChar();
-    virtual void OnKeyDown();
-    virtual void OnControlRelease();
-    virtual void OnControlPress();
-    virtual void OnNetworkMessage();
-    virtual void AttachRenderContext();
-    virtual void MarkPendingRelease();
-    virtual void TakeScreenshot();
-    virtual void UpdateMatrices();
-    virtual void LookAt();
-    virtual int SetWorldMatrix(const Matrix4* value);
-    virtual int SetViewMatrix(const Matrix4* value);
-    virtual int SetProjectionMatrix(const Matrix4* value);
-
-    unsigned char field_0x004[0xac - 4];
-    Matrix4 viewMatrix;                       // +0xac
-    Matrix4 screenMatrix[2];                  // +0x0ec Camera screenMatrix; [0] is the clipper's matrix
-    float fieldOfView;                        // +0x16c Camera fieldOfView
-    Vector3 position;                         // +0x170
-    Vector3 direction;                        // +0x17c
-    unsigned char field_0x188[0x198 - 0x188];
-    float projectionScale;                    // +0x198: the billboard size test
-    unsigned char field_0x19c[0x1c0 - 0x19c];
-    float farDistance;                        // +0x1c0
-};
-// Slots 6-9, 15 and 18 are named from the D3D arguments their callers pass
-// (D3DTSS_*/D3DRENDERSTATE_* states, D3DPT_/D3DFVF_ index draws, the alpha
-// reference); the names follow the IDirect3DDevice7 calls they forward to.
-class EcoRenderTargetView {
-public:
-    virtual void UnknownVirtualSlot0();
-    virtual int BeginScene();
-    virtual int EndScene();
-    virtual int Blit(void* destination, void* source, void* sourceRect, int flags);
-    virtual void* LockSurface(void* rect, long* pitch, int flags);
-    virtual int UnlockSurface(void* rect);
-    virtual long GetTextureStageState(int stage, int type, int* value);
-    virtual long SetTextureStageState(int stage, int type, int value);
-    virtual void SetRenderState(int state, int value, int force);
-    virtual long GetRenderState(int state, int* value);
-    virtual void SetTextureBlend(int mode, int flag);
-    virtual long ClearTexture(int stage);
-    virtual int Clear(const void* rect, int flags);
-    virtual int SupportsTextureFormat(int format);
-    virtual int SetViewport(void* viewport);
-    virtual int DrawIndexedPrimitive(int primitive, int format, void* vertices, int vertexCount,
-                                     void* indices, int indexCount, int flags);
-    virtual int DrawPrimitive(int type, int vertexFormat, int vertices, int count, int flags);
-    virtual int DrawIndexedPrimitiveVB(int type, int vertexBuffer, int start, int vertexCount,
-                                       int indices, int indexCount, int flags);
-    virtual void SetAlphaReference(int value);
-    virtual void DisableAlphaTest();
-
-    unsigned char targetDisplay[4];  // +0x04 RenderTarget targetDisplay (bytes kept)
-    EcoCameraView* camera;                 // +0x08
-    int width;                                // +0x0c
-    unsigned char field_0x10[0x38 - 0x10];
-    int verticesDrawn;                        // +0x38
-    unsigned char field_0x3c[0x44 - 0x3c];
-    int trianglesDrawn;                       // +0x44
-};
+#include "Camera.h"
 
 // TextureMap.h: the texture objects the definitions hold (0x0050a590, Texmap.cpp,
 // returns a TextureMap). Slots 1-3 are BaseObject's and 4-19 TextureMap.h's.
@@ -334,7 +233,7 @@ int ReadXorDecoded(unsigned char* data, int size, int count, FILE* file, unsigne
 // Griddraw.h / VisibilityQuadTree.h: the visibility clipper 0x00575a98.
 class EcoVisibilityClipperView {
 public:
-    int SphereInFrustum(const EcoCameraView* camera, const void* matrix, const Vector3* center,
+    int SphereInFrustum(const Camera* camera, const void* matrix, const Vector3* center,
                         float radius, int* fullyInside);       // 0x0052fbb0
 };
 #include "../krusty2/visibility/VisibilityClipperGlobal.h"        // 0x00575a98
@@ -432,7 +331,7 @@ public:
     int ReadEsb(const char* path, FileStream* stream);               // 0x00458f70: reads the .esb
     void SetDetailLevel(int level);    // 0x004594c0: detail level
     // 0x004594d0: creates the ecosystem.
-    EcoSystem* Create(void* view, TextureMapManager* textures, EcoTerrainView* terrain,
+    EcoSystem* Create(void* view, TextureMapManager* textures, Terrain* terrain,
                                      LightManager* lights, char* path, FileStream* stream,
                                      int textureFormat, int collisions, int level);
     int PlaceStoredObjects();                 // 0x004598d0: places the objects read from the .esb
@@ -446,7 +345,7 @@ public:
     Vegetation* vegetation;                   // the objects
     Vegetation** billboardList;               // objects drawn as billboards
     Vegetation** geometryList;                // objects drawn as geometry
-    EcoTerrainView* groundTerrain;
+    Terrain* groundTerrain;
     TextureMapManager* textureManager;
     LightManager* lightManager;
     EcoLitVertex* billboardVertices;      // billboard vertices (120 * 6)
