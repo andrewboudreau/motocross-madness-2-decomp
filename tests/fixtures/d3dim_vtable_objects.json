@@ -20,7 +20,7 @@
     "src/krusty2/soultree/SoulTreePhysics.cpp": {
       "sections": 163,
       "relocations": 787,
-      "sha256": "5dec96409e0bb45ef138b8ba5488586183c9df164d29b61daa8b25c83f3e71d9"
+      "sha256": "1bb25cf7e27839d8cc579e8fe7d9917af816fa0b83170df464eb9400c217e093"
     },
     "src/krusty2/vehicle/Vehicle.cpp": {
       "sections": 151,
@@ -45,7 +45,7 @@
     "src/krusty2/motion/D3DIMSoultreeMotnctrl.cpp": {
       "sections": 62,
       "relocations": 273,
-      "sha256": "6eb9cec3e348017a0e1280fabf49611db98d16cc74e2a2e9c0cc092fe30cac44"
+      "sha256": "3ef725395bdf4598f28e4abf4f05b938cf6a050caf8bf611980166e59eab58b2"
     }
   },
   "strict": [

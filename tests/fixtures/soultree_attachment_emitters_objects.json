@@ -3,7 +3,7 @@
     "src/krusty2/soultree/SoulTreePhysics.cpp": {
       "sections": 163,
       "relocations": 787,
-      "sha256": "5dec96409e0bb45ef138b8ba5488586183c9df164d29b61daa8b25c83f3e71d9"
+      "sha256": "1bb25cf7e27839d8cc579e8fe7d9917af816fa0b83170df464eb9400c217e093"
     },
     "src/reconstructed/DustParticleEmitter.cpp": {
       "sections": 28,
@@ -23,7 +23,7 @@
     "src/reconstructed/SceneManager.cpp": {
       "sections": 335,
       "relocations": 1757,
-      "sha256": "06b9187ba4b9bcfb12220e7472f353ef33f1efd534884ce25db9b151da6eb194"
+      "sha256": "82f6eaff2801502c7961635ed83a8f351681c29dfd589cdf3417fefe44c994d6"
     }
   },
   "renames": {
