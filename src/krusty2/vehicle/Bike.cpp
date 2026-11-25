@@ -644,7 +644,7 @@ GameObject* Bike::LoadBike(int context, const char* engineName, const char* mode
     savedForward = bodyForward;
     savedUp = bodyUp;
     poseNode = modelNode->FindByName("Bike");
-    handlebars = new(__FILE__, 0x660) BikeA60C("Handlebars", modelNode, steerState);
+    handlebars = new(__FILE__, 0x660) MovingPart("Handlebars", modelNode, (int)steerState);
     wheelPos = (Vec3*)new(__FILE__, 0x664) char[2 * sizeof(Vec3)];
 
     // Per-wheel configuration: front, rear (tier 3 names; the defaults apply with the

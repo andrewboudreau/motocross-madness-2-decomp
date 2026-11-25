@@ -6,7 +6,7 @@
 
 struct BikeA5C4;
 struct BikeA5F8;
-struct BikeA60C;
+class MovingPart;
 struct BikeA640;
 struct BikeA644;
 struct BikeDirtChunkEmitter;
@@ -138,7 +138,7 @@ public:
     int tailContact;                          // +0x600  the loader's contact point at the tail (0, 3.345, -3.206) on modelNode, beside the handlebar contacts
     Wrecker* wrecker;  // +0x604  Wrecker (SetupWrecker with rider.col, StartAnimatedWreck); RaceView/BikeRace +0x604 wrecker
     Vehicle* linkedVehicle;  // +0x608 cleared in ctor and reset (lines near linkedVehicle = 0), set reciprocally in the slot 38 pairing code: linkedVehicle = other; ((Bike*)other)->linkedVehicle = this
-    BikeA60C* handlebars;          // +0x60c BikeA60C("Handlebars", model, steerState); the steer axis runs from the front wheel to its node; cleared in the ctor; ~Bike calls 0x00464e90 on it, then operator delete
+    MovingPart* handlebars;        // +0x60c MovingPart("Handlebars", model, steerState); the steer axis runs from the front wheel to its node; cleared in the ctor; ~Bike calls 0x00464e90 on it, then operator delete
     Vec3 steerTorqueGains;  // +0x610  per-axis gains of the steering torque integrator (IntegrateSteerTorque)
     Vec3 steerTorque;  // +0x61C  integrated steering torque (IntegrateSteerTorque); decays by 0.99 (or -0.02/-0.1 at the limit) per step
     float driveSlideAngle;                    // +0x628  slot 61: rear-wheel drive term while all wheels touch and the bike leans, decayed to 0 over 0.75 s; returned to slot 49, which hands it to slot 46 (provisional)

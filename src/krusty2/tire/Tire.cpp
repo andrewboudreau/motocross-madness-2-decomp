@@ -631,7 +631,7 @@ void Tire::UpdateSuspensionProbe(TireWorld* world, const CollisionVec3* position
 {
     CollisionVec3& origin = wheelCenter;                 // wheel centre in world space
 
-    MovingPart::sceneNode->GetPositionIn(0, &origin);
+    ((TireNode*)MovingPart::node)->GetPositionIn(0, &origin);
     this->CollisionPoint::surfacePosition = origin;
     world->QueryGround(&this->CollisionPoint::surfacePosition, &this->CollisionPoint::surfaceNormal, 0, TireSurfaceByte(this));
 
@@ -845,15 +845,15 @@ Tire::Tire(void* name, int root, float rollFriction_, float sideFriction_, int f
            int steer, float slipThreshold_, float rollFrictionScale_, float sideFrictionScale_,
            float driveStrength_, float driveTorqueScale_, float levelRiseRate_, float levelFallRate_,
            float blendWeight_, int track)
-    : CollisionObject(1), MovingPart(name, root, steer), CollisionPoint(sideFriction_, track)
+    : CollisionObject(1), MovingPart((const char*)name, (SoultreeObject*)root, steer), CollisionPoint(sideFriction_, track)
 {
     CollisionVec3 boundsCenter;
     CollisionVec3 halfExtent;
-    MovingPart::sceneNode->GetLocalBounds(&boundsCenter, &halfExtent);
+    ((TireNode*)MovingPart::node)->GetLocalBounds(&boundsCenter, &halfExtent);
     wheelRadius = halfExtent.y;
     invWheelRadius = 1.0f / halfExtent.y;
     rollAngle = 0.0f;
-    MovingPart::sceneNode->GetPositionIn(0, &wheelCenter);
+    ((TireNode*)MovingPart::node)->GetPositionIn(0, &wheelCenter);
     slipVector = kVec3Zero;
     inContact = 0;
     bodyPosition = kVec3Zero;
@@ -899,14 +899,14 @@ void Tire::SetRollDistance(float distance)
 {
     rollAngle = distance * invWheelRadius;
     if (_finite(rollAngle))
-        MovingPart::sceneNode->RotateAbout(1.0f, 0.0f, 0.0f, rollAngle);
+        ((TireNode*)MovingPart::node)->RotateAbout(1.0f, 0.0f, 0.0f, rollAngle);
 }
 
 // 0x005135b0
 void Tire::ApplyRollAngle()
 {
     if (_finite(rollAngle))
-        MovingPart::sceneNode->RotateAbout(1.0f, 0.0f, 0.0f, rollAngle);
+        ((TireNode*)MovingPart::node)->RotateAbout(1.0f, 0.0f, 0.0f, rollAngle);
 }
 
 // 0x00515660

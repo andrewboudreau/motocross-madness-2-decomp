@@ -1,4 +1,5 @@
 #include "MovingPart.h"
+#include "../krusty2/core/SoultreeObject.h"
 
 // 0x004a2350. The component-wise copy into a local gives retail's stack
 // temporary; returning the row through a Vector3 cast copies it directly.

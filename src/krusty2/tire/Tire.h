@@ -21,8 +21,7 @@
 // MovingPart is a non-polymorphic 0x4c-byte class (ctor 0x004a23a0 initialises 0x40..0x48
 // and has ret 0xc, the dtor is the shared empty function 0x00464e90).  Its real size is
 // only known to be >= 0x4c (tier 2: the next Tire member 0x1c8 is written by the Tire
-// ctor).  PROVISIONAL area-local declaration: MovingPart has no RTTI virtuals and no
-// reconstruction elsewhere yet.
+// ctor).  Declared once in src/reconstructed/MovingPart.h (shared with Shock and Bike).
 //
 // Member names: field_0xNN are Tire-object-relative for Tire's own members.  Names of
 // inherited members are qualified where two bases share the number (CollisionObject and
@@ -35,21 +34,9 @@
 
 #include "collision/CollisionPoint.h"
 
-// Provisional (see above); src/reconstructed/MovingPart.cpp is the matched constructor.
-// Constructor args (name, root, ownerRef): root->FindByName(name) (0x004fdae0) gives the
-// node, ownerRef is stored at +0x44.
+#include "../../reconstructed/MovingPart.h"
 class TireNode;
 
-class MovingPart {
-public:
-    MovingPart(void* name, int root, int ownerRef); // 0x004a23a0 (ret 0xc)
-    ~MovingPart();                          // 0x00464e90, an empty out-of-line dtor
-
-    char matrix[0x40]; // +0x00: MovingPart::matrix, a Matrix4 (bytes kept)
-    TireNode* sceneNode;                   // +0x40 root->FindByName(name) (0x004fdae0)
-    int ownerRef;                         // +0x44 ctor arg ownerRef
-    int field_0x48;                         // 0
-};
 
 // Provisional stand-ins for the two heap objects the dtor releases (rotatingShock/inlineShock).
 // Their dtors are 0x004fa8a0 and 0x004f9f80 (both in the scene-graph range); tier 3.

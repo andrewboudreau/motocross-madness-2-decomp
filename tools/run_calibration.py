@@ -19,10 +19,10 @@ CASES = [
      'target_size': 30,
      'reason': 'Complete constructor at three actual embedded owner sites; unchanged existing view, actual '
                'clock helper and field/store ordering. Original class and TU remain provisional.'},
-    {'name': 'Gameplay default ??1BikeA60C@@QAE@XZ',
+    {'name': 'Gameplay default ??1MovingPart@@QAE@XZ',
      'source': 'src/reconstructed/GameplayDefaults.cpp',
      'bindings': 'src/reconstructed/GameplayDefaults.bindings.json',
-     'symbol': '??1BikeA60C@@QAE@XZ',
+     'symbol': '??1MovingPart@@QAE@XZ',
      'target_va': '0x00464e90',
      'target_size': 1,
      'reason': 'Complete independent default identified through actual receiver/member lifetime or argument '

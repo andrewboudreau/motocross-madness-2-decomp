@@ -5,7 +5,7 @@ their genuine declarations. Each complete body matches authentic VC6 SP3 output:
 
 | Existing declaration | Retail address | Complete body |
 | --- | --- | --- |
-| `BikeA60C::~BikeA60C()` | `0x00464e90` | 1-byte RET |
+| `MovingPart::~MovingPart()` | `0x00464e90` | 1-byte RET |
 | `VehicleSpeedState::~VehicleSpeedState()` | `0x00464e90` | 1-byte RET |
 | `KbRaceHandler::NotifyContactImpulse(void*, float, int)` | `0x004de580` | 3-byte RET 12 |
 
@@ -28,8 +28,8 @@ Bike's loader allocates 0x4c bytes at `0x00407da2`, calls constructor `0x004a23a
 at `0x00407dce` with the original allocated pointer in ECX, and stores the result
 at primary+0x60c at `0x00407dee`. Its three arguments are the literal
 `Handlebars`, the model root and steering owner. The complete 48-byte constructor
-stores node+0x40, owner+0x44 and zero+0x48. Its existing MovingPart source body is
-strict; this corroborates the accessed layout without unifying the two views.
+stores node+0x40, owner+0x44 and zero+0x48. That is MovingPart's strict constructor
+(src/reconstructed/MovingPart.cpp), and Bike's handlebars are now a `MovingPart`.
 LoadBike remains an existing nonexact function, preserved in full by its whole
 object pin. The producer excerpt is not described as a newly strict loader.
 
@@ -69,12 +69,11 @@ methods or change virtual slots.
 
 ## Narrow declaration ownership and preservation
 
-The existing BikeA60C, VehicleSpeedEntry/VehicleSpeedState and KbRaceHandler
-declarations move verbatim into BikeHandlebarView.h, VehicleSpeedState.h and
-BikeRaceHandlerView.h. Their original headers include them at the same
-declaration positions. There is one definition of each class. The handlebar
-header preserves `VehicleSteerState` as the actual alias of forward-declared
-`SteeringControl`; it does not invent a class with the alias name.
+MovingPart comes from src/reconstructed/MovingPart.h, the one declaration Tire,
+Shock and Bike share. The VehicleSpeedEntry/VehicleSpeedState and KbRaceHandler
+declarations live in VehicleSpeedState.h and BikeRaceHandlerView.h, which their
+original headers include at the same declaration positions. There is one
+definition of each class.
 
 The new source needs only these narrow headers. It compiles without project
 include paths into one 40-byte directive section and three 16-byte code sections,

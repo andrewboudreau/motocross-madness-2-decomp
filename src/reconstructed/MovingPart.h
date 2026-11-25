@@ -14,13 +14,8 @@
 
 #include "MatrixUtil.h"
 
-// Scene-graph node (RTTI SoultreeObject, soultree.cpp); only the two calls
-// the constructor makes.
-class SoultreeObject {
-public:
-    SoultreeObject* FindByName(const char* name);   // 0x004fdae0
-    void GetLocalMatrix(Matrix4* out);               // 0x004fca60
-};
+// Scene-graph node (RTTI SoultreeObject, soultree.cpp; src/krusty2/core/SoultreeObject.h).
+class SoultreeObject;
 
 // 0x004a2350: the first three entries of `row` of `m`. Called by
 // MorphBastardModifier and Bike.
@@ -29,8 +24,10 @@ Vector3 GetMatrixRow(const Matrix4* m, int row);
 class MovingPart {
 public:
     // 0x004a23a0 (ret 0xc): finds `name` below `root` and copies its local
-    // matrix. The destructor is the shared empty function 0x00464e90.
+    // matrix.
     MovingPart(const char* name, SoultreeObject* root, int ownerRef_);
+    // 0x00464e90: out of line and empty (one shared RET; GameplayDefaults.cpp).
+    ~MovingPart();
 
     Matrix4 matrix;          // +0x00 the node's local matrix at construction
     SoultreeObject* node;    // +0x40

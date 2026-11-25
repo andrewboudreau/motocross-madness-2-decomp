@@ -90,7 +90,7 @@ static int MapReference(const char* path){DWORD old;BYTE*mapped=(BYTE*)0x400000;
 int main(int argc,char**argv){if(argc!=2||!MapReference(argv[1]))return 3;
  guard=(BYTE*)VirtualAlloc(0,8192,MEM_RESERVE|MEM_COMMIT,PAGE_READWRITE);DWORD old;if(!guard||!VirtualProtect(guard+4096,4096,PAGE_NOACCESS,&old))return 4;
  if(sizeof(SoultreeObject)!=0x1a4||sizeof(InlineShock)!=0xd8||sizeof(ShockVec3)!=12||sizeof(Vec3)!=12||
-    offsetof(InlineShock,axis)!=0xc0||offsetof(InlineShock,minLength)!=0xcc||offsetof(InlineShock,anchorNode)!=0xd0||offsetof(InlineShock,axisLength)!=0xd4||offsetof(InlineShock,sceneNode)!=0x44)return 5;
+    offsetof(InlineShock,axis)!=0xc0||offsetof(InlineShock,minLength)!=0xcc||offsetof(InlineShock,anchorNode)!=0xd0||offsetof(InlineShock,axisLength)!=0xd4||offsetof(InlineShock,node)!=0x44)return 5;
  unsigned rc[]={_RC_NEAR,_RC_DOWN,_RC_UP,_RC_CHOP},pc[]={_PC_64,_PC_53,_PC_24};int caches[]={0,15,5,10};int family,parents,rounding,precision,minimum;
  for(int seed=0;seed<16;++seed)for(family=0;family<8;++family)for(parents=0;parents<4;++parents)for(int cache=0;cache<4;++cache)for(minimum=0;minimum<6;++minimum)for(rounding=0;rounding<4;++rounding)for(precision=0;precision<3;++precision){
    ResetScenario();scenario.seed=seed;scenario.family=family;scenario.parents=parents;scenario.caches=caches[cache];scenario.minimum=minimum;scenario.rounding=rc[rounding];scenario.precision=pc[precision];Compare();}

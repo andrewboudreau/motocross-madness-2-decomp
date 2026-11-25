@@ -1,7 +1,7 @@
 {
   "??0Bike@@QAE@H@Z$ehhandler": "0x005497cb",
   "??0Wrecker@@QAE@H@Z": "0x0052ff90",
-  "??0BikeA60C@@QAE@PBDPAVSoultreeObject@@PAVSteeringControl@@@Z": "0x004a23a0",
+  "??0MovingPart@@QAE@PBDPAVSoultreeObject@@H@Z": "0x004a23a0",
   "??0DirtChunkParticleEmitter@@QAE@H@Z": "0x004b8df0",
   "??0DustParticleEmitter@@QAE@H@Z": "0x004b8a00",
   "??0Vec3@@QAE@MMM@Z": "0x00404e60",
@@ -15,7 +15,7 @@
   "??0VehicleWheel@@QAE@PBDPAVSoultreeObject@@MMHPAVSteeringControl@@MMMMMMMMPAVSoultreeSlot1f0@@@Z": "0x00512f10",
   "??1Bike@@UAE@XZ": "0x00409a10",
   "??1Bike@@UAE@XZ$ehhandler": "0x005498fe",
-  "??1BikeA60C@@QAE@XZ": "0x00464e90",
+  "??1MovingPart@@QAE@XZ": "0x00464e90",
   "??1GameObject@@UAE@XZ": "0x00468d60",
   "??1Vehicle@@UAE@XZ": "0x00526380",
   "??2@YAPAXIPBDH@Z": "0x004a3010",

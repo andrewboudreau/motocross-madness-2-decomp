@@ -109,18 +109,6 @@ int TireWorld::QueryGround(CollisionVec3* pos, CollisionVec3* outNormal, int fla
     return 0;
 }
 
-// MovingPart: the constructor 0x004a23a0 is src/reconstructed/MovingPart.cpp under its
-// (const char*, SoultreeObject*, int) signature; Group2_TireMovingPart.cpp reaches it.
-// The destructor is retail's shared empty function 0x00464e90.
-void TireConstructMovingPart(void* part, void* name, int root, int ownerRef);
-MovingPart::MovingPart(void* name, int root, int ownerRef)
-{
-    TireConstructMovingPart(this, name, root, ownerRef);
-}
-MovingPart::~MovingPart()
-{
-}
-
 // ---------------------------------------------------------------------------------------
 // The vehicle code's view of the wheel (Vehicle.h VehicleWheel): same storage, so each
 // member forwards to the Tire member at the same retail address.

@@ -412,7 +412,7 @@ Large functions of the two units (all registered in `src/krusty2/vehicle/targets
   0.8/1.8 and `field_0x28 = 32.2 / loadWeight`, builds the rider (`new(__FILE__, 0x583)
   D3DIMSoultreeCharacter(statusFlags & 1)`, loaded through its slot 11 and dropped when
   `GameObject::AppendChild` answers 0, which is why that method now returns int), the
-  handlebar part `BikeA60C("Handlebars", modelNode, steerState)` (line 0x660) and the two
+  handlebar part `MovingPart("Handlebars", modelNode, steerState)` (line 0x660) and the two
   wheels: per wheel a local name table (`"Inline"`/`"InlineRear"`), a `{name[20], kind}`
   table of four kinds matched with the library `strcmp` (`#pragma function(strcmp)`), a
   rotating shock (`0x004fa700`, line 0x683, `AddLateTicker`) for the rear wheel or an inline

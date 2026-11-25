@@ -818,11 +818,8 @@ clearly more faithful, the game now links the sample's text:
   | Retail | View name | Provider |
   |---|---|---|
   | 0x0048fa60 | `BikeRaceKrustyBikeView` constructor (0x1638 bytes) | `KrustyBike` |
-  | 0x004b5d00 | `OrientationAxesFromAngles` (`Vector3`/`int` and `Vec3`/`void` forms) | `src/reconstructed/OrientationAxes.cpp` |
   | 0x004fc050, 0x004fc740, 0x004fdab0, 0x004fb8c0 | `TreeSceneNode` axes, position, dirty mark, matrix | `SoultreeObject` (`SetAxesIn`, `SetPositionInFrame`, `MarkSubtreeDirty`, `SetMatrixIn`) |
-  | 0x004fc690 | `SoultreeObject::TranslateIn` taking `Vector3` | the `Vec3` form |
   | 0x00505600 | `Grid1Terrain::AcquireOwnedObject` | `Terrain::AcquireOwnedObject` |
-  | 0x004210f0 | `EventBikeRaceView::WriteRelativePositions` | `BikeRace` |
   | 0x00404e60, 0x0040ae30, 0x00421cb0, 0x005015b0 | Wrecker and shadow vector call views | `Vec3Call`, `Vec3DotCall`, `Vec3AddCall`, `Vec3ScaleCall` |
   | 0x004da7b0 | `UnknownKrustyUIShadow::Init` | `ProjectedShadow::Init` |
   | 0x004c5f00, 0x004da520 | `ShadowTexture`, `ShadowCameraProxy` constructors | `PCTextureMap`, `ShadowCamera` |
@@ -920,12 +917,9 @@ body was unregistered:
 
   | Retail | View name | Provider | Retired stand-in |
   |---|---|---|---|
-  | 0x004b5d00 | `OrientationAxesFromAngles` | `src/reconstructed/OrientationAxes.cpp` (promoted from samples) | `Group4_OrientationAxes.cpp` |
-  | 0x00513560 | `KbWheel::SetRollDistance` | `Tire::SetRollDistance` | body in `Group3_KrustyBikeAISupport.cpp` |
   | 0x004b8d90 | `VehicleImpactSink::SetPosition(Vec3, float)` | `DustParticleEmitter::SetPosition` | body in `Group3_VehicleStubs.cpp` |
   | 0x004b9dc0 | `VehicleImpactSink::SetPosition(Vec3)` | `SparkParticleEmitter::SetPosition` | body in `Group3_VehicleStubs.cpp` |
   | 0x004baa50 | `WreckerParticleManagerView::AddParticle` | `ParticleManager::AddParticle` | `Group1_WreckerParticles.cpp` |
-  | 0x004a23a0 | `BikeA60C` constructor | `MovingPart(const char*, SoultreeObject*, int)` | `Group2_BikeA60C.cpp` |
 
   Each stand-in's bytes equalled the provider's apart from relocations, and
   the linker already folded each pair (`/OPT:ICF`). The argument dwords and

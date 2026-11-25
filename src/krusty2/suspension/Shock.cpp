@@ -19,7 +19,7 @@ const ShockVec3 kShockAxisZ = ShockVec3(0.0f, 0.0f, 1.0f);
 
 Shock::Shock(void* name, int root, float stiffnessMin_, float stiffnessMax_, float dampingRatio_,
              float speedThreshold_, float retractScale_)
-    : MovingPart(name, root, 0)
+    : MovingPart((const char*)name, (SoultreeObject*)root, 0)
 {
     stiffnessMin = stiffnessMin_;
     stiffnessMax = stiffnessMax_;
@@ -129,7 +129,7 @@ void InlineShock::ClampAndStep(float maxDelta, float dt, ShockVec3& pos)
         atLimit = 0;
         ratio = length / minLength;
     }
-    sceneNode->SetPositionVec(pos);
+    ((ShockNode*)node)->SetPositionVec(pos);
     float delta = prevLength - length;
     if (length != 0.0f) {
         if (delta >= 0.0f) {
@@ -160,7 +160,7 @@ void InlineShock::Retract(float amount, const ShockCarrier* carrier)
         }
         length = length - retraction;
         ratio = length / minLength;
-        sceneNode->SetPosition(axis * -length);
+        ((ShockNode*)node)->SetPosition(axis * -length);
     }
     Shock::ClearForces();
 }
@@ -222,7 +222,7 @@ void InlineShock::SolveContact(float dt, const ShockVec3* offset, const ShockVec
 
 void InlineShock::Reset()
 {
-    sceneNode->SetPosition(0.0f, 0.0f, 0.0f);
+    ((ShockNode*)node)->SetPosition(0.0f, 0.0f, 0.0f);
     Shock::Reset();
 }
 
@@ -281,7 +281,7 @@ void RotatingShock::Retract(float amount, const ShockCarrier* carrier)
         length = length - retraction;
         float delta = length / armLength - angle;
         if (_finite(delta)) {
-            sceneNode->Rotate(rotationAxis, delta);
+            ((ShockNode*)node)->Rotate(rotationAxis, delta);
             ratio = length / chord;
             angle = delta + angle;
         }
@@ -304,8 +304,8 @@ void RotatingShock::ClampAndStep(float maxDelta, float dt)
         ratio = length / chord;
     }
     if (_finite(angle)) {
-        sceneNode->SetMatrixLike((const char*)this + 4);
-        sceneNode->Rotate(rotationAxis, angle);
+        ((ShockNode*)node)->SetMatrixLike((const char*)this + 4);
+        ((ShockNode*)node)->Rotate(rotationAxis, angle);
     }
     float delta = prevLength - length;
     if (length != 0.0f) {
@@ -327,7 +327,7 @@ void RotatingShock::ClampAndStep(float maxDelta, float dt)
 
 void RotatingShock::Reset()
 {
-    sceneNode->SetMatrixLike((const char*)this + 4);
+    ((ShockNode*)node)->SetMatrixLike((const char*)this + 4);
     angle = 0.0f;
     Shock::Reset();
 }
@@ -340,7 +340,7 @@ void RotatingShock::SolveContact(float dt, const ShockVec3* axisA, const ShockVe
     int miss = 0;
     float contactRatio;
     ShockVec3 anchor;
-    sceneNode->GetPositionIn(0, &anchor);
+    ((ShockNode*)node)->GetPositionIn(0, &anchor);
     ShockVec3 toPoint = *point - anchor;
     ShockVec3 swing;
     switch (axisId) {
