@@ -687,7 +687,7 @@ int BonusObjectManager::Tick(float frameTime) {
         Vector3 position;
         raceView->localRacer->modelNode->GetPosition(&position);
         position += t * keyPositionChange + keyPosition;
-        baseFrame->TranslateIn(0, position);
+        baseFrame->TranslateIn(0, *(Vec3*)&position);
         if (camera != reinterpret_cast<CueTrackGameView*>(g_TrackGame)->renderTarget->currentCamera || camera->fieldOfView != placedFieldOfView ||
             isResizePending) {
             camera = reinterpret_cast<CueTrackGameView*>(g_TrackGame)->renderTarget->currentCamera;

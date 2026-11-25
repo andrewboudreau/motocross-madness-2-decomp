@@ -188,10 +188,9 @@ public:
     // function; this declaration exists only so those callers keep that call shape.
     void SetPositionVec3(Vec3 p);
 
-    // The rendering code's Vector3 spellings of 0x004fd660, 0x004fc690 and 0x004fc630
+    // The rendering code's Vector3 spellings of 0x004fd660 and 0x004fc630
     // (see the header comment); each is linked to the Vec3 definition above.
     Vector3 LocalToWorldPoint(const Vector3& p);
-    void TranslateIn(SoultreeObject* frame, Vector3 delta);
     void SetPositionVec3(Vector3 p);
 
     // 0x004fedb0, thiscall, plain ret (soultree.cpp, __FILE__ line 0x49b): appends this node to the global node

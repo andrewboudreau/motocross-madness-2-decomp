@@ -112,7 +112,7 @@
   "?QueryGround@Terrain@@QAEXPAUTerrainVec3@@0HPAE@Z": "0x00507c10",
   "?FastSqrt@@YAMM@Z": "0x00460b50",
   "?SetAxesPtr@SoultreeObject@@QAEXPBUVec3@@0HH@Z": "0x004fbd70",
-  "?TranslateIn@SoultreeObject@@QAEXPAV1@UVector3@@@Z": "0x004fc690",
+  "?TranslateIn@SoultreeObject@@QAEXPAV1@UVec3@@@Z": "0x004fc690",
   "?GetPosition@BonusSoultreeObjectView@@QAEXPAUVector3@@@Z": "0x004fc970",
   "?SetRotation@SoultreeObject@@QAEXMMMM@Z": "0x004fd090",
   "?Scale@SoultreeObject@@QAEXMMM@Z": "0x004fd340",
