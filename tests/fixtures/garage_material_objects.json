@@ -8,12 +8,12 @@
     "src/reconstructed/DlgProcs.cpp": {
       "sections": 557,
       "relocations": 4155,
-      "sha256": "becb57c4a60b61466d6a010e374a28f7938cad8bff7e7e802bc5df720e883428"
+      "sha256": "ee77ab8db9afc754e23c51b8b2a400b3ad790e09949950bc94c558625c2852d7"
     },
     "src/reconstructed/ProCircuitProcs.cpp": {
       "sections": 365,
       "relocations": 2327,
-      "sha256": "94b9c07d646668feb0b72ab1f7514471bf609e7fc95660469c27599991896bfe"
+      "sha256": "c71141f3a18f5c1950d7646237c7bbee7143eb1556958e2cf8f166a0adfd19c6"
     }
   }
 }

@@ -8,12 +8,13 @@
 #include "D3DIMSoulTree.h"
 #include "SoultreeMaterial.h"
 #include "SelectGamePicProcs.h"
+#include "../krusty2/motion/D3DIMSoultreeCharacter.h"
 typedef char Layout[(sizeof(D3DIMSoultreeObject) == 0x2d8 &&
                      offsetof(D3DIMSoultreeObject, materialTable) == 0x290 &&
                      offsetof(D3DIMSoultreeObject, materialCount) == 0x294 &&
                      offsetof(SoultreeMaterial, textureName) == 0x2c &&
                      offsetof(SoultreeMaterial, hasTextureName) == 0x9c &&
-                     offsetof(SelectGameD3DIMSoultreeCharacterView, plateTexture) == 0x1a0 &&
+                     offsetof(D3DIMSoultreeCharacter, modelNode) == 0x1a0 &&
                      offsetof(KrustyUIModelRecord, uiModel) == 0xc0)
                         ? 1
                         : -1];

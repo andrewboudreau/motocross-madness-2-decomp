@@ -14649,7 +14649,7 @@ CASES = [
         'name': 'bikerace.cpp BikeRace mesh id swap 0x41ea60',
         'bindings': 'src/reconstructed/BikeRace.bindings.json',
         'source': 'src/reconstructed/BikeRace.cpp',
-        'symbol': '?ReplaceMeshId@BikeRace@@QAEXPAVBikeRaceD3DIMSoultreeCharacterView@@HH@Z',
+        'symbol': '?ReplaceMeshId@BikeRace@@QAEXPAVD3DIMSoultreeCharacter@@HH@Z',
         'target_va': '0x0041ea60',
         'target_size': 186,
         'reason': 'triple loop over +0x1a0 mesh groups',

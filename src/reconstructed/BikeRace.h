@@ -123,35 +123,6 @@ public:
     KrustyVcrRacerRecord racers[11];         // +0x300 0x0049c070 / 0x0049c1e0
 };
 
-class BikeRaceD3DIMSoultreeCharacterView {
-public:
-    // D3DIMSoultreeCharacter's primary slots 0-11 (the object is one; names as there).
-    virtual void BuildModel();
-    virtual void LoadFromSlt();
-    virtual void CaptureRestPose();
-    virtual void CaptureFramePoses();
-    virtual void ApplyPose();
-    virtual void ApplyMirroredPose();
-    virtual void ApplyFullPose();
-    // Slot 7: per frame (BikeRace slot 10 passes the frame time).
-    virtual int AdvanceMotionInterpolated(float frameTime, int a, int b);
-    virtual void CopyStateFrom();
-    virtual void CopyModelFrom();
-    virtual void DumpNodeTransforms();
-    // Slot 11 (D3DIMSoultreeCharacter's LoadCharacter): loads the
-    // model file `name`; returns the GameObject to add.
-    virtual GameObject* LoadCharacter(void* owner, const char* name, LightManager* lights,
-                                      TextureContext* textures, int a, int b);
-
-    // 0x004a8b10: plays a motion ("Stand", "FlagStart", "FlagLoop").
-    void SetMotionByName(const char* motion);
-
-    unsigned char field_0x004[0x0c - 0x04];
-    int motionFinished;                       // +0x00c the motion finished (slot 10 then loops "FlagLoop")
-    unsigned char field_0x010[0x1a0 - 0x10];
-    D3DIMSoultreeObject* modelNode;            // +0x1a0 the flag girl's model (Create places it)
-};
-
 // The object at BikeRace+0x44: three GameObjects at +0x3c..+0x44 that a
 // restart turns on (slot 16 with 0).
 struct BikeRaceRaceSoundView {

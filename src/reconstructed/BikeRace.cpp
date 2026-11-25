@@ -426,14 +426,14 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
             if (g_TrackGame->mode.raceSettings.raceMode != 0 &&
                 g_TrackGame->mode.raceSettings.raceMode != 4) {
                 sprintf(modelName, "%s\\%s", "Res", "FlagGirl.mcf");
-                flagGirl = (BikeRaceD3DIMSoultreeCharacterView*)new(__FILE__, 0x26f) D3DIMSoultreeCharacter(1);
-                AppendChild(flagGirl->LoadCharacter(renderContext, modelName, lights, textures, 1, 1),
+                flagGirl = new(__FILE__, 0x26f) D3DIMSoultreeCharacter(1);
+                AppendChild(flagGirl->LoadCharacter((int)renderContext, modelName, (const SoultreeLoadDesc*)lights, (int)textures, 1, 1),
                                       -1);
                 ReplaceMeshId(flagGirl, 1, 2);
-                flagGirl->modelNode->SetUseLighting(1);
+                reinterpret_cast<D3DIMSoultreeObject*>(flagGirl->modelNode)->SetUseLighting(1);
                 flagGirl->modelNode->SetPositionVec3(girlPosition);
                 flagGirl->modelNode->SetAxesPtr((const Vec3*)&direction, (const Vec3*)&kVec3YAxis, 1, 0);
-                reinterpret_cast<Character*>(flagGirl)->SetMotionByName("Stand");
+                flagGirl->SetMotionByName("Stand");
                 flagGirl->AdvanceMotionInterpolated(0.001f, 0, 0);
             }
 
@@ -1740,27 +1740,27 @@ int BikeRace::Tick(float frameTime) {
                                                                               localRacer->statusNode->progressPos);
                         if (flagGirlState && localRacer->finished && fromFinish > 100.0f) {
                             ReplaceMeshId(flagGirl, 1, 2);
-                            reinterpret_cast<Character*>(flagGirl)->SetMotionByName("Stand");
+                            flagGirl->SetMotionByName("Stand");
                             flagGirlState = 0;
                         } else if ((previous && toFinish < 300.0f) || (last && fromFinish < 100.0f)) {
                             if (flagGirlState != 1) {
                                 ReplaceMeshId(flagGirl, 1, 2);
                                 flagGirlState = 1;
-                                reinterpret_cast<Character*>(flagGirl)->SetMotionByName("FlagStart");
-                            } else if (flagGirl->motionFinished) {
-                                reinterpret_cast<Character*>(flagGirl)->SetMotionByName("FlagLoop");
+                                flagGirl->SetMotionByName("FlagStart");
+                            } else if (flagGirl->motionStopped) {
+                                flagGirl->SetMotionByName("FlagLoop");
                             }
                         } else if (flagGirlState && flagGirlState < 3 &&
                                    ((previous && toFinish > 100.0f) || (last && fromFinish > 100.0f))) {
-                            reinterpret_cast<Character*>(flagGirl)->SetMotionByName("Stand");
+                            flagGirl->SetMotionByName("Stand");
                             flagGirlState = 0;
                         } else if ((last && toFinish < 300.0f) || (localRacer->finished && fromFinish < 100.0f)) {
                             if (flagGirlState < 3) {
                                 ReplaceMeshId(flagGirl, 2, 1);
                                 flagGirlState = 3;
-                                reinterpret_cast<Character*>(flagGirl)->SetMotionByName("FlagStart");
-                            } else if (flagGirl->motionFinished) {
-                                reinterpret_cast<Character*>(flagGirl)->SetMotionByName("FlagLoop");
+                                flagGirl->SetMotionByName("FlagStart");
+                            } else if (flagGirl->motionStopped) {
+                                flagGirl->SetMotionByName("FlagLoop");
                                 flagGirlState = 4;
                             }
                         }
@@ -1920,12 +1920,12 @@ int BikeRace::AnyRacerRemote() {
 }
 
 // 0x0041ea60
-void BikeRace::ReplaceMeshId(BikeRaceD3DIMSoultreeCharacterView* character, int from, int to) {
-    for (int i = 0; i < character->modelNode->lodCount; i++) {
-        for (int j = 0; j < character->modelNode->lodTable[i].surfaceCount; j++) {
-            for (int k = 0; k < character->modelNode->lodTable[i].surfaces[j].materialCount; k++) {
-                if (character->modelNode->lodTable[i].surfaces[j].materialIndices[k] == from) {
-                    character->modelNode->lodTable[i].surfaces[j].materialIndices[k] = to;
+void BikeRace::ReplaceMeshId(D3DIMSoultreeCharacter* character, int from, int to) {
+    for (int i = 0; i < reinterpret_cast<D3DIMSoultreeObject*>(character->modelNode)->lodCount; i++) {
+        for (int j = 0; j < reinterpret_cast<D3DIMSoultreeObject*>(character->modelNode)->lodTable[i].surfaceCount; j++) {
+            for (int k = 0; k < reinterpret_cast<D3DIMSoultreeObject*>(character->modelNode)->lodTable[i].surfaces[j].materialCount; k++) {
+                if (reinterpret_cast<D3DIMSoultreeObject*>(character->modelNode)->lodTable[i].surfaces[j].materialIndices[k] == from) {
+                    reinterpret_cast<D3DIMSoultreeObject*>(character->modelNode)->lodTable[i].surfaces[j].materialIndices[k] = to;
                 }
             }
         }
@@ -2699,7 +2699,7 @@ void BikeRace::RestartRace(int mode, char* path, char* description) {
     }
     if (flagGirl != 0) {
         ReplaceMeshId(flagGirl, 1, 2);
-        reinterpret_cast<Character*>(flagGirl)->SetMotionByName("Stand");
+        flagGirl->SetMotionByName("Stand");
         flagGirlState = 0;
     }
     SetSceneTime(0.0001f);

@@ -8,6 +8,7 @@
 
 #include "DialogEventKind.h"
 #include "SelectGamePicProcs.h"
+#include "../krusty2/motion/D3DIMSoultreeCharacter.h"
 #include "KrustyUI.h"
 #include "MenuId.h"
 #include "TrackGame.h"
@@ -676,8 +677,8 @@ void PCCentralBikeRiderDlg::FillBikeRiderLists()
     list->RemoveAllRows();
     for (int i = 0; i < g_TrackGame->ui->bikeCount; i++) {
         int rule = g_TrackGame->proCircuit->bikeClassRule;
-        if (rule != 3 && !((KrustyUIBikeRecord*)g_TrackGame->ui->bikes)[i].engineSizeSelectable) {
-            int bikeClass = BikeClassOf(((KrustyUIBikeRecord*)g_TrackGame->ui->bikes)[i].engineSize);
+        if (rule != 3 && !g_TrackGame->ui->bikes[i].engineSizeSelectable) {
+            int bikeClass = BikeClassOf(g_TrackGame->ui->bikes[i].engineSize);
             if (bikeClass != 0) {
                 if (bikeClass <= 0 || bikeClass > 2)
                     continue;
@@ -687,10 +688,10 @@ void PCCentralBikeRiderDlg::FillBikeRiderLists()
                 continue;
             }
         }
-        KrustyUIModelRecord* model = &((KrustyUIModelRecord*)g_TrackGame->ui->manufacturers)[((KrustyUIBikeRecord*)g_TrackGame->ui->bikes)[i].manufacturer];
+        KrustyUIModelRecord* model = &g_TrackGame->ui->manufacturers[g_TrackGame->ui->bikes[i].manufacturer];
         if (model->availability > g_TrackGame->proCircuit->maxAvailability)
             continue;
-        sprintf(text, "%s %s", model->displayName, ((KrustyUIBikeRecord*)g_TrackGame->ui->bikes)[i].displayName);
+        sprintf(text, "%s %s", model->displayName, g_TrackGame->ui->bikes[i].displayName);
         list->AddRow(text, i, 0);
         if (g_TrackGame->proCircuit->bikeRow == i)
             bike = i;
@@ -703,7 +704,7 @@ void PCCentralBikeRiderDlg::FillBikeRiderLists()
     list = static_cast<UIDropDownList*>(self->FindControl("DDLRiders", 6))->listPart;
     list->RemoveAllRows();
     for (int j = 0; j < g_TrackGame->ui->riderCount; j++) {
-        KrustyUIModelRecord* entry = &((KrustyUIModelRecord*)g_TrackGame->ui->riders)[j];
+        KrustyUIModelRecord* entry = &g_TrackGame->ui->riders[j];
         if (entry->availability <= g_TrackGame->proCircuit->maxAvailability || entry->uiModel) {
             list->AddRow(entry->displayName, j, 0);
             if (g_TrackGame->proCircuit->riderRow == j)
@@ -722,7 +723,7 @@ void PCCentralBikeRiderDlg::PaintPlateNumber(int number)
     BikeNumberPainter painter(g_TrackGame->textureContext);
     for (int i = 0; i < g_TrackGame->ui->manufacturerCount; i++)
         painter.PaintNumber(
-            reinterpret_cast<D3DIMSoultreeObject*>(((KrustyUIModelRecord*)g_TrackGame->ui->manufacturers)[i].uiModel->plateTexture), number);
+            reinterpret_cast<D3DIMSoultreeObject*>(g_TrackGame->ui->manufacturers[i].uiModel->modelNode), number);
 }
 
 // 0x004d72a0
@@ -807,11 +808,11 @@ int PCCentralBikeRiderDlg::Tick(float frameTime)
         }
         idleMotionPlaying = 0;
     }
-    if (!idleMotionPlaying && g_TrackGame->ui->riderPreview->motionFinished) {
+    if (!idleMotionPlaying && g_TrackGame->ui->riderPreview->motionStopped) {
         UIListBox* bikes = static_cast<UIDropDownList*>(FindControl("DDLBikes", 6))->listPart;
         KrustyUI* ui = g_TrackGame->ui;
         KrustyUIModelRecord* model =
-            &((KrustyUIModelRecord*)ui->manufacturers)[((KrustyUIBikeRecord*)ui->bikes)[bikes->GetRowData(-1)].manufacturer];
+            &ui->manufacturers[ui->bikes[bikes->GetRowData(-1)].manufacturer];
         model->uiModel->SetMotionByName("WaitB");
         g_TrackGame->ui->riderPreview->SetMotionByName("WaitR");
         idleMotionPlaying = 1;
@@ -831,16 +832,16 @@ int PCCentralBikeRiderDlg::RenderPre3D()
         UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLBikes", 6))->listPart;
         KrustyUI* ui = g_TrackGame->ui;
         int bike = list->GetRowData(-1);
-        KrustyUIBikeRecord* entry = &((KrustyUIBikeRecord*)ui->bikes)[bike];
-        reinterpret_cast<D3DIMSoultreeObject*>(((KrustyUIModelRecord*)ui->manufacturers)[entry->manufacturer].uiModel->plateTexture)
+        KrustyUIBikeRecord* entry = &ui->bikes[bike];
+        reinterpret_cast<D3DIMSoultreeObject*>(ui->manufacturers[entry->manufacturer].uiModel->modelNode)
             ->ReplaceMaterialTexture(0, entry->texture, reinterpret_cast<int>(&g_TrackGame->textureContext));
         bikeChanged = 0;
     }
     if (riderChanged) {
         UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLRiders", 6))->listPart;
         KrustyUI* ui = g_TrackGame->ui;
-        KrustyUIModelRecord* rider = &((KrustyUIModelRecord*)ui->riders)[list->GetRowData(-1)];
-        reinterpret_cast<D3DIMSoultreeObject*>(ui->riderPreview->plateTexture)
+        KrustyUIModelRecord* rider = &ui->riders[list->GetRowData(-1)];
+        reinterpret_cast<D3DIMSoultreeObject*>(ui->riderPreview->modelNode)
             ->ReplaceMaterialTexture(0, rider->modelFile, reinterpret_cast<int>(&g_TrackGame->textureContext));
         riderChanged = 0;
     }
@@ -861,12 +862,12 @@ void PCCentralBikeRiderDlg::ApplyChosenBike()
     char text[12];
     UIListBox* bikes = static_cast<UIDropDownList*>(FindControl("DDLBikes", 6))->listPart;
     KrustyUI* ui = g_TrackGame->ui;
-    KrustyUIBikeRecord* bike = &((KrustyUIBikeRecord*)ui->bikes)[bikes->GetRowData(-1)];
-    KrustyUIModelRecord* model = &((KrustyUIModelRecord*)ui->manufacturers)[bike->manufacturer];
+    KrustyUIBikeRecord* bike = &ui->bikes[bikes->GetRowData(-1)];
+    KrustyUIModelRecord* model = &ui->manufacturers[bike->manufacturer];
     int i;
     // Retail re-reads TrackGame's KrustyUI after each model is hidden.
     for (i = 0; i < ui->manufacturerCount; i++) {
-        ((KrustyUIModelRecord*)ui->manufacturers)[i].uiModel->Disable();
+        ui->manufacturers[i].uiModel->Disable();
         ui = g_TrackGame->ui;
     }
     model->uiModel->Enable();
@@ -898,9 +899,9 @@ void PCCentralBikeRiderDlg::ApplyChosenBike()
     } else {
         int row = bikes->GetRowData(-1);
         g_TrackGame->proCircuit->racers[0].engineSize =
-            ((KrustyUIBikeRecord*)g_TrackGame->ui->bikes)[row].engineSize;
+            g_TrackGame->ui->bikes[row].engineSize;
         g_TrackGame->proCircuit->racers[0].fourStroke =
-            ((KrustyUIBikeRecord*)g_TrackGame->ui->bikes)[row].fourStroke;
+            g_TrackGame->ui->bikes[row].fourStroke;
         int bikeClass = BikeClassOf(g_TrackGame->proCircuit->racers[0].engineSize);
         UNKNOWN_APPLY_BIKE_CLASS(bikeClass, i);
     }
@@ -920,17 +921,17 @@ void PCCentralBikeRiderDlg::SyncValues(int apply)
     UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLBikes", 6))->listPart;
     int bike = list->GetRowData(-1);
     strcpy(g_TrackGame->proCircuit->racers[0].bikeModel,
-           ((KrustyUIModelRecord*)g_TrackGame->ui->manufacturers)
-               [((KrustyUIBikeRecord*)g_TrackGame->ui->bikes)[bike].manufacturer].modelFile);
+           g_TrackGame->ui->manufacturers
+               [g_TrackGame->ui->bikes[bike].manufacturer].modelFile);
     strcpy(g_TrackGame->proCircuit->racers[0].bikeName,
-           ((KrustyUIBikeRecord*)g_TrackGame->ui->bikes)[bike].texture);
+           g_TrackGame->ui->bikes[bike].texture);
     strcpy(g_TrackGame->proCircuit->racers[0].bikeDisplayName,
-           ((KrustyUIBikeRecord*)g_TrackGame->ui->bikes)[bike].displayName);
+           g_TrackGame->ui->bikes[bike].displayName);
     strcpy(g_TrackGame->proCircuit->racers[0].riderModel, "");
     list = static_cast<UIDropDownList*>(FindControl("DDLRiders", 6))->listPart;
     int rider = list->GetRowData(-1);
     strcpy(g_TrackGame->proCircuit->racers[0].riderModel,
-           ((KrustyUIModelRecord*)g_TrackGame->ui->riders)[rider].modelFile);
+           g_TrackGame->ui->riders[rider].modelFile);
 }
 
 // 0x004d7f40

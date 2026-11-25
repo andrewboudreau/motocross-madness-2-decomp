@@ -19,6 +19,11 @@ index or an ownership transfer. The flag character retains its `Stand`,
 `FlagStart` and `FlagLoop` selections, and the garage previews retain `Spin`,
 `WaitR` and `WaitB`. The BikeRace sample's setup call uses the same boundary.
 
+The BikeRace, KrustyUI and selection-dialog character views have since been
+retired: the flag girl, garage character, rider preview and per-manufacturer
+bike models are typed `D3DIMSoultreeCharacter*` (each is constructed as one),
+so these calls no longer need a cast.
+
 ## Receiver and provider evidence
 
 The retail D3DIMSoultreeCharacter primary vtable is `0x00551530`. Its RTTI

@@ -14,7 +14,7 @@ class VCRFile;
 class BikeRaceKrustyBikeView;
 class Terrain;
 class ProjectedShadow;
-class BikeRaceD3DIMSoultreeCharacterView;
+class D3DIMSoultreeCharacter;
 struct TextureContext;
 struct BikeRaceKrustyBikeCameraView;
 struct RaceGateEvent;
@@ -77,7 +77,7 @@ public:
     void SetSceneTime(float time);   // 0x0041d2a0: the scene's time
     int AnyRacerRemote();              // 0x0041ea10: whether a racer is remote
     // 0x0041ea60: replaces id `from` with `to` in `character`'s mesh groups.
-    void ReplaceMeshId(BikeRaceD3DIMSoultreeCharacterView* character, int from, int to);
+    void ReplaceMeshId(D3DIMSoultreeCharacter* character, int from, int to);
     // 0x0041eb20: points the camera at racer +0x14c (when it follows a
     // racer) or at scene object +0x154 / +0x150; 0 when that one is hidden.
     int AimCamera(int caster);
@@ -120,7 +120,7 @@ public:
     int startGateEntry;                       // +0x68 its scene animation entry index
     CollisionCharacter* thirtySecondMan;   // +0x6c the scene's "30SecMan.slt" entry
     int thirtySecondManEntry;                 // +0x70 its scene animation entry index
-    BikeRaceD3DIMSoultreeCharacterView* flagGirl;    // the flag girl (0x0041ea60's argument)
+    D3DIMSoultreeCharacter* flagGirl;    // the flag girl (0x0041ea60's argument)
     int flagGirlState;  // +0x78  flag girl motion state: 0 Stand, 1 first FlagStart, 3 second FlagStart, 4 FlagLoop (slot 10)
     float aiSettings[11];  // +0x7C  Create's 11 constants: [0..1]/[5..6] AI skill ranges, [8..10] AI stunt chance % by difficulty
     int lodDebugPage;                         // +0x0a8

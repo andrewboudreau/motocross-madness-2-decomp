@@ -74,7 +74,7 @@
   "?UpdateTrackSeparation@BikeRace@@QAEHXZ": "0x0041d1e0",
   "?SetSceneTime@BikeRace@@QAEXM@Z": "0x0041d2a0",
   "?AnyRacerRemote@BikeRace@@QAEHXZ": "0x0041ea10",
-  "?ReplaceMeshId@BikeRace@@QAEXPAVBikeRaceD3DIMSoultreeCharacterView@@HH@Z": "0x0041ea60",
+  "?ReplaceMeshId@BikeRace@@QAEXPAVD3DIMSoultreeCharacter@@HH@Z": "0x0041ea60",
   "?NextCameraTarget@BikeRace@@QAEXHHH@Z": "0x0041f1d0",
   "?ToggleReplayPause@BikeRace@@QAEXH@Z": "0x0041f550",
   "?NextBike@BikeRace@@QAEPAVBikeRaceKrustyBikeView@@PAH@Z": "0x004204e0",

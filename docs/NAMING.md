@@ -2573,7 +2573,7 @@ Left for later:
 | `UnknownBikeRaceRacerInfo` | `LodBikeRaceView` | 2 | 3 | A racer's +0x740 is its BikeRace (RaceView.h bikeView); +0x18c is BikeRace's "ForceHighLOD". |
 | `UnknownBikeRaceRacerPart604` | `BikeRaceWreckerView` | 2 | 2 | A racer's +0x604 is the Wrecker (Bike SetupWrecker); +0x38 is Wrecker::collisionModel. |
 | `UnknownBikeRaceViews` | `BikeRaceRaceSoundView` | 2 | 5 | BikeRace+0x44 is the RaceSound (RaceView.h raceSound); +0x3c and +0x44 are RaceSound's engineGroup and effectsGroup. |
-| `UnknownBikeRaceCharacter` | `BikeRaceD3DIMSoultreeCharacterView` | 2 | 13 | Its slots 0-11 are D3DIMSoultreeCharacter's primary slots (LoadCharacter is slot 11) and 0x004a8b10 is the character's SetMotionByName. |
+| `UnknownBikeRaceCharacter` | `BikeRaceD3DIMSoultreeCharacterView` | 2 | 13 | Its slots 0-11 are D3DIMSoultreeCharacter's primary slots (LoadCharacter is slot 11) and 0x004a8b10 is the character's SetMotionByName. Merged into `D3DIMSoultreeCharacter`: BikeRace constructs the flag girl as one; `motionFinished` is `motionStopped`. |
 | `UnknownBikeRaceMesh` | `StartD3DIMSoultreeObjectView` | 2 | 13 | The model at +0x1a0 of the start character and of the BikeRace+0x64/+0x6c objects; the methods called on it are D3DIMSoultreeObject's (0x004444c0, 0x004fc630, 0x004fbd70) and +0x28c is the LOD table. Merged into `D3DIMSoultreeObject` (BikeRace.h) when BikeRace.cpp moved to direct canonical calls. |
 | `UnknownBikeRaceModel` | `RacerD3DIMSoultreeObjectView` | 2 | 34 | A racer's +0x3bc model and its rider's +0x1a0: 0x00444d00, 0x00444d40 and 0x00444c70 are D3DIMSoulTree/D3DIMSoultreeModifier code, and +0x274/+0x27c/+0x280/+0x28c are the LOD count, level, distances and table. Merged into `D3DIMSoultreeObject` (BikeRace.h) when BikeRace.cpp moved to direct canonical calls. |
 | `UnknownBikeRaceMeshGroup` | `BikeRaceSoultreeLodView` | 2 | 5 | An entry of the +0x28c LOD table (8 bytes): D3DIMSoulTree's SoultreeLod, item count and surfaces. Merged into `SoultreeLod` when BikeRace.cpp moved to direct canonical calls. |
@@ -2721,7 +2721,7 @@ Left for later:
 | `UnknownSceneCollisionObject` | `SceneCollisionObjectView` | 2 | 16 | CollisionObject members SceneManager reads Merged into `CollisionObject` (src/krusty2/collision). |
 | `UnknownSceneAnimatedObject` | `SceneCarProceduralView` | 2 | 20 | CarProcedural members Merged into `CarProcedural` (CarProcedural.h). |
 | `UnknownSceneObject` | `SceneCollisionCharacterView` | 2 | 29 | CollisionCharacter ctor 0x004318d0 (0x294 bytes); SetMotion 0x004a8b40 Merged into `CollisionCharacter` (src/krusty2/motion). |
-| `UnknownKrustyUICharacter` | `KrustyUID3DIMSoultreeCharacterView` | 2 | 13 | RTTI D3DIMSoultreeCharacter |
+| `UnknownKrustyUICharacter` | `KrustyUID3DIMSoultreeCharacterView` | 2 | 13 | RTTI D3DIMSoultreeCharacter. Merged into `D3DIMSoultreeCharacter` (KrustyUI::garageCharacter/riderPreview). |
 | `UnknownWreckerParticles` | `WreckerParticleManagerView` | 2 | 7 | RTTI ParticleManager |
 | `UnknownCubeVertex` | `CubeLitVertex` | 2 | 7 | D3DLVERTEX layout |
 
@@ -3337,9 +3337,9 @@ tools/static_check.py passes.
 | `UnknownKrustyUIEntry` | `KrustyUITrackEntry` | 2 | 0x54-byte KrustyUI+0x60 list appended by AddEntry 0x0049ba70 (directory index, scene, series, file time/size, .env name) |
 | `UnknownKrustyUIGui` | `KrustyUIGuiManager` | 2 | typedef GUIManager (KrustyUI.h:14; +0x2c built by GUIManager ctor 0x00485190); typedefs are not mangled |
 | `UnknownKrustyUIGuiLayer` | `KrustyUIGuiUser` | 2 | typedef GUIUser (KrustyUI.h:15) |
-| `UnknownKrustyUIModelObject` | `SelectGameD3DIMSoultreeCharacterView` | 2 | KrustyUI.cpp:388 casts new D3DIMSoultreeCharacter(0) to it; slots carry Character names (SelectGamePicProcs.h:63) |
+| `UnknownKrustyUIModelObject` | `SelectGameD3DIMSoultreeCharacterView` | 2 | KrustyUI.cpp:388 casts new D3DIMSoultreeCharacter(0) to it; slots carry Character names. Merged into `D3DIMSoultreeCharacter` (KrustyUIModelRecord::uiModel; `plateTexture` is `modelNode`). |
 | `UnknownKrustyUISlot` | `KrustyUIGridEntryView` | 2 | KrustyUI+0x634 and DlgProcs.h header +0x180 are RaceSettings::gridOrder; layout = TrackGame.h GridEntry (playerId, points) |
-| `UnknownKrustyUISoultree` | `KrustyUISoultreeObjectView` | 2 | SetPosition 0x004fc660 / SetAxes 0x004fbd10 are SoultreeObject methods (KrustyUI.cpp:54) |
+| `UnknownKrustyUISoultree` | `KrustyUISoultreeObjectView` | 2 | SetPosition 0x004fc660 / SetAxes 0x004fbd10 are SoultreeObject methods. Merged into `SoultreeObject` (D3DIMSoultreeCharacter::modelNode). |
 | `UnknownKrustyUIToolTipView` | `KrustyUIToolTipView` | 2 | +0x5c enabled is GUIManager.h ToolTip::enabled; GUIManagerCore.h +0xc0 userToolTip is a ToolTip* |
 | `UnknownModelTexture` | `DialogSoultreeObjectView` | 2 | DlgProcs.h: ReplaceMaterialTexture joined to D3DIMSoultreeObject::ReplaceMaterialTexture (tests/fixtures/garage_material_objects.json); the object is the bike/rider model |
 | `UnknownNumberOwner` | `NumberRenderTargetView` | 2 | GameObject+0x18 renderContext is a RenderTarget; +0x08 is RenderTarget currentCamera (RenderTarget.h:48) |

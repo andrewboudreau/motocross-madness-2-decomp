@@ -47,42 +47,9 @@ char g_ResourceNames[36][16];
 // keyboard hook, nonzero removes it. Called first on shutdown with 0.
 void SetTaskSwitchAllowed(int value);
 
-// Remaining views for 0x00498cf0 (the garage scene). Only the character and
-// shadow boundaries it calls are declared here; their names are provisional.
-
-// The Soultree object at a character's +0x1a0.
-struct KrustyUISoultreeObjectView {
-    void SetPosition(const Vector3* position);   // 0x004fc660
-    void SetAxes(float zx, float zy, float zz, float yx, float yy, float yz, int orthogonalize,
-                               int keepZ);                     // 0x004fbd10
-};
-
-// RTTI D3DIMSoultreeCharacter (0x240 bytes, constructor 0x004455b0): vfptr
-// at +0, vbptr at +4, virtual GameObject base. Its primary slot 11 loads a
-// model file and returns the GameObject to add to the scene.
-class KrustyUID3DIMSoultreeCharacterView : public virtual GameObject {
-public:
-    explicit KrustyUID3DIMSoultreeCharacterView(int flags);
-    virtual void BuildModel();
-    virtual void LoadFromSlt();
-    virtual void CaptureRestPose();
-    virtual void CaptureFramePoses();
-    virtual void ApplyPose();
-    virtual void ApplyMirroredPose();
-    virtual void ApplyFullPose();
-    virtual void AdvanceMotionInterpolated();
-    virtual void CopyStateFrom();
-    virtual void CopyModelFrom();
-    virtual void DumpNodeTransforms();
-    virtual GameObject* LoadCharacter(void* owner, const char* name, GameObject* lights,
-                                               void* context, int useOptions, int unused);
-    void SetMotionByName(const char* motion);        // 0x004a8b10: plays a motion
-    int AdvanceMotion(float time, int mirror, int mask);   // 0x004a6bb0: advances it
-
-    unsigned char field_0x008[0x1a0 - 0x8];
-    KrustyUISoultreeObjectView* modelNode;           // +0x1a0
-    unsigned char field_0x1a4[0x214 - 0x1a4];
-};
+// 0x00498cf0 (the garage scene) builds the garage, the rider preview and one
+// bike per manufacturer as D3DIMSoultreeCharacter; only the shadow's Init
+// boundary below keeps a provisional view.
 
 // Adds `light` to `lights` when there is one. An inline helper: written out
 // at each of the three sites, VC6 here forms the bike loop's addresses as
@@ -260,16 +227,11 @@ GameObject* KrustyUI::Create(RenderTarget* target, int showIntro) {
 }
 
 
-// KrustyUI.h keeps riderPosition (+0x480) as bytes and types +0x46c and +0x470 as the
-// selection dialogs' model views; 0x00498cf0 stores the garage character at
-// +0x470, the rider at +0x46c and the rider's position (a Vector3) at +0x480.
-#define KRUSTYUI_GARAGE (*(KrustyUID3DIMSoultreeCharacterView**)&garageCharacter)
-#define KRUSTYUI_RIDER (*(KrustyUID3DIMSoultreeCharacterView**)&riderPreview)
+// KrustyUI.h keeps riderPosition (+0x480) as bytes; 0x00498cf0 stores the
+// garage character at +0x470, the rider at +0x46c and the rider's position
+// (a Vector3) at +0x480.
 #define KRUSTYUI_RIDER_POSITION (*(Vector3*)riderPosition)
 #define KRUSTYUI_TARGET ((PCRenderTarget*)renderContext)
-#define KRUSTYUI_MODELS ((KrustyUIModelRecord*)manufacturers)
-// The manufacturers' UI models, seen through this unit's character view.
-#define KRUSTYUI_MODEL_CHARACTER(i) reinterpret_cast<KrustyUID3DIMSoultreeCharacterView*>(KRUSTYUI_MODELS[i].uiModel)
 
 // 0x00498cf0: builds the garage scene (+0x464) on the first call with 1 or
 // -1: camera, lights, the garage and rider models and their shadow; with 2
@@ -353,30 +315,30 @@ void KrustyUI::BuildGarageScene(int value) {
             if (!g_TrackGame->display->isAGP && free < 0x500000)
                 context.halvings = 1;
         }
-        KRUSTYUI_GARAGE = reinterpret_cast<KrustyUID3DIMSoultreeCharacterView*>(new(__FILE__, 0x174) D3DIMSoultreeCharacter(1));
+        garageCharacter = new(__FILE__, 0x174) D3DIMSoultreeCharacter(1);
         garageScene->AppendChild(
-            KRUSTYUI_GARAGE->LoadCharacter(renderContext, "UIgarage.mcf", lights, &context, 1, 1), -1);
-        reinterpret_cast<D3DIMSoultreeObject*>(KRUSTYUI_GARAGE->modelNode)->SetUseLighting(0);
-        reinterpret_cast<SoultreeObject*>(KRUSTYUI_GARAGE->modelNode)->SetPosition(*reinterpret_cast<const Vec3*>(&garageFocus));
-        reinterpret_cast<SoultreeObject*>(KRUSTYUI_GARAGE->modelNode)->SetAxes(0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0, 1);
-        reinterpret_cast<Character*>(KRUSTYUI_GARAGE)->SetMotionByName("Spin");
-        reinterpret_cast<Character*>(KRUSTYUI_GARAGE)->AdvanceMotion(0.03f, 0, 0);
+            garageCharacter->LoadCharacter((int)renderContext, "UIgarage.mcf", (const SoultreeLoadDesc*)lights, (int)&context, 1, 1), -1);
+        reinterpret_cast<D3DIMSoultreeObject*>(garageCharacter->modelNode)->SetUseLighting(0);
+        garageCharacter->modelNode->SetPosition(*reinterpret_cast<const Vec3*>(&garageFocus));
+        garageCharacter->modelNode->SetAxes(0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0, 1);
+        garageCharacter->SetMotionByName("Spin");
+        garageCharacter->AdvanceMotion(0.03f, 0, 0);
         UnknownKrustyUIShadow* projected = reinterpret_cast<UnknownKrustyUIShadow*>(new(__FILE__, 0x182) ProjectedShadow(1));
         shadow = projected->Init(renderContext, g_TrackGame->textureManager);
         D3DIMSoultreeShadow* link = new(__FILE__, 0x186) D3DIMSoultreeShadow(1);
-        shadowLink = link->Attach(reinterpret_cast<int>(renderContext), reinterpret_cast<ShadowCaster*>(KRUSTYUI_GARAGE->modelNode), reinterpret_cast<ProjectedShadow*>(shadow));
+        shadowLink = link->Attach(reinterpret_cast<int>(renderContext), reinterpret_cast<ShadowCaster*>(garageCharacter->modelNode), reinterpret_cast<ProjectedShadow*>(shadow));
         garageScene->AppendChild(shadowLink, -1);
         if (shadow)
             garageScene->AppendChild(shadow, -1);
-        KRUSTYUI_RIDER = reinterpret_cast<KrustyUID3DIMSoultreeCharacterView*>(new(__FILE__, 0x194) D3DIMSoultreeCharacter(1));
+        riderPreview = new(__FILE__, 0x194) D3DIMSoultreeCharacter(1);
         garageScene->AppendChild(
-            KRUSTYUI_RIDER->LoadCharacter(renderContext, "UIRider.mcf", lights,
-                                                   &g_TrackGame->textureContext, 1, 1), -1);
-        reinterpret_cast<D3DIMSoultreeObject*>(KRUSTYUI_RIDER->modelNode)->SetUseLighting(1);
-        reinterpret_cast<SoultreeObject*>(KRUSTYUI_RIDER->modelNode)->SetPosition(*reinterpret_cast<const Vec3*>(&KRUSTYUI_RIDER_POSITION));
-        reinterpret_cast<SoultreeObject*>(KRUSTYUI_RIDER->modelNode)->SetAxes(0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0, 1);
-        reinterpret_cast<Character*>(KRUSTYUI_RIDER)->SetMotionByName("WaitR");
-        reinterpret_cast<Character*>(KRUSTYUI_RIDER)->AdvanceMotion(0.03f, 0, 0);
+            riderPreview->LoadCharacter((int)renderContext, "UIRider.mcf", (const SoultreeLoadDesc*)lights,
+                                                   (int)&g_TrackGame->textureContext, 1, 1), -1);
+        reinterpret_cast<D3DIMSoultreeObject*>(riderPreview->modelNode)->SetUseLighting(1);
+        riderPreview->modelNode->SetPosition(*reinterpret_cast<const Vec3*>(&KRUSTYUI_RIDER_POSITION));
+        riderPreview->modelNode->SetAxes(0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0, 1);
+        riderPreview->SetMotionByName("WaitR");
+        riderPreview->AdvanceMotion(0.03f, 0, 0);
         ((RenderTarget*)renderContext)->SetCamera(0);
         pending = 1;
         done = 0;
@@ -384,23 +346,22 @@ void KrustyUI::BuildGarageScene(int value) {
     if (pending && !done && (value == 2 || value == -1)) {
         BikeNumberPainter painter(g_TrackGame->textureContext);
         for (int i = 0; i < manufacturerCount; i++) {
-            sprintf(text, "Animations\\UIbike\\%s", KRUSTYUI_MODELS[i].uiModelFile);
-            KRUSTYUI_MODELS[i].uiModel = reinterpret_cast<SelectGameD3DIMSoultreeCharacterView*>(new(__FILE__, 0x1b4) D3DIMSoultreeCharacter(0));
+            sprintf(text, "Animations\\UIbike\\%s", manufacturers[i].uiModelFile);
+            manufacturers[i].uiModel = new(__FILE__, 0x1b4) D3DIMSoultreeCharacter(0);
             garageScene->AppendChild(
-                KRUSTYUI_MODEL_CHARACTER(i)->LoadCharacter(renderContext, text, lights,
-                                                                      &g_TrackGame->textureContext,
-                                                                      1, 1), -1);
-            KrustyUID3DIMSoultreeCharacterView* bike = KRUSTYUI_MODEL_CHARACTER(i);
+                manufacturers[i].uiModel->LoadCharacter((int)renderContext, text, (const SoultreeLoadDesc*)lights,
+                                                                      (int)&g_TrackGame->textureContext, 1, 1), -1);
+            D3DIMSoultreeCharacter* bike = manufacturers[i].uiModel;
             reinterpret_cast<D3DIMSoultreeObject*>(bike->modelNode)->SetUseLighting(1);
-            reinterpret_cast<SoultreeObject*>(bike->modelNode)->SetPosition(*reinterpret_cast<const Vec3*>(&garageFocus));
-            reinterpret_cast<SoultreeObject*>(bike->modelNode)->SetAxes(0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0, 1);
-            reinterpret_cast<Character*>(bike)->SetMotionByName("WaitB");
-            reinterpret_cast<Character*>(bike)->AdvanceMotion(0.03f, 0, 0);
+            bike->modelNode->SetPosition(*reinterpret_cast<const Vec3*>(&garageFocus));
+            bike->modelNode->SetAxes(0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0, 1);
+            bike->SetMotionByName("WaitB");
+            bike->AdvanceMotion(0.03f, 0, 0);
             painter.PaintNumber(reinterpret_cast<D3DIMSoultreeObject*>(bike->modelNode), g_TrackGame->mode.plateNumber);
         }
         if (shadow) {
-            reinterpret_cast<ProjectedShadow*>(shadow)->AddCaster(reinterpret_cast<ShadowCaster*>(KRUSTYUI_MODEL_CHARACTER(0)->modelNode));
-            reinterpret_cast<ProjectedShadow*>(shadow)->AddCaster(reinterpret_cast<ShadowCaster*>(KRUSTYUI_RIDER->modelNode));
+            reinterpret_cast<ProjectedShadow*>(shadow)->AddCaster(reinterpret_cast<ShadowCaster*>(manufacturers[0].uiModel->modelNode));
+            reinterpret_cast<ProjectedShadow*>(shadow)->AddCaster(reinterpret_cast<ShadowCaster*>(riderPreview->modelNode));
             s468 = garageFocus;
             s468.y += 40.0f;
             s468.x += 15.0f;
@@ -740,22 +701,22 @@ void KrustyUI::LoadBikesAndRiders() {
             block.GetString("UIModelFile", "", uiModel, -1);
             block.GetString("ModelFile", "", model, -1);
             block.GetInt("Availability", 1, &availability);
-            manufacturers = ResizeDebugBlock(manufacturers, (manufacturerCount + 1) * sizeof(KrustyUIModelRecord));
+            manufacturers = (KrustyUIModelRecord*)ResizeDebugBlock(manufacturers, (manufacturerCount + 1) * sizeof(KrustyUIModelRecord));
             int length = strlen(name);
             int copyLength = length > 63 ? 63 : length;
-            strncpy(((KrustyUIModelRecord*)manufacturers)[manufacturerCount].displayName, name, copyLength);
-            ((KrustyUIModelRecord*)manufacturers)[manufacturerCount].displayName[copyLength] = 0;
+            strncpy(manufacturers[manufacturerCount].displayName, name, copyLength);
+            manufacturers[manufacturerCount].displayName[copyLength] = 0;
             length = strlen(model);
             copyLength = length > 63 ? 63 : length;
-            strncpy(((KrustyUIModelRecord*)manufacturers)[manufacturerCount].modelFile, model,
+            strncpy(manufacturers[manufacturerCount].modelFile, model,
                     copyLength);
-            ((KrustyUIModelRecord*)manufacturers)[manufacturerCount].modelFile[copyLength] = 0;
+            manufacturers[manufacturerCount].modelFile[copyLength] = 0;
             length = strlen(uiModel);
             copyLength = length > 63 ? 63 : length;
-            strncpy(((KrustyUIModelRecord*)manufacturers)[manufacturerCount].uiModelFile, uiModel,
+            strncpy(manufacturers[manufacturerCount].uiModelFile, uiModel,
                     copyLength);
-            ((KrustyUIModelRecord*)manufacturers)[manufacturerCount].uiModelFile[copyLength] = 0;
-            ((KrustyUIModelRecord*)manufacturers)[manufacturerCount].availability = availability;
+            manufacturers[manufacturerCount].uiModelFile[copyLength] = 0;
+            manufacturers[manufacturerCount].availability = availability;
             for (int j = 1; j <= manufacturerBikeCount; j++) {
                 if (j != 2)
                     continue;
@@ -765,21 +726,21 @@ void KrustyUI::LoadBikesAndRiders() {
                 block.GetString(key, "(no name)", bikeName, -1);
                 sprintf(key, "BikeTexture_%02d", j);
                 block.GetString(key, "", texture, -1);
-                bikes = ResizeDebugBlock(bikes, (bikeCount + 1) * sizeof(KrustyUIBikeRecord));
-                ((KrustyUIBikeRecord*)bikes)[bikeCount].manufacturer = manufacturerCount;
-                ((KrustyUIBikeRecord*)bikes)[bikeCount].engineSizeSelectable = 0;
+                bikes = (KrustyUIBikeRecord*)ResizeDebugBlock(bikes, (bikeCount + 1) * sizeof(KrustyUIBikeRecord));
+                bikes[bikeCount].manufacturer = manufacturerCount;
+                bikes[bikeCount].engineSizeSelectable = 0;
                 length = strlen(bikeName);
                 copyLength = length > 63 ? 63 : length;
-                strncpy(((KrustyUIBikeRecord*)bikes)[bikeCount].displayName, bikeName, copyLength);
-                ((KrustyUIBikeRecord*)bikes)[bikeCount].displayName[copyLength] = 0;
+                strncpy(bikes[bikeCount].displayName, bikeName, copyLength);
+                bikes[bikeCount].displayName[copyLength] = 0;
                 length = strlen(texture);
                 copyLength = length > 63 ? 63 : length;
-                strncpy(((KrustyUIBikeRecord*)bikes)[bikeCount].texture, texture, copyLength);
-                ((KrustyUIBikeRecord*)bikes)[bikeCount].texture[copyLength] = 0;
+                strncpy(bikes[bikeCount].texture, texture, copyLength);
+                bikes[bikeCount].texture[copyLength] = 0;
                 sprintf(key, "BikeEngineSize_%02d", j);
-                block.GetInt(key, 250, &((KrustyUIBikeRecord*)bikes)[bikeCount].engineSize);
+                block.GetInt(key, 250, &bikes[bikeCount].engineSize);
                 sprintf(key, "BikeFourStroke_%02d", j);
-                block.GetInt(key, 0, &((KrustyUIBikeRecord*)bikes)[bikeCount].fourStroke);
+                block.GetInt(key, 0, &bikes[bikeCount].fourStroke);
                 bikeCount++;
             }
             manufacturerCount++;
@@ -801,17 +762,17 @@ void KrustyUI::LoadBikesAndRiders() {
             block.GetString("Name", "(no name)", riderName, -1);
             block.GetString("File", "", file, -1);
             block.GetInt("Availability", 1, &availability);
-            riders = ResizeDebugBlock(riders, (riderCount + 1) * sizeof(KrustyUIModelRecord));
-            ((KrustyUIModelRecord*)riders)[riderCount].uiModel = 0;
+            riders = (KrustyUIModelRecord*)ResizeDebugBlock(riders, (riderCount + 1) * sizeof(KrustyUIModelRecord));
+            riders[riderCount].uiModel = 0;
             int length = strlen(riderName);
             int copyLength = length > 63 ? 63 : length;
-            strncpy(((KrustyUIModelRecord*)riders)[riderCount].displayName, riderName, copyLength);
-            ((KrustyUIModelRecord*)riders)[riderCount].displayName[copyLength] = 0;
+            strncpy(riders[riderCount].displayName, riderName, copyLength);
+            riders[riderCount].displayName[copyLength] = 0;
             length = strlen(file);
             copyLength = length > 127 ? 127 : length;
-            strncpy(((KrustyUIModelRecord*)riders)[riderCount].modelFile, file, copyLength);
-            ((KrustyUIModelRecord*)riders)[riderCount].modelFile[copyLength] = 0;
-            ((KrustyUIModelRecord*)riders)[riderCount].availability = availability;
+            strncpy(riders[riderCount].modelFile, file, copyLength);
+            riders[riderCount].modelFile[copyLength] = 0;
+            riders[riderCount].availability = availability;
             riderCount++;
         }
     }
@@ -842,9 +803,9 @@ int KrustyUI::ResolveBikeFile(const char* name, char* text, int size) {
     int index;
     do {
         index = (int)(RandomUnit() * (bikeCount - 1));
-    } while (((KrustyUIBikeRecord*)bikes)[index].engineSizeSelectable
-             || ((KrustyUIModelRecord*)manufacturers)[((KrustyUIBikeRecord*)bikes)[index].manufacturer].availability != 3);
-    UNKNOWN_COPY_SIZED(text, ((KrustyUIBikeRecord*)bikes)[index].texture, size);
+    } while (bikes[index].engineSizeSelectable
+             || manufacturers[bikes[index].manufacturer].availability != 3);
+    UNKNOWN_COPY_SIZED(text, bikes[index].texture, size);
     return 0;
 }
 
@@ -872,9 +833,9 @@ int KrustyUI::ResolveRiderFile(const char* name, char* text, int size) {
     int index;
     do {
         index = (int)(RandomUnit() * (riderCount - 1));
-    } while (((KrustyUIModelRecord*)riders)[index].uiModel
-             || ((KrustyUIModelRecord*)riders)[index].availability != 3);
-    UNKNOWN_COPY_SIZED(text, ((KrustyUIModelRecord*)riders)[index].modelFile, size);
+    } while (riders[index].uiModel
+             || riders[index].availability != 3);
+    UNKNOWN_COPY_SIZED(text, riders[index].modelFile, size);
     return 0;
 }
 
@@ -991,17 +952,17 @@ void KrustyUI::PickRandomRacers(int* bikeChoices, int count, int* riderChoices) 
     srand(ReadClock());
     int i;
     for (i = 0; i < riderCount; i++) {
-        int type = ((KrustyUIModelRecord*)riders)[i].availability;
+        int type = riders[i].availability;
         if (type < 2 || type > 3)
             usedRiders[i] = -1;
     }
     for (i = 0; i < bikeCount; i++) {
-        int type = ((KrustyUIModelRecord*)manufacturers)[((KrustyUIBikeRecord*)bikes)[i].manufacturer].availability;
+        int type = manufacturers[bikes[i].manufacturer].availability;
         if (type < 2 || type > 3) {
             usedBikes[i] = -1;
             continue;
         }
-        int bikeClass = BikeClassOf(((KrustyUIBikeRecord*)bikes)[i].engineSize);
+        int bikeClass = BikeClassOf(bikes[i].engineSize);
         if (playerClass == bikeClass || (playerClass == 1 && bikeClass == 2)
             || (playerClass == 2 && bikeClass == 1) || (playerClass == 3 && bikeClass == 4)
             || (playerClass == 4 && bikeClass == 3))
@@ -1018,7 +979,7 @@ void KrustyUI::PickRandomRacers(int* bikeChoices, int count, int* riderChoices) 
         int start = index;
         if (!usedBikes[index]) {
             chance = RandomUnit();
-            bikeClass = BikeClassOf(((KrustyUIBikeRecord*)bikes)[index].engineSize);
+            bikeClass = BikeClassOf(bikes[index].engineSize);
             switch (bikeClass) {
             case 1:
             case 2:

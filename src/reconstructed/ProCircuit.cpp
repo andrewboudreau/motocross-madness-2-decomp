@@ -212,16 +212,16 @@ void ProCircuit::StartCareer(const char* name, int level, int classRule, int cou
     KrustyUI* ui = g_TrackGame->ui;
     int rider;
     for (rider = 0; rider < ui->riderCount; rider++) {
-        if (((KrustyUIModelRecord*)ui->riders)[rider].availability == 1)
+        if (ui->riders[rider].availability == 1)
             break;
     }
-    UNKNOWN_COPY_TEXT(racers[0].riderModel, ((KrustyUIModelRecord*)ui->riders)[rider].modelFile)
+    UNKNOWN_COPY_TEXT(racers[0].riderModel, ui->riders[rider].modelFile)
 
     ui = g_TrackGame->ui;
     int bike;
     for (bike = 0; bike < ui->bikeCount; bike++) {
-        if (((KrustyUIModelRecord*)ui->manufacturers)[((KrustyUIBikeRecord*)ui->bikes)[bike].manufacturer].availability == 1) {
-            int bikeClass = BikeClassOf(((KrustyUIBikeRecord*)ui->bikes)[bike].engineSize);
+        if (ui->manufacturers[ui->bikes[bike].manufacturer].availability == 1) {
+            int bikeClass = BikeClassOf(ui->bikes[bike].engineSize);
             switch (bikeClassRule) {
             case 1:
                 if (bikeClass == 0)
@@ -238,13 +238,13 @@ void ProCircuit::StartCareer(const char* name, int level, int classRule, int cou
     }
 found:
     UNKNOWN_COPY_TEXT(racers[0].bikeModel,
-                      ((KrustyUIModelRecord*)ui->manufacturers)[((KrustyUIBikeRecord*)ui->bikes)[bike].manufacturer].modelFile)
+                      ui->manufacturers[ui->bikes[bike].manufacturer].modelFile)
     UNKNOWN_COPY_TEXT(racers[0].bikeName,
-                    ((KrustyUIBikeRecord*)g_TrackGame->ui->bikes)[bike].texture)
+                    g_TrackGame->ui->bikes[bike].texture)
     UNKNOWN_COPY_TEXT(racers[0].bikeDisplayName,
-                    ((KrustyUIBikeRecord*)g_TrackGame->ui->bikes)[bike].displayName)
-    racers[0].engineSize = ((KrustyUIBikeRecord*)g_TrackGame->ui->bikes)[bike].engineSize;
-    racers[0].fourStroke = ((KrustyUIBikeRecord*)g_TrackGame->ui->bikes)[bike].fourStroke;
+                    g_TrackGame->ui->bikes[bike].displayName)
+    racers[0].engineSize = g_TrackGame->ui->bikes[bike].engineSize;
+    racers[0].fourStroke = g_TrackGame->ui->bikes[bike].fourStroke;
     DebugFree(used, __FILE__, 273);
 }
 
@@ -388,12 +388,12 @@ void ProCircuit::PickComputerRacers()
     int riderKind = 0;
     int i;
     for (i = 0; i < ui->bikeCount; i++) {
-        int kind = ((KrustyUIModelRecord*)ui->manufacturers)[((KrustyUIBikeRecord*)ui->bikes)[i].manufacturer].availability;
+        int kind = ui->manufacturers[ui->bikes[i].manufacturer].availability;
         if (kind <= maxAvailability && kind > bikeKind)
             bikeKind = kind;
     }
     for (i = 0; i < ui->riderCount; i++) {
-        int kind = ((KrustyUIModelRecord*)ui->riders)[i].availability;
+        int kind = ui->riders[i].availability;
         if (kind <= maxAvailability && kind > riderKind)
             riderKind = kind;
     }
@@ -402,17 +402,17 @@ void ProCircuit::PickComputerRacers()
         KrustyUIModelRecord* rider;
         do {
             ui = g_TrackGame->ui;
-            rider = &((KrustyUIModelRecord*)ui->riders)[(int)(UNKNOWN_RANDOM_UNIT() * (ui->riderCount - 1))];
+            rider = &ui->riders[(int)(UNKNOWN_RANDOM_UNIT() * (ui->riderCount - 1))];
         } while (rider->uiModel || rider->availability != riderKind);
         UNKNOWN_COPY_TEXT(racers[racer].riderModel, rider->modelFile)
 
         KrustyUIBikeRecord* bike;
         for (;;) {
             ui = g_TrackGame->ui;
-            bike = &((KrustyUIBikeRecord*)ui->bikes)[(int)(UNKNOWN_RANDOM_UNIT() * (ui->bikeCount - 1))];
+            bike = &ui->bikes[(int)(UNKNOWN_RANDOM_UNIT() * (ui->bikeCount - 1))];
             if (bike->engineSizeSelectable)
                 continue;
-            if (((KrustyUIModelRecord*)ui->manufacturers)[bike->manufacturer].availability != bikeKind)
+            if (ui->manufacturers[bike->manufacturer].availability != bikeKind)
                 continue;
             int bikeClass = BikeClassOf(bike->engineSize);
             float roll = UNKNOWN_RANDOM_UNIT();
@@ -438,7 +438,7 @@ void ProCircuit::PickComputerRacers()
         }
     found:
         UNKNOWN_COPY_TEXT(racers[racer].bikeModel,
-                        ((KrustyUIModelRecord*)g_TrackGame->ui->manufacturers)[bike->manufacturer].modelFile)
+                        g_TrackGame->ui->manufacturers[bike->manufacturer].modelFile)
         UNKNOWN_COPY_TEXT(racers[racer].bikeName, bike->texture)
         UNKNOWN_COPY_TEXT(racers[racer].bikeDisplayName, bike->displayName)
         racers[racer].engineSize = bike->engineSize;

@@ -5,7 +5,9 @@
 
 class Camera;
 class RenderTarget;
-struct SelectGameD3DIMSoultreeCharacterView;
+class D3DIMSoultreeCharacter;
+struct KrustyUIModelRecord;
+struct KrustyUIBikeRecord;
 
 // Shared GUI manager and user declarations. Legacy view names are aliases;
 // object storage and methods belong to the existing GUI implementations.
@@ -99,11 +101,11 @@ public:
     int replayAvailable;                      // +0x40: BikeRace 0x00420b00 sets it after closing a replay VCR; shows "ButViewReplay"
     int demoEnded;                            // +0x44: BikeRace sets it at race end while playingDemo is set; DemoDlg slot 10 closes on it; cleared by EventManager 0x0045cdc0
     // Lists that LoadBikesAndRiders reads from bikes.pb and riders.pb.
-    void* manufacturers;                      // +0x48: "Manufacturer_%02d" entries; freed by the destructor
+    KrustyUIModelRecord* manufacturers;       // +0x48: "Manufacturer_%02d" entries; freed by the destructor
     int manufacturerCount;                    // +0x4c
-    void* bikes;                              // +0x50: each manufacturer's bikes
+    KrustyUIBikeRecord* bikes;                // +0x50: each manufacturer's bikes
     int bikeCount;                            // +0x54
-    void* riders;                             // +0x58: "Rider_%02d" entries
+    KrustyUIModelRecord* riders;              // +0x58: "Rider_%02d" entries
     int riderCount;                           // +0x5c
     KrustyUITrackEntry* entries;            // +0x60: also freed by 0x0049bb80
     int entryCount;                           // +0x64: entries in +0x60
@@ -120,8 +122,8 @@ public:
     int maxRange[5];                          // +0x450: slider maximum (the largest band maximum)
     GameObject* garageScene;                  // +0x464: the garage scene (built by 0x00498cf0); released by 0x004999b0
     Camera* garageCamera;                     // +0x468: made current while +0x464 is shown
-    SelectGameD3DIMSoultreeCharacterView* riderPreview; // +0x46c: the rider preview (dlgprocs.cpp SPBikeRiderDlg slot 13)
-    SelectGameD3DIMSoultreeCharacterView* garageCharacter; // +0x470: the garage character (dlgprocs.cpp SPBikeRiderDlg slot 10)
+    D3DIMSoultreeCharacter* riderPreview; // +0x46c: the rider preview (dlgprocs.cpp SPBikeRiderDlg slot 13)
+    D3DIMSoultreeCharacter* garageCharacter; // +0x470: the garage character (dlgprocs.cpp SPBikeRiderDlg slot 10)
     Vector3 garageFocus;                      // +0x474: the +0x464 scene's focus (SelectGamePicProcs.cpp)
     unsigned char riderPosition[0x48c - 0x480]; // +0x480: the rider model's position, a Vector3 (bytes kept; 0x00498cf0)
     int profileLoaded;                        // +0x48c: set once a profile is loaded or saved (UiInfo.cpp LoadProfile/SaveProfile)

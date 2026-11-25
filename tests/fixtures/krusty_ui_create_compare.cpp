@@ -118,8 +118,8 @@ FileStream* ResourceManager::AddArchive(const char* path,int flags){EventAt(15,W
 void TrackGameMode::LoadBonusTrackNames(){EventAt(16,Which(this,&GameAt(0)->mode,&GameAt(1)->mode));}
 int TrackGameMode::LoadProfile(){EventAt(17,Which(this,&GameAt(0)->mode,&GameAt(1)->mode));return scenario.mask&1;}
 void PCJoystickDevice::SetJoystickFilter(unsigned char value){EventAt(18,this?Which(this,world.joysticks[0],world.joysticks[1]):-1,value);joystickFilter=value;}
-void KrustyUI::LoadBikesAndRiders(){if(this!=UI() || bikes || riders || manufacturers)Fail(94);EventAt(19);bikes=(void*)0x12341111;riders=(void*)0x12342222;}
-void KrustyUI::LoadGarageTables(){if(this!=UI())Fail(94);EventAt(20);manufacturers=(void*)0x12343333;}
+void KrustyUI::LoadBikesAndRiders(){if(this!=UI() || bikes || riders || manufacturers)Fail(94);EventAt(19);bikes=(KrustyUIBikeRecord*)0x12341111;riders=(KrustyUIModelRecord*)0x12342222;}
+void KrustyUI::LoadGarageTables(){if(this!=UI())Fail(94);EventAt(20);manufacturers=(KrustyUIModelRecord*)0x12343333;}
 UIDialog* GUIManager::ShowDialog(UIDialog* dialog,int a,int flags,int b,UIDialog* parent,int c,int d,int wait){
     if(a || flags!=2 || b || parent || c || d || wait!=1 || (dialog && (void*)dialog!=world.intro))Fail(95);
     if(dialog && *(DWORD*)dialog!=(retailActive?0x5548fc:sourceIntroTable))Fail(96);

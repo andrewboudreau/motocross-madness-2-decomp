@@ -72,13 +72,14 @@ class GarageSetterConnectionsTests(unittest.TestCase):
                 function_text(text, 'static inline Vec3 Normalized(') + '\n' + '\n\n'.join(
                     function_text(text, signature) for signature, _, _, _ in BODIES))
             layout = output / 'layout.cpp'
-            # Actual provisional producer view from the caller; no invented test layout.
+            # The caller builds its garage models as the real D3DIMSoultreeCharacter;
+            # check that class rather than an invented test layout.
             caller = (ROOT / GARAGE).read_text()
-            char_start = caller.index('class KrustyUID3DIMSoultreeCharacterView :')
-            char_end = caller.index('\n};', char_start)+3
+            self.assertIn('new(__FILE__, 0x174) D3DIMSoultreeCharacter(1)', caller)
+            self.assertNotIn('SoultreeCharacterView', caller)
             layout.write_text('#include <stddef.h>\n#include "D3DIMSoulTree.h"\n'
-                'struct KrustyUISoultreeObjectView;\n' + caller[char_start:char_end] + '\n'
-                'typedef char ModelOffset[(offsetof(KrustyUID3DIMSoultreeCharacterView,modelNode)==0x1a0)?1:-1];\n'
+                '#include "motion/D3DIMSoultreeCharacter.h"\n'
+                'typedef char ModelOffset[(offsetof(D3DIMSoultreeCharacter,modelNode)==0x1a0)?1:-1];\n'
                 'typedef char LocalOffset[(offsetof(SoultreeObject,localMatrix)==0xb8)?1:-1];\n'
                 'typedef char ValidOffset[(offsetof(SoultreeObject,worldValid)==0x138)?1:-1];\n'
                 'typedef char DirtyOffset[(offsetof(SoultreeObject,subtreeDirty)==0x18c)?1:-1];\n'
@@ -96,7 +97,7 @@ class GarageSetterConnectionsTests(unittest.TestCase):
                 if source in (TREE, CHARACTER, *MATH, str(extracted), fixture):
                     command += ['--include', str(ROOT / 'src/krusty2')]
                 if source == str(layout):
-                    command += ['--include', str(ROOT / 'src/reconstructed')]
+                    command += ['--include', str(ROOT / 'src/reconstructed'), '--include', str(ROOT / 'src/krusty2')]
                 result = subprocess.run(command, cwd=ROOT, capture_output=True, text=True,
                                         encoding='latin1', env={**os.environ, 'PYTHONPATH': str(ROOT)})
                 self.assertEqual(result.returncode, 0, result.stdout + result.stderr)

@@ -57,55 +57,16 @@ void FillTrackList(int largePictures, const char* picture, const char* listName,
 
 // KrustyUI+0x50's 0x94-byte bike records and the 0xc8-byte model records
 // at KrustyUI+0x48 and +0x58 (bikes and riders) they index.
-// A bike or rider model: a vfptr at +0, GameObject reached through the
-// vbptr at +4 (the bike dialogs hide and show the models with its slots 4
-// and 5).
-struct SelectGameD3DIMSoultreeCharacterView : virtual public GameObject {
-    // Its own vtable (the slots past GameObject's; names provisional).
-    virtual void BuildModel();
-    virtual void LoadFromSlt();
-    virtual void CaptureRestPose();
-    virtual void CaptureFramePoses();
-    virtual void ApplyPose();
-    virtual void ApplyMirroredPose();
-    virtual void ApplyFullPose();
-    // Advances the model's animation (dlgprocs.cpp SPBikeRiderDlg slot 10
-    // passes the frame time and two zeros).
-    virtual void AdvanceMotionInterpolated(float frameTime, int a, int b);
-    void SetMotionByName(const char* motion); // 0x004a8b10: plays a motion ("WaitR")
-
-    unsigned char sltFile[0x0c - 0x08]; // +0x08: D3DIMSoultreeCharacter::sltFile (bytes kept)
-    int motionFinished;                       // +0x0c: the motion has finished
-    float motionTime;                         // +0x010 Character motionTime
-    int motionCount;                          // +0x014 Character motionCount
-    void* currentMotion;                      // +0x018 Character currentMotion (a Motion*)
-    void* currentFrame;                       // +0x01c Character currentFrame (a MotionPoseList*)
-    void* blendFromMotion;                    // +0x020 Character blendFromMotion (a Motion*)
-    void* lastFrame;                          // +0x024 Character lastFrame (a MotionPoseList*)
-    float lastFrameTime;                      // +0x028 Character lastFrameTime
-    float blendFromTime;                      // +0x02c Character blendFromTime
-    float blendDuration;                      // +0x030 Character blendDuration
-    int blendActive;                          // +0x034 Character blendActive
-    unsigned char field_0x038[0x3c - 0x38];
-    char sltPath[0x50];                       // +0x03c Character sltPath
-    char vutFilename[0x50];                   // +0x08c Character vutFilename
-    char mirFilename[0x50];                   // +0x0dc Character mirFilename
-    char contentDirectory[0x50];              // +0x12c Character contentDirectory
-    int keepMotions;                          // +0x17c Character keepMotions
-    void** motions;                           // +0x180 Character motions (Motion**)
-    int nodeCount;                            // +0x184 Character nodeCount
-    void* nodeNames;                          // +0x188 Character nodeNames (a NodeNameEntry*)
-    int* mirrorMap;                           // +0x18c Character mirrorMap
-    unsigned char poseList[0x19c - 0x190];    // +0x190 Character poseList (a MotionPoseList; bytes kept)
-    int vutLoaded;                            // +0x19c Character vutLoaded
-    void* plateTexture;                       // +0x1a0: the texture the plate number goes on
-};
+// A bike or rider model is a D3DIMSoultreeCharacter (KrustyUI constructs one per
+// manufacturer); the bike dialogs hide and show it with GameObject slots 4 and 5
+// and paint the plate number on its modelNode.
+class D3DIMSoultreeCharacter;
 
 struct KrustyUIModelRecord {                // a KrustyUI manufacturer or rider (bikes.pb/riders.pb)
     char displayName[0x40];                   // +0x00: "Name"
     char modelFile[0x40];                     // +0x40: "ModelFile" (a rider's "File")
     char uiModelFile[0x40];                   // +0x80: "UIModelFile"
-    SelectGameD3DIMSoultreeCharacterView* uiModel;      // +0xc0
+    D3DIMSoultreeCharacter* uiModel;      // +0xc0
     int availability;                         // +0xc4: "Availability"
 };
 
