@@ -6,7 +6,7 @@
 #include <float.h>
 #include "EcoSystem.h"
 
-typedef char Layout[(sizeof(UnknownEcoQuadTreeObject)==0xc &&
+typedef char Layout[(sizeof(QuadTreeObject)==0xc &&
     sizeof(EcoQuantizedPosition)==6 && sizeof(Vegetation)==0x1c &&
     offsetof(Vegetation,quantizedPosition)==0xc &&
     offsetof(Vegetation,definitionIndex)==0x12 && offsetof(Vegetation,radiusParam)==0x15 &&

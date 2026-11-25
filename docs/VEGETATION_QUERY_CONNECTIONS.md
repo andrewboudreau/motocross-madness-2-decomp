@@ -18,7 +18,7 @@ three existing-provider connections described here retain their original scope.
 `VegetationDefinition::RadiusForParameter` at `0x455ff0`. There is no new
 implementation, forwarding method, linker alias, storage or initialization.
 
-The existing `UnknownEcoQuadTreeObject`, `EcoQuantizedPosition` and
+The existing quadtree object base (now the real `QuadTreeObject`), `EcoQuantizedPosition` and
 `Vegetation` definitions move verbatim into narrow headers. `EcoSystem.h`
 includes each at its previous declaration position. Pointer-only dependencies
 are forward declared. `EcoSystemGlobal.h` exposes the existing canonical

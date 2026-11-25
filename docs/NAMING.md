@@ -2697,7 +2697,7 @@ Left for later:
 | `UnknownGroundFog` | `GroundFogView` | 3 | 6 | found by name "GroundFog" (0x00484f10); class not established |
 | `UnknownGroundFogShader` | `GroundFogCacheOwner` | 3 | 9 | object whose first member caches the fog (0x00484f10) |
 | `UnknownFogVertex` | `GroundFogVertex` | 2 | 11 | D3DLVERTEX layout the fog pass edits |
-| `UnknownEcoQuadTree` | `EcoQuadTreeView` | 2 | 15 | QuadTree global 0x0068aba4; Insert 0x004dcac0 |
+| `UnknownEcoQuadTree` | `EcoQuadTreeView` | 2 | 15 | QuadTree global 0x0068aba4; Insert 0x004dcac0 Merged into `QuadTree` (Vegetation slot 1 takes `QuadTree*`). |
 | `UnknownEcoTerrain` | `EcoTerrainView` | 2 | 24 | Terrain QueryGround 0x00507c10 Merged into `Terrain`: EcoSystem::Create takes a `Terrain*` and GetHeightRange is Terrain's 0x00508970. |
 | `UnknownEcoHullShape` | `EcoHullShape` | 3 | 6 | CollisionObject shapeType 0 data |
 | `UnknownEcoCapsuleShape` | `EcoCapsuleShape` | 3 | 2 | CollisionObject shapeType 3 data |
@@ -3422,8 +3422,8 @@ tools/static_check.py passes.
 | GUIManager | `UnknownFunction464e90` | `OnPaletteChanged` | 3 | GUIManager::Tick 0x00485870 calls it after clearing paletteChanged (+0x1f0); ~UIDialog 0x0046a070 calls it in 8-bit mode unless the palette is locked |
 | DrawableGridNode | `UnknownFunction464e90` | `OnMaskCleared` | 3 | Griddraw: all three calls follow childMask becoming 0 (child->childMask = 0, or oldMask != 0 && childMask == 0) |
 | ManagedTextureGroup | `UnknownFunction464e90` | `OnOutOfPageSpace` | 3 | placement loop calls it when cachePages.Next() returns no page; TextureMapManager.h already notes "out of page space" |
-| CarProceduralNode | `UnknownNodeVirtualSlot0` | `ComputeSortKey` | 3 | QuadTreeObject slot 0 (EcoQuadTreeObject.h) Merged into `SoultreeObject`. |
-| CarProceduralNode | `UnknownNodeVirtualSlot1` | `ComputeQuadTreeCode` | 3 | QuadTreeObject slot 1 (EcoQuadTreeObject.h) Merged into `SoultreeObject`. |
+| CarProceduralNode | `UnknownNodeVirtualSlot0` | `ComputeSortKey` | 3 | QuadTreeObject slot 0 (QuadTreeObject.h) Merged into `SoultreeObject`. |
+| CarProceduralNode | `UnknownNodeVirtualSlot1` | `ComputeQuadTreeCode` | 3 | QuadTreeObject slot 1 (QuadTreeObject.h) Merged into `SoultreeObject`. |
 | CarProceduralNode | `UnknownNodeVirtualSlot2` | `LoadHierarchy` | 3 | SoultreeObject slot 2, 0x004fdc00 Merged into `SoultreeObject`. |
 | CarProceduralNode | `UnknownNodeVirtualSlot3` | `LoadHierarchyFromParameters` | 3 | SoultreeObject slot 3, 0x004fddc0 Merged into `SoultreeObject`. |
 | CarProceduralNode | `UnknownNodeVirtualSlot4` | `CreateNode` | 3 | SoultreeObject slot 4, 0x004fe020 Merged into `SoultreeObject`. |
@@ -3461,7 +3461,7 @@ The 573 remaining `Unknown*` uses (86 names), grouped by work/naming/w28/remain.
 | 46 | 7 | Typedef aliases of named classes (`UnknownResourceEntry` = ResourceItem, `UnknownSceneResourceManager` = ResourceManager, `UnknownParameterStream` = FileStream, `UnknownPickCallback` = CollisionCallback, `UnknownWreckerSkeleton` = SoultreeObject, `UnknownWreckerCharacter` = D3DIMSoultreeCharacter, `UnknownVehiclePart` = SoultreeObject) | The target is already known. A role name would only add a second name for the same class. | Spell the target at the uses and drop the typedef. That is a declaration edit, not a rename. |
 | 33 | 5 | Retired or comment-only names (`UnknownQuarry`, `UnknownBikeRaceOverlay19c`, `UnknownBikeRaceNewRacer`, `UnknownProCircuitSkinned`) and the retail string literal `"Unknown"` (23 uses, not a placeholder) | Some old names are asserted absent by tests, or are stale bindings keys. `UnknownProCircuitSkinned` is an unused declaration. | Clean up the comments and stale keys. Deleting `UnknownProCircuitSkinned` needs its fixture pin moved. |
 | 20 | 4 | Class or role not established (`UnknownLightEmitterTarget`, `UnknownTrackGameViewEntryTarget`, `UnknownAxisSettle_4cb6e0`, `UnknownEventPlayerMessage`) | No constructor, vtable, binding or offset join fixes the class. A name would be a guess. | New retail evidence. |
-| 11 | 2 | `UnknownEcoQuadTreeObject`, `UnknownSoultreeQuadTreeObject` | Polymorphic bases whose `??_R0` type descriptors and base-class arrays are emitted in .data. | None by renaming. Retail RTTI would name them if they had RTTI of their own. |
+| 11 | 2 | ~~`UnknownEcoQuadTreeObject`, `UnknownSoultreeQuadTreeObject`~~ | Polymorphic bases whose `??_R0` type descriptors are emitted in .data. | Resolved by merging, not renaming: both are now the real `QuadTreeObject` (QuadTreeObject.h), and EcoSystem.cpp emits retail's `.?AVQuadTreeObject@@` descriptor. |
 | 2 | 1 | `UnknownEventGraphicsTest` | The RTTI name `GraphicsTest` collides with the real class that EventManager.cpp includes. | Delete the local view and use GraphicsTest.h (a declaration edit). |
 
 The 1274 remaining `field_0x` uses fall into these groups

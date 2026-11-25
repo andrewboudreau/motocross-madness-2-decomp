@@ -7,7 +7,7 @@
     "src/reconstructed/EcoSystem.cpp": {
       "sections": 207,
       "relocations": 1143,
-      "sha256": "c91d26acd00c803a1b8d057a920cda2c50dd856210cad428631ef00a4e842ff8"
+      "sha256": "27cb9b724356c0b33345bd755f478930efa591b0d725c0c75d6e95f592bab0d3"
     },
     "src/reconstructed/LightEmitter.cpp": {
       "sections": 57,
@@ -252,13 +252,13 @@
     },
     {
       "source": "src/reconstructed/EcoSystem.cpp",
-      "symbol": "?ComputeSortKey@Vegetation@@UAEGXZ",
+      "symbol": "?ComputeSortKey@Vegetation@@UAEFXZ",
       "va": "0x00456690",
       "size": 141
     },
     {
       "source": "src/reconstructed/EcoSystem.cpp",
-      "symbol": "?ComputeQuadTreeCode@Vegetation@@UAEIPAVEcoQuadTreeView@@@Z",
+      "symbol": "?ComputeQuadTreeCode@Vegetation@@UAEIPAVQuadTree@@@Z",
       "va": "0x00456720",
       "size": 117
     },

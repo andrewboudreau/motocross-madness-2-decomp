@@ -188,9 +188,9 @@ class EcoQuadTreeConnectionsTests(unittest.TestCase):
             eco_layout=output/'eco_layout.cpp'
             eco_layout.write_text('#include "'+(ROOT/'src/reconstructed/EcoSystem.h').as_posix()+'"\n#include <stddef.h>\n'+''.join(
                 f'typedef char B{i}[({condition})?1:-1];\n'for i,condition in enumerate([
-                    'sizeof(Vegetation)==28','sizeof(UnknownEcoQuadTreeObject)==12',
+                    'sizeof(Vegetation)==28','sizeof(QuadTreeObject)==12',
                     'offsetof(Vegetation,queryStamp)==4','offsetof(Vegetation,sortKey)==6',
-                    'offsetof(Vegetation,typeId)==8','offsetof(Vegetation,geometryBlock)==24',
+                    'offsetof(Vegetation,objectTypeId)==8','offsetof(Vegetation,geometryBlock)==24',
                     'offsetof(EcoSystem,vegetation)==0x38'])))
             compile_source(eco_layout,'eco_layout')
             fixture,_=compile_source(ROOT/'tests/fixtures/eco_quadtree_insert_compare.cpp','fixture',True)

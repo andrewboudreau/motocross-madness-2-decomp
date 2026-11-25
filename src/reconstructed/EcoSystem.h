@@ -35,22 +35,8 @@ struct TgaFile;
 // file touches (the canonical declarations live in src/krusty2 and would
 // drag in the collision header tree).
 
-// src/krusty2/collision/CollisionObject.h: QuadTreeObject.
-#include "EcoQuadTreeObject.h"
+#include "../krusty2/broadphase/QuadTreeObject.h"
 
-// src/krusty2/broadphase/Quadtree.h: QuadTree (the global 0x0068aba4).
-class EcoQuadTreeView {
-public:
-    unsigned char field_0x00[0x50];
-    float extentX;                            // +0x50: world x extent
-    float extentZ;                            // +0x54: world z extent
-
-    unsigned int ComputeCode(float x0, float z0, float x1, float z1); // 0x004dc8c0
-    void Insert(UnknownEcoQuadTreeObject* object, unsigned int code, float y0, float y1); // 0x004dcac0
-    UnknownEcoQuadTreeObject* NextObjectSorted(); // 0x004dd600
-    void RestartQuery();                      // 0x004dd750
-    int IsValidCode(unsigned int code);       // 0x004ddd90
-};
 #include "../krusty2/broadphase/QuadTreeDeclarations.h"
 
 class Terrain;
@@ -73,7 +59,7 @@ struct EcoSphereShape {              // type 4
     float centreScale;                        // +0x18: centre scale
     Matrix4 transform;                        // +0x1c
 };
-class CollisionObject : public UnknownEcoQuadTreeObject, public GameObject {
+class CollisionObject : public QuadTreeObject, public GameObject {
 public:
     explicit CollisionObject(int flags);      // 0x00431e70
     void Configure(void* context, int useBroadphase, int collisionEnabled, int collidable); // 0x004320f0

@@ -265,11 +265,11 @@ Vegetation::Vegetation() {
     radiusParam = 0;
     definitionIndex = 0;
     geometryBlock = 0;
-    typeId = g_EcoSystem->vegetationTypeId;
+    objectTypeId = g_EcoSystem->vegetationTypeId;
 }
 
 // 0x00456690
-unsigned short Vegetation::ComputeSortKey() {
+short Vegetation::ComputeSortKey() {
     Matrix4* view = g_UnknownGlobal59af00;
     float depth = ((quantizedPosition.z * (*view)(2, 2) + quantizedPosition.x * (*view)(0, 2)) *
                        g_EcoSystem->unitsPerCoordinate +
@@ -284,11 +284,11 @@ unsigned short Vegetation::ComputeSortKey() {
 }
 
 // 0x00456720
-unsigned int Vegetation::ComputeQuadTreeCode(EcoQuadTreeView* tree) {
+unsigned int Vegetation::ComputeQuadTreeCode(QuadTree* tree) {
     float radius = g_EcoSystem->definitionTable[definitionIndex]->RadiusForParameter(radiusParam);
     float x = quantizedPosition.x * g_EcoSystem->unitsPerCoordinate;
     float z = quantizedPosition.z * g_EcoSystem->unitsPerCoordinate;
-    return reinterpret_cast<QuadTree*>(tree)->ComputeCode(x - radius, z - radius, x + radius, z + radius);
+    return tree->ComputeCode(x - radius, z - radius, x + radius, z + radius);
 }
 
 // 0x004567a0
@@ -1169,7 +1169,7 @@ int EcoSystem::PlaceStoredObjects() {
         float z = vegetation[i].quantizedPosition.z * g_EcoSystem->unitsPerCoordinate;
         unsigned int code = g_collisionQuadTree->ComputeCode((x - radius), (z - radius), (x + radius), (z + radius));
         g_MemTagStack->Push("QuadTree");
-        g_collisionQuadTree->Insert(reinterpret_cast<QuadTreeObject*>(&vegetation[i]), code, y, y + height);
+        g_collisionQuadTree->Insert(&vegetation[i], code, y, y + height);
         g_MemTagStack->Push("EcoSystem");
     }
     if (!esbStreamInArchive) {
@@ -1487,7 +1487,7 @@ int EcoSystem::GenerateObjects(int checkCodes) {
                                                     probe.z + radius);
             vegetation[placedCount].Place(textureManager, selected, &probe, heightParameter, radiusParameter);
             g_MemTagStack->Push("QuadTree");
-            g_collisionQuadTree->Insert(reinterpret_cast<QuadTreeObject*>(&vegetation[placedCount]), code, probe.y, probe.y + height);
+            g_collisionQuadTree->Insert(&vegetation[placedCount], code, probe.y, probe.y + height);
             g_MemTagStack->Push("EcoSystem");
             placedCount++;
         }
@@ -1564,7 +1564,7 @@ int EcoSystem::PrepareGeometry() {
     g_collisionQuadTree->RestartQuery();
     Vegetation* object = (Vegetation*)g_collisionQuadTree->NextObjectSorted();
     while (object) {
-        if (object->typeId == vegetationTypeId) {
+        if (object->objectTypeId == vegetationTypeId) {
             int billboard = object->isBillboard;
             int fade = object->fadeLevel;
             object->TestDistance(&billboard, &fade);

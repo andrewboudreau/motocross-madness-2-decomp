@@ -12,7 +12,7 @@
     "src/reconstructed/EcoSystem.cpp": {
       "sections": 207,
       "relocations": 1143,
-      "sha256": "c91d26acd00c803a1b8d057a920cda2c50dd856210cad428631ef00a4e842ff8"
+      "sha256": "27cb9b724356c0b33345bd755f478930efa591b0d725c0c75d6e95f592bab0d3"
     },
     "src/krusty2/broadphase/Quadtree.cpp": {
       "sections": 51,
@@ -28,7 +28,7 @@
   "inventory": [
     [
       "src/reconstructed/EcoSystem.cpp",
-      "?ComputeQuadTreeCode@Vegetation@@UAEIPAVEcoQuadTreeView@@@Z",
+      "?ComputeQuadTreeCode@Vegetation@@UAEIPAVQuadTree@@@Z",
       "?ComputeCode@QuadTree@@QAEIMMMM@Z",
       108,
       20
