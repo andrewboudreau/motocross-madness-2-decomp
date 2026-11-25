@@ -95,35 +95,7 @@ public:
 
 #include "Camera.h"
 
-// TextureMap.h: the texture objects the definitions hold (0x0050a590, Texmap.cpp,
-// returns a TextureMap). Slots 1-3 are BaseObject's and 4-19 TextureMap.h's.
-class EcoTextureMapView {
-public:
-    virtual void UnknownVirtualSlot0();
-    virtual int AddRef();
-    virtual int Release();
-    virtual int GetRefCount();
-    virtual int CreateSurface();
-    virtual int LoadSurface();
-    virtual int Clone();
-    virtual int IsResident();
-    virtual int CreateTextureSurface(int upload, int asRenderTarget, int localVideo);
-    virtual int Upload();
-    virtual int ReleaseTextureSurface();
-    virtual int SetAsTexture();
-    virtual int RecreateIfLost();
-    virtual int LockSurface();
-    virtual int UnlockSurface();
-    virtual int BuildMipLevels();
-    virtual int LockLevel();
-    virtual int UnlockLevel();
-    virtual int ApplyColorKey(unsigned int key);
-    virtual int Bind();
-    unsigned char field_0x04[0x20 - 4];
-    int pixelFormat;                          // +0x20
-};
-// 0x0050a590 (TextureMap.h): loads a texture through the manager.
-#include "TextureLoader.h"
+#include "TextureMap.h"
 
 // 0x00460b50 / 0x00460c00 / 0x00460c70 (src/krusty2/math/FastMath.h).
 float FastSqrt(float x);
@@ -204,8 +176,8 @@ public:
     float normalizedMinY;                     // +0x1D4  the model's lowest y over its height (modelHeightScale * minY); the billboards start that far below the object
     int lodCount;                             // NumberOfLOD (at most kMaxLods)
     unsigned int keyColor;                    // key colour
-    EcoTextureMapView* billboardTexture;      // billboard texture
-    EcoTextureMapView* modelTexture;          // model texture
+    TextureMap* billboardTexture;             // billboard texture
+    TextureMap* modelTexture;                 // model texture
     unsigned short* modelIndices[kMaxLods];   // model indices (inside the vertex block)
     EcoModelVertex* modelVertices[kMaxLods]; // model vertices
     int modelVertexCount[kMaxLods];           // vertex count
@@ -246,16 +218,7 @@ struct EcoVideoCardView {
     unsigned char field_0x02c[0x1c0 - 0x2c];
     int driverColorKeyCaps;                   // +0x1c0: DDCAPS dwCKeyCaps (PCVideoCard::driverColorKeyCaps)
 };
-// DebugOverlay.h: the overlay the draw prints its statistics on.
-class EcoDebugOverlayView {
-public:
-    // 0x00447f40 / 0x00447fa0: format a row onto page `page` (cdecl, `this`
-    // on the stack).
-    void Print(int page, const char* format, ...);
-    void Title(int page, const char* format, ...);
-    unsigned char field_0x0000[0x26c0];
-    int nextPage;                             // +0x26c0 next free page (DebugOverlay.h)
-};
+#include "DebugOverlay.h"
 class EcoTrackGameView {
 public:
     virtual void UnknownVirtualSlot0();
@@ -285,7 +248,7 @@ public:
     unsigned char field_0x004[0x10 - 4];
     EcoVideoCardView* display;               // +0x10
     unsigned char field_0x014[0x38 - 0x14];
-    EcoDebugOverlayView* debugOverlay;     // +0x38 the debug overlay (DebugOverlay.h), or 0
+    DebugOverlay* debugOverlay;            // +0x38 the debug overlay (DebugOverlay.h), or 0
     unsigned char field_0x03c[0x2d0 - 0x3c];
     int bladeRenderer;                        // +0x2d0 the "Blade" software renderer (Game.h)
     unsigned char field_0x2d4[0x54c - 0x2d4];

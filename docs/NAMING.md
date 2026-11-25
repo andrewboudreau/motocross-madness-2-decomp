@@ -2705,12 +2705,12 @@ Left for later:
 | `UnknownEcoLight` | `EcoLightEmitterView` | 2 | 16 | LightManager::FindLightOfType 0x004a0190 result Merged into `LightEmitter`: LightingChanged reads ambientRGBA (+0x54) and lightDirection (+0x70); EcoSystem.h's partial LightManager is replaced by LightEmitter.h. |
 | `UnknownEcoCamera` | `EcoCameraView` | 2 | 13 | Camera slots 27-32, RenderTarget+0x08 Merged into `Camera`: eyePosition, viewDirection, focalLength, farPlane, viewMatrix and screenMatrix. |
 | `UnknownEcoRenderTarget` | `EcoRenderTargetView` | 2 | 14 | GameObject+0x18 render target; IDirect3DDevice7 forwards Merged into `RenderTarget` (currentCamera, targetWidth, verticesDrawn, trianglesDrawn; slot 18 is SetAlphaTest). |
-| `UnknownEcoTexture` | `EcoTextureMapView` | 2 | 9 | TextureMap slots 4-19; 0x0050a590 returns TextureMap |
+| `UnknownEcoTexture` | `EcoTextureMapView` | 2 | 9 | TextureMap slots 4-19; 0x0050a590 returns TextureMap Merged into `TextureMap`: TerrainLoadTexture already returns one; +0x20 is `mapFormat`. |
 | `UnknownEcoModelVertex` | `EcoModelVertex` | 2 | 5 | .slt loader vertex (8 floats) |
 | `UnknownEcoVertex` | `EcoLitVertex` | 2 | 9 | D3DLVERTEX FVF 0x1e2 |
 | `UnknownEcoVisibilityClipper` | `EcoVisibilityClipperView` | 2 | 9 | visibility clipper 0x00575a98, SphereInFrustum 0x0052fbb0 |
 | `UnknownEcoDisplay` | `EcoVideoCardView` | 3 | 2 | TrackGame+0x10; +0x1c0 PCVideoCard::driverColorKeyCaps |
-| `UnknownEcoDebugOverlay` | `EcoDebugOverlayView` | 2 | 8 | DebugOverlay Print/Title 0x00447f40/0x00447fa0 |
+| `UnknownEcoDebugOverlay` | `EcoDebugOverlayView` | 2 | 8 | DebugOverlay Print/Title 0x00447f40/0x00447fa0 Merged into `DebugOverlay` (Print/Title, nextPage +0x26c0). |
 | `UnknownEcoTrackGame` | `EcoTrackGameView` | 2 | 48 | cast from g_TrackGame; Game registry slots 20-22 |
 
 ### Scene, follow camera and other views

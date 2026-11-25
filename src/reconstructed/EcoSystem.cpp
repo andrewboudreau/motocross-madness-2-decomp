@@ -158,7 +158,7 @@ int VegetationDefinition::LoadModel(TextureMapManager* textures, int modelFlags)
     char path[0x104];
     char section[0x80];
     if (billboardName[0]) {
-        billboardTexture = reinterpret_cast<EcoTextureMapView*>(TerrainLoadTexture(textures, billboardName, modelFlags, 0, 2, 5, 6, 0, 0x80, 0xff00ff, 1, 1));
+        billboardTexture = TerrainLoadTexture(textures, billboardName, modelFlags, 0, 2, 5, 6, 0, 0x80, 0xff00ff, 1, 1);
         if (!billboardTexture->IsResident())
             billboardTexture->CreateTextureSurface(1, 0, 0);
     }
@@ -179,9 +179,9 @@ int VegetationDefinition::LoadModel(TextureMapManager* textures, int modelFlags)
             if (!reinterpret_cast<EcoTrackGameView*>(g_TrackGame)->bladeRenderer && (reinterpret_cast<EcoTrackGameView*>(g_TrackGame)->display->driverColorKeyCaps & 8)
                 && reinterpret_cast<EcoTrackGameView*>(g_TrackGame)->GetRegistryFlag("KeyColorTrees", 0))
                 format = reinterpret_cast<EcoTrackGameView*>(g_TrackGame)->display->colorKeyFormat;
-            modelTexture = reinterpret_cast<EcoTextureMapView*>(TerrainLoadTexture(textures, path, format, 0, 2, 5, 6, 0, 0x80, 0xff00ff, 1, 1));
+            modelTexture = TerrainLoadTexture(textures, path, format, 0, 2, 5, 6, 0, 0x80, 0xff00ff, 1, 1);
             if (!modelTexture->IsResident()) {
-                int loaded = modelTexture->pixelFormat;
+                int loaded = modelTexture->mapFormat;
                 if (loaded == 555 || loaded == 565 || loaded == 888 || loaded == 1555)
                     modelTexture->ApplyColorKey(keyColor);
                 modelTexture->CreateTextureSurface(1, 0, 0);
@@ -1808,7 +1808,7 @@ int EcoSystem::Render3D() {
     if (reinterpret_cast<EcoTrackGameView*>(g_TrackGame)->bladeRenderer)
         ECO_VIEW->SetRenderState(D3DRENDERSTATE_TEXTUREPERSPECTIVE, g_UnknownGlobal59af14[detailLevel].fog, 0);
     if (geometryCount) {
-        SetRenderStates(definitionTable[vegetation[0].definitionIndex]->modelTexture->pixelFormat);
+        SetRenderStates(definitionTable[vegetation[0].definitionIndex]->modelTexture->mapFormat);
         for (i = 0; i < geometryCount; i++) {
             if (s_drawEnabled)
                 geometryList[i]->DrawGeometry(ECO_VIEW);
@@ -1820,7 +1820,7 @@ int EcoSystem::Render3D() {
         ECO_VIEW->SetRenderState(D3DRENDERSTATE_TEXTUREPERSPECTIVE, 0, 0);
     if (billboardCount) {
         definitionTable[vegetation[0].definitionIndex]->billboardTexture->Bind();
-        SetRenderStates(definitionTable[vegetation[0].definitionIndex]->billboardTexture->pixelFormat);
+        SetRenderStates(definitionTable[vegetation[0].definitionIndex]->billboardTexture->mapFormat);
         int next = 0;
         int remaining = billboardCount;
         float widthScale = (float)(15.0 / ECO_VIEW->targetWidth);
@@ -1948,7 +1948,7 @@ int EcoSystem::Render3D() {
         }
     }
     s_renderTicks = ReadClock() - start;
-    EcoDebugOverlayView* overlay = reinterpret_cast<EcoTrackGameView*>(g_TrackGame)->debugOverlay;
+    DebugOverlay* overlay = reinterpret_cast<EcoTrackGameView*>(g_TrackGame)->debugOverlay;
     if (overlay) {
         if (s_debugPage < 0)
             { int page = overlay->nextPage++; s_debugPage = page; }
@@ -2072,8 +2072,8 @@ int PreloadEcosystem(TextureMapManager* textures, char* path, FileStream* stream
         }
         for (i = 0; i < 256; i++) {
             if (billboardNames[i][0]) {
-                EcoTextureMapView* texture = reinterpret_cast<EcoTextureMapView*>(TerrainLoadTexture(textures, billboardNames[i], modelFlags, 0, 2, 5, 6, 0, 0x80,
-                                                                   0xff00ff, 1, 1));
+                TextureMap* texture = TerrainLoadTexture(textures, billboardNames[i], modelFlags, 0, 2, 5, 6, 0, 0x80,
+                                                                   0xff00ff, 1, 1);
                 if (!texture->IsResident()) {
                     texture->CreateTextureSurface(1, 0, 0);
                     g_UnknownGlobal59af10++;
@@ -2092,10 +2092,10 @@ int PreloadEcosystem(TextureMapManager* textures, char* path, FileStream* stream
                     if (!reinterpret_cast<EcoTrackGameView*>(g_TrackGame)->bladeRenderer && (reinterpret_cast<EcoTrackGameView*>(g_TrackGame)->display->driverColorKeyCaps & 8)
                         && reinterpret_cast<EcoTrackGameView*>(g_TrackGame)->GetRegistryFlag("KeyColorTrees", 0))
                         format = reinterpret_cast<EcoTrackGameView*>(g_TrackGame)->display->colorKeyFormat;
-                    EcoTextureMapView* texture = reinterpret_cast<EcoTextureMapView*>(TerrainLoadTexture(textures, sltName, format, 0, 2, 5, 6, 0, 0x80, 0xff00ff, 1, 1));
+                    TextureMap* texture = TerrainLoadTexture(textures, sltName, format, 0, 2, 5, 6, 0, 0x80, 0xff00ff, 1, 1);
                     if (!texture->IsResident()) {
                         g_UnknownGlobal59af10++;
-                        int loaded = texture->pixelFormat;
+                        int loaded = texture->mapFormat;
                         if (loaded == 555 || loaded == 565 || loaded == 888 || loaded == 1555)
                             texture->ApplyColorKey(keyColors[i]);
                         texture->CreateTextureSurface(1, 0, 0);
