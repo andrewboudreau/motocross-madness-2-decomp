@@ -183,10 +183,9 @@ public:
     int dirtyFlags;               // +0x130 ctor 0
 };
 
-// 0x004a1b00 / 0x004a1a50: transform `count` points from src (srcStride bytes apart) by the matrix
-// into dst (dstStride bytes apart).  Tier 3 names and argument roles from the call at 0x004dba87.
-void ShadowTransformPointsOrtho(ShadowVec3* dst, const void* src, const ShadowMatrix* m, int count, int dstStride, int srcStride);
-void ShadowTransformPointsProjective(ShadowVec3* dst, const void* src, const ShadowMatrix* m, int count, int dstStride, int srcStride);
+// The light-space transforms are TransformPoints 0x004a1b00 (D3DIMSoulTree.h; orthographic
+// shadows, mode 3) and ProjectPoints 0x004a1a50 (MatrixUtil.h; perspective). Callers cast
+// lightMatrix to Matrix4.
 // 0x00461e60: rasterises a triangle of 2D integer points (3 x {x,y}) into a (1<<shift)-wide
 // 16-bit buffer, value = height word.  Last argument is 1 at the call site.
 void ShadowFillTriangle(int shift, short* buffer, short value, int* points, int flag);

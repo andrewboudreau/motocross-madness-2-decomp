@@ -1,25 +1,15 @@
 // Group5 bring-up definitions (best-guess, link frontier). Not strict matches.
 //
 // ProjectedShadow.h names the shadow pass's providers with its own tier-3
-// views (ShadowMatrix*, ShadowTransformPoints*, ShadowFillTriangle).
+// views (ShadowMatrix*, ShadowFillTriangle).
 // Where the retail VA already has a definition under its owner's name, the
 // view forwards to it:
 //   0x004a1410 ShadowMatrixIdentity     -> IdentityMatrix
 //   0x004a1860 ShadowMatrixMultiply     -> MatrixMult
-//   0x004a1b00 ShadowTransformPointsOrtho -> TransformPoints
-// 0x004a1a50 (the perspective transform) and 0x00461e60 (the triangle
-// rasteriser) have no definition yet and are written out here.
+// 0x00461e60 (the triangle rasteriser) has no definition yet and is
+// written out here.
 #include "shadow/ProjectedShadow.h"
-
-// The providers, declared only as far as these calls need (the parameter
-// types keep the providers' mangled names).
-struct Matrix4 {
-    float m[4][4];
-};
-Matrix4 IdentityMatrix();                    // 0x004a1410
-Matrix4 MatrixMult(Matrix4 a, Matrix4 b);    // 0x004a1860
-void TransformPoints(void* destinationPoints, const void* sourcePoints, const Matrix4* matrix, int count,
-                     int destinationStride, int sourceStride);  // 0x004a1b00
+#include "D3DIMSoulTree.h"   // TransformPoints 0x004a1b00 and MatrixUtil.h
 
 ShadowMatrix ShadowMatrixIdentity()
 {
@@ -32,17 +22,6 @@ ShadowMatrix ShadowMatrixMultiply(ShadowMatrix a, ShadowMatrix b)
     Matrix4 product = MatrixMult(*reinterpret_cast<Matrix4*>(&a), *reinterpret_cast<Matrix4*>(&b));
     return *reinterpret_cast<ShadowMatrix*>(&product);
 }
-
-// TransformPoints writes its first pointer and reads its second (disassembly
-// of 0x004a1b00), the same roles and stride order as the shadow view.
-void ShadowTransformPointsOrtho(ShadowVec3* dst, const void* src, const ShadowMatrix* m, int count, int dstStride,
-                                int srcStride)
-{
-    TransformPoints(dst, src, reinterpret_cast<const Matrix4*>(m), count, dstStride, srcStride);
-}
-
-// 0x004a1a50 (ShadowTransformPointsProjective) is MatrixUtil.cpp's
-// ProjectPoints, bound through a link alias (config/game_build.json).
 
 // 0x00461d60 (thiscall, ret 0xc): one edge of the triangle, stepped one row
 // at a time with an integer error term (0x1c bytes).

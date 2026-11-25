@@ -6,6 +6,7 @@
 #include "shadow/ProjectedShadow.cpp"
 #include "../../../src/reconstructed/PCRenderTarget.h"
 #include "../../../src/reconstructed/PCVideoCard.h"
+#include "../../../src/reconstructed/D3DIMSoulTree.h"   // TransformPoints 0x004a1b00; MatrixUtil.h ProjectPoints
 
 // 0x004da7b0: binds the shadow to its render target, picks a surface format from the device
 // capabilities (and the DriverInfo\<driver>\DestColorShadow setting), creates the shadow
@@ -389,9 +390,9 @@ void ProjectedShadow::RenderShadow()
             int indexCount;
             casters[c]->GetPart(part, (SoultreeVertex**)&vertices, &count, &indices, &indexCount, 0, -1);
             if (mode == 3)
-                ShadowTransformPointsOrtho(vertexBuffer + vertexBase, vertices, &lightMatrix, count, 0xc, 0x20);
+                TransformPoints(vertexBuffer + vertexBase, vertices, reinterpret_cast<const Matrix4*>(&lightMatrix), count, 0xc, 0x20);
             else
-                ShadowTransformPointsProjective(vertexBuffer + vertexBase, vertices, &lightMatrix, count, 0xc, 0x20);
+                ProjectPoints(vertexBuffer + vertexBase, vertices, reinterpret_cast<const Matrix4*>(&lightMatrix), count, 0xc, 0x20);
 
             for (int i = 0; i < indexCount; i += 3) {
                 ShadowVec3* v0 = &vertexBuffer[indices[i + 2] + vertexBase];

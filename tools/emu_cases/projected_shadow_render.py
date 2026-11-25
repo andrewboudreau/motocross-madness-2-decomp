@@ -18,8 +18,8 @@ PROBES = {0x004dbb5c: 'x fistp', 0x004dbc7d: 'fill triangle'}
 
 PART_COUNT = 0x00445030      # D3DIMSoultreeObject::GetSurfaceCount(int), thiscall ret 4
 GET_PART = 0x004433f0        # D3DIMSoultreeObject::GetPart(...), thiscall ret 0x1c
-ORTHO = 0x004a1b00           # ShadowTransformPointsOrtho, cdecl, 6 args
-PROJECTIVE = 0x004a1a50      # ShadowTransformPointsProjective, cdecl, 6 args
+ORTHO = 0x004a1b00           # TransformPoints, cdecl, 6 args
+PROJECTIVE = 0x004a1a50      # ProjectPoints, cdecl, 6 args
 FILL = 0x00461e60            # ShadowFillTriangle(shift, buffer, value, points, flag), cdecl
 RELEASE_PARTS = 0x004fdab0   # SoultreeObject::MarkSubtreeDirty(), thiscall
 

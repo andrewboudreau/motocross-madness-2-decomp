@@ -19,8 +19,8 @@ SOURCE = 'samples/physics/shadow/TerrainShadow.cpp'
 PROBES = {0x00509fd0: 'fill triangle', 0x0050a14e: 'MarkUsed', 0x0050a134: 'vertex array full'}
 
 G_CLIP_RECTANGLE = 0x0056852c
-ORTHO = 0x004a1b00           # ShadowTransformPointsOrtho, cdecl, 6 args
-PROJECTIVE = 0x004a1a50      # ShadowTransformPointsProjective, cdecl, 6 args
+ORTHO = 0x004a1b00           # TransformPoints, cdecl, 6 args
+PROJECTIVE = 0x004a1a50      # ProjectPoints, cdecl, 6 args
 FILL = 0x00461e60            # ShadowFillTriangle(shift, buffer, value, points, flag), cdecl
 MARK_USED = 0x00401250       # AgeManager::MarkUsed(AgeEntry*), thiscall ret 4
 

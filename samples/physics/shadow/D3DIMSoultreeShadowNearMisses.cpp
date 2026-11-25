@@ -177,9 +177,9 @@ void D3DIMSoultreeShadow::BuildShadowVertices()
             s_shadowPointCapacity = mesh->vertexCount;
         }
         if (shadow->mode == 3)
-            ShadowTransformPointsOrtho(s_shadowPoints, mesh->vertices, &shadow->lightMatrix, mesh->vertexCount, 0xc, 0x20);
+            TransformPoints(s_shadowPoints, mesh->vertices, reinterpret_cast<const Matrix4*>(&shadow->lightMatrix), mesh->vertexCount, 0xc, 0x20);
         else
-            ShadowTransformPointsProjective(s_shadowPoints, mesh->vertices, &shadow->lightMatrix, mesh->vertexCount, 0xc, 0x20);
+            ProjectPoints(s_shadowPoints, mesh->vertices, reinterpret_cast<const Matrix4*>(&shadow->lightMatrix), mesh->vertexCount, 0xc, 0x20);
 
         ShadowVec3* point = s_shadowPoints;
         int* code = g_d3dimShadowOutcodes;

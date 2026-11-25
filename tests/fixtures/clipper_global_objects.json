@@ -52,7 +52,7 @@
     "samples/physics/shadow/D3DIMSoultreeShadowNearMisses.cpp": {
       "sections": 7,
       "relocations": 53,
-      "sha256": "09606ace2bdb9fdf8771daf8a6b2d0b845c055dc2569aecfa5aeff83cae453d0"
+      "sha256": "5a46d2ddfa168fb0e5ed3b94953047deb9fe40ec7ca3c0115e91f2b164a50167"
     },
     "src/krusty2/broadphase/Terrain.cpp": {
       "sections": 87,

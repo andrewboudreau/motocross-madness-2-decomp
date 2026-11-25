@@ -13,6 +13,7 @@
 #include "../../../src/reconstructed/ClipRectangle.h"
 #include "../../../src/reconstructed/PCRenderTarget.h"
 #include "../../../src/reconstructed/Camera.h"
+#include "../../../src/reconstructed/D3DIMSoulTree.h"   // TransformPoints 0x004a1b00; MatrixUtil.h ProjectPoints
 #include "../../../src/krusty2/visibility/VisibilityClipper.h"   // g_visibilityClipper 0x00575a98
 #include "../../common/FistpFloatToInt.h"
 #include <math.h>
@@ -150,9 +151,9 @@ void TerrainShadow::BuildShadowVertices()
             if (!cell->owner->vertices)
                 continue;
             if (shadow->mode == 3)
-                ShadowTransformPointsOrtho(transformed, cell->owner->vertices, &shadow->lightMatrix, cell->owner->vertexCount, 0xc, 0x20);
+                TransformPoints(transformed, cell->owner->vertices, reinterpret_cast<const Matrix4*>(&shadow->lightMatrix), cell->owner->vertexCount, 0xc, 0x20);
             else
-                ShadowTransformPointsProjective(transformed, cell->owner->vertices, &shadow->lightMatrix, cell->owner->vertexCount, 0xc, 0x20);
+                ProjectPoints(transformed, cell->owner->vertices, reinterpret_cast<const Matrix4*>(&shadow->lightMatrix), cell->owner->vertexCount, 0xc, 0x20);
 
             int remaining = cell->owner->vertexCount;
             if (remaining > 0) {

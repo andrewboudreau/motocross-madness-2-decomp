@@ -56,8 +56,8 @@ Codegen evidence for the types (`Matrix4`, `Vector3`):
 ## ProjectPoints forms tried
 
 The notes the near-miss sample carried before `0x004a1a50` moved into
-`src/reconstructed/MatrixUtil.cpp` (it is also the shadow code's
-`ShadowTransformPointsProjective`, bound by a link alias):
+`src/reconstructed/MatrixUtil.cpp` (the shadow passes call it for perspective
+shadows):
 
 ```text
 0x004a1a50 (strided perspective transform, 175 bytes): 171/175; only the z

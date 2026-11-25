@@ -1543,7 +1543,7 @@ both control words. These agreed with retail in every run (runs in brackets):
   `PCJoystickDevice::ReadBufferedState` 0x004c3100 (160) and
   `ReadImmediateState` 0x004c3790 (100), `VCRInterface::Tick` 0x004e7d60
   (200).
-- Terrain, shadows and grid: `ShadowTransformPointsProjective` 0x004a1a50,
+- Terrain, shadows and grid: `ProjectPoints` 0x004a1a50,
   `TerrainShutdownObject::LookupCell` 0x00484d70, `GridVertexCache::GetVertex`
   0x0047de90, `D3DIMSoultreeObject::GetVertexCount` 0x00444fe0 (600 each),
   `DrawableGridNode::WalkVisibilityQuadrants` 0x00481de0 (400),
@@ -1856,7 +1856,7 @@ needed a fix. The emu counts below are at 0x007f with seed 11.
   `shadow_camera_set_look_at`: 0 of 1500 differ. A reassociated x\*x + (y\*y + z\*z) differs in
   112 of 1500, so the case sees the order.
 - `TransformPoints` 0x004a1b00: every row is ((x + y) + z) + t (0x004a1b43..0x004a1bb0).
-  `ShadowTransformPointsOrtho` forwards to it. `transform_points`: 0 of 1500 differ.
+  The shadow passes call it for orthographic shadows. `transform_points`: 0 of 1500 differ.
 - `ComputeViewerDetail` 0x004815e0: the same near/far sums and ratio, with `FastSqrt` bound to
   0x00460b50. `grid_viewer_detail`: 0 of 1500 differ.
 - `PositionAtTime` 0x00430b10: the Hermite sum has the same association, with operands only

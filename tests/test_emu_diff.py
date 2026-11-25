@@ -137,7 +137,6 @@ CLEAN_CASES = {
     'soultree_vertex_count': 100,
     'grid_light_vertices': 200,
     'light_manager_light_vertices': 200,
-    'shadow_transform_ortho': 100,
     'net_receive_messages': 100,
     'net_handle_received_message': 120,
     'net_dispatch_messages': 60,

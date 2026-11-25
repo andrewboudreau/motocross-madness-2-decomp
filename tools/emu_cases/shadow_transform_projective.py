@@ -1,7 +1,7 @@
 """ProjectPoints 0x004a1a50, strided projective transform (tools/emu_diff.py case).
 
-The body is src/reconstructed/MatrixUtil.cpp's ProjectPoints; the shadow code reaches it as
-ShadowTransformPointsProjective through a link alias. Each point is divided by its w row
+The body is src/reconstructed/MatrixUtil.cpp's ProjectPoints; the shadow code calls it for
+perspective shadows. Each point is divided by its w row
 (fdivr by 1.0) and the three coordinate rows are scaled by that reciprocal, all on the x87
 stack; retail sums each row in its own order (w: (z y) x + t; x: (y z) x + t; y and z:
 (y x) z + t). Cases: random projective matrices (w row near zero in some), random points,

@@ -41,8 +41,9 @@ Notes
   has a fourth table of the same shape.
 - 0x004dc2b0 iterates the casters (+0x2c/+0x30), not receivers, so it is named TintCasterVertices.
 - DebugMalloc(size, file, line) at 0x4a2e20 uses core/DebugAlloc.h.
+- Light-space transforms: TransformPoints 0x4a1b00 (D3DIMSoulTree.h) and ProjectPoints 0x4a1a50 (MatrixUtil.h).
 - Helper stand-ins (tier 3): ShadowMatrixIdentity 0x4a1410, ShadowMatrixMultiply 0x4a1860,
-  ShadowTransformPoints* 0x4a1b00/0x4a1a50, ShadowFillTriangle 0x461e60, caster 0x4433f0/0x445030/0x4fe850/0x4fdab0.
+  ShadowFillTriangle 0x461e60, caster 0x4433f0/0x445030/0x4fe850/0x4fdab0.
 
 # D3DIMSoultreeShadow.cpp (shadow)
 
