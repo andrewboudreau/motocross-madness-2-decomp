@@ -225,8 +225,6 @@ struct EventBikeRaceView : public GameObject {
     void SaveReplay(char* path, char* description);
     // 0x004204e0: the next racer after `*iterator` (advancing it), or 0.
     EventKrustyBikeView* NextBike(int* iterator);
-    // 0x004210f0: writes two positions relative to `reference`.
-    void WriteRelativePositions(Vector3* a, Vector3* b, void* reference, int flags);
 
     unsigned char field_0x02c[0x38 - 0x2c];
     EventKrustyBikeView* localRacer;            // +0x38 its own racer

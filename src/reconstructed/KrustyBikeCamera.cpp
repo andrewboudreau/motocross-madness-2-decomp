@@ -3,6 +3,7 @@
 #include "D3DIMSoulTree.h"
 
 #include "EventManager.h"
+#include "BikeRaceCore.h"
 
 // The four Math3D vector constants (.CRT$XCU 159-162, initialisers
 // 0x004986b0..0x004987eb, after the last method): 0x0067c3c8, 0x0067c3d8,
@@ -95,10 +96,10 @@ int KrustyBikeCamera::Tick(float frameTime) {
         Vector3 second;
         if (!s_networkStartViewActive) {
             s_networkStartViewActive = true;
-            raceView->WriteRelativePositions(&second, &first, g_TrackGame->bajaEnduroEvent, 0);
+            ((BikeRace*)raceView)->WriteRelativePositions(&second, &first, g_TrackGame->bajaEnduroEvent, 0);
             FollowCamera::BuildOrientationBasis(&first, &kVec3YAxis);
         }
-        raceView->WriteRelativePositions(&first, &second, g_TrackGame->bajaEnduroEvent, 0);
+        ((BikeRace*)raceView)->WriteRelativePositions(&first, &second, g_TrackGame->bajaEnduroEvent, 0);
         first.y = raceView->localRacer->position.y + 2.0f;
         FollowCamera::PlayRecordedFrame(frameTime, &first);
         return 1;
