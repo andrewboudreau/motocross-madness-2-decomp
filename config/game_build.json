@@ -83,7 +83,7 @@
     "?ShadowTransformPointsProjective@@YAXPAUShadowVec3@@PBXPBUShadowMatrix@@HHH@Z": "?ProjectPoints@@YAXPAXPBXPBUMatrix4@@HHH@Z",
     "?TransformVertexGroups@D3DIMShadowCasterView@@QAEXH@Z": "?TransformVertexGroups@D3DIMSoultreeObject@@QAEXH@Z",
     "?g_d3dimShadowVertexArray@@3PAUD3DIMShadowVertexView@@A": "?g_d3dimShadowVertices@@3PAUD3DIMShadowVertex@@A",
-    "?SphereInFrustum@EcoVisibilityClipperView@@QAEHPBVEcoCameraView@@PBXPBUVector3@@MPAH@Z": "?SphereInFrustum@VisibilityClipper@@QAEHPBUVisibilityCamera@@PBUVisibilityMatrix@@PBUVisibilityBoxVec@@MPAH@Z",
+    "?SphereInFrustum@EcoVisibilityClipperView@@QAEHPBVCamera@@PBXPBUVector3@@MPAH@Z": "?SphereInFrustum@VisibilityClipper@@QAEHPBUVisibilityCamera@@PBUVisibilityMatrix@@PBUVisibilityBoxVec@@MPAH@Z",
     "??0BikeAIVec3Call@@QAE@MMM@Z": "??0Vec3@@QAE@MMM@Z",
     "?BikeAIVec3Scale@@YA?AUVec3@@ABU1@M@Z": "??D@YA?AUVec3@@ABU0@M@Z",
     "?g_ObstacleDebugUpperLine@@3PAUVec3@@A": "?g_ObstacleDebugUpperLine@@3PAUVector3@@A",
