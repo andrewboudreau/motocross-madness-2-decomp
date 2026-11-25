@@ -823,7 +823,6 @@ clearly more faithful, the game now links the sample's text:
   | 0x004fc690 | `SoultreeObject::TranslateIn` taking `Vector3` | the `Vec3` form |
   | 0x00505600 | `Grid1Terrain::AcquireOwnedObject` | `Terrain::AcquireOwnedObject` |
   | 0x004210f0 | `EventBikeRaceView::WriteRelativePositions` | `BikeRace` |
-  | 0x00404df0 | `KbTrack::SelectLapGates` | `TrackGameViewOwner` |
   | 0x00404e60, 0x0040ae30, 0x00421cb0, 0x005015b0 | Wrecker and shadow vector call views | `Vec3Call`, `Vec3DotCall`, `Vec3AddCall`, `Vec3ScaleCall` |
   | 0x004da7b0 | `UnknownKrustyUIShadow::Init` | `ProjectedShadow::Init` |
   | 0x004c5f00, 0x004da520 | `ShadowTexture`, `ShadowCameraProxy` constructors | `PCTextureMap`, `ShadowCamera` |

@@ -9,7 +9,6 @@
 #define KRUSTYBIKE_TYPES_H
 
 struct KbRacer;
-struct KbOverlay;
 struct KbSession;
 struct KbPlayer;
 struct KbBody;
@@ -58,14 +57,9 @@ struct KbGate {
 // tier 3.  KrustyBike+0x838 holds one; 0x00414370 rebuilds it every frame.
 #include "KrustyBikeRecords.h"
 
-// Object reached through the global at 0x0056E26C (game/session singleton).
+// 0x18-byte gate records of the Baja/Enduro owner (TrackGame::bajaEnduroEvent): [lapGate + 9]
+// is gates[lapGate] at +0xd8 (tier 2 offsets, view name).
 struct KbTrackRec { Vec3 position; char pad_0x0C[0xC]; };
-struct KbMode { char pad_0x00[0x94]; int GetSelectedSeries(); };
-struct KbGameCfg {
-    char pad_0x0000[0x10]; int isHost;  // +0x10 NetworkInterface::isHost (Net.h)
-    // 0x004AC830 (Net.cpp): send a message (type, data, size, destination id, flags); returns 1 on success.
-    int Send(int type, void* data, int size, int dest, int flags);
-};
 // Object behind KrustyBike+0x13fc (tier 3); 0x004E8720 appends a record (type, id, data, flag).
 struct KbRecorder { int QueueRecord(int type, int id, void* data, int flag); };
 // Entity-level view used for the id at +0x11bc of any bike (tier 3, offset confirmed by decoded loads).
@@ -163,101 +157,6 @@ struct KbBikeDeltaMessage {
 struct KbNetPacket { int header; char request; char pad_0x5[3]; int followedRacerId; };
 // On-screen message object (0x8C bytes; ctor 0x0051B200 takes the text and a display time).
 struct KbMessage { char data[0x8C]; KbMessage(const char* text, float seconds); };
-// The debug overlay at KbGame+0x38 (src/reconstructed DebugOverlay: 0x00447fa0 names a page
-// line block, 0x00447f40 prints a line; both cdecl varargs members).
-struct KbOverlay {
-    void Title(int line, const char* format, ...);   // 0x00447fa0
-    void Print(int line, const char* format, ...);   // 0x00447f40
-    char pad_0x0000[0x26c0];
-    int lineCount;   // 0x26C0: next free line block
-};
-// 0x70-byte records behind KbGame+0x33fc (TrackGame.h ControlSetup: currentDevice
-// at +0, then assignments[8][14] of 8 bytes, one 0x70-byte row per device).  0x0048fc80 reads
-// records[records[0].currentDevice].throttleCode = assignments[currentDevice][4].code, the
-// row DeviceSetup.cpp binds to the throttle axis (tier 2 offsets, view names).
-struct KbTrackEntry {
-    int currentDevice;           // +0x00 (meaningful in records[0] only)
-    char pad_0x04[0x24];
-    int throttleCode;            // +0x28 assignments[this row][4].code
-    char pad_0x2C[0x70 - 0x2c];
-};
-struct KbGame {
-    // The game object is polymorphic: 0x0048fc80 calls slot 20 (vtable +0x50) with a setting
-    // name and a default and stores the int result (tier 1 slot, tier 3 names).
-    virtual void UnknownVirtualSlot0();
-    virtual void Startup();
-    virtual void Initialize();
-    virtual void OpenResources();
-    virtual void CreateGameObjects();
-    virtual void OnActivate();
-    virtual void OnDeactivate();
-    virtual void SetRenderStates();
-    virtual void RenderFrame();
-    virtual void PresentFrame();
-    virtual void Tick();
-    virtual void SetInputSuspended();
-    virtual void OnInputEvent();
-    virtual void OnControlRelease();
-    virtual void OnControlPress();
-    virtual void Shutdown();
-    virtual void CreateNetworkInterface();
-    virtual void OnNetworkMessage();
-    virtual void FindDataFile();
-    virtual void SwitchDisplayMode();
-    virtual int GetRegistryInt(const char* name, int defaultValue);
-    void GetStringText(int id, char* buffer, int size);   // 0x00521970: fetch text for a string id
-    char pad_0x0004[0x4];
-    KbGameCfg* network;  // +0x8  Game +0x8 network (NetworkInterface); set in network games, KrustyBike sends its packets through it
-    char pad_0x000C[0xC];
-    int playerCount;  // +0x18  Game +0x18 playerCount
-    char pad_0x001C[0x1c];
-    KbOverlay* debugOverlay;  // +0x38  Game +0x38 debugOverlay (0 when off)
-    char pad_0x003C[0x2f0 - 0x3c];
-    float frameTime;  // +0x2F0  Game +0x2f0 frameTime (seconds)
-    char pad_0x02F4[0x560 - 0x2f4];
-    KbTrackRec* bajaEnduroEvent;  // +0x560  TrackGame +0x560 bajaEnduroEvent (TrackGameViewOwner): [lapGate + 9] is gates[lapGate] at +0xd8, +0xac the gate count
-    char pad_0x0564[0x4];
-    KbRacer* tagEvent;  // +0x568  TrackGame +0x568 tagEvent (event type 4); its +0xa8 is compared with the bike
-    char pad_0x056C[0x4];
-    KbSession* eventManager;  // +0x570  TrackGame +0x570 eventManager (FindRaceMode/FindTextQueue)
-    char pad_0x0574[0x4];
-    KbMode mode;  // +0x578  TrackGame +0x578 mode (TrackGameMode; only the first 0x94 bytes are modelled here)
-    int difficulty;  // +0x60C  TrackGame mode.difficulty (+0x578 + 0x94)
-    char pad_0x0610[0x640];
-    int wreckResetOnTrack; // +0xC50 TrackGame mode.wreckResetOnTrack (+0x578 + 0x6d8, ChkWreckResetOnTrack)
-    char pad_0x0C54[0x38C];
-    int steeringSlider;                       // +0xFE0  OptionProcs.h UnknownOptControlSettings (TrackGame+0xfe0) +0x00: SteeringSlider
-    int crossupSlider;                        // +0xFE4  UnknownOptControlSettings +0x04: CrossupSlider
-    int pitchSlider;                          // +0xFE8  UnknownOptControlSettings +0x08: PitchSlider
-    int pressThrottleSlider;                  // +0xFEC  UnknownOptControlSettings +0x0c: PressThrottleSlider
-    int pressBrakesSlider;                    // +0xFF0  UnknownOptControlSettings +0x10: PressBrakesSlider
-    int releaseThrottleSlider;                // +0xFF4  UnknownOptControlSettings +0x14: ReleaseThrottleSlider
-    int releaseBrakesSlider;                  // +0xFF8  UnknownOptControlSettings +0x18: ReleaseBrakesSlider
-    int feedbackSlider;                       // +0xFFC  UnknownOptControlSettings +0x1c: FeedbackSlider
-    char pad_0x1000[0x1D70];
-    int raceMode;  // +0x2D70  TrackGame mode.raceSettings.raceMode (+0x578 + 0x27f8)
-    int eventType;  // +0x2D74  TrackGame mode.raceSettings.eventType: 3 SX, 4 Tag
-    char pad_0x2D78[0xC];
-    int riderCollision;  // +0x2D84  TrackGame mode.raceSettings.riderCollision
-    char pad_0x2D88[0x2eb8 - 0x2d88];
-    int stuntMode;  // +0x2EB8  TrackGame mode.raceSettings.stuntMode (ChkStuntMode)
-    char pad_0x2EBC[0x3334 - 0x2ebc];
-    int saveReplay;  // +0x3334  TrackGame mode.saveReplay
-    char pad_0x3338[0xC];
-    char steerBinding[0x3c];  // +0x3344  TrackGame +0x3344 steerBinding (LoadBike's steer)
-    char leanBinding[0x3c];  // +0x3380  TrackGame +0x3380 leanBinding (LoadBike's lean)
-    char throttleBinding[0x3c];  // +0x33BC  TrackGame +0x33bc throttleBinding (LoadBike's throttle)
-    char pad_0x33F8[0x4];
-    KbTrackEntry* controlSetup;  // +0x33FC  TrackGame +0x33fc controlSetup
-    char pad_0x3400[0x14];
-    float fullNetPacketIntervalSec; // 0x3414
-    float shortNetPacketIntervalSec; // 0x3418
-    float fullRecordPacketIntervalSec; // 0x341C
-    char pad_0x3420[0x8];
-    int playingReplay;  // +0x3428  TrackGame +0x3428 playingReplay
-    char pad_0x342C[0x3444 - 0x342c];
-    KbBonusTable* proCircuit;  // +0x3444  TrackGame +0x3444 proCircuit (ProCircuit.h)
-};
 // 0x004BFA80: millisecond clock (timeGetTime-based; tier 3).
 unsigned int ReadClock();
 // 0x004B5D00 (cdecl): forward/up axes from yaw, pitch and roll (tier 3 names; 0x00493660
@@ -279,12 +178,6 @@ extern int g_kbAllowNegative;        // 0x0056CB5C
 extern int g_kbInterpolate;          // 0x0056CB60
 extern float g_kbStallThreshold;     // 0x0056CB64  interval time at which slot 50 holds
 extern float g_kbStallHoldSec;       // 0x0056CB68  length of that hold
-// Track view behind KbGame+0x560 (tier 3): checkpoint count at +0xac.
-struct KbTrack {
-    char pad_0x00[0xac];
-    int gateCount;  // +0xac the lap-gate modulus (nextLapGate = (lapGate + 1) % gateCount); RadarGateOwner names +0xac gateCount
-    void SelectLapGates(int gate, int nextGate, KrustyBike* bike); // 0x00404DF0 (TrackGameViewOwner)
-};
 // BikeWheel view for 0x00513560 (tier 3 name).
 struct KbWheel { void SetRollDistance(float d); };
 
@@ -324,7 +217,7 @@ struct KbRacer {
 #include "BikeRaceHandlerView.h"
 // Object at KbRace+0xbc: 0x00495ff0 hands it the trick angle and multiplier.
 struct KbScoreBoard { void ShowValue(float points, float multiplier); };
-// Object at KbGame+0x3444 (bonus rules; packed: its ints sit at odd offsets).
+// Object at TrackGame+0x3444 (proCircuit; bonus rules; packed: its ints sit at odd offsets).
 #pragma pack(push, 1)
 struct KbBonusTable {
     char pad_0x0000[0x40];
@@ -490,7 +383,7 @@ struct KbA5C4 {
 };
 
 
-// Session object at KbGame+0x570; 0x0045D2B0 returns the local player record (tier 3 names).
+// Session object at TrackGame+0x570 (eventManager); 0x0045D2B0 returns the local player record (tier 3 names).
 struct KbMessage;
 struct KbMsgSink { void ReplaceHeadMessage(KbMessage* m); };
 struct KbSession { KbPlayer* FindRaceMode(); KbMsgSink* FindTextQueue(); };

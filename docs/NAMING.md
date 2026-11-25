@@ -305,7 +305,7 @@ message.
 | `KbBikePing` | +0x00 | `field_0x00` | `type` | 2 | Message 10. |
 | `KbBikeDeltaMessage` | +0x00 | `field_0x00` | `type` | 2 | Message 13. |
 | `KbNetDelta` | +0x00 | `field_0x00` | `type` | 2 | Received message 13; `BikeRace` passes the message itself to `ApplyStateDelta`. |
-| `KbTrack` | +0xac | `field_0xac` | `gateCount` | 2 | Modulus of the lap gates (`nextLapGate = (lapGate + 1) % gateCount`). `UnknownRadarGateOwner` and `UnknownBikeRaceNodeOwner` name +0xac `gateCount`. |
+| `KbTrack` | +0xac | `field_0xac` | `gateCount` | 2 | Modulus of the lap gates (`nextLapGate = (lapGate + 1) % gateCount`). `UnknownRadarGateOwner` and `UnknownBikeRaceNodeOwner` name +0xac `gateCount`. Merged into `TrackGame` (bajaEnduroEvent is a `TrackGameViewOwner`; KbGame, KbMode and KbTrack retired). |
 | `UnknownChatMessage` (TrackOverlay.h) | +0x00 | `field_0x00` | `header` | 2 | Message 0x85 (`0x0051db4b`), as `SelectGamePicProcs`' `UnknownChatMessage`. |
 | `UnknownLoadFailedMessage` | +0x00 | `field_0x00` | `header` | 2 | Message 0xcc (`LoadingDlg::Tick`). |
 | `UnknownPlayerStateMessage` | +0x00 | `field_0x00` | `type` | 2 | Message 2 (`0x004f5703`). |
@@ -2980,7 +2980,7 @@ tools/static_check.py passes.
 | BikeQuadTreeHead (Bike.cpp) | `field_0x08` | `objectTypeId` | 2 | The 0xc-byte QuadTreeObject head (+0x04 queryStamp, +0x06 sortKey, +0x08 objectTypeId char); this is the view's +0x08. The int type is kept, and it has no uses. |
 | BikeBodyObj (Bike.cpp) | `field_0x178` | `mass` | 2 | BikeBodyObj is a PhysicsBody view: angularVelocity +0x16c, invMass +0x17c, invInertia +0x1d0, centerOfMass +0x228, node +0x234 and slot 43 GetWorldAngularVelocity all agree. PhysicsBody +0x178 is mass. No uses. |
 | BikeKindInfo (Bike.cpp) | `field_0x24` | `fraction` | 2 | BikeKindParty is a ConstraintMethodCollisionModel, so +0x5c is CollisionObject::contactRecord, a CollisionSweepQuery whose +0x24 is fraction (ApplyContactImpulse's t between prev velocity and velocity); ApplyCollisionEvent case 0x3ea uses it the same way. |
-| KbGame (KrustyBikeTypes.h) | `field_0xc50` | `wreckResetOnTrack` | 2 | KbGame is a TrackGame view (frameTime, bajaEnduroEvent, mode +0x578 and difficulty agree); TrackGame.h names mode +0x6d8 wreckResetOnTrack after the retail string ChkWreckResetOnTrack (Tier 1 backing). FindPlacement 0x00491e31 respawns at the stored position when it is set. |
+| KbGame (KrustyBikeTypes.h) | `field_0xc50` | `wreckResetOnTrack` | 2 | KbGame is a TrackGame view (frameTime, bajaEnduroEvent, mode +0x578 and difficulty agree); TrackGame.h names mode +0x6d8 wreckResetOnTrack after the retail string ChkWreckResetOnTrack (Tier 1 backing). FindPlacement 0x00491e31 respawns at the stored position when it is set. Merged into `TrackGame` (bajaEnduroEvent is a `TrackGameViewOwner`; KbGame, KbMode and KbTrack retired). |
 | KbChild (KrustyBikeTypes.h) | `field_0x4` | `ownerNode` | 2 | The collisionPoints (+0x12c) elements are CollisionPoint objects; CollisionPoint+0x04 is ownerNode. ClearCrashState tests it before clearing the contact. |
 | KbChild (KrustyBikeTypes.h) | `field_0xa4` | `inContact` | 2 | CollisionPoint+0xa4 inContact (SoultreeContact calls it touching, VehicleContact contactActive); ClearCrashState clears it. |
 | CarProceduralNode (CarProcedural.h) | `field_0x08` | `objectTypeId` | 2 | The QuadTreeObject head (+0x08 objectTypeId char); the int type is kept. Merged into `SoultreeObject`. |
