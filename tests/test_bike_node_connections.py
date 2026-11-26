@@ -101,7 +101,7 @@ class BikeNodeConnectionsTests(unittest.TestCase):
                 calls = {obj.symbol_by_index[r.symbol_index].name for r in obj.relocations if r.type == 0x14}
                 self.assertTrue(required <= calls, source)
             probe = objects[fixture]
-            entry = probe.find_symbol('?RiderModel@@YAPAVSoultreeObject@@PAUBikeA5C4@@@Z')
+            entry = probe.find_symbol('?RiderModel@@YAPAVSoultreeObject@@PAVD3DIMSoultreeCharacter@@@Z')
             body, extent, relocations = probe.symbol_extent(entry)
             self.assertEqual(body, bytes.fromhex('8b4424048b80a0010000c3'))
             self.assertEqual(relocations, [])

@@ -67,7 +67,7 @@ class CharacterMotionStartTests(unittest.TestCase):
         self.assertEqual(struct.unpack('<f', retail.bytes_at_va(0x5507f4, 4))[0], 0.5)
 
         # Character is the primary base of the allocated motion receiver, not
-        # the separate virtual GameObject view. No BikeA5C4 alias is changed here.
+        # the separate virtual GameObject view.
         locator, = struct.unpack('<I', retail.bytes_at_va(0x551530-4, 4))
         _, offset, _, descriptor, hierarchy = struct.unpack('<5I', retail.bytes_at_va(locator, 20))
         self.assertEqual(offset, 0)

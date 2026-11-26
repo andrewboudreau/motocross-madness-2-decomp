@@ -36,7 +36,7 @@ int Bike::IsWrecking()
 
 int Bike::CheckMotionComplete()
 {
-    if (crashState == 0 && motionIndex >= 0 && motionActive && riderCharacter->c_0xc)
+    if (crashState == 0 && motionIndex >= 0 && motionActive && riderCharacter->motionStopped)
         return 1;
     return 0;
 }
@@ -312,7 +312,7 @@ void Bike::SimulateFrame(float dt)
 void Bike::RemoveFromRace()
 {
     Vehicle::RemoveFromRace();
-    reinterpret_cast<D3DIMSoultreeObject*>(riderCharacter->c_0x1a0)->ClearScreenRects();
+    ((D3DIMSoultreeObject*)riderCharacter->modelNode)->ClearScreenRects();
 }
 
 void Bike::UpdateAirborneState(int nowAirborne)
@@ -629,13 +629,13 @@ GameObject* Bike::LoadBike(int context, const char* engineName, const char* mode
     crashGraceTime = crashTimerReload - 0.5f;
     ResetDynamicState(loadWeight);
 
-    riderCharacter = (BikeA5C4*)new(__FILE__, 0x583) D3DIMSoultreeCharacter(GameObject::isEnabled);
+    riderCharacter = new(__FILE__, 0x583) D3DIMSoultreeCharacter(GameObject::isEnabled);
     if (!GameObject::AppendChild(
-            ((D3DIMSoultreeCharacter*)riderCharacter)->LoadCharacter(
+            riderCharacter->LoadCharacter(
                 (int)GameObject::renderContext, riderModel, lights, textures, 1, 1), -1))
         riderCharacter = 0;
     if (lights && lights->isEnabled)
-        reinterpret_cast<D3DIMSoultreeObject*>(riderCharacter->c_0x1a0)->SetUseLighting(1);
+        ((D3DIMSoultreeObject*)riderCharacter->modelNode)->SetUseLighting(1);
     if (textures)
         loadTextures = *textures;
     bodyForward = kVec3ZAxis;
@@ -779,7 +779,7 @@ GameObject* Bike::LoadBike(int context, const char* engineName, const char* mode
     }
 
     modelNode->GetMatrixIn(0, &riderMatrix);
-    reinterpret_cast<SoultreeObject*>(riderCharacter->c_0x1a0)->SetMatrixIn(0, &riderMatrix);
+    riderCharacter->modelNode->SetMatrixIn(0, &riderMatrix);
     CreateWrecker();
     steerState->SetAxisFromPoints(frontWheel->sceneNode, handlebars->node, poseNode);
     steerState->SetAngle(0.0f, poseNode);
@@ -804,7 +804,7 @@ GameObject* Bike::LoadBike(int context, const char* engineName, const char* mode
     // rider and of the steering integrator gains (tier 3 reading).
     modelNode->GetSubtreeBounds(&bikeCenter, &bikeExtents);
     float length = bikeExtents.z * 2.0f;
-    reinterpret_cast<SoultreeObject*>(riderCharacter->c_0x1a0)->GetSubtreeBounds(&riderCenter, &riderExtents);
+    riderCharacter->modelNode->GetSubtreeBounds(&riderCenter, &riderExtents);
     float width = riderExtents.x * 2.0f;
     float height = riderExtents.y * 2.0f;
     float h2 = height * height;
@@ -847,23 +847,23 @@ GameObject* Bike::LoadBike(int context, const char* engineName, const char* mode
     ResetToPlacement(&position, &bodyForward, &bodyUp, &kVec3YAxis, 0, loadWeight);
     crashHeading = Vec3(bodyForward.x, 0.0f, bodyForward.z);
 
-    riderPoseHandles[RiderPose_LeanR01] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("LeanR01", 1);
-    riderPoseHandles[RiderPose_LeanR02] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("LeanR02", 1);
-    riderPoseHandles[RiderPose_LeanR03] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("LeanR03", 1);
-    riderPoseHandles[RiderPose_Turn1D] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("Turn1D", 1);
-    riderPoseHandles[RiderPose_Turn1U] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("Turn1U", 1);
-    riderPoseHandles[RiderPose_Turn2D] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("Turn2D", 1);
-    riderPoseHandles[RiderPose_Turn2U] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("Turn2U", 1);
-    riderPoseHandles[RiderPose_Turn3D] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("Turn3D", 1);
-    riderPoseHandles[RiderPose_Turn3U] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("Turn3U", 1);
-    riderPoseHandles[RiderPose_Wheelie] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("Wheelie", 1);
-    riderPoseHandles[RiderPose_CrosOv1] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("CrosOv1", 1);
-    riderPoseHandles[RiderPose_CrosOv2] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("CrosOv2", 1);
-    riderPoseHandles[RiderPose_CrosOv3] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("CrosOv3", 1);
-    riderPoseHandles[RiderPose_LookBack] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("LookBack", 1);
-    riderPoseHandles[RiderPose_Victory] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("Victory", 1);
-    riderPoseHandles[RiderPose_BackUpTop] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("BackUpTop", 1);
-    riderPoseHandles[RiderPose_BackUpBottom] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("BackUpBottom", 1);
+    riderPoseHandles[RiderPose_LeanR01] = (int)riderCharacter->FindMotion("LeanR01", 1);
+    riderPoseHandles[RiderPose_LeanR02] = (int)riderCharacter->FindMotion("LeanR02", 1);
+    riderPoseHandles[RiderPose_LeanR03] = (int)riderCharacter->FindMotion("LeanR03", 1);
+    riderPoseHandles[RiderPose_Turn1D] = (int)riderCharacter->FindMotion("Turn1D", 1);
+    riderPoseHandles[RiderPose_Turn1U] = (int)riderCharacter->FindMotion("Turn1U", 1);
+    riderPoseHandles[RiderPose_Turn2D] = (int)riderCharacter->FindMotion("Turn2D", 1);
+    riderPoseHandles[RiderPose_Turn2U] = (int)riderCharacter->FindMotion("Turn2U", 1);
+    riderPoseHandles[RiderPose_Turn3D] = (int)riderCharacter->FindMotion("Turn3D", 1);
+    riderPoseHandles[RiderPose_Turn3U] = (int)riderCharacter->FindMotion("Turn3U", 1);
+    riderPoseHandles[RiderPose_Wheelie] = (int)riderCharacter->FindMotion("Wheelie", 1);
+    riderPoseHandles[RiderPose_CrosOv1] = (int)riderCharacter->FindMotion("CrosOv1", 1);
+    riderPoseHandles[RiderPose_CrosOv2] = (int)riderCharacter->FindMotion("CrosOv2", 1);
+    riderPoseHandles[RiderPose_CrosOv3] = (int)riderCharacter->FindMotion("CrosOv3", 1);
+    riderPoseHandles[RiderPose_LookBack] = (int)riderCharacter->FindMotion("LookBack", 1);
+    riderPoseHandles[RiderPose_Victory] = (int)riderCharacter->FindMotion("Victory", 1);
+    riderPoseHandles[RiderPose_BackUpTop] = (int)riderCharacter->FindMotion("BackUpTop", 1);
+    riderPoseHandles[RiderPose_BackUpBottom] = (int)riderCharacter->FindMotion("BackUpBottom", 1);
     bikePoseHandles[RiderPose_LeanR01] = bikePoseHandles[RiderPose_LeanR02] = (int)D3DIMSoultreeCharacter::FindMotion("BLeanR02", 1);
     bikePoseHandles[RiderPose_LeanR03] = bikePoseHandles[RiderPose_LeanR02];
     bikePoseHandles[RiderPose_Turn1D] = bikePoseHandles[RiderPose_Turn2D] = (int)D3DIMSoultreeCharacter::FindMotion("BTurn2D", 1);
@@ -882,7 +882,7 @@ GameObject* Bike::LoadBike(int context, const char* engineName, const char* mode
     }
     wrecker->EndWreck();
     D3DIMSoultreeCharacter::ApplyMotionAtPhase(bikePoseHandles[RiderPose_LeanR02], 0.5f);
-    reinterpret_cast<Character*>(riderCharacter)->ApplyMotionAtPhase(riderPoseHandles[RiderPose_LeanR02], 0.5f);
+    riderCharacter->ApplyMotionAtPhase(riderPoseHandles[RiderPose_LeanR02], 0.5f);
     verticalAccelSmoother->Reset(fixedStepTime * 7.0f);
     forwardAccelSmoother->Reset(0.5f);
     steerAxis = new(__FILE__, 0x7df) BikeA640(frontWheel->restLoadWeight, fixedStepTime * 6.3f);
@@ -900,7 +900,7 @@ int Bike::ResetToPlacement(const Vec3* newPosition, const Vec3* newForward, cons
     int mode = wrecker->wreckState;
     if (mode == 0 || mode == 1) {
         modelNode->GetMatrixIn(0, &tmp);
-        reinterpret_cast<SoultreeObject*>(riderCharacter->c_0x1a0)->SetMatrixIn(0, &tmp);
+        riderCharacter->modelNode->SetMatrixIn(0, &tmp);
     }
     wrecker->collisionModel->SnapPlacement();
     return result;
@@ -1096,7 +1096,7 @@ void Bike::SaveBodyOrientation(int)
     if (mode == 0 || mode == 1) {
         Matrix4 tmp;
         modelNode->GetMatrixIn(0, &tmp);
-        reinterpret_cast<SoultreeObject*>(riderCharacter->c_0x1a0)->SetMatrixIn(0, &tmp);
+        riderCharacter->modelNode->SetMatrixIn(0, &tmp);
     }
 }
 
@@ -1174,14 +1174,14 @@ void Bike::UpdateRiderPose(float)
         cnt += 2;
     }
     float blend = 1.0f - poseBlend;
-    reinterpret_cast<Character*>(riderCharacter)->ApplyMotionBlendAtPhase(riderPoseHandles[idx],
+    riderCharacter->ApplyMotionBlendAtPhase(riderPoseHandles[idx],
                                                                     riderPoseHandles[next], poseParam, blend);
     D3DIMSoultreeCharacter::ApplyMotionBlendAtPhase(bikePoseHandles[idx], bikePoseHandles[next], poseParam, blend);
     int mode = wrecker->wreckState;
     if (mode == 0 || mode == 1) {
         Matrix4 tmp;
         modelNode->GetMatrixIn(0, &tmp);
-        reinterpret_cast<SoultreeObject*>(riderCharacter->c_0x1a0)->SetMatrixIn(0, &tmp);
+        riderCharacter->modelNode->SetMatrixIn(0, &tmp);
     }
 }
 

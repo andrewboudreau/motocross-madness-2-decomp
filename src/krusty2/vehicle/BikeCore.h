@@ -4,7 +4,6 @@
 #include "VehicleCore.h"
 #include "../../reconstructed/TextureLoader.h"
 
-struct BikeA5C4;
 struct BikeA5F8;
 class MovingPart;
 struct BikeA640;
@@ -128,7 +127,7 @@ public:
 
     int gasGyro;  // +0x5BC  0 from the constructor, LoadBike's gasGyroOption: TrackGameMode gasGyro (key 0x22, reset 0)
     int brakeGyro;  // +0x5C0  1 from the constructor, LoadBike's brakeGyroOption: TrackGameMode brakeGyro (key 0x30, reset 1)
-    BikeA5C4* riderCharacter;  // +0x5c4 slot 8/89 (0x406ae0): calls ApplyMotionBlendAtPhase(poseA, poseB, poseParam, w) on it and riderCharacter->c_0x1a0 scene node; slot 97 passes it with "rider.col" to the 0x604 object
+    D3DIMSoultreeCharacter* riderCharacter;  // +0x5c4 slot 8/89 (0x406ae0): calls ApplyMotionBlendAtPhase(poseA, poseB, poseParam, w) on it and riderCharacter->c_0x1a0 scene node; slot 97 passes it with "rider.col" to the 0x604 object
     TextureContext loadTextures;  // +0x5c8 copy of LoadBike's textures (when given), which it also passes to LoadVehicle and the rider's LoadCharacter
     char riderName[16];           // +0x5e0 ctor strcpy from global 0x00577738 (empty string in the image); tier 3 name
     BikeWheel* frontWheel;       // +0x5f0 front wheel (largest config z, see 0x4079c0 loop at 0x408705); tier 3

@@ -371,14 +371,6 @@ extern int g_kbPadActive;   // 0x0067C3AC
 
 // Views of the rider-animation objects behind Bike+0x5c4 and Bike+0x604 (tier 3 names).
 struct KbAnim;
-struct KbA5C4 {
-    char pad_0x00[0x10];
-    int motionTime; // +0x10  Character/D3DIMSoultreeCharacter motionTime (the motion clock)
-    KbAnim* FindMotion(const char* name, int unused);
-    void SetMotion(int a);
-    void ApplyMotionAtPhase(int handle, float phase); // 0x004A8BF0 (ret 8): Character::ApplyMotionAtPhase
-    void ApplyRestPose();               // 0x004A8B00 (Character::ApplyRestPose)
-};
 
 
 // Session object at TrackGame+0x570 (eventManager); 0x0045D2B0 returns the local player record (tier 3 names).

@@ -3,7 +3,7 @@
 #ifdef PHYSICS_VIEW
 #include "../../src/krusty2/vehicle/Bike.h"
 #include "../../src/krusty2/soultree/SoultreePhysicsObject.h"
-CHECK(character_model, offsetof(BikeA5C4, c_0x1a0) == 0x1a0);
+CHECK(character_model, offsetof(D3DIMSoultreeCharacter, modelNode) == 0x1a0);
 CHECK(bike_rider, offsetof(Bike, riderCharacter) == 0x5c4);
 CHECK(vehicle_model, offsetof(Vehicle, modelNode) == 0x3bc);
 extern "C" int PhysicsModelBase() {
