@@ -745,12 +745,12 @@ GameObject* Bike::LoadBike(int context, const char* engineName, const char* mode
     centerNode = modelNode->FindByName("NullFrame");
 
     if (particleManager) {
-        dustEmitter = reinterpret_cast<BikeDustEmitter*>(new(__FILE__, 0x70f) DustParticleEmitter(1));
-        GameObject::AppendChild((GameObject*)dustEmitter->Create(GameObject::renderContext, particleManager), -1);
-        dirtChunkEmitter = reinterpret_cast<BikeDirtChunkEmitter*>(new(__FILE__, 0x710) DirtChunkParticleEmitter(1));
-        GameObject::AppendChild((GameObject*)dirtChunkEmitter->Create(GameObject::renderContext, particleManager), -1);
-        steamEmitter = reinterpret_cast<BikeSteamEmitter*>(new(__FILE__, 0x711) SteamParticleEmitter(1));
-        GameObject::AppendChild((GameObject*)steamEmitter->Create(GameObject::renderContext, particleManager), -1);
+        dustEmitter = new(__FILE__, 0x70f) DustParticleEmitter(1);
+        GameObject::AppendChild((GameObject*)dustEmitter->Create(GameObject::renderContext, (ParticleManager*)particleManager), -1);
+        dirtChunkEmitter = new(__FILE__, 0x710) DirtChunkParticleEmitter(1);
+        GameObject::AppendChild((GameObject*)dirtChunkEmitter->Create(GameObject::renderContext, (ParticleManager*)particleManager), -1);
+        steamEmitter = new(__FILE__, 0x711) SteamParticleEmitter(1);
+        GameObject::AppendChild((GameObject*)steamEmitter->Create(GameObject::renderContext, (ParticleManager*)particleManager), -1);
         steamEmitter->emitting = 1;
     }
 
@@ -1989,9 +1989,9 @@ void Bike::ApplyCollisionEvent(int notify, int eventKind, void* event)
                 impulseScale = 1.0f;
         }
         if (particleManager && (particleManager->isEnabled)) {
-            reinterpret_cast<SparkParticleEmitter*>(sparkEmitter)->SetPosition(
+            sparkEmitter->SetPosition(
                 reinterpret_cast<const ParticleVec3&>(((BikeContactSet*)collisionObject)->hitPoint));
-            sparkEmitter->launchVelocity = Vec3(0.0f, 12.0f, 0.0f);
+            sparkEmitter->launchVelocity = ParticleVec3(0.0f, 12.0f, 0.0f);
             sparkEmitter->burstPending = 1;
         }
         break;
@@ -2016,9 +2016,9 @@ void Bike::ApplyCollisionEvent(int notify, int eventKind, void* event)
         angScale = Vec3(1.0f, 1.0f, 1.0f);
         hasBody = 0;
         if (particleManager && (particleManager->isEnabled)) {
-            reinterpret_cast<SparkParticleEmitter*>(sparkEmitter)->SetPosition(
+            sparkEmitter->SetPosition(
                 reinterpret_cast<const ParticleVec3&>(((BikeContactSet*)collisionObject)->hitPoint));
-            sparkEmitter->launchVelocity = Vec3(0.0f, 12.0f, 0.0f);
+            sparkEmitter->launchVelocity = ParticleVec3(0.0f, 12.0f, 0.0f);
             sparkEmitter->burstPending = 1;
         }
         break;

@@ -1235,9 +1235,9 @@ void Vehicle::ApplyCollisionEvent(int notify, int eventKind, void* event)
         angScale = VehOnes();
         hasBody = 0;
         if (particleManager && (particleManager->isEnabled)) {
-            reinterpret_cast<SparkParticleEmitter*>(sparkEmitter)->SetPosition(
+            sparkEmitter->SetPosition(
                 reinterpret_cast<const ParticleVec3&>(((VehicleContactSet*)collisionObject)->contactPoint));
-            sparkEmitter->launchVelocity = Vec3(0.0f, 12.0f, 0.0f);
+            sparkEmitter->launchVelocity = ParticleVec3(0.0f, 12.0f, 0.0f);
             sparkEmitter->burstPending = 1;
         }
         break;
@@ -2106,9 +2106,8 @@ GameObject* Vehicle::LoadVehicle(int context, const char* engineName, const char
                                                    trackObject ? ((VehicleTrackView*)trackObject)->probeMask : 0,
                                                    createCollision);
     if (particleManager) {
-        sparkEmitter = reinterpret_cast<VehicleSparkEmitter*>(
-            new(__FILE__, 0x1dc) SparkParticleEmitter(1));
-        GameObject::AppendChild((GameObject*)sparkEmitter->Create(renderContext, particleManager), -1);
+        sparkEmitter = new(__FILE__, 0x1dc) SparkParticleEmitter(1);
+        GameObject::AppendChild((GameObject*)sparkEmitter->Create(renderContext, (ParticleManager*)particleManager), -1);
     }
     steerState = new(__FILE__, 0x1e0) VehicleSteerState(steerScale, controlResponse[0], &startForward, &startUp);
     Vec3 down = startUp * -1.0f;

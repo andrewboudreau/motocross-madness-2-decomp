@@ -191,30 +191,6 @@ struct VehicleAxis {                 // objects at Vehicle+0x4f8/0x4fc/0x500 (pr
     char pad_0x04[0x20];
     float axisValue;                // +0x24 axis value (slot 63 reads it)
 };
-// Object at Vehicle+0x5ac: the SparkParticleEmitter (vtable 0x00555c1c, ctor 0x004b9830,
-// 0x60c bytes; src/reconstructed/ParticleEmitters.h).  LoadVehicle builds it and hands the
-// result of its virtual slot 27 to GameObject::AppendChild; the impact handlers view
-// it as VehicleImpactSink.  Provisional view; Vehicle and Bike slot 38 store (0, 12, 0) at +0x78 and
-// set +0x60 after SetPosition, matching SparkParticleEmitter::launchVelocity / burstPending.
-struct VehicleSparkEmitter {
-    explicit VehicleSparkEmitter(int flags);
-    virtual void UnknownVirtualSlot0(); virtual void AddRef(); virtual void Release();
-    virtual void GetRefCount(); virtual void Disable(); virtual void Enable();
-    virtual void OnDisable(); virtual void OnEnable(); virtual void SetRenderContext();
-    virtual void PreTick(); virtual void Tick(); virtual void Step();
-    virtual void PrepareGeometry(); virtual void RenderPre3D(); virtual void Render3D();
-    virtual void RenderPost3D(); virtual void SetPaused(); virtual void OnDeactivate();
-    virtual void OnActivate(); virtual void OnInputEvent(); virtual void OnChar();
-    virtual void OnKeyDown(); virtual void OnControlRelease(); virtual void OnControlPress();
-    virtual void OnNetworkMessage(); virtual void AttachRenderContext(); virtual void MarkPendingRelease();
-    virtual void* Create(void* a, GameObject* manager);
-    void SetPosition(Vec3 p);        // 0x004b9dc0 (SparkParticleEmitter::SetPosition)
-    char pad_0x04[0x5c];
-    int burstPending;  // +0x60  SparkParticleEmitter +0x60 burstPending; Bike slot 38 and the Vehicle impact handler set it to 1 after SetPosition
-    char pad_0x64[0x14];
-    Vec3 launchVelocity;             // +0x78 SparkParticleEmitter::launchVelocity; Bike slot 38 stores (0, 12, 0)
-    char pad_0x84[0x588];            // 0x60c bytes (LoadVehicle's allocation)
-};
 // The track object (SoultreeSlot1f0) as LoadVehicle reads it: only the byte at +0x88, forwarded
 // to the base loader's a20.
 struct VehicleTrackView {

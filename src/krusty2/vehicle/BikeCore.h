@@ -9,9 +9,9 @@ struct BikeA5F8;
 class MovingPart;
 struct BikeA640;
 struct BikeA644;
-struct BikeDirtChunkEmitter;
-struct BikeDustEmitter;
-struct BikeSteamEmitter;
+class DirtChunkParticleEmitter;
+class DustParticleEmitter;
+class SteamParticleEmitter;
 struct BikeWheel;
 class Wrecker;
 
@@ -171,9 +171,9 @@ public:
     float wobbleOffset;  // +0x71c slot 91 wobble: added into angularVelocity.z, decays *0.9 per frame, reloaded from angularVelocity.z on flip/slot 71
     int wobbleStage;  // +0x720 slot 91 wobble: cycles 1..2 on each sign flip, loop active only while 1..2; slot 71 sets to 1
     float leanSpeedThreshold;                 // +0x724  32.0; slot 57 returns savedRoll as the lean while not crashed and prevSpeed is below it (provisional)
-    BikeDustEmitter* dustEmitter;  // +0x728  BikeDustEmitter built by the loader (Bike.cpp new line 0x70f), attached as type 1 on the rear wheel
-    BikeDirtChunkEmitter* dirtChunkEmitter;  // +0x72C  BikeDirtChunkEmitter built by the loader (line 0x710), attached as type 2 on the rear wheel
-    BikeSteamEmitter* steamEmitter;  // +0x730  BikeSteamEmitter built by the loader (line 0x711), attached as type 4 at (0, 2.5, -2.75); own data ends at 0x734, the compiler places the vtordisp there
+    DustParticleEmitter* dustEmitter;  // +0x728  built by the loader (Bike.cpp new line 0x70f), attached as type 1 on the rear wheel
+    DirtChunkParticleEmitter* dirtChunkEmitter;  // +0x72C  built by the loader (line 0x710), attached as type 2 on the rear wheel
+    SteamParticleEmitter* steamEmitter;  // +0x730  built by the loader (line 0x711), attached as type 4 at (0, 2.5, -2.75); own data ends at 0x734, the compiler places the vtordisp there
 };
 
 typedef char bike_assert_sizeof[(sizeof(Bike) == 0x738 + 0x2c) ? 1 : -1];

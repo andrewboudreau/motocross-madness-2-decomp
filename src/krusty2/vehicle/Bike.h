@@ -42,36 +42,6 @@ struct BikeA38;
 // (tier 3: contents unknown, only the whole-block copy is decoded).
 #include "../../reconstructed/TextureLoader.h"
 
-// Particle emitters the loader hangs on the bike (src/reconstructed/ParticleEmitters.h:
-// Dust 0x80 bytes, DirtChunk 0x608, Steam 0x47c).  Provisional views: the constructor, the
-// GameObject-shaped virtual slot 27 that returns the child to register, and Steam's +0x60 flag.
-struct BikeParticleEmitterView {
-    virtual void UnknownVirtualSlot0(); virtual void AddRef(); virtual void Release();
-    virtual void GetRefCount(); virtual void Disable(); virtual void Enable();
-    virtual void OnDisable(); virtual void OnEnable(); virtual void SetRenderContext();
-    virtual void PreTick(); virtual void Tick(); virtual void Step();
-    virtual void PrepareGeometry(); virtual void RenderPre3D(); virtual void Render3D();
-    virtual void RenderPost3D(); virtual void SetPaused(); virtual void OnDeactivate();
-    virtual void OnActivate(); virtual void OnInputEvent(); virtual void OnChar();
-    virtual void OnKeyDown(); virtual void OnControlRelease(); virtual void OnControlPress();
-    virtual void OnNetworkMessage(); virtual void AttachRenderContext(); virtual void MarkPendingRelease();
-    virtual void* Create(void* a, GameObject* manager);
-};
-struct BikeDustEmitter : BikeParticleEmitterView {
-    explicit BikeDustEmitter(int flags);        // 0x004b8a00
-    char pad_0x04[0x7c];                        // 0x80 bytes (`new(__FILE__, 0x70f)`)
-};
-struct BikeDirtChunkEmitter : BikeParticleEmitterView {
-    explicit BikeDirtChunkEmitter(int flags);   // 0x004b8df0
-    char pad_0x04[0x604];                       // 0x608 bytes (`new(__FILE__, 0x710)`)
-};
-struct BikeSteamEmitter : BikeParticleEmitterView {
-    explicit BikeSteamEmitter(int flags);       // 0x004b9f40
-    char pad_0x04[0x5c];
-    int emitting;  // +0x60  SteamParticleEmitter +0x60 emitting; the loader sets it to 1
-    char pad_0x64[0x418];                       // 0x47c bytes (`new(__FILE__, 0x711)`)
-};
-
 // Objects reached through Bike fields.  Layout is only known where accessed.
 // Frame object at BikeWheel+0x1c0 (provisional): only the vector at +0xc is read.
 struct BikeWheelFrame {

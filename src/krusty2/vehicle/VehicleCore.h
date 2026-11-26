@@ -6,10 +6,10 @@
 #define VEH_CHECK_OFFSET(cls, member, off) \
     typedef char veh_assert_##member##_##off[(offsetof(cls, member) == (off)) ? 1 : -1]
 
+class SparkParticleEmitter;
 struct VehicleAxis;
 struct VehicleInputMap;
 struct VehicleSmoother;
-struct VehicleSparkEmitter;
 struct VehicleSpeedState;
 struct VehicleTicker;
 struct VehicleWheel;
@@ -257,7 +257,7 @@ public:
     int wheelPointInContact;  // +0x5A0 UpdateWheelsInContact (0x00529a20) sets it when any in-contact wheel's pointInContact (+0x15c) is set
     int anyWheelInContact;  // +0x5a4 slot 49: = (wheelsInContact != 0)
     int allWheelsInContact;  // +0x5a8 slot 49: = (wheelsInContact == wheelCount)
-    VehicleSparkEmitter* sparkEmitter;  // +0x5AC  VehicleSparkEmitter built by LoadVehicle (Vehicle.cpp line 0x1dc); impact handlers cast it to VehicleImpactSink
+    SparkParticleEmitter* sparkEmitter;  // +0x5AC  SparkParticleEmitter built by LoadVehicle (Vehicle.cpp line 0x1dc); impact handlers cast it to VehicleImpactSink
     float prevThrottleFraction;               // +0x5B0  slot 21 copies engineState->throttleFraction here; KrustyBike's tests compare it with the current throttle fraction (rising/falling)
     int prevCrashState;  // +0x5b4 slot 49 stores crashState there at the end of each step; slots 1/67 clear it
     char pad_0x5B8[0x4];      // own data ends at 0x5bc; the compiler places the vtordisp there

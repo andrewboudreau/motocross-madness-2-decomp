@@ -97,12 +97,10 @@ class ParticleEmitterConnections(unittest.TestCase):
    self.assertEqual(sorted(calls.values()),[1,1,1,1,3])
    layout=out/'layout.cpp'
    layout.write_text('#include "vehicle/Bike.h"\n#include "ParticleEmitters.h"\n#include <stddef.h>\n'
-    'typedef char L[(sizeof(BikeDustEmitter)==sizeof(DustParticleEmitter) && sizeof(DustParticleEmitter)==0x80 && '
-    'sizeof(BikeDirtChunkEmitter)==sizeof(DirtChunkParticleEmitter) && sizeof(DirtChunkParticleEmitter)==0x608 && '
-    'sizeof(BikeSteamEmitter)==sizeof(SteamParticleEmitter) && sizeof(SteamParticleEmitter)==0x47c && '
-    'sizeof(VehicleSparkEmitter)==sizeof(SparkParticleEmitter) && sizeof(SparkParticleEmitter)==0x60c && '
-    'offsetof(VehicleSparkEmitter,burstPending)==offsetof(SparkParticleEmitter,burstPending) && '
-    'offsetof(VehicleSparkEmitter,launchVelocity)==offsetof(SparkParticleEmitter,launchVelocity) && sizeof(Vec3)==sizeof(ParticleVec3))?1:-1];\n')
+    'typedef char L[(sizeof(DustParticleEmitter)==0x80 && sizeof(DirtChunkParticleEmitter)==0x608 && '
+    'sizeof(SteamParticleEmitter)==0x47c && offsetof(SteamParticleEmitter,emitting)==0x60 && '
+    'sizeof(SparkParticleEmitter)==0x60c && offsetof(SparkParticleEmitter,burstPending)==0x60 && '
+    'offsetof(SparkParticleEmitter,launchVelocity)==0x78 && sizeof(Vec3)==sizeof(ParticleVec3))?1:-1];\n')
    compile_source(str(layout),'layout')
    helper=out/'helper.cpp';helper.write_text('#include "ParticleEmitters.h"\n'+extract((ROOT/'src/reconstructed/SparkParticleEmitter.cpp').read_text(),'void SparkParticleEmitter::SetPosition(')+'\n')
    obj=compile_source(str(helper),'helper');symbol='?SetPosition@SparkParticleEmitter@@QAEXUParticleVec3@@@Z'
