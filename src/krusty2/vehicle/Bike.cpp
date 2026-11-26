@@ -9,6 +9,7 @@
 #include "collision/CollisionPoint.h"
 #include "broadphase/Terrain.h"
 #include "../../reconstructed/Wrecker.h"
+#include "../../reconstructed/TrackGame.h"
 #include "../../reconstructed/Suspension.h"
 #include "../../reconstructed/ParticleEmitters.h"
 #include "../../reconstructed/LightEmitter.h"
@@ -989,7 +990,7 @@ int Bike::ApplyPendingRespawn(float dt)
         return result;
     if (crashState) {
         if (crashTimer != 0.0f && wrecker->hadContact) {
-            crashTimer -= reinterpret_cast<BikeGlobal_0056e26c*>(g_TrackGame)->g_0x2f0;
+            crashTimer -= g_TrackGame->frameTime;
             if (crashTimer > crashGraceTime) {
                 wrecker->hadContact = 0;
             } else if (crashTimer <= 0.0f) {

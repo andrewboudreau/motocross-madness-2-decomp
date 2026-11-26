@@ -135,8 +135,6 @@ struct BikeA644 {
 // The scene node (d3d_field_0x1a0, poseNode, SoultreeObject::firstChild) is SoultreeObject
 // (../common/SoultreeObject.h).
 
-struct BikeGlobal_0056e26c { char pad_0x000[0x2f0]; float g_0x2f0; };
-
 // Bike.cpp uses its Math3D header-local kVec3Zero, initialized at 0x00407890.
 
 #include "BikeCore.h"
