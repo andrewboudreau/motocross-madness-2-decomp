@@ -37,7 +37,6 @@ static void Prepare(){
      if(scenario.family==1){x=n==0?3.0f:0;y=z=0;}
      if(scenario.family==2){x=y=z=0;}
      if(scenario.family==8){x=n==0?1.0f:0;y=z=0;}
-     if(scenario.family==8){x=n==0?1.0f:0;y=z=0;}
      if(scenario.family==3){x=n?0:Bits(0x3f800001);y=n?0:Bits(0x33800000);z=n?0:Bits(0x33000000);}
      if(scenario.family==4){x=(n&1?-1:1)*Bits(0x71800000);y=(n&1?1:-1)*Bits(0x6f123456);z=(n&1?-1:1)*Bits(0x70fedcba);}
      if(scenario.family==5){x=Bits(1+(seed&255));y=Bits(0x80000100+(seed&511));z=Bits(0x00001000+(seed&1023));}
@@ -108,8 +107,6 @@ int main(int argc,char**argv){if(argc!=2||!MapReference(argv[1]))return 3;
    if(observed.exception||Shock()->axis.x!=1.0f||Shock()->axis.y!=0||Shock()->axis.z!=0||Shock()->axisLength!=3.0f||Shock()->minLength!=values[minimum]||!Node(0)->worldValid||!Node(1)->worldValid)ExitProcess(90);
    if(memcmp(world.shock,initial.shock,16+0xc0)||memcmp(world.shock+16+0xd8,initial.shock+16+0xd8,16))ExitProcess(91);
  }
- ResetScenario();scenario.family=8;scenario.minimum=4;scenario.precision=_PC_64;Compare();
- if(observed.exception||Shock()->axis.x!=1.0f||Shock()->axis.y!=0||Shock()->axis.z!=0||Shock()->axisLength!=1.0f||Shock()->minLength!=1.0f)ExitProcess(93);
  ResetScenario();scenario.family=8;scenario.minimum=4;scenario.precision=_PC_64;Compare();
  if(observed.exception||Shock()->axis.x!=1.0f||Shock()->axis.y!=0||Shock()->axis.z!=0||Shock()->axisLength!=1.0f||Shock()->minLength!=1.0f)ExitProcess(93);
  ResetScenario();scenario.family=1;scenario.guardTarget=3;scenario.validBytes=0xc4;scenario.precision=_PC_64;Compare();

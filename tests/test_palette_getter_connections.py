@@ -17,11 +17,11 @@ from tools.run_calibration import CASES
 from test_edit_box_on_char import extract
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCES = ('src/reconstructed/Pixtrans.cpp', 'samples/render/PixtransNearMisses.cpp')
-FILENAMES = ()
+SOURCES = ('src/reconstructed/Pixtrans.cpp',)
+FILENAMES = SOURCES
 PROOFS = ('src/reconstructed/Quantize.cpp', 'src/reconstructed/Palette8.cpp',
-          'src/reconstructed/TextureMap.cpp', 'src/reconstructed/PCTextureMap.cpp')
-RENAMES = {'?GetIndexFrom%s@UnknownTexturePalette@@QAEPAEXZ' % n:
+          'src/reconstructed/Texmap.cpp', 'src/reconstructed/PCTextureMap.cpp')
+RENAMES = {'?GetIndexFrom%s@TextureColorMapperView@@QAEPAEXZ' % n:
            '?GetIndexFrom%s@ColorMapper@@QAEPAEXZ' % n for n in ('555', '565')}
 NATIVE = ((SOURCES[0], 'int Convert24To8(', '?Convert24To8@@', 0x4d0aa0, 232),
           (SOURCES[0], 'int Convert565To8(', '?Convert565To8@@', 0x4d0b90, 171),
@@ -29,7 +29,7 @@ NATIVE = ((SOURCES[0], 'int Convert24To8(', '?Convert24To8@@', 0x4d0aa0, 232),
           (PROOFS[0], 'unsigned char* ColorMapper::GetIndexFrom565(', '?GetIndexFrom565@ColorMapper@@', 0x4de290, 7))
 
 
-def whole_object(obj, roots=()):
+def whole_object(obj, roots=(ROOT,)):
     """Keep all nondebug contents; normalize only the enumerated source paths."""
     sections = [s for s in obj.sections if not s.name.startswith('.debug')]
     prefixes = [str(root).replace('\\', '/') + '/' for root in roots]
@@ -133,7 +133,7 @@ class PaletteGetterConnections(unittest.TestCase):
             code=decode(va,size)
             self.assertEqual([at for at,op in code.items() if op==('call',hex(target))],sites)
             self.assertEqual(code[va+4],('mov','ecx, dword ptr [esp + 0x20]'))
-        # Sample receivers are the unchanged seventh/eleventh caller arguments.
+        # The halver's and ditherer's receivers are the unchanged seventh/eleventh caller arguments.
         for va,size,expected_ops in (
             (0x4cee30,41,{0x4cee34:('mov','ebx, dword ptr [esp + 0x68]'),
                            0x4cee52:('mov','ecx, ebx'),0x4cee54:('call','0x4de280')}),
@@ -179,7 +179,7 @@ class PaletteGetterConnections(unittest.TestCase):
                     found.extend((entry.name,r.virtual_address-entry.value,obj.symbol_by_index[r.symbol_index].name)
                                  for r in relocs if obj.symbol_by_index[r.symbol_index].name in RENAMES.values())
                 self.assertEqual(sorted(set(found)),sorted((r['caller'],r['offset'],r['callee'])for r in rows))
-            # Whole sample pins above include every complete nonexact body, not selected windows.
+            # The whole-object pin above includes every complete nonexact body, not selected windows.
             native=output/'providers.cpp'
             native.write_text('#include "Pixtrans.h"\n#include "TextureMap.h"\n#include "Quantize.h"\n'+
                               '\n'.join(extract((ROOT/src).read_text(),sig)for src,sig,_,_,_ in NATIVE)+'\n')
@@ -192,7 +192,7 @@ class PaletteGetterConnections(unittest.TestCase):
                 self.assertTrue(compare(image,obj,query,va,size,ROOT/Path(source).with_suffix('.bindings.json'))['strict_exact'])
                 strict+=1
             self.assertEqual({s.name for s in obj.symbols if s.section_number==0 and s.storage_class==2},
-                             {'?DitherConvert@@YAHPAXHHHHH0000PAUUnknownTexturePalette@@@Z'})
+                             {'?DitherConvert@@YAHPAXHHHHH0000PAUTextureColorMapperView@@@Z'})
             self.assertFalse(any(s.raw_size and (s.name.startswith('.CRT')or s.characteristics&0xc0)
                                  for s in obj.sections if not s.name.startswith('.debug')))
             fixture_path,_=compile_source(ROOT/'tests/fixtures/palette_getter_compare.cpp','fixture',True)
@@ -205,7 +205,8 @@ class PaletteGetterConnections(unittest.TestCase):
             result=subprocess.run([str(executable),str(image_path)],capture_output=True,text=True,timeout=90)
             self.assertEqual(result.returncode,0,result.stdout+result.stderr)
             self.assertEqual(result.stdout.strip(),'Palette getters: 8139 cases, 22 access faults, scalar buffers and aliases match')
-            print('%d strict checks; two complete objects; six calls; '%strict+result.stdout.strip())
+            self.assertEqual(strict, 103)
+            print('%d strict checks; one complete object; six calls; '%strict+result.stdout.strip())
 
 
 if __name__=='__main__':
