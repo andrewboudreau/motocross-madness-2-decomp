@@ -30,7 +30,8 @@ import random
 import struct
 
 RETAIL_VA = 0x00417ed0
-SYMBOL = ('?Create@BikeRace@@QAEPAV1@PAX0PAVLightManager@@PAUTextureContext@@'
+SYMBOL = ('?Create@BikeRace@@QAEPAV1@PAXPAVParticleManager@@PAVLightManager@@'
+          'PAUTextureContext@@'
           'PAVTerrain@@PAVKrustyBikeCamera@@PAVScene@@PAURaceGateEvent@@'
           'PAVProjectedShadow@@@Z')
 SOURCE = 'src/reconstructed/BikeRace.cpp'
