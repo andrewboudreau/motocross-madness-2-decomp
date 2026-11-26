@@ -36,11 +36,6 @@ class RotatingShock;
 #include "../../reconstructed/TextureLoader.h"
 
 // Objects reached through Bike fields.  Layout is only known where accessed.
-// Frame object at BikeWheel+0x1c0 (provisional): only the vector at +0xc is read.
-struct BikeWheelFrame {
-    char pad_0x00[0xc];
-    Vec3 axis;
-};
 struct BikeWheel {
     char pad_0x000[184];
     char contactPoint_0x0b8[20];   // registered in the owner's collisionPoints list; ~Bike removes it (0x00409a10)
@@ -63,7 +58,7 @@ struct BikeWheel {
     int w_0x16c;              // IntegrateSteerTorque sets it to 2 while the wheel is in contact
     char pad_0x170[76];
     SoultreeObject* sceneNode;  // +0x1bc wheel scene node (VehicleWheel name)
-    BikeWheelFrame* ownerRef;  // +0x1c0 MovingPart+0x44 ownerRef (Tire ctor arg c; sceneNode +0x1bc is MovingPart+0x40); IntegrateSteerTorque projects on its +0xc axis
+    SteeringControl* ownerRef;  // +0x1c0 MovingPart+0x44 ownerRef (Tire ctor arg c; sceneNode +0x1bc is MovingPart+0x40): the loader passes steerState for the steered wheel; IntegrateSteerTorque projects on its axis
     char pad_0x1c4[60];
     Vec3 nodePosition;        // +0x200 (VehicleWheel name)
     Vec3 wheelForwardAxis;  // +0x20c Tire.h wheelForwardAxis; scaled by wheelRadius while airborne (IntegrateSteerTorque)

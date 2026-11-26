@@ -27,6 +27,13 @@ retail writes is an output, so its name and the names around it are usually
 backwards. `tests/test_check_signatures.py` runs the check when `MCM2_EXE` is
 set.
 
+`tools/source_inventory.py` and `tools/type_census.py` measure what is still
+unnamed: offset-named members, stand-in view types (no RTTI, named `*View`,
+`Unknown*`, `<Class>A<hex>`, ...), `reinterpret_cast`s, raw byte-offset
+pointer arithmetic, classes declared in more than one file, and RTTI classes
+without a definition. They are regex scans, so use them to track the trend
+and to pick the next file, not as exact counts.
+
 ## Wave 1
 
 | Old name | New name | VA | Tier | Evidence |
@@ -4539,6 +4546,7 @@ finds every edited file still CRLF.
 | Bike.h `BikeGlobal_0056e26c` (`g_0x2f0`) | `g_TrackGame->frameTime` (`Game::frameTime`, +0x2f0) | 1 | Bike::ApplyPendingRespawn counts the crash timer down by the global game's +0x2f0, the same field DropTextOverlay::Tick and the network timers add. Bike.cpp includes TrackGame.h. Proof over 19 units: identical apart from goto-label counters. Bike.h's `BikeA5F8` handlebar contacts stay a view: they are CollisionPoints (tests/fixtures/bike_contact_compare.cpp), but CollisionPoint declares +0xb4 `contactState` as float where Bike stores the integer 2. |
 | CollisionPoint `float impactPosted` / `slidePosted` / `scrapePosted` / `contactState` (+0xa8..+0xb4) | `int` | 2 | Every writer stores 0, 1 or 2 (the inline constructor, Tire, SoultreePhysics slots 30/31, Bike's handlebar contacts), slot 13 compares contactState with 2, and the SoultreeContact view types all four int. Proof over 22 units: identical. |
 | Bike.h `BikeA5F8` (`point`, `axis`, `active`, `state`); BikeCore `int tailContact` | `CollisionPoint` (`worldPosition`, `surfaceNormal`, `inContact`, `contactState`); `CollisionPoint* tailContact` | 2 | The loader stores AddCollisionPoint's results at +0x5f8/+0x5fc/+0x600; the view's offsets are CollisionPoint's. IntegrateSteerTorque casts the CollisionVec3 members to Vec3 at the use site. Proof over 23 units: identical apart from labels. |
+| Bike.h `BikeWheelFrame` (`axis`) | `SteeringControl` (`axis`) | 2 | BikeWheel+0x1c0 is the Tire's MovingPart ownerRef, and the loader passes `steered[i] ? steerState : 0` (a SteeringControl) for it; IntegrateSteerTorque reads its +0xc axis. Proof over 19 units: identical apart from labels. |
 | `SoultreeTextureOptions` (SoultreeMaterial.h) | `TextureContext` (TextureLoader.h) | 2 | Same size and offsets as the loader's TextureContext, which SoultreeMaterial.cpp handed it as; the material member is that struct, and `TextureContext` moved beside the loader declaration. |
 | `D3DIMSoultreeObject::ReplaceMaterialTexture` `int unused` | `TextureContext* textures` (unused) | 2 | BikeRace passes its `TextureContext*`; the dialogs pass Game+0x1c's context block and the podium a local copy, both laid out like TextureContext. The dead `DialogSoultreeObjectView` and `UnknownProCircuitSkinned` views are gone. |
 | `GUIManager::ShowDialog` `int area`, `int name` | `CameraRect* area`, `const char* name` | 1 | 0x00485a70 hands both straight to `UIDialog::Create`'s rectangle and name parameters; 18 callers passed `(int)&area`. |
