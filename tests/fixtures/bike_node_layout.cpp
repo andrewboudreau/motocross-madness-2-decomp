@@ -2,8 +2,6 @@
 #include <stddef.h>
 
 typedef char CanonicalModelOffset[offsetof(D3DIMSoultreeCharacter, modelNode) == 0x1a0 ? 1 : -1];
-typedef char WreckerModelOffset[offsetof(BikeA34, r_0x1a0) == 0x1a0 ? 1 : -1];
-typedef char ChildViewOffset[offsetof(BikeA1A0, d_0x140) == 0x140 ? 1 : -1];
 typedef char ChildCanonicalOffset[offsetof(SoultreeObject, firstChild) == 0x140 ? 1 : -1];
 typedef char LocalMatrixOffset[offsetof(SoultreeObject, localMatrix) == 0xb8 ? 1 : -1];
 typedef char VectorExtent[sizeof(Vec3) == 12 ? 1 : -1];

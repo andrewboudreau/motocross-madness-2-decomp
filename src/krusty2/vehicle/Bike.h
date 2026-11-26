@@ -26,9 +26,6 @@
 struct BikeWheel;
 struct BikeWheelQ;
 class Wrecker;
-struct BikeA34;
-struct BikeA1A0;
-struct BikeA128;
 struct BikeElem;
 struct BikeA1F4;
 struct BikeA640;
@@ -120,24 +117,6 @@ struct BikeWheel {
 struct BikeWheelQ {};
 
 
-struct BikeA34 {
-    char pad_0x000[416];
-    BikeA1A0* r_0x1a0;
-};
-
-struct BikeA1A0 {
-    char pad_0x000[320];
-    SoultreeObject* d_0x140;           // SoultreeObject::firstChild
-    int FindByName(const char* name);     // 0x004fdae0, SoultreeObject::FindByName (soultree.cpp)
-    void GetSubtreeBounds(Vec3* center, Vec3* extents);   // 0x004fe850 (SoultreeObject::GetSubtreeBounds)
-    void SetMatrixIn(int frame, Matrix4* m);
-};
-
-struct BikeA128 {
-    char pad_0x000[752];
-    int g_0x2f0;
-};
-
 struct BikeElem {
     char pad_0x000[4];
     int h_0x4;
@@ -209,7 +188,7 @@ struct BikeA38 {
     void SnapPlacement();  // 0x00435fe0: unused view of CollisionObject::SnapPlacement (docs/NAMING.md)
 };
 
-// The scene node (d3d_field_0x1a0, poseNode, BikeA1A0::d_0x140) is SoultreeObject
+// The scene node (d3d_field_0x1a0, poseNode, SoultreeObject::firstChild) is SoultreeObject
 // (../common/SoultreeObject.h).
 
 struct BikeGlobal_0056e26c { char pad_0x000[0x2f0]; float g_0x2f0; };

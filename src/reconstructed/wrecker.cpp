@@ -63,13 +63,13 @@ Wrecker::~Wrecker() {
     if (indexedAnimations) DebugFree(indexedAnimations, __FILE__, 0x47);
 }
 
-Wrecker* Wrecker::SetupWrecker(void* owner, UnknownWreckerCharacter* rider, const char* name) {
+Wrecker* Wrecker::SetupWrecker(void* owner, D3DIMSoultreeCharacter* rider, const char* name) {
     GameObject::SetRenderContext(owner);
     CreateBodies(rider, name);
     return this;
 }
 
-void Wrecker::CreateBodies(UnknownWreckerCharacter* rider, const char* name) {
+void Wrecker::CreateBodies(D3DIMSoultreeCharacter* rider, const char* name) {
     character = rider;
     rider->modelNode->TranslateIn(0, Vec3(0.0f, 120.0f, 0.0f));
     gravityModel = new (__FILE__, 0x5b) SelectiveGravityModel(1);

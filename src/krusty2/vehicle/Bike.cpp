@@ -1379,14 +1379,14 @@ static __forceinline void BikeAttachBone(Bike* self, const char* name, float x, 
     offset.x = x;
     offset.y = y;
     offset.z = z;
-    int bone = reinterpret_cast<int>(reinterpret_cast<SoultreeObject*>(((BikeA34*)self->wrecker->character)->r_0x1a0)->FindByName(name));
+    int bone = reinterpret_cast<int>(self->wrecker->character->modelNode->FindByName(name));
     self->wrecker->AddProbe(offset, bone);
 }
 
 void Bike::CreateWrecker()
 {
     wrecker = new(__FILE__, 2023) Wrecker(1);
-    if (wrecker->SetupWrecker(GameObject::renderContext, (UnknownWreckerCharacter*)riderCharacter, "rider.col")) {
+    if (wrecker->SetupWrecker(GameObject::renderContext, riderCharacter, "rider.col")) {
         GameObject::AppendChild((GameObject*)wrecker, -1);
         ((BikeA38*)wrecker->collisionModel)->n_0xe4 = ((BikeA1F4*)terrain);
         ((BikeA38*)wrecker->collisionModel)->n_0x64 = 0x65;
@@ -1420,7 +1420,7 @@ int Bike::EvaluateCrash(float dt, float noseOverLimit, int impact, float impulse
         return crashState;
     Wrecker* rider = wrecker;
     if (rider->anyProbeHit) {
-        scratchVector = ((BikeA34*)rider->character)->r_0x1a0->d_0x140->WorldToLocalPoint(reinterpret_cast<const Vec3&>(rider->hitCenter));
+        scratchVector = rider->character->modelNode->firstChild->WorldToLocalPoint(reinterpret_cast<const Vec3&>(rider->hitCenter));
         if (scratchVector.y > 1.0f) {
             if (scratchVector.x < -1.0f) {
                 crashDirection = 5;

@@ -14,7 +14,7 @@ typedef char WreckerParticlesField[offsetof(Wrecker, particles) == 0x11c ? 1 : -
 typedef char WreckerSkipField[offsetof(Wrecker, skipProbeEffects) == 0x52c ? 1 : -1];
 
 // The subordinate declarations remain explicit views at their old boundaries.
-typedef char RiderModelView[offsetof(BikeA34, r_0x1a0) == 0x1a0 ? 1 : -1];
+typedef char RiderModelView[offsetof(D3DIMSoultreeCharacter, modelNode) == 0x1a0 ? 1 : -1];
 typedef char CollisionTypeView[offsetof(BikeA38, n_0x64) == 0x64 ? 1 : -1];
 typedef char CollisionTerrainView[offsetof(BikeA38, n_0xe4) == 0xe4 ? 1 : -1];
 typedef char VectorSizes[sizeof(Vec3) == 12 && sizeof(Vector3) == 12 ? 1 : -1];
@@ -28,6 +28,6 @@ Wrecker* BikeWreckerPointer(Bike* bike) { return bike->wrecker; }
 // callers intentionally ignore the former and test the latter for nonnull.
 void CheckWreckerSignatures() {
     int (Wrecker::*append)(int) = &Wrecker::AddIndexedAnimation;
-    Wrecker* (Wrecker::*setup)(void*, UnknownWreckerCharacter*, const char*) =
+    Wrecker* (Wrecker::*setup)(void*, D3DIMSoultreeCharacter*, const char*) =
         &Wrecker::SetupWrecker;
 }

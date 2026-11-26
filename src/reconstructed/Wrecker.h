@@ -73,7 +73,6 @@ struct WreckerMotionView {
 
 // Rider is the primary Character/D3DIM subobject; its GameObject base remains virtual.
 #include "../krusty2/motion/D3DIMSoultreeCharacter.h"
-typedef D3DIMSoultreeCharacter UnknownWreckerCharacter;
 
 // Object at Wrecker+0x40: RTTI PhysicsRigidBody (new 0x2a8 at line 0x5f,
 // constructor 0x004cc120 writes vtable 0x00556ec0, COL 0x0055e558). Wrecker
@@ -144,8 +143,8 @@ public:
     virtual int OnControlPress(ControlEvent* event, InputButtonState* entry);       // 0x00532890
 
     // 0x00530190: slot 8 on the owner, then 0x005301c0; returns this.
-    Wrecker* SetupWrecker(void* owner, UnknownWreckerCharacter* rider, const char* name);
-    void CreateBodies(UnknownWreckerCharacter* rider, const char* name); // 0x005301c0: gravity, rigid body, collision
+    Wrecker* SetupWrecker(void* owner, D3DIMSoultreeCharacter* rider, const char* name);
+    void CreateBodies(D3DIMSoultreeCharacter* rider, const char* name); // 0x005301c0: gravity, rigid body, collision
     void AddContactAnimation(int value);             // appends to contactAnimations
     void AddRandomAnimation(int value);             // appends to randomAnimations
     int AddIndexedAnimation(int value);              // appends to indexedAnimations, returns its index
@@ -163,7 +162,7 @@ public:
     void ContinueAsTumble();          // 0x00532490: state 1 -> 2 halfway through the animation (slot 10)
     void RebuildPoseSteps();
 
-    UnknownWreckerCharacter* character; // +0x34
+    D3DIMSoultreeCharacter* character; // +0x34
     ConstraintMethodCollisionModel* collisionModel; // +0x38
     SelectiveGravityModel* gravityModel; // +0x3c
     PhysicsRigidBody* rigidBody; // +0x40
