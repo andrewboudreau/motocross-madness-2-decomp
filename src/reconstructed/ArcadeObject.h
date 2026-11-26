@@ -16,6 +16,8 @@
 #include "TransparencyMod.h"
 
 class Camera;
+class LightManager;
+struct TextureContext;
 class CollisionObject;
 class D3DIMSoultreeObject;
 typedef void (*UnknownPickCallback)(CollisionObject* self, CollisionObject* other);
@@ -30,7 +32,7 @@ public:
     // 0x00401310 (ret 0x34): slot 8 of the base, then loads the model `name`
     // (line 78), places it and optionally scales it to `pixels` and attaches
     // a TransparencyMod with `alpha` (line 104). 0 when the model fails.
-    ArcadeObject* Create(void* context, int lights, int options, const char* name, Vector3 position,
+    ArcadeObject* Create(void* context, const LightManager* lights, const TextureContext* textures, const char* name, Vector3 position,
                                         int pixels, Camera* view, float size,
                                         float screenXFraction, float screenYFraction, unsigned char alpha);
     void SetPosition(const Vector3* position);  // 0x004014f0

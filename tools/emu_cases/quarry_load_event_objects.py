@@ -64,7 +64,7 @@ BINDINGS = {'??0ParticleManager@@QAE@H@Z': 0x004ba390, '??0SoultreeQuadTreeRende
 # Callee-popped bytes of the virtual slots (from the retail call sites). The generic objects:
 # slot 20 g_TrackGame's GetRegistryInt (two arguments, an int), 8 SetRenderContext (one; it
 # answers the object), 27 ParticleManager's Create (four), 2 Release. The event: 27
-# Create3DObjects (one, an int), 32 and 33 (one), 28..31 and 35 none.
+# Create3DObjects (one, the texture context), 32 and 33 (one), 28..31 and 35 none.
 OBJECT_POPS = {20: 8, 8: 4, 27: 0x10}
 EVENT_POPS = {27: 4, 32: 4, 33: 4}
 

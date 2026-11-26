@@ -25,7 +25,7 @@ struct RunwayKrustyBikeView;
 class RunwayLights : public GameObject {
 public:
     explicit RunwayLights(int flags);          // 0x0048a5b0
-    RunwayLights* SetupLights(void* value, int a, int b, Terrain* terrain); // 0x0048a600
+    RunwayLights* SetupLights(void* context, const LightManager* lights, const TextureContext* textures, Terrain* terrain); // 0x0048a600
     void SetRacer(RunwayKrustyBikeView* racer); // 0x0048ad50
 
     float blinkTimer;                          // +0x2c blink timer
@@ -51,13 +51,13 @@ NationalRace* NationalRace::Create(RenderTarget* target, LoadProgressFn progress
 }
 
 // 0x004aa890
-int NationalRace::Create3DObjects(int value) {
+int NationalRace::Create3DObjects(const TextureContext* textures) {
     char message[0x104];
 
-    if (!BaseQuarryEvent::Create3DObjects(value))
+    if (!BaseQuarryEvent::Create3DObjects(textures))
         return 0;
     runwayLights = (new (__FILE__, 53) RunwayLights(g_TrackGame->mode.visualCuesOn))
-                     ->SetupLights(renderContext, (int)lightManager, value, (Terrain*)eventTerrain);
+                     ->SetupLights(renderContext, lightManager, textures, (Terrain*)eventTerrain);
     if (!AppendChild(runwayLights, -1)) {
         sprintf(message, "Runway Lights not loaded.\n");
         return 0;

@@ -103,7 +103,7 @@ CarProcedural::~CarProcedural()
 // 0x0042f600: slot 27 sets the car up from its parameters: the model and
 // its wheels, the two collision objects and the path.
 CarProcedural* CarProcedural::Create(void* renderContext, const char* name, const char* collisionFile,
-                                     int lights, int options, void* ground, const char* pathFile,
+                                     const LightManager* lights, const TextureContext* textures, void* ground, const char* pathFile,
                                      const Vector3* offset, float speed, int steerFront, float trail,
                                      float a11, unsigned int wheelCount, float a13,
                                      float a14, float a15)
@@ -115,7 +115,7 @@ CarProcedural* CarProcedural::Create(void* renderContext, const char* name, cons
     carName[length] = 0;
 
     carModel = new (__FILE__, 99) D3DIMSoultreeObject(1);
-    carModel->LoadModel(renderContext, name, lights, options, 1);
+    carModel->LoadModel(renderContext, name, lights, textures, 1);
     AppendChild(carModel, -1);
     pathOffset = *offset;
     trailDistance = trail;

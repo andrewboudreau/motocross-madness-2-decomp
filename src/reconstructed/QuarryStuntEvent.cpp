@@ -622,7 +622,7 @@ int BaseQuarryEvent::LoadEventObjects(LoadProgressFn progress) {
                          ->Create((int)renderContext, g_TrackGame->textureManager,
                                   eventScene->environment->particleTexture, (int)lightManager);
     g_MemTagStack->Push("3DObjects");
-    if (!Create3DObjects((int)&modelTextures))
+    if (!Create3DObjects(&modelTextures))
         return 0;
     g_TrackGame->mode.networkGame = eventScene->crowdPresent;
     g_MemTagStack->Push("BikeRace");
@@ -744,7 +744,7 @@ int BaseQuarryEvent::LoadEventObjects(LoadProgressFn progress) {
         sprintf(path, "%s\\%s", "Res", "truckpodium.slt");
     g_TrackGame->eventManager->podiumObject =
         (ArcadeObject*)(new(__FILE__, 1093) ArcadeObject(0))
-            ->Create(renderContext, (int)lightManager, (int)&modelTextures, path,
+            ->Create(renderContext, lightManager, &modelTextures, path,
                                     g_TrackGame->eventManager->podiumPosition, 0, 0, 2.0f, 0.5f, 0.5f, 0);
     if (!raceView->AppendChild((GameObject*)g_TrackGame->eventManager->podiumObject, -1))
         return 0;
@@ -884,10 +884,10 @@ int BaseQuarryEvent::EstimateRaceBytes() {
 }
 
 // 0x004e06a0
-int BaseQuarryEvent::Create3DObjects(int value) {
+int BaseQuarryEvent::Create3DObjects(const TextureContext* textures) {
     char message[388];
     visualCue = (new(__FILE__, 1369) VisualCue(g_TrackGame->mode.visualCuesOn))
-                     ->LoadVisualCue(renderContext, (int)lightManager, value, (Terrain*)eventTerrain,
+                     ->LoadVisualCue(renderContext, lightManager, textures, (Terrain*)eventTerrain,
                                      Vector3(0.0f, 0.0f, 0.0f), (VisualCueBikeRaceView*)raceView, 45,
                                      (Camera*)raceCamera, 3.0f, 0.1f, 0.85f);
     if (!AppendChild(visualCue, -1)) {

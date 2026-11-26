@@ -63,7 +63,7 @@ RunwayLights::RunwayLights(int flags) : GameObject(flags) {
 }
 
 // 0x0048a600
-RunwayLights* RunwayLights::SetupLights(void* context, int lights, int options,
+RunwayLights* RunwayLights::SetupLights(void* context, const LightManager* lights, const TextureContext* textures,
                                         Terrain* terrain) {
     char name[0x104];
 
@@ -74,7 +74,7 @@ RunwayLights* RunwayLights::SetupLights(void* context, int lights, int options,
     Vector3 position(0.0f, 0.0f, 0.0f);
     for (; i < 5; i++) {
         lightModels[i] = (new (__FILE__, 0x40) ArcadeObject(1))
-                            ->Create(context, lights, options, name, position, 0, 0, 2.0f, 0.5f, 0.5f, 0);
+                            ->Create(context, lights, textures, name, position, 0, 0, 2.0f, 0.5f, 0.5f, 0);
         if (!AppendChild(lightModels[i], -1)) {
             Release();
             return 0;
@@ -178,7 +178,7 @@ VisualCue::VisualCue(int flags) : ArcadeObject(flags) {
 }
 
 // 0x0048adf0
-VisualCue* VisualCue::LoadVisualCue(void* context, int lights, int options, Terrain* terrain,
+VisualCue* VisualCue::LoadVisualCue(void* context, const LightManager* lights, const TextureContext* textures, Terrain* terrain,
                                     Vector3 position, VisualCueBikeRaceView* view, int pixels,
                                     Camera* camera, float size, float screenXFraction,
                                     float screenYFraction) {
@@ -186,7 +186,7 @@ VisualCue* VisualCue::LoadVisualCue(void* context, int lights, int options, Terr
 
     if (pixels && camera && screenXFraction != 0.0f && screenYFraction != 0.0f) {
         sprintf(name, "%s\\%s", "Res", "viscue.slt");
-        if (ArcadeObject::Create(context, lights, options, name, position, pixels, camera, size,
+        if (ArcadeObject::Create(context, lights, textures, name, position, pixels, camera, size,
                                  screenXFraction, screenYFraction, 0)) {
             cueView = view;
             builtFieldOfView = 0;
@@ -421,7 +421,7 @@ NumberObjectManager::NumberObjectManager(int flags) : GameObject(flags) {
 }
 
 // 0x0048bd00
-NumberObjectManager* NumberObjectManager::SetupDigits(void* context, int options, NumberBikeRaceView* racer,
+NumberObjectManager* NumberObjectManager::SetupDigits(void* context, const TextureContext* textures, NumberBikeRaceView* racer,
                                                       int pixels, Camera* camera,
                                                       float size) {
     char name[0x104];
@@ -439,7 +439,7 @@ NumberObjectManager* NumberObjectManager::SetupDigits(void* context, int options
     for (int i = 0; i < 5; i++) {
         sprintf(name, "%s\\%s", "Res", names[i]);
         digitModels[i] = (new (__FILE__, 0x240) ArcadeObject(1))
-                            ->Create(context, 0, options, name, position, pixels,
+                            ->Create(context, 0, textures, name, position, pixels,
                                                     (Camera*)camera, size, 0.5f, 0.1f, 0);
         if (!AppendChild(digitModels[i], -1)) {
             Release();
@@ -533,7 +533,7 @@ BonusObjectManager::~BonusObjectManager() {
 }
 
 // 0x0048c330
-int BonusObjectManager::LoadDigitModels(void* context, int lights, int options) {
+int BonusObjectManager::LoadDigitModels(void* context, const LightManager* lights, const TextureContext* textures) {
     char name[0x104];
     Vector3 position;
     int digit;
@@ -542,13 +542,13 @@ int BonusObjectManager::LoadDigitModels(void* context, int lights, int options) 
     position = Vector3(0.74f, 0.0f, 0.0f);
     sprintf(name, "%s\\%1d.slt", "Res", 0);
     digitModels[0][0] = new (__FILE__, 0x2d3) D3DIMSoultreeObject(isEnabled);
-    digitModels[0][0]->LoadModel(context, name, lights, options, 1);
+    digitModels[0][0]->LoadModel(context, name, lights, textures, 1);
     digitModels[0][0]->SetPosition(*reinterpret_cast<const Vec3*>(&position));
     baseFrame->AppendChild(digitModels[0][0], -1);
     digitModels[0][0]->ClearScreenRects();
     position.x = 0.37f;
     digitModels[0][1] = new (__FILE__, 0x2da) D3DIMSoultreeObject(isEnabled);
-    digitModels[0][1]->LoadModel(context, name, lights, options, 1);
+    digitModels[0][1]->LoadModel(context, name, lights, textures, 1);
     digitModels[0][1]->SetPosition(*reinterpret_cast<const Vec3*>(&position));
     baseFrame->AppendChild(digitModels[0][1], -1);
     digitModels[0][1]->ClearScreenRects();
@@ -561,7 +561,7 @@ int BonusObjectManager::LoadDigitModels(void* context, int lights, int options) 
         position.x = 0.0f;
         for (place = 2; place < 5; place++) {
             digitModels[digit][place] = new (__FILE__, 0x2ec) D3DIMSoultreeObject(isEnabled);
-            digitModels[digit][place]->LoadModel(context, name, lights, options, 1);
+            digitModels[digit][place]->LoadModel(context, name, lights, textures, 1);
             digitModels[digit][place]->SetPosition(*reinterpret_cast<const Vec3*>(&position));
             baseFrame->AppendChild(digitModels[digit][place], -1);
             digitModels[digit][place]->ClearScreenRects();
@@ -573,14 +573,14 @@ int BonusObjectManager::LoadDigitModels(void* context, int lights, int options) 
     position.x = 1.18f;
     sprintf(name, "%s\\x.slt", "Res", 0);
     timesModel = new (__FILE__, 0x2fe) D3DIMSoultreeObject(isEnabled);
-    timesModel->LoadModel(context, name, lights, options, 1);
+    timesModel->LoadModel(context, name, lights, textures, 1);
     timesModel->SetPosition(*reinterpret_cast<const Vec3*>(&position));
     baseFrame->AppendChild(timesModel, -1);
     timesModel->ClearScreenRects();
     position.x = 1.67f;
     sprintf(name, "%s\\DecimalPoint.slt", "Res", 0);
     decimalPointModel = new (__FILE__, 0x307) D3DIMSoultreeObject(isEnabled);
-    decimalPointModel->LoadModel(context, name, lights, options, 1);
+    decimalPointModel->LoadModel(context, name, lights, textures, 1);
     decimalPointModel->SetPosition(*reinterpret_cast<const Vec3*>(&position));
     baseFrame->AppendChild(decimalPointModel, -1);
     decimalPointModel->ClearScreenRects();
@@ -589,7 +589,7 @@ int BonusObjectManager::LoadDigitModels(void* context, int lights, int options) 
         position.x = 1.87f;
         for (place = 0; place < 2; place++) {
             fractionDigitModels[digit][place] = new (__FILE__, 0x312) D3DIMSoultreeObject(isEnabled);
-            fractionDigitModels[digit][place]->LoadModel(context, name, lights, options, 1);
+            fractionDigitModels[digit][place]->LoadModel(context, name, lights, textures, 1);
             fractionDigitModels[digit][place]->SetPosition(*reinterpret_cast<const Vec3*>(&position));
             baseFrame->AppendChild(fractionDigitModels[digit][place], -1);
             fractionDigitModels[digit][place]->ClearScreenRects();
@@ -602,9 +602,9 @@ int BonusObjectManager::LoadDigitModels(void* context, int lights, int options) 
 }
 
 // 0x0048c8a0
-int BonusObjectManager::CreateFrameNode(void* context, int lights, int options) {
+int BonusObjectManager::CreateFrameNode(void* context, const LightManager* lights, const TextureContext* textures) {
     baseFrame = new (__FILE__, 0x326) D3DIMSoultreeObject(1);
-    if (!AppendChild(baseFrame->LoadModel(context, "", lights, options, 1), -1))
+    if (!AppendChild(baseFrame->LoadModel(context, "", lights, textures, 1), -1))
         return 0;
     strcpy(baseFrame->name, "Base Bonus Frame");
     reinterpret_cast<Vector3&>(baseFrame->subtreeBoundsCenter) = kVec3Zero;
@@ -618,16 +618,16 @@ int BonusObjectManager::CreateFrameNode(void* context, int lights, int options) 
 }
 
 // 0x0048ca60
-BonusObjectManager* BonusObjectManager::SetupCounter(void* context, int lights, int options,
+BonusObjectManager* BonusObjectManager::SetupCounter(void* context, const LightManager* lights, const TextureContext* textures,
                                                      BonusBikeRaceView* racer, Camera* camera) {
     GameObject::SetRenderContext(context);
     raceView = racer;
     this->camera = camera;
-    if (!CreateFrameNode(context, lights, options)) {
+    if (!CreateFrameNode(context, lights, textures)) {
         Release();
         return 0;
     }
-    if (!LoadDigitModels(context, lights, options)) {
+    if (!LoadDigitModels(context, lights, textures)) {
         Release();
         return 0;
     }

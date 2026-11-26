@@ -142,12 +142,10 @@ public:
     // the resource manager, else ".slt") and returns the GameObject base;
     // callers hand it straight to GameObject 0x00469190. `owner` goes to
     // GameObject slot 8, `lights` is the LightManager kept at +0x1bc,
-    // `options` points to the six-dword texture options copied to +0x248
-    // when `useOptions` is set, and `useOptions` is also the load flag
-    // handed to the materials. The int types are
-    // kept from the first (LightEmitter.cpp, ArcadeObject.cpp) callers.
-    virtual GameObject* LoadModel(void* owner, const char* name, int lights, int options,
-                                  int useOptions);
+    // `textures` is the texture context copied to +0x248 when `useOptions`
+    // is set, and `useOptions` is also the load flag handed to the materials.
+    virtual GameObject* LoadModel(void* owner, const char* name, const LightManager* lights,
+                                  const TextureContext* textures, int useOptions);
 
     // GameObject slots (`this` is the GameObject subobject).
     virtual void Disable();                        // 0x00444540

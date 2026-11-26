@@ -276,7 +276,7 @@ public:
     virtual void CopyFrom(ModelObject* source);  // 0x00444560, ret 4: copies the node tree of 'source'
     virtual void ModelSlot8();                   // 0x00444b60
     // 0x0043f4b0, ret 0x14: loads the model; slot 0 passes (field_0x18, name, descriptor words, 1).
-    virtual void Load(void* owner, const char* name, int lights, int options, int useOptions);
+    virtual void Load(void* owner, const char* name, const LightManager* lights, const TextureContext* textures, int useOptions);
     char pad_0x38[0x240 - 0x38];
     int textureManager;                          // +0x240 D3DIMSoulTree.h names: copied by CopyFrom, passed to SoultreeMaterial::Attach
     int textureFormat;                           // +0x244 copied by CopyFrom, passed to SoultreeMaterial::Attach
@@ -324,7 +324,7 @@ void D3DIMSoultreeCharacter::BuildModel()
 
     ModelObject* frame = reinterpret_cast<ModelObject*>(new(__FILE__, 0xd6) D3DIMSoultreeObject(isEnabled));
     modelNode = (SoultreeObject*)frame;
-    frame->Load(renderContext, "", (int)loadLights, (int)loadTextures, 1);
+    frame->Load(renderContext, "", loadLights, loadTextures, 1);
     GameObject* frameChild = (ModelObject*)modelNode;
     AppendChild(frameChild, -1);
     modelNode->RegisterNode();
@@ -334,7 +334,7 @@ void D3DIMSoultreeCharacter::BuildModel()
     modelNode->name[copyLength] = 0;
 
     ModelObject* loaded = reinterpret_cast<ModelObject*>(new(__FILE__, 0xdf) D3DIMSoultreeObject(isEnabled));
-    loaded->Load(renderContext, name, (int)loadLights, (int)loadTextures, loadUseOptions);
+    loaded->Load(renderContext, name, loadLights, loadTextures, loadUseOptions);
     ((SoultreeObject*)loaded)->UnregisterNode();
     void* owner = g_ResourceManager->FindItemByObject(loaded);
     if (owner)

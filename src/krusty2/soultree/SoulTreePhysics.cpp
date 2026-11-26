@@ -1141,7 +1141,7 @@ GameObject* SoultreePhysicsObject::LoadPhysicsModel(int renderContext, const cha
     char colPath[0x104];
 
     // Slot 9 takes the five dwords unchanged; its third is this loader's light manager.
-    D3DIMSoultreeObject::LoadModel((void*)renderContext, modelPath, (int)lights, (int)textures, 1);
+    D3DIMSoultreeObject::LoadModel((void*)renderContext, modelPath, lights, textures, 1);
     SoultreePhysicsBaseObject::InitializePhysics(renderContext, 1, startPosition, startForward, startUp, terrainProbe, linkedObject, weight, contactCapacity, attachmentSlots,
                                                    trackObject, fixedStep, maxSteps, drag, elasticity, radius, shapeMode, restThreshold,
                                                    probeMask, createCollision);

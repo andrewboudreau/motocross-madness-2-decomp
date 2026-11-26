@@ -8,6 +8,7 @@ class EcoSystem;
 class InstrumentOverlay;
 class LightEmitter;
 class LightManager;
+struct TextureContext;
 class RadarOverlay;
 class RenderTarget;
 class Scene;
@@ -44,7 +45,7 @@ public:
     virtual int OnControlPress(ControlEvent* event, InputButtonState* entry);       // 0x004e0ce0
     virtual int OnNetworkMessage(int type, void* data, int from, int to, int flags);       // 0x004e1cc0
     // Slots 27-35 are introduced here (NationalRace overrides 27, 29 and 30).
-    virtual int Create3DObjects(int value);    // 0x004e06a0: creates the visual cue
+    virtual int Create3DObjects(const TextureContext* textures); // 0x004e06a0: creates the visual cue
     virtual void UnknownVirtualSlot28();      // 0x00464e90 (shared empty body)
     // Slot 29 (0x004e07c0): creates the instrument, chat, radar, stats and
     // text-queue overlays; LoadEventObjects calls it (0x004df036).

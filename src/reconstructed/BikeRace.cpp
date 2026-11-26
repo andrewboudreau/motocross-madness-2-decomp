@@ -391,7 +391,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
 
             sprintf(name, "%s\\%s", "Res", "MetalArch.slt");
             ArcadeObject* arch = new(__FILE__, 0x247) ArcadeObject(1);
-            arch = arch->Create(renderContext, (int)lights, (int)textures, name, kVec3Zero, 0, 0,
+            arch = arch->Create(renderContext, lights, textures, name, kVec3Zero, 0, 0,
                                                2.0f, 0.5f, 0.5f, 0);
             AppendChild(arch, -1);
             arch->arcadeModel->SetUseLighting(1);
@@ -439,7 +439,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
 
             sprintf(name, "%s\\%s", "Res", "GirlBox.slt");
             ArcadeObject* box = new(__FILE__, 0x27c) ArcadeObject(1);
-            box = box->Create(renderContext, (int)lights, (int)textures, name, kVec3Zero, 0, 0, 2.0f,
+            box = box->Create(renderContext, lights, textures, name, kVec3Zero, 0, 0, 2.0f,
                                              0.5f, 0.5f, 0);
             AppendChild(box, -1);
             box->arcadeModel->SetUseLighting(1);
@@ -451,7 +451,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
         }
     } else if (mode == 0 || (mode == 4 && g_TrackGame->mode.raceSettings.stuntMode)) {
         BonusObjectManager* bonus = new(__FILE__, 0x28e) BonusObjectManager(1);
-        scoreBoard = (int)bonus->SetupCounter(renderContext, (int)lights, (int)textures,
+        scoreBoard = (int)bonus->SetupCounter(renderContext, lights, textures,
                                                (BonusBikeRaceView*)this, raceCamera);
         if (!AppendChild((GameObject*)scoreBoard, -1))
             return 0;
@@ -462,7 +462,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
     raceScene->holdAnimations = 1;
     if (g_TrackGame->mode.raceSettings.raceMode) {
         NumberObjectManager* numbers = new(__FILE__, 0x29b) NumberObjectManager(1);
-        digitCounter = (int)numbers->SetupDigits(renderContext, (int)textures, (NumberBikeRaceView*)this, 0x1e,
+        digitCounter = (int)numbers->SetupDigits(renderContext, textures, (NumberBikeRaceView*)this, 0x1e,
                                                 raceCamera, 3.0f);
         if (!AppendChild((GameObject*)digitCounter, -1))
             return 0;
@@ -472,7 +472,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
         (g_TrackGame->playerCount > 1 || g_TrackGame->mode.raceSettings.aiRacerCount > 0)) {
         sprintf(name, "%s\\%s", "Res", "youind.slt");
         ArcadeObject* marker = new(__FILE__, 0x2a9) ArcadeObject(g_TrackGame->mode.playerIndicator);
-        youIndicator = marker->Create(renderContext, (int)lights, (int)textures, name, position, 0, 0,
+        youIndicator = marker->Create(renderContext, lights, textures, name, position, 0, 0,
                                                     2.0f, 0.5f, 0.5f, 0);
         AppendChild(youIndicator, -1);
         Vector3 axis(0.0f, 1.0f, 0.0f);

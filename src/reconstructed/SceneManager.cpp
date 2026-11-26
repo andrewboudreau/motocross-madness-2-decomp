@@ -1211,7 +1211,7 @@ int Scene::ReadStaticModels(LightManager* lights, int particleManager, int textu
             staticModels->casters[i].physicsObject = 0;
             D3DIMSoultreeObject* object = new(__FILE__, 1956) D3DIMSoultreeObject(1);
             staticModels->casters[i].model = object;
-            AppendChild(object->LoadModel(renderContext, sltPath, (int)lights, (int)modelTextures, 1), -1);
+            AppendChild(object->LoadModel(renderContext, sltPath, lights, modelTextures, 1), -1);
             int length = strcspn(sltPath, ".");
             count = length < 0x14 ? length : 0x14;
             strncpy(staticModels->casters[i].fileName, sltPath, count);
@@ -1444,7 +1444,7 @@ int Scene::ReadAnimations(LightManager* lights, int textureManager, const Textur
         if (!animationTable->entries[i].keyFramed) {
             CarProcedural* car = new(__FILE__, 2305) CarProcedural(1);
             animationTable->entries[i].proceduralObject = car;
-            if (!AppendChild(car->Create(renderContext, sltPath, colPath, (int)lights, (int)modelTextures, 0, vuePath,
+            if (!AppendChild(car->Create(renderContext, sltPath, colPath, lights, modelTextures, 0, vuePath,
                                                                  &animationTable->entries[i].position, fps,
                                                                  frontWheelsTurn, lagDistance, 1.0f, tires, 0, 0, 0),
                                        -1)) {

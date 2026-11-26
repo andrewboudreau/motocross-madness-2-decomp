@@ -93,13 +93,13 @@ D3DIMSoultreeObject::~D3DIMSoultreeObject()
 }
 
 // 0x0043f4b0
-GameObject* D3DIMSoultreeObject::LoadModel(void* owner, const char* path, int lights, int options,
+GameObject* D3DIMSoultreeObject::LoadModel(void* owner, const char* path, const LightManager* lights, const TextureContext* textures,
                                            int useOptions)
 {
     GameObject::SetRenderContext(owner);
     if (useOptions) {
-        memcpy(textureOptions, (const int*)options, sizeof(textureOptions));
-        textureManager = *(TextureMapManager**)options;
+        memcpy(textureOptions, textures, sizeof(textureOptions));
+        textureManager = textures->manager;
     }
     loadFlag = useOptions;
     lightManager = (LightManager*)lights;
@@ -1524,7 +1524,7 @@ void D3DIMSoultreeObject::CreateNode(SoultreeObject** out)
 {
     D3DIMSoultreeObject* copy = new (__FILE__, 0x7d5) D3DIMSoultreeObject(isEnabled);
     *out = copy;
-    copy->LoadModel(renderContext, "", (int)lightManager, (int)textureOptions, 1);
+    copy->LoadModel(renderContext, "", lightManager, (const TextureContext*)textureOptions, 1);
 }
 
 static inline void Raise(float& bound, float value)

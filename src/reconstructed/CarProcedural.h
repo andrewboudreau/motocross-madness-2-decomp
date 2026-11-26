@@ -25,7 +25,9 @@
 // The car model is a D3DIMSoultreeObject (D3DIMSoulTree.h; constructor
 // 0x0043f160, new 0x2d8 at line 0x63), and its "Body" and wheel nodes are
 // SoultreeObjects (src/krusty2/core/SoultreeObject.h) found by name.
+class LightManager;
 class SoultreeObject;
+struct TextureContext;
 class D3DIMSoultreeObject;
 
 // Rigid body reached through CarProceduralCollision::shape.
@@ -67,7 +69,7 @@ public:
     // unused here; Scene's loader passes it 1.0f (`push 0x3f800000` at
     // 0x004ee7a9), so it is a float.
     virtual CarProcedural* Create(void* renderContext, const char* name, const char* collisionFile,
-                                  int lights, int options, void* ground, const char* pathFile,
+                                  const LightManager* lights, const TextureContext* textures, void* ground, const char* pathFile,
                                   const Vector3* offset, float speed, int steerFront, float trail,
                                   float a11, unsigned int wheelCount, float a13, float a14,
                                   float a15);

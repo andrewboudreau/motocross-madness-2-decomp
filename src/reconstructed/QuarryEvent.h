@@ -10,6 +10,7 @@ class EcoSystem;
 class InstrumentOverlay;
 class LightEmitter;
 class LightManager;
+struct TextureContext;
 class RadarOverlay;
 class RenderTarget;
 class Scene;
@@ -71,7 +72,7 @@ class NationalRace : public BaseQuarryEvent {
 public:
     explicit NationalRace(int flags);         // 0x004aa7f0
     virtual int Tick(float frameTime);                 // 0x004aaa70: shows the finish text once
-    virtual int Create3DObjects(int value);    // 0x004aa890: the visual cue, then the runway lights
+    virtual int Create3DObjects(const TextureContext* textures); // 0x004aa890: the visual cue, then the runway lights
     virtual void CreateOverlays();            // 0x004aa970: the overlays, then the drop text
     virtual void AttachOverlays();            // 0x004aaa50: the overlays, then the drop text as a child
     // 0x004aa850: the base initialiser, then 0x0048ad50 on +0xa4.
