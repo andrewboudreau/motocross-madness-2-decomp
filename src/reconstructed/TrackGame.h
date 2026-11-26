@@ -212,6 +212,7 @@ struct GridEntry {
 
     int playerId;  // +0x0  SelectGamePicProcs' SelectGameGridEntryView view: network player id (BikeRace compares it)
     char points;  // +0x4  SelectGameGridEntryView view: championship points, the start grid sort key
+    char racerIndex;  // +0x5  SelectGameGridEntryView racerIndex; BikeRace treats nonzero as an AI racer that player's host runs
 };
 
 // The 0x1ec-byte race settings block. TrackGameMode holds three: the current

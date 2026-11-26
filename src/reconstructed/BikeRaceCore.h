@@ -20,7 +20,7 @@ struct TextureContext;
 struct BikeRaceKrustyBikeCameraView;
 struct RaceGateEvent;
 struct RaceGatePose;
-struct BikeRaceRaceSoundView;
+class RaceSound;
 class CollisionCharacter;
 struct RaceStatusNode;
 
@@ -109,7 +109,7 @@ public:
     BikeRaceKrustyBikeView* localRacer;        // its own racer
     BikeRaceKrustyBikeView** racerSlots;       // all racers, by racer slot
     BikeRaceKrustyBikeView** aiRacers;       // AI racers (TrackGame+0x2d94 of them)
-    BikeRaceRaceSoundView* raceSound;          // +0x44 the RaceSound object (RaceSound::Create in the setup)
+    RaceSound* raceSound;          // +0x44 the RaceSound object (RaceSound::Create in the setup)
     Track* raceTrack;
     Terrain* raceTerrain;  // +0x4C  Create's terrain argument; QueryGround (Terrain 0x00507c10) puts probes/debug lines on the ground; grid scale
     KrustyBikeCamera* raceCamera;            // the race camera

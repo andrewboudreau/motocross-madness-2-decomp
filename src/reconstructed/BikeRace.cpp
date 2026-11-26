@@ -14,6 +14,7 @@
 #include "BaseQuarryEvent.h"
 #include "../krusty2/vehicle/KrustyBikeCore.h"
 #include "../krusty2/shadow/ProjectedShadow.h"
+#include "../krusty2/soultree/SoultreePhysicsObject.h"
 
 #include <math.h>
 #include <stdlib.h>
@@ -561,8 +562,7 @@ BikeRace* BikeRace::Create(void* owner, ParticleManager* particles, LightManager
 
     g_MemTagStack->Push("Audio");
     RaceSound* sound = new(__FILE__, 0x347) RaceSound(1);
-    raceSound = (BikeRaceRaceSoundView*)sound->Create(renderContext, (EventBikeRaceView*)this,
-                                                                      (RaceSoundKrustyBikeCameraView*)raceCamera, 6);
+    raceSound = sound->Create(renderContext, (EventBikeRaceView*)this, (RaceSoundKrustyBikeCameraView*)raceCamera, 6);
     AppendChild((GameObject*)raceSound, -1);
     g_MemTagStack->Push("BikeRace");
     if (g_TrackGame->mode.joystickOn) {
@@ -615,10 +615,10 @@ static inline void RandomSkill(float& skill, const float& base, const float& ran
     skill += base;
 }
 
-// The network view of start grid entry i (BikeRace reads +0x5 as the AI
-// flag); the loader reads it through g_TrackGame each time.
-static inline BikeRaceGridEntryView& GridPlayer(int i) {
-    return ((BikeRaceGridEntryView*)g_TrackGame->mode.raceSettings.gridOrder)[i];
+// Start grid entry i (a nonzero racerIndex marks an AI racer of that
+// player's host); the loader reads it through g_TrackGame each time.
+static inline GridEntry& GridPlayer(int i) {
+    return g_TrackGame->mode.raceSettings.gridOrder[i];
 }
 
 // Event AI racer n's record in the event manager; read through g_TrackGame
@@ -896,10 +896,10 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, TextureContext* te
         // AI racers of other hosts.
         playerId = g_TrackGame->network->localPlayer;
         for (i = 0; i < racerCount; i++) {
-            if (GridPlayer(i).networkPlayerId == playerId && !GridPlayer(i).isAi) {
+            if (GridPlayer(i).playerId == playerId && !GridPlayer(i).racerIndex) {
                 int j;
                 for (j = 0; j < g_TrackGame->mode.racerCount; j++) {
-                    if (GridPlayer(i).networkPlayerId == g_TrackGame->mode.racers[j].networkPlayerId && g_TrackGame->mode.racers[j].racerIndex == 0) {
+                    if (GridPlayer(i).playerId == g_TrackGame->mode.racers[j].networkPlayerId && g_TrackGame->mode.racers[j].racerIndex == 0) {
                         used[j] = 1;
                         break;
                     }
@@ -950,11 +950,11 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, TextureContext* te
             }
         }
         for (i = 0; i < racerCount; i++) {
-            if (GridPlayer(i).networkPlayerId == playerId || GridPlayer(i).isAi)
+            if (GridPlayer(i).playerId == playerId || GridPlayer(i).racerIndex)
                 continue;
             int j;
             for (j = 0; j < g_TrackGame->mode.racerCount; j++) {
-                if (GridPlayer(i).networkPlayerId == g_TrackGame->mode.racers[j].networkPlayerId && g_TrackGame->mode.racers[j].racerIndex == 0) {
+                if (GridPlayer(i).playerId == g_TrackGame->mode.racers[j].networkPlayerId && g_TrackGame->mode.racers[j].racerIndex == 0) {
                     used[j] = 1;
                     break;
                 }
@@ -1002,8 +1002,8 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, TextureContext* te
             }
         }
         for (i = 0; i < racerCount; i++) {
-            int other = GridPlayer(i).networkPlayerId;
-            if (other == playerId || !GridPlayer(i).isAi)
+            int other = GridPlayer(i).playerId;
+            if (other == playerId || !GridPlayer(i).racerIndex)
                 continue;
             int j;
             for (j = 0; j < racerCount; j++) {
@@ -1201,8 +1201,8 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, TextureContext* te
         if (g_TrackGame->mode.raceSettings.aiRacerCount > 0) {
             aiRacers = new(__FILE__, 0x770) BikeRaceKrustyBikeView*[g_TrackGame->mode.raceSettings.aiRacerCount];
             for (i = 0; i < racerCount; i++) {
-                int other = GridPlayer(i).networkPlayerId;
-                if (other != playerId || !GridPlayer(i).isAi)
+                int other = GridPlayer(i).playerId;
+                if (other != playerId || !GridPlayer(i).racerIndex)
                     continue;
                 int j;
                 for (j = 0; j < g_TrackGame->mode.racerCount; j++) {
@@ -2418,16 +2418,15 @@ int BikeRace::OnControlPress(ControlEvent* event, InputButtonState* entry) {
                 if (picked != 0) {
                     if (raceScene->staticModels != 0) {
                         for (int i = 0; i < raceScene->staticModels->casterCount; i++) {
-                            PickSceneStaticModelView* caster =
-                                &((PickSceneStaticModelView*)raceScene->staticModels->casters)[i];
-                            if (caster->flags & 1) {
-                                if (picked == caster->physicsObject->collisionObject) {
+                            SceneStaticModel* caster = &raceScene->staticModels->casters[i];
+                            if (caster->physics) {
+                                if (picked == (int)caster->physicsObject->collisionObject) {
                                     RaceCameraView()->followingRacer = 1;
                                     targetCaster = i;
                                     NextCameraTarget(1, 0, 0);
                                     return 1;
                                 }
-                            } else if (picked == caster->collisionObject) {
+                            } else if (picked == (int)caster->collisionObject) {
                                 RaceCameraView()->followingRacer = 1;
                                 targetCaster = i;
                                 NextCameraTarget(1, 0, 0);
@@ -2439,13 +2438,13 @@ int BikeRace::OnControlPress(ControlEvent* event, InputButtonState* entry) {
                         for (int i = 0; i < raceScene->animationTable->entryCount; i++) {
                             SceneAnimation* entry = &raceScene->animationTable->entries[i];
                             if (entry->keyFramed) {
-                                if (picked == ((PickCollisionCharacterView*)entry->character)->collisionObject) {
+                                if (picked == (int)entry->character->collisionObject) {
                                     RaceCameraView()->followingRacer = 1;
                                     targetEntry = i;
                                     NextCameraTarget(1, 0, 1);
                                     return 1;
                                 }
-                            } else if (picked == ((PickProceduralObjectView*)entry->proceduralObject)->collisionObject) {
+                            } else if (picked == (int)entry->proceduralObject->bodyCollider) {
                                 RaceCameraView()->followingRacer = 1;
                                 targetEntry = i;
                                 NextCameraTarget(1, 0, 1);

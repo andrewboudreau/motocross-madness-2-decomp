@@ -58,7 +58,7 @@ struct KrustyVcrGridEntry {
         networkPlayerId = 0;
         points = 0;
     }
-    int networkPlayerId;  // +0x0  same 8-byte grid entry as BikeRaceGridEntryView (+0 compared with racers' networkPlayerId)
+    int networkPlayerId;  // +0x0  same 8-byte grid entry as TrackGame.h GridEntry (+0 compared with racers' networkPlayerId)
     char points;  // +0x4  same grid entry: TrackGame.h GridEntry::points (championship points)
 };
 
@@ -117,19 +117,10 @@ public:
     // +0x110 TrackGame+0x2d70's 0x1ec bytes, the race settings from
     // raceMode on (copied by 0x0049bf10, mode 0).
     unsigned char raceSettings[0x25c - 0x110];
-    KrustyVcrGridEntry gridEntries[8];  // +0x25C  raceSettings+0x14c (TrackGame+0x2ebc) copied with the settings: per grid slot player id (BikeRaceGridEntryView)
+    KrustyVcrGridEntry gridEntries[8];  // +0x25C  raceSettings+0x14c (TrackGame+0x2ebc) copied with the settings: per grid slot player id (TrackGame.h GridEntry)
     unsigned char field_0x29c[0x2fc - 0x29c];
     int racerCount;                           // +0x2fc racers recorded (the loader)
     KrustyVcrRacerRecord racers[11];         // +0x300 0x0049c070 / 0x0049c1e0
-};
-
-// The object at BikeRace+0x44: three GameObjects at +0x3c..+0x44 that a
-// restart turns on (slot 16 with 0).
-struct BikeRaceRaceSoundView {
-    unsigned char field_0x00[0x3c];
-    GameObject* engineGroup;  // +0x3C  RaceSound+0x3c engineGroup (RaceSound.h); a restart re-enables it
-    GameObject* field_0x40;
-    GameObject* effectsGroup;  // +0x44  RaceSound+0x44 effectsGroup (RaceSound.h); a restart re-enables it
 };
 
 // Shared chat overlay stored at BikeRace+0x19c and by the race events.
@@ -141,13 +132,6 @@ struct BikeRaceRiderView {
 };
 
 class BikeRace;
-
-// The object at a racer's +0x604: its +0x38 collision is paired with the
-// other racers' (the loader 0x00419970).
-struct BikeRaceWreckerView {
-    unsigned char field_0x00[0x38];
-    CollisionObject* collisionModel;  // +0x38  Wrecker+0x38 collisionModel (Wrecker.h); the loader pairs it with other racers' collisions
-};
 
 // A bike's engine setup (0x5c bytes): the loader copies TrackGameMode
 // +0xfd8 (TrackGame+0x1550) and fills it from KrustyUI's garage tables for
@@ -161,15 +145,6 @@ struct BikeEngineSetup {
     int rpmLowerLimit;                        // +0x50 "RPMLowerLimit"
     int rpmUpperLimit;                        // +0x54 "RPMUpperLimit"
     int rpmStep;                              // +0x58 a tenth of their range
-};
-
-// TrackGame+0x2ebc (race settings +0x14c): a network player's id and its
-// +5 byte, set for the AI racers a host runs.
-struct BikeRaceGridEntryView {
-    int networkPlayerId;  // +0x0  compared with localPlayer and slots[j].networkPlayerId (loader, grid order)
-    char points;  // +0x4  TrackGame.h GridEntry::points (championship points, the grid sort key)
-    char isAi;  // +0x5  set for a grid slot holding an AI racer of that player's host (racerIndex != 0)
-    unsigned char field_0x06[2];
 };
 
 // The object at a racer's +0x740 (its view, BikeRace): +0x18c set keeps the
@@ -341,7 +316,7 @@ public:
     void* leftBarContact;                     // +0x5f8 KrustyBike leftBarContact (Bike)
     void* rightBarContact;                    // +0x5fc KrustyBike rightBarContact (Bike)
     int tailContact;                          // +0x600 KrustyBike tailContact (Bike)
-    BikeRaceWreckerView* wrecker;  // +0x604  Bike+0x604 object (SetupWrecker with rider.col, StartAnimatedWreck: Wrecker); its collision model is paired
+    Wrecker* wrecker;  // +0x604  Bike+0x604 object (SetupWrecker with rider.col, StartAnimatedWreck: Wrecker); its collision model is paired
     unsigned char field_0x608[0x734 - 0x608];
     unsigned char netIndex;                   // +0x734 racer index in network messages
     char isRemote;  // +0x735  KrustyBike loader's remote argument (1 for other players' bikes); gates the +0x1414/+0x1418 pairing
@@ -570,32 +545,6 @@ struct BikeRaceKrustyBikeCameraView {
         targetCharacter = 0;
         shadowCaster = 0;
     }
-};
-
-// What slot 23 compares a pick against: a Scene+0xb8 caster's model (+0x08,
-// whose +0x128 is its collision) or its +0x0c, and a Scene+0xb4 entry's
-// character (+0x210) or object (+0x3c).
-struct PickPhysicsObjectView {
-    unsigned char field_0x000[0x128];
-    int collisionObject;  // +0x128  physics object's collision object (SoultreePhysicsBaseObject+0x128); compared with the pick
-};
-
-struct PickSceneStaticModelView {
-    unsigned char flags;  // +0x0  SceneStaticModel+0 bits; bit 0 physics: a physics object at +0x08
-    unsigned char field_0x01[0x08 - 0x01];
-    PickPhysicsObjectView* physicsObject;  // +0x8  SceneStaticModel+0x08 physicsObject
-    int collisionObject;  // +0xC  SceneStaticModel+0x0c collisionObject; compared with the pick
-    unsigned char fileName[0x28 - 0x10];  // +0x10 SceneStaticModel fileName (bytes kept)
-};
-
-struct PickCollisionCharacterView {
-    unsigned char field_0x000[0x210];
-    int collisionObject;                      // +0x210 krusty2 CollisionCharacter::collisionObject
-};
-
-struct PickProceduralObjectView {
-    unsigned char field_0x00[0x3c];
-    int collisionObject;  // +0x3C  procedural scene object's collision; slot 23 compares it with ObjectPicker::PickAtCursor
 };
 
 // The replay recorder's record kinds -1 (a tick) carry the time played and
