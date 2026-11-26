@@ -27,7 +27,8 @@ struct BikeWheel;
 struct BikeWheelQ;
 class Wrecker;
 struct BikeA644;
-struct BikeQ;
+class InlineShock;
+class RotatingShock;
 
 
 // 24-byte block the loader's sixth argument points to; copied into Bike+0x5c8 when present
@@ -100,8 +101,8 @@ struct BikeWheel {
     char pad_0x2a0[4];
     float leanCos;  // +0x2a4 Tire.h leanCos
     BikeWheelQ* aux;  // +0x2a8 VehicleWheel aux (Tire.h TireAux)
-    BikeQ* secondaryAux;  // +0x2ac VehicleWheel secondaryAux (the fallback when primaryAux is null)
-    BikeQ* primaryAux;  // +0x2b0 VehicleWheel primaryAux (attachment AddWheel stores)
+    RotatingShock* secondaryAux;  // +0x2ac VehicleWheel secondaryAux (the fallback when primaryAux is null); the rear swingarm shock
+    InlineShock* primaryAux;  // +0x2b0 VehicleWheel primaryAux (attachment AddWheel stores); the front fork shock
     char pad_0x2b4[4];
     float driveShare;  // +0x2b8 UpdateDriveShare (0x00513f90) stores the drive share here (fst [esi+0x2b8]; 1.0 on the other path)
     float driveShareComplement;  // +0x2bc UpdateDriveShare (0x00513f90) stores 1 - driveShare here (0 on the other path)
@@ -129,18 +130,6 @@ struct BikeA644 {
     float smoothRatio;
     float maxRise;
     float maxFall;
-};
-
-// Shock objects at BikeWheel+0x2ac (RotatingShock) / +0x2b0 (InlineShock); the classes are
-// in src/reconstructed/Suspension.h.
-struct BikeQ {
-    char pad_0x000[148];
-    float impulseScale;                       // VehicleShock +0x94 impulseScale; slot 65 stores min(min(0.6 * smoothedVerticalAccel, 100) * rate * 5, 10000)
-    float q_0x98;             // KrustyBike 0x00413200 stores the rear travel here
-    char pad_0x09c[0x24];
-    Vec3 q_0xc0;              // InlineShock::axis
-    void ClampAndStepAlong(float maxDelta, float dt, Vec3& pos);   // 0x004fa090 InlineShock::ClampAndStep
-    void ClampAndStep(float maxDelta, float dt);                   // 0x004fa8b0 RotatingShock::ClampAndStep
 };
 
 // The scene node (d3d_field_0x1a0, poseNode, SoultreeObject::firstChild) is SoultreeObject

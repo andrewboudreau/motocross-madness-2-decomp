@@ -31,6 +31,7 @@
 #include "tire/Tire.h"
 #include "broadphase/Quadtree.h"
 #include "../../reconstructed/Vegetation.h"
+#include "../../reconstructed/Suspension.h"
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
@@ -1620,8 +1621,8 @@ int KrustyBike::SimulateAIFrame(float dt)
     linearSpeed = BikeAILength(velocity);
     turnRate = 0.0f;
 
-    frontWheel->primaryAux->ClampAndStepAlong(-lookAheadFrontTravel, 0, frontWheel->primaryAux->q_0xc0 * -lookAheadFrontTravel);
-    rearWheel->secondaryAux->q_0x98 = lookAheadRearTravel;
+    frontWheel->primaryAux->ClampAndStep(-lookAheadFrontTravel, 0, frontWheel->primaryAux->axis * -lookAheadFrontTravel);
+    rearWheel->secondaryAux->length = lookAheadRearTravel;
     rearWheel->secondaryAux->ClampAndStep(lookAheadRearTravel, 0);
     if (!airborne)
         anyWheelInContact = 1;

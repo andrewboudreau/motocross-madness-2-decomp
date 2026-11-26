@@ -113,8 +113,8 @@ case. The other 73 were checked:
 | Body | Retail | Review |
 |---|---|---|
 | `RadarOverlay::DrawTrackOutline` | 0x51c720 | Case `radar_draw_track_outline`: random track graphs (rings, open chains, links, pre-flagged nodes), modes 0-3; 600 runs. |
-| `InlineShock::ClampAndStep` (`BikeQ::ClampAndStepAlong`) | 0x4fa090 | Case `shock_inline_clamp_and_step`; 800 runs. |
-| `RotatingShock::ClampAndStep` (`BikeQ::ClampAndStep`) | 0x4fa8b0 | Case `shock_rotating_clamp_and_step`, non-finite angles included; 800 runs. |
+| `InlineShock::ClampAndStep` (then the bring-up `BikeQ::ClampAndStepAlong`; BikeAI now calls Shock.cpp's body, which the case checks) | 0x4fa090 | Case `shock_inline_clamp_and_step`; 800 runs. |
+| `RotatingShock::ClampAndStep` (then the bring-up `BikeQ::ClampAndStep`; now Shock.cpp's body) | 0x4fa8b0 | Case `shock_rotating_clamp_and_step`, non-finite angles included; 800 runs. |
 | `Vec3Normalize` (CollisionVec3) | 0x5087b0 | Case `collision_vec3_normalize`, unit and zero vectors; 800 runs. |
 | `TireCross`, `ShockScaleCall` | 0x515600, 0x5015b0 | Cases `tire_cross`, `shock_scale_call` (forwarders; a swapped operand order is caught in 63 of 100 runs); 400 runs each. |
 | `LocalToWorldDirection` (two views) | 0x4fd5c0 | Cases `soultree_local_to_world_direction`, `tire_node_local_to_world_direction`; 400 runs each. |

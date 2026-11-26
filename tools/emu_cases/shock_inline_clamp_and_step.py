@@ -1,7 +1,6 @@
 """InlineShock::ClampAndStep 0x004fa090 (tools/emu_diff.py case).
 
-src/bringup/Group3_KrustyBikeAISupport.cpp re-implements it as BikeQ::ClampAndStepAlong with a
-shared static step tail. Offsets are retail's (0x004fa090 disassembly): scene node +0x44,
+The canonical body is src/krusty2/suspension/Shock.cpp. Offsets are retail's (0x004fa090 disassembly): scene node +0x44,
 atLimit +0x50, extending +0x54, ratio +0x70, displacement +0x74, step displacement +0x80,
 previous length +0x8c, length +0x98, velocity +0xb0, axis +0xc0, minimum length +0xcc.
 
@@ -12,8 +11,8 @@ is written only at the limit. Stubbed: SetPosition 0x004fc660 (position bytes no
 import random
 
 RETAIL_VA = 0x004fa090
-SYMBOL = '?ClampAndStepAlong@BikeQ@@QAEXMMAAUVec3@@@Z'
-SOURCE = 'src/bringup/Group3_KrustyBikeAISupport.cpp'
+SYMBOL = '?ClampAndStep@InlineShock@@QAEXMMAAUShockVec3@@@Z'
+SOURCE = 'src/krusty2/suspension/Shock.cpp'
 PROBES = {0x004fa0b1: 'at limit', 0x004fa27b: 'zero length'}
 
 

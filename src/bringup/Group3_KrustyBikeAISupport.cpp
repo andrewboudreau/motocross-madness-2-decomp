@@ -1,6 +1,6 @@
 // Group 3 bring-up: providers that BikeAI.cpp's KrustyBike steps (0x00413200, 0x00414370 in
 // src/krusty2/vehicle/BikeAI.cpp) and the look-ahead simulation 0x0040eca0 call through tier-3
-// views (KbRaceSub, KbWheel, BikeQ) that no src/ file defines.  KrustyBike::PickTrick is
+// views (KbRaceSub, KbWheel) that no src/ file defines.  KrustyBike::PickTrick is
 // linked from samples/physics/bikeai/KrustyBikeTrickPick.cpp.
 //
 // Status: best-guess-unreviewed.  Each body was read from the retail disassembly at the
@@ -74,109 +74,4 @@ int KbRaceSub::DistanceToStripEdge(Vec3 p, int segment, float* out, int mode)
 {
     return G3Track(this)->DistanceToStripEdge(G3TVec(p), reinterpret_cast<TrackSegment*>(segment),
                                               out, mode);
-}
-
-// ---------------------------------------------------------------------------------------
-// BikeQ: the wheel's shock (InlineShock at BikeWheel+0x2b0, RotatingShock at +0x2ac).  The
-// layout is the Shock of src/reconstructed/Suspension.h (MovingPart at +0x04 with its local
-// matrix at +0x04 and scene node at +0x44).  Bodies from 0x004fa090 / 0x004fa8b0
-// (src/krusty2/suspension/Shock.cpp, checked against the retail disassembly).
-// ---------------------------------------------------------------------------------------
-struct G3ShockView {
-    void* vtable;                // +0x00
-    char localMatrix[0x40];      // +0x04 MovingPart local matrix (Matrix4)
-    SoultreeObject* sceneNode;   // +0x44
-    char pad_0x48[0x08];
-    int atLimit;                 // +0x50
-    int extending;               // +0x54
-    Vec3 spring;                 // +0x58
-    Vec3 damper;                 // +0x64
-    float ratio;                 // +0x70
-    Vec3 displacement;           // +0x74
-    Vec3 stepDisplacement;       // +0x80
-    float prevLength;            // +0x8c
-    float clearedLength;         // +0x90
-    float impulseScale;          // +0x94
-    float length;                // +0x98
-    char pad_0x9c[0xb0 - 0x9c];
-    Vec3 velocity;               // +0xb0
-    char pad_0xbc[0xc0 - 0xbc];
-    // InlineShock: axis +0xc0, minLength +0xcc.  RotatingShock: maxAngle +0xc0, chord +0xc4,
-    // armLength +0xc8, angle +0xd0, rotationAxis +0xd4.
-    float f_0xc0;
-    float f_0xc4;
-    float f_0xc8;
-    float f_0xcc;
-    float angle;                 // +0xd0 (RotatingShock)
-    Vec3 rotationAxis;           // +0xd4 (RotatingShock)
-};
-
-static inline Vec3 G3Scale(const Vec3& v, float s) { return Vec3(v.x * s, v.y * s, v.z * s); }
-
-// Common tail of both ClampAndStep bodies: the per-step velocity from the length change,
-// clamped to maxDelta, and the step displacement.
-static void G3ShockStepTail(G3ShockView* s, float maxDelta, float dt)
-{
-    float delta = s->prevLength - s->length;
-    if (s->length != 0.0f) {
-        if (delta >= 0.0f) {
-            float clamped = (delta < maxDelta) ? delta : maxDelta;
-            s->velocity = G3Scale(s->displacement, clamped / (dt * s->length));
-        } else {
-            float clamped = (delta > -maxDelta) ? delta : -maxDelta;
-            s->velocity = G3Scale(s->displacement, clamped / (dt * s->length));
-        }
-        s->stepDisplacement = G3Scale(s->displacement, -(delta / s->length));
-    } else {
-        // kShockZero (0x00689e58) is the zero vector.
-        s->velocity = Vec3(0.0f, 0.0f, 0.0f);
-        s->stepDisplacement = Vec3(0.0f, 0.0f, 0.0f);
-    }
-    s->extending = (s->length > s->prevLength);
-    s->prevLength = s->length;
-}
-
-// 0x004fa090 (InlineShock::ClampAndStep, ret 0xc).
-void BikeQ::ClampAndStepAlong(float maxDelta, float dt, Vec3& pos)
-{
-    G3ShockView* s = reinterpret_cast<G3ShockView*>(this);
-    const Vec3& axis = *reinterpret_cast<const Vec3*>(&s->f_0xc0);
-    float minLength = s->f_0xcc;
-    if (s->length >= minLength) {
-        float negMin = -minLength;
-        s->atLimit = 1;
-        s->ratio = 1.0f;
-        pos = G3Scale(axis, negMin);
-        s->displacement = G3Scale(s->displacement, minLength / s->length);
-        s->length = minLength;
-    } else {
-        s->atLimit = 0;
-        s->ratio = s->length / minLength;
-    }
-    s->sceneNode->SetPosition(pos);
-    G3ShockStepTail(s, maxDelta, dt);
-}
-
-// 0x004fa8b0 (RotatingShock::ClampAndStep, ret 8).
-void BikeQ::ClampAndStep(float maxDelta, float dt)
-{
-    G3ShockView* s = reinterpret_cast<G3ShockView*>(this);
-    float chord = s->f_0xc4;
-    if (s->length >= chord) {
-        float limitScale = chord / s->length;
-        s->atLimit = 1;
-        s->ratio = 1.0f;
-        s->angle = s->f_0xc0;            // maxAngle
-        s->displacement = G3Scale(s->displacement, limitScale);
-        s->length = chord;
-    } else {
-        s->angle = s->length / s->f_0xc8;  // armLength
-        s->atLimit = 0;
-        s->ratio = s->length / chord;
-    }
-    if (_finite(s->angle)) {
-        s->sceneNode->SetLocalMatrix(reinterpret_cast<const Matrix4*>(s->localMatrix));
-        s->sceneNode->Rotate(s->rotationAxis, s->angle);
-    }
-    G3ShockStepTail(s, maxDelta, dt);
 }

@@ -1,7 +1,6 @@
 """RotatingShock::ClampAndStep 0x004fa8b0 (tools/emu_diff.py case).
 
-src/bringup/Group3_KrustyBikeAISupport.cpp re-implements it as BikeQ::ClampAndStep with a
-shared static step tail. Offsets are retail's (0x004fa8b0 disassembly): local matrix +0x04,
+The canonical body is src/krusty2/suspension/Shock.cpp. Offsets are retail's (0x004fa8b0 disassembly): local matrix +0x04,
 scene node +0x44, atLimit +0x50, extending +0x54, ratio +0x70, displacement +0x74, step
 displacement +0x80, previous length +0x8c, length +0x98, velocity +0xb0, max angle +0xc0,
 chord +0xc4, arm length +0xc8, angle +0xd0, rotation axis +0xd4.
@@ -15,8 +14,8 @@ maxDelta. Stubbed: SetLocalMatrix 0x004fca30 (matrix bytes noted) and Rotate 0x0
 import random
 
 RETAIL_VA = 0x004fa8b0
-SYMBOL = '?ClampAndStep@BikeQ@@QAEXMM@Z'
-SOURCE = 'src/bringup/Group3_KrustyBikeAISupport.cpp'
+SYMBOL = '?ClampAndStep@RotatingShock@@QAEXMM@Z'
+SOURCE = 'src/krusty2/suspension/Shock.cpp'
 PROBES = {0x004fa972: 'node update', 0x004faab6: 'zero length'}
 
 
