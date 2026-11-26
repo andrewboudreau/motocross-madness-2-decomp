@@ -110,7 +110,10 @@ public:
     // +0x1c..+0x30: a texture context block laid out like
     // TextureContext (TextureMap.h): the manager, two groups, two
     // formats and the halvings. The UI painters and ReplaceMaterialTexture
-    // take its address (KrustyUI.cpp copies all six).
+    // take its address (KrustyUI.cpp copies all six). Kept as six members:
+    // one TextureContext member moves TrackGame::Startup and
+    // ManagedTextureGroup::DrawSelection (both exact) out of their
+    // declaration-count windows (VC6_OPERAND_ORDER.md).
     TextureMapManager* textureContext;        // +0x1c
     int textureOpaqueGroup;                   // +0x20  texture context opaqueGroup (TextureContext +0x04); 0 after initialisation
     int textureAlphaGroup;                    // +0x24  texture context alphaGroup (+0x08); 0 after initialisation

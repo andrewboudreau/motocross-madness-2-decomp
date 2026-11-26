@@ -183,7 +183,7 @@ struct QuarryLoadKrustyBikeView {
     D3DIMSoultreeObject* modelNode;             // +0x3bc bike model
     unsigned char field_0x3c0[0x5c4 - 0x3c0];
     QuarryLoadRiderView* riderCharacter;      // +0x5c4
-    unsigned char loadInfo[0x5e0 - 0x5c8];    // +0x5c8 KrustyBike loadInfo (Bike, BikeA5C8) (bytes kept)
+    unsigned char loadInfo[0x5e0 - 0x5c8];    // +0x5c8 KrustyBike loadTextures (Bike, a TextureContext) (bytes kept)
     char riderName[0x10];                     // +0x5e0 KrustyBike riderName (Bike)
     CollisionObject* frontWheel;           // +0x5f0
     CollisionObject* rearWheel;            // +0x5f4
@@ -497,7 +497,7 @@ int BaseQuarryEvent::LoadEventObjects(LoadProgressFn progress) {
         return 0;
     }
     if (!eventScene->Load(renderContext, lightManager, (int)particleManager, (int)g_TrackGame->textureManager,
-                                           (int)&modelTextures, "Teraform\\Skies", (void (*)(int))progress,
+                                           &modelTextures, "Teraform\\Skies", (void (*)(int))progress,
                                            (int)ceil(sceneSteps * 0.1f)))
         return 0;
     if (progress)

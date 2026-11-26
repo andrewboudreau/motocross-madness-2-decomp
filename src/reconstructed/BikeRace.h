@@ -334,7 +334,7 @@ public:
     int gasGyro;                              // +0x5bc TrackGameMode gasGyro copy (slot 23 key 0x22)
     int brakeGyro;                            // +0x5c0 TrackGameMode brakeGyro copy (slot 23 key 0x30)
     BikeRaceRiderView* riderCharacter;     // +0x5c4
-    unsigned char loadInfo[0x5e0 - 0x5c8];    // +0x5c8 KrustyBike loadInfo (Bike, BikeA5C8) (bytes kept)
+    unsigned char loadInfo[0x5e0 - 0x5c8];    // +0x5c8 KrustyBike loadTextures (Bike, a TextureContext) (bytes kept)
     char riderName[0x10];                     // +0x5e0 KrustyBike riderName (Bike); EventKrustyBikeView racerName
     CollisionObject* frontWheel;       // +0x5f0 paired with the other racers' (the loader)
     CollisionObject* rearWheel;        // +0x5f4

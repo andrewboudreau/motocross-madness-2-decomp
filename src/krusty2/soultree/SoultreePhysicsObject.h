@@ -45,7 +45,7 @@ public:
     virtual ~SoultreePhysicsObject();             // core 0x005038d0, deleting 0x00503890
     virtual int Tick(float dt);                    // 0x00503c50 (vbase thunk 0x00504270)
     // Slot 40 (0x00503970, `ret 0x70` = 28 argument dwords, tier 1).  Grouping (tier 2):
-    //  * renderContext, modelPath, lights and options (a1..a4) go to D3DIMSoultreeObject::LoadModel
+    //  * renderContext, modelPath, lights and textures (a1..a4) go to D3DIMSoultreeObject::LoadModel
     //    (slot 9) as (a1, a2, a3, a4, 1); modelPath is also the name the ".col" path is built from, lights
     //    is tested at +0x25.
     //  * a5..a7 are three Vec3 by value (struct-copy shape) and a8..a22 are forwarded
@@ -55,7 +55,7 @@ public:
     //  * Returns the D3DIMSoultreeObject GameObject (+0x228), not the virtual one: the tail
     //    0x00503c16 null-checks `this`, then this+0x21c, then adds 12.
     virtual GameObject* LoadPhysicsModel(int renderContext, const char* modelPath,
-                                             const LightManager* lights, int options,
+                                             const LightManager* lights, const TextureContext* textures,
                                              Vec3 startPosition, Vec3 startForward,
                                              Vec3 startUp, void* terrainProbe,
                                              void* linkedObject, float weight,

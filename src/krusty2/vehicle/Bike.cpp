@@ -578,7 +578,7 @@ static inline int BikeFindWheelKind(const char* name, const BikeWheelKind* kinds
 }
 
 GameObject* Bike::LoadBike(int context, const char* engineName, const char* modelPath, const char* riderModel,
-                           const LightManager* lights, const BikeA5C8* info, Vec3 startPosition,
+                           const LightManager* lights, const TextureContext* textures, Vec3 startPosition,
                            Vec3 forward, Vec3 up, void* terrainProbe, VehicleInputMap* map,
                            const char* name, int a19, int defaultEngine, int* torqueTable,
                            int rpmLow, int rpmHigh, int rpmStep, float frontSpring, float frontDamper,
@@ -605,7 +605,7 @@ GameObject* Bike::LoadBike(int context, const char* engineName, const char* mode
 
     if (weight <= 0.0f)
         weight = 230.0f;
-    LoadVehicle(context, engineName, modelPath, lights, (int)info, startPosition, forward, up, terrainProbe,
+    LoadVehicle(context, engineName, modelPath, lights, textures, startPosition, forward, up, terrainProbe,
                 map, linkedObject, weight,
                 0.9f, 40.0f * 0.01745329f, device, 2, 3, 3, 1, 1, defaultEngine, torqueTable, rpmLow, rpmHigh,
                 rpmStep, 0.18f, steer, lean, throttle, trackObject, createCollision);
@@ -632,12 +632,12 @@ GameObject* Bike::LoadBike(int context, const char* engineName, const char* mode
     riderCharacter = (BikeA5C4*)new(__FILE__, 0x583) D3DIMSoultreeCharacter(GameObject::isEnabled);
     if (!GameObject::AppendChild(
             ((D3DIMSoultreeCharacter*)riderCharacter)->LoadCharacter(
-                (int)GameObject::renderContext, riderModel, lights, (int)info, 1, 1), -1))
+                (int)GameObject::renderContext, riderModel, lights, textures, 1, 1), -1))
         riderCharacter = 0;
     if (lights && lights->isEnabled)
         reinterpret_cast<D3DIMSoultreeObject*>(riderCharacter->c_0x1a0)->SetUseLighting(1);
-    if (info)
-        loadInfo = *info;
+    if (textures)
+        loadTextures = *textures;
     bodyForward = kVec3ZAxis;
     bodyUp = kVec3YAxis;
     StoreBodyAxes(1, 1);

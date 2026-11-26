@@ -2044,7 +2044,7 @@ void VehicleHitBy(CollisionObject* self, CollisionObject* other)
 // (0x004b9830, registered as a child through its slot 27) and the steering control
 // (0x00504b60) aligned with the negated third axis, and installs the hit callbacks.
 GameObject* Vehicle::LoadVehicle(int context, const char* engineName, const char* modelPath,
-                                 const LightManager* lights, int loadInfo, Vec3 startPosition, Vec3 startForward,
+                                 const LightManager* lights, const TextureContext* textures, Vec3 startPosition, Vec3 startForward,
                                  Vec3 startUp, void* terrainProbe, VehicleInputMap* map, void* linkedObject,
                                  float weight, float suspensionScale, float steerScale, void* device, int wheelCap,
                                  int extraContacts, int attachmentSlots, int earlyCap, int lateCap, int defaultEngine,
@@ -2099,7 +2099,7 @@ GameObject* Vehicle::LoadVehicle(int context, const char* engineName, const char
         engineState = reinterpret_cast<VehicleSpeedState*>(new(__FILE__, 0x1b5) EngineGearbox(
             engineName, 0.02f, torqueTable, rpmLow, rpmHigh, rpmStep, reinterpret_cast<const int&>(gearArg),
             controlResponse[2], controlResponse[3]));
-    SoultreePhysicsCharacter::LoadPhysicsModel(context, 0, modelPath, lights, loadInfo, startPosition,
+    SoultreePhysicsCharacter::LoadPhysicsModel(context, 0, modelPath, lights, textures, startPosition,
                                                    startForward, startUp, terrainProbe, linkedObject,
                                                    weight, wheelCap + extraContacts, attachmentSlots,
                                                    trackObject, 0.02f, 100, 0.001f, 0.1f, 3,

@@ -67,7 +67,7 @@ public:
     //    SceneManager caller 0x004ed3bf passes the result to GameObject::AppendChild.
     virtual GameObject* LoadPhysicsModel(int renderContext, int createCenterNode,
                                              const char* modelPath,
-                                             const LightManager* lights, int loadInfo,
+                                             const LightManager* lights, const TextureContext* textures,
                                              Vec3 startPosition, Vec3 startForward,
                                              Vec3 startUp, void* terrainProbe,
                                              void* linkedObject, float weight,

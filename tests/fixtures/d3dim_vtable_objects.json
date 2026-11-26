@@ -20,22 +20,22 @@
     "src/krusty2/soultree/SoulTreePhysics.cpp": {
       "sections": 163,
       "relocations": 787,
-      "sha256": "f8b1028fe8421bb9502f2cfac75b3f803b6cc359293360b9683e76fc3332135a"
+      "sha256": "29993d1581b89cbe2f9a75e9a188c512f4eb33cf9b0c4dd0014a4ffe9f78934a"
     },
     "src/krusty2/vehicle/Vehicle.cpp": {
       "sections": 151,
       "relocations": 720,
-      "sha256": "6688ab36ab2aaac44c5926aabe37267bee42ed97cc27165380c1cd507567990c"
+      "sha256": "e942e1a644d5ee3e5940e98ada4a738518b8c899c2067de9dfb318bd502bf4a3"
     },
     "src/krusty2/vehicle/Bike.cpp": {
       "sections": 243,
       "relocations": 1105,
-      "sha256": "234cddfbadb474c59a7aa2c0b0dfcb4c4df44530ed479660934323456e2efc2d"
+      "sha256": "c4b866a62af560efc31decfc9faba6a1171e746b09d473bec63525f2cea3effa"
     },
     "src/krusty2/vehicle/KrustyBike.cpp": {
       "sections": 271,
       "relocations": 1443,
-      "sha256": "7488ff40df47e6611051971b02304313fa832dd721c09f5067430066520f9b4f"
+      "sha256": "ca95430d616fcda10fec96c8fca54392c7b863eba6b0861b2ad01da37a84edab"
     },
     "src/krusty2/collision/CollisionObject.cpp": {
       "sections": 136,
@@ -45,7 +45,7 @@
     "src/krusty2/motion/D3DIMSoultreeMotnctrl.cpp": {
       "sections": 62,
       "relocations": 273,
-      "sha256": "5fe1c6c8a0a26254419c23b04f68df06e2e6ed3c37cde5f612b136da1bfd8755"
+      "sha256": "0b2dbd9502916511b9eec410d7aaa6e9f88aff998dea42db2c0d94d1568c8597"
     }
   },
   "strict": [
@@ -450,14 +450,14 @@
     },
     {
       "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
-      "symbol": "?LoadPhysicsModel@SoultreePhysicsObject@@UAEPAVGameObject@@HPBDPBVLightManager@@HUVec3@@22PAX3MHHPAVSoultreeSlot1f0@@MHMMMHHEH@Z",
+      "symbol": "?LoadPhysicsModel@SoultreePhysicsObject@@UAEPAVGameObject@@HPBDPBVLightManager@@PBUTextureContext@@UVec3@@33PAX4MHHPAVSoultreeSlot1f0@@MHMMMHHEH@Z",
       "target_va": "0x00503970",
       "target_size": 724,
       "bindings": "src/krusty2/soultree/SoulTreePhysics.bindings.json"
     },
     {
       "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
-      "symbol": "?LoadPhysicsModel@SoultreePhysicsCharacter@@UAEPAVGameObject@@HHPBDPBVLightManager@@HUVec3@@22PAX3MHHPAVSoultreeSlot1f0@@MHMMHEH@Z",
+      "symbol": "?LoadPhysicsModel@SoultreePhysicsCharacter@@UAEPAVGameObject@@HHPBDPBVLightManager@@PBUTextureContext@@UVec3@@33PAX4MHHPAVSoultreeSlot1f0@@MHMMHEH@Z",
       "target_va": "0x00503de0",
       "target_size": 731,
       "bindings": "src/krusty2/soultree/SoulTreePhysics.bindings.json"

@@ -212,7 +212,7 @@
   "additional_functions": [
     [
       "src/reconstructed/SceneManager.cpp",
-      "?ReadAnimations@Scene@@QAEHPAVLightManager@@HHP6AXH@ZH@Z",
+      "?ReadAnimations@Scene@@QAEHPAVLightManager@@HPBUTextureContext@@P6AXH@ZH@Z",
       5169120,
       5335,
       "847993de0c5b498cde320bc7642a190020db56abb60c07cdd6481dc552cbf08e"

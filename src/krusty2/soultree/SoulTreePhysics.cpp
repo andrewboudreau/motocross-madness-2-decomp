@@ -1128,7 +1128,7 @@ extern ResourceManager* g_ResourceManager; // pointer stored at 0x00572b44
 // SoultreePhysicsObject has two GameObjects, so sceneNode and the GameObject call are
 // qualified.
 GameObject* SoultreePhysicsObject::LoadPhysicsModel(int renderContext, const char* modelPath,
-                                                        const LightManager* lights, int options,
+                                                        const LightManager* lights, const TextureContext* textures,
                                                         Vec3 startPosition, Vec3 startForward,
                                                         Vec3 startUp, void* terrainProbe, void* linkedObject,
                                                         float weight, int contactCapacity, int attachmentSlots,
@@ -1141,7 +1141,7 @@ GameObject* SoultreePhysicsObject::LoadPhysicsModel(int renderContext, const cha
     char colPath[0x104];
 
     // Slot 9 takes the five dwords unchanged; its third is this loader's light manager.
-    D3DIMSoultreeObject::LoadModel((void*)renderContext, modelPath, (int)lights, options, 1);
+    D3DIMSoultreeObject::LoadModel((void*)renderContext, modelPath, (int)lights, (int)textures, 1);
     SoultreePhysicsBaseObject::InitializePhysics(renderContext, 1, startPosition, startForward, startUp, terrainProbe, linkedObject, weight, contactCapacity, attachmentSlots,
                                                    trackObject, fixedStep, maxSteps, drag, elasticity, radius, shapeMode, restThreshold,
                                                    probeMask, createCollision);
@@ -1200,7 +1200,7 @@ SoultreePhysicsCharacter::~SoultreePhysicsCharacter()
 // character: D3DIM character slot 11 instead of the object's slot 9, line 0x8cd, the pose
 // node set from the model node, and shape setup 0x004324b0 when no ".col" file exists.
 GameObject* SoultreePhysicsCharacter::LoadPhysicsModel(int renderContext, int createCenterNode, const char* modelPath,
-                                                           const LightManager* lights, int loadInfo,
+                                                           const LightManager* lights, const TextureContext* textures,
                                                            Vec3 startPosition, Vec3 startForward,
                                                            Vec3 startUp, void* terrainProbe, void* linkedObject,
                                                            float weight, int contactCapacity, int attachmentSlots,
@@ -1211,7 +1211,7 @@ GameObject* SoultreePhysicsCharacter::LoadPhysicsModel(int renderContext, int cr
     char name[0x104];
     char colPath[0x104];
 
-    D3DIMSoultreeCharacter::LoadCharacter(renderContext, modelPath, lights, loadInfo, 1, 1);
+    D3DIMSoultreeCharacter::LoadCharacter(renderContext, modelPath, lights, textures, 1, 1);
     poseNode = sceneNode = modelNode;
     SoultreePhysicsBaseObject::InitializePhysics(renderContext, createCenterNode, startPosition, startForward, startUp, terrainProbe, linkedObject, weight, contactCapacity, attachmentSlots,
                                                    trackObject, fixedStep, maxSteps, drag, elasticity, 0.0f, 0, restThreshold, probeMask,

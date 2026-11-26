@@ -11,6 +11,7 @@
 
 class LightEmitter;
 class LightManager;
+struct TextureContext;
 class Sound;
 class SoundGroup;
 struct DS3DBuffer;
@@ -232,18 +233,18 @@ public:
     void LogDefaultParameter(const char* section, const char* key, const char* value);
     // 0x004efb20: loads the scene: its file, the start and podium positions,
     // the environment, lights, fog, resources, stadium and the rest.
-    int Load(void* owner, LightManager* lights, int particleManager, int textureManager, int modelTextures,
+    int Load(void* owner, LightManager* lights, int particleManager, int textureManager, const TextureContext* modelTextures,
                               const char* cubeDirectory, void (*progress)(int), int interval);
     // 0x004ecd60: reads "StaticModels": a model per "Model<n>", with its
     // physics object, collision points and particle emitters or its
     // collision object, and its sound emitter. `progress` is called every
     // `interval` models.
-    int ReadStaticModels(LightManager* lights, int particleManager, int textureManager, int modelTextures, void (*progress)(int),
+    int ReadStaticModels(LightManager* lights, int particleManager, int textureManager, const TextureContext* modelTextures, void (*progress)(int),
                               int interval);
     // 0x004edfe0: reads "Animations": a key-framed character or a procedural
     // car per "Animation<n>", with its motions and sound emitter, then the
     // "RandomSet<n>" sections.
-    int ReadAnimations(LightManager* lights, int textureManager, int modelTextures, void (*progress)(int),
+    int ReadAnimations(LightManager* lights, int textureManager, const TextureContext* modelTextures, void (*progress)(int),
                               int interval);           // near miss
     int ReadSounds();                                // 0x004ef4c0: reads the "Sounds" section
     int ReadEnvironment(const char* directory, const char* cubeDirectory); // 0x004ebfc0: "Environment"

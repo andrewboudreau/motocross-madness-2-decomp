@@ -1029,7 +1029,7 @@ static inline int FindEmitter(const char* name, const SceneEmitterTypeKeyword* t
 // 0x004ecd60: see the declaration. A model whose ".seg" name is the
 // stadium's gets no collision object; its ".col" file is used when the
 // archive has one.
-int Scene::ReadStaticModels(LightManager* lights, int particleManager, int textureManager, int modelTextures, void (*progress)(int),
+int Scene::ReadStaticModels(LightManager* lights, int particleManager, int textureManager, const TextureContext* modelTextures, void (*progress)(int),
                                  int interval)
 {
     int models;
@@ -1211,7 +1211,7 @@ int Scene::ReadStaticModels(LightManager* lights, int particleManager, int textu
             staticModels->casters[i].physicsObject = 0;
             D3DIMSoultreeObject* object = new(__FILE__, 1956) D3DIMSoultreeObject(1);
             staticModels->casters[i].model = object;
-            AppendChild(object->LoadModel(renderContext, sltPath, (int)lights, modelTextures, 1), -1);
+            AppendChild(object->LoadModel(renderContext, sltPath, (int)lights, (int)modelTextures, 1), -1);
             int length = strcspn(sltPath, ".");
             count = length < 0x14 ? length : 0x14;
             strncpy(staticModels->casters[i].fileName, sltPath, count);
@@ -1301,7 +1301,7 @@ void Scene::AttachCasterShadows(ProjectedShadow* shadow, int flags)
 // Not exact (5289 of 5335 bytes: instructions, calls, EH states and the 0xcfc frame match;
 // retail lets the random-set entries offset share fps's home and keeps i's to itself, and
 // reloads motionCount as [ebx + ecx + 0x1c]; docs/SCENEMANAGER.md lists the forms tried).
-int Scene::ReadAnimations(LightManager* lights, int textureManager, int modelTextures, void (*progress)(int), int interval)
+int Scene::ReadAnimations(LightManager* lights, int textureManager, const TextureContext* modelTextures, void (*progress)(int), int interval)
 {
     float fps;
     int animations;
@@ -1444,7 +1444,7 @@ int Scene::ReadAnimations(LightManager* lights, int textureManager, int modelTex
         if (!animationTable->entries[i].keyFramed) {
             CarProcedural* car = new(__FILE__, 2305) CarProcedural(1);
             animationTable->entries[i].proceduralObject = car;
-            if (!AppendChild(car->Create(renderContext, sltPath, colPath, (int)lights, modelTextures, 0, vuePath,
+            if (!AppendChild(car->Create(renderContext, sltPath, colPath, (int)lights, (int)modelTextures, 0, vuePath,
                                                                  &animationTable->entries[i].position, fps,
                                                                  frontWheelsTurn, lagDistance, 1.0f, tires, 0, 0, 0),
                                        -1)) {
@@ -1758,7 +1758,7 @@ int Scene::OnControlPress(ControlEvent* event, InputButtonState* entry)
 // an emitter in `lights` for each light that emits; then the fog, resource
 // files, stadium and the 0x004ecd60/0x004edfe0/0x004ef4c0 parts. Returns 0
 // when a part fails.
-int Scene::Load(void* owner, LightManager* lights, int particleManager, int textureManager, int modelTextures,
+int Scene::Load(void* owner, LightManager* lights, int particleManager, int textureManager, const TextureContext* modelTextures,
                                  const char* cubeDirectory, void (*progress)(int), int interval)
 {
     int logProgress;

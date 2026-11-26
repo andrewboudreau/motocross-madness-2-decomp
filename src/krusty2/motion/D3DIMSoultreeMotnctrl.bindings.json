@@ -31,7 +31,7 @@
   "?CopyModelFrom@D3DIMSoultreeCharacter@@UAEXH@Z$ehhandler": "0x0054a287",
   "?CopyFrom@SoultreeMaterial@@QAEXPBV1@@Z": "0x005000f0",
   "?CountNodes@SoultreeObject@@QAEHXZ": "0x004fda30",
-  "?LoadCharacter@D3DIMSoultreeCharacter@@UAEPAVGameObject@@HPBDPBVLightManager@@HHH@Z$ehhandler": "0x0054a1e1",
+  "?LoadCharacter@D3DIMSoultreeCharacter@@UAEPAVGameObject@@HPBDPBVLightManager@@PBUTextureContext@@HH@Z$ehhandler": "0x0054a1e1",
   "?DebugFree@@YAXPAXPBDH@Z": "0x004a2e60",
   "?DebugMalloc@@YAPAXIPBDH@Z": "0x004a2e20",
   "?FillNodeNames@@YAHHPAUNodeNameEntry@@PAVSoultreeObject@@@Z": "0x00445460",

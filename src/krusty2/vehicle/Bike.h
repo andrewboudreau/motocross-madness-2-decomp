@@ -40,7 +40,7 @@ struct BikeA38;
 
 // 24-byte block the loader's sixth argument points to; copied into Bike+0x5c8 when present
 // (tier 3: contents unknown, only the whole-block copy is decoded).
-#include "BikeLoaderRecord.h"
+#include "../../reconstructed/TextureLoader.h"
 
 // Particle emitters the loader hangs on the bike (src/reconstructed/ParticleEmitters.h:
 // Dust 0x80 bytes, DirtChunk 0x608, Steam 0x47c).  Provisional views: the constructor, the

@@ -148,8 +148,10 @@ public:
 
 // The loaders take the scene's LightManager (D3DIMSoultreeCharacter slot 11, D3DIMSoultreeObject
 // slot 9); both slot 40 loaders and Bike::LoadBike turn lighting on for the model
-// (SetUseLighting(1)) when it is enabled (`test byte [p+0x25],1`, GameObject::isEnabled).
+// (SetUseLighting(1)) when it is enabled (`test byte [p+0x25],1`, GameObject::isEnabled), and
+// their texture context (TextureLoader.h).
 class LightManager;
+struct TextureContext;
 
 class D3DIMSoultreeCharacter : public Character {
 public:
@@ -172,12 +174,12 @@ public:
     // --- slot 11, introduced here ---
     // path/lights types follow SoultreePhysicsCharacter slot 40, which passes its name string and
     // light manager here (tier 2).  context and unused go to SetCharacterRenderContext; lights is
-    // kept in loadLights (+0x204), a copy of the 0x18-byte loadInfo block (when nonzero) in
-    // loadInfoCopy (+0x208) and useOptions in loadUseOptions (+0x20c) (tier 1 decode).
+    // kept in loadLights (+0x204), a copy of the textures (when given) in
+    // loadTextures (+0x208) and useOptions in loadUseOptions (+0x20c) (tier 1 decode).
     // Returns the GameObject subobject (this converted to GameObject*) on success, 0 when the
     // resource could not be found and the object released itself (tier 1 decode of 0x00445680).
     virtual GameObject* LoadCharacter(int context, const char* path, const LightManager* lights,
-                                           int loadInfo, int useOptions, int unused); // 0x00445680 (ret 0x18)
+                                           const TextureContext* textures, int useOptions, int unused); // 0x00445680 (ret 0x18)
 
     // D3DIM's own data 0x1a0..0x210 (then vtordisp at 0x210, GameObject at 0x214).
     // modelNode is the pointer that SoultreePhysicsCharacter code reads at the
@@ -191,7 +193,7 @@ public:
     // exact (VC6's declaration-count tie-break).
     int d3d_field_0x1f4[4];
     const LightManager* loadLights;     // +0x204 slot 11's lights; BuildModel passes them to both model loads
-    struct LoadDescCopy* loadInfoCopy;  // +0x208 slot 11's 0x18-byte copy of loadInfo (DebugMalloc line 0x64); freed by the destructor
+    TextureContext* loadTextures;       // +0x208 slot 11's copy of its textures (DebugMalloc line 0x64); freed by the destructor
     int loadUseOptions;              // +0x20c slot 11's useOptions; BuildModel's second model load gets it
 };
 

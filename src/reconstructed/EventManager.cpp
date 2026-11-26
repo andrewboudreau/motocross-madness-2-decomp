@@ -446,7 +446,7 @@ struct PodiumRiderView {                    // racer +0x5c4
 struct PodiumKrustyBikeView {
     unsigned char field_0x000[0x5c4];
     PodiumRiderView* riderCharacter;      // +0x5c4
-    unsigned char loadInfo[0x5e0 - 0x5c8];    // +0x5c8 Bike loadInfo (a BikeA5C8; bytes kept)
+    unsigned char loadInfo[0x5e0 - 0x5c8];    // +0x5c8 Bike loadTextures (a TextureContext; bytes kept)
     char riderName[16];                       // +0x5e0 Bike riderName
     void* frontWheel;                         // +0x5f0 Bike frontWheel
     void* rearWheel;                          // +0x5f4 Bike rearWheel
@@ -479,16 +479,6 @@ struct PodiumKrustyBikeView {
     void* heapBufferA;                        // +0x77c KrustyBike heapBufferA
     void* heapBufferB;                        // +0x780 KrustyBike heapBufferB
     int place;                                      // +0x784
-};
-// Game+0x1c's resource context, as the podium characters' slot 11 takes it
-// (laid out like TextureMap.h's TextureContext).
-struct PodiumTextureContextView {
-    TextureMapManager* textureManager;              // +0x00
-    int opaqueGroup;                                // +0x04
-    int alphaGroup;                                 // +0x08
-    int opaqueFormat;                               // +0x0c
-    int alphaFormat;                                // +0x10
-    int halvings;                                   // +0x14
 };
 
 extern "C" Vector3* __stdcall D3DRMVectorRotate(Vector3* result, Vector3* vector, Vector3* axis,
@@ -632,10 +622,10 @@ int EventManager::CreatePodiumScene() {
         D3DRMVectorRotate(&rotated, &facings[i], &kVec3YAxis, angle);
         facings[i] = rotated * PodiumLength(facings[i]);
     }
-    PodiumTextureContextView context;
-    context.textureManager = g_TrackGame->textureManager;
-    context.opaqueGroup = PODIUM_OWNER(owner)->opaqueTextureGroup;
-    context.alphaGroup = PODIUM_OWNER(owner)->alphaTextureGroup;
+    TextureContext context;
+    context.manager = g_TrackGame->textureManager;
+    context.opaqueGroup = (ManagedTextureGroup*)PODIUM_OWNER(owner)->opaqueTextureGroup;
+    context.alphaGroup = (ManagedTextureGroup*)PODIUM_OWNER(owner)->alphaTextureGroup;
     context.opaqueFormat = ((RenderTarget*)renderContext)->surfacePixelFormat;
     context.alphaFormat = 0x115c;
     context.halvings = 0;
@@ -671,7 +661,7 @@ int EventManager::CreatePodiumScene() {
         D3DIMSoultreeCharacter*& character = podiumCharacters[place - 1];
         character = new(__FILE__, 0x31d) D3DIMSoultreeCharacter(isEnabled);
         character->LoadCharacter((int)renderContext, path, PODIUM_OWNER(owner)->lights,
-                                       (int)&context, 1, 1);
+                                       &context, 1, 1);
         view->AppendChild(character, -1);
         if (character) {
             if (PODIUM_OWNER(owner)->lights && PODIUM_OWNER(owner)->lights->isEnabled)
@@ -694,7 +684,7 @@ int EventManager::CreatePodiumScene() {
             if (racer) {
                 SoultreeMaterial** texture = ((PodiumKrustyBikeView*)racer)->riderCharacter->modelNode->materialTable;
                 if (texture)
-                    PODIUM_MODEL(character)->ReplaceMaterialTexture(0, (*texture)->textureName, reinterpret_cast<TextureContext*>(&context));
+                    PODIUM_MODEL(character)->ReplaceMaterialTexture(0, (*texture)->textureName, &context);
             }
         }
     }

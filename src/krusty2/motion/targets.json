@@ -942,7 +942,7 @@
   {
     "class": "D3DIMSoultreeCharacter",
     "source": "D3DIMSoultreeMotnctrl.cpp",
-    "candidate_symbol_contains": "?LoadCharacter@D3DIMSoultreeCharacter@@UAEPAVGameObject@@HPBDPBVLightManager@@HHH@Z",
+    "candidate_symbol_contains": "?LoadCharacter@D3DIMSoultreeCharacter@@UAEPAVGameObject@@HPBDPBVLightManager@@PBUTextureContext@@HH@Z",
     "target_va": "0x00445680",
     "target_size": 788,
     "expect": "exact",

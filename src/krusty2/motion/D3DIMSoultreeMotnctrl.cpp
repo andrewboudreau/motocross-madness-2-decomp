@@ -10,6 +10,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "core/DebugAlloc.h"
+#include "../../reconstructed/TextureLoader.h"
 #include "collision/CollisionObject.h"
 #include "math/Math3D.h"
 #include "motion/D3DIMSoultreeCharacter.h"
@@ -218,8 +219,8 @@ void D3DIMSoultreeCharacter::CaptureRestPose()
 // owned by this object, then runs Character's destructor.
 D3DIMSoultreeCharacter::~D3DIMSoultreeCharacter()
 {
-    if (loadInfoCopy)
-        DebugFree(loadInfoCopy, __FILE__, 0xc4);
+    if (loadTextures)
+        DebugFree(loadTextures, __FILE__, 0xc4);
     if (nodeNames)
         operator delete(nodeNames);
     void* entry = g_ResourceManager->FindItemByObject(this);
@@ -255,7 +256,7 @@ D3DIMSoultreeCharacter::D3DIMSoultreeCharacter(int flags) : GameObject(1), Chara
     d3d_field_0x1f4[1] = 0;
     d3d_field_0x1f4[2] = 0;
     d3d_field_0x1f4[3] = 0;
-    loadInfoCopy = 0;
+    loadTextures = 0;
     nodeNames = 0;
 }
 
@@ -323,7 +324,7 @@ void D3DIMSoultreeCharacter::BuildModel()
 
     ModelObject* frame = reinterpret_cast<ModelObject*>(new(__FILE__, 0xd6) D3DIMSoultreeObject(isEnabled));
     modelNode = (SoultreeObject*)frame;
-    frame->Load(renderContext, "", (int)loadLights, (int)loadInfoCopy, 1);
+    frame->Load(renderContext, "", (int)loadLights, (int)loadTextures, 1);
     GameObject* frameChild = (ModelObject*)modelNode;
     AppendChild(frameChild, -1);
     modelNode->RegisterNode();
@@ -333,7 +334,7 @@ void D3DIMSoultreeCharacter::BuildModel()
     modelNode->name[copyLength] = 0;
 
     ModelObject* loaded = reinterpret_cast<ModelObject*>(new(__FILE__, 0xdf) D3DIMSoultreeObject(isEnabled));
-    loaded->Load(renderContext, name, (int)loadLights, (int)loadInfoCopy, loadUseOptions);
+    loaded->Load(renderContext, name, (int)loadLights, (int)loadTextures, loadUseOptions);
     ((SoultreeObject*)loaded)->UnregisterNode();
     void* owner = g_ResourceManager->FindItemByObject(loaded);
     if (owner)
@@ -369,16 +370,13 @@ void D3DIMSoultreeCharacter::BuildModel()
 unsigned int ReadClock();                                // 0x004bfa80: timeBeginPeriod(1), timeGetTime, timeEndPeriod(1); result unused here
 #include "../../reconstructed/FileStream.h"
 #include "../../reconstructed/Parameterblocks.h"
-struct LoadDescCopy {                                    // 0x18-byte block copied by slot 11 (no member is read in this TU)
-    int field_0x00[6];
-};
 
 // slot 11 (0x00445680, ret 0x18): loads a character from the resource 'path'.  The file name part is looked up
 // in the owner registry; a cached entry with an owner is cloned through slot 8, otherwise the .slt file is read
 // and the new object becomes the entry's owner.  Returns the GameObject subobject, or 0 when the lookup fails
 // (the object has then released itself).
 GameObject* D3DIMSoultreeCharacter::LoadCharacter(int context, const char* path, const LightManager* lights,
-                                                       int loadInfo, int useOptions, int unused)
+                                                       const TextureContext* textures, int useOptions, int unused)
 {
     char drive[4];
     char fname[0x100];
@@ -388,10 +386,10 @@ GameObject* D3DIMSoultreeCharacter::LoadCharacter(int context, const char* path,
     SetCharacterRenderContext(context, unused);
     loadLights = lights;
     loadUseOptions = useOptions;
-    if (loadInfo) {
-        LoadDescCopy* copy = (LoadDescCopy*)DebugMalloc(0x18, __FILE__, 0x64);
-        loadInfoCopy = copy;
-        *copy = *(LoadDescCopy*)loadInfo;
+    if (textures) {
+        TextureContext* copy = (TextureContext*)DebugMalloc(sizeof(TextureContext), __FILE__, 0x64);
+        loadTextures = copy;
+        *copy = *textures;
     }
     FileStream* file = new(__FILE__, 0x68) FileStream(g_ResourceManager);
     _splitpath(path, drive, dir, fname, ext);

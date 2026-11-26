@@ -389,6 +389,6 @@
   "_s_kbTrickLength": "0x0056cc60",
   "_s_kbTrickFrame": "0x0056d060",
   "?PointInPlacementSquare@@YAHPBUCollisionVec3@@MMMMPAM111@Z": "0x004b0ac0",
-  "?LoadBike@Bike@@QAEPAVGameObject@@HPBD00PBVLightManager@@PBUBikeA5C8@@UVec3@@33PAXPAUVehicleInputMap@@0HHPAHHHHMMMMMMHH44PAUVehicleAxis@@77PAVSoultreeSlot1f0@@MH@Z": "0x004079c0",
+  "?LoadBike@Bike@@QAEPAVGameObject@@HPBD00PBVLightManager@@PBUTextureContext@@UVec3@@33PAXPAUVehicleInputMap@@0HHPAHHHHMMMMMMHH44PAUVehicleAxis@@77PAVSoultreeSlot1f0@@MH@Z": "0x004079c0",
   "?Load@KrustyBike@@QAEPAVGameObject@@PAXPBD11PAVLightManager@@PAUTextureContext@@UVector3@@44PAVTerrain@@PAVControlInterface@@DEPAVBikeRace@@1HHPBUKbBikeSetup@@HHHPAVScene@@PAVKrustyVCR@@MH@Z$ehhandler": "0x0054bd32"
 }

@@ -949,7 +949,7 @@ GameObject* KrustyBike::Load(void* context, const char* engineName, const char* 
     }
     statusNode = 0;
     LoadBike((int)context, engineName, modelPath, riderModel, lights,
-             (const BikeA5C8*)textures, *(Vec3*)&startPosition, *(Vec3*)&forward, *(Vec3*)&up, terrain,
+             textures, *(Vec3*)&startPosition, *(Vec3*)&forward, *(Vec3*)&up, terrain,
              (VehicleInputMap*)control, riderName, a16,
              setup == 0,
              setup ? (int*)setup->eqBands : 0,

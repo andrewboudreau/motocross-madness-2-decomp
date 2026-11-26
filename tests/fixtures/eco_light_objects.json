@@ -17,7 +17,7 @@
     "src/reconstructed/SceneManager.cpp": {
       "sections": 335,
       "relocations": 1757,
-      "sha256": "740e99ad3886a7ac83c9f5f4c2be0b984b0c43e1d421266ccb96060c01998ce7"
+      "sha256": "c23198277b31d2e5661d660ac86c4ab4cb9a49051b8999f125d057239f3695bd"
     },
     "src/reconstructed/KrustyUI.cpp": {
       "sections": 317,
@@ -27,7 +27,7 @@
     "src/reconstructed/QuarryStuntEvent.cpp": {
       "sections": 145,
       "relocations": 923,
-      "sha256": "bf1c1764d6a27e07aadd1521ea221720e76e363d82a792cf952ea1df33cbbf1f"
+      "sha256": "4264417baf349b09bc0409e770f08784c9eb13e054b3dd79c571419c2cd09a0d"
     },
     "src/reconstructed/ArcadeObject.cpp": {
       "sections": 32,
