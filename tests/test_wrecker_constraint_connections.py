@@ -28,8 +28,8 @@ PROVIDER = 'src/krusty2/constraint/ConstraintMethodCollisionModel.cpp'
 # must be imported once by the caller and defined by PROVIDER.
 CONSTRAINT_CALLS = (
     '??0ConstraintMethodCollisionModel@@QAE@H@Z',
-    '?SetBody@ConstraintMethodCollisionModel@@QAEXPAVConBody@@HPBD@Z',
-    '?AddProbePoint@ConstraintMethodCollisionModel@@QAEXUVec3@@PAVConNode@@@Z',
+    '?SetBody@ConstraintMethodCollisionModel@@QAEXPAVPhysicsBody@@HPBD@Z',
+    '?AddProbePoint@ConstraintMethodCollisionModel@@QAEXUVec3@@PAVSoultreeObject@@@Z',
 )
 FILENAMES = (CALLER,)
 HEADERS = {CALLER: 'src/reconstructed/Wrecker.h',

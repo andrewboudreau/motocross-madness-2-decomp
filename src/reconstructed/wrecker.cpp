@@ -82,7 +82,7 @@ void Wrecker::CreateBodies(D3DIMSoultreeCharacter* rider, const char* name) {
     gravityModel->AddBody(reinterpret_cast<GravityBody*>(rigidBody));
     collisionModel = new (__FILE__, 0x68) ConstraintMethodCollisionModel(1);
     collisionModel->SetRenderContext(renderContext);
-    collisionModel->SetBody(reinterpret_cast<ConBody*>(rigidBody), 1, name);
+    collisionModel->SetBody(rigidBody, 1, name);
     AppendChild(collisionModel, -1);
     collisionModel->shapeCollisionEnabled = 0;
     collisionModel->collisionEnabled = 0;
@@ -714,7 +714,7 @@ void Wrecker::SetPushBox(UnknownWreckerSkeleton* frame, Vector3 center, Vector3 
 }
 
 void Wrecker::AddProbe(Vector3 offset, int bone) {
-    collisionModel->AddProbePoint(reinterpret_cast<const Vec3&>(offset), reinterpret_cast<ConNode*>(bone));
+    collisionModel->AddProbePoint(reinterpret_cast<const Vec3&>(offset), reinterpret_cast<SoultreeObject*>(bone));
     probePositions = (Vector3*)DebugRealloc(probePositions, collisionModel->probeCount * sizeof(Vector3), __FILE__, 0x308);
     probePositions[collisionModel->probeCount - 1] = Vector3(0.0f, 0.0f, 0.0f);
     probeHits = (int*)DebugRealloc(probeHits, collisionModel->probeCount * 4, __FILE__, 0x30b);

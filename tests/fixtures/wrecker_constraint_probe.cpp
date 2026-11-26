@@ -15,7 +15,7 @@ typedef char Layout[(sizeof(Wrecker)==0x53c && sizeof(ConstraintMethodCollisionM
     offsetof(Wrecker,collisionModel)==0x38 && offsetof(Wrecker,probePositions)==0x104 &&
     offsetof(Wrecker,probeHits)==0x108 && offsetof(ConstraintMethodCollisionModel,body)==0xc4 &&
     offsetof(ConstraintMethodCollisionModel,probeCount)==0x100 &&
-    offsetof(ConstraintMethodCollisionModel,probes)==0x104 && offsetof(ConBody,node)==0x234 &&
+    offsetof(ConstraintMethodCollisionModel,probes)==0x104 && offsetof(PhysicsBody,node)==0x234 &&
     offsetof(PhysicsRigidBody,initialVelocity)==0x13c)?1:-1];
 
 static void Check(int value,const char* label) { if(!value){printf("FAIL %s\n",label);ExitProcess(7);} }
@@ -66,7 +66,7 @@ static void* Initial(unsigned bytes,unsigned char value){
     Block& b=blocks[blockCount++];b.p=p;b.size=bytes;b.actual=_msize(p);b.alive=1;memset(p,value,bytes);return p;
 }
 static void ExpectedRecord(ConstraintProbe* p,const DWORD* xyz,DWORD node){
-    memset(p,0xcd,32);memcpy(&p->localPoint,xyz,12);p->node=(ConNode*)node;p->hit=0;
+    memset(p,0xcd,32);memcpy(&p->localPoint,xyz,12);p->node=(SoultreeObject*)node;p->hit=0;
 }
 static void Normal(int count,DWORD seed,int fromProbe,int tagged){
     Begin();Wrecker* w=(Wrecker*)(receiver+32);ConstraintMethodCollisionModel* m=(ConstraintMethodCollisionModel*)(model+32);

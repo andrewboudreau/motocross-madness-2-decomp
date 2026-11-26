@@ -1,9 +1,9 @@
 # Constraint scene connections
 
 The constraint solver now calls three existing `SoultreeObject` implementations
-through its observed primary node pointers. The provisional `ConNode`
-and `ConBody` views remain separate (vectors are the shared `Vec3`); this change does not assert full
-class equivalence or alter their layout.
+through its observed primary node pointers, which are typed `SoultreeObject*`
+(the former `ConNode` view had no data members). Bodies are `PhysicsBody*` and
+vectors the shared `Vec3`.
 
 | Previous call view | Existing provider | Retail extent | Production sites |
 | --- | --- | --- | --- |

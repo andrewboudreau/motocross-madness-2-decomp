@@ -6,9 +6,10 @@
 #include <string.h>
 #include "math/Math3D.h"
 #include "constraint/ConstraintMethodCollisionModel.h"
+#include "rigidbody/PhysicsBody.h"
 
 typedef char VecLayout[(sizeof(Vec3)==12 && offsetof(Vec3,z)==8)?1:-1];
-typedef char BodyNode[(offsetof(ConBody,node)==0x234)?1:-1];
+typedef char BodyNode[(offsetof(PhysicsBody,node)==0x234)?1:-1];
 typedef char ProbeNode[(sizeof(ConstraintProbe)==32 && offsetof(ConstraintProbe,node)==12)?1:-1];
 typedef char NodeFields[(offsetof(SoultreeObject,localMatrix)==0xb8 && offsetof(SoultreeObject,worldValid)==0x138)?1:-1];
 union Storage { double align; unsigned char bytes[6*sizeof(SoultreeObject)+32]; } actual, expected;
@@ -76,7 +77,7 @@ int main() {
             Vec3* result=alias?(Vec3*)&n[1].localMatrix._41:(Vec3*)(output.bytes+16);
             void* wanted=alias?(void*)&e[1].localMatrix._41:(void*)(wantedOutput.bytes+16);
             memcpy(wanted,&e[1].worldMatrix._41,12);
-            reinterpret_cast<SoultreeObject*>((ConNode*)&n[1])->GetPositionIn(0,reinterpret_cast<Vec3*>(result));
+            ((SoultreeObject*)&n[1])->GetPositionIn(0,reinterpret_cast<Vec3*>(result));
             Verify();cases++;
         }
         for(alias=0;alias<3;alias++) {
@@ -93,7 +94,7 @@ int main() {
             } else for(int k=0;k<3;k++)local[k]=p[k];
             for(int k=0;k<3;k++)e[1].localMatrix.m[3][k]=(float)local[k];
             Invalidated();
-            reinterpret_cast<SoultreeObject*>((ConNode*)&n[1])->SetPositionInFrame(0,reinterpret_cast<const Vec3*>(point));
+            ((SoultreeObject*)&n[1])->SetPositionInFrame(0,reinterpret_cast<const Vec3*>(point));
             Verify();
             // Follow the setter with the same null-frame getter the solver uses.
             World(1);memcpy(wantedOutput.bytes+16,&e[1].worldMatrix._41,12);
@@ -113,7 +114,7 @@ int main() {
             }
             memcpy(wantedOutput.bytes+16,result,12);
             *(Vec3*)(output.bytes+16)=reinterpret_cast<const Vec3&>(static_cast<const Vec3&>(
-                reinterpret_cast<SoultreeObject*>((ConNode*)&n[1])->LocalToWorldPoint(reinterpret_cast<const Vec3&>(*point))));
+                ((SoultreeObject*)&n[1])->LocalToWorldPoint(reinterpret_cast<const Vec3&>(*point))));
             Verify();cases++;
         }
     }

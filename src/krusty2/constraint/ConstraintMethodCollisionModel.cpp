@@ -39,6 +39,7 @@
 #include "math/Vec3.h"
 #include "../../reconstructed/Matrix4.h"
 #include "core/SoultreeObject.h"
+#include "rigidbody/PhysicsBody.h"
 #include "broadphase/Terrain.h"
 
 #include "core/DebugAlloc.h"   // DebugRealloc
@@ -56,7 +57,7 @@ Vec3 CrossProduct(const Vec3& a, const Vec3& b);    // 0x00515600
 float Magnitude(const Vec3& v);                     // 0x00435ec0 (1.0 if |v|^2 == 1 else FastSqrt)
 Vec3 Vec3Normalize(const Vec3& v);                  // 0x005087b0 (src/reconstructed/Math3D.cpp)
 // 0x0043ca20: row vector times the upper 3x3 of m (x' = v.x*m00 + v.y*m10 + v.z*m20).
-Vec3 RotateVector(const Vec3& v, const ConMatrix& m);
+Vec3 RotateVector(const Vec3& v, const Matrix4& m);
 
 // The two callbacks slot 8 installs (CollisionObject.h, CollisionCallback).
 void ConstraintContactCallback(CollisionObject* self, CollisionObject* other);  // 0x0043b800, below
@@ -68,14 +69,11 @@ void CollisionEmptyCallback(CollisionObject* self, CollisionObject* other);     
 // builds the value in a stack temporary and copies it out, which is the shape VC6 gives
 // copy-initialization from a constructor call (direct initialization stores the floats
 // straight into the global).  Only the zero vector has a reader: ApplyContactImpulse copies it
-// as a whole Vec3 (three dword moves), which is why the type derives from Vec3.
-struct ConStaticVec3 : Vec3 {
-    ConStaticVec3(float a, float b, float c) { x = a; y = b; z = c; }
-};
-static const ConStaticVec3 g_ConZero = ConStaticVec3(0.0f, 0.0f, 0.0f);
-static const ConStaticVec3 g_ConXAxis = ConStaticVec3(1.0f, 0.0f, 0.0f);
-static const ConStaticVec3 g_ConYAxis = ConStaticVec3(0.0f, 1.0f, 0.0f);
-static const ConStaticVec3 g_ConZAxis = ConStaticVec3(0.0f, 0.0f, 1.0f);
+// as a whole Vec3 (three dword moves).
+static const Vec3 g_ConZero = Vec3(0.0f, 0.0f, 0.0f);
+static const Vec3 g_ConXAxis = Vec3(1.0f, 0.0f, 0.0f);
+static const Vec3 g_ConYAxis = Vec3(0.0f, 1.0f, 0.0f);
+static const Vec3 g_ConZAxis = Vec3(0.0f, 0.0f, 1.0f);
 
 // ---- Contact callback (0x0043b800) ----------------------------------------------
 // Stored into onHitCallback by slot 8 (with 0x464e90 in onHitByCallback). cdecl; self is the
@@ -94,7 +92,7 @@ void ConstraintContactCallback(CollisionObject* self, CollisionObject* other)
     ConstraintMethodCollisionModel* model = (ConstraintMethodCollisionModel*)self;
     ConContactRecord* rec = (ConContactRecord*)model->contactRecord;
     if (other->ownerType == 0x3ea)
-        model->ApplyContactImpulse(*(ConBody**)((char*)other + 0xc4), rec->t, rec->contactOffset, rec->contact,
+        model->ApplyContactImpulse(*(PhysicsBody**)((char*)other + 0xc4), rec->t, rec->contactOffset, rec->contact,
                                    rec->contactNormal);
     else
         model->ApplyContactImpulse(0, rec->t, rec->contactOffset, rec->contact, rec->contactNormal);
@@ -148,7 +146,7 @@ int ConstraintMethodCollisionModel::Render3D()
     return CollisionObject::Render3D();
 }
 
-void ConstraintMethodCollisionModel::SetBody(ConBody* b, int useNodeModel, const char* shapePath)
+void ConstraintMethodCollisionModel::SetBody(PhysicsBody* b, int useNodeModel, const char* shapePath)
 {
     body = b;
     if (useNodeModel && !shapePath)
@@ -180,8 +178,7 @@ int ConstraintMethodCollisionModel::Step(float t)
     if (shapeCollisionEnabled && QueryCollisions()) {
         const Vec3* contactOffset = (const Vec3*)contactRecord;
         Vec3 pos;
-        reinterpret_cast<SoultreeObject*>(body->node)->GetPositionIn(
-            0, &pos);
+        body->node->GetPositionIn(0, &pos);
         Vec3 push;
         push.x = contactOffset->x * 1.005f;
         push.y = contactOffset->y * 1.005f;
@@ -189,8 +186,7 @@ int ConstraintMethodCollisionModel::Step(float t)
         pos.x -= push.x;
         pos.y -= push.y;
         pos.z -= push.z;
-        reinterpret_cast<SoultreeObject*>(body->node)->SetPositionInFrame(
-            0, &pos);
+        body->node->SetPositionInFrame(0, &pos);
         UpdatePlacement();
     }
     if (terrain) {
@@ -203,8 +199,7 @@ int ConstraintMethodCollisionModel::Step(float t)
         Vec3 surfaceNormal;
         for (int i = 0; i < probeCount; i++) {
             // The probe stores a primary scene-node pointer.
-            surfacePoint = reinterpret_cast<SoultreeObject*>(probes[i].node)->LocalToWorldPoint(
-                probes[i].localPoint);
+            surfacePoint = probes[i].node->LocalToWorldPoint(probes[i].localPoint);
             probeY = surfacePoint.y;
             terrain->QueryGround(reinterpret_cast<TerrainVec3*>(&surfacePoint),
                                  reinterpret_cast<TerrainVec3*>(&surfaceNormal), 0, 0);
@@ -230,8 +225,7 @@ int ConstraintMethodCollisionModel::Step(float t)
             offset.z = (bestNormal.z * negPenetration);
             ApplyContactImpulse(0, 1.0f, offset, bestPoint, bestNormal);
             Vec3 pos;
-            reinterpret_cast<SoultreeObject*>(body->node)->GetPositionIn(
-                0, &pos);
+            body->node->GetPositionIn(0, &pos);
             Vec3 step;
             step.x = offset.x * 1.005f;
             step.y = offset.y * 1.005f;
@@ -239,8 +233,7 @@ int ConstraintMethodCollisionModel::Step(float t)
             pos.x -= step.x;
             pos.y -= step.y;
             pos.z -= step.z;
-            reinterpret_cast<SoultreeObject*>(body->node)->SetPositionInFrame(
-                0, &pos);
+            body->node->SetPositionInFrame(0, &pos);
             UpdatePlacement();
             hasContact = 1;
         }
@@ -294,7 +287,7 @@ static inline Vec3 ConCross(const Vec3& a, const Vec3& b)
 }
 
 // Row vector times the upper 3x3 (same formula as the out-of-line copy 0x0043ca20).
-static inline Vec3 ConRotate(const Vec3& v, const ConMatrix& m)
+static inline Vec3 ConRotate(const Vec3& v, const Matrix4& m)
 {
     Vec3 r;
     r.x = v.x * m.m[0][0] + v.y * m.m[1][0] + v.z * m.m[2][0];
@@ -304,7 +297,7 @@ static inline Vec3 ConRotate(const Vec3& v, const ConMatrix& m)
 }
 
 // Row vector times the matrix including the translation row.
-static inline Vec3 ConTransform(const Vec3& v, const ConMatrix& m)
+static inline Vec3 ConTransform(const Vec3& v, const Matrix4& m)
 {
     Vec3 r;
     r.x = (v.x * m.m[0][0] + v.y * m.m[1][0] + v.z * m.m[2][0]) + m.m[3][0];
@@ -373,7 +366,7 @@ static inline float ConDotGroupedY(const Vec3& a, const Vec3& b)
 // Kept: point = point + offset (offset's components load first), vn = normal . vRel, the
 // zero vector copied as a whole struct (needed for the frame: component copies put vB in the
 // wrong slot).
-void ConstraintMethodCollisionModel::ApplyContactImpulse(ConBody* other, float t,
+void ConstraintMethodCollisionModel::ApplyContactImpulse(PhysicsBody* other, float t,
                                                          Vec3 offset, Vec3 point, Vec3 normal)
 {
     Vec3 wA = body->GetWorldAngularVelocity();
@@ -431,7 +424,7 @@ void ConstraintMethodCollisionModel::ApplyContactImpulse(ConBody* other, float t
     Vec3 vPoint = v + CrossProduct(wA, rA);
 }
 
-void ConstraintMethodCollisionModel::AddProbePoint(Vec3 point, ConNode* node)
+void ConstraintMethodCollisionModel::AddProbePoint(Vec3 point, SoultreeObject* node)
 {
     probes = (ConstraintProbe*)DebugRealloc(probes, (probeCount + 1) * sizeof(ConstraintProbe), __FILE__, 331);
     probes[probeCount].node = node;

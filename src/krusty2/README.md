@@ -47,7 +47,7 @@ Headers have no retail names beyond a few `.h` strings, so their names are ours
 | `bvh/` | Shared box-tree layouts and `BoundingBoxTreeQuery.cpp` (unattested name, 42 strict cases); the builder is matched in `src/reconstructed/BoundingBoxTreeBuild.cpp` |
 | `effects/` | NormalDistribution, NullManager, ParticleManager: 18 strict cases |
 | `motion/` | SphereManager: 14 strict cases; `Motnctrl.cpp`: 40; `SteeringControl.cpp`: 21; `D3DIMSoultreeMotnctrl.cpp`: 26; `CollisionCharacter.cpp`: 11; shared motion layouts |
-| `constraint/` | `ConstraintMethodCollisionModel.cpp` (+ `ConstraintTypes.h`): 19 strict cases; its near miss ApplyContactImpulse sits in the unit in retail order |
+| `constraint/` | `ConstraintMethodCollisionModel.cpp`: 19 strict cases; its near miss ApplyContactImpulse sits in the unit in retail order |
 | `shadow/` | D3DIMSoultreeShadow: 18 strict cases; `ProjectedShadow.cpp`: 21 strict cases, its near misses and the two inline-asm functions in `samples/physics/shadow/ProjectedShadowNearMisses.cpp`; TerrainShadow's exact functions in `src/reconstructed/TerrainShadow.cpp`, its near misses in samples |
 | `visibility/` | VisibilityQuadTree: 39 strict cases; partial traversal in samples |
 

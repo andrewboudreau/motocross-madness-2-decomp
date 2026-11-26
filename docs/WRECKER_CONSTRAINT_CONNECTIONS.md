@@ -21,8 +21,9 @@ type used by Wrecker.
 `SetBody` receives the separate `0x2a8`-byte PhysicsRigidBody allocation stored
 at Wrecker `+0x40`. Its constructor writes the primary `0x556ec0` vtable. Slot
 28 stores the rider's model node at body `+0x234`, which the complete `SetBody`
-provider reads. The `ConBody` cast is limited to that existing boundary and
-does not claim complete declaration equivalence.
+provider reads. `SetBody` takes that `PhysicsBody` base directly (vtable
+`0x556e0c` slot 43 and every field offset the solver reads agree with
+`PhysicsBody.h`).
 
 The full 210-byte `Wrecker::AddProbe` caller passes a 12-byte vector by value
 followed by a 32-bit node pointer. Its older `int bone` parameter carries the

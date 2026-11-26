@@ -116,7 +116,7 @@
     "target_va": "0x0043c8f0",
     "target_size": 60,
     "expect": "exact",
-    "notes": "Dynamic-initializer body: builds (0,0,0) in a stack temporary, then copies it to 0x579830. Exact with copy-initialization `static const ConZeroVec g_ConZero = ConZeroVec(0,0,0);`; direct initialization gives three direct stores instead.",
+    "notes": "Dynamic-initializer body: builds (0,0,0) in a stack temporary, then copies it to 0x579830. Exact with copy-initialization `static const Vec3 g_ConZero = Vec3(0.0f, 0.0f, 0.0f);`; direct initialization gives three direct stores instead.",
     "bindings": "ConstraintMethodCollisionModel.bindings.json"
   },
   {

@@ -1,6 +1,6 @@
 """ConstraintMethodCollisionModel::ApplyContactImpulse 0x0043bdb0 (tools/emu_diff.py case).
 
-ConBody layout from ConstraintTypes.h (velocity +0x154, previous velocity +0x160, angular
+PhysicsBody layout from rigidbody/PhysicsBody.h (velocity +0x154, previous velocity +0x160, angular
 velocity +0x16c, mass +0x178, inertia and inverse inertia matrices +0x190/+0x1d0, centre of
 mass +0x228, node +0x234) and the model's fields (+0xb8 restitution, +0xc0 dt, +0xc4 body,
 +0xcc contact point, +0xf0 damping, +0xf4 impulse loss, +0xf8 max impulse, +0xfc max speed).
@@ -11,7 +11,7 @@ impulse and max speed zero (unlimited) or small enough to clamp.
 from tools.emu_cases.resolve_contact_impulse import build_node, node_case, normal, vec
 
 RETAIL_VA = 0x0043bdb0
-SYMBOL = '?ApplyContactImpulse@ConstraintMethodCollisionModel@@QAEXPAVConBody@@MUVec3@@11@Z'
+SYMBOL = '?ApplyContactImpulse@ConstraintMethodCollisionModel@@QAEXPAVPhysicsBody@@MUVec3@@11@Z'
 SOURCE = 'src/krusty2/constraint/ConstraintMethodCollisionModel.cpp'
 PROBES = {0x0043c0b2: 'other body', 0x0043c47a: 'max impulse test', 0x0043c6f5: 'speed clamp'}
 

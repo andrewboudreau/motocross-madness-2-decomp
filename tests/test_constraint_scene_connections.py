@@ -129,18 +129,16 @@ class ConstraintSceneConnectionsTests(unittest.TestCase):
                 for _, symbol, va, _ in CONNECTED:
                     self.assertEqual(actual[symbol], 1 if va == 0x4fd660 else 2)
                     self.assertEqual(actual[symbol], original[va])
-            # Only the near miss ApplyContactImpulse still calls the ConNode views;
-            # every exact body uses the connected SoultreeObject providers.
+            # No body calls the retired ConNode views; they use the connected
+            # SoultreeObject providers.
             caller = objects[CALLER]
             for entry in caller.symbols:
                 if entry.storage_class != 2 or entry.section_number <= 0 or not entry.function_size:
                     continue
-                if 'ApplyContactImpulse' in entry.name:
-                    continue
                 _, _, relocs = caller.symbol_extent(entry)
                 self.assertFalse(any('@ConNode@@' in caller.symbol_by_index[r.symbol_index].name for r in relocs), entry.name)
             binding = (ROOT / CALLER).with_suffix('.bindings.json')
-            symbol = '?ApplyContactImpulse@ConstraintMethodCollisionModel@@QAEXPAVConBody@@MUVec3@@11@Z'
+            symbol = '?ApplyContactImpulse@ConstraintMethodCollisionModel@@QAEXPAVPhysicsBody@@MUVec3@@11@Z'
             result = compare(retail, objects[CALLER], symbol, 0x43bdb0, 2619, binding)
             self.assertEqual((result['candidate_size'], result['strict_match']['matching_positions']), (2619, 2515))
             with patch('mcm2tool.resolved_match.compare_bytes',

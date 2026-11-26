@@ -1,4 +1,4 @@
-Shared constraint types (`ConstraintTypes.h`) and the promoted unit live here. The
+The promoted unit lives here. The
 remaining near miss, ApplyContactImpulse, sits in its retail position in the unit.
 See [physics validation](../../../docs/PHYSICS_VALIDATION.md).
 
