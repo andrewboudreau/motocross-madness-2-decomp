@@ -6,14 +6,7 @@
 // race->handler->ReportTrickScore(this, score), so the handler object is the
 // RaceSound and the bike pointer is the racer it compares.
 #include "../krusty2/vehicle/BikeRaceHandlerView.h"
-
-struct EventKrustyBikeView;
-
-// Only the provider call is needed here (RaceSound.h declares the full class).
-class RaceSound {
-public:
-    void PlayScoreSounds(EventKrustyBikeView* racer, float score);  // 0x004e57d0
-};
+#include "RaceSound.h"
 
 void KbRaceHandler::ReportTrickScore(KrustyBike* who, float score)
 {

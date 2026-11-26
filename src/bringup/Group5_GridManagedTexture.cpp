@@ -4,18 +4,8 @@
 // ManagedTexture.cpp). Griddraw.h's GridManagedTexture is a boundary view of
 // the same object (mapFlags at +0x68), so the view forwards to the provider.
 
-// ManagedTexture.h's provider, declared only as far as this call needs.
-class ManagedTexture {
-public:
-    int RemapTexCoordsIfMoved(float* scale, float* offsetU, float* offsetV, float* u, float* v, int count,
-                              unsigned int stride);  // 0x00510910
-};
-
-class GridManagedTexture {
-public:
-    int RemapTexCoordsIfMoved(float* scale, float* offsetU, float* offsetV, float* u, float* v, int count,
-                              unsigned int stride);  // 0x00510910 (ret 0x1c)
-};
+#include "Griddraw.h"        // GridManagedTexture
+#include "ManagedTexture.h"  // ManagedTexture
 
 int GridManagedTexture::RemapTexCoordsIfMoved(float* scale, float* offsetU, float* offsetV, float* u, float* v, int count,
                                               unsigned int stride)

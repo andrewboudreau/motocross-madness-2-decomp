@@ -18,14 +18,7 @@
 //   followedRacer(+0xa8) = racer
 #include "vehicle/KrustyBike.h"
 #include "RaceSound.h"
-
-struct EventKrustyBikeView;
-
-// The owner's FollowRacer.cpp helper is defined on the TrackGameViewOwner view
-// (src/reconstructed/FollowRacer.cpp); only that member is declared here.
-struct TrackGameViewOwner {
-    void AnnounceFollowedRacer(EventKrustyBikeView* racer, EventKrustyBikeView* previous);  // 0x004a9f90
-};
+#include "TrackGame.h"   // TrackGameViewOwner (AnnounceFollowedRacer, FollowRacer.cpp)
 
 // Raw view of the race view at owner +0x34 (RaceView.h EventBikeRaceView).
 struct Group3FollowRaceView {

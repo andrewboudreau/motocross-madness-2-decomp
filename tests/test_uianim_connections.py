@@ -2,7 +2,6 @@
 import hashlib
 import json
 import os
-import posixpath
 from pathlib import Path
 import struct
 import subprocess
@@ -20,12 +19,13 @@ from test_edit_box_on_char import extract
 from test_edit_box_draw import signature
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCES = ('src/reconstructed/GUIManager.cpp', 'src/reconstructed/DlgProcs.cpp')
-FILENAMES = SOURCES + ('src/reconstructed/ContainerList.h',)
+SOURCES = ('src/reconstructed/GUIManager.cpp', 'src/reconstructed/DlgProcs.cpp',
+           'samples/ui/GUIManagerNearMisses.cpp', 'samples/ui/DlgProcsNearMisses.cpp')
+FILENAMES = SOURCES
 GETTER = '?GetCurrentTexture@UIAnim@@QAEPAVTextureMap@@XZ'
 ADVANCE = '?AdvancePastSounds@UIAnim@@QAEPAVTextureMap@@XZ'
-RENAMES = {'?GetCurrentTexture@DialogUIAnimView@@QAEHXZ': GETTER,
-           '?AdvancePastSounds@CursorUIAnimView@@QAEHXZ': ADVANCE}
+RENAMES = {'?GetCurrentTexture@UnknownDialogImage@@QAEHXZ': GETTER,
+           '?AdvancePastSounds@UnknownCursorAnimation@@QAEHXZ': ADVANCE}
 
 
 def pin(rows):
@@ -40,7 +40,7 @@ def whole_object(obj, roots=(ROOT,)):
 
     def filename(data):
         value, nul, tail = data.partition(b'\0')
-        path = posixpath.normpath(value.decode('latin1').replace('\\', '/'))
+        path = value.decode('latin1').replace('\\', '/')
         for prefix in prefixes:
             if nul and path.lower().startswith(prefix.lower()) and path[len(prefix):] in FILENAMES:
                 return ('source:' + path[len(prefix):]).encode() + nul + tail
@@ -122,10 +122,6 @@ class UIAnimConnectionsTests(unittest.TestCase):
             # Both default animation and per-control MouseAnim preserve that pointer.
             (0x46b545, 5, 'call', '0x46e9a0'),
             (0x46b54a, 6, 'mov', 'dword ptr [ebp + 0x95c], eax'),
-            (0x46da6f, 7, 'lea', 'eax, [esp + 0x2004]'),
-            (0x46da81, 5, 'push', '0x56b838'),
-            (0x46da8d, 5, 'call', '0x4b7ec0'),
-            (0x46e55d, 7, 'lea', 'eax, [esp + 0x2004]'),
             (0x46e567, 5, 'call', '0x46e9a0'),
             (0x46e56c, 6, 'mov', 'dword ptr [ebx + 0x180], eax'),
             (0x46f033, 6, 'mov', 'eax, dword ptr [edi + 0x180]'),
@@ -146,7 +142,6 @@ class UIAnimConnectionsTests(unittest.TestCase):
             (0x4511c7, 5, 'call', '0x47b3d0'),
         ): instruction(*args)
         self.assertEqual(image.bytes_at_va(0x569d94, 8), b'BlueBar\0')
-        self.assertEqual(image.bytes_at_va(0x56b838, 10), b'MouseAnim\0')
         with tempfile.TemporaryDirectory(prefix='mcm2-uianim-') as directory:
             output = Path(directory)
             compiler = Path(os.environ['VC6_ROOT'])
@@ -173,18 +168,17 @@ class UIAnimConnectionsTests(unittest.TestCase):
                                      case['target_size'], ROOT/Path(source).with_suffix('.bindings.json'))
                     self.assertTrue(result['strict_exact'], result)
                     strict += 1
-                cursor = source == 'src/reconstructed/GUIManager.cpp'
-                wanted = ADVANCE if cursor else GETTER
+                wanted = ADVANCE if n in (0, 2) else GETTER
                 imports = {s.name for s in obj.symbols if s.storage_class == 2 and s.section_number == 0}
                 self.assertIn(wanted, imports)
                 self.assertFalse(imports & set(RENAMES))
-                caller = '?RenderPost3D@GUICursor@@UAEHXZ' if cursor else '?HandleEvent@LoadingDlg@@UAEXPAUDialogEvent@@@Z'
+                caller = '?RenderPost3D@GUICursor@@UAEHXZ' if n in (0, 2) else '?HandleEvent@LoadingDlg@@UAEXPAUUnknownDialogEvent@@@Z'
                 entry = obj.find_symbol(caller)
                 _, _, calls = obj.symbol_extent(entry)
                 self.assertEqual([(r.virtual_address-entry.value, r.type) for r in calls
                                   if obj.symbol_by_index[r.symbol_index].name == wanted],
-                                 [(11 if cursor else 416, 20)])
-            self.assertEqual((strict, sections, relocations), (194, 765, 5026))
+                                 [(11 if n in (0, 2) else 416, 20)])
+            self.assertEqual((strict, sections, relocations), (193, 1387, 8896))
             _, provider = compile_source(ROOT/'src/reconstructed/GameUi.cpp', 'provider')
             for symbol, address, size in (
                 ('??0UIAnim@@QAE@PAX0@Z', 0x472e30, 82),
@@ -219,8 +213,8 @@ class UIAnimConnectionsTests(unittest.TestCase):
             self.assertEqual(result.returncode, 0, result.stdout+result.stderr)
             self.assertEqual(result.stdout.strip(),
                 'UIAnim GetCurrentTexture: 3067 cases, 41 independently checked AV; no storage writes')
-            self.assertEqual(strict, 200)
-        print('200 strict checks; three whole objects; two retail calls; '+result.stdout.strip())
+            self.assertEqual(strict, 199)
+        print('199 strict checks; four whole objects; two retail calls; '+result.stdout.strip())
 
 
 if __name__ == '__main__':

@@ -33,14 +33,9 @@
 #include "../reconstructed/Krusty3DObjects.h"
 #include "../reconstructed/Camera.h"
 #include "../../samples/common/FistpFloatToInt.h"
+#include "vehicle/KrustyBikeTypes.h"   // KbScoreBoard
 
 float FastSqrt(float x); // 0x00460b50
-
-// KrustyBikeTypes.h's view, declared here with its one method (the member
-// function's mangled name does not depend on the class-key).
-struct KbScoreBoard {
-    void ShowValue(float points, float multiplier);
-};
 
 // Shows a model under the base frame (0x004fdb50, mark the subtree dirty,
 // 0x004fd910 AddChild).

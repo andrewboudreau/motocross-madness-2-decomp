@@ -6,18 +6,7 @@
 //   BonusSoultreeObjectView::GetPosition 0x004fc970 = SoultreeObject::GetPosition
 // (GetPosition's returned pointer is the argument and is ignored by the view).
 
-#include "MatrixUtil.h"   // Vector3
-
-struct Vec3;
-
-class SoultreeObject {
-public:
-    Vec3* GetPosition(Vec3* out);
-};
-
-struct BonusSoultreeObjectView {
-    void GetPosition(Vector3* translation);
-};
+#include "Krusty3DObjects.h"   // BonusSoultreeObjectView; SoultreeObject through D3DIMSoulTree.h
 
 // 0x004fc970
 void BonusSoultreeObjectView::GetPosition(Vector3* translation)

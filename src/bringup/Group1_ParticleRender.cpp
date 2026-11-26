@@ -55,6 +55,7 @@
 #include "Camera.h"
 #include "PCRenderTarget.h"
 #include "TextureMap.h"
+#include "LightEmitter.h"   // LightManager
 #include "../../samples/common/FistpFloatToInt.h"
 
 extern "C" void qsort(void* base, unsigned int num, unsigned int width,
@@ -65,13 +66,6 @@ float FastInvSqrt(float x);
 
 // 0x00689158 (Group1_Globals.cpp).
 extern ParticleUVRect g_particleCellUVs[61];
-
-// src/reconstructed/LightEmitter.h's LightManager, reduced to the one method used here.
-class LightManager {
-public:
-    void LightVertices(void* matrix, int count, void* vertices, void* buffer, int stride,
-                       void* colors);   // 0x0049e4a0
-};
 
 // IDirect3DVertexBuffer7 as slot 14 uses it (slots 3 Lock, 4 Unlock, 5 ProcessVertices).
 class Group1ParticleVertexBuffer {
