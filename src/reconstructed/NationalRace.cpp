@@ -8,6 +8,7 @@
 #include "TrackGame.h"
 #include "EventManager.h"
 #include "TrackOverlay.h"
+#include "Krusty3DObjects.h"   // RunwayLights
 
 // Reconstruction of D:\aardvark\VC\krusty2\NationalRace.cpp (literal
 // __FILE__ at 0x0056e338, used by slots 27 and 29): NationalRace,
@@ -15,24 +16,6 @@
 // 0x004aa64d) and Net.cpp (first xref 0x004aae60). RTTI confirms
 // NationalRace : BaseQuarryEvent (vtable 0x00555354) and the overridden
 // slots 0, 10, 27, 29 and 30. Member and function names are provisional.
-
-// Krusty3DObjects.h's RunwayLights, as this file uses it. That header and
-// QuarryEvent.h cannot be included together (both declare VisualCue), so
-// the three members are redeclared here with the same signatures.
-class Terrain;
-struct RunwayKrustyBikeView;
-
-class RunwayLights : public GameObject {
-public:
-    explicit RunwayLights(int flags);          // 0x0048a5b0
-    RunwayLights* SetupLights(void* context, const LightManager* lights, const TextureContext* textures, Terrain* terrain); // 0x0048a600
-    void SetRacer(RunwayKrustyBikeView* racer); // 0x0048ad50
-
-    float blinkTimer;                          // +0x2c blink timer
-    RunwayKrustyBikeView* trackedRacer;          // +0x30
-    Terrain* groundTerrain;                 // +0x34
-    ArcadeObject* lightModels[5];              // +0x38
-};
 
 // 0x004aa7f0
 NationalRace::NationalRace(int flags) : BaseQuarryEvent(flags) {

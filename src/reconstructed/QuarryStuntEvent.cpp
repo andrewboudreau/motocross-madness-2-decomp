@@ -39,6 +39,7 @@
 #include "../krusty2/shadow/ProjectedShadow.h"
 #include "../krusty2/soultree/SoultreeQuadTreeRenderer.h"
 #include "../krusty2/visibility/VisibilityQuadTree.h"
+#include "DirectPlayMessages.h"   // DPMsgDestroyPlayerOrGroup
 
 // Reconstruction of D:\aardvark\VC\krusty2\QuarryStuntEvent.cpp (literal
 // __FILE__ at 0x00572154): BaseQuarryEvent, 0x004de2a0..0x004e1fa7, between
@@ -1365,13 +1366,6 @@ static const Vector3 kVec3Zero = Vector3(0.0f, 0.0f, 0.0f);
 static const Vector3 kVec3XAxis = Vector3(1.0f, 0.0f, 0.0f);
 static const Vector3 kVec3YAxis = Vector3(0.0f, 1.0f, 0.0f);
 static const Vector3 kVec3ZAxis = Vector3(0.0f, 0.0f, 1.0f);
-
-// The data of network message 5 (a player left): the player's id at +0x08.
-struct DPMsgDestroyPlayerOrGroup {
-    int type;                                 // +0x00 5: a DirectPlay system message (no Send passes 5; NetMessage::Set 0x004aacc0 reads the whole dword when from == 0)
-    int playerType;
-    int playerId;                             // +0x08 matched against racers' networkPlayerId
-};
 
 // 0x004e1cc0
 int BaseQuarryEvent::OnNetworkMessage(int type, void* data, int from, int to, int flags) {

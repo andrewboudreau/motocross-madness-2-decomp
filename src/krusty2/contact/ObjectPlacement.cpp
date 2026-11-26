@@ -34,14 +34,7 @@
 #include "contact/ObjectPlacement.h"
 #include "collision/CollisionObject.h"
 #include "core/DebugAlloc.h"
-
-// The terrain ground query (broadphase/Terrain.h, which cannot be included beside the
-// collision headers): 0x00507c10, thiscall, ret 0x10.
-struct TerrainVec3;
-class Terrain {
-public:
-    void QueryGround(TerrainVec3* pos, TerrainVec3* normal, int flatShaded, unsigned char* surface);
-};
+#include "broadphase/Terrain.h"   // Terrain::QueryGround 0x00507c10 (thiscall, ret 0x10)
 
 // The placement area queries in src/reconstructed/PlacementQueries.cpp, which has no
 // header (it declares its own partial CollisionObject view).  CollisionVec3 is three

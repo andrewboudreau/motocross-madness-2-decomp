@@ -30,6 +30,8 @@
 #include "TextureMap.h"
 #include "Track.h"
 #include "TrackGame.h"
+#include "DirectPlayMessages.h"   // DPMsgDestroyPlayerOrGroup
+#include "TrackOverlay.h"   // ChatMessage (0x85)
 
 // A truncating copy into a `size`-byte buffer (as in DlgProcs.cpp).
 #define COPY_TEXT(dest, source, size)                              \
@@ -99,12 +101,6 @@ int g_LobbyLocalReady;
 int g_LobbyRemotePlayerCount;
 int g_LobbyReadyBlockReason;
 
-// The chat message (types 0x85 and 0x92): 0x4e bytes are sent.
-struct ChatMessage {
-    int header;                               // +0x00 SendRaw (0x004ad280) writes the type byte here and the sequence at +0x02
-    char text[0x4a];                          // +0x04: the chat text
-};
-
 // A player's state (type 2).
 struct PlayerStateMessage {
     unsigned char type;                       // +0x00 SendRaw (0x004ad280) writes the type byte here
@@ -132,13 +128,6 @@ struct GridDrawKey {
     int playerId;                             // +0x00: player id
     float key;                                // +0x04: random key
     char racerIndex;                          // +0x08: racer index
-};
-
-// The player left message (type 5).
-struct DPMsgDestroyPlayerOrGroup {
-    int type;                                 // +0x00 5: a DirectPlay system message (no Send passes 5; NetMessage::Set 0x004aacc0 reads the whole dword when from == 0)
-    int playerType;
-    int playerId;                             // +0x08: player id
 };
 
 // The lobby start message (type 0x83, 0x8d8 bytes).
