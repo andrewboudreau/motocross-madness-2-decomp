@@ -41,18 +41,6 @@ struct BikeWheelFrame {
     char pad_0x00[0xc];
     Vec3 axis;
 };
-// Objects at Bike+0x5f8 / +0x5fc (provisional, IntegrateSteerTorque): a point, an axis, an
-// active flag and a state code that the method sets to 2.
-struct BikeA5F8 {
-    char pad_0x00[0x14];
-    Vec3 point;               // +0x14
-    char pad_0x20[0xc];
-    Vec3 axis;                // +0x2c
-    char pad_0x38[0x6c];
-    int active;               // +0xa4
-    char pad_0xa8[0xc];
-    int state;                // +0xb4
-};
 struct BikeWheel {
     char pad_0x000[184];
     char contactPoint_0x0b8[20];   // registered in the owner's collisionPoints list; ~Bike removes it (0x00409a10)

@@ -16,11 +16,12 @@ The allocation helper's source attribution is anchored by retail's
 constructor, allocates `0xc4` bytes, stores the new primary pointer into the
 list, copies the local position, records owner/threshold/load parameters,
 and increments the count. Its final integer parameter retains the 32-bit
-track/surface-owner address. The loader's two `BikeA5F8*` results and integer
-tail-contact handle keep the same pointer bits. Native layout checks establish
-the accessed `BikeA5F8`/`CollisionPoint` offsets `0x14`, `0x2c`, `0xa4`, and
-`0xb4`, and the three 12-byte vector components. They do not claim equivalence
-of the complete provisional classes.
+track/surface-owner address. Bike stores the three results directly as
+`CollisionPoint*` (`leftBarContact` +0x5f8, `rightBarContact` +0x5fc,
+`tailContact` +0x600). Native layout checks establish those Bike offsets,
+CollisionPoint's `contactState` at `0xb4`, and the three 12-byte vector
+components that let the steer-torque code read `worldPosition` and
+`surfaceNormal` as `Vec3`.
 
 The wheel contact is a **secondary** subobject. Retail Tire RTTI reached
 through vtable `0x005584fc` gives object offset `0xb8` and the nonvirtual

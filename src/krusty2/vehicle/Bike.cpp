@@ -147,12 +147,12 @@ float Bike::IntegrateSteerTorque()
             driven = 1;
             torque = CrossProduct(offset, frontWheel->normalLoadVector);
             frontWheel->w_0x16c = 2;
-            if (leftBarContact->active) {
+            if (leftBarContact->inContact) {
                 {
                     Vec3 callResult;
-                    offset = *Vec3SubtractCall(&callResult, &leftBarContact->point, &frontWheel->nodePosition);
+                    offset = *Vec3SubtractCall(&callResult, (const Vec3*)&leftBarContact->worldPosition, &frontWheel->nodePosition);
                 }
-                const Vec3& axis = leftBarContact->axis;
+                const Vec3& axis = (const Vec3&)leftBarContact->surfaceNormal;
                 float d = Vec3DotCall(&base, &axis);
                 if (d >= 0.0f)
                     push = Vec3(0.0f, 0.0f, 0.0f);
@@ -161,9 +161,9 @@ float Bike::IntegrateSteerTorque()
                     push = *Vec3ScaleCall(&callResult, &axis, -d);
                 }
                 torque += CrossProduct(offset, push);
-                leftBarContact->state = 2;
-            } else if (rightBarContact->active) {
-                const Vec3& axis = rightBarContact->axis;
+                leftBarContact->contactState = 2;
+            } else if (rightBarContact->inContact) {
+                const Vec3& axis = (const Vec3&)rightBarContact->surfaceNormal;
                 float d = Vec3DotCall(&base, &axis);
                 if (d >= 0.0f)
                     push = BikeVec3Call(0.0f, 0.0f, 0.0f);
@@ -173,18 +173,18 @@ float Bike::IntegrateSteerTorque()
                 }
                 {
                     Vec3 callResult;
-                    offset = *Vec3SubtractCall(&callResult, &rightBarContact->point, &frontWheel->nodePosition);
+                    offset = *Vec3SubtractCall(&callResult, (const Vec3*)&rightBarContact->worldPosition, &frontWheel->nodePosition);
                 }
                 torque += CrossProduct(offset, push);
-                rightBarContact->state = 2;
+                rightBarContact->contactState = 2;
             }
-        } else if (leftBarContact->active) {
+        } else if (leftBarContact->inContact) {
             driven = 1;
             {
                 Vec3 callResult;
-                offset = *Vec3SubtractCall(&callResult, &leftBarContact->point, &frontWheel->nodePosition);
+                offset = *Vec3SubtractCall(&callResult, (const Vec3*)&leftBarContact->worldPosition, &frontWheel->nodePosition);
             }
-            const Vec3& axis = leftBarContact->axis;
+            const Vec3& axis = (const Vec3&)leftBarContact->surfaceNormal;
             float d = Vec3DotCall(&base, &axis);
             if (d >= 0.0f)
                 push = BikeVec3Call(0.0f, 0.0f, 0.0f);
@@ -193,10 +193,10 @@ float Bike::IntegrateSteerTorque()
                 push = *Vec3ScaleCall(&callResult, &axis, -d);
             }
             torque = CrossProduct(offset, push);
-            leftBarContact->state = 2;
-        } else if (rightBarContact->active) {
+            leftBarContact->contactState = 2;
+        } else if (rightBarContact->inContact) {
             driven = 1;
-            const Vec3& axis = rightBarContact->axis;
+            const Vec3& axis = (const Vec3&)rightBarContact->surfaceNormal;
             float d = Vec3DotCall(&base, &axis);
             if (d >= 0.0f)
                 push = BikeVec3Call(0.0f, 0.0f, 0.0f);
@@ -206,10 +206,10 @@ float Bike::IntegrateSteerTorque()
             }
             {
                 Vec3 callResult;
-                offset = *Vec3SubtractCall(&callResult, &rightBarContact->point, &frontWheel->nodePosition);
+                offset = *Vec3SubtractCall(&callResult, (const Vec3*)&rightBarContact->worldPosition, &frontWheel->nodePosition);
             }
             torque = CrossProduct(offset, push);
-            rightBarContact->state = 2;
+            rightBarContact->contactState = 2;
         } else {
             result = 0.0f;
             goto integrate;
@@ -759,18 +759,18 @@ GameObject* Bike::LoadBike(int context, const char* engineName, const char* mode
     Vec3 leftBarEnd = Vec3(-1.305f, 0.225f, -0.228f);
     Vec3 rightBarEnd = Vec3(1.305f, 0.225f, -0.228f);
     Vec3 tailPoint = Vec3(0.0f, 3.345f, -3.206f);
-    leftBarContact = reinterpret_cast<BikeA5F8*>(AddCollisionPoint(collisionPointCapacity,
+    leftBarContact = AddCollisionPoint(collisionPointCapacity,
         reinterpret_cast<CollisionPoint**>(collisionPoints), reinterpret_cast<const CollisionVec3*>(&leftBarEnd),
         reinterpret_cast<CollisionContactOwner*>(handlebars->node), 0.0f, &collisionPointCount, 0.6f,
-        reinterpret_cast<int>(track)));
-    rightBarContact = reinterpret_cast<BikeA5F8*>(AddCollisionPoint(collisionPointCapacity,
+        reinterpret_cast<int>(track));
+    rightBarContact = AddCollisionPoint(collisionPointCapacity,
         reinterpret_cast<CollisionPoint**>(collisionPoints), reinterpret_cast<const CollisionVec3*>(&rightBarEnd),
         reinterpret_cast<CollisionContactOwner*>(handlebars->node), 0.0f, &collisionPointCount, 0.6f,
-        reinterpret_cast<int>(track)));
-    tailContact = reinterpret_cast<int>(AddCollisionPoint(collisionPointCapacity,
+        reinterpret_cast<int>(track));
+    tailContact = AddCollisionPoint(collisionPointCapacity,
         reinterpret_cast<CollisionPoint**>(collisionPoints), reinterpret_cast<const CollisionVec3*>(&tailPoint),
         reinterpret_cast<CollisionContactOwner*>(modelNode), -0.3f, &collisionPointCount, 0.6f,
-        reinterpret_cast<int>(track)));
+        reinterpret_cast<int>(track));
     AddAttachment(1, dustEmitter, rearWheel ? (SoultreeAttachTarget*)&rearWheel->contactPoint_0x0b8 : 0, 0);
     AddAttachment(2, dirtChunkEmitter, rearWheel ? (SoultreeAttachTarget*)&rearWheel->contactPoint_0x0b8 : 0, 0);
     Vec3 steamOffset = Vec3(0.0f, 2.5f, -2.75f);

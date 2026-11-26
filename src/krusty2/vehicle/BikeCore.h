@@ -4,7 +4,7 @@
 #include "VehicleCore.h"
 #include "../../reconstructed/TextureLoader.h"
 
-struct BikeA5F8;
+class CollisionPoint;
 class MovingPart;
 struct BikeA644;
 class DirtChunkParticleEmitter;
@@ -131,9 +131,9 @@ public:
     char riderName[16];           // +0x5e0 ctor strcpy from global 0x00577738 (empty string in the image); tier 3 name
     BikeWheel* frontWheel;       // +0x5f0 front wheel (largest config z, see 0x4079c0 loop at 0x408705); tier 3
     BikeWheel* rearWheel;       // +0x5f4 rear wheel (smallest config z, 0x408728); tier 3
-    BikeA5F8* leftBarContact;      // +0x5f8 cleared in the ctor (0x00407700); LoadBike adds it at (-1.305, 0.225, -0.228) on the "Handlebars" node; IntegrateSteerTorque reads it
-    BikeA5F8* rightBarContact;     // +0x5fc cleared in the ctor; the mirror point (+1.305, 0.225, -0.228) on the "Handlebars" node
-    int tailContact;                          // +0x600  the loader's contact point at the tail (0, 3.345, -3.206) on modelNode, beside the handlebar contacts
+    CollisionPoint* leftBarContact;      // +0x5f8 cleared in the ctor (0x00407700); LoadBike adds it at (-1.305, 0.225, -0.228) on the "Handlebars" node; IntegrateSteerTorque reads it
+    CollisionPoint* rightBarContact;     // +0x5fc cleared in the ctor; the mirror point (+1.305, 0.225, -0.228) on the "Handlebars" node
+    CollisionPoint* tailContact;              // +0x600  the loader's contact point at the tail (0, 3.345, -3.206) on modelNode, beside the handlebar contacts
     Wrecker* wrecker;  // +0x604  Wrecker (SetupWrecker with rider.col, StartAnimatedWreck); RaceView/BikeRace +0x604 wrecker
     Vehicle* linkedVehicle;  // +0x608 cleared in ctor and reset (lines near linkedVehicle = 0), set reciprocally in the slot 38 pairing code: linkedVehicle = other; ((Bike*)other)->linkedVehicle = this
     MovingPart* handlebars;        // +0x60c MovingPart("Handlebars", model, steerState); the steer axis runs from the front wheel to its node; cleared in the ctor; ~Bike calls 0x00464e90 on it, then operator delete
