@@ -54,10 +54,10 @@ public:
     float penetrationThreshold;  // +0x9c AddCollisionPoint threshold; 0x0043ad80: inContact = (penetration >= penetrationThreshold)
     float blendWeight;  // +0xa0 Vehicle/Bike view (VehicleContact, VehicleWheel::loadWeight +0x158): per-point blend weight; ctor 0.5f, Tire ctor a14
     int inContact;  // +0xa4 0x0043ad80 stores the integer 1/0 (mov eax, 1 / xor eax, eax) from the penetration test and counts it; 0x0043aa30 only merges points with it set; Tire 0x00513c70 stores 1/0 the same way
-    float impactPosted;  // +0xa8 int flag in the Vehicle/Soultree views: slot 18 sets it when it posts the contact effect, slot 30 clears it
-    float slidePosted;  // +0xac int flag: Vehicle slot 19 sets it when it posts the slide effect, slot 30 clears it
-    float scrapePosted;  // +0xb0 int flag: Vehicle slot 20 sets it when it posts the scrape effect, slot 30 clears it
-    float contactState;  // +0xb4 int in the SoultreeContact view: slot 31 stores 0/1 (keeps 2), slot 13 reads it
+    int impactPosted;  // +0xa8 flag (int in the Vehicle/Soultree views too): slot 18 sets it when it posts the contact effect, slot 30 clears it
+    int slidePosted;  // +0xac flag: Vehicle slot 19 sets it when it posts the slide effect, slot 30 clears it
+    int scrapePosted;  // +0xb0 flag: Vehicle slot 20 sets it when it posts the scrape effect, slot 30 clears it
+    int contactState;  // +0xb4 int in the SoultreeContact view too: slot 31 stores 0/1 (keeps 2), slot 13 reads it
     float field_0xb8;
     char surfaceType;  // +0xbc low three bits of the flag byte written by the ground query (&= 7 in 0x0043ad80); indexes the per-surface grip table
     int surfaceOwner;  // +0xc0 inlined ctor argument owner (AddCollisionPoint surfaceOwner); 0x0043ad80 reads the surface table from [this+0xa4]+0x3a0 when nonzero
