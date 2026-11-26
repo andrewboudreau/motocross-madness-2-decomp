@@ -6,6 +6,7 @@
 
 class TextureMap;
 class TextureMapManager;
+struct TextureContext;
 
 // RTTI: CharacterCell (no bases; vtable 0x00552994, one slot: the deleting
 // destructor 0x00467660). 0x24 bytes, made by FontTexture's loader: a
@@ -45,7 +46,7 @@ public:
     // 0x004673d0 (cdecl): the font `name`, already loaded or read from the
     // cell file `path` with its texture `textureName` (through 0x0050a590).
     static FontTexture* Load(const char* name, const char* path, const char* textureName,
-                                              int format, TextureMapManager* manager, int textureContext);
+                                              int format, TextureMapManager* manager, TextureContext* textures);
 
     // 0x0065b478. A static data member: its atexit destructor 0x00467130 is
     // guarded by a flag byte, as VC6 emits for class statics. The owning

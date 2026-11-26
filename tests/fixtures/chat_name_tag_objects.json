@@ -2,7 +2,7 @@
   "canonical": {
     "sections": 231,
     "relocations": 1031,
-    "sha256": "f0cace3785bb573d584dc5ce233e4dc3e68dc8c879a765aa441f026091b89417"
+    "sha256": "59ed31bda033570cc168c508c95b36979a33b61a64ead3f9f643cee22c84654a"
   },
   "note": "Complete TrackOverlay.cpp object after the TrackOverlay near misses (DrawStandings, DrawRacers, IntersectLineCircle, DrawTrackOutline, CollectRacers, DrawNameTag) moved into it in retail order; TrackOverlay.cpp literals named by path."
 }

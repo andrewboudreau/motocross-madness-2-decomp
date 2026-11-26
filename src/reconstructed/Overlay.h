@@ -30,7 +30,7 @@ public:
                                    const OverlayRect* rect, int scaleRect,
                                    const OverlayRect* source, float depth,
                                    char withText, const char* textArchive, const char** fontNames,
-                                   int fontCount, int textFormat, int textureContext);
+                                   int fontCount, int textFormat, TextureContext* textures);
 
     // 0x004b6710: copies `rect` of the backing texture (+0x30) into the
     // overlay texture (ChatOverlay calls it before redrawing a line); 0 when

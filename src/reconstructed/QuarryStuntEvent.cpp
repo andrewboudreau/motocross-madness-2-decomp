@@ -620,7 +620,7 @@ int BaseQuarryEvent::LoadEventObjects(LoadProgressFn progress) {
     if (particleManager)
         particleManager = ((ParticleManager*)particleManager)
                          ->Create((int)renderContext, g_TrackGame->textureManager,
-                                  eventScene->environment->particleTexture, (int)lightManager);
+                                  eventScene->environment->particleTexture, lightManager);
     g_MemTagStack->Push("3DObjects");
     if (!Create3DObjects(&modelTextures))
         return 0;

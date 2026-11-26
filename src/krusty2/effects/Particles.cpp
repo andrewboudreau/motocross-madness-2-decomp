@@ -102,7 +102,7 @@ int ParticleManager::Tick(float dt)
 }
 
 ParticleManager* ParticleManager::Create(int parentArg, TextureMapManager* textures,
-                                         const char* textureName, int lights)
+                                         const char* textureName, LightManager* lights)
 {
     GameObject::SetRenderContext((void*)parentArg);
     for (int i = 0; i < 1000; i++)

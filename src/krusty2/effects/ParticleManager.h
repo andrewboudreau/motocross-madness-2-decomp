@@ -69,6 +69,7 @@ public:
     virtual int IsResident();
     virtual int CreateTextureSurface(int upload, int asRenderTarget, int localVideo);
 };
+class LightManager;
 class TextureMapManager;
 // 0x0050a590 (cdecl; src/reconstructed/TextureMap.h TerrainLoadTexture): the texture
 // `name` through the manager; 0 on failure.  Pointer parameters other than the first two are
@@ -152,7 +153,7 @@ public:
     // 0x004ba4d0 (ret 0x10): returns this, or 0 (after BaseObject slot 2) when a vertex buffer
     // or the index array is missing.
     virtual ParticleManager* Create(int parentArg, TextureMapManager* textures,
-                                    const char* textureName, int lights);
+                                    const char* textureName, LightManager* lights);
 
     // 0x004baa50 (thiscall, ret 0x20).  Takes the next particle from the free tail of the table
     // and fills it in; returns 0 when all 1000 are in use.
@@ -173,7 +174,7 @@ public:
     ParticleVec3 gravity;               // +0x1f98 ctor stores (0, -64, 0); slot 10 adds dt*gravity to flagged particle velocity
     ParticleCornerVertex corners[4];    // +0x1fa4 slot 27: (1,1,0), (-1,1,0), (1,-1,0), (-1,-1,0)
     ParticleVec3 cornerNormals[4];      // +0x2024 slot 27: (+-1, +-1, 0.25) scaled by FastInvSqrt(2.0625)
-    int lightManager;                   // +0x2054 slot 27's last argument; slot 14 lights the corner normals through it (LightManager::LightVertices). Tier 2
+    LightManager* lightManager;         // +0x2054 slot 27's last argument; slot 14 lights the corner normals through it (LightManager::LightVertices). Tier 2
 };
 
 #endif

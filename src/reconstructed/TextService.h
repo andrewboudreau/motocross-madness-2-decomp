@@ -8,6 +8,7 @@ class FontTexture;
 class RenderTarget;
 class TextureMap;
 class TextureMapManager;
+struct TextureContext;
 
 // A pre-transformed, lit vertex (D3DTLVERTEX, 0x20 bytes) as passed to
 // RenderTarget slot 16 with vertex format 0x1c4.
@@ -50,7 +51,7 @@ public:
     // "<name>.tga") and selects the first.
     static TextService* Create(const char* archive, const char** names, int count,
                                                      int format, TextureMapManager* manager, float x,
-                                                     float y, float width, float height, int textureContext);
+                                                     float y, float width, float height, TextureContext* textures);
 
     void SelectFont(const char* font);            // 0x0050ade0: selects the font named `font`
     void SetFont(unsigned int index, FontTexture* font);               // 0x0050ae60

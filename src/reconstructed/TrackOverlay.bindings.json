@@ -79,7 +79,7 @@
   "?AppendChild@GameObject@@QAEHPAV1@H@Z": "0x00469190",
   "?ModifierHolds@KeyboardDevice@@QAEHH@Z": "0x0048a240",
   "?Send@NetworkInterface@@QAEHHPAXHHH@Z": "0x004ac830",
-  "?Attach@Overlay@@QAEPAV1@PAVRenderTarget@@PAVTextureMap@@PBUOverlayRect@@H2MDPBDPAPBDHHH@Z": "0x004b5f50",
+  "?Attach@Overlay@@QAEPAV1@PAVRenderTarget@@PAVTextureMap@@PBUOverlayRect@@H2MDPBDPAPBDHHPAUTextureContext@@@Z": "0x004b5f50",
   "?RestoreRect@Overlay@@QAEHPBUOverlayRect@@@Z": "0x004b6710",
   "?TintRows@Overlay@@QAEHHHG@Z": "0x004b6880",
   "?GetPositionIn@SoultreeObject@@QAEXPAV1@PAUVec3@@@Z": "0x004fc9a0",
