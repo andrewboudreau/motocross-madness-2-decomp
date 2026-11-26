@@ -885,7 +885,7 @@ KrustyBike::KrustyBike(int flags) : GameObject(1), Bike(flags)
 //    brace-init produced immediates or temporary copies;
 //  * the dead `cmp g->eventType, 0` survives as an if/else with identical 100.0f arms
 //    (tail-merged), which also restores the register rotation of the whole tail;
-//  * a local `BikeA640* axis` keeps the steer axis in one register for its three stores and
+//  * a local `VehicleSmoother* axis` keeps the steer axis in one register for its three stores and
 //    0.42210004f is needed for retail's 0x3ed81d7f (0.4221f rounds to 0x3ed81d7e);
 //  * 0.001f comes from the TU-local kbSecondsPerMillisecond, not the shared pool.
 GameObject* KrustyBike::Load(void* context, const char* engineName, const char* modelPath, const char* riderModel,
@@ -968,10 +968,10 @@ GameObject* KrustyBike::Load(void* context, const char* engineName, const char* 
              (VehicleAxis*)&g_TrackGame->throttleBinding,
              (SoultreeSlot1f0*)scene, setupFloat, 0);
     if (isRemote) {
-        BikeA640* axis = steerAxis;
-        axis->steerValue = 0.5f;
-        axis->l_0x4 = 0.42210004f;
-        axis->l_0x8 = 1.0f;
+        VehicleSmoother* axis = steerAxis;
+        axis->smoothedValue = 0.5f;
+        axis->timeConstant = 0.42210004f;
+        axis->blendFactor = 1.0f;
     }
     if (aiKind || isGhost) {
         gasGyro = 0;
@@ -1139,10 +1139,10 @@ GameObject* KrustyBike::Load(void* context, const char* engineName, const char* 
     wrecker->EndWreck();
     lastFramePosition = position;
     if (isRemote) {
-        BikeA640* axis = steerAxis;
-        axis->steerValue = 0.5f;
-        axis->l_0x4 = 0.42210004f;
-        axis->l_0x8 = 1.0f;
+        VehicleSmoother* axis = steerAxis;
+        axis->smoothedValue = 0.5f;
+        axis->timeConstant = 0.42210004f;
+        axis->blendFactor = 1.0f;
     }
     drawnAtLastPosition = 0;
     field_0x15cc = 0;
@@ -2416,14 +2416,14 @@ void KrustyBike::InterpolateNetworkState(float dt, int copyRaceProgress)
             else
                 value = (float)((int)((float)(to - from) * ratio) + from);
             value *= KB_BYTE_SCALE;
-            lim = steerAxis->l_0x4;
+            lim = steerAxis->timeConstant;
             step = g_TrackGame->frameTime;
             if (step >= lim)
                 step = lim;
-            rate = step / steerAxis->l_0x4;
-            steerAxis->l_0x8 = rate;
-            value = (value - steerAxis->steerValue) * rate + steerAxis->steerValue;
-            steerAxis->steerValue = value;
+            rate = step / steerAxis->timeConstant;
+            steerAxis->blendFactor = rate;
+            value = (value - steerAxis->smoothedValue) * rate + steerAxis->smoothedValue;
+            steerAxis->smoothedValue = value;
             poseBlend = value;
         }
         if (poseBlend > 1.0f)

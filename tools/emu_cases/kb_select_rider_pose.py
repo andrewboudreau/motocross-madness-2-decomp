@@ -5,7 +5,7 @@ configured /QIfist. Offsets from the retail body: bike +0x108 airborne (byte), +
 crashState, +0x47a backingUp (byte), +0x504 controlInput.x, +0x510 prevControlInput.x, +0x520
 steerPoseState (0..6, so the default arms of both switches run), +0x5b8 fixed-pose flag,
 +0x5f0/+0x5f4 front/rear wheel (+0x150 penetration, +0x260 inContact, +0x27c slipSpeed),
-+0x63c crossupScale, +0x640 steer axis (+0 steerValue), +0x644 pose smoother (+0 value, +4
++0x63c crossupScale, +0x640 steer axis (VehicleSmoother; +0 smoothedValue), +0x644 pose smoother (+0 value, +4
 time, +8 ratio, +0xc maxRise, +0x10 maxFall), +0x650 poseIndex, +0x654 poseBlend, +0x658
 poseState, +0x65c poseParam, +0x660 poseLeanBlend, +0x6fc crossoverPose, +0x704 smooth time
 (FLT_MAX in some runs), +0x734..+0x736 aiKind/isRemote/isGhost. The steer value sits on the

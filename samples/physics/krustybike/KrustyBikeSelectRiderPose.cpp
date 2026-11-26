@@ -26,7 +26,7 @@
 // the argument is rounded to binary32, then rounded to an integer under the current x87
 // mode, so fistp(p - 0.5f) is floor(p) apart from exact ties.  FistpFloatToIntChecked gives
 // that under /QIfist, and 0x80000000 for a result outside int as the 32-bit store does.
-// steerValue is not bounded anywhere this file can show (AI writes (lean + 1) * 0.25, the
+// The steer axis smoothedValue is not bounded anywhere this file can show (AI writes (lean + 1) * 0.25, the
 // player axis is smoothed toward its target), so the checked form is used.  The old
 // canonical body corrected a truncating __ftol to round-to-nearest-even (three __ftol calls
 // retail does not make) and ignored the rounding mode.  Without /QIfist (the physics
@@ -116,10 +116,10 @@ void KrustyBike::SelectRiderPose(float t)
         lean = 0.0f;
 
     if (airborne && lean > 2.0f && rearWheel->penetration < -1.0f) {
-        FistpFloatToIntChecked(&poseIndex, (0.75f - steerAxis->steerValue) * 3.99f - 0.5f);
+        FistpFloatToIntChecked(&poseIndex, (0.75f - steerAxis->smoothedValue) * 3.99f - 0.5f);
         int idx = poseIndex;
         poseIndex = idx + RiderPose_CrosOv1;
-        poseBlend = (0.75f - steerAxis->steerValue) * 3.99f - idx;
+        poseBlend = (0.75f - steerAxis->smoothedValue) * 3.99f - idx;
         if (crossoverPose == 0) {
             BikeA644* smoother = poseSmoother;
             float initialTime = poseSmoothTime;
@@ -136,15 +136,15 @@ void KrustyBike::SelectRiderPose(float t)
     } else {
         EndMotion();
         if (rearWheel->slipSpeed > 14.0f) {
-            FistpFloatToIntChecked(&poseIndex, (0.75f - steerAxis->steerValue) * 3.99f - 0.5f);
+            FistpFloatToIntChecked(&poseIndex, (0.75f - steerAxis->smoothedValue) * 3.99f - 0.5f);
             int idx = poseIndex;
             if (idx == 2) {
                 if (rearWheel->slipSpeed > 32.0f)
-                    poseBlend = (0.75f - steerAxis->steerValue) * 3.99f - 2.0f;
+                    poseBlend = (0.75f - steerAxis->smoothedValue) * 3.99f - 2.0f;
                 else
                     poseBlend = (rearWheel->slipSpeed - 14.0f) * 0.0555f;
             } else {
-                poseBlend = (0.75f - steerAxis->steerValue) * 3.99f - idx;
+                poseBlend = (0.75f - steerAxis->smoothedValue) * 3.99f - idx;
             }
             poseState = idx * 2 + RiderPose_Turn1U;
             poseIndex = poseState - 1;
@@ -152,10 +152,10 @@ void KrustyBike::SelectRiderPose(float t)
             poseIndex = RiderPose_BackUpTop;
             poseState = 5;
         } else {
-            FistpFloatToIntChecked(&poseIndex, (0.75f - steerAxis->steerValue) * 3.99f - 0.5f);
+            FistpFloatToIntChecked(&poseIndex, (0.75f - steerAxis->smoothedValue) * 3.99f - 0.5f);
             int idx = poseIndex;
             poseState = idx * 2 + RiderPose_Turn1D;
-            poseBlend = (0.75f - steerAxis->steerValue) * 3.99f - idx;
+            poseBlend = (0.75f - steerAxis->smoothedValue) * 3.99f - idx;
             poseLeanBlend = (14.0f - rearWheel->slipSpeed) * 0.0714285746f;
         }
     }

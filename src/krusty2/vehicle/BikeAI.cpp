@@ -1656,7 +1656,7 @@ int KrustyBike::SimulateAIFrame(float dt)
     else if (controlInput.y < -1.0f)
         controlInput.y = -1.0f;
     float leanAxis = controlInput.y + 1.0f;
-    steerAxis->steerValue = (leanAxis + 1.0f) * 0.25f;
+    steerAxis->smoothedValue = (leanAxis + 1.0f) * 0.25f;
     StoreBodyAxes(1, 1);
     if (aiKind && airborne)
         controlInput.x = 0.0f;

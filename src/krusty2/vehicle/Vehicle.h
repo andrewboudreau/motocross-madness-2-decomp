@@ -147,13 +147,14 @@ struct VehicleImpactEvent {          // argument of slots 18..20 (provisional)
 // canonical provider. The destructor is separately identified through the owning
 // delete path; this does not establish complete equivalence of the two views.
 #include "VehicleSpeedState.h"
-// Exponential smoother objects at Vehicle+0x58c / +0x598 (provisional): f0 is the smoothed value.
+// Exponential smoother objects at Vehicle+0x58c / +0x598 and Bike+0x640 (provisional): f0 is the
+// smoothed value.
 // 0x14 bytes: LoadVehicle allocates two with `new(__FILE__, 0x19d/0x1a0)` and fills all five
 // fields inline (no EH state, so the constructor is inline and calls nothing).
 struct VehicleSmoother {
-    VehicleSmoother(float tc)
+    VehicleSmoother(float tc, float value = 0.0f)
     {
-        smoothedValue = 0.0f;
+        smoothedValue = value;
         timeConstant = tc;
         minValue = 3.402823466e+38f;
         maxValue = -3.402823466e+38f;

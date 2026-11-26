@@ -886,7 +886,7 @@ GameObject* Bike::LoadBike(int context, const char* engineName, const char* mode
     riderCharacter->ApplyMotionAtPhase(riderPoseHandles[RiderPose_LeanR02], 0.5f);
     verticalAccelSmoother->Reset(fixedStepTime * 7.0f);
     forwardAccelSmoother->Reset(0.5f);
-    steerAxis = new(__FILE__, 0x7df) BikeA640(frontWheel->restLoadWeight, fixedStepTime * 6.3f);
+    steerAxis = new(__FILE__, 0x7df) VehicleSmoother(fixedStepTime * 6.3f, frontWheel->restLoadWeight);
     poseSmoother = new(__FILE__, 0x7e0) BikeA644(poseSmoothTime, 1.0f, -1.0f);
     return this;
 }
@@ -1040,7 +1040,7 @@ void Bike::UpdateLocalCenterOfMass()
 {
     localCenterOfMass = poseNode->WorldToLocalPoint(centerOfMass);
     if (crashState == 0 && steerAxis) {
-        float steer = (steerAxis->steerValue - 0.5f) * 4.0f;
+        float steer = (steerAxis->smoothedValue - 0.5f) * 4.0f;
         localCenterOfMass.x = 0.0f;
         localCenterOfMass.z += steer;
         centerOfMass = poseNode->LocalToWorldPoint(localCenterOfMass);
@@ -1557,12 +1557,12 @@ int Bike::EvaluateCrash(float dt, float noseOverLimit, int impact, float impulse
 // initialised 71-184; an inline element accessor over (list, i), (i, list), (this, i),
 // (i, this) or a byte offset, in the first, the second or both loops; a list local in
 // the second loop.
-static inline void BikeSteerToward(BikeA640* p, float target, float dt)
+static inline void BikeSteerToward(VehicleSmoother* p, float target, float dt)
 {
-    float step = BikeMin(dt, p->l_0x4);
-    float fraction = step / p->l_0x4;
-    p->l_0x8 = fraction;
-    p->steerValue = (target - p->steerValue) * fraction + p->steerValue;
+    float step = BikeMin(dt, p->timeConstant);
+    float fraction = step / p->timeConstant;
+    p->blendFactor = fraction;
+    p->smoothedValue = (target - p->smoothedValue) * fraction + p->smoothedValue;
 }
 static inline float BikeWheelDistance(const Vec3& a, const Vec3& b)
 {
@@ -2157,11 +2157,11 @@ void Bike::SelectRiderPose(float t)
         lean = 0.0f;
 
     if (airborne && lean > 2.0f && rearWheel->penetration < -1.0f) {
-        float posePosition = (0.75f - steerAxis->steerValue) * 3.99f;
+        float posePosition = (0.75f - steerAxis->smoothedValue) * 3.99f;
         BikeFloatToInt(&poseIndex, posePosition - 0.5f);
         int idx = poseIndex;
         poseIndex = idx + RiderPose_CrosOv1;
-        poseBlend = (0.75f - steerAxis->steerValue) * 3.99f - idx;
+        poseBlend = (0.75f - steerAxis->smoothedValue) * 3.99f - idx;
         if (crossoverPose == 0) {
             BikeA644* smoother = poseSmoother;
             float initialTime = poseSmoothTime;
@@ -2187,23 +2187,23 @@ void Bike::SelectRiderPose(float t)
             poseBlend = (controlInput.y + 1.0f) * 0.5f;
             poseLeanBlend = (lean - leanPoseMin) / (leanPoseMax - leanPoseMin);
         } else if (rearWheel->slipSpeed > 14.0f) {
-            BikeFloatToInt(&poseIndex, (0.75f - steerAxis->steerValue) * 3.99f - 0.5f);
+            BikeFloatToInt(&poseIndex, (0.75f - steerAxis->smoothedValue) * 3.99f - 0.5f);
             int idx = poseIndex;
             if (idx == 2) {
                 if (rearWheel->slipSpeed > 32.0f)
-                    poseBlend = (0.75f - steerAxis->steerValue) * 3.99f - 2.0f;
+                    poseBlend = (0.75f - steerAxis->smoothedValue) * 3.99f - 2.0f;
                 else
                     poseBlend = (rearWheel->slipSpeed - 14.0f) * 0.0555f;
             } else {
-                poseBlend = (0.75f - steerAxis->steerValue) * 3.99f - idx;
+                poseBlend = (0.75f - steerAxis->smoothedValue) * 3.99f - idx;
             }
             poseState = idx * 2 + RiderPose_Turn1U;
             poseIndex = poseState - 1;
         } else {
-            BikeFloatToInt(&poseIndex, (0.75f - steerAxis->steerValue) * 3.99f - 0.5f);
+            BikeFloatToInt(&poseIndex, (0.75f - steerAxis->smoothedValue) * 3.99f - 0.5f);
             int idx = poseIndex;
             poseState = idx * 2 + RiderPose_Turn1D;
-            poseBlend = (0.75f - steerAxis->steerValue) * 3.99f - idx;
+            poseBlend = (0.75f - steerAxis->smoothedValue) * 3.99f - idx;
             poseLeanBlend = (14.0f - rearWheel->slipSpeed) * 0.0714285746f;
         }
     }

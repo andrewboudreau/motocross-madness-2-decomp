@@ -26,7 +26,6 @@
 struct BikeWheel;
 struct BikeWheelQ;
 class Wrecker;
-struct BikeA640;
 struct BikeA644;
 struct BikeQ;
 
@@ -114,24 +113,8 @@ struct BikeWheel {
 struct BikeWheelQ {};
 
 
-// Smoother objects at Bike+0x640 / +0x644 (the Vehicle.h VehicleSmoother shape, 0x14 bytes each;
-// the loader builds them with `new(__FILE__, 0x7df/0x7e0)` and inline constructors).
-struct BikeA640 {
-    BikeA640(float value, float tc)
-    {
-        steerValue = value;
-        l_0x4 = tc;
-        minValue = 3.402823466e+38f;
-        maxValue = -3.402823466e+38f;
-        l_0x8 = 1.0f;
-    }
-    float steerValue;
-    float l_0x4;
-    float l_0x8;
-    float minValue;
-    float maxValue;
-};
-
+// Rate-limited smoother at Bike+0x644 (0x14 bytes; the loader builds it with
+// `new(__FILE__, 0x7e0)` and an inline constructor). Bike+0x640 is a VehicleSmoother.
 struct BikeA644 {
     BikeA644(float tc, float rise, float fall)
     {
