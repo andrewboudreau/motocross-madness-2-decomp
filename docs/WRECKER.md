@@ -313,7 +313,7 @@ Field names of the collaborator views follow the canonical krusty2 layouts:
 `ConstraintMethodCollisionModel`, `SelectiveGravityModel` and
 `PhysicsRigidBody` classes themselves, and the ignore list holds
 `CollisionObject` pointers. The collision model's interface keeps its own
-views (`ConBody`, `ConVec3`, `ConNode` in `constraint/ConstraintTypes.h`), so
+views (`ConBody`, `ConNode` in `constraint/ConstraintTypes.h`; vectors are `Vec3`), so
 Wrecker passes its rigid body, probe offset and probe node through
 `reinterpret_cast` and calls `SoultreeObject` methods on a probe's `ConNode`.
 Wrecker's own fields are named from the

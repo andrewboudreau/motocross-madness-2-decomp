@@ -714,7 +714,7 @@ void Wrecker::SetPushBox(UnknownWreckerSkeleton* frame, Vector3 center, Vector3 
 }
 
 void Wrecker::AddProbe(Vector3 offset, int bone) {
-    collisionModel->AddProbePoint(reinterpret_cast<const ConVec3&>(offset), reinterpret_cast<ConNode*>(bone));
+    collisionModel->AddProbePoint(reinterpret_cast<const Vec3&>(offset), reinterpret_cast<ConNode*>(bone));
     probePositions = (Vector3*)DebugRealloc(probePositions, collisionModel->probeCount * sizeof(Vector3), __FILE__, 0x308);
     probePositions[collisionModel->probeCount - 1] = Vector3(0.0f, 0.0f, 0.0f);
     probeHits = (int*)DebugRealloc(probeHits, collisionModel->probeCount * 4, __FILE__, 0x30b);

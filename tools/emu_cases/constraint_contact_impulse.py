@@ -11,7 +11,7 @@ impulse and max speed zero (unlimited) or small enough to clamp.
 from tools.emu_cases.resolve_contact_impulse import build_node, node_case, normal, vec
 
 RETAIL_VA = 0x0043bdb0
-SYMBOL = '?ApplyContactImpulse@ConstraintMethodCollisionModel@@QAEXPAVConBody@@MUConVec3@@11@Z'
+SYMBOL = '?ApplyContactImpulse@ConstraintMethodCollisionModel@@QAEXPAVConBody@@MUVec3@@11@Z'
 SOURCE = 'src/krusty2/constraint/ConstraintMethodCollisionModel.cpp'
 PROBES = {0x0043c0b2: 'other body', 0x0043c47a: 'max impulse test', 0x0043c6f5: 'speed clamp'}
 

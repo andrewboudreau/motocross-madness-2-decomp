@@ -7,7 +7,7 @@
 #include "math/Math3D.h"
 #include "constraint/ConstraintMethodCollisionModel.h"
 
-typedef char VecLayout[(sizeof(ConVec3)==12 && sizeof(Vec3)==12 && offsetof(ConVec3,z)==8)?1:-1];
+typedef char VecLayout[(sizeof(Vec3)==12 && offsetof(Vec3,z)==8)?1:-1];
 typedef char BodyNode[(offsetof(ConBody,node)==0x234)?1:-1];
 typedef char ProbeNode[(sizeof(ConstraintProbe)==32 && offsetof(ConstraintProbe,node)==12)?1:-1];
 typedef char NodeFields[(offsetof(SoultreeObject,localMatrix)==0xb8 && offsetof(SoultreeObject,worldValid)==0x138)?1:-1];
@@ -73,7 +73,7 @@ int main() {
         // Actual explicit-output getter with an independent result or local-row alias.
         for(alias=0;alias<2;alias++) {
             Setup(seed,parent,valid);World(1);
-            ConVec3* result=alias?(ConVec3*)&n[1].localMatrix._41:(ConVec3*)(output.bytes+16);
+            Vec3* result=alias?(Vec3*)&n[1].localMatrix._41:(Vec3*)(output.bytes+16);
             void* wanted=alias?(void*)&e[1].localMatrix._41:(void*)(wantedOutput.bytes+16);
             memcpy(wanted,&e[1].worldMatrix._41,12);
             reinterpret_cast<SoultreeObject*>((ConNode*)&n[1])->GetPositionIn(0,reinterpret_cast<Vec3*>(result));
@@ -82,7 +82,7 @@ int main() {
         for(alias=0;alias<3;alias++) {
             Setup(seed,parent,valid);
             Vec3 input((float)(seed-8),3.0f,(float)(9-seed));
-            const ConVec3* point=alias?(const ConVec3*)(alias==1?&n[1].localMatrix._41:&n[1].worldMatrix._41):(const ConVec3*)&input;
+            const Vec3* point=alias?(const Vec3*)(alias==1?&n[1].localMatrix._41:&n[1].worldMatrix._41):(const Vec3*)&input;
             double p[3]={point->x,point->y,point->z},local[3];
             if(parent) {
                 World(0);
@@ -102,7 +102,7 @@ int main() {
         for(alias=0;alias<3;alias++) {
             Setup(seed,parent,valid);
             Vec3 input((float)(seed-8),3.0f,(float)(9-seed));
-            const ConVec3* point=alias?(const ConVec3*)(alias==1?&n[1].localMatrix._41:&n[1].worldMatrix._41):(const ConVec3*)&input;
+            const Vec3* point=alias?(const Vec3*)(alias==1?&n[1].localMatrix._41:&n[1].worldMatrix._41):(const Vec3*)&input;
             World(1);
             const float* p=alias?(alias==1?&e[1].localMatrix._41:&e[1].worldMatrix._41):&input.x;
             float result[3];
@@ -112,7 +112,7 @@ int main() {
                 result[col]=(float)value;
             }
             memcpy(wantedOutput.bytes+16,result,12);
-            *(ConVec3*)(output.bytes+16)=reinterpret_cast<const ConVec3&>(static_cast<const Vec3&>(
+            *(Vec3*)(output.bytes+16)=reinterpret_cast<const Vec3&>(static_cast<const Vec3&>(
                 reinterpret_cast<SoultreeObject*>((ConNode*)&n[1])->LocalToWorldPoint(reinterpret_cast<const Vec3&>(*point))));
             Verify();cases++;
         }

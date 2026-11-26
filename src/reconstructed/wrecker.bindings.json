@@ -23,7 +23,7 @@
   "?SnapPlacement@CollisionObject@@QAEXXZ": "0x00435fe0",
   "?AddIgnoredOwner@CollisionObject@@QAEXPAX@Z": "0x00439410",
   "?SetBody@ConstraintMethodCollisionModel@@QAEXPAVConBody@@HPBD@Z": "0x0043b9e0",
-  "?AddProbePoint@ConstraintMethodCollisionModel@@QAEXUConVec3@@PAVConNode@@@Z": "0x0043c7f0",
+  "?AddProbePoint@ConstraintMethodCollisionModel@@QAEXUVec3@@PAVConNode@@@Z": "0x0043c7f0",
   "?FastSqrt@@YAMM@Z": "0x00460b50",
   "?ApplyFullPoseList@Character@@QAEXPAUMotionPoseList@@PBH@Z": "0x004a8ac0",
   "?SetMotionByName@Character@@QAEXPBD@Z": "0x004a8b10",

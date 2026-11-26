@@ -29,7 +29,7 @@ PROVIDER = 'src/krusty2/constraint/ConstraintMethodCollisionModel.cpp'
 CONSTRAINT_CALLS = (
     '??0ConstraintMethodCollisionModel@@QAE@H@Z',
     '?SetBody@ConstraintMethodCollisionModel@@QAEXPAVConBody@@HPBD@Z',
-    '?AddProbePoint@ConstraintMethodCollisionModel@@QAEXUConVec3@@PAVConNode@@@Z',
+    '?AddProbePoint@ConstraintMethodCollisionModel@@QAEXUVec3@@PAVConNode@@@Z',
 )
 FILENAMES = (CALLER,)
 HEADERS = {CALLER: 'src/reconstructed/Wrecker.h',

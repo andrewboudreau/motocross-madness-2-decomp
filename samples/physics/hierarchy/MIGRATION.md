@@ -73,8 +73,8 @@ No generators wrote into `collision/` or `constraint/`. The scripts in `work/b2_
    Any future override must fix the placeholder first, as was done for slot 23.
 3. **One declaration of the constraint class.** The minimal duplicate `collision/ConstraintMethodCollisionModel.{h,cpp}` was removed; its target, primary slot 2 (0x0044d710, the shared bare `ret`), is registered against `src/krusty2/constraint/ConstraintMethodCollisionModel.cpp`.
 4. **Three vector types.**
-   - `CollisionVec3` (collision/CollisionTypes.h) and `ConVec3` (src/krusty2/constraint/ConstraintTypes.h) are the Math3D `Vec3` layout.
-   - They stay separate on purpose: they declare out-of-line operators (to force retail calls), while Math3D defines them inline.
+   - `CollisionVec3` (collision/CollisionTypes.h) is the Math3D `Vec3` layout. `ConVec3` is retired: the constraint unit uses `Vec3` and declares the out-of-line operators it calls in its own .cpp (it does not include Math3D.h).
+   - `CollisionVec3` stays separate for now: it declares out-of-line operators (to force retail calls), while Math3D defines them inline.
    - Unifying them needs the Math3D static-initializer issue solved first.
 
 ## General rules

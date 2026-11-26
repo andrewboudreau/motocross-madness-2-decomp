@@ -1,8 +1,8 @@
 # Constraint scene connections
 
 The constraint solver now calls three existing `SoultreeObject` implementations
-through its observed primary node pointers. The provisional `ConNode`,
-`ConBody`, and `ConVec3` views remain separate; this change does not assert full
+through its observed primary node pointers. The provisional `ConNode`
+and `ConBody` views remain separate (vectors are the shared `Vec3`); this change does not assert full
 class equivalence or alter their layout.
 
 | Previous call view | Existing provider | Retail extent | Production sites |
@@ -17,8 +17,7 @@ match their complete retail bodies. The setter deliberately uses
 `0x4fc890` translates instead of setting the position. Both getter/setter pairs
 in the constraint solver pass a null frame. The third call transforms a probe
 point and returns a 12-byte vector through the VC6 hidden result pointer.
-The explicit const-reference view keeps that temporary alive through its
-assignment into the existing `ConVec3` local.
+The temporary is assigned straight into the `Vec3` local.
 
 The receiving pointer has independent producer evidence:
 

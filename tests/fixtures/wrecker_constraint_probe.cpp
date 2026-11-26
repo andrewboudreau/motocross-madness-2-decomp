@@ -11,7 +11,7 @@
 extern int g_UnclaimedBytes;
 typedef char Layout[(sizeof(Wrecker)==0x53c && sizeof(ConstraintMethodCollisionModel)==0x10c &&
     sizeof(ConstraintProbe)==32 &&
-    sizeof(Vector3)==12 && sizeof(ConVec3)==12 &&
+    sizeof(Vector3)==12 && sizeof(Vec3)==12 &&
     offsetof(Wrecker,collisionModel)==0x38 && offsetof(Wrecker,probePositions)==0x104 &&
     offsetof(Wrecker,probeHits)==0x108 && offsetof(ConstraintMethodCollisionModel,body)==0xc4 &&
     offsetof(ConstraintMethodCollisionModel,probeCount)==0x100 &&

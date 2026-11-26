@@ -15,10 +15,10 @@ class Terrain;
 
 // One probe point (32 bytes), see AddProbePoint / Step.
 struct ConstraintProbe {
-    ConVec3 localPoint;    // +0x00 point in the owner node's space
+    Vec3 localPoint;    // +0x00 point in the owner node's space
     ConNode* node;         // +0x0c owner node
     int hit;               // +0x10 set by the last slot 11 query
-    ConVec3 normal;        // +0x14 surface normal recorded by that query
+    Vec3 normal;        // +0x14 surface normal recorded by that query
 };
 
 class ConstraintMethodCollisionModel : public CollisionObject {
@@ -34,16 +34,16 @@ public:
     virtual int Render3D();                   // 0x0043c880 (tail jump)
 
     void SetBody(ConBody* b, int useNodeModel, const char* shapePath);     // 0x0043b9e0
-    void AddProbePoint(ConVec3 point, ConNode* node);   // 0x0043c7f0
+    void AddProbePoint(Vec3 point, ConNode* node);   // 0x0043c7f0
     // 0x0043bdb0: impulse response for a contact; see the header comment in the .cpp.
-    void ApplyContactImpulse(ConBody* other, float t, ConVec3 offset, ConVec3 point, ConVec3 normal);
+    void ApplyContactImpulse(ConBody* other, float t, Vec3 offset, Vec3 point, Vec3 normal);
 
     float restitution;                // +0xb8 restitution e in -(1+e) v.n
     float field_0xbc;                // 0.9f in the constructor
     float dt;                        // 0xc0, slot 11 argument
     ConBody* body;                   // 0xc4
     int refreshPending;  // +0xc8 slot 11 0x0043ba70: when set it runs 0x00435fe0 (double refresh) instead of 0x00435fb0 and clears it
-    ConVec3 contactPoint;            // 0xcc, world contact point of the last impulse
+    Vec3 contactPoint;            // 0xcc, world contact point of the last impulse
     int field_0xd8;
     int field_0xdc;
     int field_0xe0;
