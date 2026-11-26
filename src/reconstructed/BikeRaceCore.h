@@ -6,6 +6,7 @@
 
 class LightManager;
 class KrustyBikeCamera;
+class ParticleManager;
 class Scene;
 class ObjectPicker;
 class ChatOverlay;
@@ -57,7 +58,7 @@ public:
     // and its probes, the start objects, the flag girl, the number and bonus
     // overlays, the replay recorder, the loader 0x00419970, the dialogs,
     // the sound and the plate numbers. Returns this, or 0 after Release.
-    BikeRace* Create(void* owner, void* particles, LightManager* lights,
+    BikeRace* Create(void* owner, ParticleManager* particles, LightManager* lights,
                                     TextureContext* textures, Terrain* terrain,
                                     KrustyBikeCamera* camera, Scene* scene, RaceGateEvent* event,
                                     ProjectedShadow* shadow);
@@ -112,7 +113,7 @@ public:
     Track* raceTrack;
     Terrain* raceTerrain;  // +0x4C  Create's terrain argument; QueryGround (Terrain 0x00507c10) puts probes/debug lines on the ground; grid scale
     KrustyBikeCamera* raceCamera;            // the race camera
-    int particleManager;  // +0x54  Create's particles argument (QuarryStuntEvent passes its particleManager); forwarded to every racer loader
+    ParticleManager* particleManager;  // +0x54  Create's particles argument (QuarryStuntEvent passes its particleManager); forwarded to every racer loader
     Scene* raceScene;
     ProjectedShadow* raceShadow;  // +0x5C  Create's shadow argument (ProjectedShadow); camera targeting clears it and adds the target's casters
     GameObject* youIndicator;                 // +0x60 the spinning "youind.slt" marker over the local racer

@@ -892,7 +892,7 @@ GameObject* KrustyBike::Load(void* context, const char* engineName, const char* 
                              LightManager* lights, TextureContext* textures, Vector3 startPosition, Vector3 forward,
                              Vector3 up, Terrain* terrain, ControlInterface* control, char kind,
                              unsigned char remote, BikeRace* race, const char* riderName, int a16, int netId,
-                             const KbBikeSetup* setup, int gasGyroOption, int brakeGyroOption, int particles, Scene* scene,
+                             const KbBikeSetup* setup, int gasGyroOption, int brakeGyroOption, ParticleManager* particles, Scene* scene,
                              KrustyVCR* recorder, float aiSkill, int withRider)
 {
     aiAccelScale1 = 1.1f;
@@ -962,7 +962,7 @@ GameObject* KrustyBike::Load(void* context, const char* engineName, const char* 
              setup ? setup->rearDecomp : 0,
              setup ? setup->frontDamp : 0,
              setup ? setup->rearDamp : 0,
-             gasGyroOption, brakeGyroOption, (void*)particles, (void*)localFlag,
+             gasGyroOption, brakeGyroOption, particles, (void*)localFlag,
              (VehicleAxis*)&g_TrackGame->steerBinding,
              (VehicleAxis*)&g_TrackGame->leanBinding,
              (VehicleAxis*)&g_TrackGame->throttleBinding,

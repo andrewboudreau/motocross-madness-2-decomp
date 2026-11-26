@@ -214,7 +214,7 @@ static inline Vector3 ScaledVector(const Vector3& v, float scale) {
 // its buffers at retail's offsets. Retail spills z*z of both vector lengths
 // to a stack temporary and orders the girl block's temporaries differently,
 // so most esp offsets below +0x44 differ (docs/BIKERACE.md).
-BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
+BikeRace* BikeRace::Create(void* owner, ParticleManager* particles, LightManager* lights,
                                           TextureContext* textures,
                                           Terrain* terrain, KrustyBikeCamera* camera,
                                           Scene* scene, RaceGateEvent* event,
@@ -243,7 +243,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
     aiSettings[9] = 50.0f;
     aiSettings[10] = 100.0f;
     forceAiStep = 0;
-    particleManager = (int)particles;
+    particleManager = particles;
     raceScene = scene;
     raceShadow = shadow;
     if (!g_TrackGame->workingDirectory) {

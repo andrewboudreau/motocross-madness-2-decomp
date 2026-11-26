@@ -27,6 +27,7 @@ class BikeRace;
 class ControlInterface;
 class KrustyVCR;
 class LightManager;
+class ParticleManager;
 class Scene;
 class Terrain;
 struct TextureContext;
@@ -144,7 +145,7 @@ public:
                      LightManager* lights, TextureContext* textures, Vector3 startPosition, Vector3 forward,
                      Vector3 up, Terrain* terrain, ControlInterface* control, char kind,
                      unsigned char remote, BikeRace* race, const char* riderName, int a16, int netId,
-                     const KbBikeSetup* setup, int gasGyroOption, int brakeGyroOption, int particles, Scene* scene,
+                     const KbBikeSetup* setup, int gasGyroOption, int brakeGyroOption, ParticleManager* particles, Scene* scene,
                      KrustyVCR* recorder, float aiSkill, int withRider);
 
 public:

@@ -139,6 +139,11 @@ SceneManager.h and BaseQuarryEvent.h forward-declare `ParticleManager` and `Text
 the retyped parameters and member. The proof over the 44 affected units found the two
 instructions at +538 as the only change in BikeRace.cpp.
 
+Typing BikeRace's particle manager swapped it again (13,394). BikeRaceCore.h and KrustyBikeCore.h
+forward-declare `ParticleManager` for BikeRace::Create, the +0x54 member and KrustyBike::Load.
+The proof over the 35 affected units found the two instructions at +538 as the only change
+in BikeRace.cpp.
+
 | Complete CreateRacers fingerprint | Before | After |
 |---|---|---|
 | Raw body SHA-256 | `1a2b16687fa89e9a0ed33dba31a1e46452caaaefa3ad73ce630b317a32bf07c4` | `9c7483a4d5ff8514f8a350f528dbe11d8d82d4d694439f87d069fd6fbf9e748b` |

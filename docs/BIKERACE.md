@@ -170,7 +170,8 @@ against retail, 600 runs with 0 mismatches):
   them again (13394; BIKE_RACE_STATE_CONNECTIONS.md); replacing the
   Krusty3DObjects camera views with `Camera` moved them back (13400);
   retiring `SoultreeLoadDesc` swapped them again (13394); typing
-  Scene::Load's particle and texture managers moved them back (13400).
+  Scene::Load's particle and texture managers moved them back (13400);
+  typing BikeRace's particle manager swapped them again (13394).
 
 Facts the two loaders establish:
 - Racers are KrustyBike (constructor `0x0048fa60`, 0x1638 bytes, the
