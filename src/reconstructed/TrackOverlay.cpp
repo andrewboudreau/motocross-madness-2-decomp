@@ -455,7 +455,8 @@ StatsOverlay::~StatsOverlay()
 // rectangles, docs/VC6_FRAME_LAYOUT.md fact 2), and lfItalic and lfHeight are
 // written last, as retail stores them. The source rectangle is written
 // top/bottom first.
-StatsOverlay* StatsOverlay::LoadPanel(RenderTarget* target, TextureMapManager* manager, void* camera,
+StatsOverlay* StatsOverlay::LoadPanel(RenderTarget* target, TextureMapManager* manager,
+                                      InstrumentKrustyBikeCameraView* camera,
                                                   OverlayRect screen)
 {
     const char* font;
@@ -464,7 +465,7 @@ StatsOverlay* StatsOverlay::LoadPanel(RenderTarget* target, TextureMapManager* m
     OverlayRect source;
     char name[260];
     char path[260];
-    instrumentSource = (InstrumentKrustyBikeCameraView*)camera;
+    instrumentSource = camera;
     rect.left = 0;
     rect.top = 0;
     rect.right = 128;
@@ -543,9 +544,9 @@ StatsOverlay* StatsOverlay::LoadPanel(RenderTarget* target, TextureMapManager* m
 }
 
 // 0x00519880
-int StatsOverlay::SetStatsSource(int source)
+int StatsOverlay::SetStatsSource(StatsBikeRaceView* source)
 {
-    statsSource = (StatsBikeRaceView*)source;
+    statsSource = source;
     return 1;
 }
 
@@ -1267,7 +1268,7 @@ RadarOverlay::~RadarOverlay()
 
 // 0x0051b840
 RadarOverlay* RadarOverlay::LoadMap(RenderTarget* target, TextureMapManager* manager,
-                                                  int camera, OverlayRect screen)
+                                                  RadarKrustyBikeCameraView* camera, OverlayRect screen)
 {
     const char* font;
     OverlayRect source;
@@ -1303,7 +1304,7 @@ RadarOverlay* RadarOverlay::LoadMap(RenderTarget* target, TextureMapManager* man
         frameRateRect.top = mapRect.top + 112;
         frameRateRect.bottom = mapRect.top + 124;
     }
-    radarCamera = (RadarKrustyBikeCameraView*)camera;
+    radarCamera = camera;
     backingTexture = TerrainLoadTexture(manager, name, 4444, 0, 8, 5, 6, 0, 0x10, 0xff00ff, 1, 1);
     if (!backingTexture) {
         Release();
@@ -1848,7 +1849,7 @@ ChatOverlay::~ChatOverlay()
 // 0x0051cf80: sets the chat overlay up: the chat and cue rectangles, the
 // texture, the side panels on wide screens, the pen, two fonts and the
 // thirteen name-tag rectangles.
-ChatOverlay* ChatOverlay::Setup(RenderTarget* target, TextureMapManager* manager, void* camera,
+ChatOverlay* ChatOverlay::Setup(RenderTarget* target, TextureMapManager* manager, ChatKrustyBikeCameraView* camera,
                                                 OverlayRect screen, OverlayRect cue)
 {
     const char* font;
@@ -1863,7 +1864,7 @@ ChatOverlay* ChatOverlay::Setup(RenderTarget* target, TextureMapManager* manager
     chatRect.right = chatRect.left + 256;
     chatRect.bottom = 68;
     strcpy(name, "chat256.tga");
-    chatCamera = (ChatKrustyBikeCameraView*)camera;
+    chatCamera = camera;
     cueRect = cue;
     timeSum = 0.08f;
     backingTexture = TerrainLoadTexture(manager, name, 4444, 0, 8, 5, 6, 0, 0x10, 0xff00ff, 1, 1);

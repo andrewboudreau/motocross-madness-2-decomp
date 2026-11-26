@@ -177,12 +177,12 @@ public:
 
     // 0x005194b0 (QuarryStuntEvent.cpp 0x004e0a9c): loads the panel for the
     // screen rectangle `screen`; returns this, or 0.
-    StatsOverlay* LoadPanel(RenderTarget* target, TextureMapManager* manager, void* camera,
+    StatsOverlay* LoadPanel(RenderTarget* target, TextureMapManager* manager, InstrumentKrustyBikeCameraView* camera,
                                         OverlayRect screen);
     // 0x00464e80: the shared empty `ret 4` body (QuarryStuntEvent.cpp
     // 0x004de4a3 passes the visual cue index).
     void SetCueIndex(int index);
-    int SetStatsSource(int source);     // 0x00519880
+    int SetStatsSource(StatsBikeRaceView* source);     // 0x00519880
     int Redraw();                             // 0x005198a0
     int DrawStandings();              // 0x00519a20
     void DrawTimeLeft();                      // 0x00519e10
@@ -255,7 +255,7 @@ public:
 
     // 0x0051b840: loads the map for the screen rectangle `screen` (only its
     // top and right edges are read).
-    RadarOverlay* LoadMap(RenderTarget* target, TextureMapManager* manager, int camera,
+    RadarOverlay* LoadMap(RenderTarget* target, TextureMapManager* manager, RadarKrustyBikeCameraView* camera,
                                         OverlayRect screen);
     int TakeRacers(EventBikeRaceView* view, int chat); // 0x0051baf0: collects the racers
     int DrawForViewMode();                    // 0x0051bc60: draws for the view mode
@@ -421,7 +421,7 @@ public:
 
     // 0x0051cf80 (QuarryStuntEvent.cpp 0x004e0965): sets the overlay up for
     // the screen and the cue rectangle; returns this, or 0.
-    ChatOverlay* Setup(RenderTarget* target, TextureMapManager* manager, void* camera,
+    ChatOverlay* Setup(RenderTarget* target, TextureMapManager* manager, ChatKrustyBikeCameraView* camera,
                                        OverlayRect screen, OverlayRect cue);
     // 0x0051d730 (QuarryStuntEvent.cpp 0x004e02c7): collects the racers of
     // `view` and gives each a name tag; in view mode 0 one more.

@@ -781,7 +781,7 @@ int BaseQuarryEvent::LoadEventObjects(LoadProgressFn progress) {
     ((FollowCamera*)(KrustyBikeCamera*)raceCamera)->SetSubject((FollowCameraTerrainView*)eventTerrain);
     ((QuarryLoadKrustyBikeCameraView*)raceCamera)->StartFollowing((QuarryLoadKrustyBikeView*)((BikeRace*)raceView)->localRacer);
     if (statsOverlay)
-        statsOverlay->SetStatsSource((int)raceView);
+        statsOverlay->SetStatsSource((StatsBikeRaceView*)raceView);
     if (chatOverlay)
         chatOverlay->CollectRacers((ChatBikeRaceView*)raceView);
     if (radarOverlay)
@@ -932,19 +932,21 @@ void BaseQuarryEvent::CreateOverlays() {
     cue.right = cue.left - (int)(width * -0.046875f);
 
     chatOverlay = new(__FILE__, 1433) ChatOverlay(1);
-    chatOverlay = chatOverlay->Setup((RenderTarget*)renderContext, g_TrackGame->textureManager, raceCamera, screen, cue);
+    chatOverlay = chatOverlay->Setup((RenderTarget*)renderContext, g_TrackGame->textureManager,
+                                     (ChatKrustyBikeCameraView*)raceCamera, screen, cue);
     if (!chatOverlay)
         sprintf(message, "Chat Overlay not created.\n");
     if (chatOverlay && g_TrackGame->mode.chatInputLine == 1)
         chatOverlay->ShowInputLine();
 
     radarOverlay = new(__FILE__, 1444) RadarOverlay(1);
-    radarOverlay = radarOverlay->LoadMap((RenderTarget*)renderContext, g_TrackGame->textureManager, (int)raceCamera, screen);
+    radarOverlay = radarOverlay->LoadMap((RenderTarget*)renderContext, g_TrackGame->textureManager, (RadarKrustyBikeCameraView*)raceCamera, screen);
     if (!radarOverlay)
         sprintf(message, "Radar Overlay not created.\n");
 
     statsOverlay = new(__FILE__, 1451) StatsOverlay(1);
-    statsOverlay = statsOverlay->LoadPanel((RenderTarget*)renderContext, g_TrackGame->textureManager, raceCamera, screen);
+    statsOverlay = statsOverlay->LoadPanel((RenderTarget*)renderContext, g_TrackGame->textureManager,
+                                           (InstrumentKrustyBikeCameraView*)raceCamera, screen);
     if (!statsOverlay)
         sprintf(message, "Stats Overlay not created.\n");
 
