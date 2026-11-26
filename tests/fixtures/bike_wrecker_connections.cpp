@@ -15,8 +15,8 @@ typedef char WreckerSkipField[offsetof(Wrecker, skipProbeEffects) == 0x52c ? 1 :
 
 // The subordinate declarations remain explicit views at their old boundaries.
 typedef char RiderModelView[offsetof(D3DIMSoultreeCharacter, modelNode) == 0x1a0 ? 1 : -1];
-typedef char CollisionTypeView[offsetof(BikeA38, n_0x64) == 0x64 ? 1 : -1];
-typedef char CollisionTerrainView[offsetof(BikeA38, n_0xe4) == 0xe4 ? 1 : -1];
+typedef char CollisionTypeField[offsetof(ConstraintMethodCollisionModel, ownerType) == 0x64 ? 1 : -1];
+typedef char CollisionTerrainField[offsetof(ConstraintMethodCollisionModel, terrain) == 0xe4 ? 1 : -1];
 typedef char VectorSizes[sizeof(Vec3) == 12 && sizeof(Vector3) == 12 ? 1 : -1];
 typedef char VectorY[offsetof(Vec3, y) == 4 && offsetof(Vector3, y) == 4 ? 1 : -1];
 typedef char VectorZ[offsetof(Vec3, z) == 8 && offsetof(Vector3, z) == 8 ? 1 : -1];

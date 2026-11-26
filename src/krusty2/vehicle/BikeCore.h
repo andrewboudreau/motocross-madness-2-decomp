@@ -120,8 +120,8 @@ public:
     float IntegrateSteerTorque();
 
     // Inherited members whose canonical types are still generic are viewed through
-    // casts at the use site (MIGRATION.md rule 6): collisionPoints as BikeElem**, terrain
-    // as BikeA1F4*.  Inline accessor
+    // casts at the use site (MIGRATION.md rule 6): collisionPoints as CollisionPoint**,
+    // terrain as Terrain*.  Inline accessor
     // functions were tried and cost the exact match of slot 8 (0x00406750): VC6 then
     // loads poseNode before the float arguments instead of after them.
 

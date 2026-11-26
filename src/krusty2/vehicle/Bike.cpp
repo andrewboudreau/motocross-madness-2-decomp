@@ -7,6 +7,7 @@
 #include "collision/CollisionObject.h"
 #include "soultree/SoultreePhysicsObject.h"
 #include "collision/CollisionPoint.h"
+#include "broadphase/Terrain.h"
 #include "../../reconstructed/Wrecker.h"
 #include "../../reconstructed/Suspension.h"
 #include "../../reconstructed/ParticleEmitters.h"
@@ -376,9 +377,9 @@ void Bike::ClearCrashState()
 {
     int i;
     for (i = 0; i < collisionPointCount; i++) {
-        BikeElem* contact = ((BikeElem**)collisionPoints)[i];
-        if (contact->h_0x4 != 0)
-            contact->h_0xa4 = 0;
+        CollisionPoint* contact = ((CollisionPoint**)collisionPoints)[i];
+        if (contact->ownerNode != 0)
+            contact->inContact = 0;
     }
     crashState = 0;
     crashTimer = 0.0f;
@@ -927,7 +928,7 @@ int Bike::ClassifyGroundContact(float slideAngle)
 int Bike::UpdateCrashState(float dt, int impact, float impulse)
 {
     float noseOverLimit = 0.766f;
-    if (((BikeA1F4*)terrain)->i_0xbe8 != 1)
+    if (((Terrain*)terrain)->field_0xbe8 != 1)
         noseOverLimit = 0.342f;
     crashState = EvaluateCrash(dt, noseOverLimit, impact, impulse);
     if (crashState) {
@@ -1388,8 +1389,8 @@ void Bike::CreateWrecker()
     wrecker = new(__FILE__, 2023) Wrecker(1);
     if (wrecker->SetupWrecker(GameObject::renderContext, riderCharacter, "rider.col")) {
         GameObject::AppendChild((GameObject*)wrecker, -1);
-        ((BikeA38*)wrecker->collisionModel)->n_0xe4 = ((BikeA1F4*)terrain);
-        ((BikeA38*)wrecker->collisionModel)->n_0x64 = 0x65;
+        wrecker->collisionModel->terrain = (Terrain*)terrain;
+        wrecker->collisionModel->ownerType = 0x65;
         BikeAttachBone(this, "Pelvis", 0.0f, 0.0f, -0.35f);
         BikeAttachBone(this, "UprTorso", 0.0f, 0.0f, 0.0f);
         BikeAttachBone(this, "Head", 0.0f, 0.75f, 0.0f);

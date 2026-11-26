@@ -26,12 +26,9 @@
 struct BikeWheel;
 struct BikeWheelQ;
 class Wrecker;
-struct BikeElem;
-struct BikeA1F4;
 struct BikeA640;
 struct BikeA644;
 struct BikeQ;
-struct BikeA38;
 
 
 // 24-byte block the loader's sixth argument points to; copied into Bike+0x5c8 when present
@@ -117,23 +114,6 @@ struct BikeWheel {
 struct BikeWheelQ {};
 
 
-struct BikeElem {
-    char pad_0x000[4];
-    int h_0x4;
-    char pad_0x008[12];
-    Vec3 h_0x14;
-    char pad_0x020[36];
-    Vec3 h_0x44;
-    char pad_0x050[80];
-    float h_0xa0;
-    int h_0xa4;
-};
-
-struct BikeA1F4 {
-    char pad_0x000[3048];
-    int i_0xbe8;
-};
-
 // Smoother objects at Bike+0x640 / +0x644 (the Vehicle.h VehicleSmoother shape, 0x14 bytes each;
 // the loader builds them with `new(__FILE__, 0x7df/0x7e0)` and inline constructors).
 struct BikeA640 {
@@ -178,14 +158,6 @@ struct BikeQ {
     Vec3 q_0xc0;              // InlineShock::axis
     void ClampAndStepAlong(float maxDelta, float dt, Vec3& pos);   // 0x004fa090 InlineShock::ClampAndStep
     void ClampAndStep(float maxDelta, float dt);                   // 0x004fa8b0 RotatingShock::ClampAndStep
-};
-
-struct BikeA38 {
-    char pad_0x000[100];
-    int n_0x64;
-    char pad_0x068[124];
-    BikeA1F4* n_0xe4;
-    void SnapPlacement();  // 0x00435fe0: unused view of CollisionObject::SnapPlacement (docs/NAMING.md)
 };
 
 // The scene node (d3d_field_0x1a0, poseNode, SoultreeObject::firstChild) is SoultreeObject
