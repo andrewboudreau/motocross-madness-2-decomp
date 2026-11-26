@@ -1,6 +1,7 @@
 #include "../krusty2/visibility/VisibilityClipper.h"
 #include "../krusty2/broadphase/Terrain.h"
 #include "BikeRaceCore.h"
+#include "../krusty2/vehicle/KrustyBikeCore.h"
 #include "GUIManagerCore.h"
 #include <math.h>
 #include <stdio.h>
@@ -271,7 +272,7 @@ NameOverlay::~NameOverlay()
 NameOverlay* NameOverlay::Create(RenderTarget* target, TextureMap* texture,
                                                 const OverlayRect* rect, int scaleRect,
                                                 const OverlayRect* source, EventKrustyBikeView* racer,
-                                                NameOverlayEventView* nameWorld, int phase)
+                                                BikeRace* nameWorld, int phase)
 {
     if (!Attach(target, texture, rect, scaleRect, source, 0.00001f, 0, 0, 0, 0, 1555, 0)) {
         Release();
@@ -323,7 +324,7 @@ int NameOverlay::IsPointVisible(const Vector3* point)
 {
     Vector3 hit;
     if (frameCounter == testPhase) {
-        int hidden = reinterpret_cast<Terrain*>(world->terrain)->CastSegment(
+        int hidden = world->raceTerrain->CastSegment(
             reinterpret_cast<const TerrainVec3*>(&((RenderTarget*)renderContext)->currentCamera->eyePosition),
             reinterpret_cast<const TerrainVec3*>(point), reinterpret_cast<TerrainVec3*>(&hit), 0, 0, 0);
         lastVisible = !hidden;
@@ -544,7 +545,7 @@ StatsOverlay* StatsOverlay::LoadPanel(RenderTarget* target, TextureMapManager* m
 }
 
 // 0x00519880
-int StatsOverlay::SetStatsSource(StatsBikeRaceView* source)
+int StatsOverlay::SetStatsSource(BikeRace* source)
 {
     statsSource = source;
     return 1;
@@ -754,7 +755,7 @@ int StatsOverlay::DrawViewModePanel()
     int finished = 0;
     iterator = 0;
     EventKrustyBikeView* racer;
-    while ((racer = reinterpret_cast<EventKrustyBikeView*>(reinterpret_cast<BikeRace*>(statsSource)->NextBike(&iterator))) != 0) {
+    while ((racer = reinterpret_cast<EventKrustyBikeView*>(statsSource->NextBike(&iterator))) != 0) {
         if (racer->outOfRace)
             finished++;
     }
@@ -784,14 +785,14 @@ int StatsOverlay::DrawViewModePanel()
     } else {
         g_TrackGame->LoadResourceString(0x837, label, 0x80);
         if (g_TrackGame->mode.raceSettings.raceMode == 4 && instrumentSource->state->isGhost)
-            FormatLapTime(time, statsSource->ownRacer->fastestLap);
+            FormatLapTime(time, ((KrustyBike*)statsSource->localRacer)->fastestLap);
         else
             FormatLapTime(time, instrumentSource->state->lastLapTime);
         sprintf(rowText[2], "%s %s", label, time);
     }
     g_TrackGame->LoadResourceString(0x838, label, 0x80);
     if (g_TrackGame->mode.raceSettings.raceMode == 4)
-        FormatLapTime(time, statsSource->ownRacer->fastestLap);
+        FormatLapTime(time, ((KrustyBike*)statsSource->localRacer)->fastestLap);
     else
         FormatLapTime(time, instrumentSource->state->fastestLap);
     sprintf(rowText[3], "%s %s", label, time);
@@ -866,7 +867,7 @@ int StatsOverlay::DrawRacePanel()
     int finished = 0;
     iterator = 0;
     EventKrustyBikeView* racer;
-    while ((racer = reinterpret_cast<EventKrustyBikeView*>(reinterpret_cast<BikeRace*>(statsSource)->NextBike(&iterator))) != 0) {
+    while ((racer = reinterpret_cast<EventKrustyBikeView*>(statsSource->NextBike(&iterator))) != 0) {
         if (racer->outOfRace)
             finished++;
     }
@@ -1950,14 +1951,14 @@ ChatOverlay* ChatOverlay::Setup(RenderTarget* target, TextureMapManager* manager
 // 0x0051d730: both Create calls read `renderContext` in the argument list;
 // through the inline Target() accessor VC6 loads it ahead of the other
 // arguments (587 bytes).
-int ChatOverlay::CollectRacers(ChatBikeRaceView* view)
+int ChatOverlay::CollectRacers(BikeRace* view)
 {
     int iterator;
     ChatKrustyBikeView* racer;
     racerCount = 0;
     iterator = 0;
     chatView = view;
-    while ((racer = reinterpret_cast<ChatKrustyBikeView*>(reinterpret_cast<BikeRace*>(chatView)->NextBike(&iterator))) != 0) {
+    while ((racer = reinterpret_cast<ChatKrustyBikeView*>(chatView->NextBike(&iterator))) != 0) {
         racers[racerCount] = racer;
         racerCount++;
     }
@@ -1965,14 +1966,14 @@ int ChatOverlay::CollectRacers(ChatBikeRaceView* view)
         nameTags[i] = (new(__FILE__, 2369) NameOverlay(1))->Create(
             (RenderTarget*)renderContext, overlayTexture, &nameTagRects[i], 0, &nameTagRects[i],
             (EventKrustyBikeView*)racers[i],
-            (NameOverlayEventView*)chatView, i);
+            chatView, i);
         AppendChild(nameTags[i], -1);
     }
     if (g_TrackGame->mode.raceSettings.eventType == 0) {
         nameTags[racerCount] = (new(__FILE__, 2376) NameOverlay(1))->Create(
             (RenderTarget*)renderContext, overlayTexture, &nameTagRects[racerCount], 0,
             &nameTagRects[racerCount], 0,
-            (NameOverlayEventView*)chatView, i);
+            chatView, i);
         AppendChild(nameTags[racerCount], -1);
         if (nameTags[racerCount]) {
             nameTags[racerCount]->SetFixedPosition(Vector3(cueRect.left, cueRect.top, 0));
@@ -2196,7 +2197,8 @@ int ChatOverlay::RenderPre3D()
             }
             if (racers[i]->racerState->hideNameTag)
                 nameTags[i]->Disable();
-            else if (racers[i] == chatView->ownRacer && chatCamera->followedRacer == chatView->ownRacer)
+            else if (racers[i] == (ChatKrustyBikeView*)chatView->localRacer &&
+                     chatCamera->followedRacer == (ChatKrustyBikeView*)chatView->localRacer)
                 nameTags[i]->Disable();
             else
                 nameTags[i]->Enable();

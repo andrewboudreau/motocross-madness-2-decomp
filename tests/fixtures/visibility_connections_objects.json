@@ -21,7 +21,7 @@
     "src/reconstructed/TrackOverlay.cpp": {
       "sections": 231,
       "relocations": 1031,
-      "sha256": "a266cefc4ea822fabec1942e3552047fce78c6262beba87d7d2954e91de0650a"
+      "sha256": "5e45b27abc24477a2d476d66b1eebf75066c91d806f8991b265036e82dfa8d34"
     },
     "src/krusty2/visibility/VisibilityQuadTree.cpp": {
       "sections": 89,

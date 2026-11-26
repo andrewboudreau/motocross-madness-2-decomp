@@ -155,7 +155,7 @@ struct QuarryLoadPhysicsObjectView {
     unsigned char field_0x000[0x128];
     CollisionObject* collisionObject;   // +0x128 SoultreePhysicsBaseObjectCore.h
     unsigned char field_0x12c[0x1f4 - 0x12c];
-    OverlayTerrainView* terrain;                   // +0x1f4
+    Terrain* terrain;                              // +0x1f4
     void* terrainScale;                        // +0x1f8 copied from the terrain's +0x40
 };
 
@@ -569,7 +569,7 @@ int BaseQuarryEvent::LoadEventObjects(LoadProgressFn progress) {
         sprintf(text, "No Terrain found in env file.  Terrain not created.\n");
         return 0;
     }
-    eventTerrain = (OverlayTerrainView*)(new(__FILE__, 799) Terrain(1))
+    eventTerrain = (new(__FILE__, 799) Terrain(1))
                      ->Load((int)renderContext, (TerrainStream*)terrainStream, 1,
                                              (TerrainSurfaceDesc*)&terrainTextures,
                                              g_TrackGame->mode.videoSettings[3], 0,
@@ -584,7 +584,7 @@ int BaseQuarryEvent::LoadEventObjects(LoadProgressFn progress) {
     g_MemTagStack->Push("Shadow");
     if (projectedShadow) {
         terrainShadow = (new(__FILE__, 822) TerrainShadow(g_TrackGame->mode.shadowsOn))
-                         ->Attach((int)renderContext, (Terrain*)eventTerrain,
+                         ->Attach((int)renderContext, eventTerrain,
                                   (ProjectedShadow*)projectedShadow);
         AppendChild((GameObject*)terrainShadow, -1);
     }
@@ -601,7 +601,7 @@ int BaseQuarryEvent::LoadEventObjects(LoadProgressFn progress) {
     } else {
         ecoSystem = (new(__FILE__, 870) EcoSystem(1))
                          ->Create(renderContext, g_TrackGame->textureManager,
-                                                 (Terrain*)eventTerrain, lightManager,
+                                                 eventTerrain, lightManager,
                                                  (char*)eventScene->environment, stream, 0x115c,
                                                  g_TrackGame->mode.raceSettings.treeCollision,
                                                  g_TrackGame->mode.videoSettings[1]);
@@ -628,7 +628,7 @@ int BaseQuarryEvent::LoadEventObjects(LoadProgressFn progress) {
     g_MemTagStack->Push("BikeRace");
     raceView = (EventBikeRaceView*)((BikeRace*)raceView)
                      ->Create(renderContext, particleManager, lightManager, &modelTextures,
-                              (Terrain*)eventTerrain, (KrustyBikeCamera*)raceCamera, eventScene,
+                              eventTerrain, (KrustyBikeCamera*)raceCamera, eventScene,
                               (RaceGateEvent*)this, (ProjectedShadow*)projectedShadow);
     if (!raceView) {
         sprintf(text, "BikeRace create failed.\n");
@@ -642,7 +642,7 @@ int BaseQuarryEvent::LoadEventObjects(LoadProgressFn progress) {
         for (int i = 0; i < eventScene->staticModels->casterCount; i++) {
             SceneStaticModel* caster = &eventScene->staticModels->casters[i];
             if (caster->physics) {
-                OverlayTerrainView* terrain = eventTerrain;
+                Terrain* terrain = eventTerrain;
                 QuarryLoadPhysicsObjectView* physics = (QuarryLoadPhysicsObjectView*)caster->physicsObject;
                 physics->terrain = terrain;
                 if (terrain)
@@ -781,9 +781,9 @@ int BaseQuarryEvent::LoadEventObjects(LoadProgressFn progress) {
     ((FollowCamera*)(KrustyBikeCamera*)raceCamera)->SetSubject((FollowCameraTerrainView*)eventTerrain);
     ((QuarryLoadKrustyBikeCameraView*)raceCamera)->StartFollowing((QuarryLoadKrustyBikeView*)((BikeRace*)raceView)->localRacer);
     if (statsOverlay)
-        statsOverlay->SetStatsSource((StatsBikeRaceView*)raceView);
+        statsOverlay->SetStatsSource((BikeRace*)raceView);
     if (chatOverlay)
-        chatOverlay->CollectRacers((ChatBikeRaceView*)raceView);
+        chatOverlay->CollectRacers((BikeRace*)raceView);
     if (radarOverlay)
         radarOverlay->TakeRacers(raceView, (int)chatOverlay);
     if (visualCue)
@@ -887,7 +887,7 @@ int BaseQuarryEvent::EstimateRaceBytes() {
 int BaseQuarryEvent::Create3DObjects(const TextureContext* textures) {
     char message[388];
     visualCue = (new(__FILE__, 1369) VisualCue(g_TrackGame->mode.visualCuesOn))
-                     ->LoadVisualCue(renderContext, lightManager, textures, (Terrain*)eventTerrain,
+                     ->LoadVisualCue(renderContext, lightManager, textures, eventTerrain,
                                      Vector3(0.0f, 0.0f, 0.0f), (VisualCueBikeRaceView*)raceView, 45,
                                      (Camera*)raceCamera, 3.0f, 0.1f, 0.85f);
     if (!AppendChild(visualCue, -1)) {
@@ -1111,7 +1111,7 @@ int BaseQuarryEvent::OnControlPress(ControlEvent* event, InputButtonState* entry
         g_TrackGame->mode.videoSettings[1] = level;
         g_TrackGame->mode.videoSettings[2] = level;
         g_TrackGame->mode.videoSettings[4] = level;
-        reinterpret_cast<Terrain*>(eventTerrain)->SelectQuality(level);
+        eventTerrain->SelectQuality(level);
         if (ecoSystem)
             ecoSystem->SetDetailLevel(level);
         if (eventFog)
@@ -1137,7 +1137,7 @@ int BaseQuarryEvent::OnControlPress(ControlEvent* event, InputButtonState* entry
         g_TrackGame->mode.videoSettings[1] = level;
         g_TrackGame->mode.videoSettings[2] = level;
         g_TrackGame->mode.videoSettings[4] = level;
-        reinterpret_cast<Terrain*>(eventTerrain)->SelectQuality(level);
+        eventTerrain->SelectQuality(level);
         if (ecoSystem)
             ecoSystem->SetDetailLevel(level);
         if (eventFog)

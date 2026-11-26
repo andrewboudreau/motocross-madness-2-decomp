@@ -83,7 +83,6 @@ class NextBikeConnectionsTests(unittest.TestCase):
             for name, header, assertions in (
                 ('event', 'RaceView.h', 'offsetof(EventBikeRaceView, localRacer) == 0x38 && offsetof(EventKrustyBikeView, position) == 0xc && offsetof(EventKrustyBikeView, bikeView) == 0x740'),
                 ('visual', 'Krusty3DObjects.h', 'offsetof(VisualCueBikeRaceView, ownRacer) == 0x38 && offsetof(VisualCueKrustyBikeView, position) == 0xc'),
-                ('stats', 'TrackOverlay.h', 'offsetof(StatsBikeRaceView, ownRacer) == 0x38 && offsetof(StatsBikeRaceView, replayTime) == 0x1b8'),
                 ('bike', 'vehicle/KrustyBike.h', 'offsetof(KbRace, localRacer) == 0x38 && offsetof(KrustyBike, race) == 0x740 && sizeof(KrustyBike) == 0x1638'),
                 ('canonical', 'BikeRace.h', 'offsetof(BikeRaceKrustyBikeView, bikeView) == 0x740 && offsetof(BikeRace, replayTime) == 0x1b8'),
             ):

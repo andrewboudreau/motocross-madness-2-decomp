@@ -9,10 +9,12 @@ this call boundary. There is no forwarding implementation or linker alias.
 | Retired production method name | Existing caller view |
 | --- | --- |
 | `EventBikeRaceView::NextBike` | EventManager, FollowRacer, RaceSound, RaceStatus, TrackOverlay |
-| `StatsBikeRaceView::NextBike` | TrackOverlay |
-| `ChatBikeRaceView::NextBike` | TrackOverlay (CollectRacers) |
 | `VisualCueBikeRaceView::NextBike` | Krusty3DObjects |
 | `KbRace::NextBike` | KrustyBike |
+
+StatsOverlay's stats source and ChatOverlay's race are now typed `BikeRace*`
+(the `StatsBikeRaceView` and `ChatBikeRaceView` views are retired), so those
+calls need no cast.
 
 ## Receiver and result evidence
 

@@ -57,7 +57,7 @@ int NationalRace::Create3DObjects(const TextureContext* textures) {
     if (!BaseQuarryEvent::Create3DObjects(textures))
         return 0;
     runwayLights = (new (__FILE__, 53) RunwayLights(g_TrackGame->mode.visualCuesOn))
-                     ->SetupLights(renderContext, lightManager, textures, (Terrain*)eventTerrain);
+                     ->SetupLights(renderContext, lightManager, textures, eventTerrain);
     if (!AppendChild(runwayLights, -1)) {
         sprintf(message, "Runway Lights not loaded.\n");
         return 0;

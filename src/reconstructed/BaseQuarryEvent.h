@@ -15,7 +15,7 @@ class RenderTarget;
 class Scene;
 class StatsOverlay;
 class TextQueueOverlay;
-class OverlayTerrainView;
+class Terrain;
 class FileStream;
 class VisualCue;
 class Fog;
@@ -89,7 +89,7 @@ public:
     EventBikeRaceView* raceView;
     VisualCue* visualCue;
     QuarryEventKrustyBikeCameraView* raceCamera;
-    OverlayTerrainView* eventTerrain;               // Terrain (src/krusty2/broadphase/Terrain.h)
+    Terrain* eventTerrain;                          // src/krusty2/broadphase/Terrain.h
     FileStream* terrainStream;        // +0x44 opened on the env's terrain file and handed to the terrain loader; the destructor deletes it
     EcoSystem* ecoSystem;
     void* field_0x4c;

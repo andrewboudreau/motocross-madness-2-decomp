@@ -15,7 +15,7 @@ float-exact range.
 import random
 
 RETAIL_VA = 0x0051d730
-SYMBOL = '?CollectRacers@ChatOverlay@@QAEHPAUChatBikeRaceView@@@Z'
+SYMBOL = '?CollectRacers@ChatOverlay@@QAEHPAVBikeRace@@@Z'
 SOURCE = 'src/reconstructed/TrackOverlay.cpp'
 PROBES = {0x0051d7bc: 'tag loop', 0x0051d84a: 'extra tag', 0x0051d8e6: 'fixed tag', 0x0051d7ee: 'new failed'}
 

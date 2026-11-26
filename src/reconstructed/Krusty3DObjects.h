@@ -48,22 +48,6 @@ struct VisualCueKrustyBikeView : virtual public GameObject {
     Vector3 position;                         // +0x0c
 };
 
-struct NumberKrustyBikeView {
-    unsigned char field_0x000[0x76c];
-    float offTrackTime;                       // +0x76c RaceView.h's racer offTrackTime
-};
-
-// NumberObjectManager's +0x2c. Its offsets line up with BikeRace.h's race
-// view: +0x38 localRacer, +0x6c the 30SecMan entry, +0x15c startCountdown.
-struct NumberBikeRaceView {
-    unsigned char field_0x000[0x38];
-    NumberKrustyBikeView* localRacer;      // +0x38
-    unsigned char field_0x03c[0x6c - 0x3c];
-    int thirtySecondMan;                      // +0x6c no digits count down while it is present
-    unsigned char field_0x070[0x15c - 0x70];
-    float countdown;                          // +0x15c count-down value
-};
-
 // 0x00460c00 (cdecl): 1/sqrt of `value` (table driven).
 float FastInvSqrt(float value);
 
@@ -167,10 +151,10 @@ public:
     virtual int Render3D();        // 0x0048c290
 
     // 0x0048bd00 (ret 0x18): loads the five digits (lines 0x23d, 0x240).
-    NumberObjectManager* SetupDigits(void* context, const TextureContext* textures, NumberBikeRaceView* racer, int pixels,
+    NumberObjectManager* SetupDigits(void* context, const TextureContext* textures, BikeRace* racer, int pixels,
                                      Camera* camera, float size);
 
-    NumberBikeRaceView* countdownRacer;       // +0x2c whose count-down the digits show
+    BikeRace* countdownRacer;                 // +0x2c whose count-down the digits show
     int drawEnabled;                          // +0x30 slot 14 draws only when set (1 from the constructor and slot 10)
     Camera* digitCamera;         // +0x34 the digits show only through this camera
     ArcadeObject* digitModels[5];             // +0x38 "one.slt" .. "five.slt"
@@ -187,6 +171,7 @@ struct BonusBikeWheelView {
     Vector3 rollDirection;                    // +0x230  Bike.h BikeWheel rollDirection (this is the localRacer's rearWheel, Bike +0x5f4)
 };
 
+// BikeRace's localRacer as the bonus counter reads it.
 struct BonusKrustyBikeView {
     unsigned char field_0x000[0x3bc];
     BonusSoultreeObjectView* modelNode;         // +0x3bc
@@ -194,11 +179,6 @@ struct BonusKrustyBikeView {
     int crashState;                           // +0x444
     unsigned char field_0x448[0x5f4 - 0x448];
     BonusBikeWheelView* rearWheel;        // +0x5f4
-};
-
-struct BonusBikeRaceView {
-    unsigned char field_0x000[0x38];
-    BonusKrustyBikeView* localRacer;       // +0x38 BikeRace.h's localRacer
 };
 
 struct CueGateKrustyBikeView {
@@ -250,21 +230,6 @@ struct CueTagEventView {
     CueTagBallView* ball;                  // +0xdc TrackGameViewOwner::ball (the tag ball)
 };
 
-struct CueTrackGameView {
-    unsigned char field_0x0000[0x10];
-    RenderTarget* renderTarget;   // +0x10
-    unsigned char field_0x0014[0x560 - 0x14];
-    CueCourseEventView* bajaEnduroEvent;     // +0x560
-    unsigned char field_0x0564[0x568 - 0x564];
-    CueTagEventView* tagEvent;            // +0x568
-    unsigned char field_0x056c[0x2d74 - 0x56c];
-    int cameraMode;                           // +0x2d74 camera mode 0..5
-    unsigned char field_0x2d78[0x2eb4 - 0x2d78];
-    int tagBall;                              // +0x2eb4 race settings' tagBall (TrackGame.h)
-    unsigned char field_0x2eb8[0x3430 - 0x2eb8];
-    int uiInteractionBlocked;                 // +0x3430 (TrackGame.h)
-};
-
 // One 0x30-byte key of the bonus animation table at 0x0056c820 (seven
 // keys); plain floats, as the table is static data.
 struct UnknownBonusKey {
@@ -289,13 +254,13 @@ public:
     // 0x0048c8a0 (ret 0xc): creates the frame node (line 0x326).
     int CreateFrameNode(void* context, const LightManager* lights, const TextureContext* textures);
     // 0x0048ca60 (ret 0x14): slot 8, then both loaders; returns this, or 0.
-    BonusObjectManager* SetupCounter(void* context, const LightManager* lights, const TextureContext* textures, BonusBikeRaceView* racer,
+    BonusObjectManager* SetupCounter(void* context, const LightManager* lights, const TextureContext* textures, BikeRace* racer,
                                      Camera* camera);
     void NextKey();              // 0x0048cad0: steps to the next key
     void ShowValue(float value, float fraction); // 0x0048d1e0 (ret 8): shows a value
     void HideDigits();              // 0x0048d540: hides the shown digits
 
-    BonusBikeRaceView* raceView;              // +0x2c the race (BikeRace passes this)
+    BikeRace* raceView;                       // +0x2c the race (BikeRace passes this)
     int currentKey;                            // current key, -1 when idle
     float elapsed;                          // time since the start
     Camera* camera;               // +0x38 the race camera, then the current camera

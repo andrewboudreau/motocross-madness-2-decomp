@@ -453,7 +453,7 @@ BikeRace* BikeRace::Create(void* owner, ParticleManager* particles, LightManager
     } else if (mode == 0 || (mode == 4 && g_TrackGame->mode.raceSettings.stuntMode)) {
         BonusObjectManager* bonus = new(__FILE__, 0x28e) BonusObjectManager(1);
         scoreBoard = (int)bonus->SetupCounter(renderContext, lights, textures,
-                                               (BonusBikeRaceView*)this, raceCamera);
+                                               this, raceCamera);
         if (!AppendChild((GameObject*)scoreBoard, -1))
             return 0;
     }
@@ -463,7 +463,7 @@ BikeRace* BikeRace::Create(void* owner, ParticleManager* particles, LightManager
     raceScene->holdAnimations = 1;
     if (g_TrackGame->mode.raceSettings.raceMode) {
         NumberObjectManager* numbers = new(__FILE__, 0x29b) NumberObjectManager(1);
-        digitCounter = (int)numbers->SetupDigits(renderContext, textures, (NumberBikeRaceView*)this, 0x1e,
+        digitCounter = (int)numbers->SetupDigits(renderContext, textures, this, 0x1e,
                                                 raceCamera, 3.0f);
         if (!AppendChild((GameObject*)digitCounter, -1))
             return 0;

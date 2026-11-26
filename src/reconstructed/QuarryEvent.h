@@ -18,7 +18,6 @@ class StatsOverlay;
 class TextureMapManager;
 class TextQueueOverlay;
 class Terrain;
-class OverlayTerrainView;
 class FileStream;
 struct EventBikeRaceView;
 

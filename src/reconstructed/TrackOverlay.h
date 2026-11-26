@@ -85,28 +85,11 @@ public:
     InstrumentKrustyBikeCameraView* instrumentSource;
 };
 
-// 0x00506e90 (thiscall, ret 0x18): casts the segment from->to against the
-// terrain and returns nonzero on a hit (point in *out). Its class (krusty2
-// Terrain) is not reconstructed under src/reconstructed.
-class OverlayTerrainView {
-public:
-    int CastSegment(const Vector3* from, const Vector3* to, Vector3* out, int a4, int a5, int a6);
-    // 0x00507960 (ret 4): selects the detail level (QuarryStuntEvent.cpp;
-    // Terrain::SelectQuality in src/krusty2/broadphase/Terrain.h).
-    void SelectQuality(int level);
-};
-
 class Camera;
 
 // The visibility clipper 0x00575a98 (VisibilityClipper.h): ProjectPoint
 // 0x0052f340 is nonzero when the point is on screen.
 #include "../krusty2/visibility/VisibilityClipperGlobal.h"
-
-// NameOverlay+0x12c: only +0x4c (the terrain) is read.
-struct NameOverlayEventView {
-    unsigned char field_0x00[0x4c];
-    OverlayTerrainView* terrain;
-};
 
 // RTTI: NameOverlay : Overlay (vtable 0x0055860c), 0x174 bytes: a rider's
 // name tag that follows a point on screen and fades when it is hidden.
@@ -120,7 +103,7 @@ public:
     NameOverlay* Create(RenderTarget* target, TextureMap* texture,
                                        const OverlayRect* rect, int scaleRect,
                                        const OverlayRect* source, EventKrustyBikeView* racer,
-                                       NameOverlayEventView* nameWorld, int phase); // 0x00518e30
+                                       BikeRace* nameWorld, int phase); // 0x00518e30
     int IsPointVisible(const Vector3* point);                           // 0x00519000
     void SetFixedPosition(Vector3 point);                // 0x00519080
     void SetRadarAnchor(Vector3 point, int leftOfAnchor, int outsideMap); // 0x005190a0
@@ -129,7 +112,7 @@ public:
     int sourceWidth;                          // source width
     int drawWidth;                            // +0x124 drawn width (screen rectangle; ChatOverlay sets it)
     int sourceHeight;                         // source height
-    NameOverlayEventView* world;
+    BikeRace* world;                          // +0x12c the race; only its raceTerrain is read
     int testPhase;                            // phase of the every-fourth-frame test
     int frameCounter;                         // frame counter, 0..3
     int lastVisible;                          // last visibility result
@@ -149,17 +132,6 @@ public:
 struct Win32Size {
     int cx;
     int cy;
-};
-
-// StatsOverlay+0x124 (set by 0x00519880): a view whose racers 0x0051a560
-// counts (0x004204e0, as EventBikeRaceView in RaceView.h).
-struct StatsBikeRaceView {
-    EventKrustyBikeView* NextBike(int* iterator); // 0x004204e0
-
-    unsigned char field_0x000[0x38];
-    EventKrustyBikeView* ownRacer;              // its own racer
-    unsigned char field_0x03c[0x1b8 - 0x3c];
-    float replayTime;                         // +0x1b8 the "TRT" row while a replay plays (RaceView.h's replayTime)
 };
 
 // RTTI: StatsOverlay : Overlay (vtable 0x00558680), 0x9b8 bytes: the race
@@ -182,7 +154,7 @@ public:
     // 0x00464e80: the shared empty `ret 4` body (QuarryStuntEvent.cpp
     // 0x004de4a3 passes the visual cue index).
     void SetCueIndex(int index);
-    int SetStatsSource(StatsBikeRaceView* source);     // 0x00519880
+    int SetStatsSource(BikeRace* source);     // 0x00519880
     int Redraw();                             // 0x005198a0
     int DrawStandings();              // 0x00519a20
     void DrawTimeLeft();                      // 0x00519e10
@@ -193,7 +165,7 @@ public:
 
     void* largeFont;                          // +0x11c 16-high font, rows 0-1 (0x005194b0; DeleteObject)
     void* smallFont;                          // +0x120 12-high font, the other rows (DeleteObject)
-    StatsBikeRaceView* statsSource;          // SetStatsSource (0x00519880); read when TrackGame+0x3428 is set
+    BikeRace* statsSource;                    // SetStatsSource (0x00519880); read when TrackGame+0x3428 is set
     InstrumentKrustyBikeCameraView* instrumentSource;
     float timeSinceRedraw;                    // seconds since the last redraw
     TrackOverlayRect rowRects[8];
@@ -365,15 +337,6 @@ struct ChatKrustyBikeCameraView {
     ChatKrustyBikeView* followedRacer;
 };
 
-struct ChatBikeRaceView {
-    // 0x004204e0: the next racer after `*iterator` (advancing it), or 0
-    // (EventBikeRaceView::NextBike in RaceView.h).
-    ChatKrustyBikeView* NextBike(int* iterator);
-
-    unsigned char field_0x00[0x38];
-    ChatKrustyBikeView* ownRacer;
-};
-
 // One chat history line (0x5c bytes).
 struct ChatHistoryEntry {
     int value;
@@ -425,7 +388,7 @@ public:
                                        OverlayRect screen, OverlayRect cue);
     // 0x0051d730 (QuarryStuntEvent.cpp 0x004e02c7): collects the racers of
     // `view` and gives each a name tag; in view mode 0 one more.
-    int CollectRacers(ChatBikeRaceView* view);
+    int CollectRacers(BikeRace* view);
     void ShowCueTag(int show);     // 0x0051d980
     // 0x0051da30 (bikerace.cpp 0x0041f5b1): a typed key; Enter sends the
     // line as network message 0x85, Escape sets *result.
@@ -448,7 +411,7 @@ public:
     void* chatFont;                           // +0x120 9-high font, selected by RedrawChat (DeleteObject)
     void* nameTagFont;                        // +0x124 10-high font, selected by DrawNameTag (DeleteObject)
     ChatKrustyBikeCameraView* chatCamera;
-    ChatBikeRaceView* chatView;
+    BikeRace* chatView;
     float timeSum;                            // time summed
     int largeLayout;                          // the large layout (set by 0x0051cf80)
     int inputShown;                           // input line shown
