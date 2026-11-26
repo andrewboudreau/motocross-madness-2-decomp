@@ -408,7 +408,7 @@
   "??_C@_0P@OKLM@UseBlendedKeys?$AA@": "0x005737f0",
   "?Push@MemTagStack@@QAEHPBD@Z": "0x004a2d00",
   "?CreateFollowing@SoultreeSoundEmitter@@QAEPAV1@PAXPBD1PAVSoultreeObject@@UDS3DBuffer@@KMMHH@Z": "0x004029f0",
-  "?Load@CollisionCharacter@@QAEPAVGameObject@@HPBD0PBUSoultreeLoadDesc@@HHH@Z": "0x004319c0",
+  "?Load@CollisionCharacter@@QAEPAVGameObject@@HPBD0PBVLightManager@@HHH@Z": "0x004319c0",
   "?Configure@CollisionObject@@QAEXPAXHHH@Z": "0x004320f0",
   "?SetHullShape@CollisionObject@@QAEXPAXHHHH@Z": "0x00432720",
   "?LoadShape@CollisionObject@@QAEXPAXPBD@Z": "0x00432800",

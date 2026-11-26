@@ -113,6 +113,12 @@ swapped one load pair in SelectGamePicProcs.cpp's exact FillFileList (0x004f17a0
 declaration restores. The record was moved because EventManager owns that storage, not for this
 count. The proof over the 33 affected units found only CreateRacers' six bytes changed.
 
+Retiring `SoultreeLoadDesc` (the loaders' light-manager view, now `LightManager`) swapped them
+again: 13,394, XOR EDI/MOV EBX at +538 in the opposite order from retail. Keeping the unused struct
+restores retail's order, so the declaration count alone moves them. The view was retired for its
+types, not for this count. The proof over the 102 affected units found only those six bytes changed
+(plus one load pair in the character-motion test harness).
+
 Retiring SceneManager's model node view swapped it again (13,394). SceneManager.h now types the
 character and car model nodes as `D3DIMSoultreeObject*` (a forward declaration) in place of the
 two-method `SceneSoultreeObjectView`. The proof over the 32 affected units found only CreateRacers'

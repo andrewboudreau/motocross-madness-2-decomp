@@ -146,13 +146,10 @@ public:
     int vutLoaded;                  // +0x19c tested by LoadVUT; slot 8 sets 1
 };
 
-// Descriptor passed to the D3DIM loaders (D3DIMSoultreeCharacter slot 11, D3DIMSoultreeObject
-// slot 9) and tested by both slot 40 loaders: `test byte [p+0x25],1` selects a
-// sceneNode->SetUseLighting(1) call (tier 1 offset; the type and its meaning are tier 3).
-struct SoultreeLoadDesc {
-    char field_0x00[0x25];
-    unsigned char statusFlags;
-};
+// The loaders take the scene's LightManager (D3DIMSoultreeCharacter slot 11, D3DIMSoultreeObject
+// slot 9); both slot 40 loaders and Bike::LoadBike turn lighting on for the model
+// (SetUseLighting(1)) when it is enabled (`test byte [p+0x25],1`, GameObject::isEnabled).
+class LightManager;
 
 class D3DIMSoultreeCharacter : public Character {
 public:
@@ -173,13 +170,13 @@ public:
     virtual void CopyModelFrom(int other); // 0x00445ec0
     virtual void DumpNodeTransforms();        // 0x00446520
     // --- slot 11, introduced here ---
-    // path/desc types follow SoultreePhysicsCharacter slot 40, which passes its name string and
-    // descriptor here (tier 2).  context and unused go to SetCharacterRenderContext; desc is
-    // kept in loadDesc (+0x204), a copy of the 0x18-byte loadInfo block (when nonzero) in
+    // path/lights types follow SoultreePhysicsCharacter slot 40, which passes its name string and
+    // light manager here (tier 2).  context and unused go to SetCharacterRenderContext; lights is
+    // kept in loadLights (+0x204), a copy of the 0x18-byte loadInfo block (when nonzero) in
     // loadInfoCopy (+0x208) and useOptions in loadUseOptions (+0x20c) (tier 1 decode).
     // Returns the GameObject subobject (this converted to GameObject*) on success, 0 when the
     // resource could not be found and the object released itself (tier 1 decode of 0x00445680).
-    virtual GameObject* LoadCharacter(int context, const char* path, const SoultreeLoadDesc* desc,
+    virtual GameObject* LoadCharacter(int context, const char* path, const LightManager* lights,
                                            int loadInfo, int useOptions, int unused); // 0x00445680 (ret 0x18)
 
     // D3DIM's own data 0x1a0..0x210 (then vtordisp at 0x210, GameObject at 0x214).
@@ -193,7 +190,7 @@ public:
     // code, and only this one keeps SceneManager.cpp's ReadLight (0x004eb570)
     // exact (VC6's declaration-count tie-break).
     int d3d_field_0x1f4[4];
-    const SoultreeLoadDesc* loadDesc;   // +0x204 slot 11's desc; BuildModel passes it to both model loads
+    const LightManager* loadLights;     // +0x204 slot 11's lights; BuildModel passes them to both model loads
     struct LoadDescCopy* loadInfoCopy;  // +0x208 slot 11's 0x18-byte copy of loadInfo (DebugMalloc line 0x64); freed by the destructor
     int loadUseOptions;              // +0x20c slot 11's useOptions; BuildModel's second model load gets it
 };

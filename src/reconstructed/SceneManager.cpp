@@ -1126,7 +1126,7 @@ int Scene::ReadStaticModels(LightManager* lights, int particleManager, int textu
             if (minPoints >= points - 1)
                 minPoints = points - 1;
             SoultreePhysicsObject* object = new(__FILE__, 1845) SoultreePhysicsObject(1);
-            AppendChild(object->LoadPhysicsModel((int)renderContext, sltPath, (const SoultreeLoadDesc*)lights,
+            AppendChild(object->LoadPhysicsModel((int)renderContext, sltPath, lights,
                                                                modelTextures, *reinterpret_cast<Vec3*>(&position),
                                                                *reinterpret_cast<Vec3*>(&look), *reinterpret_cast<Vec3*>(&up),
                                                                0, (void*)particleManager, 5.0f, points, emitters, (SoultreeSlot1f0*)this,
@@ -1434,7 +1434,7 @@ int Scene::ReadAnimations(LightManager* lights, int textureManager, int modelTex
         if (animationTable->entries[i].keyFramed) {
             CollisionCharacter* character = new(__FILE__, 2300) CollisionCharacter(1);
             animationTable->entries[i].character = character;
-            if (!AppendChild(character->Load((int)renderContext, sltPath, colPath, (const SoultreeLoadDesc*)lights, modelTextures, 1, 1),
+            if (!AppendChild(character->Load((int)renderContext, sltPath, colPath, lights, modelTextures, 1, 1),
                                        -1)) {
                 sprintf(message, "\nScene: Cannot create character from %s.\n\n", file);
                 LogMessage(message);

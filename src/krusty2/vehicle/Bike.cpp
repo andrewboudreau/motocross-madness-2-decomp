@@ -10,6 +10,7 @@
 #include "../../reconstructed/Wrecker.h"
 #include "../../reconstructed/Suspension.h"
 #include "../../reconstructed/ParticleEmitters.h"
+#include "../../reconstructed/LightEmitter.h"
 
 
 static inline float BikeMin(float a, float b) { return a < b ? a : b; }
@@ -577,7 +578,7 @@ static inline int BikeFindWheelKind(const char* name, const BikeWheelKind* kinds
 }
 
 GameObject* Bike::LoadBike(int context, const char* engineName, const char* modelPath, const char* riderModel,
-                           const SoultreeLoadDesc* desc, const BikeA5C8* info, Vec3 startPosition,
+                           const LightManager* lights, const BikeA5C8* info, Vec3 startPosition,
                            Vec3 forward, Vec3 up, void* terrainProbe, VehicleInputMap* map,
                            const char* name, int a19, int defaultEngine, int* torqueTable,
                            int rpmLow, int rpmHigh, int rpmStep, float frontSpring, float frontDamper,
@@ -604,7 +605,7 @@ GameObject* Bike::LoadBike(int context, const char* engineName, const char* mode
 
     if (weight <= 0.0f)
         weight = 230.0f;
-    LoadVehicle(context, engineName, modelPath, desc, (int)info, startPosition, forward, up, terrainProbe,
+    LoadVehicle(context, engineName, modelPath, lights, (int)info, startPosition, forward, up, terrainProbe,
                 map, linkedObject, weight,
                 0.9f, 40.0f * 0.01745329f, device, 2, 3, 3, 1, 1, defaultEngine, torqueTable, rpmLow, rpmHigh,
                 rpmStep, 0.18f, steer, lean, throttle, trackObject, createCollision);
@@ -631,9 +632,9 @@ GameObject* Bike::LoadBike(int context, const char* engineName, const char* mode
     riderCharacter = (BikeA5C4*)new(__FILE__, 0x583) D3DIMSoultreeCharacter(GameObject::isEnabled);
     if (!GameObject::AppendChild(
             ((D3DIMSoultreeCharacter*)riderCharacter)->LoadCharacter(
-                (int)GameObject::renderContext, riderModel, desc, (int)info, 1, 1), -1))
+                (int)GameObject::renderContext, riderModel, lights, (int)info, 1, 1), -1))
         riderCharacter = 0;
-    if (desc && (desc->statusFlags & 1))
+    if (lights && lights->isEnabled)
         reinterpret_cast<D3DIMSoultreeObject*>(riderCharacter->c_0x1a0)->SetUseLighting(1);
     if (info)
         loadInfo = *info;

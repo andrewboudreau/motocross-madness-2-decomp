@@ -106,7 +106,7 @@ public:
     // with their shocks, the three contact points, the particle emitters and the pose handles.
     // Argument names are tier 3 except where a callee's parameter fixes them; a19 is unused.
     GameObject* LoadBike(int context, const char* engineName, const char* modelPath, const char* riderModel,
-                         const SoultreeLoadDesc* desc, const BikeA5C8* info, Vec3 position,
+                         const LightManager* lights, const BikeA5C8* info, Vec3 position,
                          Vec3 forward, Vec3 up, void* terrainProbe, VehicleInputMap* map,
                          const char* name, int a19, int defaultEngine, int* torqueTable,
                          int rpmLow, int rpmHigh, int rpmStep, float frontSpring, float frontDamper,

@@ -1113,6 +1113,7 @@ int SoultreePhysicsObject::Tick(float dt)
 // from TrackGame+0x574; its complete layout is declared independently.
 #include "../../reconstructed/FileStream.h"
 #include "../../reconstructed/SceneArchiveFinder.h"
+#include "../../reconstructed/LightEmitter.h"
 
 struct SoultreeGlobals {
     char field_0x000[0x574];
@@ -1127,7 +1128,7 @@ extern ResourceManager* g_ResourceManager; // pointer stored at 0x00572b44
 // SoultreePhysicsObject has two GameObjects, so sceneNode and the GameObject call are
 // qualified.
 GameObject* SoultreePhysicsObject::LoadPhysicsModel(int renderContext, const char* modelPath,
-                                                        const SoultreeLoadDesc* desc, int options,
+                                                        const LightManager* lights, int options,
                                                         Vec3 startPosition, Vec3 startForward,
                                                         Vec3 startUp, void* terrainProbe, void* linkedObject,
                                                         float weight, int contactCapacity, int attachmentSlots,
@@ -1139,13 +1140,12 @@ GameObject* SoultreePhysicsObject::LoadPhysicsModel(int renderContext, const cha
     char name[0x104];
     char colPath[0x104];
 
-    // Slot 9 takes the five dwords unchanged; its third (the light manager in
-    // D3DIMSoulTree.cpp's reading) is this loader's desc.
-    D3DIMSoultreeObject::LoadModel((void*)renderContext, modelPath, (int)desc, options, 1);
+    // Slot 9 takes the five dwords unchanged; its third is this loader's light manager.
+    D3DIMSoultreeObject::LoadModel((void*)renderContext, modelPath, (int)lights, options, 1);
     SoultreePhysicsBaseObject::InitializePhysics(renderContext, 1, startPosition, startForward, startUp, terrainProbe, linkedObject, weight, contactCapacity, attachmentSlots,
                                                    trackObject, fixedStep, maxSteps, drag, elasticity, radius, shapeMode, restThreshold,
                                                    probeMask, createCollision);
-    if (desc && (desc->statusFlags & 1)) {
+    if (lights && lights->isEnabled) {
         reinterpret_cast<D3DIMSoultreeObject*>(SoultreePhysicsBaseObject::sceneNode)->SetUseLighting(1);
     }
 
@@ -1200,7 +1200,7 @@ SoultreePhysicsCharacter::~SoultreePhysicsCharacter()
 // character: D3DIM character slot 11 instead of the object's slot 9, line 0x8cd, the pose
 // node set from the model node, and shape setup 0x004324b0 when no ".col" file exists.
 GameObject* SoultreePhysicsCharacter::LoadPhysicsModel(int renderContext, int createCenterNode, const char* modelPath,
-                                                           const SoultreeLoadDesc* desc, int loadInfo,
+                                                           const LightManager* lights, int loadInfo,
                                                            Vec3 startPosition, Vec3 startForward,
                                                            Vec3 startUp, void* terrainProbe, void* linkedObject,
                                                            float weight, int contactCapacity, int attachmentSlots,
@@ -1211,12 +1211,12 @@ GameObject* SoultreePhysicsCharacter::LoadPhysicsModel(int renderContext, int cr
     char name[0x104];
     char colPath[0x104];
 
-    D3DIMSoultreeCharacter::LoadCharacter(renderContext, modelPath, desc, loadInfo, 1, 1);
+    D3DIMSoultreeCharacter::LoadCharacter(renderContext, modelPath, lights, loadInfo, 1, 1);
     poseNode = sceneNode = modelNode;
     SoultreePhysicsBaseObject::InitializePhysics(renderContext, createCenterNode, startPosition, startForward, startUp, terrainProbe, linkedObject, weight, contactCapacity, attachmentSlots,
                                                    trackObject, fixedStep, maxSteps, drag, elasticity, 0.0f, 0, restThreshold, probeMask,
                                                    createCollision);
-    if (desc && (desc->statusFlags & 1)) {
+    if (lights && lights->isEnabled) {
         reinterpret_cast<D3DIMSoultreeObject*>(sceneNode)->SetUseLighting(1);
     }
 

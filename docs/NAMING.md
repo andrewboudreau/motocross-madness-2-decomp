@@ -437,7 +437,6 @@ Left as placeholders in wave 6:
 - `CollisionPoint` +0xb8: only the constructor writes it (1.0).
 - `SoultreePhysicsBaseObject` +0x28 and `field_0x164[9]`: only the
   constructor writes them.
-- `SoultreeLoadDesc` +0x25: only the bit test `& 1` is known.
 - `D3DIMVirtualSlot11`'s fifth argument and `CollisionCharacter`'s `a6`: they
   are stored at +0x68, and nothing shows what reads them.
 - The `aN` parameters of `Scene::Load`/`ReadStaticModels` (a3 to a5) and
@@ -4522,6 +4521,7 @@ finds every edited file still CRLF.
 | --- | --- | --- | --- |
 | `EcoVisibilityClipperView::SphereInFrustum` | `VisibilityClipper::SphereInFrustum` 0x0052fbb0 | 2 | Same pointer cell 0x00575a98 and VA; the link alias is gone. Proof: 43 units, no game-object byte change. |
 | `CubeVisibilityClipperView`, `FollowCameraVisibilityClipperView`, `OverlayVisibilityClipperView` | removed | 1 | No users left; their calls already name `VisibilityClipper` methods. Overlay's `float* depth` was wrong: 0x0052f340 stores a dword code (`mov [eax], esi` at 0x0052f4b5). |
+| `SoultreeLoadDesc` (D3DIMSoultreeCharacter.h), `desc`, `loadDesc` | `LightManager`, `lights`, `loadLights` | 2 | Every caller passes its scene's `lights`; the loaders hand it to D3DIMSoultreeObject::LoadModel's light-manager argument, and the only read, +0x25 bit 0, is GameObject::isEnabled (it selects SetUseLighting(1)). Applies to LoadCharacter, CollisionCharacter::Load, both LoadPhysicsModel slots, Vehicle::LoadVehicle and Bike::LoadBike; the podium view's +0x7c is the same LightManager*. |
 | `SoultreeTextureOptions` (SoultreeMaterial.h) | `TextureContext` (TextureLoader.h) | 2 | Same size and offsets as the loader's TextureContext, which SoultreeMaterial.cpp handed it as; the material member is that struct, and `TextureContext` moved beside the loader declaration. |
 | `D3DIMSoultreeObject::ReplaceMaterialTexture` `int unused` | `TextureContext* textures` (unused) | 2 | BikeRace passes its `TextureContext*`; the dialogs pass Game+0x1c's context block and the podium a local copy, both laid out like TextureContext. The dead `DialogSoultreeObjectView` and `UnknownProCircuitSkinned` views are gone. |
 | `GUIManager::ShowDialog` `int area`, `int name` | `CameraRect* area`, `const char* name` | 1 | 0x00485a70 hands both straight to `UIDialog::Create`'s rectangle and name parameters; 18 callers passed `(int)&area`. |

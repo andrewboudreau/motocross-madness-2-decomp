@@ -323,7 +323,7 @@ void D3DIMSoultreeCharacter::BuildModel()
 
     ModelObject* frame = reinterpret_cast<ModelObject*>(new(__FILE__, 0xd6) D3DIMSoultreeObject(isEnabled));
     modelNode = (SoultreeObject*)frame;
-    frame->Load(renderContext, "", (int)loadDesc, (int)loadInfoCopy, 1);
+    frame->Load(renderContext, "", (int)loadLights, (int)loadInfoCopy, 1);
     GameObject* frameChild = (ModelObject*)modelNode;
     AppendChild(frameChild, -1);
     modelNode->RegisterNode();
@@ -333,7 +333,7 @@ void D3DIMSoultreeCharacter::BuildModel()
     modelNode->name[copyLength] = 0;
 
     ModelObject* loaded = reinterpret_cast<ModelObject*>(new(__FILE__, 0xdf) D3DIMSoultreeObject(isEnabled));
-    loaded->Load(renderContext, name, (int)loadDesc, (int)loadInfoCopy, loadUseOptions);
+    loaded->Load(renderContext, name, (int)loadLights, (int)loadInfoCopy, loadUseOptions);
     ((SoultreeObject*)loaded)->UnregisterNode();
     void* owner = g_ResourceManager->FindItemByObject(loaded);
     if (owner)
@@ -377,7 +377,7 @@ struct LoadDescCopy {                                    // 0x18-byte block copi
 // in the owner registry; a cached entry with an owner is cloned through slot 8, otherwise the .slt file is read
 // and the new object becomes the entry's owner.  Returns the GameObject subobject, or 0 when the lookup fails
 // (the object has then released itself).
-GameObject* D3DIMSoultreeCharacter::LoadCharacter(int context, const char* path, const SoultreeLoadDesc* desc,
+GameObject* D3DIMSoultreeCharacter::LoadCharacter(int context, const char* path, const LightManager* lights,
                                                        int loadInfo, int useOptions, int unused)
 {
     char drive[4];
@@ -386,7 +386,7 @@ GameObject* D3DIMSoultreeCharacter::LoadCharacter(int context, const char* path,
     char dir[0x100];
     ReadClock();
     SetCharacterRenderContext(context, unused);
-    loadDesc = desc;
+    loadLights = lights;
     loadUseOptions = useOptions;
     if (loadInfo) {
         LoadDescCopy* copy = (LoadDescCopy*)DebugMalloc(0x18, __FILE__, 0x64);

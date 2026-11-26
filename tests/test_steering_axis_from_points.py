@@ -164,7 +164,7 @@ class SteeringAxisFromPointsTests(unittest.TestCase):
             # Emitter construction joins preserve these bytes and exact targets;
             # only the three verified external constructor names change.
             self.assertEqual(caller_fingerprint(bike, '?LoadBike@Bike@@'),
-                             '873dc7d90f9943f587f1ec6bae22f98f9b53adeb7a1b9884882b2752342869cd')
+                             '87d9a603d14fbcd974b5e1614ba069757d3bf9355bb61a0d24a5af83c9c907bc')
             self.assertEqual(sum(name==SYMBOL for _,_,name in caller_relocs),1)
             # The promoted body sits in the canonical unit between SetAxisFromDirection and SetAngle.
             entry = canonical.find_symbol(SYMBOL)

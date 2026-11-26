@@ -146,7 +146,7 @@ public:
     // (0.02f, 100, 0.001f, 0.1f, 3) and the track byte; the other arguments configure the
     // vehicle (names tier 3).
     GameObject* LoadVehicle(int context, const char* engineName, const char* modelPath,
-                            const SoultreeLoadDesc* desc, int loadInfo, Vec3 startPosition, Vec3 startForward,
+                            const LightManager* lights, int loadInfo, Vec3 startPosition, Vec3 startForward,
                             Vec3 startUp, void* terrainProbe, VehicleInputMap* map, void* linkedObject,
                             float weight, float suspensionScale, float steerScale, void* device, int wheelCap,
                             int extraContacts, int attachmentSlots, int earlyCap, int lateCap, int defaultEngine,

@@ -59,7 +59,7 @@ public:
     //    (0.02f, 0.001f, 0.1f); a20 is pushed zero-extended from a byte (tier 2).
     //  * a10, a11, a14, a20 take the types of the slot 2 parameters they are forwarded to.
     //  * The names follow slot 2's: a1 renderContext, a2 createCenterNode, a3 modelPath,
-    //    a4 desc, a6..a8 startPosition/startForward/startUp, a9..a18 terrainProbe ..
+    //    a4 lights, a6..a8 startPosition/startForward/startUp, a9..a18 terrainProbe ..
     //    elasticity, a19 restThreshold, a20 probeMask, a21 createCollision; slot 2's radius
     //    and shapeMode are passed as 0.0f and 0.
     //  * Returns the GameObject virtual base (`this ? this+vbase : 0` at 0x0050408e).  The
@@ -67,7 +67,7 @@ public:
     //    SceneManager caller 0x004ed3bf passes the result to GameObject::AppendChild.
     virtual GameObject* LoadPhysicsModel(int renderContext, int createCenterNode,
                                              const char* modelPath,
-                                             const SoultreeLoadDesc* desc, int loadInfo,
+                                             const LightManager* lights, int loadInfo,
                                              Vec3 startPosition, Vec3 startForward,
                                              Vec3 startUp, void* terrainProbe,
                                              void* linkedObject, float weight,

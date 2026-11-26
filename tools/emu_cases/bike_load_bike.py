@@ -16,7 +16,7 @@ import random
 import struct
 
 RETAIL_VA = 0x004079c0
-SYMBOL = ('?LoadBike@Bike@@QAEPAVGameObject@@HPBD00PBUSoultreeLoadDesc@@PBUBikeA5C8@@UVec3@@33PAXPAU'
+SYMBOL = ('?LoadBike@Bike@@QAEPAVGameObject@@HPBD00PBVLightManager@@PBUBikeA5C8@@UVec3@@33PAXPAU'
           'VehicleInputMap@@0HHPAHHHHMMMMMMHH44PAUVehicleAxis@@77PAVSoultreeSlot1f0@@MH@Z')
 SOURCE = 'src/krusty2/vehicle/Bike.cpp'
 # Math3D.h's axis constants are per-unit statics (bound to many VAs repo-wide); these are Bike.cpp's

@@ -427,7 +427,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
                 g_TrackGame->mode.raceSettings.raceMode != 4) {
                 sprintf(modelName, "%s\\%s", "Res", "FlagGirl.mcf");
                 flagGirl = new(__FILE__, 0x26f) D3DIMSoultreeCharacter(1);
-                AppendChild(flagGirl->LoadCharacter((int)renderContext, modelName, (const SoultreeLoadDesc*)lights, (int)textures, 1, 1),
+                AppendChild(flagGirl->LoadCharacter((int)renderContext, modelName, lights, (int)textures, 1, 1),
                                       -1);
                 ReplaceMeshId(flagGirl, 1, 2);
                 reinterpret_cast<D3DIMSoultreeObject*>(flagGirl->modelNode)->SetUseLighting(1);

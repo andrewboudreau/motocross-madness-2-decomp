@@ -424,7 +424,7 @@ struct PodiumBaseQuarryEventView : public GameObject {     // TrackGameViewOwner
     unsigned char skyCube[0x34 - 0x30];  // +0x30 BaseQuarryEvent skyCube (bytes kept)
     EventBikeRaceView* raceView;                // +0x34
     unsigned char field_0x38[0x7c - 0x38];
-    GameObject* lights;                             // +0x7c
+    LightManager* lights;                           // +0x7c
     unsigned char field_0x80[0x94 - 0x80];
     int opaqueTextureGroup;                         // +0x94, as BaseQuarryEvent.h
     int alphaTextureGroup;                          // +0x98
@@ -670,7 +670,7 @@ int EventManager::CreatePodiumScene() {
         }
         D3DIMSoultreeCharacter*& character = podiumCharacters[place - 1];
         character = new(__FILE__, 0x31d) D3DIMSoultreeCharacter(isEnabled);
-        character->LoadCharacter((int)renderContext, path, (const SoultreeLoadDesc*)PODIUM_OWNER(owner)->lights,
+        character->LoadCharacter((int)renderContext, path, PODIUM_OWNER(owner)->lights,
                                        (int)&context, 1, 1);
         view->AppendChild(character, -1);
         if (character) {

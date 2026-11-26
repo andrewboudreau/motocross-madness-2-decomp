@@ -33,7 +33,7 @@ public:
 
     // 0x004319c0 (ret 0x1c), non-virtual.  Not a vtable slot: it is absent from every
     // vtable, and the 0x00445680 call is a direct call.  Tier 3 name/argument roles.
-    GameObject* Load(int context, const char* name, const char* colPath, const SoultreeLoadDesc* desc,
+    GameObject* Load(int context, const char* name, const char* colPath, const LightManager* lights,
                      int loadInfo, int useOptions, int unused);
 
     CollisionObject* collisionObject;   // +0x210 allocated 0xb8 bytes (CollisionObject), created by Load

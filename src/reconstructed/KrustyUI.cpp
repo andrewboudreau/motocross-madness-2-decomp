@@ -308,7 +308,7 @@ void KrustyUI::BuildGarageScene(int value) {
         }
         garageCharacter = new(__FILE__, 0x174) D3DIMSoultreeCharacter(1);
         garageScene->AppendChild(
-            garageCharacter->LoadCharacter((int)renderContext, "UIgarage.mcf", (const SoultreeLoadDesc*)lights, (int)&context, 1, 1), -1);
+            garageCharacter->LoadCharacter((int)renderContext, "UIgarage.mcf", lights, (int)&context, 1, 1), -1);
         reinterpret_cast<D3DIMSoultreeObject*>(garageCharacter->modelNode)->SetUseLighting(0);
         garageCharacter->modelNode->SetPosition(*reinterpret_cast<const Vec3*>(&garageFocus));
         garageCharacter->modelNode->SetAxes(0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0, 1);
@@ -323,7 +323,7 @@ void KrustyUI::BuildGarageScene(int value) {
             garageScene->AppendChild(shadow, -1);
         riderPreview = new(__FILE__, 0x194) D3DIMSoultreeCharacter(1);
         garageScene->AppendChild(
-            riderPreview->LoadCharacter((int)renderContext, "UIRider.mcf", (const SoultreeLoadDesc*)lights,
+            riderPreview->LoadCharacter((int)renderContext, "UIRider.mcf", lights,
                                                    (int)&g_TrackGame->textureContext, 1, 1), -1);
         reinterpret_cast<D3DIMSoultreeObject*>(riderPreview->modelNode)->SetUseLighting(1);
         riderPreview->modelNode->SetPosition(*reinterpret_cast<const Vec3*>(&KRUSTYUI_RIDER_POSITION));
@@ -340,7 +340,7 @@ void KrustyUI::BuildGarageScene(int value) {
             sprintf(text, "Animations\\UIbike\\%s", manufacturers[i].uiModelFile);
             manufacturers[i].uiModel = new(__FILE__, 0x1b4) D3DIMSoultreeCharacter(0);
             garageScene->AppendChild(
-                manufacturers[i].uiModel->LoadCharacter((int)renderContext, text, (const SoultreeLoadDesc*)lights,
+                manufacturers[i].uiModel->LoadCharacter((int)renderContext, text, lights,
                                                                       (int)&g_TrackGame->textureContext, 1, 1), -1);
             D3DIMSoultreeCharacter* bike = manufacturers[i].uiModel;
             reinterpret_cast<D3DIMSoultreeObject*>(bike->modelNode)->SetUseLighting(1);
