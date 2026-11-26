@@ -256,7 +256,7 @@
   "?GetSelectedSeries@TrackGameMode@@QAEHXZ": "0x00524100",
   "?Init@ProjectedShadow@@QAEPAV1@PAVShadowRenderTarget@@PAX@Z": "0x004da7b0",
   "?InsertNodesInQuadtree@SoultreeQuadTreeRenderer@@QAEXXZ": "0x005046e0",
-  "?Load@Scene@@QAEHPAXPAVLightManager@@HHPBUTextureContext@@PBDP6AXH@ZH@Z": "0x004efb20",
+  "?Load@Scene@@QAEHPAXPAVLightManager@@PAVParticleManager@@PAVTextureMapManager@@PBUTextureContext@@PBDP6AXH@ZH@Z": "0x004efb20",
   "?Load@Terrain@@QAEPAV1@HPAVTerrainStream@@HPAUTerrainSurfaceDesc@@HHPBDH@Z": "0x005059d0",
   "?LoadEventObjects@BaseQuarryEvent@@QAEHP6AXPAH@Z@Z$ehhandler": "0x0054d608",
   "?NextBike@BikeRace@@QAEPAVBikeRaceKrustyBikeView@@PAH@Z": "0x004204e0",

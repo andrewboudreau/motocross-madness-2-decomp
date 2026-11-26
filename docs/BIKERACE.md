@@ -168,7 +168,9 @@ against retail, 600 runs with 0 mismatches):
   Scene views with CollisionCharacter, CarProcedural and SoultreePhysicsObject
   moved them back (13400); retiring BikeRace.h's own scene views swapped
   them again (13394; BIKE_RACE_STATE_CONNECTIONS.md); replacing the
-  Krusty3DObjects camera views with `Camera` moved them back (13400).
+  Krusty3DObjects camera views with `Camera` moved them back (13400);
+  retiring `SoultreeLoadDesc` swapped them again (13394); typing
+  Scene::Load's particle and texture managers moved them back (13400).
 
 Facts the two loaders establish:
 - Racers are KrustyBike (constructor `0x0048fa60`, 0x1638 bytes, the

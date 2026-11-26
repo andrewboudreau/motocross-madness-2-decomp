@@ -1029,7 +1029,7 @@ static inline int FindEmitter(const char* name, const SceneEmitterTypeKeyword* t
 // 0x004ecd60: see the declaration. A model whose ".seg" name is the
 // stadium's gets no collision object; its ".col" file is used when the
 // archive has one.
-int Scene::ReadStaticModels(LightManager* lights, int particleManager, int textureManager, const TextureContext* modelTextures, void (*progress)(int),
+int Scene::ReadStaticModels(LightManager* lights, ParticleManager* particleManager, TextureMapManager* textureManager, const TextureContext* modelTextures, void (*progress)(int),
                                  int interval)
 {
     int models;
@@ -1129,7 +1129,7 @@ int Scene::ReadStaticModels(LightManager* lights, int particleManager, int textu
             AppendChild(object->LoadPhysicsModel((int)renderContext, sltPath, lights,
                                                                modelTextures, *reinterpret_cast<Vec3*>(&position),
                                                                *reinterpret_cast<Vec3*>(&look), *reinterpret_cast<Vec3*>(&up),
-                                                               0, (void*)particleManager, 5.0f, points, emitters, (SoultreeSlot1f0*)this,
+                                                               0, particleManager, 5.0f, points, emitters, (SoultreeSlot1f0*)this,
                                                                0.033333f, 10, 0.025f, 0.05f, radius, shape,
                                                                minPoints, groundProbeMask, 1),
                                   -1);
@@ -1168,7 +1168,7 @@ int Scene::ReadStaticModels(LightManager* lights, int particleManager, int textu
                         } else {
                             DustParticleEmitter* emitter = new(__FILE__, 1917) DustParticleEmitter(1);
                             D3DIMSoultreeObject* node = object;
-                            node->AppendChild((GameObject*)emitter->Create(renderContext, (ParticleManager*)particleManager), -1);
+                            node->AppendChild((GameObject*)emitter->Create(renderContext, particleManager), -1);
                             object->AddAttachment(1, emitter, (SoultreeAttachTarget*)*object->collisionPoints, 0);
                             dust = 1;
                         }
@@ -1180,7 +1180,7 @@ int Scene::ReadStaticModels(LightManager* lights, int particleManager, int textu
                         } else {
                             DirtChunkParticleEmitter* emitter = new(__FILE__, 1927) DirtChunkParticleEmitter(1);
                             D3DIMSoultreeObject* node = object;
-                            node->AppendChild((GameObject*)emitter->Create(renderContext, (ParticleManager*)particleManager), -1);
+                            node->AppendChild((GameObject*)emitter->Create(renderContext, particleManager), -1);
                             object->AddAttachment(2, emitter, (SoultreeAttachTarget*)*object->collisionPoints, 0);
                             chunk = 1;
                         }
@@ -1192,7 +1192,7 @@ int Scene::ReadStaticModels(LightManager* lights, int particleManager, int textu
                         } else {
                             DirtSprayParticleEmitter* emitter = new(__FILE__, 1937) DirtSprayParticleEmitter(1);
                             D3DIMSoultreeObject* node = object;
-                            node->AppendChild((GameObject*)emitter->Create(renderContext, (ParticleManager*)particleManager), -1);
+                            node->AppendChild((GameObject*)emitter->Create(renderContext, particleManager), -1);
                             object->AddAttachment(3, emitter, (SoultreeAttachTarget*)*object->collisionPoints, 0);
                             spray = 1;
                         }
@@ -1301,7 +1301,7 @@ void Scene::AttachCasterShadows(ProjectedShadow* shadow, int flags)
 // Not exact (5289 of 5335 bytes: instructions, calls, EH states and the 0xcfc frame match;
 // retail lets the random-set entries offset share fps's home and keeps i's to itself, and
 // reloads motionCount as [ebx + ecx + 0x1c]; docs/SCENEMANAGER.md lists the forms tried).
-int Scene::ReadAnimations(LightManager* lights, int textureManager, const TextureContext* modelTextures, void (*progress)(int), int interval)
+int Scene::ReadAnimations(LightManager* lights, TextureMapManager* textureManager, const TextureContext* modelTextures, void (*progress)(int), int interval)
 {
     float fps;
     int animations;
@@ -1758,7 +1758,7 @@ int Scene::OnControlPress(ControlEvent* event, InputButtonState* entry)
 // an emitter in `lights` for each light that emits; then the fog, resource
 // files, stadium and the 0x004ecd60/0x004edfe0/0x004ef4c0 parts. Returns 0
 // when a part fails.
-int Scene::Load(void* owner, LightManager* lights, int particleManager, int textureManager, const TextureContext* modelTextures,
+int Scene::Load(void* owner, LightManager* lights, ParticleManager* particleManager, TextureMapManager* textureManager, const TextureContext* modelTextures,
                                  const char* cubeDirectory, void (*progress)(int), int interval)
 {
     int logProgress;
@@ -1804,13 +1804,13 @@ int Scene::Load(void* owner, LightManager* lights, int particleManager, int text
             return 0;
         if (sceneLights[i].emitsLight) {
             const char* flare = sceneLights[i].hasLensFlare ? sceneLights[i].lensFlareTexture : 0;
-            int flareTextureManager = sceneLights[i].hasLensFlare ? (int)g_TrackGame->textureManager : 0;
+            TextureMapManager* flareTextures = sceneLights[i].hasLensFlare ? g_TrackGame->textureManager : 0;
             sceneLights[i].emitter =
                 (new(__FILE__, 2798) LightEmitter(1))
                     ->Create(renderContext, sceneLights[i].type, sceneLights[i].color,
                                             &sceneLights[i].position, sceneLights[i].emitterDirection,
-                                            sceneLights[i].range, sceneLights[i].showDebugSphere, 0, flareTextureManager,
-                                            (int)flare, i);
+                                            sceneLights[i].range, sceneLights[i].showDebugSphere, 0, flareTextures,
+                                            flare, i);
             if (!sceneLights[i].emitter)
                 return 0;
             lights->AddLight(sceneLights[i].emitter);

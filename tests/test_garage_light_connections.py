@@ -19,7 +19,7 @@ ROOT = Path(__file__).resolve().parents[1]
 EXE = Path(os.environ.get('MCM2_EXE', ROOT / 'work/game/mcm2.exe'))
 PROVIDERS = {
     '??0LightEmitter@@QAE@H@Z': (0x49deb0, 227),
-    '?Create@LightEmitter@@QAEPAV1@PAXHIPBUVector3@@1MHHHHH@Z': (0x49e230, 348),
+    '?Create@LightEmitter@@QAEPAV1@PAXHIPBUVector3@@1MHHPAVTextureMapManager@@PBDH@Z': (0x49e230, 348),
     '??0LightManager@@QAE@H@Z': (0x49e390, 78),
     '?AddLight@LightManager@@QAEXPAVLightEmitter@@@Z': (0x49e470, 23),
 }

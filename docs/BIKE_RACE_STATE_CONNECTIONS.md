@@ -134,6 +134,11 @@ camera targets are now `CollisionCharacter*` and `CarProcedural*`, and their col
 `CollisionObject*`. The proof over the 23 units including BikeRace.h found the two instructions
 at +538 as the only change; the pins carry the 13,394 fingerprints of the Scene-view step again.
 
+Typing Scene::Load's particle and texture managers moved it back (13,400) with retail's order.
+SceneManager.h and BaseQuarryEvent.h forward-declare `ParticleManager` and `TextureMapManager` for
+the retyped parameters and member. The proof over the 44 affected units found the two
+instructions at +538 as the only change in BikeRace.cpp.
+
 | Complete CreateRacers fingerprint | Before | After |
 |---|---|---|
 | Raw body SHA-256 | `1a2b16687fa89e9a0ed33dba31a1e46452caaaefa3ad73ce630b317a32bf07c4` | `9c7483a4d5ff8514f8a350f528dbe11d8d82d4d694439f87d069fd6fbf9e748b` |

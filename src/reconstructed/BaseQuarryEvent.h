@@ -8,6 +8,7 @@ class EcoSystem;
 class InstrumentOverlay;
 class LightEmitter;
 class LightManager;
+class ParticleManager;
 struct TextureContext;
 class RadarOverlay;
 class RenderTarget;
@@ -102,7 +103,7 @@ public:
     TextQueueOverlay* textQueue;
     float clockMinutes;                         // race clock, minutes
     float clockSeconds;                         // race clock, seconds
-    void* particleManager;                         // ParticleManager
+    ParticleManager* particleManager;
     LightManager* lightManager;
     LightEmitter* sunLight;                 // sun
     LightEmitter* ambientLight;                 // ambient

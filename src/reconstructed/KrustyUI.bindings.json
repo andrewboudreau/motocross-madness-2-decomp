@@ -131,7 +131,7 @@
   "?RecordRaceResults@KrustyUI@@QAEXXZ": "0x0049bbb0",
   "?RecordHighScoreTable@KrustyUI@@QAEXH@Z": "0x0049bc50",
   "?GuiProgressCallback@@YAXXZ": "0x0049bda0",
-  "?Create@LightEmitter@@QAEPAV1@PAXHIPBUVector3@@1MHHHHH@Z": "0x0049e230",
+  "?Create@LightEmitter@@QAEPAV1@PAXHIPBUVector3@@1MHHPAVTextureMapManager@@PBDH@Z": "0x0049e230",
   "?AddLight@LightManager@@QAEXPAVLightEmitter@@@Z": "0x0049e470",
   "?AdvanceMotion@Character@@QAEHMHPBH@Z": "0x004a6bb0",
   "?Attach@ParameterBlock@@QAEXPAVFileStream@@HH@Z": "0x004b77a0",

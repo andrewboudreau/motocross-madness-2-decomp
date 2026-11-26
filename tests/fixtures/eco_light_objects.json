@@ -12,22 +12,22 @@
     "src/reconstructed/LightEmitter.cpp": {
       "sections": 57,
       "relocations": 172,
-      "sha256": "85f50cbaa264327417d72e531d4d34c84ef1e14ffa376ede0b95df84cb065f8e"
+      "sha256": "3c8d959db1ecb271745c6cedacb2b1b0c618155f8d97d01b1398867b77e93c84"
     },
     "src/reconstructed/SceneManager.cpp": {
       "sections": 335,
       "relocations": 1757,
-      "sha256": "c23198277b31d2e5661d660ac86c4ab4cb9a49051b8999f125d057239f3695bd"
+      "sha256": "4e23b57fb925650d53d548493a496d8d4149e731612f2df3440ef3851a46b921"
     },
     "src/reconstructed/KrustyUI.cpp": {
       "sections": 317,
       "relocations": 1847,
-      "sha256": "1977068d7d3acdac85c34e4ed2d1fc5a1beb697bcdb43dbb733883e914f2bdb6"
+      "sha256": "2963d8ec7bec09e6fdc48703ac6a00ba913e6eec692bdc3c425772a9c9f882d7"
     },
     "src/reconstructed/QuarryStuntEvent.cpp": {
       "sections": 145,
       "relocations": 923,
-      "sha256": "fd2af56791f313826b91dc38bbcc69768aefa333ca1a792287210478d54446e0"
+      "sha256": "007487b1d2809959730f0447207962be155a7ce1c9921e561bf60b122d5a8971"
     },
     "src/reconstructed/ArcadeObject.cpp": {
       "sections": 32,
@@ -156,7 +156,7 @@
     },
     {
       "source": "src/reconstructed/LightEmitter.cpp",
-      "symbol": "?Create@LightEmitter@@QAEPAV1@PAXHIPBUVector3@@1MHHHHH@Z",
+      "symbol": "?Create@LightEmitter@@QAEPAV1@PAXHIPBUVector3@@1MHHPAVTextureMapManager@@PBDH@Z",
       "va": "0x0049e230",
       "size": 348
     },

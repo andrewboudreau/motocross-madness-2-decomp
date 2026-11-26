@@ -23,6 +23,7 @@ public:
 };
 
 class LightManager;
+class TextureMapManager;
 
 class LightEmitter : public GameObject {
 public:
@@ -36,7 +37,7 @@ public:
     // are unused.
     LightEmitter* Create(void* context, int type, unsigned int color,
                                         const Vector3* position, const Vector3* direction,
-                                        float range, int sphere, int a8, int a9, int a10,
+                                        float range, int sphere, int a8, TextureMapManager* flareTextures, const char* flareName,
                                         int index);
     unsigned int PackedColor();                  // 0x0049dfd0: packed ARGB colour
     void SetColor(unsigned int color);        // 0x0049e020: sets the colours

@@ -128,7 +128,7 @@ void LightEmitter::SetDirection(const Vector3* direction) {
 // 0x0049e230
 LightEmitter* LightEmitter::Create(void* context, int type, unsigned int color,
                                                   const Vector3* position, const Vector3* direction,
-                                                  float range, int sphere, int a8, int a9, int a10,
+                                                  float range, int sphere, int a8, TextureMapManager* flareTextures, const char* flareName,
                                                   int index) {
     GameObject::SetRenderContext(context);
     lightType = type;

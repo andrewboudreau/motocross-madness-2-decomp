@@ -205,14 +205,14 @@
       4299120,
       13428,
       13428,
-      13394,
-      "0d1c681ea02fca8595769e383bb8c26b54766961c5e0f091988b367da388d9ad"
+      13400,
+      "2da850db52316df8731a83fbd44bed12c4aed598cba48e96e19bc22ce3f63d08"
     ]
   ],
   "additional_functions": [
     [
       "src/reconstructed/SceneManager.cpp",
-      "?ReadAnimations@Scene@@QAEHPAVLightManager@@HPBUTextureContext@@P6AXH@ZH@Z",
+      "?ReadAnimations@Scene@@QAEHPAVLightManager@@PAVTextureMapManager@@PBUTextureContext@@P6AXH@ZH@Z",
       5169120,
       5335,
       "847993de0c5b498cde320bc7642a190020db56abb60c07cdd6481dc552cbf08e"

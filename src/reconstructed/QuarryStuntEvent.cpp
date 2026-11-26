@@ -496,7 +496,7 @@ int BaseQuarryEvent::LoadEventObjects(LoadProgressFn progress) {
         sprintf(text, "Scene not created.\n");
         return 0;
     }
-    if (!eventScene->Load(renderContext, lightManager, (int)particleManager, (int)g_TrackGame->textureManager,
+    if (!eventScene->Load(renderContext, lightManager, particleManager, g_TrackGame->textureManager,
                                            &modelTextures, "Teraform\\Skies", (void (*)(int))progress,
                                            (int)ceil(sceneSteps * 0.1f)))
         return 0;
@@ -618,7 +618,7 @@ int BaseQuarryEvent::LoadEventObjects(LoadProgressFn progress) {
     raceView = (EventBikeRaceView*)new(__FILE__, 898) BikeRace(0);
     g_MemTagStack->Push("Particles");
     if (particleManager)
-        particleManager = ((ParticleManager*)particleManager)
+        particleManager = particleManager
                          ->Create((int)renderContext, g_TrackGame->textureManager,
                                   eventScene->environment->particleTexture, lightManager);
     g_MemTagStack->Push("3DObjects");
