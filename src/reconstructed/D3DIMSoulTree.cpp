@@ -98,7 +98,7 @@ GameObject* D3DIMSoultreeObject::LoadModel(void* owner, const char* path, const 
 {
     GameObject::SetRenderContext(owner);
     if (useOptions) {
-        memcpy(textureOptions, textures, sizeof(textureOptions));
+        textureOptions = *textures;
         textureManager = textures->manager;
     }
     loadFlag = useOptions;
@@ -191,7 +191,7 @@ void D3DIMSoultreeObject::LoadHierarchy(FileStream* stream)
         materialTable = (SoultreeMaterial**)DebugMalloc(materialCount * 4, __FILE__, 0x156);
         for (int i = 0; i < materialCount; i++) {
             materialTable[i] = new (__FILE__, 0x158) SoultreeMaterial(1);
-            materialTable[i]->Attach((RenderTarget*)renderContext, (const TextureContext*)textureOptions,
+            materialTable[i]->Attach((RenderTarget*)renderContext, &textureOptions,
                                                   textureManager, textureFormat);
             AppendChild(materialTable[i], -1);
             materialTable[i]->ReadSaved((FileStream*)stream);
@@ -267,7 +267,7 @@ void D3DIMSoultreeObject::LoadHierarchyFromParameters()
     materialTable = (SoultreeMaterial**)DebugMalloc(materialCount * 4, __FILE__, 0x1c0);
     for (int i = 0; i < count; i++) {
         materialTable[i] = new (__FILE__, 0x1c5) SoultreeMaterial(1);
-        materialTable[i]->Attach((RenderTarget*)renderContext, (const TextureContext*)textureOptions,
+        materialTable[i]->Attach((RenderTarget*)renderContext, &textureOptions,
                                               textureManager, textureFormat);
         AppendChild(materialTable[i], -1);
         char section[0x80];
@@ -277,7 +277,7 @@ void D3DIMSoultreeObject::LoadHierarchyFromParameters()
     }
     if (untextured) {
         materialTable[count] = new (__FILE__, 0x1ce) SoultreeMaterial(1);
-        materialTable[count]->Attach((RenderTarget*)renderContext, (const TextureContext*)textureOptions,
+        materialTable[count]->Attach((RenderTarget*)renderContext, &textureOptions,
                                                   textureManager, textureFormat);
         AppendChild(materialTable[count], -1);
         materialTable[count]->MakeUntextured();
@@ -1524,7 +1524,7 @@ void D3DIMSoultreeObject::CreateNode(SoultreeObject** out)
 {
     D3DIMSoultreeObject* copy = new (__FILE__, 0x7d5) D3DIMSoultreeObject(isEnabled);
     *out = copy;
-    copy->LoadModel(renderContext, "", lightManager, (const TextureContext*)textureOptions, 1);
+    copy->LoadModel(renderContext, "", lightManager, &textureOptions, 1);
 }
 
 static inline void Raise(float& bound, float value)
@@ -1724,7 +1724,7 @@ void D3DIMSoultreeObject::CopyMaterials(D3DIMSoultreeObject* source)
     materialTable = (SoultreeMaterial**)DebugMalloc(materialCount * 4, __FILE__, 0x8ed);
     for (int i = 0; i < materialCount; i++) {
         materialTable[i] = new (__FILE__, 0x8ef) SoultreeMaterial(1);
-        materialTable[i]->Attach((RenderTarget*)renderContext, (const TextureContext*)textureOptions,
+        materialTable[i]->Attach((RenderTarget*)renderContext, &textureOptions,
                                               textureManager, textureFormat);
         AppendChild(materialTable[i], -1);
         materialTable[i]->CopyFrom(source->materialTable[i]);
@@ -1749,7 +1749,7 @@ void D3DIMSoultreeObject::CopySubtree(SoultreeObject* sourceNode, SoultreeObject
     target->lightManager = source->lightManager;
     target->textureManager = source->textureManager;
     target->textureFormat = source->textureFormat;
-    memcpy(target->textureOptions, source->textureOptions, sizeof(target->textureOptions));
+    target->textureOptions = source->textureOptions;
     target->screenRect = source->screenRect;
     target->field_0x2a8 = source->field_0x2a8;
 }

@@ -25,9 +25,9 @@
 // QuarryStuntEvent.cpp see the same class.
 
 #include "GameObject.h"
-struct TextureContext;
 #include "MatrixUtil.h"
 #include "SoultreeLodSettings.h"
+#include "TextureLoader.h"
 
 struct Vec3;
 class LightManager;
@@ -203,7 +203,7 @@ public:
     char modelName[0x80];                      // +0x1c0 name (0x7f characters)
     TextureMapManager* textureManager;         // +0x240 texture manager (first option dword)
     int textureFormat;                         // +0x244 texture format, 555
-    int textureOptions[6];                     // +0x248 texture options
+    TextureContext textureOptions;             // +0x248 LoadModel's texture context; the materials' Attach takes its address
     int field_0x260;                           // +0x260
     int modifierCount;                         // +0x264 first modifier list
     GameObject** modifierList;                 // +0x268

@@ -280,7 +280,8 @@ public:
     char pad_0x38[0x240 - 0x38];
     int textureManager;                          // +0x240 D3DIMSoulTree.h names: copied by CopyFrom, passed to SoultreeMaterial::Attach
     int textureFormat;                           // +0x244 copied by CopyFrom, passed to SoultreeMaterial::Attach
-    char textureOptions[0x274 - 0x248];          // +0x248 the six option dwords, then the modifier lists; passed by address to SoultreeMaterial::Attach
+    TextureContext textureOptions;               // +0x248 passed by address to SoultreeMaterial::Attach
+    char pad_0x260[0x274 - 0x260];               // +0x260 the modifier lists
     int lodCount;                                // +0x274 moved from the temporary model in slot 0
     char pad_0x278[0x280 - 0x278];
     int autoLodDistances;                        // +0x280 moved (and cleared in the source) in slot 0
@@ -345,7 +346,7 @@ void D3DIMSoultreeCharacter::BuildModel()
     for (int i = 0; i < ((ModelObject*)modelNode)->itemCount; i++) {
         ((ModelObject*)modelNode)->items[i] = new(__FILE__, 0xed) SceneItem(1);
         ((ModelObject*)modelNode)->items[i]->Attach(static_cast<RenderTarget*>(renderContext),
-                reinterpret_cast<const TextureContext*>(((ModelObject*)modelNode)->textureOptions),
+                &((ModelObject*)modelNode)->textureOptions,
                 reinterpret_cast<TextureMapManager*>(((ModelObject*)modelNode)->textureManager),
                                                   ((ModelObject*)modelNode)->textureFormat);
         AppendChild(((ModelObject*)modelNode)->items[i], -1);
