@@ -148,7 +148,7 @@ RaceSound::~RaceSound() {
 // present engine's section ("125", "250", "400") of audio_16.ini or
 // audio_08.ini: the sample counts (divided down when several engines share
 // the race) and names of eight sample sets, and three engine speeds.
-RaceSound* RaceSound::Create(void* owner, EventBikeRaceView* view,
+RaceSound* RaceSound::Create(void* owner, BikeRace* view,
                                             KrustyBikeCamera* camera, int racers) {
     int count;
     FileStream* stream;
@@ -181,7 +181,7 @@ RaceSound* RaceSound::Create(void* owner, EventBikeRaceView* view,
     enginePresent[1] = 0;
     enginePresent[2] = 0;
     iterator = 0;
-    while ((racer = reinterpret_cast<KrustyBike*>(reinterpret_cast<BikeRace*>(raceView)->NextBike(&iterator))) != 0) {
+    while ((racer = reinterpret_cast<KrustyBike*>(raceView->NextBike(&iterator))) != 0) {
         if (racer->engineSize < 250) {
             enginePresent[0] = 1;
             if (racer == raceView->localRacer)
@@ -490,7 +490,7 @@ void RaceSound::AssignChannels() {
 
     iterator = 0;
     count = 0;
-    while ((racer = reinterpret_cast<KrustyBike*>(reinterpret_cast<BikeRace*>(raceView)->NextBike(&iterator))) != 0) {
+    while ((racer = reinterpret_cast<KrustyBike*>(raceView->NextBike(&iterator))) != 0) {
         engineChannels[count].channelRacer = racer;
         if (racer->engineSize < 250)
             engineChannels[count].engine = 0;

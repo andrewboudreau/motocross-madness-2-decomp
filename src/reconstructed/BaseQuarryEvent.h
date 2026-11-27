@@ -19,7 +19,7 @@ class Terrain;
 class FileStream;
 class VisualCue;
 class Fog;
-struct EventBikeRaceView;
+class BikeRace;
 class KrustyBikeCamera;
 
 // Progress callback the events' initialisers take (EventManager passes the
@@ -86,7 +86,7 @@ public:
 
     Scene* eventScene;
     void* skyCube;                         // SkyCube
-    EventBikeRaceView* raceView;
+    BikeRace* raceView;
     VisualCue* visualCue;
     KrustyBikeCamera* raceCamera;
     Terrain* eventTerrain;                          // src/krusty2/broadphase/Terrain.h

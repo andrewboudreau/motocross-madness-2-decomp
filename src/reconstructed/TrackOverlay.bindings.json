@@ -234,7 +234,6 @@
   "?DebugFree@@YAXPAXPBDH@Z": "0x004a2e60",
   "?DrawTrackOutline@RadarOverlay@@QAEXH@Z": "0x0051c720",
   "?IntersectLineCircle@RadarOverlay@@QAEHPBM00PAM1@Z": "0x0051c4f0",
-  "?NextBike@EventBikeRaceView@@QAEPAVKrustyBike@@PAH@Z": "0x004204e0",
   "?SetCueRacer@ChatOverlay@@QAEXMPBD@Z": "0x0051d9c0",
   "?SetRadarAnchor@NameOverlay@@QAEXUVector3@@HH@Z": "0x005190a0",
   "__real@4@40008000000000000000": "0x0055074c",

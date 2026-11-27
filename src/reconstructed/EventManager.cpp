@@ -12,6 +12,8 @@
 
 #include "../krusty2/broadphase/Terrain.h"
 #include "ArcadeObject.h"
+#include "KrustyBikeCamera.h"
+#include "RaceSound.h"
 #include "Camera.h"
 #include "D3DIMSoulTree.h"
 #include "DebugAlloc.h"
@@ -231,7 +233,7 @@ void EventManager::CloseRace(int mode) {
     char name[260];
     char filtered[260];
     g_TrackGame->ui->demoEnded = 0;
-    EventBikeRaceView* view = FindRaceView();
+    BikeRace* view = FindRaceView();
     TrackGameViewOwner* owner = FindRaceMode();
     g_TrackGame->mode.SaveProfile();
     if (mode == 1) {
@@ -252,7 +254,7 @@ void EventManager::CloseRace(int mode) {
             view->youIndicator->Disable();
         int iterator = 0;
         KrustyBike* racer;
-        while ((racer = reinterpret_cast<KrustyBike*>(reinterpret_cast<BikeRace*>(view)->NextBike(&iterator))) != 0)
+        while ((racer = reinterpret_cast<KrustyBike*>(view->NextBike(&iterator))) != 0)
             racer->Disable();
         return;
     }
@@ -278,7 +280,7 @@ void EventManager::CloseRace(int mode) {
             GetDateFormatA(0, 0, 0, "M/d/yyyy", date, sizeof(date));
             GetTimeFormatA(0, 0, 0, "h:mm tt", time, sizeof(time));
             sprintf(description, "%s %s", date, time);
-            reinterpret_cast<BikeRace*>(view)->SaveReplay(name, description);
+            view->SaveReplay(name, description);
         }
         if (g_TrackGame->mode.raceSettings.raceMode == 4 && g_TrackGame->mode.saveGhost) {
             char time[32];
@@ -329,7 +331,7 @@ void EventManager::EnableRaceObjects() {
     if (!owner)
         return;
     owner->Enable();
-    EventBikeRaceView* view = FindRaceView();
+    BikeRace* view = FindRaceView();
     if (view)
         view->Enable();
     TextQueueOverlay* target = FindTextQueue();
@@ -351,7 +353,7 @@ TrackGameViewOwner* EventManager::FindRaceMode() {
 }
 
 // 0x0045d2f0
-EventBikeRaceView* EventManager::FindRaceView() {
+BikeRace* EventManager::FindRaceView() {
     if (g_TrackGame->supercrossEvent)
         return g_TrackGame->supercrossEvent->raceView;
     if (g_TrackGame->quarryEvent)
@@ -424,7 +426,7 @@ struct PodiumSceneView {                          // TrackGameViewOwner+0x2c
 struct PodiumBaseQuarryEventView : public GameObject {     // TrackGameViewOwner
     PodiumSceneView* grid;                        // +0x2c
     unsigned char skyCube[0x34 - 0x30];  // +0x30 BaseQuarryEvent skyCube (bytes kept)
-    EventBikeRaceView* raceView;                // +0x34
+    BikeRace* raceView;                // +0x34
     unsigned char field_0x38[0x7c - 0x38];
     LightManager* lights;                           // +0x7c
     unsigned char field_0x80[0x94 - 0x80];
@@ -538,7 +540,7 @@ int EventManager::CreatePodiumScene() {
     char message[0x184];
     ProCircuit* circuit = g_TrackGame->proCircuit;
     TrackGameViewOwner* owner = FindRaceMode();
-    EventBikeRaceView* view = FindRaceView();
+    BikeRace* view = FindRaceView();
     int iterator = 0;
     int ok;
     if (g_TrackGame->mode.raceSettings.raceMode == 2)
@@ -759,7 +761,7 @@ void EventManager::EndRace() {
         return;
     if (!g_TrackGame->uiInteractionBlocked && !g_TrackGame->podiumFinished) {
         RankRacers();
-        EventBikeRaceView* view = FindRaceView();
+        BikeRace* view = FindRaceView();
         if (view)
             view->Enable();
         if (CreatePodiumScene()) {
@@ -854,7 +856,7 @@ int CompareRankings(const void* a, const void* b) {
 // awards points; in mode 2 it also orders the standings and copies each
 // racer's place to its player's entry.
 void EventManager::RankRacers() {
-    EventBikeRaceView* view = FindRaceView();
+    BikeRace* view = FindRaceView();
     switch (g_TrackGame->mode.raceSettings.raceMode) { // a one-case switch: `sub eax, 2; jne`
     case 2:
         racesRun++;
@@ -871,7 +873,7 @@ void EventManager::RankRacers() {
             RacerTimeRank rankings[11];
             int ranked = 0;
             int next = 0;
-            while ((racer = reinterpret_cast<KrustyBike*>(reinterpret_cast<BikeRace*>(view)->NextBike(&next))) != 0) {
+            while ((racer = reinterpret_cast<KrustyBike*>(view->NextBike(&next))) != 0) {
                 if (!racer->outOfRace) {
                     rankings[ranked].value = racer->totalRunningTime;
                     rankings[ranked].racer = racer;
@@ -883,7 +885,7 @@ void EventManager::RankRacers() {
                 rankings[i].racer->finishPosition = i + 1;
         }
         iterator = 0;
-        for (racer = reinterpret_cast<KrustyBike*>(reinterpret_cast<BikeRace*>(view)->NextBike(&iterator)); racer; racer = reinterpret_cast<KrustyBike*>(reinterpret_cast<BikeRace*>(view)->NextBike(&iterator))) {
+        for (racer = reinterpret_cast<KrustyBike*>(view->NextBike(&iterator)); racer; racer = reinterpret_cast<KrustyBike*>(view->NextBike(&iterator))) {
             results[count].CopyFromRacer(racer);
             if ((g_TrackGame->mode.raceSettings.raceMode == 2 || g_TrackGame->proCircuit) &&
                 !racer->outOfRace)
@@ -896,7 +898,7 @@ void EventManager::RankRacers() {
         RacerScoreRank scores[11];
         int scored = 0;
         int next = 0;
-        while ((racer = reinterpret_cast<KrustyBike*>(reinterpret_cast<BikeRace*>(view)->NextBike(&next))) != 0) {
+        while ((racer = reinterpret_cast<KrustyBike*>(view->NextBike(&next))) != 0) {
             if (!racer->outOfRace) {
                 scores[scored].value = racer->score;
                 scores[scored].racer = racer;
@@ -907,7 +909,7 @@ void EventManager::RankRacers() {
         for (int i = 0; i < scored; i++)
             scores[i].racer->finishPosition = i + 1;
         next = 0;
-        for (racer = reinterpret_cast<KrustyBike*>(reinterpret_cast<BikeRace*>(view)->NextBike(&next)); racer; racer = reinterpret_cast<KrustyBike*>(reinterpret_cast<BikeRace*>(view)->NextBike(&next))) {
+        for (racer = reinterpret_cast<KrustyBike*>(view->NextBike(&next)); racer; racer = reinterpret_cast<KrustyBike*>(view->NextBike(&next))) {
             results[count].CopyFromRacer(racer);
             if (g_TrackGame->mode.raceSettings.raceMode == 2 && !racer->outOfRace)
                 AddChampionshipPoints(racer, &results[count].points);
@@ -920,7 +922,7 @@ void EventManager::RankRacers() {
             RacerScoreRank scores[11];
             int scored = 0;
             int next = 0;
-            while ((racer = reinterpret_cast<KrustyBike*>(reinterpret_cast<BikeRace*>(view)->NextBike(&next))) != 0) {
+            while ((racer = reinterpret_cast<KrustyBike*>(view->NextBike(&next))) != 0) {
                 if (!racer->outOfRace) {
                     scores[scored].value = racer->score;
                     scores[scored].racer = racer;
@@ -931,7 +933,7 @@ void EventManager::RankRacers() {
             for (int i = 0; i < scored; i++)
                 scores[i].racer->finishPosition = i + 1;
             next = 0;
-            for (racer = reinterpret_cast<KrustyBike*>(reinterpret_cast<BikeRace*>(view)->NextBike(&next)); racer; racer = reinterpret_cast<KrustyBike*>(reinterpret_cast<BikeRace*>(view)->NextBike(&next))) {
+            for (racer = reinterpret_cast<KrustyBike*>(view->NextBike(&next)); racer; racer = reinterpret_cast<KrustyBike*>(view->NextBike(&next))) {
                 results[count].CopyFromRacer(racer);
                 if (g_TrackGame->mode.raceSettings.raceMode == 2 && !racer->outOfRace)
                     AddChampionshipPoints(racer, &results[count].points);
@@ -941,7 +943,7 @@ void EventManager::RankRacers() {
             RacerScoreRank scores[11];
             int scored = 0;
             int next = 0;
-            while ((racer = reinterpret_cast<KrustyBike*>(reinterpret_cast<BikeRace*>(view)->NextBike(&next))) != 0) {
+            while ((racer = reinterpret_cast<KrustyBike*>(view->NextBike(&next))) != 0) {
                 if (!racer->outOfRace) {
                     scores[scored].value = racer->totalTagRun;
                     scores[scored].racer = racer;
@@ -952,7 +954,7 @@ void EventManager::RankRacers() {
             for (int i = 0; i < scored; i++)
                 scores[i].racer->finishPosition = i + 1;
             next = 0;
-            for (racer = reinterpret_cast<KrustyBike*>(reinterpret_cast<BikeRace*>(view)->NextBike(&next)); racer; racer = reinterpret_cast<KrustyBike*>(reinterpret_cast<BikeRace*>(view)->NextBike(&next))) {
+            for (racer = reinterpret_cast<KrustyBike*>(view->NextBike(&next)); racer; racer = reinterpret_cast<KrustyBike*>(view->NextBike(&next))) {
                 results[count].CopyFromRacer(racer);
                 if (g_TrackGame->mode.raceSettings.raceMode == 2 && !racer->outOfRace)
                     AddChampionshipPoints(racer, &results[count].points);
@@ -966,7 +968,7 @@ void EventManager::RankRacers() {
         RacerStanding standings[11];
         int next = 0;
         int standing = 0;
-        while ((racer = reinterpret_cast<KrustyBike*>(reinterpret_cast<BikeRace*>(view)->NextBike(&next))) != 0) {
+        while ((racer = reinterpret_cast<KrustyBike*>(view->NextBike(&next))) != 0) {
             if (!racer->outOfRace) {
                 standings[standing].points = results[standing].points;
                 standings[standing].racer = racer;
@@ -975,7 +977,7 @@ void EventManager::RankRacers() {
         }
         qsort(standings, standing, sizeof(standings[0]), CompareStandings);
         next = 0;
-        while ((racer = reinterpret_cast<KrustyBike*>(reinterpret_cast<BikeRace*>(view)->NextBike(&next))) != 0) {
+        while ((racer = reinterpret_cast<KrustyBike*>(view->NextBike(&next))) != 0) {
             int i;
             for (i = 0; i < standing; i++) {
                 if (standings[i].racer == racer) {
@@ -1007,7 +1009,7 @@ void EventManager::CheckRaceOver(float frameTime) {
     if (g_TrackGame->mode.raceSettings.raceMode == 0 || g_TrackGame->mode.raceSettings.raceMode == 4 || !owner ||
         !owner->isEnabled)
         return;
-    EventBikeRaceView* view = FindRaceView();
+    BikeRace* view = FindRaceView();
     if (!view || !view->isRacing)
         return;
     switch (g_TrackGame->mode.raceSettings.eventType) {
@@ -1020,7 +1022,7 @@ void EventManager::CheckRaceOver(float frameTime) {
             allRacersFinished = 1;
             int iterator = 0;
             KrustyBike* racer;
-            while ((racer = reinterpret_cast<KrustyBike*>(reinterpret_cast<BikeRace*>(view)->NextBike(&iterator))) != 0) {
+            while ((racer = reinterpret_cast<KrustyBike*>(view->NextBike(&iterator))) != 0) {
                 if (racer->hasFinished)
                     anyRacerFinished = 1;
                 else if (!racer->outOfRace)
@@ -1174,7 +1176,7 @@ int EventManager::OnNetworkMessage(int type, void* data, int from, int to, int f
                 RemovePlayer(from);
         } else if (type == 0x86) {
             RacerResultsMessage* update = (RacerResultsMessage*)data;
-            EventBikeRaceView* view = FindRaceView();
+            BikeRace* view = FindRaceView();
             if (!view || g_TrackGame->uiInteractionBlocked)
                 return 0;
             for (int i = 0; i < g_TrackGame->mode.racerCount; i++) {
@@ -1238,9 +1240,9 @@ int EventManager::OnNetworkMessage(int type, void* data, int from, int to, int f
                     }
                 }
             }
-            EventBikeRaceView* view = g_TrackGame->eventManager->FindRaceView();
+            BikeRace* view = g_TrackGame->eventManager->FindRaceView();
             if (view)
-                reinterpret_cast<BikeRace*>(view)->HandlePlayerLeft(message->player);
+                view->HandlePlayerLeft(message->player);
         } else if (type == 0x8e) {
             if (message->player == g_TrackGame->network->localPlayer) {
                 if (FindRaceMode()) {
@@ -1265,7 +1267,7 @@ int EventManager::OnNetworkMessage(int type, void* data, int from, int to, int f
 void EventManager::SendRacerResults() {
     if (!g_TrackGame->network || keepAliveStarted)
         return;
-    EventBikeRaceView* view = FindRaceView();
+    BikeRace* view = FindRaceView();
     if (!view->localRacer->hasFinished) {
         view->localRacer->totalRunningTime = FLT_MAX;
         view->localRacer->finishTimeStamp = 0x7ffffffe;

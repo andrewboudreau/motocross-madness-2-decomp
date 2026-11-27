@@ -188,7 +188,7 @@ public:
     // top and right edges are read).
     RadarOverlay* LoadMap(RenderTarget* target, TextureMapManager* manager, KrustyBikeCamera* camera,
                                         OverlayRect screen);
-    int TakeRacers(EventBikeRaceView* view, int chat); // 0x0051baf0: collects the racers
+    int TakeRacers(BikeRace* view, int chat); // 0x0051baf0: collects the racers
     int DrawForViewMode();                    // 0x0051bc60: draws for the view mode
     void DrawFrameRate();                     // 0x0051bdc0: frame-rate readout
     // 0x0051bed0: places every racer's name tag and draws its map dot, then
@@ -221,7 +221,7 @@ public:
     float frameCount;                         // frames summed
     float averageFrameTime;                   // average frame time
     float frameRateSum;                       // frame rate summed
-    EventBikeRaceView* radarView;
+    BikeRace* radarView;
     KrustyBikeCamera* radarCamera;
     KrustyBike* racers[11];
     int racerCount;                           // racer count

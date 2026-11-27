@@ -30,6 +30,7 @@
 
 #include "../../src/reconstructed/FollowRacer.cpp"
 #include "../../src/reconstructed/RaceSound.h"
+#include "../../src/reconstructed/Krusty3DObjects.h"
 
 // rand() scaled to [0, 1), as ProCircuit.cpp.
 #define UNKNOWN_RANDOM_UNIT() (rand() * (1.0f / 32768.0f))

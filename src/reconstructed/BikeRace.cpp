@@ -563,7 +563,7 @@ BikeRace* BikeRace::Create(void* owner, ParticleManager* particles, LightManager
 
     g_MemTagStack->Push("Audio");
     RaceSound* sound = new(__FILE__, 0x347) RaceSound(1);
-    raceSound = sound->Create(renderContext, (EventBikeRaceView*)this, raceCamera, 6);
+    raceSound = sound->Create(renderContext, this, raceCamera, 6);
     AppendChild((GameObject*)raceSound, -1);
     g_MemTagStack->Push("BikeRace");
     if (g_TrackGame->mode.joystickOn) {
@@ -573,7 +573,7 @@ BikeRace* BikeRace::Create(void* owner, ParticleManager* particles, LightManager
         g_TrackGame->controlInterface->activeJoystick->SetAcquired(1);
     }
     if (g_TrackGame->mode.raceSettings.eventType)
-        BuildStatusList(&statusList, (EventBikeRaceView*)this);
+        BuildStatusList(&statusList, this);
     if (ghostVcr)
         localRacer->fastestLap = bestGhostLength;
     g_TrackGame->ui->StepProgressBar();
@@ -3053,7 +3053,7 @@ int BikeRace::RecordFrame(int kind, void* data, int flag, int recorderId, int* k
         if (g_TrackGame->mode.raceSettings.raceMode == 4) {
             return 1;
         }
-        replayTime = replayVcr->timePlayed;
+        replayTime = replayVcr->recordedLength;
         if (replaySeekTarget != -1.0f && replayTime > replaySeekTarget) {
             replayMode = 11;
             ToggleReplayPause(0);

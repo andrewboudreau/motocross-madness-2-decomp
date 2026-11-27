@@ -31,10 +31,9 @@ emitted callers remain strict matches in the focused test.
 
 ## Iterator connection and dependencies
 
-Only the picker's two iterator invocations change from the provisional
-`EventBikeRaceView` method name to the existing canonical `BikeRace`
-provider. Explicit receiver and result casts preserve the primary pointer
-values. This uses the same boundary already established in canonical
+The picker's two iterator invocations call the canonical `BikeRace`
+provider (the provisional `EventBikeRaceView` view they used to name has been
+retired). This uses the same boundary already established in canonical
 `FollowRacer.cpp`; it does not establish complete equivalence between the
 partial race/racer types. The [iterator evidence](NEXTBIKE_CONNECTIONS.md)
 includes lifecycle, raw RTTI, layouts, full callers and returned-pointer

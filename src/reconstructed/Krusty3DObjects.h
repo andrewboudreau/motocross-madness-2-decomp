@@ -84,7 +84,7 @@ public:
 
 class KrustyBikeCamera;
 
-// The view VisualCue follows (its +0xa8; RaceView.h's EventBikeRaceView).
+// The view VisualCue follows (its +0xa8; RaceView.h's BikeRace).
 struct VisualCueBikeRaceView {
     // 0x004204e0: the next racer after `*iterator` (advancing it), or 0.
     VisualCueKrustyBikeView* NextBike(int* iterator);

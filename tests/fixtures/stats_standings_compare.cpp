@@ -86,7 +86,7 @@ static int WINAPI Draw(HDC dc,LPCSTR text,int n,LPRECT rect,UINT flags){if(flags
 static int WINAPI Load(HINSTANCE h,UINT id,LPSTR out,int size){Event&e=Begin(1,-1);e.a=(DWORD)h;e.b=id;e.c=size;strcpy(out,"Time left");e.status=sc.status?9:0;Boundary(0);Finish(e);return e.status;}
 static void Defaults(){memset(&sc,0,sizeof(sc));sc.count=5;sc.own=4;sc.disabled=-1;sc.width=4;sc.format=4444;sc.pitch=16;sc.rows=4;sc.whole=1;sc.resource=1;sc.status=1;sc.partial=1;sc.control=_MCW_EM|_PC_64|_RC_NEAR;}
 static void Setup(){
- memset(&w,0,sizeof(w));memset(&got,0,sizeof(got));receiver=OverlayObject();g_TrackGame=(TrackGame*)w.game[0];g_TrackGame->quarryEvent=(TrackGameViewOwner*)w.owner;g_TrackGame->quarryEvent->raceView=(EventBikeRaceView*)w.race;
+ memset(&w,0,sizeof(w));memset(&got,0,sizeof(got));receiver=OverlayObject();g_TrackGame=(TrackGame*)w.game[0];g_TrackGame->quarryEvent=(TrackGameViewOwner*)w.owner;g_TrackGame->quarryEvent->raceView=(BikeRace*)w.race;
  g_TrackGame->playerCount=sc.count;g_TrackGame->mode.raceSettings.raceMode=sc.mode;g_TrackGame->mode.raceSettings.aiRacerCount=sc.count-1;g_TrackGame->mode.raceSettings.multiplayerAiRacerCount=0;g_TrackGame->mode.raceSettings.timeLimitMinutes=3.5f;g_TrackGame->quarryEvent->elapsedMinutes=1;g_TrackGame->quarryEvent->elapsedSeconds=15;
  if(sc.timeCase){float times[]={-75.0f,-0.5f,0.0f,59.75f,60.0f,60.25f,119.75f,120.0f,3599.0f};g_TrackGame->mode.raceSettings.timeLimitMinutes=0;g_TrackGame->quarryEvent->elapsedMinutes=0;g_TrackGame->quarryEvent->elapsedSeconds=-times[sc.timeCase-1];}
  g_TrackGame->resourceInstance=sc.resource?(void*)0x1111:0;g_TrackGame->display=(PCVideoCard*)w.display;((PCVideoCard*)w.display)->partialTextureUploadResult=sc.partial;

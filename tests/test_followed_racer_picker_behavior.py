@@ -124,7 +124,7 @@ class FollowedRacerPickerBehaviorTests(unittest.TestCase):
                 'offsetof(TrackGameViewOwner,raceView)==0x34 && offsetof(TrackGameViewOwner,followedRacer)==0xa8 && '
                 'offsetof(KrustyBike,outOfRace)==0x4a0 && offsetof(KrustyBike,netId)==0x11bc && '
                 'offsetof(BikeRace,racerSlots)==0x3c && offsetof(BikeRace,replayVcr)==0x1a0 && '
-                'offsetof(EventBikeRaceView,racerSlots)==0x3c && offsetof(EventBikeRaceView,replayVcr)==0x1a0) ? 1 : -1];\n')
+                'offsetof(BikeRace,racerSlots)==0x3c && offsetof(BikeRace,replayVcr)==0x1a0) ? 1 : -1];\n')
             compile_source(layout, 'layout')
             patch_file = output / 'calls.bin'
             patch_file.write_bytes(b''.join(patches))

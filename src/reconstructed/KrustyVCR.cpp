@@ -1,11 +1,12 @@
 // KrustyVCR.cpp -- KrustyVCR's out-of-line methods 0x0049bf10..0x0049c2e9
-// (RTTI KrustyVCR : VCRInterface, vtable 0x00550e9c; class in BikeRace.h).
+// (RTTI KrustyVCR : VCRInterface, vtable 0x00550e9c; class in KrustyVCR.h).
 // The code sits after krustyui.cpp's and has no __FILE__ literal: the file
 // name is ours (tier 3), as are the member names. bikerace.cpp calls these
 // methods on its replay and ghost recorders.
 
 #include <string.h>
 
+#include "KrustyVCR.h"
 #include "BikeRace.h"
 #include "TrackGame.h"
 
@@ -33,7 +34,7 @@ int KrustyVCR::OpenRecording(RecorderCallbackProc callback, int mode, char* name
     if (mode == 0) {
         COPY_TRUNCATED(magic, "MCMVCR")
         COPY_TRUNCATED(version, "2.0\x1a")
-        timePlayed = 0;
+        recordedLength = 0;
         memcpy(raceSettings, &g_TrackGame->mode.raceSettings.raceMode, 0x1ec);
     }
     return Start((int)callback, (int)magic, 0xeb0, mode, (int)name, 0x58,
@@ -49,14 +50,14 @@ void KrustyVCR::SetReplayLength(float time, int flag)
 // 0x0049c000
 float KrustyVCR::RecordedLength()
 {
-    return timePlayed;
+    return recordedLength;
 }
 
 // 0x0049c010
 void KrustyVCR::SaveRecording(float duration, char* description, int flag)
 {
     COPY_TRUNCATED(this->description, description)
-    timePlayed = duration;
+    recordedLength = duration;
     CloseFile((int)magic, 0xeb0, flag);
 }
 

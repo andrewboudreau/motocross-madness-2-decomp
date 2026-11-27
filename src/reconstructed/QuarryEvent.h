@@ -19,7 +19,7 @@ class TextureMapManager;
 class TextQueueOverlay;
 class Terrain;
 class FileStream;
-struct EventBikeRaceView;
+class BikeRace;
 
 // RTTI: EcoSystem (vtable 0x00552508, 0x5c4 bytes); constructed by 0x004de590
 // with 0x00457250.

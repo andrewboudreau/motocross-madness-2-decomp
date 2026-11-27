@@ -278,7 +278,7 @@
   "?SetupFlyby@KrustyBikeCamera@@QAEPAV1@PAXMMMMMHHPBH@Z": "0x00497d90",
   "?ShareCacheLimit@TextureMapManager@@QAEHXZ": "0x005113d0",
   "?SnapPlacement@CollisionObject@@QAEXXZ": "0x00435fe0",
-  "?TakeRacers@RadarOverlay@@QAEHPAUEventBikeRaceView@@H@Z": "0x0051baf0",
+  "?TakeRacers@RadarOverlay@@QAEHPAVBikeRace@@H@Z": "0x0051baf0",
   "?g_UnknownGlobal59af10@@3HA": "0x0059af10",
   "___CxxFrameHandler": "0x0053471a",
   "__imp__GlobalMemoryStatus@4": "0x005501c4",

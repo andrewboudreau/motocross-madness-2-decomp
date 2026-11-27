@@ -21,14 +21,14 @@ void TrackGameViewOwner::PickFollowedRacer()
     int tries = 0;
     KrustyBike* last = 0;
     KrustyBike* racer = reinterpret_cast<KrustyBike*>(
-            reinterpret_cast<BikeRace*>(raceView)->NextBike(&iterator));
+            raceView->NextBike(&iterator));
     while (racer) {
         if (racer->outOfRace == 0) {
             last = racer;
             racing++;
         }
         racer = reinterpret_cast<KrustyBike*>(
-            reinterpret_cast<BikeRace*>(raceView)->NextBike(&iterator));
+            raceView->NextBike(&iterator));
     }
     if (racing == 0) {
         followedRacer = raceView->localRacer;
@@ -36,7 +36,7 @@ void TrackGameViewOwner::PickFollowedRacer()
         followedRacer = last;
     } else {
         // Retail keeps this view across rand(), then reads its slot array.
-        EventBikeRaceView* selectionView = raceView;
+        BikeRace* selectionView = raceView;
         int count = selectionView->racerCount;
         int index = (int)(UNKNOWN_RANDOM_UNIT() * count);
         while (selectionView->racerSlots[index]->outOfRace == 1 && tries < count) {

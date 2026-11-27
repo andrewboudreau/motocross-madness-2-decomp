@@ -298,7 +298,7 @@
   "?LoadEvent@EventManager@@QAEHXZ": "0x0045cb70",
   "?CloseRace@EventManager@@QAEXH@Z": "0x0045cdc0",
   "?EnableRaceObjects@EventManager@@QAEXXZ": "0x0045d270",
-  "?FindRaceView@EventManager@@QAEPAUEventBikeRaceView@@XZ": "0x0045d2f0",
+  "?FindRaceView@EventManager@@QAEPAVBikeRace@@XZ": "0x0045d2f0",
   "?ResetEntries@EventManager@@QAEXXZ": "0x0045e520",
   "?LeaveRaceForMenu@EventManager@@QAEXH@Z": "0x0045e710",
   "?ResetClock@Game@@QAEXXZ": "0x00468880",

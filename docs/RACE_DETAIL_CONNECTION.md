@@ -4,8 +4,8 @@ The two detail-key branches in `BaseQuarryEvent::OnControlPress` now call the
 existing `BikeRace::SetDetailLevel(int)` definition through an explicit primary
 pointer cast. The existing `BikeRaceCore.h` include supplies the declaration.
 No class layout, provider body, allocation, shared header or table changes.
-The provisional `EventBikeRaceView` is not identified as a complete BikeRace
-class by this bounded connection.
+(The provisional `EventBikeRaceView` was later retired; the event's race
+view is `BikeRace*`.)
 
 ## Receiver and ABI evidence
 

@@ -3287,7 +3287,7 @@ void DemoDlg::HandleEvent(DialogEvent* event) {
 
 // 0x00455ae0
 int DemoDlg::OnControlPress(ControlEvent* event, InputButtonState* entry) {
-    EventBikeRaceView* view = g_TrackGame->eventManager->FindRaceView();
+    BikeRace* view = g_TrackGame->eventManager->FindRaceView();
     if (view && view->isRacing)
         EndDialog(0);
     return 1;

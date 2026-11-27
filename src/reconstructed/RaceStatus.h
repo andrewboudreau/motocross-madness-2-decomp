@@ -44,7 +44,7 @@ int HasStatusNode(RaceStatusNode* list, KrustyBike* racer);  // 0x004e5c70
 int PruneStatusList(RaceStatusNode** list);  // 0x004e5ca0
 // 0x004e5d00: builds `*list` for `view`: its own racer, then (in some race
 // modes) the AI racers, then the other racers.
-int BuildStatusList(RaceStatusNode** list, EventBikeRaceView* view);  // 0x004e5d00
+int BuildStatusList(RaceStatusNode** list, BikeRace* view);  // 0x004e5d00
 // 0x004e5f10: frees every node of `list`.
 int FreeStatusList(RaceStatusNode* list);  // 0x004e5f10
 // 0x004e5f40: track distances to `probe`, then orders `*list` by laps and

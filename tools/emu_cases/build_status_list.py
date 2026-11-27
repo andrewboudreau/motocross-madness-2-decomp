@@ -13,7 +13,7 @@ null slot array are included.
 import struct
 
 RETAIL_VA = 0x004e5d00
-SYMBOL = '?BuildStatusList@@YAHPAPAURaceStatusNode@@PAUEventBikeRaceView@@@Z'
+SYMBOL = '?BuildStatusList@@YAHPAPAURaceStatusNode@@PAVBikeRace@@@Z'
 SOURCE = 'src/reconstructed/RaceStatus.cpp'
 TRACK_GAME = 0x0056e26c
 PROBES = {0x004e5d9e: 'AI loop', 0x004e5dd3: 'AI node', 0x004e5e5e: 'slot loop', 0x004e5e90: 'slot node',

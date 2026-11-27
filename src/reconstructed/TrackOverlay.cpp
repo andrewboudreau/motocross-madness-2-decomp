@@ -647,7 +647,7 @@ int StatsOverlay::DrawStandings()
     void* font;
     int i;
     int count = 0;
-    EventBikeRaceView* view = g_TrackGame->quarryEvent->raceView;
+    BikeRace* view = g_TrackGame->quarryEvent->raceView;
     if (g_TrackGame->mode.raceSettings.raceMode != 0 && g_TrackGame->mode.raceSettings.raceMode != 4) {
         g_TrackGame->LoadResourceString(0x943, label, 0x80);
         TrackGameViewOwner* owner = g_TrackGame->quarryEvent;
@@ -657,7 +657,7 @@ int StatsOverlay::DrawStandings()
     }
     iterator = 0;
     KrustyBike* racer;
-    while ((racer = reinterpret_cast<KrustyBike*>(reinterpret_cast<BikeRace*>(view)->NextBike(&iterator))) != 0) {
+    while ((racer = reinterpret_cast<KrustyBike*>(view->NextBike(&iterator))) != 0) {
         if (racer->isEnabled) {
             scores[count].value = racer->score;
             scores[count].racer = racer;
@@ -961,10 +961,10 @@ int StatsOverlay::DrawTagStandings()
     if (g_TrackGame->mode.raceSettings.stuntMode) {
         int iterator;
         int own;
-        EventBikeRaceView* view = g_TrackGame->tagEvent->raceView;
+        BikeRace* view = g_TrackGame->tagEvent->raceView;
         iterator = 0;
         KrustyBike* racer;
-        while ((racer = reinterpret_cast<KrustyBike*>(reinterpret_cast<BikeRace*>(view)->NextBike(&iterator))) != 0) {
+        while ((racer = reinterpret_cast<KrustyBike*>(view->NextBike(&iterator))) != 0) {
             scores[count].value = racer->score;
             scores[count].racer = racer;
             count++;
@@ -1327,7 +1327,7 @@ RadarOverlay* RadarOverlay::LoadMap(RenderTarget* target, TextureMapManager* man
 }
 
 // 0x0051baf0: takes the racers from `view`.
-int RadarOverlay::TakeRacers(EventBikeRaceView* view, int chat)
+int RadarOverlay::TakeRacers(BikeRace* view, int chat)
 {
     int iterator;
     KrustyBike* racer;

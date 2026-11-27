@@ -8,9 +8,10 @@ Evidence:
   at `0x0041cfd8`, by the inline node-list free in the destructor.
 - **RTTI:** `BikeRace : GraphicsTest : GameObject` (vtable `0x00550d24`).
   Only the constructor `0x00417c30` and destructor `0x0041cf30` write it.
-- **Same object as RaceView.h:** RaceView.h's `EventBikeRaceView`
-  describes the same object at the same offsets (strong inference); its
-  callers' mangled names are unchanged.
+- **The race the events hold:** EventManager::FindRaceView `0x0045d2f0`,
+  TrackGame's view owners (+0x34), RaceSound, RaceStatus, TrackOverlay and
+  KrustyBikeCamera (+0x3b8) take `BikeRace*` itself. RaceView.h's former
+  `EventBikeRaceView` view had the same members at the same offsets.
 
 Extent: `0x00417b00..0x004238bb` (strong inference). The plate-number
 painter at `0x00417500..0x00417aff` may also belong here and is

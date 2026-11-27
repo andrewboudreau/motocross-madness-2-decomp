@@ -77,7 +77,7 @@ struct TrackGameViewOwner : public GameObject {
 
     Scene* eventScene;                  // +0x2C  BaseQuarryEvent::eventScene (0x004df108 stores the Scene that 0x004ea7e0 sets up)
     unsigned char skyCube[0x34 - 0x30];  // +0x30 BaseQuarryEvent skyCube (bytes kept)
-    EventBikeRaceView* raceView;          // +0x34
+    BikeRace* raceView;          // +0x34
     unsigned char visualCue[0x3c - 0x38];  // +0x38 BaseQuarryEvent visualCue (bytes kept)
     FollowCamera* raceCamera;                 // +0x3c the race camera (InGameProcs.cpp VCRDlg)
     unsigned char field_0x40[0x5c - 0x40];
@@ -207,9 +207,9 @@ struct GridEntry {
         points = 0;
     }
 
-    int playerId;  // +0x0  SelectGamePicProcs' SelectGameGridEntryView view: network player id (BikeRace compares it)
-    char points;  // +0x4  SelectGameGridEntryView view: championship points, the start grid sort key
-    char racerIndex;  // +0x5  SelectGameGridEntryView racerIndex; BikeRace treats nonzero as an AI racer that player's host runs
+    int playerId;  // +0x0  network player id (BikeRace compares it; SelectGamePicProcs fills the grid)
+    char points;  // +0x4  championship points, the start grid sort key
+    char racerIndex;  // +0x5  racer index; BikeRace treats nonzero as an AI racer that player's host runs
 };
 
 // The 0x1ec-byte race settings block. TrackGameMode holds three: the current

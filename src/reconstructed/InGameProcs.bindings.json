@@ -44,7 +44,7 @@
   "?SetTextsOrResources@ChoiceDlg@@QAEXPBDH0H0H0H0H@Z": "0x00455700",
   "?CloseRace@EventManager@@QAEXH@Z": "0x0045cdc0",
   "?FindRaceMode@EventManager@@QAEPAUTrackGameViewOwner@@XZ": "0x0045d2b0",
-  "?FindRaceView@EventManager@@QAEPAUEventBikeRaceView@@XZ": "0x0045d2f0",
+  "?FindRaceView@EventManager@@QAEPAVBikeRace@@XZ": "0x0045d2f0",
   "?LeaveRaceForMenu@EventManager@@QAEXH@Z": "0x0045e710",
   "?ResetClock@Game@@QAEXXZ": "0x00468880",
   "?FindControl@UIDialog@@QAEPAVUIControl@@PBDH@Z": "0x0046ebf0",

@@ -1,9 +1,8 @@
 # Race control calls
 
-Five provisional `EventBikeRaceView` method references now call existing
-`BikeRace` implementations through explicit primary-pointer casts. The
-provisional field view remains in place; no class layout, inheritance,
-virtual declaration, method body, or provider ownership changes.
+Five race-control calls reach the `BikeRace` implementations. The callers
+used to hold a provisional `EventBikeRaceView` and cast it; that view has been
+retired, and FindRaceView now returns `BikeRace*`, so the calls need no cast.
 
 | Canonical provider | Retail VA | Complete strict bytes | Callers |
 |---|---:|---:|---|

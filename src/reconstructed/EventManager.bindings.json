@@ -46,7 +46,7 @@
   "?LoadEvent@EventManager@@QAEHXZ$ehhandler": "0x0054aa94",
   "?CloseRace@EventManager@@QAEXH@Z": "0x0045cdc0",
   "?FindRaceMode@EventManager@@QAEPAUTrackGameViewOwner@@XZ": "0x0045d2b0",
-  "?FindRaceView@EventManager@@QAEPAUEventBikeRaceView@@XZ": "0x0045d2f0",
+  "?FindRaceView@EventManager@@QAEPAVBikeRace@@XZ": "0x0045d2f0",
   "?FindTextQueue@EventManager@@QAEPAVTextQueueOverlay@@XZ": "0x0045d340",
   "?HasRaceMode@EventManager@@QAEHXZ": "0x0045d390",
   "?CompareStandings@@YAHPBX0@Z": "0x0045d3d0",

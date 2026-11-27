@@ -5,6 +5,7 @@
 
 #include "TrackGame.h"
 #include "EventManager.h"
+#include "BikeRaceCore.h"
 
 #include "DebugAlloc.h"
 #include "KeyboardDevice.h"
@@ -383,8 +384,8 @@ void TrackGame::SetMenuOpen(int open, int id, int sound) {
     if (!ui || !menu || uiInteractionBlocked)
         return;
     if (open) {
-        GameObject* other = eventManager->FindRaceView();
-        if (other && !other->isEnabled)
+        BikeRace* raceView = eventManager->FindRaceView();
+        if (raceView && !raceView->isEnabled)
             return;
         if (menuIsOpen)
             return;

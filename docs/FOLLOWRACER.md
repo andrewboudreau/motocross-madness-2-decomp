@@ -94,5 +94,5 @@ declarations, view owner +0xac as an int/float union) and `BikeRace.h`
 float fields). The racer's slot 50 is viewed by a struct local to the
 near-miss sample: 50 placeholder slots in `RaceView.h` flipped a register
 choice in TrackGame slot 1 (`0x00520ab0`, header-content chaos; removing
-`EventKbScoreBoardView` flips it too), and the +0xac float on its own turned
+`EventKbScoreBoardView` flipped it too), and the +0xac float on its own turned
 the StatsOverlay race panel's `%d` (`0x0051a560`) into a float load.

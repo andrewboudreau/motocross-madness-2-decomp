@@ -145,19 +145,6 @@ struct LobbyStartMessage {
     int fourStrokes[8];                       // +0x8b8: racer slot +0xf0 (four-stroke)
 };
 
-// A grid entry at race settings +0x14c (TrackGame.h's
-// GridEntry) with the racer index at +5.
-struct SelectGameGridEntryView {
-    SelectGameGridEntryView() {
-        playerId = 0;
-        points = 0;
-    }
-
-    int playerId;                             // +0x00: player id
-    char points;                              // +0x04: championship points
-    char racerIndex;                          // +0x05: racer index
-};
-
 // 0x004f17a0
 int FillFileList(DirectoryList* directories, const char* directory, const char* pattern, const char* kind,
                  int largePictures, const char* picture, const char* listName, char* name, int* value,
@@ -443,13 +430,13 @@ void MultiPlayerDlg::SendStartMessage(short start) {
         if (g_TrackGame->mode.raceSettings.raceMode == 2 && g_TrackGame->eventManager->racesRun > 0) {
             // By the championship points.
             for (i = 0; i < racer; i++) {
-                SelectGameGridEntryView entry;
+                GridEntry entry;
                 entry.playerId = g_TrackGame->mode.racers[i].networkPlayerId;
                 entry.points = g_TrackGame->eventManager->results[i].points;
                 entry.racerIndex = g_TrackGame->mode.racers[i].racerIndex;
-                ((SelectGameGridEntryView*)g_TrackGame->mode.raceSettings.gridOrder)[i] = entry;
+                g_TrackGame->mode.raceSettings.gridOrder[i] = entry;
             }
-            qsort(g_TrackGame->mode.raceSettings.gridOrder, racer, sizeof(SelectGameGridEntryView),
+            qsort(g_TrackGame->mode.raceSettings.gridOrder, racer, sizeof(GridEntry),
                   CompareGridEntries);
         } else {
             // At random.
@@ -463,10 +450,10 @@ void MultiPlayerDlg::SendStartMessage(short start) {
             }
             qsort(draws, racer, sizeof(GridDrawKey), CompareGridDraws);
             for (i = 0; i < racer; i++) {
-                SelectGameGridEntryView entry;
+                GridEntry entry;
                 entry.playerId = draws[i].playerId;
                 entry.racerIndex = draws[i].racerIndex;
-                ((SelectGameGridEntryView*)g_TrackGame->mode.raceSettings.gridOrder)[i] = entry;
+                g_TrackGame->mode.raceSettings.gridOrder[i] = entry;
             }
         }
         if (names)

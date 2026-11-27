@@ -1,8 +1,8 @@
 {
-  "?NextBike@EventBikeRaceView@@QAEPAVKrustyBike@@PAH@Z": "0x004204e0",
+  "?NextBike@BikeRace@@QAEPAVKrustyBike@@PAH@Z": "0x004204e0",
   "?SendFollowedRacer@KrustyBike@@QAEXPAVVehicle@@_N@Z": "0x004925a0",
   "?IgnoreCollisionsWith@KrustyBike@@QAEXPAV1@@Z": "0x00496f90",
-  "?ShowValue@EventKbScoreBoardView@@QAEXMM@Z": "0x0048d1e0",
+  "?ShowValue@BonusObjectManager@@QAEXMM@Z": "0x0048d1e0",
   "?AnnounceFollowedRacer@TrackGameViewOwner@@QAEXPAVKrustyBike@@0@Z": "0x004a9f90",
   "?PlayItSound@RaceSound@@QAEXXZ": "0x004e5860",
   "?Send@NetworkInterface@@QAEHHPAXHHH@Z": "0x004ac830",
@@ -13,6 +13,5 @@
   "__real@4@3ff08000000000000000": "0x005505f0",
   "__real@4@3ffac90fd00000000000": "0x0055534c",
   "__real@4@3ffcf000000000000000": "0x00554714",
-  "__real@4@400a9c40000000000000": "0x00550bb8",
-  "?NextBike@BikeRace@@QAEPAVKrustyBike@@PAH@Z": "0x004204e0"
+  "__real@4@400a9c40000000000000": "0x00550bb8"
 }

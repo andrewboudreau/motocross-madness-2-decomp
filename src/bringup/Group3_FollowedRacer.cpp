@@ -21,7 +21,7 @@
 #include "Krusty3DObjects.h"   // BonusObjectManager (the score board)
 #include "TrackGame.h"   // TrackGameViewOwner (AnnounceFollowedRacer, FollowRacer.cpp)
 
-// Raw view of the race view at owner +0x34 (RaceView.h EventBikeRaceView).
+// Raw view of the race view at owner +0x34 (RaceView.h BikeRace).
 struct Group3FollowRaceView {
     char pad_0x00[0x38];
     KrustyBike* localRacer;      // +0x38

@@ -536,7 +536,7 @@ int BaseQuarryEvent::LoadEventObjects(LoadProgressFn progress) {
     if (!PrepareEvent3DObjects())
         return 0;
     g_MemTagStack->Push("BikeRace");
-    raceView = (EventBikeRaceView*)new(__FILE__, 898) BikeRace(0);
+    raceView = (BikeRace*)new(__FILE__, 898) BikeRace(0);
     g_MemTagStack->Push("Particles");
     if (particleManager)
         particleManager = particleManager
@@ -547,7 +547,7 @@ int BaseQuarryEvent::LoadEventObjects(LoadProgressFn progress) {
         return 0;
     g_TrackGame->mode.networkGame = eventScene->crowdPresent;
     g_MemTagStack->Push("BikeRace");
-    raceView = (EventBikeRaceView*)((BikeRace*)raceView)
+    raceView = (BikeRace*)((BikeRace*)raceView)
                      ->Create(renderContext, particleManager, lightManager, &modelTextures,
                               eventTerrain, raceCamera, eventScene,
                               (RaceGateEvent*)this, (ProjectedShadow*)projectedShadow);
@@ -1038,7 +1038,7 @@ int BaseQuarryEvent::OnControlPress(ControlEvent* event, InputButtonState* entry
         if (eventFog)
             eventFog->SetDetailLevel(level);
         eventScene->SetDetailLevel(level);
-        reinterpret_cast<BikeRace*>(raceView)->SetDetailLevel(level);
+        raceView->SetDetailLevel(level);
         if (textQueue) {
             char text[0x80];
             char buffer[0x100];
@@ -1064,7 +1064,7 @@ int BaseQuarryEvent::OnControlPress(ControlEvent* event, InputButtonState* entry
         if (eventFog)
             eventFog->SetDetailLevel(level);
         eventScene->SetDetailLevel(level);
-        reinterpret_cast<BikeRace*>(raceView)->SetDetailLevel(level);
+        raceView->SetDetailLevel(level);
         if (textQueue) {
             char text[0x80];
             char buffer[0x100];
@@ -1312,7 +1312,7 @@ int BaseQuarryEvent::OnNetworkMessage(int type, void* data, int from, int to, in
         sprintf(buffer, "%s %s", name, text);
         TextQueueMessage message(buffer, 3.25f);
         textQueue->AppendMessage(&message);
-        reinterpret_cast<BikeRace*>(raceView)->HandlePlayerLeft(leave->playerId);
+        raceView->HandlePlayerLeft(leave->playerId);
         if (g_TrackGame->mode.raceSettings.raceMode == 2)
             g_TrackGame->eventManager->RemovePlayer(leave->playerId);
     } else if (from && type == 0x89) {
@@ -1322,7 +1322,7 @@ int BaseQuarryEvent::OnNetworkMessage(int type, void* data, int from, int to, in
         sprintf(buffer, "%s %s", (char*)data + 4, text);
         TextQueueMessage message(buffer, 3.25f);
         textQueue->AppendMessage(&message);
-        reinterpret_cast<BikeRace*>(raceView)->HandlePlayerLeft(from);
+        raceView->HandlePlayerLeft(from);
         if (g_TrackGame->mode.raceSettings.raceMode == 2)
             g_TrackGame->eventManager->RemovePlayer(from);
     }

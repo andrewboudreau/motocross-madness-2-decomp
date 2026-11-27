@@ -45,5 +45,5 @@ public:
     void StartFollowing(KrustyBike* racer);
 
     KrustyBike* krustyBike;          // +0x3b4 the followed racer
-    EventBikeRaceView* raceView;     // +0x3b8
+    BikeRace* raceView;     // +0x3b8
 };

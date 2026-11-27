@@ -3,6 +3,7 @@
 #include "QuarryEvent.h"
 
 #include "DebugAlloc.h"
+#include "BikeRaceCore.h"
 #include "RaceView.h"
 #include "RenderTarget.h"
 #include "TrackGame.h"

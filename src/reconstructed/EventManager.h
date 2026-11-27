@@ -7,7 +7,7 @@
 class ArcadeObject;
 class TextQueueOverlay;
 struct TrackGameViewOwner;
-struct EventBikeRaceView;
+class BikeRace;
 
 // 0x50-byte entry; EventManager keeps 11 at +0x50.
 class Camera;
@@ -121,7 +121,7 @@ public:
     // The first race-mode object of TrackGame+0x558..+0x568 present, its
     // +0x34 view and its +0x6c target.
     TrackGameViewOwner* FindRaceMode();            // 0x0045d2b0
-    EventBikeRaceView* FindRaceView();         // 0x0045d2f0
+    BikeRace* FindRaceView();         // 0x0045d2f0
     TextQueueOverlay* FindTextQueue();             // 0x0045d340
     // 0x0045d270: Enable() on all three; LoadingDlg's timer (0x00451020)
     // calls it as it ends the loading dialog.

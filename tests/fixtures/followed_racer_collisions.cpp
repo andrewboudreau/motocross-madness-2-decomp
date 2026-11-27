@@ -97,7 +97,7 @@ static void AnnounceCases(){
   for(int i=0;i<8;++i)world.racers[i]=(KrustyBike*)Bike(i%4);
   if(hole)world.racers[2]=0;
   r->localRacer=(KrustyBike*)Bike(0);r->aiRacers=world.racers+1;r->racerSlots=world.racers;
-  v->raceView=(EventBikeRaceView*)r;g_TrackGame->playerCount=mode==2?2:1;g_TrackGame->uiInteractionBlocked=blocked;
+  v->raceView=(BikeRace*)r;g_TrackGame->playerCount=mode==2?2:1;g_TrackGame->uiInteractionBlocked=blocked;
   g_TrackGame->mode.raceSettings.raceMode=mode==1?4:0;g_TrackGame->mode.raceSettings.aiRacerCount=3;g_TrackGame->mode.raceSettings.multiplayerAiRacerCount=2;
   KrustyBike*a=newIndex<0?0:Bike(newIndex),*old=oldIndex<0?0:Bike(oldIndex);expected=world;
   int limit=mode==1?2:4;

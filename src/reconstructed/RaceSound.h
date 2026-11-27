@@ -15,7 +15,7 @@
 // (0x004195e4) and constructs it with 1.
 
 class KrustyBike;
-struct EventBikeRaceView;
+class BikeRace;
 
 class KrustyBikeCamera;
 
@@ -67,7 +67,7 @@ public:
     // 0x004e23f0 (thiscall, ret 0x10; bikerace.cpp 0x00419628 passes its
     // +0x18, itself, its +0x50 camera and 6): creates the sound groups and
     // loads every sample; returns this.
-    RaceSound* Create(void* owner, EventBikeRaceView* view, KrustyBikeCamera* camera,
+    RaceSound* Create(void* owner, BikeRace* view, KrustyBikeCamera* camera,
                                      int racers);
     // 0x004e3430: assigns the racers to channels and resets the listener and
     // the 3D distances.
@@ -100,7 +100,7 @@ public:
 
     KrustyBike* listenerRacer;        // listener's racer
     int field_0x30;
-    EventBikeRaceView* raceView;
+    BikeRace* raceView;
     KrustyBikeCamera* listenerCamera;
     SoundGroup* engineGroup;               // +0x3c, engine voices and LandHard01
     SoundGroup* field_0x40;

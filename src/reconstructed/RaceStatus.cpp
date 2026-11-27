@@ -158,7 +158,7 @@ int PruneStatusList(RaceStatusNode** list) {
 // started from `&(*list)->next`, the race-mode test against `index`,
 // `++index` in the node store, and the link written as `tail =
 // &(*tail)->next` or `tail = &(*tail = status)->next`.
-int BuildStatusList(RaceStatusNode** list, EventBikeRaceView* view) {
+int BuildStatusList(RaceStatusNode** list, BikeRace* view) {
     RaceStatusNode* status;
     RaceStatusNode** tail;
     int index;
@@ -343,10 +343,10 @@ int RankByScore(int keepRacing) {
 
     if (g_TrackGame->mode.raceSettings.eventType == 0) {
         count = 0;
-        EventBikeRaceView* view = g_TrackGame->quarryEvent->raceView;
+        BikeRace* view = g_TrackGame->quarryEvent->raceView;
         KrustyBike* racer;
         iterator = 0;
-        for (racer = reinterpret_cast<KrustyBike*>(reinterpret_cast<BikeRace*>(view)->NextBike(&iterator)); racer; racer = reinterpret_cast<KrustyBike*>(reinterpret_cast<BikeRace*>(view)->NextBike(&iterator))) {
+        for (racer = reinterpret_cast<KrustyBike*>(view->NextBike(&iterator)); racer; racer = reinterpret_cast<KrustyBike*>(view->NextBike(&iterator))) {
             if (racer->isEnabled) {
                 scores[count].value = racer->score;
                 scores[count].racer = racer;

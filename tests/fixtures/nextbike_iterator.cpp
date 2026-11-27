@@ -10,7 +10,7 @@ typedef char RaceSlots[offsetof(BikeRace, racerSlots) == 0x3c ? 1 : -1];
 typedef char RaceAi[offsetof(BikeRace, aiRacers) == 0x40 ? 1 : -1];
 typedef char GateSize[sizeof(RaceGate) == 0x3c ? 1 : -1];
 typedef char GateNext[offsetof(RaceGate, nextGate) == 0x38 ? 1 : -1];
-typedef char ViewLocal[offsetof(EventBikeRaceView, localRacer) == 0x38 ? 1 : -1];
+typedef char ViewLocal[offsetof(BikeRace, localRacer) == 0x38 ? 1 : -1];
 typedef char GamePlayers[offsetof(TrackGame, playerCount) == 0x18 ? 1 : -1];
 typedef char GameBlocked[offsetof(TrackGame, uiInteractionBlocked) == 0x3430 ? 1 : -1];
 
