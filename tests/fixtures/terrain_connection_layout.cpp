@@ -25,6 +25,4 @@ typedef char PaletteSize[sizeof(ColorMapper) == 0x18b10 ? 1 : -1];
 typedef char PaletteEntries[offsetof(ColorMapper, entries) == 0x10 ? 1 : -1];
 typedef char BlockSize[sizeof(GridBaseBlock) == 0xd50 ? 1 : -1];
 typedef char SharedNodeSize[sizeof(DrawableGridNodeSharedTextures) == 0x5c ? 1 : -1];
-typedef char NodeLevel[offsetof(TerrainShutdownObject, level) == offsetof(GridNode, level) ? 1 : -1];
-typedef char NodeShift[offsetof(TerrainShutdownObject, gridShift) == offsetof(GridNode, shift) ? 1 : -1];
 typedef char MatrixSize[sizeof(TerrainMatrix) == sizeof(Matrix4) && sizeof(Matrix4) == 64 ? 1 : -1];

@@ -23,7 +23,7 @@ MATRIX = 'src/reconstructed/MatrixUtil.cpp'
 VECTOR = 'src/reconstructed/VectorCalls.cpp'
 SCALE = 'src/reconstructed/VectorScaleAssign.cpp'
 BIKE = 'src/krusty2/vehicle/Bike.cpp'
-SAMPLER = '?GetCellCorners@GridNode@@QAEHHHPAMPAUGridVec3@@PAE@Z'
+SAMPLER = '?GetCellCorners@GridNode@@QAEHHHPAMPAUTerrainVec3@@PAE@Z'
 TRIANGLE = '?TriangleNormal@@YAXPBUVector3@@00PAU1@PAM@Z'
 DOT = '?Vec3DotCall@@YAMPBUVec3@@0@Z'
 

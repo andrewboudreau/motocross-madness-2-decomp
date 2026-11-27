@@ -103,7 +103,7 @@ int TerrainShadow::UpdateTexelSize()
 // Retail's inline-asm fistp helper gives this function an EBP frame; the
 // pragma keeps the frame pointer for it alone (docs/GAME_BUILD.md#frame-pointer-units).
 // Linked masked 0.736 -> 0.875 (Session 23), all levers removing cached locals
-// so each use reloads like retail: cell->owner-> instead of a mesh local, shadow-> instead of a
+// so each use reloads like retail: cell->data-> instead of a mesh local, shadow-> instead of a
 // projected local, vertices[vertexCount].field instead of an out pointer, and
 // indices[indexStart + triStart + n] instead of an index pointer (retail's strength-reduced
 // `lea ecx,[ecx+ecx+2]` base).  Also: the whole body inside if (cellCount > 0) puts the empty
@@ -148,15 +148,15 @@ void TerrainShadow::BuildShadowVertices()
         vertexCount = 0;
         for (int i = 0; i < cellCount; i++) {
             int used = 0;
-            TerrainCell* cell = (TerrainCell*)cellKeys[i];
-            if (!cell->owner->vertexBuffer)
+            DrawableGridNode* cell = (DrawableGridNode*)cellKeys[i];
+            if (!cell->data->vertexBuffer)
                 continue;
             if (shadow->mode == 3)
-                TransformPoints(transformed, cell->owner->vertexBuffer, reinterpret_cast<const Matrix4*>(&shadow->lightMatrix), cell->owner->vertexCount, 0xc, 0x20);
+                TransformPoints(transformed, cell->data->vertexBuffer, reinterpret_cast<const Matrix4*>(&shadow->lightMatrix), cell->data->vertexCount, 0xc, 0x20);
             else
-                ProjectPoints(transformed, cell->owner->vertexBuffer, reinterpret_cast<const Matrix4*>(&shadow->lightMatrix), cell->owner->vertexCount, 0xc, 0x20);
+                ProjectPoints(transformed, cell->data->vertexBuffer, reinterpret_cast<const Matrix4*>(&shadow->lightMatrix), cell->data->vertexCount, 0xc, 0x20);
 
-            int remaining = cell->owner->vertexCount;
+            int remaining = cell->data->vertexCount;
             if (remaining > 0) {
                 ProjectedShadow* ps = shadow;
                 int* code = outcodes;
@@ -188,7 +188,7 @@ void TerrainShadow::BuildShadowVertices()
             }
 
             int sectionCount = 1;
-            if (cell->owner->b3)
+            if (cell->data->b3)
                 sectionCount = 0x10;
             for (int sec = 0; sec < sectionCount; sec++) {
                 int indexStart;
@@ -197,20 +197,20 @@ void TerrainShadow::BuildShadowVertices()
                 if (sectionCount == 1) {
                     indexStart = 0;
                     vertexBase = 0;
-                    indexCount = cell->owner->indexCount;
+                    indexCount = cell->data->indexCount;
                 } else if (sec == 0) {
                     indexStart = 0;
                     vertexBase = 0;
-                    indexCount = ((GridBlockRange*)cell->owner->blockRanges)[0].indexEnd;
+                    indexCount = ((GridBlockRange*)cell->data->blockRanges)[0].indexEnd;
                 } else {
-                    indexStart = ((GridBlockRange*)cell->owner->blockRanges)[sec - 1].indexEnd;
-                    indexCount = ((GridBlockRange*)cell->owner->blockRanges)[sec].indexEnd - indexStart;
-                    vertexBase = ((GridBlockRange*)cell->owner->blockRanges)[sec - 1].end;
+                    indexStart = ((GridBlockRange*)cell->data->blockRanges)[sec - 1].indexEnd;
+                    indexCount = ((GridBlockRange*)cell->data->blockRanges)[sec].indexEnd - indexStart;
+                    vertexBase = ((GridBlockRange*)cell->data->blockRanges)[sec - 1].end;
                 }
                 for (int triStart = 0; triStart < indexCount; triStart += 3) {
-                    corner[0] = ((short*)cell->owner->indexBuffer)[indexStart + triStart];
-                    corner[1] = ((short*)cell->owner->indexBuffer)[indexStart + triStart + 1];
-                    corner[2] = ((short*)cell->owner->indexBuffer)[indexStart + triStart + 2];
+                    corner[0] = ((short*)cell->data->indexBuffer)[indexStart + triStart];
+                    corner[1] = ((short*)cell->data->indexBuffer)[indexStart + triStart + 1];
+                    corner[2] = ((short*)cell->data->indexBuffer)[indexStart + triStart + 2];
                     int i0 = (unsigned short)corner[0] + vertexBase;
                     int i1 = (unsigned short)corner[1] + vertexBase;
                     int i2 = (unsigned short)corner[2] + vertexBase;
@@ -241,9 +241,9 @@ void TerrainShadow::BuildShadowVertices()
                     } else if (cell->childMask) {
                         for (int k = 0; k < 3; k++) {
                             int idx = (unsigned short)corner[k] + vertexBase;
-                            vertices[vertexCount].x = ((TerrainLitVertex*)cell->owner->vertexBuffer)[idx].x;
-                            vertices[vertexCount].y = ((TerrainLitVertex*)cell->owner->vertexBuffer)[idx].y;
-                            vertices[vertexCount].z = ((TerrainLitVertex*)cell->owner->vertexBuffer)[idx].z;
+                            vertices[vertexCount].x = ((TerrainLitVertex*)cell->data->vertexBuffer)[idx].x;
+                            vertices[vertexCount].y = ((TerrainLitVertex*)cell->data->vertexBuffer)[idx].y;
+                            vertices[vertexCount].z = ((TerrainLitVertex*)cell->data->vertexBuffer)[idx].z;
                             vertices[vertexCount].diffuse = color;
                             vertices[vertexCount].reserved = 0;
                             vertices[vertexCount].specular = 0;
@@ -258,7 +258,7 @@ void TerrainShadow::BuildShadowVertices()
             }
     full:
             if (used)
-                caster->meshAgeManager->MarkUsed(&cell->owner->ageEntry);
+                caster->meshAgeManager->MarkUsed(&cell->data->ageEntry);
             if (vertexCount == 0x300)
                 break;
         }
@@ -321,7 +321,7 @@ struct TerrainShadowCamera {
 class TerrainShadowCaster {
 public:
     int CastSegment(const TerrainShadowVec* from, const TerrainShadowVec* to, TerrainShadowVec* hit,
-                              TerrainCell** cell, int a, int b);              // 0x00506e90 (ret 0x18)
+                              DrawableGridNode** cell, int a, int b);              // 0x00506e90 (ret 0x18)
 };
 
 // Out-of-line call views (docs/VC6_INLINE_BUDGET.md): the far corners of mode 2 are built
@@ -411,7 +411,7 @@ int TerrainShadow::IsShadowVisible()
     TerrainShadowVec hit;
     TerrainShadowVec screen;
     int code;
-    TerrainCell* cell;
+    DrawableGridNode* cell;
     TerrainShadowVec right;
     TerrainShadowVec up;
     if (shadow->mode == 1) {

@@ -39,9 +39,9 @@ no additional globals or initializers are introduced.
   9 slots). The vptr writes are at `0x0047e562` (constructor) and
   `0x0047ec7d` (destructor). Grid1.cpp's
   `DrawableGridNodeSharedTextures` derives from it. The GridNode destructor
-  `0x004838a0` and slot 1 `0x00483d40` are in the next TU. Terrain.h's
-  `TerrainShutdownObject` is a boundary view of the same node
-  (`0x0047edb0` is its `Shutdown(1)`).
+  `0x004838a0` and slot 1 `0x00483d40` are in the next TU. Terrain's
+  `heightField` is the root node, typed `GridNode*` (`0x0047edb0`,
+  `DrawableGridNode::ReleaseVertexBuffers(1)`, runs before its delete).
 
 ## What the code does (names tier 3)
 

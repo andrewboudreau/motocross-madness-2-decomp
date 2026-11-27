@@ -2,6 +2,7 @@
 // are in src/krusty2/broadphase/Terrain.cpp. This filename is ours.
 #include "../krusty2/broadphase/Terrain.h"
 #include "AgeManager.h"
+#include "Griddraw.h"
 #include "ManagedTexture.h"
 #include "TextureMapManager.h"
 
@@ -54,13 +55,13 @@ BaseObject* Terrain::AcquireOwnedObject()
 }
 
 
-// 0x00508970 (ret 8): world-space height range of the grid, the heightField's heightMin/heightMax
+// 0x00508970 (ret 8): world-space height range of the grid, the height field root's minHeight/maxHeight
 // (+0x18/+0x1c) scaled by gridCellSize (+0x40).  Either out pointer may be null.
 // owner: bracket only (no __FILE__ reference; it follows Terrain slot 23 0x00508850).
 void Terrain::GetHeightRange(float* outMin, float* outMax)
 {
     if (outMin)
-        *outMin = heightField->heightMin * gridCellSize;
+        *outMin = heightField->minHeight * gridCellSize;
     if (outMax)
-        *outMax = heightField->heightMax * gridCellSize;
+        *outMax = heightField->maxHeight * gridCellSize;
 }

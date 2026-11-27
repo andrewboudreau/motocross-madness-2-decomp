@@ -263,16 +263,16 @@ Terrain* Terrain::Load(int host, TerrainStream* stream, int loadChildren, Terrai
 
     boundsMin = TerrainVec3(FLT_MAX, FLT_MAX, FLT_MAX);
     boundsMax = TerrainVec3(-FLT_MAX, -FLT_MAX, -FLT_MAX);
-    heightField = reinterpret_cast<TerrainShutdownObject*>(new(__FILE__, 0x1e6)
+    heightField = new(__FILE__, 0x1e6)
         DrawableGridNodeSharedTextures(reinterpret_cast<FileStream*>(this->stream), loadChildren,
                                       0, reinterpret_cast<GridTerrain*>(this), gridSize,
-                                      gridSize * 4, 0, 0, 0, &boundsMin.x, &boundsMax.x));
+                                      gridSize * 4, 0, 0, 0, &boundsMin.x, &boundsMax.x);
     boundsMax.x += 16.0f;
     boundsMax.z += 16.0f;
     ScaleTerrainVec3(boundsMax, gridCellSize);
     ScaleTerrainVec3(boundsMin, gridCellSize);
     if (heightField) {
-        int shift = heightField->gridShift;
+        int shift = heightField->shift;
         int levels = heightField->level;
         if (levels > 0)
             shift -= levels * 4;
@@ -499,7 +499,7 @@ int Terrain::Render3D()
         ((TerrainRenderTarget*)renderContext)->SetTextureStageState(1, 1, 0xd);
         ((TerrainRenderTarget*)renderContext)->SetRenderState(0x1d, 0, 0);
         ((TerrainRenderTarget*)renderContext)->device->SetTexture(1, detailTexture->textureSurface);
-        if (!reinterpret_cast<DrawableGridNode*>(heightField)->DrawVisibleWithDetail(renderContext, reinterpret_cast<int>(detailTexture)))
+        if (!((DrawableGridNode*)heightField)->DrawVisibleWithDetail(renderContext, reinterpret_cast<int>(detailTexture)))
             return 0;
         ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 0xb, 0);
     } else {
@@ -509,14 +509,14 @@ int Terrain::Render3D()
             ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 3, 0);
             ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 4, 1);
             ((TerrainRenderTarget*)renderContext)->SetRenderState(0x1d, 1, 0);
-            reinterpret_cast<DrawableGridNode*>(heightField)->DrawVisible(renderContext);
+            ((DrawableGridNode*)heightField)->DrawVisible(renderContext);
             ((TerrainRenderTarget*)renderContext)->SetRenderState(0x1d, 0, 0);
         } else {
             ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 1, 2);
             ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 2, 2);
             ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 4, 1);
             ((TerrainRenderTarget*)renderContext)->SetRenderState(0x1d, 0, 0);
-            reinterpret_cast<DrawableGridNode*>(heightField)->DrawVisible(renderContext);
+            ((DrawableGridNode*)heightField)->DrawVisible(renderContext);
         }
         if (!reinterpret_cast<TerrainGameSettings*>(g_TrackGame)->softwareRendering && detailTexture && g_terrainQualityValue) {
             detailTexture->SetAsTexture();
@@ -529,7 +529,7 @@ int Terrain::Render3D()
             ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 0x10, reinterpret_cast<TerrainGameSettings*>(g_TrackGame)->magFilter);
             ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 0x11, 2);
             ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 0x12, 1);
-            if (!reinterpret_cast<DrawableGridNode*>(heightField)->DrawVisibleWithDetail(renderContext, reinterpret_cast<int>(detailTexture)))
+            if (!((DrawableGridNode*)heightField)->DrawVisibleWithDetail(renderContext, reinterpret_cast<int>(detailTexture)))
                 return 0;
             ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 0x10, reinterpret_cast<TerrainGameSettings*>(g_TrackGame)->magFilter);
             ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 0x11, reinterpret_cast<TerrainGameSettings*>(g_TrackGame)->minFilter);
@@ -681,7 +681,7 @@ Terrain::~Terrain()
         }
     }
     if (heightField) {
-        reinterpret_cast<DrawableGridNode*>(heightField)->ReleaseVertexBuffers(1);
+        ((DrawableGridNode*)heightField)->ReleaseVertexBuffers(1);
         if (heightField)
             delete heightField;
     }
@@ -893,8 +893,8 @@ void Terrain::QueryGround(TerrainVec3* pos, TerrainVec3* normal, int flatShaded,
     TerrainVec3* cornerNormals = 0;
     if (normal)
         cornerNormals = n;
-    reinterpret_cast<GridNode*>(heightField)->GetCellCorners(
-        ix, iz, heights, reinterpret_cast<GridVec3*>(cornerNormals), kinds);
+    heightField->GetCellCorners(
+        ix, iz, heights, cornerNormals, kinds);
 
     float y0 = heights[0] * gridCellSize;
     float y1 = heights[1] * gridCellSize;
@@ -1047,15 +1047,15 @@ inline TerrainVec3 TerrainClipRayToPlaneX(TerrainVec3& origin, const TerrainVec3
 // following `-dir` sites still do.  The successful grid cast is the guarded block, which
 // leaves one `return 0` at the end that the reject test also jumps to.
 int Terrain::CastSegment(const TerrainVec3* from, const TerrainVec3* to, TerrainVec3* out,
-                         int a, int b, int c)
+                         GridNode** outNode, int* outX, int* outZ)
 {
     TerrainVec3 start = *from / gridCellSize;
     TerrainVec3 end = *to / gridCellSize;
     TerrainVec3 dir = end - start;
 
-    float size = (float)(16 << heightField->gridShift);
-    float yLo = heightField->heightMin;
-    float yHi = heightField->heightMax;
+    float size = (float)(16 << heightField->shift);
+    float yLo = heightField->minHeight;
+    float yHi = heightField->maxHeight;
 
     // x slab
     if (dir.x > 0.0f) {
@@ -1104,7 +1104,7 @@ int Terrain::CastSegment(const TerrainVec3* from, const TerrainVec3* to, Terrain
     t = end.y;
     end.y = end.z;
     end.z = t;
-    if (heightField->CastSegment(&start, &end, out, a, b, c)) {
+    if (heightField->IntersectSegment(&start, &end, out, outNode, outX, outZ)) {
         t = out->y;
         out->y = out->z;
         out->z = t;

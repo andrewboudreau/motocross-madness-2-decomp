@@ -27,7 +27,7 @@
     "src/reconstructed/QuarryStuntEvent.cpp": {
       "sections": 145,
       "relocations": 923,
-      "sha256": "2a9eca7f6d0b8bc79de21ea8dfb9c28fb9af59c7f9301a674b0cc43446c98243"
+      "sha256": "59b416a1d06c4cfdc666e42bbd30cac0478e632b1a5dd312e393dbd2fc8a9d1a"
     },
     "src/reconstructed/ArcadeObject.cpp": {
       "sections": 32,

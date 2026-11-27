@@ -122,7 +122,7 @@ void VehicleCamera::LookAtTargetPoint() {
     float lead = (float)(heading.y * 0.0310559f) * 1.5f;
     Vector3 side(heading.z, 0.0f, -heading.x);
     eyePosition = Add(Add(Add(base, heading * lead), heading * -0.2f), side * 0.45f);
-    reinterpret_cast<Terrain*>(subject)->QueryGround(reinterpret_cast<TerrainVec3*>(&eyePosition), 0, 0, 0);
+    subject->QueryGround(reinterpret_cast<TerrainVec3*>(&eyePosition), 0, 0, 0);
     if (heading.y > 10.0f)
         base.y += (heading * lead).y * 0.19f;
     if (vehicleMode) {
@@ -388,7 +388,7 @@ Vector3 VehicleCamera::ComputeLookAheadPoint(unsigned char a, float dt) {
             float reach = (float)(FollowCameraAbs(followPitch) * 0.63661975f) * 1.2f + 0.3f;
             Vector3 ahead = Add(direction * reach, targetPoint);
             Vector3 ground = ahead;
-            reinterpret_cast<Terrain*>(subject)->QueryGround(reinterpret_cast<TerrainVec3*>(&ground), 0, 0, 0);
+            subject->QueryGround(reinterpret_cast<TerrainVec3*>(&ground), 0, 0, 0);
             if (ground.y > ahead.y)
                 lift = (ground.y - ahead.y) * 0.6f;
             else

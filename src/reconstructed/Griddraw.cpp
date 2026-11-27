@@ -258,7 +258,7 @@ DrawableGridNode::DrawableGridNode(int stream, int loadChildren, GridNode* paren
 // components are reloaded after their stores (retail 0x0047e600's `fstp
 // extent.y` followed by a reload); a direct test keeps extent.y on the x87
 // stack.
-static inline int GridExtentBelow(const GridVec3& v, float limit)
+static inline int GridExtentBelow(const TerrainVec3& v, float limit)
 {
     return v.x < limit && v.y < limit && v.z < limit;
 }
@@ -372,7 +372,7 @@ allocated:
     extent.x = center.x - terrain->gridCellSize * minX;
     extent.y = center.y - terrain->gridCellSize * minY;
     if (GridExtentBelow(extent, 0.1f))
-        extent = GridVec3(0.1f, 0.1f, 0.1f);
+        extent = TerrainVec3(0.1f, 0.1f, 0.1f);
     extent.z = center.z - data->gridMinZ * terrain->gridCellSize;
     if (parent)
         terrain = parent->terrain;
@@ -1629,11 +1629,11 @@ int DrawableGridNode::WalkVisibilityQuadrants(void* stream, void* screenMatrix, 
         } else {
             size >>= 1;
             if (size) {
-                GridVec3 childExtent = GridVec3(extent[0] * 0.5f, extent[1], extent[2] * 0.5f);
-                GridVec3 c1 = GridVec3(center[0] - childExtent.x, center[1], center[2] - childExtent.z);
-                GridVec3 c2 = GridVec3(childExtent.x + center[0], center[1], center[2] - childExtent.z);
-                GridVec3 c3 = GridVec3(center[0] - childExtent.x, center[1], childExtent.z + center[2]);
-                GridVec3 c4 = GridVec3(childExtent.x + center[0], center[1], childExtent.z + center[2]);
+                TerrainVec3 childExtent = TerrainVec3(extent[0] * 0.5f, extent[1], extent[2] * 0.5f);
+                TerrainVec3 c1 = TerrainVec3(center[0] - childExtent.x, center[1], center[2] - childExtent.z);
+                TerrainVec3 c2 = TerrainVec3(childExtent.x + center[0], center[1], center[2] - childExtent.z);
+                TerrainVec3 c3 = TerrainVec3(center[0] - childExtent.x, center[1], childExtent.z + center[2]);
+                TerrainVec3 c4 = TerrainVec3(childExtent.x + center[0], center[1], childExtent.z + center[2]);
                 count += WalkVisibilityQuadrants(stream, screenMatrix, &c1.x, &childExtent.x, x, z, size, depth + 1, path * 4, coarse);
                 count += WalkVisibilityQuadrants(stream, screenMatrix, &c2.x, &childExtent.x, x + size, z, size, depth + 1, path * 4 + 1, coarse);
                 count += WalkVisibilityQuadrants(stream, screenMatrix, &c3.x, &childExtent.x, x, z + size, size, depth + 1, path * 4 + 2, coarse);

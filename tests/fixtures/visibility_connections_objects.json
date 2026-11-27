@@ -16,12 +16,12 @@
     "src/reconstructed/FollowCamera.cpp": {
       "sections": 120,
       "relocations": 469,
-      "sha256": "60017c261f46e2b03660e26151a58f20347a9186e49c082974f49f3a27464e3b"
+      "sha256": "d9ae94ef73ba31a4301c407a72d3b798c1944106596fb1b106487fdad0bf0a6e"
     },
     "src/reconstructed/TrackOverlay.cpp": {
       "sections": 231,
       "relocations": 1031,
-      "sha256": "c4cb7855ed58f8d76c8f3a455dc0bfa8fb15ab16292fd6ab4ed5de624d5f2623"
+      "sha256": "a0e237e2be2dbb5febc0b498767be0b735e5dded023b67c4619c29e24d823f8f"
     },
     "src/krusty2/visibility/VisibilityQuadTree.cpp": {
       "sections": 89,

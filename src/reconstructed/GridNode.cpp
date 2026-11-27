@@ -49,7 +49,7 @@ GridNode::~GridNode()
 // float right after the GridNode vtable). Retail's loop is VC6's
 // tail-recursion elimination of the child call; the clamped copies of x and
 // z (xx, zz) are what retail keeps in ebp/[esp+0x14] and in z's argument home.
-int GridNode::GetCellCorners(int x, int z, float* heights, GridVec3* normals, unsigned char* bytes)
+int GridNode::GetCellCorners(int x, int z, float* heights, TerrainVec3* normals, unsigned char* bytes)
 {
     int xx = x;
     int zz = z;
@@ -147,7 +147,7 @@ int GridNode::GetCellCorners(int x, int z, float* heights, GridVec3* normals, un
 missing:
     for (int i = 0; i < 4; i++) {
         if (normals) {
-            normals[i] = GridVec3(0.0f, 1.0f, 0.0f);
+            normals[i] = TerrainVec3(0.0f, 1.0f, 0.0f);
         }
         heights[i] = 0.0f;
         bytes[i] = 0;
@@ -192,12 +192,12 @@ static inline float GridMax(float a, float b)
 // either the child whose height range the segment reaches or, in a leaf,
 // the two cell triangles. A hit is written in parent units; returns 1.
 #pragma optimize("y", off)
-int GridNode::IntersectSegment(const GridVec3* p0, const GridVec3* p1, GridVec3* out, GridNode** outNode,
+int GridNode::IntersectSegment(TerrainVec3* p0, TerrainVec3* p1, TerrainVec3* out, GridNode** outNode,
                                int* outX, int* outZ)
 {
-    GridVec3 cross[34];
-    GridVec3 xCross[17];
-    GridVec3 yCross[17];
+    TerrainVec3 cross[34];
+    TerrainVec3 xCross[17];
+    TerrainVec3 yCross[17];
     Vector3 hit;
     float dx = p1->x - p0->x;
     float dy = p1->y - p0->y;
@@ -399,10 +399,10 @@ int GridNode::IntersectSegment(const GridVec3* p0, const GridVec3* p1, GridVec3*
             }
             float ox = ix * cellSize;
             float oy = iy * cellSize;
-            GridVec3 a;
-            GridVec3 b;
-            a = GridVec3(cross[k].x - ox, cross[k].y - oy, cross[k].z);
-            b = GridVec3(cross[k + 1].x - ox, cross[k + 1].y - oy, cross[k + 1].z);
+            TerrainVec3 a;
+            TerrainVec3 b;
+            a = TerrainVec3(cross[k].x - ox, cross[k].y - oy, cross[k].z);
+            b = TerrainVec3(cross[k + 1].x - ox, cross[k + 1].y - oy, cross[k + 1].z);
             if (child->IntersectSegment(&a, &b, out, outNode, outX, outZ)) {
                 return 1;
             }

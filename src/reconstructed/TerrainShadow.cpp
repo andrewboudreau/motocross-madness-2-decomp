@@ -55,10 +55,10 @@ int TerrainShadow::NeedsShadowRender()
     cellCount = 0;
     for (int z = minZ; z <= maxZ; z += 16) {
         for (int x = minX; x <= maxX; x += 16) {
-            TerrainCell* cell = caster->heightField->LookupCell(x, z);
+            DrawableGridNode* cell = (DrawableGridNode*)caster->heightField->FindLeaf(x, z);
             if (cell) {
-                if (cell->owner->vertexCount == 0)
-                    cell = (TerrainCell*)cell->key;
+                if (cell->data->vertexCount == 0)
+                    cell = (DrawableGridNode*)cell->parent;
                 void* key = cell;
                 int i = 0;
                 while (i < cellCount && cellKeys[i] != key)

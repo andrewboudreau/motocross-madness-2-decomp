@@ -272,7 +272,7 @@
   "?SetShadowGrey@ProjectedShadow@@QAEXH@Z": "0x004dae30",
   "?SetShadowStrength@ProjectedShadow@@QAEXH@Z": "0x004dace0",
   "?SetStatsSource@StatsOverlay@@QAEHPAVBikeRace@@@Z": "0x00519880",
-  "?SetSubject@FollowCamera@@QAEXPAUFollowCameraTerrainView@@@Z": "0x00463600",
+  "?SetSubject@FollowCamera@@QAEXPAVTerrain@@@Z": "0x00463600",
   "?SetUseBroadphase@CollisionObject@@QAEXH@Z": "0x00432120",
   "?Setup@VisibilityQuadTree@@QAEPAVGameObject@@HMMMMM@Z": "0x0052d460",
   "?SetupFlyby@KrustyBikeCamera@@QAEPAV1@PAXMMMMMHHPBH@Z": "0x00497d90",

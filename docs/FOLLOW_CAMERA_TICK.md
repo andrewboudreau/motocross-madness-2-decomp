@@ -91,9 +91,9 @@ call. It executes the complete Tick body; production contains no mapped-retail
 dispatch or instrumentation.
 
 Terrain `QueryGround`, Direct3DRM rotation, other camera methods, allocation and
-virtual/input callbacks are scripted boundaries. In particular, this does not
-validate or connect the still-separate `FollowCameraTerrainView::QueryGround`
-declaration, nor validate the default virtual implementations or rendered
+virtual/input callbacks are scripted boundaries. In particular, it does not
+validate `Terrain::QueryGround` itself (the camera's subject is the Terrain),
+nor the default virtual implementations or rendered
 camera behavior. The rotation callback is a deterministic test transformation,
 not a replacement Direct3DRM implementation. Finite full-state equivalence under
 these boundary scripts supports explicit **reviewed-nonexact** build admission;

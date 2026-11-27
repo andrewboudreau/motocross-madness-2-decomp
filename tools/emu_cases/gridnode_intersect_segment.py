@@ -25,7 +25,7 @@ import random
 import struct
 
 RETAIL_VA = 0x00483d40
-SYMBOL = '?IntersectSegment@GridNode@@UAEHPBUGridVec3@@0PAU2@PAPAV1@PAH3@Z'
+SYMBOL = '?IntersectSegment@GridNode@@UAEHPAUTerrainVec3@@00PAPAV1@PAH2@Z'
 SOURCE = 'src/reconstructed/GridNode.cpp'
 BINDINGS = {'_g_gridRow16': 0x0056c2ac, '_g_gridRow17': 0x0056c2f0}
 PROBES = {0x004845f2: 'child call', 0x004a1300: 'LinePlaneIntersection'}

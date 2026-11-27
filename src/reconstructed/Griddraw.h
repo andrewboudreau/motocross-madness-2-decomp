@@ -230,15 +230,10 @@ struct GridNodeDrawData {
     void* blockRanges;  // +0x17C  sixteen GridBlockRange records (data + 0x180) or null (0x0047e600)
 };
 
-// Three floats; the constructor builds a temporary that is then copied
-// (0x0047e600 sets the extent to (0.1, 0.1, 0.1) through a stack copy).
-struct GridVec3 {
-    float x;
-    float y;
-    float z;
-    GridVec3() {}
-    GridVec3(float x_, float y_, float z_) { x = x_; y = y_; z = z_; }
-};
+// Three floats (TerrainVec3.h); the constructor builds a temporary that is
+// then copied (0x0047e600 sets the extent to (0.1, 0.1, 0.1) through a
+// stack copy).
+#include "../krusty2/broadphase/TerrainVec3.h"
 
 class GridNode {
 public:
@@ -249,7 +244,7 @@ public:
     // range the segment reaches and intersects the two cell triangles in a leaf.
     // Writes *out in parent units, the leaf to *outNode and the rounded hit
     // coordinates to *outX/*outZ (each when non-null); returns 1 on a hit.
-    virtual int IntersectSegment(const GridVec3* p0, const GridVec3* p1, GridVec3* out, GridNode** outNode,
+    virtual int IntersectSegment(TerrainVec3* p0, TerrainVec3* p1, TerrainVec3* out, GridNode** outNode,
                                  int* outX, int* outZ); // 0x00483d40
     // 0x00484d70: the leaf whose grid position is (x, z), or 0 (GridNode.cpp).
     GridNode* FindLeaf(int x, int z);
@@ -257,7 +252,7 @@ public:
     // (x, z) and writes the four corner heights, normals and sample bytes of
     // that cell (order (x,z), (x+1,z), (x,z+1), (x+1,z+1)); returns 1, or 0
     // with heights 0, normals (0,1,0) and bytes 0 when no leaf exists.
-    int GetCellCorners(int x, int z, float* heights, GridVec3* normals, unsigned char* bytes);
+    int GetCellCorners(int x, int z, float* heights, TerrainVec3* normals, unsigned char* bytes);
 
     GridNode** children;                       // +0x04 256 entries (0x400 bytes)
     GridNode* parent;                          // +0x08
@@ -393,8 +388,8 @@ public:
     GridNodeDrawData* data;                    // +0x38
     GridNodeExtra* extra;                      // +0x3c points into data
     int childMask;                             // +0x40 bit 1..4: 8-cell quadrants, 5..: 4-cell
-    GridVec3 center;                           // +0x44 bounding box centre (world units)
-    GridVec3 extent;                           // +0x50 half extents
+    TerrainVec3 center;                           // +0x44 bounding box centre (world units)
+    TerrainVec3 extent;                           // +0x50 half extents
 };
 
 // 0x0047ecc0: AgeManager eviction callback for a node's vertex buffers.

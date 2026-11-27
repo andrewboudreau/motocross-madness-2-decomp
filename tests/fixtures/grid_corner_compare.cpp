@@ -15,8 +15,8 @@
 
 typedef char GridLayout[sizeof(GridNode)==0x34 && offsetof(GridNode,level)==0x28 ? 1:-1];
 typedef char GridBaseLayout[sizeof(GridBaseBlock)==0xd50 && sizeof(GridBaseCell)==8 ? 1:-1];
-typedef char Views[sizeof(TerrainVec3)==12 && sizeof(TreeVec3)==12 && sizeof(Vector3)==12 && sizeof(Vec3)==12 && sizeof(GridVec3)==12 ? 1:-1];
-typedef char VectorOffsets[offsetof(TerrainVec3,z)==8 && offsetof(TreeVec3,z)==8 && offsetof(Vector3,z)==8 && offsetof(Vec3,z)==8 && offsetof(GridVec3,z)==8 ? 1:-1];
+typedef char Views[sizeof(TerrainVec3)==12 && sizeof(TreeVec3)==12 && sizeof(Vector3)==12 && sizeof(Vec3)==12 ? 1:-1];
+typedef char VectorOffsets[offsetof(TerrainVec3,z)==8 && offsetof(TreeVec3,z)==8 && offsetof(Vector3,z)==8 && offsetof(Vec3,z)==8 ? 1:-1];
 
 static BYTE referenceSpace[0x800000]={1};
 struct Storage {
@@ -59,9 +59,9 @@ static int Filter(EXCEPTION_POINTERS* info){
 static void Run(int retail,int x,int z,int flags,int mode,int precision){
     memset(&observed,0,sizeof(observed));observed.result=-13;state=initial;
     float* heights=(float*)&state.output[2];
-    GridVec3* normals=flags&1?(GridVec3*)&state.output[8]:0;
+    TerrainVec3* normals=flags&1?(TerrainVec3*)&state.output[8]:0;
     unsigned char* bytes=flags&2?(unsigned char*)&state.output[24]:0;
-    union{int(GridNode::*method)(int,int,float*,GridVec3*,unsigned char*);DWORD address;}call;
+    union{int(GridNode::*method)(int,int,float*,TerrainVec3*,unsigned char*);DWORD address;}call;
     memset(&call,0,sizeof(call));call.method=&GridNode::GetCellCorners;if(retail)call.address=0x483910;
     _control87(_MCW_EM|mode|precision,_MCW_EM|_MCW_RC|_MCW_PC);_clear87();
     __try{observed.result=(Node(0)->*call.method)(x,z,heights,normals,bytes);}__except(Filter(GetExceptionInformation())){}
@@ -115,7 +115,7 @@ int main(int argc,char** argv){
     if(observed.result!=1 || observed.exception)return 4;
     for(i=0;i<4;++i)if(((float*)&state.output[2])[i]!=(float)(i+1) || ((BYTE*)&state.output[24])[i]!=10+i)return 5;
     Seed(0,4);Compare(0,0,3,_RC_NEAR,_PC_64);if(observed.result || observed.exception)return 6;
-    for(i=0;i<4;++i){GridVec3* normal=(GridVec3*)&state.output[8];if(((float*)&state.output[2])[i]!=0 || normal[i].x!=0 || normal[i].y!=1 || normal[i].z!=0 || ((BYTE*)&state.output[24])[i])return 7;}
+    for(i=0;i<4;++i){TerrainVec3* normal=(TerrainVec3*)&state.output[8];if(((float*)&state.output[2])[i]!=0 || normal[i].x!=0 || normal[i].y!=1 || normal[i].z!=0 || ((BYTE*)&state.output[24])[i])return 7;}
     Seed(0,4);Compare(0,0,1,_RC_NEAR,_PC_64);if(observed.exception!=EXCEPTION_ACCESS_VIOLATION || observed.access!=1 || observed.address)return 8;
     const int modes[]={_RC_NEAR,_RC_DOWN,_RC_UP,_RC_CHOP};const int precisions[]={_PC_24,_PC_53,_PC_64};
     for(unsigned sample=0;sample<2033;++sample)for(int round=0;round<4;++round)for(int prec=0;prec<3;++prec)

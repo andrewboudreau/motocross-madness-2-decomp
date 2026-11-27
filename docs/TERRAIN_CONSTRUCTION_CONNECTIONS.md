@@ -30,8 +30,8 @@ therefore supplies the primary receiver for drawing and recursive buffer release
 The eleven constructor arguments retain the stream, host, null parent, Terrain
 pointer, dimensions, indices and bounds pointers in their original order.
 The detail texture remains the same 32-bit argument in DrawVisibleWithDetail's
-currently provisional integer parameter. These selected connections do not
-establish every field or method in the remaining TerrainShutdownObject view.
+currently provisional integer parameter. The TerrainShutdownObject view is retired:
+Terrain::heightField is now the GridNode root itself (docs/NAMING.md).
 
 The identity helper returns a 64-byte Matrix4 by value through VC6's hidden
 output argument. The Terrain constructor now expresses that return convention

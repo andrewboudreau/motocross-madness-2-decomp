@@ -21,7 +21,7 @@
 
 class AuralScape;
 class SoultreeObject;
-struct FollowCameraTerrainView;
+class Terrain;
 
 // 8-byte listener record AuralScape keeps two of (not RTTI-typed): the
 // owner and a DirectSound 3D listener. Every setter is deferred (apply 1)
@@ -145,7 +145,7 @@ public:
     ContainerList<SoundEmitter*> playingEmitters; // +0x6c playing
     ContainerList<SoundEmitter*> waitingEmitters; // +0x80 waiting for a sound
     Scene* reverbOwner;                       // +0x94 the event scene; its environment->enviroID[zone] picks the reverb
-    FollowCameraTerrainView* groundSubject; // +0x98
+    Terrain* groundSubject;                   // +0x98
     int debugPage;                            // +0x9c debug page
     unsigned char reverbEnabled : 1;          // +0xa0 reverb enabled
 };

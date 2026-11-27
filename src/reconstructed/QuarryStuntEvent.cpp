@@ -656,7 +656,7 @@ int BaseQuarryEvent::LoadEventObjects(LoadProgressFn progress) {
     if (!raceView->AppendChild((GameObject*)g_TrackGame->eventManager->podiumObject, -1))
         return 0;
     if (auralScape) {
-        auralScape->groundSubject = (FollowCameraTerrainView*)eventTerrain;
+        auralScape->groundSubject = eventTerrain;
         AppendChild(auralScape, -1);
     }
 
@@ -685,7 +685,7 @@ int BaseQuarryEvent::LoadEventObjects(LoadProgressFn progress) {
     g_MemTagStack->Push("3DObjects");
     CreateRacer3DObjects((int)((BikeRace*)raceView)->localRacer);
     g_MemTagStack->Push("BikeRace");
-    raceCamera->SetSubject((FollowCameraTerrainView*)eventTerrain);
+    raceCamera->SetSubject(eventTerrain);
     raceCamera->StartFollowing(((BikeRace*)raceView)->localRacer);
     if (statsOverlay)
         statsOverlay->SetStatsSource((BikeRace*)raceView);

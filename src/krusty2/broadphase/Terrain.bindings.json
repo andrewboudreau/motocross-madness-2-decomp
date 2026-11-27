@@ -119,7 +119,7 @@
   "__real@4@407effffff0000000000": "0x00550844",
   "?FastInvSqrt@@YAMM@Z": "0x00460c00",
   "?TerrainLoadTexture@@YAPAVTextureMap@@PAVTextureMapManager@@PBDHPAVPalette8@@HHHPAUTextureContext@@HIHH@Z": "0x0050a590",
-  "?GetCellCorners@GridNode@@QAEHHHPAMPAUGridVec3@@PAE@Z": "0x00483910",
+  "?GetCellCorners@GridNode@@QAEHHHPAMPAUTerrainVec3@@PAE@Z": "0x00483910",
   "?Vec3DotCall@@YAMPBUVec3@@0@Z": "0x0040ae30",
   "?TriangleNormal@@YAXPBUVector3@@00PAU1@PAM@Z": "0x004a11e0",
   "?IdentityMatrix@@YA?AUMatrix4@@XZ": "0x004a1410",

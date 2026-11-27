@@ -216,7 +216,7 @@ bool FollowCamera::AppendTableEntry(const Vector3& position, float distanceRate,
 }
 
 // 0x00463600
-void FollowCamera::SetSubject(FollowCameraTerrainView* newSubject) {
+void FollowCamera::SetSubject(Terrain* newSubject) {
     subject = newSubject;
     subjectCellSize = newSubject->gridCellSize;
 }
@@ -1012,7 +1012,7 @@ bool FollowCamera::PlayRecordedFrame(float dt, const Vector3* offset) {
         eyePosition.z = viewMatrix.m[3][2];
         eyePosition += *offset;
         Vector3 ground = eyePosition;
-        reinterpret_cast<Terrain*>(subject)->QueryGround(reinterpret_cast<TerrainVec3*>(&ground), 0, 0, 0);
+        subject->QueryGround(reinterpret_cast<TerrainVec3*>(&ground), 0, 0, 0);
         float height = ground.y + 3.5f;
         if (height > eyePosition.y)
             eyePosition.y = height;
@@ -1039,7 +1039,7 @@ int FollowCamera::Tick(float dt) {
         targetPoint = GetLeadTargetPoint(0);
         position = followHeading * -followDistance;
         position += targetPoint;
-        reinterpret_cast<Terrain*>(subject)->QueryGround(reinterpret_cast<TerrainVec3*>(&position), 0, 0, 0);
+        subject->QueryGround(reinterpret_cast<TerrainVec3*>(&position), 0, 0, 0);
         Vector3 direction = position - targetPoint;
         D3DRMVectorRotate(&position, &direction, &kVec3XAxis, followPitch);
         D3DRMVectorRotate(&direction, &position, &kVec3YAxis, followYaw);
@@ -1048,7 +1048,7 @@ int FollowCamera::Tick(float dt) {
         SetFrame(&position, 0, 0, 0, 0);
         target = followHeading * lookAheadDistance;
         target += targetPoint;
-        reinterpret_cast<Terrain*>(subject)->QueryGround(reinterpret_cast<TerrainVec3*>(&target), 0, 0, 0);
+        subject->QueryGround(reinterpret_cast<TerrainVec3*>(&target), 0, 0, 0);
         LookAt(target);
         wasWide = FollowCameraAbs(followYaw) > 2.0f;
     }

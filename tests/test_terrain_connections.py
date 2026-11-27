@@ -34,7 +34,7 @@ CONSTRUCTION_PROVIDERS = (
 PROVIDERS = (
     ('?RetireOwnedObject@Terrain@@QAEXPAVBaseObject@@@Z', 0x5057d0, 83),
     ('?SelectQuality@Terrain@@QAEXH@Z', 0x507960, 129),
-    ('?CastSegment@Terrain@@QAEHPBUTerrainVec3@@0PAU2@HHH@Z', 0x506e90, 1654),
+    ('?CastSegment@Terrain@@QAEHPBUTerrainVec3@@0PAU2@PAPAVGridNode@@PAH3@Z', 0x506e90, 1654),
 )
 # Preserve the existing incomplete functions too. Their COFF bodies plus named
 # relocation records are hashed because QueryGround still has unbound helpers.
@@ -66,7 +66,7 @@ PARTIAL = (
     # the body bytes and the other 64 relocation records are identical.
     # Tire.h/CollisionPoint.h's relative includes renumber it again; the body
     # bytes and the other 64 relocation records are identical.
-    ('?Load@Terrain@@', 2117, 'd7e269d33fa5e2bc1e0cfb51e195087064a4384b798eb18c78d9f9e2f34ded7e'),
+    ('?Load@Terrain@@', 2117, 'd57386f3d6aa4c4034333138de1f23ee50f54adf2b73770fa7937fc7135918e2'),
     # Intentional cell-conversion repair, verified at the actual first-cell
     # boundary in test_terrain_cell_conversion; full interpolation remains partial.
     # The sampler, dot and triangle provider names are now canonical, with
@@ -76,7 +76,7 @@ PARTIAL = (
     # Re-pinned for two behaviour repairs found by differential emulation: the
     # (0, 1, 3) smooth normal blends corners 0, 1, 2 (0x0050848c) and the height
     # keeps retail's (base + slope_x) + slope_z order: 3587 -> 3544 bytes.
-    ('QueryGround', 3544, '6afd82c44b51bcd4b9cdd548a1bc7f48268306699cf52251a63f3437a6df2213'),
+    ('QueryGround', 3544, 'c9f33d4e9443d88c48077732ec1bdee8fe030b488015d33e79023bf8917b3f6e'),
 )
 
 

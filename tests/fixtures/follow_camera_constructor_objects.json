@@ -6,7 +6,7 @@
   "aggregate": {
     "sections": 120,
     "relocations": 469,
-    "sha256": "47f8e5c51b9246b77d0b8f9469cae670704a2371984b7453aa45f6bb500c87af"
+    "sha256": "af29dc7fdc342a817106c4a31ce56950caa87654bfc6fdddb82e9c844ab37f7c"
   },
   "candidate": {
     "sections": 31,

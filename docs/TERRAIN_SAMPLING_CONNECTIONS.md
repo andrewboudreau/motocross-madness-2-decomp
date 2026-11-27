@@ -16,10 +16,10 @@ Terrain's loader constructs DrawableGridNodeSharedTextures, whose retail RTTI
 places GridNode at primary offset zero. The existing height-field pointer is
 passed unchanged to GetCellCorners. Its five stack arguments are the two cell
 indices and three output arrays. The provider returns an integer; QueryGround
-continues to ignore it. The provisional class view remains for other boundaries.
+continues to ignore it. heightField is the GridNode root, so the call needs no view.
 
-TerrainVec3, TreeVec3, GridVec3, Vector3 and Vec3 retain their separate layouts
-and inline arithmetic. All are three consecutive floats. Explicit boundary
+TerrainVec3 (which GridVec3 folded into), TreeVec3, Vector3 and Vec3 retain
+their separate layouts and inline arithmetic. All are three consecutive floats. Explicit boundary
 casts preserve the original pointers, including null normal outputs.
 MatrixUtil and Griddraw declarations introduce no additional dynamic
 initializers in either caller. Original type names remain unproven.

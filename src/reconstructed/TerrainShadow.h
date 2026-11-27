@@ -35,7 +35,7 @@ public:
     virtual void BuildShadowVertices();                                                 // 0x00509aa0 slot 30
 
     Terrain* caster;               // +0x2c ctor 0; Attach stores its second argument.  Tier 2: slot 28 calls
-                                   // 0x00484d70 on caster+0x44, which is Terrain::heightField
+                                   // GridNode::FindLeaf on caster->heightField
     ProjectedShadow* shadow;       // +0x30 Attach stores its third argument and registers this
     TerrainShadowVertex vertices[0x300];  // +0x34 slot 14 draws vertexCount of them with indexTable
     char pad_0x6034[0x6054 - 0x6034];

@@ -1543,7 +1543,7 @@ both control words. These agreed with retail in every run (runs in brackets):
   `ReadImmediateState` 0x004c3790 (100), `VCRInterface::Tick` 0x004e7d60
   (200).
 - Terrain, shadows and grid: `ProjectPoints` 0x004a1a50,
-  `TerrainShutdownObject::LookupCell` 0x00484d70, `GridVertexCache::GetVertex`
+  `GridNode::FindLeaf` 0x00484d70, `GridVertexCache::GetVertex`
   0x0047de90, `D3DIMSoultreeObject::GetVertexCount` 0x00444fe0 (600 each),
   `DrawableGridNode::WalkVisibilityQuadrants` 0x00481de0 (400),
   `GridVertexSink::LightVertices` 0x0049e4a0 with its three workers linked

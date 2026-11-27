@@ -100,53 +100,11 @@ struct TerrainSurfaceDesc {
 
 struct TerrainVec3;
 
-// PROVISIONAL: object destroyed through its scalar deleting dtor (vtable slot 0) after a
-// call to 0x0047edb0(1).
-// PROVISIONAL cell of the height field's quadtree (0x00484d70 returns one): +0x24/+0x26 hold the
-// 16-bit cell coordinates compared with the lookup arguments, +0x08 is a pointer returned as the
-// key, +0x38 the cell's mesh (TerrainShadow slot 30 reads its lit vertices, index list and
-// 16 section records; +0x121 bit 3 selects the sectioned layout).  Tier 2 offsets, tier 3 names.
-// The mesh is the node draw data Griddraw.h declares as GridNodeDrawData; its sixteen
-// sections are GridBlockRange records (strong inference: every offset used here agrees).
-struct GridNodeDrawData;  // Griddraw.h
-struct TerrainCell {
-    char pad_0x00[8];
-    void* key;                                                 // +0x08
-    char pad_0x0c[0x24 - 0x0c];
-    unsigned short gridX;                                      // +0x24 cell column (LookupCell compares it with x)
-    unsigned short gridZ;                                      // +0x26 cell row
-    char pad_0x28[0x38 - 0x28];
-    GridNodeDrawData* owner;                                   // +0x38
-    char pad_0x3c[4];
-    int childMask;                                             // +0x40 nonzero lets TerrainShadow slot 30 emit the cell's vertices
-};
-
-class Terrain;
-class TerrainShutdownObject {
-public:
-    // 0x00484d70 (thiscall, ret 8): walks the cell quadtree (child table +0x04, shift +0x29, nibble
-    // table at 0x0056c2ac) down to the leaf whose +0x24/+0x26 halfwords equal (x, z); null if none.
-    TerrainCell* LookupCell(int x, int z);
-    virtual ~TerrainShutdownObject();
-    // vtable slot 1 (called `mov ecx,[obj]; call [ecx+4]` at 0x005074d1, callee pops 6 args):
-    // casts the grid-space segment (a, b) against the terrain; on a hit writes the grid-space hit
-    // point to *out.  The last three ints are forwarded from Terrain::CastSegment (tier 3 role).
-    virtual int CastSegment(TerrainVec3* a, TerrainVec3* b, TerrainVec3* out, int p3, int p4, int p5);
-    // 0x00483910 (thiscall, ret 0x14; tier 2: heightField is the same object the dtor shuts
-    // down).  Fetches the four corners of grid cell (ix, iz): heights[4], optional normals[4]
-    // and per-corner surface bytes[4] (three output arrays, see Terrain::QueryGround).
-    void GetCellCorners(int ix, int iz, float* heights, TerrainVec3* normals,
-                        unsigned char* surface);
-    // Members read by Terrain::CastSegment (tier 2 offsets, tier 3 names).
-    void* cellTable;                                           // +0x04 cell table read by 0x00483910
-    char pad_0x08[0x18 - 0x08];
-    float heightMin;                                           // +0x18 lower height bound of the grid (compared with segment y)
-    float heightMax;                                           // +0x1c upper height bound
-    char pad_0x20[0x28 - 0x20];
-    unsigned char level;  // +0x28  GridNode +0x28 level (Griddraw.h); Load subtracts level*4 from gridShift for invGridCellSize
-    unsigned char gridShift;                                   // +0x29 log2 shift: grid edge = 16 << gridShift cells
-    char pad_0x2a[0x5c - 0x2a];
-};
+// heightField is the root of the terrain quadtree (Griddraw.h): Load allocates
+// a DrawableGridNodeSharedTextures there. The member is the GridNode base;
+// CastSegment calls IntersectSegment (slot 1) on it with no this conversion,
+// which retail's inlining shows, and the draw calls cast down.
+class GridNode;
 
 // 0x0056df04 / 0x004a2d00 / 0x004a2d90 bracket the Terrain dtor body: MemTagStack in
 // core/MemTag.h.
@@ -211,16 +169,7 @@ extern TerrainSharedState g_terrainSharedState;                 // 0x0068a090
 extern int g_terrainToggle314;                                  // 0x0068a314
 extern int g_terrainToggle718;                                  // 0x00574718
 
-// PROVISIONAL stand-in for the shared Vec3 (Math3D.h is not included: its static const
-// objects would add $E initializers that Terrain.cpp does not have).  The out-of-line
-// copies 0x00404e60 (ctor), 0x00421cb0 (+), 0x0043c890 (/ scalar), 0x005015b0 (* scalar)
-// exist in retail as COMDATs; VC6 inlines them at most call sites of QueryGround.
-struct TerrainVec3 {
-    float x, y, z;
-    TerrainVec3() {}
-    TerrainVec3(float x_, float y_, float z_) { x = x_; y = y_; z = z_; }
-    TerrainVec3& operator*=(float s);                            // 0x0040ae00 (out of line at its one call site)
-};
+#include "TerrainVec3.h"
 inline TerrainVec3 operator-(const TerrainVec3& a, const TerrainVec3& b)
 {
     return TerrainVec3(a.x - b.x, a.y - b.y, a.z - b.z);
@@ -267,8 +216,10 @@ public:
     void QueryGround(TerrainVec3* pos, TerrainVec3* normal, int flatShaded, unsigned char* surface);
     // 0x00506e90 (thiscall, ret 0x18).  Casts the world segment from->to against the terrain grid:
     // rescales to grid space (1 / gridCellSize), clips it to the grid box, hands it to
-    // heightField->CastSegment, and on a hit returns the world-space hit point in *out.
-    int CastSegment(const TerrainVec3* from, const TerrainVec3* to, TerrainVec3* out, int a, int b, int c);
+    // heightField->IntersectSegment, and on a hit returns the world-space hit point in *out.
+    // outNode/outX/outZ pass through to IntersectSegment (each may be null).
+    int CastSegment(const TerrainVec3* from, const TerrainVec3* to, TerrainVec3* out,
+                    GridNode** outNode, int* outX, int* outZ);
     // GameObject slot overrides (vtable 0x0055825c, tier 1 addresses).
     // Slot 14 (0x00506220): draws the height field (tier 3 role; see Terrain.cpp).
     // Slot 12 (0x00507610): per-frame terrain preparation; best-guess body in
@@ -307,7 +258,7 @@ public:
     TerrainSurfaceRegistry* surfaceRegistry;  // +0x38  Load: desc->registry; when set, surfaces are ManagedTextures Register()ed with it
     TerrainStream* stream;                                      // +0x3c Load's stream argument
     float gridCellSize;                                           // +0x40 ctor 1.0f
-    TerrainShutdownObject* heightField;  // +0x44 object with CastSegment slot and GetCellCorners; QueryGround returns early when null; dtor Shutdown(1) then deletes
+    GridNode* heightField;  // +0x44 root of the height-field quadtree; QueryGround returns early when null; dtor Shutdown(1) then deletes
     TerrainVec3 boundsMin;                                      // +0x48 Load: FLT_MAX, filled by the height field, scaled by gridCellSize
     TerrainVec3 boundsMax;                                      // +0x54 Load: -FLT_MAX, filled, x/z + 16, scaled
     char viewerPosition[0x6c - 0x60];  // +0x60  GridTerrain viewerX/Y/Z: viewer position Griddraw measures node/vertex distances from

@@ -3,8 +3,6 @@
 // nothing defines.  None of this is a byte-match claim; it exists so the source-built game
 // links.  Where the retail VA already has a definition under its owner's name, the view
 // forwards to it:
-//   0x00484d70 TerrainShutdownObject::LookupCell -> written out (an older walk spelling of
-//              GridNode::FindLeaf, now exact in src/reconstructed/GridNode.cpp)
 //   0x004a1410 TerrainMatrixIdentityInto  -> ShadowMatrixIdentity (-> IdentityMatrix)
 //   0x004a1860 TerrainMatrixMultiplyInto  -> ShadowMatrixMultiply (-> MatrixMult)
 //   0x00421cb0 TerrainShadowSum           -> Vec3AddCall
@@ -13,6 +11,7 @@
 //   0x00506e90 TerrainShadowCaster::CastSegment      -> Terrain::CastSegment
 #include "broadphase/Terrain.h"
 #include "shadow/ProjectedShadow.h"
+#include "Griddraw.h"
 
 // The sample's local views, redeclared with its class keys so the mangled names agree.
 struct TerrainShadowVec {
@@ -26,7 +25,7 @@ struct TerrainShadowVecCall : TerrainShadowVec {
 class TerrainShadowCaster {
 public:
     int CastSegment(const TerrainShadowVec* from, const TerrainShadowVec* to, TerrainShadowVec* hit,
-                    TerrainCell** cell, int a, int b);                             // 0x00506e90
+                    DrawableGridNode** cell, int a, int b);                             // 0x00506e90
 };
 ShadowMatrix* TerrainMatrixIdentityInto(ShadowMatrix* out);                         // 0x004a1410
 ShadowMatrix* TerrainMatrixMultiplyInto(ShadowMatrix* out, ShadowMatrix a, ShadowMatrix b);  // 0x004a1860
@@ -37,36 +36,6 @@ TerrainShadowVec TerrainShadowDifference(const TerrainShadowVec& a, const Terrai
 struct Vec3;
 Vec3* Vec3AddCall(Vec3* out, const Vec3* a, const Vec3* b);        // 0x00421cb0
 Vec3* Vec3SubtractCall(Vec3* out, const Vec3* a, const Vec3* b);   // 0x00421d00
-
-// ---------------------------------------------------------------------------------------------
-// 0x00484d70 (thiscall, ret 8): the heightField is the root GridNode (src/reconstructed/
-// Griddraw.h); children at +0x04 (16 x 16 table), shift at +0x29, grid position at +0x24/+0x26.
-// The row table at 0x0056c2ac is g_gridRow16 (row * 16), written here as the multiply.
-// best guess: the old 81/90 walk spelling of GridNode::FindLeaf (exact form in GridNode.cpp) over a local view.
-struct Group6TerrainGridNodeView {
-    void* vtable;                                   // +0x00
-    Group6TerrainGridNodeView** children;           // +0x04
-    char pad_0x08[0x24 - 0x08];
-    unsigned short gridX;                           // +0x24
-    unsigned short gridZ;                           // +0x26
-    unsigned char level;                            // +0x28
-    unsigned char shift;                            // +0x29
-};
-
-TerrainCell* TerrainShutdownObject::LookupCell(int x, int z)
-{
-    Group6TerrainGridNodeView* node = reinterpret_cast<Group6TerrainGridNodeView*>(this);
-    Group6TerrainGridNodeView** table = node->children;
-    while (table) {
-        node = table[((z >> node->shift) & 0xf) * 16 + ((x >> node->shift) & 0xf)];
-        if (!node)
-            return 0;
-        table = node->children;
-    }
-    if (node->gridX != x || node->gridZ != z)
-        return 0;
-    return reinterpret_cast<TerrainCell*>(node);
-}
 
 // ---------------------------------------------------------------------------------------------
 // 0x004a1410 / 0x004a1860 with an explicit destination (returned), as the sample calls them.
@@ -114,15 +83,14 @@ TerrainShadowVecCall::TerrainShadowVecCall(float x_, float y_, float z_)
 }
 
 // ---------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------
 // 0x00506e90 (thiscall, ret 0x18): Terrain::CastSegment.  The sample's caster is the
-// TerrainShadow's Terrain; its fourth argument (the hit cell out-pointer) is Terrain's first
-// forwarded int, which reaches GridNode slot 1's outNode.
+// TerrainShadow's Terrain; its fourth argument (the hit cell out-pointer) is Terrain's outNode,
+// which reaches GridNode slot 1 (IntersectSegment).
 // best guess: forwarding to the canonical method at the same VA.
 int TerrainShadowCaster::CastSegment(const TerrainShadowVec* from, const TerrainShadowVec* to,
-                                     TerrainShadowVec* hit, TerrainCell** cell, int a, int b)
+                                     TerrainShadowVec* hit, DrawableGridNode** cell, int a, int b)
 {
     return reinterpret_cast<Terrain*>(this)->CastSegment(
         reinterpret_cast<const TerrainVec3*>(from), reinterpret_cast<const TerrainVec3*>(to),
-        reinterpret_cast<TerrainVec3*>(hit), reinterpret_cast<int>(cell), a, b);
+        reinterpret_cast<TerrainVec3*>(hit), reinterpret_cast<GridNode**>(cell), (int*)a, (int*)b);
 }

@@ -466,7 +466,7 @@ class Signature:
         return total
 
 
-DEFAULT_STRUCT_SIZES = {'Vec3': 12, 'GridVec3': 12}
+DEFAULT_STRUCT_SIZES = {'Vec3': 12, 'TerrainVec3': 12}
 _SIMPLE_TYPES = {'C': ('int', 1), 'D': ('int', 1), 'E': ('int', 1), 'F': ('int', 2), 'G': ('int', 2),
                  'H': ('int', 4), 'I': ('int', 4), 'J': ('int', 4), 'K': ('int', 4), 'M': ('float', 4),
                  'N': ('double', 8), 'O': ('double', 8), 'X': ('void', 0)}

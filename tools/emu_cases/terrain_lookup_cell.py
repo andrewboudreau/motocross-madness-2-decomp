@@ -1,6 +1,6 @@
-"""TerrainShutdownObject::LookupCell 0x00484d70, grid leaf lookup (tools/emu_diff.py case).
+"""GridNode::FindLeaf 0x00484d70, grid leaf lookup (tools/emu_diff.py case).
 
-Linked from src/bringup/Group6_TerrainShadow.cpp. A random sparse grid tree (1 to 3 levels):
+Linked from src/reconstructed/GridNode.cpp. A random sparse grid tree (1 to 3 levels):
 child tables of 256 slots (+0x04) at a random density, per-node shift (+0x29) and leaves
 whose 16-bit grid position (+0x24/+0x26) matches the queried cell, a neighbour or garbage.
 Queries are cells inside the tree, negative and past the 16-bit range (so the unsigned
@@ -10,8 +10,8 @@ import random
 import struct
 
 RETAIL_VA = 0x00484d70
-SYMBOL = '?LookupCell@TerrainShutdownObject@@QAEPAUTerrainCell@@HH@Z'
-SOURCE = 'src/bringup/Group6_TerrainShadow.cpp'
+SYMBOL = '?FindLeaf@GridNode@@QAEPAV1@HH@Z'
+SOURCE = 'src/reconstructed/GridNode.cpp'
 PROBES = {0x00484da7: 'descend', 0x00484dc2: 'miss', 0x00484dc4: 'return'}
 
 

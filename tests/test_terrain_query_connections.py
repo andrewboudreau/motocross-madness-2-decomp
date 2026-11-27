@@ -98,7 +98,7 @@ class TerrainQueryConnectionsTests(unittest.TestCase):
             records = [(r.virtual_address - entry.value, r.type,
                         provider.symbol_by_index[r.symbol_index].name) for r in relocations]
             self.assertEqual(hashlib.sha256(body + json.dumps(records).encode()).hexdigest(),
-                             '6afd82c44b51bcd4b9cdd548a1bc7f48268306699cf52251a63f3437a6df2213')
+                             'c9f33d4e9443d88c48077732ec1bdee8fe030b488015d33e79023bf8917b3f6e')
             print(f'{len(cases)} strict caller comparisons; 23 query call boundaries and complete partial provider preserved')
 
 

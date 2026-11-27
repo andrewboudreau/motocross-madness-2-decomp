@@ -4,7 +4,7 @@
 // Retail 0x00506e90 (thiscall, ret 0x18) is Terrain::CastSegment, reconstructed in
 // src/krusty2/broadphase/Terrain.cpp: the physics objects' +0x1f4 probe is the
 // terrain.  The view's method forwards to the canonical body
-// (?CastSegment@Terrain@@QAEHPBUTerrainVec3@@0PAU2@HHH@Z).  TerrainVec3 and Vec3 are
+// (?CastSegment@Terrain@@QAEHPBUTerrainVec3@@0PAU2@PAPAVGridNode@@PAH3@Z).  TerrainVec3 and Vec3 are
 // both three packed floats.
 
 #include "soultree/SoultreePhysicsBaseObjectCore.h"
@@ -15,5 +15,5 @@ int SoultreeProbe::CastSegment(const Vec3* from, const Vec3* to, Vec3* out, int 
 {
     return reinterpret_cast<Terrain*>(this)->CastSegment(
         reinterpret_cast<const TerrainVec3*>(from), reinterpret_cast<const TerrainVec3*>(to),
-        reinterpret_cast<TerrainVec3*>(out), a, b, c);
+        reinterpret_cast<TerrainVec3*>(out), (GridNode**)a, (int*)b, (int*)c);
 }

@@ -83,18 +83,10 @@ struct FollowCameraPoint {
     Vector3 screenPoint;  // +0x20  slot 38: ProjectPoint writes the screen point; nearest two by z go to slot 73
 };
 
-// Object at FollowCamera+0x240: the Terrain (QueryGround is Terrain::QueryGround 0x00507c10);
-// slots 43/44 test its +0xbe8, which Terrain::Load reads from the file header.
-struct FollowCameraTerrainView {
-    // 0x00507c10: adjusts *point (KrustyBikeCamera slot 52 reads its new y).
-    void QueryGround(Vector3* point, int a, int b, int c);
-
-    unsigned char field_0x000[0x40];
-    float gridCellSize;                       // +0x40  Terrain gridCellSize; SetSubject 0x00463600 copies it to subjectCellSize
-    unsigned char field_0x044[0xbe8 - 0x44];
-    int field_0xbe8;
-};
-
+// FollowCamera+0x240 is the Terrain (Terrain.h): SetSubject copies its
+// gridCellSize, slots 43/44 test its +0xbe8 and the ground queries call
+// Terrain::QueryGround 0x00507c10.
+class Terrain;
 // FollowCamera's view of ControlInterface's active joystick (+0x0c): slot 45
 // tests only the low byte of slot 4's result (JoystickDevice.h declares int),
 // as with FollowCameraKeyboardDeviceView. Slot 4 reads stick `index` into *x/*y.
@@ -223,7 +215,7 @@ public:
     bool AppendTableEntry(const Vector3& position, float distanceRate, float raiseRate,
                           float lowerRate, float tiltRate, float yawRate);
     // 0x00463600: stores the subject and copies its +0x40.
-    void SetSubject(FollowCameraTerrainView* subject);
+    void SetSubject(Terrain* subject);
 
     // The camera data is public: BikeRace, the quarry loader, the overlays,
     // the race sound and VCRDlg (InGameProcs.cpp) read and write it directly.
@@ -236,7 +228,7 @@ public:
     float followYaw;                          // +0x234 yaw slot 49 adds to +0x308 / +0x23c; presets in slots 63-67
     float initialYaw;                         // +0x238 copy of followYaw
     float worldYaw;  // +0x23C  slot 49 non-orbit: rotates world Z by followYaw + it; re-based from the orbit yaw, slot 39 added
-    FollowCameraTerrainView* subject;      // +0x240 (0x00463600 SetSubject)
+    Terrain* subject;      // +0x240 (0x00463600 SetSubject)
     int cameraState;                 // +0x244, current state (slots 70-72, 75)
     int savedCameraState;            // +0x248, saved state (slot 70)
     float savedFieldOfView;          // +0x24c, saved targetFieldOfView (slot 70)

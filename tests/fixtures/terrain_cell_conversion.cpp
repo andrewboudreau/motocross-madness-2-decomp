@@ -16,7 +16,7 @@ static unsigned char material;
 struct Observation {int called,x,z,normal;unsigned fp,control;TerrainVec3 point,output;unsigned char material;};
 static Observation observed,expected;
 static unsigned checks;
-int GridNode::GetCellCorners(int x,int z,float* heights,GridVec3* normals,unsigned char* kinds){
+int GridNode::GetCellCorners(int x,int z,float* heights,TerrainVec3* normals,unsigned char* kinds){
     if((void*)this!=fieldBytes || !heights || !kinds)ExitProcess(81);
     observed.called=1;observed.x=x;observed.z=z;observed.normal=normals!=0;
     throw 0x3910; // Stop at the first cell request, before interpolation.
@@ -45,7 +45,7 @@ static int Map(const char* name){
 }
 static void Run(int retail,unsigned x,unsigned z,unsigned scale,int mode,int precision,int hasField,int wantsNormal){
     memset(&observed,0,sizeof(observed));memset(terrainBytes,0x71,sizeof(terrainBytes));
-    Terrain* terrain=(Terrain*)terrainBytes;terrain->heightField=hasField?(TerrainShutdownObject*)fieldBytes:0;
+    Terrain* terrain=(Terrain*)terrainBytes;terrain->heightField=hasField?(DrawableGridNode*)fieldBytes:0;
     memcpy(&terrain->invGridCellSize,&scale,4);memcpy(&point.x,&x,4);point.y=7.25f;memcpy(&point.z,&z,4);
     normal.x=3;normal.y=4;normal.z=5;material=0x37;
     _control87(_MCW_EM|precision|mode,_MCW_EM|_MCW_PC|_MCW_RC);_clear87();
