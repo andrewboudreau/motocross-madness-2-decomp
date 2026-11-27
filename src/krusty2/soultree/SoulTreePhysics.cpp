@@ -12,6 +12,7 @@
 #include "core/DebugAlloc.h"
 #include "core/MemTag.h"
 #include "soultree/SoultreePhysicsContact.h"
+#include "../../reconstructed/SceneManager.h"
 #include "soultree/SoultreePhysicsObject.h"
 #include "soultree/SoultreePhysicsCharacter.h"
 #include "collision/CollisionPoint.h"
@@ -262,7 +263,7 @@ void SoultreePhysicsBaseObject::UpdateContactEffect(SoultreeAttachment* attachme
     for (int i = 0; i < collisionPointCount; i++) {
         SoultreeContact* contact = collisionPoints[i];
         if (contact->touching && !contact->effectSpawned &&
-            track->trackData->materialEffectFlags[(unsigned char)contact->materialId] != 0) {
+            track->environment->generateDust[(unsigned char)contact->materialId] != 0) {
             contact->effectSpawned = 1;
             reinterpret_cast<DustParticleEmitter*>(attachment->contactEmitter)->SetPosition(
                 reinterpret_cast<const ParticleVec3&>(contact->surfacePosition), 0.0f);
@@ -792,7 +793,7 @@ GameObject* SoultreePhysicsBaseObject::InitializePhysics(int renderContext, int 
                                                            Vec3 startUp, void* terrainProbe,
                                                            void* linkedObject, float weight,
                                                            int contactCapacity, int attachmentSlots,
-                                                           SoultreeSlot1f0* trackObject,
+                                                           Scene* trackObject,
                                                            float fixedStep, int maxSteps, float drag,
                                                            float elasticity, float radius,
                                                            int shapeMode, int restThreshold,
@@ -1132,7 +1133,7 @@ GameObject* SoultreePhysicsObject::LoadPhysicsModel(int renderContext, const cha
                                                         Vec3 startPosition, Vec3 startForward,
                                                         Vec3 startUp, void* terrainProbe, void* linkedObject,
                                                         float weight, int contactCapacity, int attachmentSlots,
-                                                        SoultreeSlot1f0* trackObject, float fixedStep,
+                                                        Scene* trackObject, float fixedStep,
                                                         int maxSteps, float drag, float elasticity,
                                                         float radius, int shapeMode, int restThreshold,
                                                         unsigned char probeMask, int createCollision)
@@ -1204,7 +1205,7 @@ GameObject* SoultreePhysicsCharacter::LoadPhysicsModel(int renderContext, int cr
                                                            Vec3 startPosition, Vec3 startForward,
                                                            Vec3 startUp, void* terrainProbe, void* linkedObject,
                                                            float weight, int contactCapacity, int attachmentSlots,
-                                                           SoultreeSlot1f0* trackObject, float fixedStep,
+                                                           Scene* trackObject, float fixedStep,
                                                            int maxSteps, float drag, float elasticity,
                                                            int restThreshold, unsigned char probeMask, int createCollision)
 {

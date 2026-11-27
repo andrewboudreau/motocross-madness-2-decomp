@@ -17,7 +17,7 @@ import struct
 
 RETAIL_VA = 0x004079c0
 SYMBOL = ('?LoadBike@Bike@@QAEPAVGameObject@@HPBD00PBVLightManager@@PBUTextureContext@@UVec3@@33PAXPAU'
-          'VehicleInputMap@@0HHPAHHHHMMMMMMHH44PAUVehicleAxis@@77PAVSoultreeSlot1f0@@MH@Z')
+          'VehicleInputMap@@0HHPAHHHHMMMMMMHH44PAUVehicleAxis@@77PAVScene@@MH@Z')
 SOURCE = 'src/krusty2/vehicle/Bike.cpp'
 # Math3D.h's axis constants are per-unit statics (bound to many VAs repo-wide); these are Bike.cpp's
 # (src/krusty2/vehicle/Bike.bindings.json). setup gives them their initialized values.

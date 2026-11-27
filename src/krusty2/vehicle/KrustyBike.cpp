@@ -43,6 +43,8 @@
 #include "../../reconstructed/TrackOverlay.h"   // ChatOverlay
 #include "../../reconstructed/KrustyBikeCamera.h"
 #include "../../reconstructed/Krusty3DObjects.h"   // BonusObjectManager (the score board)
+#include "../../reconstructed/SceneManager.h"
+#include "../../reconstructed/CarProcedural.h"
 
 // KbFloat: identity inline standing in for the original inline float getters (tier 3).
 // Passing a member straight to a float parameter makes VC6 push the raw dword; retail
@@ -303,12 +305,12 @@ int KrustyBike::ClassifyOutOfBounds(int grounded)
         float lo = terrainScale * 105.0f;
         if (position.x < lo)
             return 1;
-        KbTrackB* grid = ((KbTrackA*)track)->trackData;
-        if ((grid->sizeX * 256.0f - 105.0f) * terrainScale < position.x)
+        SceneEnvironment* environment = track->environment;
+        if ((environment->terrainWidth * 256.0f - 105.0f) * terrainScale < position.x)
             return 2;
         if (position.z < lo)
             return 3;
-        if ((grid->sizeZ * 256.0f - 105.0f) * terrainScale < position.z)
+        if ((environment->terrainBreadth * 256.0f - 105.0f) * terrainScale < position.z)
             return 4;
     }
     return 0;
@@ -970,7 +972,7 @@ GameObject* KrustyBike::Load(void* context, const char* engineName, const char* 
              (VehicleAxis*)&g_TrackGame->steerBinding,
              (VehicleAxis*)&g_TrackGame->leanBinding,
              (VehicleAxis*)&g_TrackGame->throttleBinding,
-             (SoultreeSlot1f0*)scene, setupFloat, 0);
+             scene, setupFloat, 0);
     if (isRemote) {
         VehicleSmoother* axis = steerAxis;
         axis->smoothedValue = 0.5f;
@@ -1341,9 +1343,9 @@ int KrustyBike::EvaluateCrash(float dt, float noseOverLimit, int impact, float i
 {
     if (crashState) return crashState;
     if (ClassifyOutOfBounds(anyWheelInContact)) {
-        KbTrackB* grid = ((KbTrackA*)track)->trackData;
-        scratchVector = Vec3(grid->sizeX * terrainScale * 128.0f, 20.0f,
-                             grid->sizeZ * terrainScale * 128.0f);
+        SceneEnvironment* environment = track->environment;
+        scratchVector = Vec3(environment->terrainWidth * terrainScale * 128.0f, 20.0f,
+                             environment->terrainBreadth * terrainScale * 128.0f);
         Vec3 off = scratchVector - position;
         velocity = off * 0.055f;
         velocity.y = 120.0f;
@@ -3238,11 +3240,11 @@ void KrustyBike::ApplySpawnCollisionIgnores(int protect)
             if (other != this)
                 IgnoreCollisionsWith(other);
         }
-        if (((KbTrackA*)track)->partList && !isRemote) {
-            for (int i = 0; i < ((KbTrackA*)track)->partList->count; i++) {
-                KbPart* part = ((KbTrackA*)track)->partList->items + i;
-                if (!(part->flags & 8))
-                    part->obj->collider->RemoveIgnoredOwner((void*)collisionObject);
+        if (track->animationTable && !isRemote) {
+            for (int i = 0; i < track->animationTable->entryCount; i++) {
+                SceneAnimation* animation = track->animationTable->entries + i;
+                if (!animation->keyFramed)
+                    animation->proceduralObject->bodyCollider->RemoveIgnoredOwner((void*)collisionObject);
             }
         }
     } else {
@@ -3250,13 +3252,13 @@ void KrustyBike::ApplySpawnCollisionIgnores(int protect)
             if (other != this && (!isRemote || !other->isRemote))
                 RestoreCollisionsWith(other);
         }
-        if (((KbTrackA*)track)->partList && !isRemote) {
-            for (int i = 0; i < ((KbTrackA*)track)->partList->count; i++) {
-                if (!(((KbTrackA*)track)->partList->items[i].flags & 8)) {
-                    KbPart* part = ((KbTrackA*)track)->partList->items + i;
-                    KbPartObj* obj = part->obj;
-                    obj->collider->AddIgnoredOwner(bikeCollision);
-                    obj->collider->AddIgnoredOwner(bikeAndRiderCollision);
+        if (track->animationTable && !isRemote) {
+            for (int i = 0; i < track->animationTable->entryCount; i++) {
+                if (!(track->animationTable->entries[i].keyFramed)) {
+                    SceneAnimation* animation = track->animationTable->entries + i;
+                    CarProcedural* car = animation->proceduralObject;
+                    car->bodyCollider->AddIgnoredOwner(bikeCollision);
+                    car->bodyCollider->AddIgnoredOwner(bikeAndRiderCollision);
                 }
             }
         }

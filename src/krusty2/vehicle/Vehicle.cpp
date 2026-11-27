@@ -11,6 +11,7 @@
 #include "soultree/SoultreePhysicsCallees.h"
 #include "collision/CollisionPoint.h"
 #include "../../reconstructed/ParticleEmitters.h"
+#include "../../reconstructed/SceneManager.h"
 
 void Vehicle::UpdateMass(float extraWeight)
 {
@@ -2050,7 +2051,7 @@ GameObject* Vehicle::LoadVehicle(int context, const char* engineName, const char
                                  int extraContacts, int attachmentSlots, int earlyCap, int lateCap, int defaultEngine,
                                  int* torqueTable, int rpmLow, int rpmHigh, int rpmStep, float gearArg,
                                  VehicleAxis* steer, VehicleAxis* lean, VehicleAxis* throttle,
-                                 SoultreeSlot1f0* trackObject, int createCollision)
+                                 Scene* trackObject, int createCollision)
 {
     int i;
 
@@ -2103,7 +2104,7 @@ GameObject* Vehicle::LoadVehicle(int context, const char* engineName, const char
                                                    startForward, startUp, terrainProbe, linkedObject,
                                                    weight, wheelCap + extraContacts, attachmentSlots,
                                                    trackObject, 0.02f, 100, 0.001f, 0.1f, 3,
-                                                   trackObject ? ((VehicleTrackView*)trackObject)->probeMask : 0,
+                                                   trackObject ? trackObject->groundProbeMask : 0,
                                                    createCollision);
     if (particleManager) {
         sparkEmitter = new(__FILE__, 0x1dc) SparkParticleEmitter(1);

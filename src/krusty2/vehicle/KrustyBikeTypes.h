@@ -12,8 +12,6 @@ struct KbSession;
 struct KbPlayer;
 struct KbBody;
 struct KbSink;
-struct KbTrackA;
-struct KbTrackB;
 struct KbXform;
 struct KbChild;
 struct KbObj128;
@@ -152,26 +150,6 @@ extern int g_kbAllowNegative;        // 0x0056CB5C
 extern int g_kbInterpolate;          // 0x0056CB60
 extern float g_kbStallThreshold;     // 0x0056CB64  interval time at which slot 50 holds
 extern float g_kbStallHoldSec;       // 0x0056CB68  length of that hold
-
-// Part table at Vehicle+0x1f0 -> +0xb4 (tier 3): count at +0, 0x44-byte records at +4.  A record
-// with flag bit 3 clear owns a collision object at record+8 -> +0x3c.
-struct KbPartObj { char pad_0x00[0x3C]; CollisionObject* collider; };  // +0x3c: AddIgnoredOwner 0x00439410 is called on it
-struct KbPart { unsigned char flags; char pad_0x01[7]; KbPartObj* obj; char pad_0x0C[0x38]; };
-struct KbPartList { int count; KbPart* items; };
-// The bike's track object (SoultreePhysicsBaseObject::track, SoultreeSlot1f0); tier 3 names.
-struct KbTrackA {
-    char pad_0x0000[0xA4];
-    KbTrackB* trackData;   // +0xa4 SoultreeSlot1f0::trackData
-    char pad_0x00A8[0xC];
-    KbPartList* partList;  // +0xb4 parts whose colliders take the bike as an ignored owner
-};
-struct KbTrackB {
-    char pad_0x0000[0x394];
-    float sizeX;           // +0x394 map extent along x in 256-unit cells (slot 12's bounds;
-                           //        slot 99 aims at sizeX * 128 * terrainScale, the centre)
-    float sizeZ;           // +0x398 the same along z
-};
-
 
 // Object at TrackGame+0x3444 (proCircuit; bonus rules; packed: its ints sit at odd offsets).
 #pragma pack(push, 1)

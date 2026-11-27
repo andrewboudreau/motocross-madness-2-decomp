@@ -1129,7 +1129,7 @@ int Scene::ReadStaticModels(LightManager* lights, ParticleManager* particleManag
             AppendChild(object->LoadPhysicsModel((int)renderContext, sltPath, lights,
                                                                modelTextures, *reinterpret_cast<Vec3*>(&position),
                                                                *reinterpret_cast<Vec3*>(&look), *reinterpret_cast<Vec3*>(&up),
-                                                               0, particleManager, 5.0f, points, emitters, (SoultreeSlot1f0*)this,
+                                                               0, particleManager, 5.0f, points, emitters, this,
                                                                0.033333f, 10, 0.025f, 0.05f, radius, shape,
                                                                minPoints, groundProbeMask, 1),
                                   -1);

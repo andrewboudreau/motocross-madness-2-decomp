@@ -60,7 +60,7 @@ public:
                                              Vec3 startUp, void* terrainProbe,
                                              void* linkedObject, float weight,
                                              int contactCapacity, int attachmentSlots,
-                                             SoultreeSlot1f0* trackObject, float fixedStep,
+                                             Scene* trackObject, float fixedStep,
                                              int maxSteps, float drag, float elasticity,
                                              float radius, int shapeMode, int restThreshold,
                                              unsigned char probeMask, int createCollision);

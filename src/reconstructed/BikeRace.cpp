@@ -3028,7 +3028,7 @@ void BikeRace::WriteRelativePositions(Vector3* a, Vector3* b, void* reference, i
 
 // Inline: TrackGame+0x568's tag ball, reloaded at each use.
 static inline TagBall* Ball() {
-    return (TagBall*)g_TrackGame->tagEvent->ball;
+    return g_TrackGame->tagEvent->ball;
 }
 
 // 0x00421d50

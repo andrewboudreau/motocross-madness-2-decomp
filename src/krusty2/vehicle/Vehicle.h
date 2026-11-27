@@ -192,12 +192,6 @@ struct VehicleAxis {                 // objects at Vehicle+0x4f8/0x4fc/0x500 (pr
     char pad_0x04[0x20];
     float axisValue;                // +0x24 axis value (slot 63 reads it)
 };
-// The track object (SoultreeSlot1f0) as LoadVehicle reads it: only the byte at +0x88, forwarded
-// to the base loader's a20.
-struct VehicleTrackView {
-    char pad_0x00[0x88];
-    unsigned char probeMask;  // +0x88 LoadVehicle passes it as LoadPhysicsModel's probeMask (stored in groundProbeMask)
-};
 struct VehicleTicker {               // elements of Vehicle+0x554/+0x560: the bike adds its two Shock objects
     virtual void Reset();            // Shock slot 0 (0x004f9ba0); only this slot is called
 };
@@ -277,7 +271,7 @@ struct VehicleWheel {
                  int field_0x298_, VehicleSteerState* steer, float slipThreshold_,
                  float rollFrictionScale_, float sideFrictionScale_, float driveStrength_,
                  float driveTorqueScale_, float levelRiseRate_, float levelFallRate_, float blendWeight_,
-                 SoultreeSlot1f0* track);
+                 Scene* track);
     char pad_0x00[0xB8];
     VehicleContactPoint contactPoint;  // +0xb8 AddWheel registers it in collisionPoints
     char pad_0xBC[0x10];

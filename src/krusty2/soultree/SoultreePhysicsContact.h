@@ -82,16 +82,4 @@ public:
     char resetTrail;  // +0x24 slot 21: resetTrail |= justReset; when set, slots 18/21 copy the target's current position over its previous one, then clear it
 };
 
-// Object at SoultreePhysicsBaseObject::track (slot 18: byte table at +0x400 of *(+0xa4)).
-class SoultreeFlagBlock {
-public:
-    char field_0x00[0x400];
-    char materialEffectFlags[256];  // +0x400 slot 18: nonzero entry for the contact's material id allows the type-1 effect
-};
-class SoultreeSlot1f0 {
-public:
-    char field_0x00[0xa4];
-    SoultreeFlagBlock* trackData;  // +0xa4 slot 18 reads trackData->materialEffectFlags[materialId] to decide whether a contact may spawn the effect
-};
-
 #endif

@@ -587,7 +587,7 @@ GameObject* Bike::LoadBike(int context, const char* engineName, const char* mode
                            int rpmLow, int rpmHigh, int rpmStep, float frontSpring, float frontDamper,
                            float rearSpring, float rearDamper, float frontRatio, float rearRatio,
                            int gasGyroOption, int brakeGyroOption, void* linkedObject, void* device, VehicleAxis* steer,
-                           VehicleAxis* lean, VehicleAxis* throttle, SoultreeSlot1f0* trackObject,
+                           VehicleAxis* lean, VehicleAxis* throttle, Scene* trackObject,
                            float weight, int createCollision)
 {
     int i;

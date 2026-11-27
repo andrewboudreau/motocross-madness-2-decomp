@@ -37,7 +37,7 @@ struct SoultreeProbe {
     int CastSegment(const Vec3* from, const Vec3* to, Vec3* out, int a, int b,
                   int c);
 };
-class SoultreeSlot1f0;
+class Scene;  // SceneManager.h
 class SoultreeAttachTarget;
 class SoultreeAttachment; // 40-byte records in the attachments array
 
@@ -79,7 +79,7 @@ public:
                                             Vec3 startPosition, Vec3 startForward, Vec3 startUp,
                                             void* terrainProbe, void* linkedObject, float weight,
                                             int contactCapacity, int attachmentSlots,
-                                            SoultreeSlot1f0* trackObject, float fixedStep,
+                                            Scene* trackObject, float fixedStep,
                                             int maxSteps, float drag, float elasticity,
                                             float radius, int shapeMode, int restThreshold,
                                             unsigned char probeMask, int createCollision);
@@ -245,7 +245,7 @@ public:
     float fixedStepTime;  // +0x1e4 slot 2's a12; slot 9 divides the frame time into steps of fixedStepTime and uses it as stepTime
     float lastStepTime;  // +0x1e8 Vehicle slot 49: lastStepTime = stepTime after each sub-step
     int maxStepsPerFrame;  // +0x1ec slot 2's a13; slot 9 clamps the number of sub-steps to it
-    SoultreeSlot1f0* track;  // +0x1f0 slot 2's a11; slot 18 indexes its +0xa4 block's +0x400 byte table by the contact material id; KrustyBike views the same pointer as its track object
+    Scene* track;  // +0x1f0 slot 2's a11: the event Scene; slot 18 reads its environment's generateDust by the contact material id
     SoultreeProbe* terrain;         // +0x1f4 tier 2: slot 2 stores a6 here and reads float +0x40 from it;
                                         // slot 21 calls thiscall 0x00506e90 on it; passed as 'obj' to 0x004b0df0
     float terrainScale;                  // +0x1f8 fld/fmul in KrustyBike slot 12 (0x0048de20), tier 1

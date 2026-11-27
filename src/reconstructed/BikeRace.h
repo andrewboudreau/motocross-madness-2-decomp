@@ -181,15 +181,22 @@ struct VcrFollowRecord {
     int followedRacerId;  // +0x8  FollowRacer sends followedRacer->networkPlayerId; RecordFrame matches it to racer recorderId
 };
 
-// TrackGame+0x568's +0xdc object as the replay recorder callback reaches it
-// (TrackGame.h keeps the type for 0x004a9d10's symbol): the Tag event's ball.
+// The Tag event's ball, TrackGame+0x568's +0xdc (TrackGameViewOwner::ball).
+// FollowRacer.cpp implements both methods.
 class TagBall {
 public:
     // 0x004a9aa0 (FollowRacer.cpp): applies record kind 0x10 to a state (as
     // 0x004933e0).
     void ApplyReplayDelta(const TagBallStateDelta* delta, TagBallReceivedState* part);
+    void SetRecorder(KrustyVCR* vcr); // 0x004a9d10: keeps the recorder at +0x708
 
-    unsigned char field_0x000[0x4f8];
+    unsigned char field_0x000[0x10a];
+    unsigned char asleep;                     // +0x10a SoultreePhysicsBaseObject::asleep; cleared when the followed racer changes (0x004a9e80)
+    unsigned char field_0x10b[0x21c - 0x10b];
+    // +0x21c: the ball's D3DIMSoultreeObject subobject (SoultreePhysicsObject
+    // layout); VisualCue::Tick (0x0048b100) turns the cue toward its
+    // SoultreeObject::GetPosition (0x004fc970).
+    unsigned char sceneObject[0x4f8 - 0x21c];
     int hasState;                             // +0x4f8 has a state
     TagBallReceivedState* receivedStates[4];  // +0x4fc newest first (0x00421d50 rotates them)
     unsigned char field_0x50c[0x5d4 - 0x50c];
@@ -200,6 +207,8 @@ public:
     float pitch;                              // +0x5FC  record +0x14. Tier 3
     float yaw;                                // +0x600  record +0x18. Tier 3
     int runningTime;                          // +0x604 running time
+    unsigned char field_0x608[0x708 - 0x608];
+    KrustyVCR* recorder;                      // +0x708
 };
 
 // KrustyUI+0x48 records (0xc8 bytes; slot 10's debug page names the

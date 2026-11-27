@@ -152,7 +152,7 @@ public:
                             int extraContacts, int attachmentSlots, int earlyCap, int lateCap, int defaultEngine,
                             int* torqueTable, int rpmLow, int rpmHigh, int rpmStep, float gearArg,
                             VehicleAxis* steer, VehicleAxis* lean, VehicleAxis* throttle,
-                            SoultreeSlot1f0* trackObject, int createCollision);
+                            Scene* trackObject, int createCollision);
     int DetectCrash();      // 0x00478fe0, shared `xor eax,eax; ret` stub (direct call from CheckCrash)
     int AddEarlyTicker(VehicleTicker* ticker);                  // 0x00525cb0, append to earlyTickers
     int AddLateTicker(VehicleTicker* ticker);                   // 0x00525cf0, append to lateTickers

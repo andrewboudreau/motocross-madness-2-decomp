@@ -4,6 +4,7 @@
 
 #include "../krusty2/broadphase/Terrain.h"
 #include "BikeRaceCore.h"
+#include "BikeRace.h"
 #include "../krusty2/vehicle/KrustyBikeCore.h"
 #include "../krusty2/tire/Tire.h"
 #include "RaceView.h"

@@ -110,7 +110,7 @@ public:
                          int rpmLow, int rpmHigh, int rpmStep, float frontSpring, float frontDamper,
                          float rearSpring, float rearDamper, float frontRatio, float rearRatio,
                          int gasGyroOption, int brakeGyroOption, void* linkedObject, void* device, VehicleAxis* steer,
-                         VehicleAxis* lean, VehicleAxis* throttle, SoultreeSlot1f0* track,
+                         VehicleAxis* lean, VehicleAxis* throttle, Scene* track,
                          float weight, int createCollision);
 
     // 0x0040a520 (2272 bytes): integrates a steering torque from the angular velocity, the

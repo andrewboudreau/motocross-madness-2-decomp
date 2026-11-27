@@ -165,9 +165,7 @@ segment's `horizontalLength`, `previous` and `next`; the work-list entry's
 centre `point` (+0x00, read as the point by `0x00518130`) and its edge
 points `edgeA` (+0x0c, mode 10 of `0x00518230`) and `edgeB` (+0x18, mode
 11); which edge is left
-is not settled. Physics keeps
-its own views (`KbTrack` and the list entry in KrustyBikeTypes.h). The
-renames changed no calibration bytes.
+is not settled. The renames changed no calibration bytes.
 
 Track's points are the shared `Vec3` (krusty2/math/Vec3.h); the former
 `TrackVec3` was a plain three-float struct. A D3DVECTOR-shaped replacement

@@ -29,23 +29,7 @@ class FollowCamera;
 // class of each owner is not established.
 class Scene;  // SceneManager.h
 
-// The object at TrackGameViewOwner+0xdc: bikerace.cpp 0x00420650 passes it
-// the new replay recorder (0x004a9d10). It is the tag ball BikeRace.h
-// declares as TagBall (FollowRacer.cpp implements both views).
-class KrustyVCR;
-class TrackGameTagBallView {
-public:
-    void SetRecorder(KrustyVCR* vcr); // 0x004a9d10: keeps the recorder at +0x708
-
-    unsigned char field_0x000[0x10a];
-    unsigned char asleep;                     // +0x10a SoultreePhysicsBaseObject::asleep; cleared when the followed racer changes (0x004a9e80)
-    unsigned char field_0x10b[0x21c - 0x10b];
-    // +0x21c: the ball's D3DIMSoultreeObject subobject (SoultreePhysicsObject
-    // layout); VisualCue::Tick (0x0048b100) turns the cue toward its
-    // SoultreeObject::GetPosition (0x004fc970).
-    unsigned char sceneObject[0x708 - 0x21c];
-    KrustyVCR* recorder;                      // +0x708
-};
+class TagBall;  // BikeRace.h
 
 struct RaceGateObject;  // RaceGateEvent.h
 
@@ -94,7 +78,7 @@ struct TrackGameViewOwner : public GameObject {
     int lapGate;  // +0xB0  picked gate: bikerace/KrustyBike pass the racer's lapGate (0x00404df0)
     int nextLapGate;  // +0xB4  picked gate: the racer's nextLapGate = (lapGate + 1) % count (0x00404df0)
     unsigned char field_0xb8[0xdc - 0xb8];
-    TrackGameTagBallView* ball;        // +0xdc string 0x14b7 "FREE BALL!" while set and no racer "is IT!" (StatsOverlay 0x0051aa40); BikeRace.cpp reads it as TagBall
+    TagBall* ball;                     // +0xdc string 0x14b7 "FREE BALL!" while set and no racer "is IT!" (StatsOverlay 0x0051aa40)
     unsigned char field_0xe0[0x420 - 0xe0];
     RaceGateObject* gates[1];  // +0x420  BikeRace 0x0041d170 builds gateList from the first +0xac entries
 };

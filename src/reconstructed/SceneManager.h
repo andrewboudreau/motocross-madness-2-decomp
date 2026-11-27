@@ -257,7 +257,7 @@ public:
     char sceneName[0x40];                 // "SceneInfo" "SceneName"
     Vector3 defaultStartPosition;             // +0x70 "SceneInfo" "DefaultStartPosition"
     Vector3 defaultStartDirection;            // +0x7c "SceneInfo" "DefaultStartDirection"
-    char groundProbeMask;
+    unsigned char groundProbeMask;            // +0x88 AttachSceneManager's probe mask; Vehicle::LoadVehicle zero-extends it into LoadPhysicsModel
     unsigned char field_0x89[3];
     Vector3 podiumPosition;                          // "PodiumPosition"
     Vector3 podiumDirection;                         // "PodiumDirection"

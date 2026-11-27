@@ -26198,10 +26198,10 @@ CASES = [
         'reason': 'applies a kind-0x10 replay delta (scaled byte triples, halved step) to the tag ball and copies its state into the part',
     },
     {
-        'name': 'FollowRacer.cpp 0x4a9d10 TrackGameTagBallView::SetRecorder',
+        'name': 'FollowRacer.cpp 0x4a9d10 TagBall::SetRecorder',
         'bindings': 'src/reconstructed/FollowRacer.bindings.json',
         'source': 'src/reconstructed/FollowRacer.cpp',
-        'symbol': '?SetRecorder@TrackGameTagBallView@@QAEXPAVKrustyVCR@@@Z',
+        'symbol': '?SetRecorder@TagBall@@QAEXPAVKrustyVCR@@@Z',
         'target_va': '0x004a9d10',
         'target_size': 13,
         'reason': 'stores the replay recorder at +0x708',

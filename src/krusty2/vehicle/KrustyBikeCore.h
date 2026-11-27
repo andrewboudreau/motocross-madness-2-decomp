@@ -139,7 +139,7 @@ public:
     // `name`, copied to Bike::riderName; a16 is its unused a19).  The types are those
     // BikeRace::CreateRacers declares for the values it passes (provisional, like its own:
     // the skill is a float, never read here).  Where Bike::LoadBike and this class's fields
-    // view an argument through another provisional type (scene as SoultreeSlot1f0*), Load
+    // view an argument through another provisional type, Load
     // casts at the use.
     GameObject* Load(void* context, const char* engineName, const char* modelPath, const char* riderModel,
                      LightManager* lights, TextureContext* textures, Vector3 startPosition, Vector3 forward,

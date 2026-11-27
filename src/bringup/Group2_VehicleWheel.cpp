@@ -21,7 +21,7 @@
 #include "math/Math3D.h"                 // Vec3, Matrix4, SoultreeObject, Vec3DotCall
 
 class SteeringControl;
-class SoultreeSlot1f0;
+class Scene;
 class Vehicle;
 struct SoultreeProbe;
 
@@ -105,7 +105,7 @@ struct VehicleWheel {
                  int field_0x298_, SteeringControl* steer, float slipThreshold_,
                  float rollFrictionScale_, float sideFrictionScale_, float driveStrength_,
                  float driveTorqueScale_, float levelRiseRate_, float levelFallRate_, float blendWeight_,
-                 SoultreeSlot1f0* track);
+                 Scene* track);
     void UpdateRoll(float dt, float distanceScale, int locked, int driven, int crashState,
                     float driveScale);
     void UpdateContactPatch(Vec3* pos, Vec3 axis, Vec3 ref, float minLength, float* outValue,
@@ -130,7 +130,7 @@ VehicleWheel::VehicleWheel(const char* name, SoultreeObject* root, float rollFri
                            float sideFriction_, int field_0x298_, SteeringControl* steer,
                            float slipThreshold_, float rollFrictionScale_, float sideFrictionScale_,
                            float driveStrength_, float driveTorqueScale_, float levelRiseRate_,
-                           float levelFallRate_, float blendWeight_, SoultreeSlot1f0* track)
+                           float levelFallRate_, float blendWeight_, Scene* track)
 {
     ::new ((void*)this) Tire((void*)name, (int)root, rollFriction_, sideFriction_, field_0x298_,
                              (int)steer, slipThreshold_, rollFrictionScale_, sideFrictionScale_,
