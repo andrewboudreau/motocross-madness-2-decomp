@@ -250,7 +250,7 @@
   "?Create@EcoSystem@@QAEPAV1@PAXPAVTextureMapManager@@PAVTerrain@@PAVLightManager@@PADPAVFileStream@@HHH@Z": "0x004594d0",
   "?Create@Fog@@QAEPAV1@PAXIMMMMM@Z": "0x00462680",
   "?Create@FogOn@@QAEPAVGameObject@@PAXPAVFog@@@Z": "0x00486a10",
-  "?Create@SkyCube@@QAEPAV1@PAXPAVFileStream@@PAUCubeTextureContextView@@M@Z": "0x004fb230",
+  "?Create@SkyCube@@QAEPAV1@PAXPAVFileStream@@PAUTextureContext@@M@Z": "0x004fb230",
   "?CreateGroup@TextureMapManager@@QAEPAVManagedTextureGroup@@HHHH@Z": "0x00511180",
   "?FindLightOfType@LightManager@@QAEPAVLightEmitter@@H@Z": "0x004a0190",
   "?GetSelectedSeries@TrackGameMode@@QAEHXZ": "0x00524100",

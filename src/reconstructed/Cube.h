@@ -30,19 +30,12 @@ class TextureMapManager;
 class ManagedTextureGroup;
 class FileStream;
 class ColorMapper;
+struct TextureContext;  // TextureLoader.h
 
 // cdecl 0x0043d080 (ControlInterface.h declares the same function): maps
 // the 2-bit field `index` of byte `byteIndex` of `bits` to 0x200, 0x40,
 // 0x80 or 0x100. Cube uses it as a face texture's size.
 int DecodeTextureSize(int bits, int index, int byteIndex);
-
-// The texture context 0x0043d460 receives: the manager the textures belong
-// to and, when set, the group that takes ManagedTextures. The same pointer
-// is handed on as PCTextureMap slot 5's format-choice argument.
-struct CubeTextureContextView {
-    TextureMapManager* manager;                 // +0x00 owner of the textures
-    ManagedTextureGroup* textureGroup;          // +0x04 takes ManagedTextures when set
-};
 
 // One face, 0xf8 bytes (stride from 0x0043d110, 0x0043d230, 0x0043d460).
 struct CubeFace {
@@ -76,9 +69,9 @@ public:
     int SetVectors(const Vector3* newCenter, const Vector3* b, const Vector3* c);
     // 0x0043d460: creates texture `index` of face `face` and reads it.
     int LoadTexture(int face, int index, ColorMapper* palette,
-                              CubeTextureContextView* context);
+                              TextureContext* context);
     // 0x0043d630: seeks to the texture data and reads every missing texture.
-    int LoadMissingTextures(ColorMapper* palette, CubeTextureContextView* context);
+    int LoadMissingTextures(ColorMapper* palette, TextureContext* context);
 
     FileStream* textureStream;        // +0x08 the stream Load read the header from
     int fileFormat;                             // file format (Tgafile.h)

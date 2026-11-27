@@ -15,7 +15,7 @@ SkyCube::SkyCube(int flags) : DrawableCube(flags) {
 }
 
 // 0x004fb230
-SkyCube* SkyCube::Create(void* value, FileStream* stream, CubeTextureContextView* context,
+SkyCube* SkyCube::Create(void* value, FileStream* stream, TextureContext* context,
                                         float height) {
     if (DrawableCube::Load(value, stream, context)) {
         centerHeight = height;

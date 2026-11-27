@@ -136,7 +136,7 @@ int Cube::SetVectors(const Vector3* newCenter, const Vector3* b, const Vector3* 
 
 // 0x0043d460
 int Cube::LoadTexture(int face, int index, ColorMapper* palette,
-                                CubeTextureContextView* context)
+                                TextureContext* context)
 {
     int size = DecodeTextureSize(faces[face].sizeCodes, index % 4, index / 4);
     int dataSize;
@@ -145,9 +145,9 @@ int Cube::LoadTexture(int face, int index, ColorMapper* palette,
     else
         dataSize = BytesPerPixel(fileFormat) * size * size;
 
-    if (context->textureGroup) {
+    if (context->opaqueGroup) {
         ManagedTexture* texture = new (__FILE__, 0x2c3) ManagedTexture(context->manager);
-        context->textureGroup->AddTexture(texture);
+        context->opaqueGroup->AddTexture(texture);
         faces[face].textures[index] = texture;
     } else {
         faces[face].textures[index] = new (__FILE__, 0x2c8) PCTextureMap(context->manager, 1);
@@ -155,7 +155,7 @@ int Cube::LoadTexture(int face, int index, ColorMapper* palette,
     if (faces[face].textures[index]) {
         faces[face].textures[index]->LoadSurface(
             textureStream, size, size, 1, fileFormat, dataSize, 0, palette, 2, 0, 2, 1,
-            (TextureContext*)context, 0x80, 0xff00ff);
+            context, 0x80, 0xff00ff);
         if (!textureGroup)
             faces[face].textures[index]->CreateTextureSurface(1, 0, 0);
     }
@@ -165,7 +165,7 @@ int Cube::LoadTexture(int face, int index, ColorMapper* palette,
 }
 
 // 0x0043d630
-int Cube::LoadMissingTextures(ColorMapper* palette, CubeTextureContextView* context)
+int Cube::LoadMissingTextures(ColorMapper* palette, TextureContext* context)
 {
     textureStream->Seek(textureDataOffset, 0, 1);
     for (int face = 0; face < 6; face++) {

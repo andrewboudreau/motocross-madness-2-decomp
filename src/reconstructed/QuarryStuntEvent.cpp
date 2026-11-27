@@ -461,7 +461,7 @@ int BaseQuarryEvent::LoadEventObjects(LoadProgressFn progress) {
             return 0;
         }
         skyCube = (new(__FILE__, 744) SkyCube(g_TrackGame->mode.skyCubeOn))
-                         ->Create(renderContext, stream, (CubeTextureContextView*)&skyTextures, 1024.0f);
+                         ->Create(renderContext, stream, &skyTextures, 1024.0f);
         if (!AppendChild((GameObject*)skyCube, -1))
             sprintf(text, "SkyCube not created.\n");
         AppendChild((new(__FILE__, 750) FogOn(1))->Create(renderContext, eventFog), -1);

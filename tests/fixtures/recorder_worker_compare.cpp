@@ -28,7 +28,7 @@ static int Buffer(const void* p){if(!p)return -1;for(int n=0;n<4;++n)if(p==world
 static void Finish(){
     if(scenario.mutateAt==observed.count){VCRInterface* v=Vcr();switch(scenario.mutation){
     case 0:v->isBusy=!v->isBusy;v->fileReady=!v->fileReady;v->isStopped^=17;v->workerAcknowledged^=7;v->recordTimeMs^=0x345678;break;
-    case 1:v->frameRing=(VCR*)world.rings[1];v->vcrFile=(RecorderVCRFileView*)world.files[1];break;
+    case 1:v->frameRing=(VCR*)world.rings[1];v->vcrFile=(VCRFile*)world.files[1];break;
     case 2:v->threadParameters.header=(int)world.headers[1];v->threadParameters.headerSize=33;v->threadParameters.fileName=(int)world.names[1];break;
     case 3:v->writeEvent=(HANDLE)0x2100;v->readForwardEvent=(HANDLE)0x2103;v->readReverseEvent=(HANDLE)0x2105;break;
     }}
@@ -129,7 +129,7 @@ static void Run(int retail){
     retailActive=retail;memset(&observed,0,sizeof(observed));observed.result=-501;memset(&world,0x53+(scenario.seed%19),sizeof(world));VCRInterface* v=Vcr();
     HANDLE* handles[]={&v->writeEvent,&v->createFileEvent,&v->reopenFileEvent,&v->readForwardEvent,&v->openPlaybackEvent,&v->readReverseEvent,&v->seekEvent,&v->rewindEvent,&v->stopReadingEvent,&v->closeFileEvent,&v->stopEvent};
     for(int n=0;n<11;++n)*handles[n]=(HANDLE)(0x1100+n);
-    v->frameRing=(VCR*)world.rings[0];v->vcrFile=(RecorderVCRFileView*)world.files[0];v->isBusy=scenario.busy;v->isStopped=-7;v->fileReady=0;v->workerAcknowledged=0;v->readsReset=0;v->recordTimeMs=-19;
+    v->frameRing=(VCR*)world.rings[0];v->vcrFile=(VCRFile*)world.files[0];v->isBusy=scenario.busy;v->isStopped=-7;v->fileReady=0;v->workerAcknowledged=0;v->readsReset=0;v->recordTimeMs=-19;
     v->threadParameters.owner=scenario.invalid==2?0:v;v->threadParameters.header=(int)world.headers[0];v->threadParameters.headerSize=scenario.headerSize;v->threadParameters.fileName=scenario.invalid==3?0:(int)world.names[0];
     if(scenario.invalid==4)v->frameRing=0;
     for(n=0;n<2;++n){((VCR*)world.rings[n])->firstPosition=83+n*17;((VCRFile*)world.files[n])->entries[0].position=123+n*19;for(int i=0;i<128;++i)world.headers[n][i]=(BYTE)(scenario.seed+i*13+n*37);for(i=0;i<scenario.nameLength;++i)world.names[n][i]='A'+(i+n)%26;world.names[n][scenario.nameLength]=0;}

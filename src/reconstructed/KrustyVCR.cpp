@@ -38,7 +38,7 @@ int KrustyVCR::OpenRecording(RecorderCallbackProc callback, int mode, char* name
         memcpy(&header.raceSettings, &g_TrackGame->mode.raceSettings, sizeof(RaceSettings));
     }
     return Start((int)callback, (int)&header, sizeof(header), mode, (int)name, 0x58,
-                 (RecorderVCRFileView*)file);
+                 file);
 }
 
 // 0x0049bff0

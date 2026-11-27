@@ -38,14 +38,10 @@ struct RecorderThreadParameters {
     class VCRInterface* owner;
 };
 
-// The object at VCRInterface+0xac: its +0x23c selects a 10 ms (else 200 ms)
-// poll interval. The worker thread calls VCRFile (VCRfile.h) methods on
-// it and +0x23c is that class's memory flag, so it is the VCR file object; the
-// type is kept for the 0x004e7a90 symbol.
-struct RecorderVCRFileView {
-    unsigned char field_0x000[0x23c];
-    int memory;                           // +0x23c VCRFile's memory flag (VCRfile.h)
-};
+// VCRInterface+0xac is the VCR file object (VCRfile.h): the worker thread
+// calls its methods, and its memory flag (+0x23c) selects a 10 ms (else
+// 200 ms) poll interval.
+class VCRFile;
 
 class VCRInterface : public GameObject {
 public:
@@ -59,7 +55,7 @@ public:
     // 0x004e7a90: creates the ring (`size`), the events and the worker, then
     // starts `mode` (0, 1 or 2); 0 on failure.
     int Start(int callback, int header, int headerSize, int mode, int fileName,
-              unsigned int size, RecorderVCRFileView* owner);
+              unsigned int size, VCRFile* owner);
     // 0x004e86d0: stores the header for worker event 9 (rewrite it, close
     // the file) and signals it, waiting for the worker with `wait`.
     void CloseFile(int header, int headerSize, int wait);
@@ -98,7 +94,7 @@ public:
     int recordType;                           // +0xA0  type of the last taken record (QueueRecord's first header word; -1 marks a tick record)
     int recordId;                             // +0xA4  the last taken record's second header word (the sender's network id)
     int recordPosition;                       // +0xA8  ring position of the last taken tick record (AppendPosition)
-    RecorderVCRFileView* vcrFile;
+    VCRFile* vcrFile;
     VCR* frameRing;
     int isStopped;                       // stopped
     int isBusy;                       // busy

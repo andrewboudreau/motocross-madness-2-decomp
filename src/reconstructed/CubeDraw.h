@@ -33,7 +33,7 @@ class Cube;
 class ManagedTextureGroup;
 class RenderTarget;
 class FileStream;
-struct CubeTextureContextView;
+struct TextureContext;
 
 // 0x20-byte lit vertex (FVF 0x1e2: position, reserved, diffuse, specular,
 // one texture coordinate pair), the D3DLVERTEX layout.
@@ -66,10 +66,10 @@ public:
 
     // 0x0043d980: reads the palettes and cubes listed in `stream`.
     DrawableCube* Load(void* value, FileStream* stream,
-                                        CubeTextureContextView* context);
+                                        TextureContext* context);
     int BuildFaceGeometry();              // 0x0043dc60: builds the face geometry
     // 0x0043e0b0: loads the cube's textures and sets the cells' texture coordinates.
-    int LoadTexturesAndCoords(Cube* cube, CubeTextureContextView* context);
+    int LoadTexturesAndCoords(Cube* cube, TextureContext* context);
     int RecordTextureUse();                   // 0x0043e210: records texture use
     void MarkVisibleCells();             // 0x0043e330: marks the visible cells
 

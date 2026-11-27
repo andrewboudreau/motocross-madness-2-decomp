@@ -58,7 +58,7 @@ DrawableCube::DrawableCube(int flags) : GameObject(flags)
 
 // 0x0043d980
 DrawableCube* DrawableCube::Load(void* value, FileStream* stream,
-                                                  CubeTextureContextView* context)
+                                                  TextureContext* context)
 {
     int offset;
     int paletteCount;
@@ -68,7 +68,7 @@ DrawableCube* DrawableCube::Load(void* value, FileStream* stream,
     int i;
 
     GameObject::SetRenderContext(value);
-    textureGroup = context->textureGroup;
+    textureGroup = context->opaqueGroup;
     if (!stream)
         goto fail;
     if (stream->innerStream)
@@ -228,7 +228,7 @@ int DrawableCube::BuildFaceGeometry()
 // 0x0043e0b0: loads the cube's textures and sets each cell's texture
 // coordinates, inset half a texel (1/32 for mipmapped files, else by the
 // cell's decoded texture size).
-int DrawableCube::LoadTexturesAndCoords(Cube* cube, CubeTextureContextView* context)
+int DrawableCube::LoadTexturesAndCoords(Cube* cube, TextureContext* context)
 {
     cubeObject = cube;
     cube->LoadMissingTextures((ColorMapper*)loadPalette, context);

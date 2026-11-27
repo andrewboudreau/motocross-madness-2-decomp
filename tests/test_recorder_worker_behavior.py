@@ -186,7 +186,7 @@ class RecorderWorkerBehaviorTests(unittest.TestCase):
                                         (ROOT / source).with_suffix('.bindings.json'))
                         self.assertTrue(proof['strict_exact'], name)
             _, caller = compile_source('src/reconstructed/Recorder.cpp')
-            start = '?Start@VCRInterface@@QAEHHHHHHIPAURecorderVCRFileView@@@Z'
+            start = '?Start@VCRInterface@@QAEHHHHHHIPAVVCRFile@@@Z'
             self.assertTrue(compare(image, caller, start, 0x4e7a90, 716,
                                     ROOT / 'src/reconstructed/Recorder.bindings.json')['strict_exact'])
             self.assertEqual(image.bytes_at_va(0x4e7c55, 5), b'\x68' + struct.pack('<I', 0x4e6f80))

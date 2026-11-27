@@ -39,7 +39,7 @@ unsigned __stdcall RecorderWorkerThread(void* parameters) {
     headerSize = params->headerSize;
     name = (char*)params->fileName;
     vcr = params->owner;
-    file = (VCRFile*)vcr->vcrFile;
+    file = vcr->vcrFile;
     events[0] = vcr->writeEvent;
     events[1] = vcr->createFileEvent;
     events[2] = vcr->reopenFileEvent;
@@ -384,7 +384,7 @@ void VCRInterface::SignalAndWait(HANDLE event, DWORD interval) {
 
 // 0x004e7a90
 int VCRInterface::Start(int callback, int header, int headerSize, int mode, int fileName,
-                        unsigned int size, RecorderVCRFileView* owner) {
+                        unsigned int size, VCRFile* owner) {
     DWORD interval;
 
     frameRing = new (__FILE__, 477) VCR(size);
