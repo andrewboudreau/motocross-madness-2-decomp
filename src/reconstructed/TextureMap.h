@@ -6,22 +6,7 @@
 #include "TextureMapManager.h"
 #include "Tgafile.h"
 
-// Palette object at TextureMap+0x2c: +0x710 maps 555 colours to palette
-// indices.
-struct TextureColorMapperView {
-    // ColorMapper's table getters (Quantize.h): Pixtrans.cpp calls them on
-    // its palette argument.
-    unsigned char* GetColors();        // 0x004de270: &entries
-    unsigned char* GetIndexFrom555();        // 0x004de280: &indexFrom555
-    unsigned char* GetIndexFrom565();        // 0x004de290: &field_0x8710 (565 to index)
-
-    unsigned char field_0x000[0x10];
-    // Named like ColorMapper's members at the same offsets (Quantize.h).
-    unsigned char entries[256][3];                 // +0x010 RGB entries
-    unsigned short entries555[256];                // +0x310 entries as 555 (Pixtrans 0x004d11c0, 8 to 555)
-    unsigned short entries565[256];                // +0x510 entries as 565 (Pixtrans 0x004d1150, 8 to 565)
-    unsigned char indexFrom555[0x8000];            // +0x710 555 colour -> palette index
-};
+class ColorMapper;  // Quantize.h: the palette at TextureMap+0x2c
 
 // TextureContext, the loader's format choice, is declared with the loader.
 #include "TextureLoader.h"
@@ -44,12 +29,12 @@ public:
     TextureMap(TextureMapManager* manager, int registered);
     virtual ~TextureMap();                            // 0x0050ab40 (deleting wrapper 0x0050a570)
     virtual int CreateSurface(void* bits, int width, int height, int stride, int minimumSize,
-                              int sourceFormat, int format, TextureColorMapperView* palette,
+                              int sourceFormat, int format, ColorMapper* palette,
                               int flags, void* surfacePalette, int checkMemory, int unused,
                               int addressU, int addressV, TextureContext* choice,
                               int alphaThreshold, unsigned int key) = 0;
     virtual int LoadSurface(FileStream* stream, int width, int height, int minimumSize,
-                            int fileFormat, int dataSize, int format, TextureColorMapperView* palette,
+                            int fileFormat, int dataSize, int format, ColorMapper* palette,
                             int flags, void* surfacePalette, int addressU, int addressV,
                             TextureContext* choice, int alphaThreshold, unsigned int key) = 0;
     virtual TextureMap* Clone() = 0;
@@ -81,7 +66,7 @@ public:
     int mapFormat;                            // +0x20 pixel format
     int mipCount;                             // +0x24 mip level count
     BaseObject* sourcePalette;                // +0x28 released by the destructor
-    TextureColorMapperView* colorMapper;       // +0x2c CreateSurface's palette; handed to the Pixtrans converters
+    ColorMapper* colorMapper;       // +0x2c CreateSurface's palette; handed to the Pixtrans converters
     int usesColorKey;                         // +0x30 has a colour key
     int colorKeyValue;                        // +0x34 colour key (DDCOLORKEY low; high +0x38)
     int colorKeyHighValue;

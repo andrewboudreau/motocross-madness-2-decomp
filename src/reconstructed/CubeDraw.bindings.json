@@ -77,7 +77,7 @@
   "?s_facePoints@@3PAY0BJ@UVector3@@A": "0x00579af8",
   "?s_viewPoints@@3PAUVector3@@A": "0x00579930",
   "?DecodeTextureSize@@YAHHHH@Z": "0x0043d080",
-  "?LoadMissingTextures@Cube@@QAEHPAUTextureColorMapperView@@PAUCubeTextureContextView@@@Z": "0x0043d630",
+  "?LoadMissingTextures@Cube@@QAEHPAVColorMapper@@PAUCubeTextureContextView@@@Z": "0x0043d630",
   "?HasMipLevels@@YAHH@Z": "0x00511850",
   "__real@4@3fff8000000000000000": "0x00550748",
   "__real@4@3ffd8000000000000000": "0x005507f8",

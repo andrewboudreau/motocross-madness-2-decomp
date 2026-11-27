@@ -273,7 +273,7 @@ int UIDialog::ReadDialogResource(void* stream, int offset) {
                                 new(__FILE__, 0x367) PCTextureMap((TextureMapManager*)dialogTextures, 1);
                             dialogBackground->currentImage->CreateSurface(
                                 file->bits, file->width, file->height, file->width, file->width, 0x22b, depth,
-                                dialogPalette ? (TextureColorMapperView*)((Palette8*)dialogPalette)->colorMapper : 0,
+                                dialogPalette ? (ColorMapper*)((Palette8*)dialogPalette)->colorMapper : 0,
                                 4, dialogPalette ? ((Palette8*)dialogPalette)->ddPalette : 0, 0, 0, 2, 1, 0,
                                 0x80, 0xff00ff);
                             dialogBackground->MarkAllDirty();

@@ -106,26 +106,9 @@ struct TerrainVec3;
 // 16-bit cell coordinates compared with the lookup arguments, +0x08 is a pointer returned as the
 // key, +0x38 the cell's mesh (TerrainShadow slot 30 reads its lit vertices, index list and
 // 16 section records; +0x121 bit 3 selects the sectioned layout).  Tier 2 offsets, tier 3 names.
-// The mesh is the node draw data Griddraw.h declares as GridNodeDrawData and a section the
-// head of its twelve-byte GridBlockRange (strong inference: every offset used here agrees).
-struct TerrainCellSection {
-    short vertexBase;                                          // +0x00 vertex base of the following section
-    short indexEnd;                                            // +0x02 cumulative index count
-    char pad_0x04[0x0c - 0x04];
-};
-struct TerrainCellOwner {
-    char pad_0x00[0x121];
-    unsigned char flags_0x121;                                 // +0x121 bit 3: 16 sections instead of one
-    char pad_0x122[0x134 - 0x122];
-    void* vertices;                                            // +0x134 32-byte lit vertices (x, y, z first)
-    short* indices;                                            // +0x138
-    short vertexCount;                                         // +0x13c (0 selects the cell key in TerrainShadow slot 29)
-    short indexCount;                                          // +0x13e
-    char pad_0x140[0x144 - 0x140];
-    char ageEntry[0x17c - 0x144];                              // +0x144 passed to AgeManager::MarkUsed
-    TerrainCellSection* sections;                              // +0x17c sixteen records, or null when unsectioned
-                                                               // (retail slot 30 loads the pointer, then reads [p + 2])
-};
+// The mesh is the node draw data Griddraw.h declares as GridNodeDrawData; its sixteen
+// sections are GridBlockRange records (strong inference: every offset used here agrees).
+struct GridNodeDrawData;  // Griddraw.h
 struct TerrainCell {
     char pad_0x00[8];
     void* key;                                                 // +0x08
@@ -133,7 +116,7 @@ struct TerrainCell {
     unsigned short gridX;                                      // +0x24 cell column (LookupCell compares it with x)
     unsigned short gridZ;                                      // +0x26 cell row
     char pad_0x28[0x38 - 0x28];
-    TerrainCellOwner* owner;                                   // +0x38
+    GridNodeDrawData* owner;                                   // +0x38
     char pad_0x3c[4];
     int childMask;                                             // +0x40 nonzero lets TerrainShadow slot 30 emit the cell's vertices
 };

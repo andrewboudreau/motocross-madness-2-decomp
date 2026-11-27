@@ -2,10 +2,9 @@
 
 Pixtrans now calls the existing `ColorMapper::GetIndexFrom555` and
 `ColorMapper::GetIndexFrom565` providers through the verified primary pointer.
-The public `TextureColorMapperView*` parameters and provisional prefix view stay
-unchanged. Four canonical call sites and two sample call sites use explicit
-receiver casts; no wrapper, alias, duplicate provider, storage or compiler flag
-was added.
+The palette parameters are now `ColorMapper*` themselves (the former
+`TextureColorMapperView` prefix view is retired; see the last section). No
+wrapper, alias, duplicate provider, storage or compiler flag was added.
 
 | Existing provider | Retail extent | Result |
 | --- | --- | --- |
@@ -45,10 +44,10 @@ and propagation chain establishes which pointer reaches these calls:
 
 The retained test checks these raw instructions, complete strict bodies,
 primary COL/type bytes and the actual header layouts. `ColorMapper` has the
-full `0x18b10` allocation, including both lookup tables. The provisional
-`TextureColorMapperView` view describes only a prefix through `0x8710`; this
-change does not claim complete type equivalence or justify allocating that
-smaller view as a `ColorMapper`.
+full `0x18b10` allocation, including both lookup tables. The chain above is
+the only producer of the palette argument found, so the converters, the
+`PCTextureMap` loaders, `TextureMap+0x2c` and `Cube`'s texture loaders now take
+`ColorMapper*` directly.
 
 ## Complete caller preservation
 
@@ -141,3 +140,12 @@ $env:VC6_ROOT=(Resolve-Path work/vc6sp3-disc).Path
 $env:MCM2_EXE=(Resolve-Path work/game/mcm2.exe).Path
 python -m unittest test_palette_getter_connections -v
 ```
+
+## View retirement
+
+The `TextureColorMapperView` prefix view (TextureMap.h) and its bring-up
+`GetColors` definition (src/bringup/Group2_TexturePalette.cpp) are retired:
+`ColorMapper::GetColors` in Quantize.cpp is the one body at `0x004de270`.
+Mangled names change from `PAUTextureColorMapperView@@` to
+`PAVColorMapper@@`; the proof compiles every unit whose include closure reached
+the view before and after and finds no code change besides the mapped names.

@@ -13,9 +13,9 @@ from mcm2tool.toolchain import find_child_ci,find_vc6_bin,infer_vc98_root,sha256
 from tools.match import compare
 from tools.unit_source import standalone_source
 # CreateSurface's imports (the candidate's undefined externals).
-IMPORTS = frozenset(['?AverageColor@@YAHPAXHHHHPAUTextureColorMapperView@@@Z', '?ConvertPixels@@YAHPAX0HHHHHHHPAUTextureColorMapperView@@HI@Z', '?CreateSystemSurface@PCTextureMap@@QAEHPAUDDSurfaceDesc2@@HPAH@Z', '?DumpLevel@PCTextureMap@@QAEHPAUDirectDrawSurface@@PBD@Z', '?FillPixelFormat@@YAXHPAX@Z', '?GrowSecondScratchBuffer@TextureMapManager@@QAEPAXI@Z', '?IsFormat4444Or8888@@YAHH@Z', '?PixelFormatBytesPerPixel@@YAHH@Z', '?g_DebugDumpTextureLevels@@3HA', '?g_SharedMipTextureSurfaces@@3PAPAUDirectDrawSurface@@A', '?g_SharedTextureSurfaces@@3PAPAUDirectDrawSurface@@A', '?g_TrackGame@@3PAVTrackGame@@A'])
+IMPORTS = frozenset(['?AverageColor@@YAHPAXHHHHPAVColorMapper@@@Z', '?ConvertPixels@@YAHPAX0HHHHHHHPAVColorMapper@@HI@Z', '?CreateSystemSurface@PCTextureMap@@QAEHPAUDDSurfaceDesc2@@HPAH@Z', '?DumpLevel@PCTextureMap@@QAEHPAUDirectDrawSurface@@PBD@Z', '?FillPixelFormat@@YAXHPAX@Z', '?GrowSecondScratchBuffer@TextureMapManager@@QAEPAXI@Z', '?IsFormat4444Or8888@@YAHH@Z', '?PixelFormatBytesPerPixel@@YAHH@Z', '?g_DebugDumpTextureLevels@@3HA', '?g_SharedMipTextureSurfaces@@3PAPAUDirectDrawSurface@@A', '?g_SharedTextureSurfaces@@3PAPAUDirectDrawSurface@@A', '?g_TrackGame@@3PAVTrackGame@@A'])
 ROOT=Path(__file__).resolve().parents[1]
-SYMBOL='?CreateSurface@PCTextureMap@@UAEHPAXHHHHHHPAUTextureColorMapperView@@H0HHHHPAUTextureContext@@HI@Z'
+SYMBOL='?CreateSurface@PCTextureMap@@UAEHPAXHHHHHHPAVColorMapper@@H0HHHHPAUTextureContext@@HI@Z'
 HELPERS={'PixelFormatBytesPerPixel':('int',0x511970,78),'FillPixelFormat':('void',0x5119c0,266),'IsFormat4444Or8888':('int',0x511ad0,30)}
 DEPENDENCIES={0x511ad0,0x5119c0,0x511970,0x511370,0x4c68e0,0x4d1d20,0x4d24d0,0x4c84e0}
 INDIRECT={0x4c6b36:'dword ptr [ecx + 4]',0x4c6c72:'dword ptr [edx + 0x18]',0x4c6c94:'dword ptr [ecx + 4]',0x4c6cb3:'dword ptr [edx + 0x7c]',0x4c6e08:'dword ptr [edx + 4]',0x4c6f4c:'dword ptr [ecx + 4]',0x4c6f63:'dword ptr [edx + 0x7c]',0x4c6f7c:'dword ptr [ecx + 0x38]',0x4c6fbf:'dword ptr [ecx + 0x64]',0x4c7067:'dword ptr [edx + 0x80]',0x4c7080:'dword ptr [eax + 0x3c]',0x4c70db:'dword ptr [edx + 0x48]'}

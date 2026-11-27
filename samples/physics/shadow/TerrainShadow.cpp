@@ -10,6 +10,7 @@
 #include "../../../src/reconstructed/ShadowCamera.h"
 #include "../../../src/reconstructed/PCTextureMap.h"
 #include "../../../src/reconstructed/AgeManager.h"
+#include "../../../src/reconstructed/Griddraw.h"
 #include "../../../src/reconstructed/ClipRectangle.h"
 #include "../../../src/reconstructed/PCRenderTarget.h"
 #include "../../../src/reconstructed/Camera.h"
@@ -148,12 +149,12 @@ void TerrainShadow::BuildShadowVertices()
         for (int i = 0; i < cellCount; i++) {
             int used = 0;
             TerrainCell* cell = (TerrainCell*)cellKeys[i];
-            if (!cell->owner->vertices)
+            if (!cell->owner->vertexBuffer)
                 continue;
             if (shadow->mode == 3)
-                TransformPoints(transformed, cell->owner->vertices, reinterpret_cast<const Matrix4*>(&shadow->lightMatrix), cell->owner->vertexCount, 0xc, 0x20);
+                TransformPoints(transformed, cell->owner->vertexBuffer, reinterpret_cast<const Matrix4*>(&shadow->lightMatrix), cell->owner->vertexCount, 0xc, 0x20);
             else
-                ProjectPoints(transformed, cell->owner->vertices, reinterpret_cast<const Matrix4*>(&shadow->lightMatrix), cell->owner->vertexCount, 0xc, 0x20);
+                ProjectPoints(transformed, cell->owner->vertexBuffer, reinterpret_cast<const Matrix4*>(&shadow->lightMatrix), cell->owner->vertexCount, 0xc, 0x20);
 
             int remaining = cell->owner->vertexCount;
             if (remaining > 0) {
@@ -187,7 +188,7 @@ void TerrainShadow::BuildShadowVertices()
             }
 
             int sectionCount = 1;
-            if (cell->owner->flags_0x121 & 8)
+            if (cell->owner->b3)
                 sectionCount = 0x10;
             for (int sec = 0; sec < sectionCount; sec++) {
                 int indexStart;
@@ -200,16 +201,16 @@ void TerrainShadow::BuildShadowVertices()
                 } else if (sec == 0) {
                     indexStart = 0;
                     vertexBase = 0;
-                    indexCount = cell->owner->sections[0].indexEnd;
+                    indexCount = ((GridBlockRange*)cell->owner->blockRanges)[0].indexEnd;
                 } else {
-                    indexStart = cell->owner->sections[sec - 1].indexEnd;
-                    indexCount = cell->owner->sections[sec].indexEnd - indexStart;
-                    vertexBase = cell->owner->sections[sec - 1].vertexBase;
+                    indexStart = ((GridBlockRange*)cell->owner->blockRanges)[sec - 1].indexEnd;
+                    indexCount = ((GridBlockRange*)cell->owner->blockRanges)[sec].indexEnd - indexStart;
+                    vertexBase = ((GridBlockRange*)cell->owner->blockRanges)[sec - 1].end;
                 }
                 for (int triStart = 0; triStart < indexCount; triStart += 3) {
-                    corner[0] = cell->owner->indices[indexStart + triStart];
-                    corner[1] = cell->owner->indices[indexStart + triStart + 1];
-                    corner[2] = cell->owner->indices[indexStart + triStart + 2];
+                    corner[0] = ((short*)cell->owner->indexBuffer)[indexStart + triStart];
+                    corner[1] = ((short*)cell->owner->indexBuffer)[indexStart + triStart + 1];
+                    corner[2] = ((short*)cell->owner->indexBuffer)[indexStart + triStart + 2];
                     int i0 = (unsigned short)corner[0] + vertexBase;
                     int i1 = (unsigned short)corner[1] + vertexBase;
                     int i2 = (unsigned short)corner[2] + vertexBase;
@@ -240,9 +241,9 @@ void TerrainShadow::BuildShadowVertices()
                     } else if (cell->childMask) {
                         for (int k = 0; k < 3; k++) {
                             int idx = (unsigned short)corner[k] + vertexBase;
-                            vertices[vertexCount].x = ((TerrainLitVertex*)cell->owner->vertices)[idx].x;
-                            vertices[vertexCount].y = ((TerrainLitVertex*)cell->owner->vertices)[idx].y;
-                            vertices[vertexCount].z = ((TerrainLitVertex*)cell->owner->vertices)[idx].z;
+                            vertices[vertexCount].x = ((TerrainLitVertex*)cell->owner->vertexBuffer)[idx].x;
+                            vertices[vertexCount].y = ((TerrainLitVertex*)cell->owner->vertexBuffer)[idx].y;
+                            vertices[vertexCount].z = ((TerrainLitVertex*)cell->owner->vertexBuffer)[idx].z;
                             vertices[vertexCount].diffuse = color;
                             vertices[vertexCount].reserved = 0;
                             vertices[vertexCount].specular = 0;
@@ -257,7 +258,7 @@ void TerrainShadow::BuildShadowVertices()
             }
     full:
             if (used)
-                caster->meshAgeManager->MarkUsed(reinterpret_cast<AgeEntry*>(cell->owner->ageEntry));
+                caster->meshAgeManager->MarkUsed(&cell->owner->ageEntry);
             if (vertexCount == 0x300)
                 break;
         }

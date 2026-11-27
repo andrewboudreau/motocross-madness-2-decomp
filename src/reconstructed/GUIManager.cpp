@@ -735,7 +735,7 @@ PCTextureMap* GUIManager::CreateFilledTexture(int width, int height, unsigned lo
             *pixel = fill;
         if (texture->CreateSurface(bits, width, height, width, width, 0x378,
                                    g_TrackGame->renderTarget->surfacePixelFormat,
-                                   (TextureColorMapperView*)(guiPalette ? guiPalette->colorMapper : 0), 4,
+                                   guiPalette ? guiPalette->colorMapper : 0, 4,
                                    guiPalette ? guiPalette->ddPalette : 0, 1, 0, 2, 1, 0, 0x80, 0xff00ff))
             texture->ApplyColorKey(0xff00ff);
         delete bits;

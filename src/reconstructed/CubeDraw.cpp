@@ -231,7 +231,7 @@ int DrawableCube::BuildFaceGeometry()
 int DrawableCube::LoadTexturesAndCoords(Cube* cube, CubeTextureContextView* context)
 {
     cubeObject = cube;
-    cube->LoadMissingTextures((TextureColorMapperView*)loadPalette, context);
+    cube->LoadMissingTextures((ColorMapper*)loadPalette, context);
     if (HasMipLevels(cubeObject->fileFormat)) {
         for (int face = 0; face < 6; face++) {
             int index = 0;

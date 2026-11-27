@@ -8,6 +8,7 @@
 #include "TrackGame.h"
 #include "ManagedTexture.h"
 #include "D3DConstants.h"
+#include "Quantize.h"
 
 // 0x004c5f00
 PCTextureMap::PCTextureMap(TextureMapManager* manager, int value) : TextureMap(manager, value) {
@@ -71,7 +72,7 @@ static inline int ReadRows(FileStream* stream, void* bits, int rowSize, int rows
 // skipped. Other files hold one image, which is halved as the choice asks
 // and handed to slot 4.
 int PCTextureMap::LoadSurface(FileStream* stream, int width, int height, int minimumSize,
-                              int fileFormat, int dataSize, int format, TextureColorMapperView* palette,
+                              int fileFormat, int dataSize, int format, ColorMapper* palette,
                               int flags, void* surfacePalette, int addressU, int addressV,
                               TextureContext* choice, int alphaThreshold, unsigned int key) {
     int offsets[12];
@@ -277,7 +278,7 @@ static inline void AppendRenderStatePair(TextureMap* map, int state, int value) 
 // its first case, retail into its last; docs/PCTEXTUREMAP.md lists the forms
 // tried and docs/TEXTURE_SURFACE_CREATE.md the behaviour review).
 int PCTextureMap::CreateSurface(void* bits, int width, int height, int stride, int minimumSize,
-                                int sourceFormat, int format, TextureColorMapperView* palette,
+                                int sourceFormat, int format, ColorMapper* palette,
                                 int flags, void* surfacePalette, int checkMemory, int unused,
                                 int addressU, int addressV, TextureContext* choice,
                                 int alphaThreshold, unsigned int key) {

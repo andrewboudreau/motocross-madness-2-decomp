@@ -192,7 +192,7 @@ class PaletteGetterConnections(unittest.TestCase):
                 self.assertTrue(compare(image,obj,query,va,size,ROOT/Path(source).with_suffix('.bindings.json'))['strict_exact'])
                 strict+=1
             self.assertEqual({s.name for s in obj.symbols if s.section_number==0 and s.storage_class==2},
-                             {'?DitherConvert@@YAHPAXHHHHH0000PAUTextureColorMapperView@@@Z'})
+                             {'?DitherConvert@@YAHPAXHHHHH0000PAVColorMapper@@@Z'})
             self.assertFalse(any(s.raw_size and (s.name.startswith('.CRT')or s.characteristics&0xc0)
                                  for s in obj.sections if not s.name.startswith('.debug')))
             fixture_path,_=compile_source(ROOT/'tests/fixtures/palette_getter_compare.cpp','fixture',True)

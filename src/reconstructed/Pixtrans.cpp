@@ -234,11 +234,11 @@ int Halve1555(void* destination, void* source, int width, int height, int destin
 // palette holds magenta (255, 0, 255) that index is the key: key pixels are
 // left out of the average and a block with fewer than two others stays the key.
 int Halve8(void* destination, void* source, int width, int height, int destinationStride,
-                          int sourceStride, TextureColorMapperView* palette) {
+                          int sourceStride, ColorMapper* palette) {
     unsigned char* sourceRow = (unsigned char*)source;
     unsigned char* row = (unsigned char*)destination;
     if (palette) {
-        unsigned char* indices = reinterpret_cast<ColorMapper*>(palette)->GetIndexFrom555();
+        unsigned char* indices = palette->GetIndexFrom555();
         if (indices) {
             RgbPixel* entries = (RgbPixel*)palette->GetColors();
             if (entries) {
@@ -366,13 +366,13 @@ static inline void ReadRow(int format, void* source, int* channels, int width)
 // error rows) into the requested 24-bit, 565, 555 and palette-index outputs.
 int DitherConvert(void* source, int format, int width, int height, int sourceStride,
                   int destinationStride, void* output24, void* output565, void* output555,
-                  void* output8, TextureColorMapperView* palette)
+                  void* output8, ColorMapper* palette)
 {
     int bytesPerPixel = PixelFormatBytesPerPixel(format);
     unsigned char* indices;
     unsigned char* colors;
     if (palette) {
-        indices = reinterpret_cast<ColorMapper*>(palette)->GetIndexFrom555();
+        indices = palette->GetIndexFrom555();
         colors = palette->GetColors();
     }
     if (g_ditherCapacity < width) {
@@ -758,7 +758,7 @@ int Downsample555(void* destination, void* source, int width, int height, int de
 // 0x004d05c0: shrinks palette-index `source` by `levels` halvings through
 // 0x004cee30.
 int Downsample8(void* destination, void* source, int width, int height, int destinationStride,
-                          int sourceStride, int levels, TextureColorMapperView* palette) {
+                          int sourceStride, int levels, ColorMapper* palette) {
     if (levels == 0) {
         for (int y = 0; y < height; y++)
             memcpy((unsigned char*)destination + y * destinationStride, (unsigned char*)source + y * sourceStride,
@@ -898,14 +898,14 @@ int Convert24To555(void* destination, void* source, int width, int height, int d
 
 // 0x004d0aa0: converts 24-bit to palette indices through the 555 table.
 int Convert24To8(void* destination, void* source, int width, int height, int destinationStride,
-                          int sourceStride, int dither, TextureColorMapperView* palette) {
+                          int sourceStride, int dither, ColorMapper* palette) {
     if (dither && palette) {
         DitherConvert(source, 888, width, height, sourceStride, destinationStride, 0, 0, 0,
                               destination, palette);
     } else {
         RgbPixel* sourceRow = (RgbPixel*)source;
         unsigned char* row = (unsigned char*)destination;
-        unsigned char* indices = reinterpret_cast<ColorMapper*>(palette)->GetIndexFrom555();
+        unsigned char* indices = palette->GetIndexFrom555();
         for (int y = 0; y < height; y++) {
             RgbPixel* from = sourceRow;
             unsigned char* to = row;
@@ -920,14 +920,14 @@ int Convert24To8(void* destination, void* source, int width, int height, int des
 
 // 0x004d0b90: converts 565 to palette indices through the 565 table.
 int Convert565To8(void* destination, void* source, int width, int height, int destinationStride,
-                          int sourceStride, int dither, TextureColorMapperView* palette) {
+                          int sourceStride, int dither, ColorMapper* palette) {
     if (dither && palette) {
         DitherConvert(source, 565, width, height, sourceStride, destinationStride, 0, 0, 0,
                               destination, palette);
     } else {
         unsigned short* sourceRow = (unsigned short*)source;
         unsigned char* row = (unsigned char*)destination;
-        unsigned char* indices = reinterpret_cast<ColorMapper*>(palette)->GetIndexFrom565();
+        unsigned char* indices = palette->GetIndexFrom565();
         for (int y = 0; y < height; y++) {
             unsigned short* from = sourceRow;
             unsigned char* to = row;
@@ -944,17 +944,17 @@ int Convert565To8(void* destination, void* source, int width, int height, int de
 // the assembly 0x004d0d40 for unpadded rows of a multiple of eight pixels,
 // otherwise through the 555 table.
 int Convert555To8(void* destination, void* source, int width, int height, int destinationStride,
-                          int sourceStride, int dither, TextureColorMapperView* palette) {
+                          int sourceStride, int dither, ColorMapper* palette) {
     if (dither && palette) {
         DitherConvert(source, 555, width, height, sourceStride, destinationStride, 0, 0, 0,
                               destination, palette);
     } else if (sourceStride == width && sourceStride % 8 == 0) {
         Convert555To8Fast(source, destination, destinationStride, width, height,
-                              reinterpret_cast<ColorMapper*>(palette)->GetIndexFrom555());
+                              palette->GetIndexFrom555());
     } else {
         unsigned short* sourceRow = (unsigned short*)source;
         unsigned char* row = (unsigned char*)destination;
-        unsigned char* indices = reinterpret_cast<ColorMapper*>(palette)->GetIndexFrom555();
+        unsigned char* indices = palette->GetIndexFrom555();
         for (int y = 0; y < height; y++) {
             unsigned short* from = sourceRow;
             unsigned char* to = row;
@@ -1054,7 +1054,7 @@ int Convert565To555(void* destination, void* source, int width, int height, int 
 
 // 0x004d10b0: converts palette indices to 24-bit RGB.
 int Convert8To24(void* destination, void* source, int width, int height, int destinationStride,
-                          int sourceStride, TextureColorMapperView* palette) {
+                          int sourceStride, ColorMapper* palette) {
     unsigned char* sourceRow = (unsigned char*)source;
     RgbPixel* row = (RgbPixel*)destination;
     for (int y = 0; y < height; y++) {
@@ -1073,7 +1073,7 @@ int Convert8To24(void* destination, void* source, int width, int height, int des
 
 // 0x004d1150: converts palette indices to 565 through entries565 (+0x510).
 int Convert8To565(void* destination, void* source, int width, int height, int destinationStride,
-                          int sourceStride, TextureColorMapperView* palette) {
+                          int sourceStride, ColorMapper* palette) {
     unsigned char* sourceRow = (unsigned char*)source;
     unsigned short* row = (unsigned short*)destination;
     for (int y = 0; y < height; y++) {
@@ -1089,7 +1089,7 @@ int Convert8To565(void* destination, void* source, int width, int height, int de
 
 // 0x004d11c0: converts palette indices to 555 through entries555 (+0x310).
 int Convert8To555(void* destination, void* source, int width, int height, int destinationStride,
-                          int sourceStride, TextureColorMapperView* palette) {
+                          int sourceStride, ColorMapper* palette) {
     unsigned char* sourceRow = (unsigned char*)source;
     unsigned short* row = (unsigned short*)destination;
     for (int y = 0; y < height; y++) {
@@ -1400,7 +1400,7 @@ int ReplaceColor8(void* bits, unsigned char from, unsigned char to, int width, i
 
 // 0x004d1b90: hands the downsampling to the helper for `format`.
 int Downsample(void* destination, void* source, int width, int height, int destinationStride,
-                          int sourceStride, int levels, int format, TextureColorMapperView* palette, int filter) {
+                          int sourceStride, int levels, int format, ColorMapper* palette, int filter) {
     switch (format) {
     case 8:
         return Downsample8(destination, source, width, height, destinationStride, sourceStride, levels,
@@ -1428,7 +1428,7 @@ int Downsample(void* destination, void* source, int width, int height, int desti
 // go through the downsamplers with no halving. 0 for unsupported pairs.
 int ConvertPixels(void* destination, void* source, int width, int height, int destinationStride,
                            int sourceStride, int format, int sourceFormat, int dither,
-                           TextureColorMapperView* palette, int alphaThreshold, unsigned int key) {
+                           ColorMapper* palette, int alphaThreshold, unsigned int key) {
     switch (sourceFormat) {
     case 565:
         switch (format) {
@@ -1551,7 +1551,7 @@ int ConvertPixels(void* destination, void* source, int width, int height, int de
 // into the palette case's, which is retail's layout; a shared return after
 // the switch lands after the 24-bit loop instead.
 int AverageColor(void* bits, int width, int height, int stride, int format,
-                          TextureColorMapperView* palette) {
+                          ColorMapper* palette) {
     unsigned int alpha = 0;
     unsigned int red = 0;
     unsigned int green = 0;

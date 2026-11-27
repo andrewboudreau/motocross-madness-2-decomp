@@ -10,6 +10,7 @@
 #include "TerrainShadow.h"
 #include "PCTextureMap.h"
 #include "PCRenderTarget.h"
+#include "Griddraw.h"
 
 // 0x00508ae0 (ret 4).
 TerrainShadow::TerrainShadow(int flags)

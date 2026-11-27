@@ -29,7 +29,7 @@ class TextureMap;
 class TextureMapManager;
 class ManagedTextureGroup;
 class FileStream;
-struct TextureColorMapperView;
+class ColorMapper;
 
 // cdecl 0x0043d080 (ControlInterface.h declares the same function): maps
 // the 2-bit field `index` of byte `byteIndex` of `bits` to 0x200, 0x40,
@@ -75,10 +75,10 @@ public:
     // 0x0043d400: copies whichever of the three vectors are given.
     int SetVectors(const Vector3* newCenter, const Vector3* b, const Vector3* c);
     // 0x0043d460: creates texture `index` of face `face` and reads it.
-    int LoadTexture(int face, int index, TextureColorMapperView* palette,
+    int LoadTexture(int face, int index, ColorMapper* palette,
                               CubeTextureContextView* context);
     // 0x0043d630: seeks to the texture data and reads every missing texture.
-    int LoadMissingTextures(TextureColorMapperView* palette, CubeTextureContextView* context);
+    int LoadMissingTextures(ColorMapper* palette, CubeTextureContextView* context);
 
     FileStream* textureStream;        // +0x08 the stream Load read the header from
     int fileFormat;                             // file format (Tgafile.h)

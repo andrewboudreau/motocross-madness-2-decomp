@@ -8,38 +8,38 @@
     "src/reconstructed/Pixtrans.cpp": {
       "sections": 54,
       "relocations": 153,
-      "sha256": "1207e81b5af8ef300d8112986957ea75312f5d7196518c485c8bcdc1e596f721"
+      "sha256": "fe875252176d6e691e70b8b5d702e01c3a6691fc748b5218c31edc110696454f"
     }
   },
   "getter_calls": {
     "src/reconstructed/Pixtrans.cpp": [
       {
-        "caller": "?Convert24To8@@YAHPAX0HHHHHPAUTextureColorMapperView@@@Z",
+        "caller": "?Convert24To8@@YAHPAX0HHHHHPAVColorMapper@@@Z",
         "offset": 91,
         "callee": "?GetIndexFrom555@ColorMapper@@QAEPAEXZ"
       },
       {
-        "caller": "?Convert565To8@@YAHPAX0HHHHHPAUTextureColorMapperView@@@Z",
+        "caller": "?Convert565To8@@YAHPAX0HHHHHPAVColorMapper@@@Z",
         "offset": 85,
         "callee": "?GetIndexFrom565@ColorMapper@@QAEPAEXZ"
       },
       {
-        "caller": "?Convert555To8@@YAHPAX0HHHHHPAUTextureColorMapperView@@@Z",
+        "caller": "?Convert555To8@@YAHPAX0HHHHHPAVColorMapper@@@Z",
         "offset": 109,
         "callee": "?GetIndexFrom555@ColorMapper@@QAEPAEXZ"
       },
       {
-        "caller": "?Convert555To8@@YAHPAX0HHHHHPAUTextureColorMapperView@@@Z",
+        "caller": "?Convert555To8@@YAHPAX0HHHHHPAVColorMapper@@@Z",
         "offset": 162,
         "callee": "?GetIndexFrom555@ColorMapper@@QAEPAEXZ"
       },
       {
-        "caller": "?Halve8@@YAHPAX0HHHHPAUTextureColorMapperView@@@Z",
+        "caller": "?Halve8@@YAHPAX0HHHHPAVColorMapper@@@Z",
         "offset": 37,
         "callee": "?GetIndexFrom555@ColorMapper@@QAEPAEXZ"
       },
       {
-        "caller": "?DitherConvert@@YAHPAXHHHHH0000PAUTextureColorMapperView@@@Z",
+        "caller": "?DitherConvert@@YAHPAXHHHHH0000PAVColorMapper@@@Z",
         "offset": 35,
         "callee": "?GetIndexFrom555@ColorMapper@@QAEPAEXZ"
       }

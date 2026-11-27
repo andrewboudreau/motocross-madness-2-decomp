@@ -1058,7 +1058,7 @@ UIFrame::UIFrame(const char* file, void* textures, int soundGroup, int duplicate
             Palette8* pal = (Palette8*)palette;
             frameTexture->CreateSurface(image->bits, image->width, image->height, image->width,
                                             image->width, 0x22b, format,
-                                            (TextureColorMapperView*)(pal ? pal->colorMapper : 0), 4,
+                                            pal ? pal->colorMapper : 0, 4,
                                             pal ? pal->ddPalette : 0, 0, 0, 2, 1, 0, 0x80, 0xff00ff);
             if (TextureHasColor(frameTexture, 0xff00ff))
                 frameTexture->ApplyColorKey(0xff00ff);
@@ -5349,7 +5349,7 @@ int UIFrame::LoadFromStream(void* stream, int offset, void* palette) {
             Palette8* pal = (Palette8*)palette;
             frameTexture->CreateSurface(image->bits, image->width, image->height, image->width,
                                             image->width, 0x22b, format,
-                                            (TextureColorMapperView*)(pal ? pal->colorMapper : 0), 4,
+                                            pal ? pal->colorMapper : 0, 4,
                                             pal ? pal->ddPalette : 0, 0, 0, 2, 1, 0, 0x80, 0xff00ff);
             if (TextureHasColor(frameTexture, 0xff00ff))
                 frameTexture->ApplyColorKey(0xff00ff);

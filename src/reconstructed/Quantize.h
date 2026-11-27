@@ -7,8 +7,8 @@ class FileStream;
 // Quantize.cpp (literal __FILE__ at 0x00572084, xrefs 0x004dde47..0x004de12e).
 // RTTI: ColorMapper : BaseObject (vtable 0x00557658, four slots; slot 0 is
 // the deleting destructor 0x004ddea0). A 256-colour palette loaded from a
-// resource stream with its 555/565 lookup tables. TextureMap.h views the
-// same object as TextureColorMapperView. Member names are provisional.
+// resource stream with its 555/565 lookup tables; TextureMap+0x2c holds one
+// and the Pixtrans converters take it. Member names are provisional.
 class ColorMapper : public BaseObject {
 public:
     explicit ColorMapper(FileStream* stream); // 0x004ddf40 (ret 4)

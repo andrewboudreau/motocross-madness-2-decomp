@@ -9,7 +9,7 @@ destination starts filled with 0x77 so every written byte is compared.
 """
 
 RETAIL_VA = 0x004cee30
-SYMBOL = '?Halve8@@YAHPAX0HHHHPAUTextureColorMapperView@@@Z'
+SYMBOL = '?Halve8@@YAHPAX0HHHHPAVColorMapper@@@Z'
 SOURCE = 'src/reconstructed/Pixtrans.cpp'
 FPCWS = (0x027f,)   # integer only
 

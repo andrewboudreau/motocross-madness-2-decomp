@@ -135,10 +135,10 @@
   "?ReplaceColor24@@YAHPAXURgbPixel@@1HHH@Z": "0x004d1a20",
   "?ReplaceColor16@@YAHPAXGGHHH@Z": "0x004d1ac0",
   "?ReplaceColor8@@YAHPAXEEHHH@Z": "0x004d1b40",
-  "?Downsample@@YAHPAX0HHHHHHPAUTextureColorMapperView@@H@Z": "0x004d1b90",
-  "?ConvertPixels@@YAHPAX0HHHHHHHPAUTextureColorMapperView@@HI@Z": "0x004d1d20",
-  "?ConvertPixels@@YAXPAX0HHHHHHHPAUTextureColorMapperView@@HI@Z": "0x004d1d20",
-  "?AverageColor@@YAHPAXHHHHPAUTextureColorMapperView@@@Z": "0x004d24d0",
+  "?Downsample@@YAHPAX0HHHHHHPAVColorMapper@@H@Z": "0x004d1b90",
+  "?ConvertPixels@@YAHPAX0HHHHHHHPAVColorMapper@@HI@Z": "0x004d1d20",
+  "?ConvertPixels@@YAXPAX0HHHHHHHPAVColorMapper@@HI@Z": "0x004d1d20",
+  "?AverageColor@@YAHPAXHHHHPAVColorMapper@@@Z": "0x004d24d0",
   "?AddTexture@ManagedTextureGroup@@QAEXPAVManagedTexture@@@Z": "0x0050c6c0",
   "?GrowScratchBuffer@TextureMapManager@@QAEPAXI@Z": "0x00511310",
   "?GrowSecondScratchBuffer@TextureMapManager@@QAEPAXI@Z": "0x00511370",
@@ -179,5 +179,5 @@
   "?DebugFree@@YAXPAXPBDH@Z": "0x004a2e60",
   "?Clone@PCTextureMap@@UAEPAVTextureMap@@XZ": "0x004c71c0",
   "?CopyRectTo@PCTextureMap@@QAEHKKPAUDirectDrawSurface@@PAUWin32Rect@@HPAE@Z": "0x004c7b40",
-  "?CreateSurface@PCTextureMap@@UAEHPAXHHHHHHPAUTextureColorMapperView@@H0HHHHPAUTextureContext@@HI@Z": "0x004c69c0"
+  "?CreateSurface@PCTextureMap@@UAEHPAXHHHHHHPAVColorMapper@@H0HHHHPAUTextureContext@@HI@Z": "0x004c69c0"
 }
