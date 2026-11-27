@@ -54,15 +54,6 @@ struct UnknownCubeTextureMapping {
     float offsetV;
 };
 
-// The camera fields 0x0043e330 reads (Camera.h keeps them protected): the
-// view matrix's third column (+0xb4, +0xc4, +0xd4) and the position.
-struct CubeCameraView {
-    unsigned char field_0x000[0xac];
-    Matrix4 viewMatrix;                       // view matrix
-    unsigned char field_0x0ec[0x170 - 0xec];
-    Vector3 position;                         // position
-};
-
 #include "../krusty2/visibility/VisibilityClipperGlobal.h"   // 0x00575a98 (VisibilityClipper, src/krusty2/visibility)
 
 class DrawableCube : public GameObject {

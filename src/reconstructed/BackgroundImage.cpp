@@ -2,6 +2,7 @@
 
 #include "BackgroundImage.h"
 
+#include "Camera.h"
 #include "DebugAlloc.h"
 #include "PCGame.h"
 #include "TrackGame.h"
@@ -63,10 +64,10 @@ static inline int ModeWidth(PCVideoCard* display)
 // frames are left to restore) the whole copy is restored.
 int BackgroundImage::RenderPre3D() {
     if (!fullRestoreFrames) {
-        BackgroundCameraView* camera = (BackgroundCameraView*)Target()->currentCamera;
-        if (!camera || !camera->isEnabled || !camera->redrawFrames ||
-            camera->viewportHeight != ModeHeight(g_TrackGame->display) ||
-            camera->viewportWidth != ModeWidth(g_TrackGame->display)) {
+        Camera* camera = Target()->currentCamera;
+        if (!camera || !camera->isEnabled || !camera->projectionChangeFrames ||
+            camera->viewport[3] != ModeHeight(g_TrackGame->display) ||
+            camera->viewport[2] != ModeWidth(g_TrackGame->display)) {
             if (!copyValid) {
                 DrawBackground(offscreenCopy);
                 copyValid = 1;
@@ -499,11 +500,11 @@ void BackgroundImage::ClearRegionRect(int index) {
 // camera to redraw).
 void BackgroundImage::MarkAllDirty() {
     fullRestoreFrames = Target()->frameModulus + 1;
-    BackgroundCameraView* camera = (BackgroundCameraView*)Target()->currentCamera;
+    Camera* camera = Target()->currentCamera;
     if (camera) {
-        camera->redrawFrames = Target()->frameModulus + 1;
-        if ((unsigned)((BackgroundCameraView*)Target()->currentCamera)->viewportHeight < (unsigned)Target()->targetHeight)
-            ((BackgroundCameraView*)Target()->currentCamera)->viewportEnabled = Target()->frameModulus + 1;
+        camera->projectionChangeFrames = Target()->frameModulus + 1;
+        if ((unsigned)Target()->currentCamera->viewport[3] < (unsigned)Target()->targetHeight)
+            Target()->currentCamera->viewportClearFrames = Target()->frameModulus + 1;
     }
 }
 

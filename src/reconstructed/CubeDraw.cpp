@@ -314,10 +314,10 @@ DrawableCube::~DrawableCube()
 void DrawableCube::MarkVisibleCells()
 {
     Vector3 forward;
-    forward.x = ((CubeCameraView*)((RenderTarget*)renderContext)->currentCamera)->viewMatrix.m[0][2];
-    forward.y = ((CubeCameraView*)((RenderTarget*)renderContext)->currentCamera)->viewMatrix.m[1][2];
-    forward.z = ((CubeCameraView*)((RenderTarget*)renderContext)->currentCamera)->viewMatrix.m[2][2];
-    const Vector3& eye = ((CubeCameraView*)((RenderTarget*)renderContext)->currentCamera)->position;
+    forward.x = ((RenderTarget*)renderContext)->currentCamera->viewMatrix.m[0][2];
+    forward.y = ((RenderTarget*)renderContext)->currentCamera->viewMatrix.m[1][2];
+    forward.z = ((RenderTarget*)renderContext)->currentCamera->viewMatrix.m[2][2];
+    const Vector3& eye = ((RenderTarget*)renderContext)->currentCamera->eyePosition;
     const Vector3& center = cubeObject->center;
     Vector3 offset(center.x - eye.x, center.y - eye.y, center.z - eye.z);
     for (int face = 0; face < 6; face++) {
@@ -335,7 +335,7 @@ void DrawableCube::MarkVisibleCells()
         reinterpret_cast<VisibilityClipper*>(g_visibilityClipper)->TransformVectors(
             reinterpret_cast<const VisibilityBoxVec*>(s_viewPoints),
             reinterpret_cast<VisibilityBoxVec*>(s_viewPoints),
-            reinterpret_cast<const VisibilityMatrix*>(&((CubeCameraView*)((RenderTarget*)renderContext)->currentCamera)->viewMatrix), 25);
+            reinterpret_cast<const VisibilityMatrix*>(&((RenderTarget*)renderContext)->currentCamera->viewMatrix), 25);
         for (int i = 0; i < 16; i++) {
             int corner = i + i / 4;
             if (reinterpret_cast<VisibilityClipper*>(g_visibilityClipper)->CullQuad(

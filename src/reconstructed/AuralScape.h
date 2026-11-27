@@ -119,18 +119,6 @@ struct AuralScapeSceneEnvironmentView {
     unsigned long enviroID[4];                // +0x410 SceneEnvironment::enviroID, per reverb zone
 };
 
-// GameObject+0x18 as AuralScape's slot 10 reads it: +0x08 points at an
-// object whose +0x170 is the position the reverb zone is looked up for.
-struct AuralScapeCameraView {
-    unsigned char field_0x000[0x170];
-    Vector3 eyePosition;                      // +0x170
-};
-
-struct AuralScapeRenderTargetView {
-    unsigned char field_0x00[0x08];
-    AuralScapeCameraView* currentCamera;   // +0x08
-};
-
 struct AuralScapeSceneView {
     unsigned char field_0x00[0xa4];
     AuralScapeSceneEnvironmentView* environment; // +0xa4 Scene::environment

@@ -17,8 +17,8 @@ struct ControlBinding;
 
 // The camera fields the pick ray reads (RenderTarget+0x08): the
 // camera-to-world rows of the matrix at +0xac, the position, the image
-// plane distance and the viewport (x, y, width, height). Camera.h declares
-// +0x198 as int and keeps these members protected.
+// plane distance and the viewport (x, y, width, height). The pick ray divides
+// the viewport unsigned (shr), while Camera.h declares it `int viewport[6]`.
 struct PickerCameraView {
     unsigned char field_0x000[0xac];
     float viewMatrix[3][4];                   // +0x0ac

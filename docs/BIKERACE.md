@@ -177,7 +177,8 @@ against retail, 600 runs with 0 mismatches):
   swapped them again (13394); retiring the Krusty3DObjects and TrackOverlay
   race views moved them back (13400); merging the duplicate EcoSystem,
   CollisionObject, QuadTree and soultree declarations swapped them again (13394);
-  typing TrackGameViewOwner's event scene as `Scene` moved them back (13400).
+  typing TrackGameViewOwner's event scene as `Scene` moved them back (13400);
+  replacing five camera views with `Camera` swapped them again (13394).
 
 Facts the two loaders establish:
 - Racers are KrustyBike (constructor `0x0048fa60`, 0x1638 bytes, the

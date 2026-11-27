@@ -105,21 +105,6 @@ struct SoultreeLod {
     SoultreeSurface* surfaces;
 };
 
-// The camera fields 0x004439c0 reads (RenderTarget+0x08): the viewport
-// origin (ObjectPicker.h's PickerCameraView names the same fields).
-struct D3DIMSoultreeCameraView {
-    unsigned char field_0x000[0xec];
-    Matrix4 viewMatrix;                        // view matrix (slot 12's visibility test)
-    unsigned char field_0x12c[0x170 - 0x12c];
-    Vector3 position;                          // position
-    Vector3 viewDirection;                     // view direction (drawing mode 5)
-    Vector3 upDirection;                      // +0x188 Camera upDirection
-    float roll;                               // +0x194 Camera roll
-    float imagePlaneDistance;                  // image plane distance
-    int displayAspect;
-    unsigned int viewportX;                    // viewport x
-    unsigned int viewportY;                    // viewport y
-};
 
 
 // 0x004a1b00 (cdecl): transforms `count` points from `source` by `matrix` into `target`;

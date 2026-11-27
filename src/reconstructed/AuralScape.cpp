@@ -710,7 +710,7 @@ int AuralScape::Tick(float frameTime) {
     unsigned long environment = 0;
     unsigned char material = 0;
     if (reverbEnabled && groundSubject && reverbOwner) {
-        Vector3 position = ((AuralScapeRenderTargetView*)renderContext)->currentCamera->eyePosition;
+        Vector3 position = ((RenderTarget*)renderContext)->currentCamera->eyePosition;
         reinterpret_cast<Terrain*>(groundSubject)->QueryGround(reinterpret_cast<TerrainVec3*>(&position), 0, 0, &material);
         zone = (material >> 4) & 3;
         environment = reverbOwner->environment->enviroID[zone];

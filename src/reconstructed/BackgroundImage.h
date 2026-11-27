@@ -19,19 +19,6 @@ struct BackgroundRegion {
     int owner;                   // owner value; nonzero regions are not blitted
 };
 
-// The fields BackgroundImage reads from the target's camera (Camera.h keeps
-// them protected): GameObject's +0x25 bit 0 and the slot 13 viewport.
-struct BackgroundCameraView {
-    unsigned char field_0x000[0x25];
-    unsigned char isEnabled : 1;              // +0x25
-    unsigned char field_0x026[0x1a8 - 0x26];
-    int viewportWidth;           // viewport width
-    int viewportHeight;          // viewport height
-    unsigned char field_0x1b0[0x1cc - 0x1b0];
-    int viewportEnabled;         // enables the viewport rectangle
-    int redrawFrames;            // frames left to redraw
-};
-
 class BackgroundImage : public GameObject {
 public:
     explicit BackgroundImage(int flags);  // 0x00403d50

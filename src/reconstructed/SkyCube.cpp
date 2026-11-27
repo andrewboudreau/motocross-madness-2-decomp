@@ -1,24 +1,14 @@
 #include "SkyCube.h"
 
+#include "Camera.h"
 #include "Cube.h"
+#include "RenderTarget.h"
 
 // SkyCube, 0x004fb1e0..0x004fb2ab (see SkyCube.h). The destructor is
 // compiler-generated.
 
-// The render target in renderContext and its camera, as slot 10 reads them
-// (RenderTarget +0x08 is the current Camera; Camera +0x170 is its position,
-// which Camera.h keeps protected).
-struct SkyCubeCameraView {
-    unsigned char field_0x000[0x170];
-    Vector3 eyePosition;                       // +0x170
-};
-
-struct SkyCubeRenderTargetView {
-    unsigned char field_0x00[8];
-    SkyCubeCameraView* currentCamera;       // +0x08
-};
-
-#define CAMERA() (((SkyCubeRenderTargetView*)renderContext)->currentCamera)
+// Slot 10 centres the cube on the current camera (RenderTarget +0x08).
+#define CAMERA() (((RenderTarget*)renderContext)->currentCamera)
 
 // 0x004fb1e0
 SkyCube::SkyCube(int flags) : DrawableCube(flags) {

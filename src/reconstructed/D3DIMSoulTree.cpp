@@ -810,7 +810,7 @@ void D3DIMSoultreeObject::DrawCurrentLod()
                 break;
             }
             case 4: {
-                Vector3 eye = ((D3DIMSoultreeCameraView*)((RenderTarget*)renderContext)->currentCamera)->position;
+                Vector3 eye = ((RenderTarget*)renderContext)->currentCamera->eyePosition;
                 for (int j = 0; j < surface->groupCount; j++) {
                     SoultreeVertexGroup* group = &surface->groups[j];
                     int vertices = group->vertexCount;
@@ -840,7 +840,7 @@ void D3DIMSoultreeObject::DrawCurrentLod()
                 line[0].diffuse = 0xffff0000;
                 line[1].diffuse = 0xffffffff;
                 if (updateEye)
-                    (Vector3&)eye = ((D3DIMSoultreeCameraView*)((RenderTarget*)renderContext)->currentCamera)->position;
+                    (Vector3&)eye = ((RenderTarget*)renderContext)->currentCamera->eyePosition;
                 for (int j = 0; j < surface->groupCount; j++) {
                     SoultreeVertexGroup* group = &surface->groups[j];
                     Vector3 localEye = ((DrawSoultreeObjectView*)group->node)->WorldToLocalPoint(&eye);
@@ -886,7 +886,7 @@ void D3DIMSoultreeObject::DrawCurrentLod()
                 if (textureScroll > 100.0f)
                     textureScroll -= 100.0f;
                 float scroll = textureScroll;
-                Vector3 eye = ((D3DIMSoultreeCameraView*)((RenderTarget*)renderContext)->currentCamera)->position;
+                Vector3 eye = ((RenderTarget*)renderContext)->currentCamera->eyePosition;
                 for (int j = 0; j < surface->groupCount; j++) {
                     SoultreeVertexGroup* group = &surface->groups[j];
                     count = group->vertexCount;
@@ -950,8 +950,8 @@ void D3DIMSoultreeObject::DrawCurrentLod()
                     ((RenderTarget*)renderContext)->DrawPrimitive(D3DPT_LINELIST, D3DFVF_LVERTEX, (int)ring, 32, 0);
                 }
                 if (updateView) {
-                    (Vector3&)viewDirection = ((D3DIMSoultreeCameraView*)((RenderTarget*)renderContext)->currentCamera)->viewDirection;
-                    (Vector3&)viewPosition = ((D3DIMSoultreeCameraView*)((RenderTarget*)renderContext)->currentCamera)->position;
+                    (Vector3&)viewDirection = ((RenderTarget*)renderContext)->currentCamera->viewDirection;
+                    (Vector3&)viewPosition = ((RenderTarget*)renderContext)->currentCamera->eyePosition;
                 }
                 SoultreeVertex lines[8];                 // 4 used; 8 inferred from the frame
                 for (i = 0; i < 4; i++) {
@@ -1045,7 +1045,7 @@ void D3DIMSoultreeObject::DrawCurrentLod()
                     SoultreeVertexGroup* group = &surface->groups[j];
                     Vector3 lightPosition = ((DrawSoultreeObjectView*)group->node)->WorldToLocalDirection(&light->lightPosition);
                     Vector3 eye = ((DrawSoultreeObjectView*)group->node)->WorldToLocalDirection(
-                        &((D3DIMSoultreeCameraView*)((RenderTarget*)renderContext)->currentCamera)->position);
+                        &((RenderTarget*)renderContext)->currentCamera->eyePosition);
                     for (int v = 0; v < group->vertexCount; v++) {
                         Vector3 position = group->vertices[v].position;
                         Vector3 toLight = Normalized(position - lightPosition);
@@ -1377,8 +1377,8 @@ void D3DIMSoultreeObject::DrawScreenRect(SoultreeScreenRect* rect)
     memset(&desc, 0, sizeof(desc));
     desc.size = sizeof(desc);
     ((PCRenderTarget*)renderContext)->renderSurface->Lock(0, &desc, 1, 0);
-    D3DIMSoultreeCameraView* camera = (D3DIMSoultreeCameraView*)((RenderTarget*)renderContext)->currentCamera;
-    char* bits = (char*)desc.surface + camera->viewportY * desc.pitch + camera->viewportX;
+    Camera* camera = ((RenderTarget*)renderContext)->currentCamera;
+    char* bits = (char*)desc.surface + camera->viewport[1] * desc.pitch + camera->viewport[0];
     int i;
     for (i = rect->left; i < rect->right; i++) {
         bits[rect->top * desc.pitch + i * 2] = 0;
@@ -1405,7 +1405,7 @@ int D3DIMSoultreeObject::PrepareGeometry()
         Vector3 center;
         Vector3 extents;
         GetSubtreeBounds(reinterpret_cast<Vec3*>(&center), reinterpret_cast<Vec3*>(&extents));
-        const Matrix4& projection = ((D3DIMSoultreeCameraView*)((RenderTarget*)renderContext)->currentCamera)->viewMatrix;
+        const Matrix4& projection = ((RenderTarget*)renderContext)->currentCamera->screenMatrix[0];
         SoultreeD3DMatrix view;
         view._11 = world.m[0][0] * projection.m[0][0] + world.m[0][1] * projection.m[1][0] + world.m[0][2] * projection.m[2][0] + world.m[0][3] * projection.m[3][0];
         view._12 = world.m[0][0] * projection.m[0][1] + world.m[0][1] * projection.m[1][1] + world.m[0][2] * projection.m[2][1] + world.m[0][3] * projection.m[3][1];
@@ -1463,11 +1463,11 @@ void D3DIMSoultreeObject::SelectLod(Vector3* center, Vector3* extents)
         GetSubtreeBounds(reinterpret_cast<Vec3*>(center), reinterpret_cast<Vec3*>(extents));
     }
     float distance = Magnitude(LocalToWorldPoint(*center) -
-                               ((D3DIMSoultreeCameraView*)((RenderTarget*)renderContext)->currentCamera)->position);
+                               ((RenderTarget*)renderContext)->currentCamera->eyePosition);
     float range = distance - Magnitude(*extents);
     if (0.1f > range)
         range = 0.1f;
-    float scale = ((D3DIMSoultreeCameraView*)((RenderTarget*)renderContext)->currentCamera)->imagePlaneDistance / range;
+    float scale = ((RenderTarget*)renderContext)->currentCamera->focalLength / range;
     if (useAutoLod) {
         int lod = 0;
         for (int i = 0; i < lodCount - 1; i++) {
