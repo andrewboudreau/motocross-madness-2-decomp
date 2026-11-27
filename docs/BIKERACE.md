@@ -175,7 +175,8 @@ against retail, 600 runs with 0 mismatches):
   Bike.h's wrecker rider views and the `UnknownWreckerCharacter` alias moved
   them back (13400); replacing the constraint unit's `ConVec3` with `Vec3`
   swapped them again (13394); retiring the Krusty3DObjects and TrackOverlay
-  race views moved them back (13400).
+  race views moved them back (13400); merging the duplicate EcoSystem,
+  CollisionObject, QuadTree and soultree declarations swapped them again (13394).
 
 Facts the two loaders establish:
 - Racers are KrustyBike (constructor `0x0048fa60`, 0x1638 bytes, the
