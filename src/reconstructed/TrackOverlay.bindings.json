@@ -73,7 +73,7 @@
   "?AddRef@BaseObject@@UAEHXZ": "0x00405160",
   "?GetRefCount@BaseObject@@UAEHXZ": "0x00401940",
   "?Release@GameObject@@UAEHXZ": "0x004696c0",
-  "?NextBike@BikeRace@@QAEPAVBikeRaceKrustyBikeView@@PAH@Z": "0x004204e0",
+  "?NextBike@BikeRace@@QAEPAVKrustyBike@@PAH@Z": "0x004204e0",
   "?TestInputEvent@@YAHHHPBUControlEvent@@H@Z": "0x0043caa0",
   "?FastSqrt@@YAMM@Z": "0x00460b50",
   "?AppendChild@GameObject@@QAEHPAV1@H@Z": "0x00469190",

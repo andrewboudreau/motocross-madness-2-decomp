@@ -15,8 +15,9 @@ extern "C" int PhysicsModelBase() {
 #include "../../src/reconstructed/D3DIMSoulTree.h"
 #include "../../src/reconstructed/CarProcedural.h"
 #include "../../src/krusty2/motion/CollisionCharacter.h"
-CHECK(racer_model, offsetof(BikeRaceKrustyBikeView, modelNode) == 0x3bc);
-CHECK(racer_rider, offsetof(BikeRaceKrustyBikeView, riderCharacter) == 0x5c4);
+#include "../../src/krusty2/vehicle/KrustyBikeCore.h"
+CHECK(racer_model, offsetof(KrustyBike, modelNode) == 0x3bc);
+CHECK(racer_rider, offsetof(KrustyBike, riderCharacter) == 0x5c4);
 CHECK(rider_model, offsetof(BikeRaceRiderView, modelNode) == 0x1a0);
 CHECK(scene_character_model, offsetof(CollisionCharacter, modelNode) == 0x1a0);
 CHECK(scene_car_model, offsetof(CarProcedural, carModel) == 0x34);

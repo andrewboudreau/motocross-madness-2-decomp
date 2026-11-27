@@ -92,7 +92,7 @@ class RaceDetailConnections(unittest.TestCase):
    # Complete extraction is byte/relocation identical before native execution.
    for label,source in (('race',RACE),('model',MODEL)):
     path=out/(label+'.cpp')
-    prefix='#include "'+(ROOT/'src/reconstructed/BikeRace.h').as_posix()+'"\n#include "'+(ROOT/'src/reconstructed/D3DIMSoulTree.h').as_posix()+'"\n'
+    prefix='#include "'+(ROOT/'src/reconstructed/BikeRace.h').as_posix()+'"\n#include "'+(ROOT/'src/reconstructed/D3DIMSoulTree.h').as_posix()+'"\n'+'#include "'+(ROOT/'src/krusty2/vehicle/KrustyBikeCore.h').as_posix()+'"\n'
     path.write_text(prefix+'\n'.join(function_text((ROOT/source).read_text(),signature)for src,_,_,_,signature in PROVIDERS if src==source)+'\n')
     compile(path,label)
    for source,symbol,va,size,_ in PROVIDERS:

@@ -14685,7 +14685,7 @@ CASES = [
         'name': 'bikerace.cpp BikeRace racer iterator 0x4204e0',
         'bindings': 'src/reconstructed/BikeRace.bindings.json',
         'source': 'src/reconstructed/BikeRace.cpp',
-        'symbol': '?NextBike@BikeRace@@QAEPAVBikeRaceKrustyBikeView@@PAH@Z',
+        'symbol': '?NextBike@BikeRace@@QAEPAVKrustyBike@@PAH@Z',
         'target_va': '0x004204e0',
         'target_size': 162,
         'reason': 'walks racers',

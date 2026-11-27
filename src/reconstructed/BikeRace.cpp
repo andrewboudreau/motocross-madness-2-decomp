@@ -513,8 +513,8 @@ BikeRace* BikeRace::Create(void* owner, ParticleManager* particles, LightManager
     if (thirtySecondMan) {
         if (hasStartProbe) {
             localRacer->modelNode->GetPosition((Vec3*)&point);
-            point.x += localRacer->heading.x * 15.0f;
-            point.z += localRacer->heading.z * 15.0f;
+            point.x += localRacer->bodyForward.x * 15.0f;
+            point.z += localRacer->bodyForward.z * 15.0f;
         }
         terrain->QueryGround(reinterpret_cast<TerrainVec3*>(&point), 0, 0, 0);
         thirtySecondMan->modelNode->SetPositionVec3(point);
@@ -539,7 +539,7 @@ BikeRace* BikeRace::Create(void* owner, ParticleManager* particles, LightManager
                 COPY_TEXT(ghostFilePlayed, "VCRgtemp.dat", 0x104);
                 ghostVcr->OpenRecording(RecorderCallback, 1, ghostFilePlayed, vcrFile);
                 bestGhostLength = ghostVcr->RecordedLength();
-                reinterpret_cast<KrustyBike*>(aiRacers[0])->SetNetRecorder(reinterpret_cast<KbRecorder*>(ghostVcr));
+                aiRacers[0]->SetNetRecorder(reinterpret_cast<KbRecorder*>(ghostVcr));
                 if (startBeforeFinish)
                     aiRacers[0]->Disable();
                 else
@@ -585,9 +585,9 @@ BikeRace* BikeRace::Create(void* owner, ParticleManager* particles, LightManager
     } else if (g_TrackGame->playerCount > 1) {
         for (int i = 0; i < CountRaceRacers(); i++) {
             for (int j = 0; j < CountRaceRacers(); j++) {
-                BikeRaceKrustyBikeView* racer = racerSlots[i];
+                KrustyBike* racer = racerSlots[i];
                 RacerSlot* slot = &g_TrackGame->mode.racers[j];
-                if (racer->recorderId == slot->networkPlayerId && racer->aiMessageIndex == slot->racerIndex)
+                if (racer->netId == slot->networkPlayerId && (char)racer->loaderKind == slot->racerIndex)
                     painter->PaintNumber(reinterpret_cast<D3DIMSoultreeObject*>(racer->modelNode), slot->plateNumber);
             }
         }
@@ -754,8 +754,8 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, TextureContext* te
             Release();
             return 0;
         }
-        localRacer = new(__FILE__, 0x42a) BikeRaceKrustyBikeView(1);
-        reinterpret_cast<KrustyBike*>(localRacer)->Load(owner, "", bikeFile, circuitRiderFile, lights, textures, position,
+        localRacer = new(__FILE__, 0x42a) KrustyBike(1);
+        localRacer->Load(owner, "", bikeFile, circuitRiderFile, lights, textures, position,
                                            direction, up, terrain, g_TrackGame->controlInterface, 0, 0, this,
                                            g_TrackGame->mode.profileName, 0, 0, (const KbBikeSetup*)&setup,
                                            g_TrackGame->mode.gasGyro,
@@ -763,16 +763,16 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, TextureContext* te
                                            replayVcr, 0, !(circuit->careerFlags & 2));
         AppendChild(localRacer, -1);
         g_TrackGame->ui->ResolveBikeFile(circuit->racers[0].bikeName, ownBikeTexture, 0x3f);
-        localRacer->modelNode->ReplaceMaterialTexture(0, ownBikeTexture, textures);
+        ((D3DIMSoultreeObject*)localRacer->modelNode)->ReplaceMaterialTexture(0, ownBikeTexture, textures);
         if (!(circuit->careerFlags & 2)) {
             g_TrackGame->ui->ResolveRiderFile(circuit->racers[0].riderModel, ownRiderTexture,
                                                              0x3f);
-            localRacer->riderCharacter->modelNode->ReplaceMaterialTexture(0, ownRiderTexture, textures);
+            ((D3DIMSoultreeObject*)localRacer->riderCharacter->modelNode)->ReplaceMaterialTexture(0, ownRiderTexture, textures);
         }
         if (g_TrackGame->mode.raceSettings.raceMode == 1) {
             id = 1;
-            aiRacers = (BikeRaceKrustyBikeView**)DebugMalloc(
-                (g_TrackGame->proCircuit->racerCount - 1) * sizeof(BikeRaceKrustyBikeView*), __FILE__,
+            aiRacers = (KrustyBike**)DebugMalloc(
+                (g_TrackGame->proCircuit->racerCount - 1) * sizeof(KrustyBike*), __FILE__,
                 0x44f);
             for (int i = 0; i < g_TrackGame->proCircuit->racerCount - 1; i++)
                 aiRacers[i] = 0;
@@ -797,14 +797,14 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, TextureContext* te
                 setup.rpmStep = (setup.rpmUpperLimit - setup.rpmLowerLimit) / 10;
                 setup.weight = g_TrackGame->ui->weight[bikeClass];
                 RandomSkill(skill, aiSettings[0], aiSettings[1]);
-                aiRacers[n - 1] = new(__FILE__, 0x47c) BikeRaceKrustyBikeView(1);
-                reinterpret_cast<KrustyBike*>(aiRacers[n - 1])->Load(owner, empty, bikeFile, riderFile, lights, textures,
+                aiRacers[n - 1] = new(__FILE__, 0x47c) KrustyBike(1);
+                aiRacers[n - 1]->Load(owner, empty, bikeFile, riderFile, lights, textures,
                                                           position, direction, up, terrain, 0, 1, 0, this,
                                                           racer->racerName, 0, id, (const KbBikeSetup*)&setup, 1, 1, particleManager,
                                                           raceScene, replayVcr, skill, 1);
                 AppendChild(aiRacers[n - 1], -1);
-                aiRacers[n - 1]->modelNode->ReplaceMaterialTexture(0, racer->bikeName, textures);
-                aiRacers[n - 1]->riderCharacter->modelNode->ReplaceMaterialTexture(0, racer->riderModel,
+                ((D3DIMSoultreeObject*)aiRacers[n - 1]->modelNode)->ReplaceMaterialTexture(0, racer->bikeName, textures);
+                ((D3DIMSoultreeObject*)aiRacers[n - 1]->riderCharacter->modelNode)->ReplaceMaterialTexture(0, racer->riderModel,
                                                                                      textures);
                 id++;
             }
@@ -814,7 +814,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, TextureContext* te
 
     int used[8];
     if (!g_TrackGame->playingReplay && g_TrackGame->playerCount > 1) {
-        racerSlots = new(__FILE__, 0x4a3) BikeRaceKrustyBikeView*[racerCount];
+        racerSlots = new(__FILE__, 0x4a3) KrustyBike*[racerCount];
         memset(used, 0, sizeof(used));
     }
     g_TrackGame->ui->StepProgressBar();
@@ -855,9 +855,9 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, TextureContext* te
     if (g_TrackGame->playingReplay || g_TrackGame->playerCount == 1) {
         // The player's racer offline (or in a replay).
         WriteRelativePositions(&position, &direction, event, order[0]);
-        localRacer = new(__FILE__, 0x4ea) BikeRaceKrustyBikeView(1);
+        localRacer = new(__FILE__, 0x4ea) KrustyBike(1);
         if (!AppendChild(
-                reinterpret_cast<KrustyBike*>(localRacer)->Load(
+                localRacer->Load(
                     owner, empty, bikeFile, riderFile, lights, textures, position, direction, up, terrain,
                     g_TrackGame->controlInterface, 0, 0, this, name, 0, id,
                     (const KbBikeSetup*)g_TrackGame->mode.garageOptions,
@@ -875,12 +875,12 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, TextureContext* te
             Release();
             return 0;
         }
-        localRacer->modelNode->ReplaceMaterialTexture(0, bikeTexture, textures);
-        localRacer->riderCharacter->modelNode->ReplaceMaterialTexture(0, riderTexture, textures);
+        ((D3DIMSoultreeObject*)localRacer->modelNode)->ReplaceMaterialTexture(0, bikeTexture, textures);
+        ((D3DIMSoultreeObject*)localRacer->riderCharacter->modelNode)->ReplaceMaterialTexture(0, riderTexture, textures);
         if (!g_TrackGame->mode.raceSettings.treeCollision) {
             localRacer->collisionObject->ignoreVegetation = 1;
-            localRacer->frontWheel->ignoreVegetation = 1;
-            localRacer->rearWheel->ignoreVegetation = 1;
+            ((CollisionObject*)localRacer->frontWheel)->ignoreVegetation = 1;
+            ((CollisionObject*)localRacer->rearWheel)->ignoreVegetation = 1;
         }
         localRacer->engineSize = ((BikeEngineSetup*)g_TrackGame->mode.garageOptions)->engineSize;
         localRacer->fourStroke = (char)((BikeEngineSetup*)g_TrackGame->mode.garageOptions)->fourStroke;
@@ -905,10 +905,10 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, TextureContext* te
                     }
                 }
                 WriteRelativePositions(&position, &direction, event, i + 1);
-                BikeRaceKrustyBikeView* racer = new(__FILE__, 0x53b) BikeRaceKrustyBikeView(1);
+                KrustyBike* racer = new(__FILE__, 0x53b) KrustyBike(1);
                 racerSlots[j] = racer;
                 if (!AppendChild(
-                        reinterpret_cast<KrustyBike*>(racer)->Load(
+                        racer->Load(
                             owner, empty, bikeFile, riderFile, lights, textures, position, direction, up, terrain,
                             g_TrackGame->controlInterface, 0, 0, this, g_TrackGame->mode.profileName, 0,
                             playerId, (const KbBikeSetup*)g_TrackGame->mode.garageOptions,
@@ -932,11 +932,11 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, TextureContext* te
                                                                  ownRiderTexture, 0x3f);
                 if (!g_TrackGame->mode.raceSettings.treeCollision) {
                     racerSlots[j]->collisionObject->ignoreVegetation = 1;
-                    racerSlots[j]->frontWheel->ignoreVegetation = 1;
-                    racerSlots[j]->rearWheel->ignoreVegetation = 1;
+                    ((CollisionObject*)racerSlots[j]->frontWheel)->ignoreVegetation = 1;
+                    ((CollisionObject*)racerSlots[j]->rearWheel)->ignoreVegetation = 1;
                 }
-                racerSlots[j]->modelNode->ReplaceMaterialTexture(0, ownBikeTexture, textures);
-                racerSlots[j]->riderCharacter->modelNode->ReplaceMaterialTexture(0, ownRiderTexture, textures);
+                ((D3DIMSoultreeObject*)racerSlots[j]->modelNode)->ReplaceMaterialTexture(0, ownBikeTexture, textures);
+                ((D3DIMSoultreeObject*)racerSlots[j]->riderCharacter->modelNode)->ReplaceMaterialTexture(0, ownRiderTexture, textures);
                 racerSlots[j]->plateNumber = g_TrackGame->mode.plateNumber;
                 if (replayVcr && g_TrackGame->useReplayTape && !g_TrackGame->playingReplay) {
                     replayVcr->SetRacer(playerId, 0, recordIndex++, g_TrackGame->mode.profileName,
@@ -971,9 +971,9 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, TextureContext* te
             setup.rpmStep = (setup.rpmUpperLimit - setup.rpmLowerLimit) / 10;
             setup.weight = g_TrackGame->ui->weight[bikeClass];
             sprintf(path, "%s\\%s", resources, g_TrackGame->mode.racers[j].bikeModelName);
-            BikeRaceKrustyBikeView* racer = new(__FILE__, 0x5a3) BikeRaceKrustyBikeView(1);
+            KrustyBike* racer = new(__FILE__, 0x5a3) KrustyBike(1);
             racerSlots[j] = racer;
-            if (!AppendChild(reinterpret_cast<KrustyBike*>(racer)->Load(
+            if (!AppendChild(racer->Load(
                                            owner, empty, path, riderFile, lights, textures, position, direction,
                                            up, terrain, 0, 0, 1, this, g_TrackGame->mode.racers[j].playerName, 0, g_TrackGame->mode.racers[j].networkPlayerId,
                                            (const KbBikeSetup*)&setup, 0, 1, particleManager, raceScene, replayVcr, 0, 1),
@@ -981,20 +981,20 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, TextureContext* te
                 sprintf(message, "Net Bike%d not loaded\n", j);
             }
             g_TrackGame->ui->ResolveBikeFile(g_TrackGame->mode.racers[j].bikeName, bikeTexture, 0x3f);
-            racerSlots[j]->modelNode->ReplaceMaterialTexture(0, bikeTexture, textures);
+            ((D3DIMSoultreeObject*)racerSlots[j]->modelNode)->ReplaceMaterialTexture(0, bikeTexture, textures);
             if (g_TrackGame->GetRegistryInt("MPR", 0) == 123 && g_TrackGame->mode.racers[j].hasMprSkin) {
-                racerSlots[j]->riderCharacter->modelNode->ReplaceMaterialTexture(0, "MPR.tga", textures);
+                ((D3DIMSoultreeObject*)racerSlots[j]->riderCharacter->modelNode)->ReplaceMaterialTexture(0, "MPR.tga", textures);
             } else {
                 g_TrackGame->ui->ResolveRiderFile(g_TrackGame->mode.racers[j].riderName, riderTexture, 0x3f);
-                racerSlots[j]->riderCharacter->modelNode->ReplaceMaterialTexture(0, riderTexture, textures);
+                ((D3DIMSoultreeObject*)racerSlots[j]->riderCharacter->modelNode)->ReplaceMaterialTexture(0, riderTexture, textures);
             }
             if (!g_TrackGame->mode.raceSettings.treeCollision) {
                 racerSlots[j]->collisionObject->ignoreVegetation = 1;
-                racerSlots[j]->frontWheel->ignoreVegetation = 1;
-                racerSlots[j]->rearWheel->ignoreVegetation = 1;
+                ((CollisionObject*)racerSlots[j]->frontWheel)->ignoreVegetation = 1;
+                ((CollisionObject*)racerSlots[j]->rearWheel)->ignoreVegetation = 1;
             }
             racerSlots[j]->Disable();
-            racerSlots[j]->messageDelay = g_TrackGame->mode.racers[j].lowestMessageDelay;
+            racerSlots[j]->clockOffset = g_TrackGame->mode.racers[j].lowestMessageDelay;
             if (replayVcr && g_TrackGame->useReplayTape && !g_TrackGame->playingReplay) {
                 replayVcr->SetRacer(g_TrackGame->mode.racers[j].networkPlayerId, 0, recordIndex++, g_TrackGame->mode.racers[j].playerName, path,
                                                    riderFile, bikeTexture, riderTexture, racerSlots[j]->engineSize,
@@ -1023,9 +1023,9 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, TextureContext* te
                 setup.presetCurve[k] = g_TrackGame->ui->standardCurves[bikeClass][0][k];
             setup.rpmStep = (setup.rpmUpperLimit - setup.rpmLowerLimit) / 10;
             setup.weight = g_TrackGame->ui->weight[bikeClass];
-            BikeRaceKrustyBikeView* racer = new(__FILE__, 0x61f) BikeRaceKrustyBikeView(1);
+            KrustyBike* racer = new(__FILE__, 0x61f) KrustyBike(1);
             racerSlots[j] = racer;
-            if (!AppendChild(reinterpret_cast<KrustyBike*>(racer)->Load(
+            if (!AppendChild(racer->Load(
                                            owner, empty, g_TrackGame->mode.racers[j].bikeModelName, riderFile, lights, textures, position,
                                            direction, up, terrain, 0, (char)g_TrackGame->mode.racers[j].racerIndex, 1, this,
                                            g_TrackGame->mode.racers[j].playerName, 0, g_TrackGame->mode.racers[j].networkPlayerId, (const KbBikeSetup*)&setup, 0, 1, particleManager,
@@ -1033,15 +1033,15 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, TextureContext* te
                                        -1)) {
                 sprintf(message, "Net Bike%d not loaded\n", j);
             }
-            racerSlots[j]->modelNode->ReplaceMaterialTexture(0, g_TrackGame->mode.racers[j].bikeName, textures);
-            racerSlots[j]->riderCharacter->modelNode->ReplaceMaterialTexture(0, g_TrackGame->mode.racers[j].riderName, textures);
+            ((D3DIMSoultreeObject*)racerSlots[j]->modelNode)->ReplaceMaterialTexture(0, g_TrackGame->mode.racers[j].bikeName, textures);
+            ((D3DIMSoultreeObject*)racerSlots[j]->riderCharacter->modelNode)->ReplaceMaterialTexture(0, g_TrackGame->mode.racers[j].riderName, textures);
             if (!g_TrackGame->mode.raceSettings.treeCollision) {
                 racerSlots[j]->collisionObject->ignoreVegetation = 1;
-                racerSlots[j]->frontWheel->ignoreVegetation = 1;
-                racerSlots[j]->rearWheel->ignoreVegetation = 1;
+                ((CollisionObject*)racerSlots[j]->frontWheel)->ignoreVegetation = 1;
+                ((CollisionObject*)racerSlots[j]->rearWheel)->ignoreVegetation = 1;
             }
             racerSlots[j]->Disable();
-            racerSlots[j]->messageDelay = g_TrackGame->mode.racers[j].lowestMessageDelay;
+            racerSlots[j]->clockOffset = g_TrackGame->mode.racers[j].lowestMessageDelay;
             if (replayVcr && g_TrackGame->useReplayTape && !g_TrackGame->playingReplay) {
                 replayVcr->SetRacer(g_TrackGame->mode.racers[j].networkPlayerId, (char)g_TrackGame->mode.racers[j].racerIndex, recordIndex++,
                                                    g_TrackGame->mode.racers[j].playerName, g_TrackGame->mode.racers[j].bikeModelName, riderFile,
@@ -1059,14 +1059,14 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, TextureContext* te
     if ((g_TrackGame->playingReplay && replayVcr->racerCount > 1) || g_TrackGame->playerCount == 1) {
         if (g_TrackGame->mode.raceSettings.raceMode == 4) {
             // The ghost.
-            aiRacers = new(__FILE__, 0x674) BikeRaceKrustyBikeView*[1];
+            aiRacers = new(__FILE__, 0x674) KrustyBike*[1];
             WriteRelativePositions(&position, &direction, event, order[0]);
             sprintf(bikeFile, "%s\\%s", resources, "Ghost.mcf");
             sprintf(riderFile, "%s\\GhostRider.mcf", resources);
-            BikeRaceKrustyBikeView* racer = new(__FILE__, 0x67c) BikeRaceKrustyBikeView(1);
+            KrustyBike* racer = new(__FILE__, 0x67c) KrustyBike(1);
             aiRacers[0] = racer;
             if (!AppendChild(
-                    reinterpret_cast<KrustyBike*>(racer)->Load(
+                    racer->Load(
                         owner, empty, bikeFile, riderFile, lights, textures, position, direction, up, terrain, 0, -1,
                         0, this, "Ghost", 0, 0, (const KbBikeSetup*)g_TrackGame->mode.garageOptions,
                         g_TrackGame->mode.gasGyro, g_TrackGame->mode.brakeGyro,
@@ -1083,7 +1083,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, TextureContext* te
         } else if (g_TrackGame->mode.raceSettings.aiRacerCount > 0) {
             // The AI racers.
             id = 1;
-            aiRacers = new(__FILE__, 0x6a5) BikeRaceKrustyBikeView*[g_TrackGame->mode.raceSettings.aiRacerCount];
+            aiRacers = new(__FILE__, 0x6a5) KrustyBike*[g_TrackGame->mode.raceSettings.aiRacerCount];
             for (int i = 0; i < g_TrackGame->mode.raceSettings.aiRacerCount; i++)
                 aiRacers[i] = 0;
             for (int n = 0; n < g_TrackGame->mode.raceSettings.aiRacerCount; n++) {
@@ -1139,9 +1139,9 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, TextureContext* te
                     setup.presetCurve[k] = g_TrackGame->ui->standardCurves[bikeClass][0][k];
                 setup.rpmStep = (setup.rpmUpperLimit - setup.rpmLowerLimit) / 10;
                 setup.weight = g_TrackGame->ui->weight[bikeClass];
-                BikeRaceKrustyBikeView* racer = new(__FILE__, 0x718) BikeRaceKrustyBikeView(1);
+                KrustyBike* racer = new(__FILE__, 0x718) KrustyBike(1);
                 aiRacers[n] = racer;
-                if (!AppendChild(reinterpret_cast<KrustyBike*>(racer)->Load(
+                if (!AppendChild(racer->Load(
                                                owner, empty, bikeFile, riderFile, lights, textures, position,
                                                direction, up, terrain, 0, ai, 0, this, aiName, 0, id, (const KbBikeSetup*)&setup, 1, 1,
                                                particleManager, raceScene, replayVcr, skill, 1),
@@ -1152,30 +1152,30 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, TextureContext* te
                     char text[0x40];
                     COPY_TEXT(text, bikeTexture, 0x40);
                     g_TrackGame->ui->ResolveBikeFile(text, bikeTexture, 0x3f);
-                    aiRacers[n]->modelNode->ReplaceMaterialTexture(0, bikeTexture, textures);
+                    ((D3DIMSoultreeObject*)aiRacers[n]->modelNode)->ReplaceMaterialTexture(0, bikeTexture, textures);
                     COPY_TEXT(text, riderTexture, 0x40);
                     g_TrackGame->ui->ResolveRiderFile(text, riderTexture, 0x3f);
-                    aiRacers[n]->riderCharacter->modelNode->ReplaceMaterialTexture(0, riderTexture, textures);
+                    ((D3DIMSoultreeObject*)aiRacers[n]->riderCharacter->modelNode)->ReplaceMaterialTexture(0, riderTexture, textures);
                     aiRacers[n]->plateNumber = plate;
                     recordIndex++;
                 } else if (fromEvent) {
                     g_TrackGame->ui->ResolveBikeFile(EventAi(n).bikeTexture, bikeTexture, 0x3f);
-                    aiRacers[n]->modelNode->ReplaceMaterialTexture(0, bikeTexture, textures);
+                    ((D3DIMSoultreeObject*)aiRacers[n]->modelNode)->ReplaceMaterialTexture(0, bikeTexture, textures);
                     g_TrackGame->ui->ResolveRiderFile(EventAi(n).riderTexture, riderTexture, 0x3f);
-                    aiRacers[n]->riderCharacter->modelNode->ReplaceMaterialTexture(0, riderTexture, textures);
+                    ((D3DIMSoultreeObject*)aiRacers[n]->riderCharacter->modelNode)->ReplaceMaterialTexture(0, riderTexture, textures);
                     aiRacers[n]->plateNumber = plate;
                 } else {
                     g_TrackGame->ui->ResolveBikeFile(UiBike(bikes[n]).texture, bikeTexture, 0x3f);
-                    aiRacers[n]->modelNode->ReplaceMaterialTexture(0, bikeTexture, textures);
+                    ((D3DIMSoultreeObject*)aiRacers[n]->modelNode)->ReplaceMaterialTexture(0, bikeTexture, textures);
                     g_TrackGame->ui->ResolveRiderFile(UiRider(riders[n]).modelFile, riderTexture,
                                                                      0x3f);
-                    aiRacers[n]->riderCharacter->modelNode->ReplaceMaterialTexture(0, riderTexture, textures);
+                    ((D3DIMSoultreeObject*)aiRacers[n]->riderCharacter->modelNode)->ReplaceMaterialTexture(0, riderTexture, textures);
                     aiRacers[n]->plateNumber = plate;
                 }
                 if (!g_TrackGame->mode.raceSettings.treeCollision) {
                     aiRacers[n]->collisionObject->ignoreVegetation = 1;
-                    aiRacers[n]->frontWheel->ignoreVegetation = 1;
-                    aiRacers[n]->rearWheel->ignoreVegetation = 1;
+                    ((CollisionObject*)aiRacers[n]->frontWheel)->ignoreVegetation = 1;
+                    ((CollisionObject*)aiRacers[n]->rearWheel)->ignoreVegetation = 1;
                 }
                 if (replayVcr && g_TrackGame->useReplayTape && !g_TrackGame->playingReplay) {
                     replayVcr->SetRacer(id, 1, recordIndex++, aiName, path, riderFile, bikeTexture,
@@ -1199,7 +1199,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, TextureContext* te
         // A network race: the AI racers this host runs.
         id = 1;
         if (g_TrackGame->mode.raceSettings.aiRacerCount > 0) {
-            aiRacers = new(__FILE__, 0x770) BikeRaceKrustyBikeView*[g_TrackGame->mode.raceSettings.aiRacerCount];
+            aiRacers = new(__FILE__, 0x770) KrustyBike*[g_TrackGame->mode.raceSettings.aiRacerCount];
             for (i = 0; i < racerCount; i++) {
                 int other = GridPlayer(i).playerId;
                 if (other != playerId || !GridPlayer(i).racerIndex)
@@ -1222,9 +1222,9 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, TextureContext* te
                     setup.presetCurve[k] = g_TrackGame->ui->standardCurves[bikeClass][0][k];
                 setup.rpmStep = (setup.rpmUpperLimit - setup.rpmLowerLimit) / 10;
                 setup.weight = g_TrackGame->ui->weight[bikeClass];
-                BikeRaceKrustyBikeView* racer = new(__FILE__, 0x78f) BikeRaceKrustyBikeView(1);
+                KrustyBike* racer = new(__FILE__, 0x78f) KrustyBike(1);
                 racerSlots[j] = racer;
-                if (!AppendChild(reinterpret_cast<KrustyBike*>(racer)->Load(
+                if (!AppendChild(racer->Load(
                                                owner, empty, g_TrackGame->mode.racers[j].bikeModelName, riderFile, lights, textures,
                                                position, direction, up, terrain, 0, (char)g_TrackGame->mode.racers[j].racerIndex, 0,
                                                this, g_TrackGame->mode.racers[j].playerName, 0, g_TrackGame->mode.racers[j].networkPlayerId, (const KbBikeSetup*)&setup, 0, 1,
@@ -1232,12 +1232,12 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, TextureContext* te
                                            -1)) {
                     sprintf(message, "Net Bike%d not loaded\n", j);
                 }
-                racerSlots[j]->modelNode->ReplaceMaterialTexture(0, g_TrackGame->mode.racers[j].bikeName, textures);
-                racerSlots[j]->riderCharacter->modelNode->ReplaceMaterialTexture(0, g_TrackGame->mode.racers[j].riderName, textures);
+                ((D3DIMSoultreeObject*)racerSlots[j]->modelNode)->ReplaceMaterialTexture(0, g_TrackGame->mode.racers[j].bikeName, textures);
+                ((D3DIMSoultreeObject*)racerSlots[j]->riderCharacter->modelNode)->ReplaceMaterialTexture(0, g_TrackGame->mode.racers[j].riderName, textures);
                 if (!g_TrackGame->mode.raceSettings.treeCollision) {
                     racerSlots[j]->collisionObject->ignoreVegetation = 1;
-                    racerSlots[j]->frontWheel->ignoreVegetation = 1;
-                    racerSlots[j]->rearWheel->ignoreVegetation = 1;
+                    ((CollisionObject*)racerSlots[j]->frontWheel)->ignoreVegetation = 1;
+                    ((CollisionObject*)racerSlots[j]->rearWheel)->ignoreVegetation = 1;
                 }
                 if (replayVcr && g_TrackGame->useReplayTape && !g_TrackGame->playingReplay) {
                     replayVcr->SetRacer(g_TrackGame->mode.racers[j].networkPlayerId, (char)g_TrackGame->mode.racers[j].racerIndex, recordIndex++,
@@ -1270,16 +1270,16 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, TextureContext* te
                     racerSlots[a]->bikeAndRiderCollision->AddIgnoredOwner(racerSlots[b]->rearWheel);
                     racerSlots[a]->bikeAndRiderCollision->AddIgnoredOwner(racerSlots[b]->wrecker->collisionModel);
                 }
-                racerSlots[a]->frontWheel->AddIgnoredOwner(racerSlots[b]->bikeCollision);
-                racerSlots[a]->frontWheel->AddIgnoredOwner(racerSlots[b]->bikeAndRiderCollision);
-                racerSlots[a]->frontWheel->AddIgnoredOwner(racerSlots[b]->frontWheel);
-                racerSlots[a]->frontWheel->AddIgnoredOwner(racerSlots[b]->rearWheel);
-                racerSlots[a]->frontWheel->AddIgnoredOwner(racerSlots[b]->wrecker->collisionModel);
-                racerSlots[a]->rearWheel->AddIgnoredOwner(racerSlots[b]->bikeCollision);
-                racerSlots[a]->rearWheel->AddIgnoredOwner(racerSlots[b]->bikeAndRiderCollision);
-                racerSlots[a]->rearWheel->AddIgnoredOwner(racerSlots[b]->frontWheel);
-                racerSlots[a]->rearWheel->AddIgnoredOwner(racerSlots[b]->rearWheel);
-                racerSlots[a]->rearWheel->AddIgnoredOwner(racerSlots[b]->wrecker->collisionModel);
+                ((CollisionObject*)racerSlots[a]->frontWheel)->AddIgnoredOwner(racerSlots[b]->bikeCollision);
+                ((CollisionObject*)racerSlots[a]->frontWheel)->AddIgnoredOwner(racerSlots[b]->bikeAndRiderCollision);
+                ((CollisionObject*)racerSlots[a]->frontWheel)->AddIgnoredOwner(racerSlots[b]->frontWheel);
+                ((CollisionObject*)racerSlots[a]->frontWheel)->AddIgnoredOwner(racerSlots[b]->rearWheel);
+                ((CollisionObject*)racerSlots[a]->frontWheel)->AddIgnoredOwner(racerSlots[b]->wrecker->collisionModel);
+                ((CollisionObject*)racerSlots[a]->rearWheel)->AddIgnoredOwner(racerSlots[b]->bikeCollision);
+                ((CollisionObject*)racerSlots[a]->rearWheel)->AddIgnoredOwner(racerSlots[b]->bikeAndRiderCollision);
+                ((CollisionObject*)racerSlots[a]->rearWheel)->AddIgnoredOwner(racerSlots[b]->frontWheel);
+                ((CollisionObject*)racerSlots[a]->rearWheel)->AddIgnoredOwner(racerSlots[b]->rearWheel);
+                ((CollisionObject*)racerSlots[a]->rearWheel)->AddIgnoredOwner(racerSlots[b]->wrecker->collisionModel);
                 racerSlots[a]->wrecker->collisionModel->AddIgnoredOwner(racerSlots[b]->bikeCollision);
                 racerSlots[a]->wrecker->collisionModel->AddIgnoredOwner(racerSlots[b]->bikeAndRiderCollision);
                 racerSlots[a]->wrecker->collisionModel->AddIgnoredOwner(racerSlots[b]->frontWheel);
@@ -1422,10 +1422,10 @@ int BikeRace::Tick(float frameTime) {
                 localRacer->UpdateForceFeedback();
             }
             if (g_TrackGame->mode.raceSettings.raceMode == 4) {
-                unsigned short lap = localRacer->lapCount;
+                unsigned short lap = (unsigned short)localRacer->lapCount;
                 if (ghostLap != lap && (!startBeforeFinish || lap > 0)) {
                     RestartReplay();
-                    ghostLap = localRacer->lapCount;
+                    ghostLap = (unsigned short)localRacer->lapCount;
                     replayTime = 0;
                     replayFrames = 0;
                     replayLength = 0;
@@ -1433,7 +1433,7 @@ int BikeRace::Tick(float frameTime) {
                     recordTickTime = 0;
                     recordTickCount = 0;
                     recordTickRecordCount = 0;
-                    localRacer->recordStateTimer = FLT_MAX / 2;
+                    localRacer->recordState.timer = FLT_MAX / 2;
                 } else {
                     replayTime += g_TrackGame->frameTime;
                     replayFrames++;
@@ -1586,7 +1586,7 @@ int BikeRace::Tick(float frameTime) {
                         } else {
                             racerSlots[i]->Enable();
                             for (int j = 0; j < g_TrackGame->networkAiRacerCount + g_TrackGame->playerCount; j++) {
-                                if (racerSlots[j]->recorderId == id) {
+                                if (racerSlots[j]->netId == id) {
                                     racerSlots[j]->Enable();
                                 }
                             }
@@ -1594,7 +1594,7 @@ int BikeRace::Tick(float frameTime) {
                         if (player == 0) {
                             racerSlots[i]->Disable();
                             for (int j = 0; j < g_TrackGame->networkAiRacerCount + g_TrackGame->playerCount; j++) {
-                                if (racerSlots[j]->recorderId == id) {
+                                if (racerSlots[j]->netId == id) {
                                     racerSlots[j]->Disable();
                                 }
                             }
@@ -1646,7 +1646,7 @@ int BikeRace::Tick(float frameTime) {
                             int count = g_TrackGame->mode.raceSettings.multiplayerAiRacerCount + g_TrackGame->playerCount;
                             for (int i = 0; i < count; i++) {
                                 if (g_TrackGame->mode.racers[i].networkPlayerId == self) {
-                                    racerSlots[i]->velocity = kVec3Zero;
+                                    (Vector3&)racerSlots[i]->velocity = kVec3Zero;
                                     racerSlots[i]->linearSpeed = 0;
                                 }
                             }
@@ -1713,7 +1713,7 @@ int BikeRace::Tick(float frameTime) {
                     isRacing = false;
                 }
                 if (youIndicator != 0 && youIndicator->isEnabled) {
-                    position = localRacer->centerOfMass;
+                    position = (Vector3&)localRacer->centerOfMass;
                     position.y += 4.25f;
                     ((ArcadeObject*)youIndicator)->SetPosition(&position);
                 }
@@ -1728,17 +1728,17 @@ int BikeRace::Tick(float frameTime) {
                         chatOpen = false;
                     }
                 }
-                if (flagGirl != 0 && localRacer->statusNode->progressPos.node != 0) {
+                if (flagGirl != 0 && ((RaceStatusNode*)localRacer->statusNode)->progressPos.node != 0) {
                     int laps = g_TrackGame->mode.raceSettings.lapCount;
-                    int lap = localRacer->lapCount;
+                    int lap = (unsigned short)localRacer->lapCount;
                     int last = lap == laps - 1;
                     int previous = lap == laps - 2;
                     if (previous || last) {
-                        float toFinish = raceTrack->DistanceAlong(localRacer->statusNode->progressPos,
+                        float toFinish = raceTrack->DistanceAlong(((RaceStatusNode*)localRacer->statusNode)->progressPos,
                                                                             finishProbe.trackPos);
                         float fromFinish = raceTrack->DistanceAlong(finishProbe.trackPos,
-                                                                              localRacer->statusNode->progressPos);
-                        if (flagGirlState && localRacer->finished && fromFinish > 100.0f) {
+                                                                              ((RaceStatusNode*)localRacer->statusNode)->progressPos);
+                        if (flagGirlState && localRacer->hasFinished && fromFinish > 100.0f) {
                             ReplaceMeshId(flagGirl, 1, 2);
                             flagGirl->SetMotionByName("Stand");
                             flagGirlState = 0;
@@ -1754,7 +1754,7 @@ int BikeRace::Tick(float frameTime) {
                                    ((previous && toFinish > 100.0f) || (last && fromFinish > 100.0f))) {
                             flagGirl->SetMotionByName("Stand");
                             flagGirlState = 0;
-                        } else if ((last && toFinish < 300.0f) || (localRacer->finished && fromFinish < 100.0f)) {
+                        } else if ((last && toFinish < 300.0f) || (localRacer->hasFinished && fromFinish < 100.0f)) {
                             if (flagGirlState < 3) {
                                 ReplaceMeshId(flagGirl, 2, 1);
                                 flagGirlState = 3;
@@ -1788,7 +1788,7 @@ int BikeRace::Tick(float frameTime) {
                         0x14);
                 name[0x14] = 0;
                 raceScene->ResolveSltPath(name);
-                model = localRacer->modelNode;
+                model = (D3DIMSoultreeObject*)localRacer->modelNode;
             } else if (targetKind == 0) {
                 strncpy(name, raceScene->staticModels->casters[targetIndex].fileName, 0x14);
                 name[0x14] = 0;
@@ -1900,7 +1900,7 @@ int BikeRace::Tick(float frameTime) {
                     break;
                 }
                 COPY_TEXT(name, "rider.slt", 0x20);
-                model = localRacer->riderCharacter->modelNode;
+                model = (D3DIMSoultreeObject*)localRacer->riderCharacter->modelNode;
             } while (++pass < 2);
         }
     }
@@ -1911,7 +1911,7 @@ int BikeRace::Tick(float frameTime) {
 int BikeRace::AnyRacerRemote() {
     if (g_TrackGame->playerCount > 1) {
         for (int i = 0; i < g_TrackGame->mode.racerCount; i++) {
-            if (reinterpret_cast<KrustyBike*>(racerSlots[i])->ReceivedPositionChanged()) {
+            if (racerSlots[i]->ReceivedPositionChanged()) {
                 return 1;
             }
         }
@@ -1932,6 +1932,36 @@ void BikeRace::ReplaceMeshId(D3DIMSoultreeCharacter* character, int from, int to
     }
 }
 
+// BikeRace.h's camera view (inline three times in 0x0041eb20): follows `racer`,
+// showing the previous racer's model again and hiding the new one's.
+inline void BikeRaceKrustyBikeCameraView::StartFollowing(KrustyBike* racer) {
+    if (followedBike != 0 && !((BikeRace*)racer->race)->forceHighLod) {
+        ((D3DIMSoultreeObject*)followedBike->modelNode)->SetLowestLod(1);
+        ((D3DIMSoultreeObject*)followedBike->riderCharacter->modelNode)->SetLowestLod(1);
+        if (((D3DIMSoultreeObject*)followedBike->modelNode)->currentLod == 0) {
+            ((D3DIMSoultreeObject*)followedBike->modelNode)->SetLod(1);
+        }
+        if (((D3DIMSoultreeObject*)followedBike->riderCharacter->modelNode)->currentLod == 0) {
+            ((D3DIMSoultreeObject*)followedBike->riderCharacter->modelNode)->SetLod(1);
+        }
+    }
+    vehicle = racer;
+    targetPointCached = 0;
+    targetHeadingCached = 0;
+    followingRacer = true;
+    shadowCaster = 0;
+    targetCharacter = 0;
+    targetCar = 0;
+    followedBike = racer;
+    isSettled = 0;
+    followedRacer = racer;
+    if (!((BikeRace*)racer->race)->forceHighLod) {
+        ((D3DIMSoultreeObject*)racer->modelNode)->SetLowestLod(0);
+        ((D3DIMSoultreeObject*)followedBike->riderCharacter->modelNode)->SetLowestLod(0);
+    }
+    isSettled = 0;
+}
+
 // 0x0041eb20
 int BikeRace::AimCamera(int caster) {
     if (RaceCameraView()->followingRacer) {
@@ -1943,11 +1973,11 @@ int BikeRace::AimCamera(int caster) {
             RaceCameraView()->StartFollowing(racerSlots[targetRacer]);
             if (raceShadow != 0) {
                 raceShadow->ClearCasters();
-                raceShadow->AddCaster(racerSlots[targetRacer]->modelNode);
-                raceShadow->AddCaster(racerSlots[targetRacer]->riderCharacter->modelNode);
+                raceShadow->AddCaster((D3DIMSoultreeObject*)racerSlots[targetRacer]->modelNode);
+                raceShadow->AddCaster((D3DIMSoultreeObject*)racerSlots[targetRacer]->riderCharacter->modelNode);
             }
             if (g_TrackGame->bajaEnduroEvent != 0) {
-                BikeRaceKrustyBikeView* racer = racerSlots[targetRacer];
+                KrustyBike* racer = racerSlots[targetRacer];
                 g_TrackGame->bajaEnduroEvent->SelectLapGates(racer->lapGate,
                                                                           racer->nextLapGate, racer);
             }
@@ -1957,11 +1987,11 @@ int BikeRace::AimCamera(int caster) {
             RaceCameraView()->StartFollowing(localRacer);
             if (raceShadow != 0) {
                 raceShadow->ClearCasters();
-                raceShadow->AddCaster(localRacer->modelNode);
-                raceShadow->AddCaster(localRacer->riderCharacter->modelNode);
+                raceShadow->AddCaster((D3DIMSoultreeObject*)localRacer->modelNode);
+                raceShadow->AddCaster((D3DIMSoultreeObject*)localRacer->riderCharacter->modelNode);
             }
             if (g_TrackGame->bajaEnduroEvent != 0) {
-                BikeRaceKrustyBikeView* racer = localRacer;
+                KrustyBike* racer = localRacer;
                 g_TrackGame->bajaEnduroEvent->SelectLapGates(racer->lapGate,
                                                                           racer->nextLapGate, racer);
             }
@@ -1972,11 +2002,11 @@ int BikeRace::AimCamera(int caster) {
             RaceCameraView()->StartFollowing(aiRacers[index]);
             if (raceShadow != 0) {
                 raceShadow->ClearCasters();
-                raceShadow->AddCaster(aiRacers[index]->modelNode);
-                raceShadow->AddCaster(aiRacers[index]->riderCharacter->modelNode);
+                raceShadow->AddCaster((D3DIMSoultreeObject*)aiRacers[index]->modelNode);
+                raceShadow->AddCaster((D3DIMSoultreeObject*)aiRacers[index]->riderCharacter->modelNode);
             }
             if (g_TrackGame->bajaEnduroEvent != 0) {
-                BikeRaceKrustyBikeView* racer = aiRacers[index];
+                KrustyBike* racer = aiRacers[index];
                 g_TrackGame->bajaEnduroEvent->SelectLapGates(racer->lapGate,
                                                                           racer->nextLapGate, racer);
             }
@@ -2033,7 +2063,7 @@ int BikeRace::AimCamera(int caster) {
 // remote racers). The player count is read at each test: retail re-tests
 // `playerCount > 1` after the `index == 0` miss (`cmp ecx, 1` twice at
 // 0x0041f2f6/0x0041f304), which a `players` local lets VC6 thread away.
-inline BikeRaceKrustyBikeView* BikeRace::RacerAtIndex(int index) {
+inline KrustyBike* BikeRace::RacerAtIndex(int index) {
     if (g_TrackGame->playerCount == 1 && index == 0) {
         return localRacer;
     }
@@ -2478,22 +2508,22 @@ int BikeRace::OnNetworkMessage(int type, void* data, int from, int to, int flags
         for (int i = 0; i < count; i++) {
             int id = g_TrackGame->mode.racers[i].networkPlayerId;
             if (id != self && id == from) {
-                BikeRaceKrustyBikeView* racer = racerSlots[i];
-                if (racer != 0 && racer->netIndex == state->racerIndex) {
+                KrustyBike* racer = racerSlots[i];
+                if (racer != 0 && (unsigned char)racer->aiKind == state->racerIndex) {
                     racerSlots[i]->hasFullState = 1;
-                    ReceivedRacerState* oldest = racerSlots[i]->receivedStates[2];
-                    racerSlots[i]->receivedStates[2] = racerSlots[i]->receivedStates[1];
-                    racerSlots[i]->receivedStates[1] = racerSlots[i]->receivedStates[0];
-                    racerSlots[i]->receivedStates[0] = oldest;
-                    racerSlots[i]->receivedStates[0]->messageFlags = flags;
-                    racerSlots[i]->receivedStates[0]->state = *state;
-                    racerSlots[i]->receivedStates[0]->fresh = 1;
-                    racerSlots[i]->deltaBaseVelocity = state->velocity;
-                    racerSlots[i]->deltaBasePosition = state->position;
-                    racerSlots[i]->deltaBaseAngularVelocity = state->angularVelocity;
-                    racerSlots[i]->deltaBaseRoll = state->roll;
-                    racerSlots[i]->deltaBasePitch = state->pitch;
-                    racerSlots[i]->deltaBaseYaw = state->yaw;
+                    KbBikeNetState* oldest = racerSlots[i]->states[2];
+                    racerSlots[i]->states[2] = racerSlots[i]->states[1];
+                    racerSlots[i]->states[1] = racerSlots[i]->states[0];
+                    racerSlots[i]->states[0] = oldest;
+                    racerSlots[i]->states[0]->timeReceived = flags;
+                    (RacerStateMessage&)*racerSlots[i]->states[0] = *state;
+                    racerSlots[i]->states[0]->fullState = 1;
+                    (Vector3&)racerSlots[i]->deltaBaseVelocity = state->velocity;
+                    (Vector3&)racerSlots[i]->deltaBasePosition = state->position;
+                    (Vector3&)racerSlots[i]->deltaBaseAngularVelocity = state->angularVelocity;
+                    (int&)racerSlots[i]->deltaBaseRoll = state->roll;
+                    (int&)racerSlots[i]->deltaBasePitch = state->pitch;
+                    (int&)racerSlots[i]->deltaBaseYaw = state->yaw;
                     racerSlots[i]->deltaBaseTime = replayMode == 11 ? flags : state->time;
                     return 1;
                 }
@@ -2505,19 +2535,19 @@ int BikeRace::OnNetworkMessage(int type, void* data, int from, int to, int flags
         for (int i = 0; i < g_TrackGame->mode.racerCount; i++) {
             int id = g_TrackGame->mode.racers[i].networkPlayerId;
             if (id != self && id == from && racerSlots[i] != 0 &&
-                racerSlots[i]->netIndex == message->racerIndex) {
+                (unsigned char)racerSlots[i]->aiKind == message->racerIndex) {
                 if (!racerSlots[i]->hasFullState) {
                     return 1;
                 }
-                ReceivedRacerState* oldest = racerSlots[i]->receivedStates[2];
-                racerSlots[i]->receivedStates[2] = racerSlots[i]->receivedStates[1];
-                racerSlots[i]->receivedStates[1] = racerSlots[i]->receivedStates[0];
-                racerSlots[i]->receivedStates[0] = oldest;
-                racerSlots[i]->receivedStates[0]->messageFlags = flags;
-                reinterpret_cast<KrustyBike*>(racerSlots[i])->ApplyStateDelta(
+                KbBikeNetState* oldest = racerSlots[i]->states[2];
+                racerSlots[i]->states[2] = racerSlots[i]->states[1];
+                racerSlots[i]->states[1] = racerSlots[i]->states[0];
+                racerSlots[i]->states[0] = oldest;
+                racerSlots[i]->states[0]->timeReceived = flags;
+                racerSlots[i]->ApplyStateDelta(
                     reinterpret_cast<const KbNetDelta*>(message),
-                    reinterpret_cast<KbNetState*>(racerSlots[i]->receivedStates[0]));
-                racerSlots[i]->receivedStates[0]->fresh = 0;
+                    reinterpret_cast<KbNetState*>(racerSlots[i]->states[0]));
+                racerSlots[i]->states[0]->fullState = 0;
                 return 1;
             }
         }
@@ -2528,8 +2558,8 @@ int BikeRace::OnNetworkMessage(int type, void* data, int from, int to, int flags
         for (int i = 0; i < count; i++) {
             int id = g_TrackGame->mode.racers[i].networkPlayerId;
             if (id != self && id == from) {
-                BikeRaceKrustyBikeView* racer = racerSlots[i];
-                if (racer != 0 && racer->netIndex == score->racerIndex) {
+                KrustyBike* racer = racerSlots[i];
+                if (racer != 0 && (unsigned char)racer->aiKind == score->racerIndex) {
                     racerSlots[i]->score = score->racerScore;
                     return 1;
                 }
@@ -2566,8 +2596,8 @@ int BikeRace::OnNetworkMessage(int type, void* data, int from, int to, int flags
 }
 
 // 0x004204e0
-BikeRaceKrustyBikeView* BikeRace::NextBike(int* iterator) {
-    BikeRaceKrustyBikeView* racer = 0;
+KrustyBike* BikeRace::NextBike(int* iterator) {
+    KrustyBike* racer = 0;
     if (g_TrackGame->uiInteractionBlocked) {
         return 0;
     }
@@ -2703,15 +2733,15 @@ void BikeRace::RestartRace(int mode, char* path, char* description) {
     }
     SetSceneTime(0.0001f);
     raceScene->holdAnimations = 1;
-    for (BikeRaceKrustyBikeView* racer = NextBike(&iterator); racer != 0;
+    for (KrustyBike* racer = NextBike(&iterator); racer != 0;
          racer = NextBike(&iterator)) {
         racer->SnapshotRespawnPose();
-        racer->restarted = true;
+        racer->respawnPending = 1;
         WriteRelativePositions(&position, &direction, g_TrackGame->bajaEnduroEvent,
                               positions[iterator - 1]);
-        racer->startPosition = position;
-        racer->startDirection = direction;
-        reinterpret_cast<KrustyBike*>(racer)->SetNetRecorder(reinterpret_cast<KbRecorder*>(replayVcr));
+        (Vector3&)racer->respawnPosition = position;
+        (Vector3&)racer->respawnHeading = direction;
+        racer->SetNetRecorder(reinterpret_cast<KbRecorder*>(replayVcr));
         replayPaused = false;
     }
     if (g_TrackGame->tagEvent != 0 &&
@@ -2759,7 +2789,7 @@ void BikeRace::RestartReplay() {
     if (replayVcr == 0) {
         return;
     }
-    if (localRacer->lapCount == 1 && startBeforeFinish) {
+    if ((unsigned short)localRacer->lapCount == 1 && startBeforeFinish) {
         replayVcr->Unlink();
         replayVcr->Release();
         replayLength = 0;
@@ -2805,8 +2835,8 @@ void BikeRace::RestartReplay() {
                                        (unsigned char)aiRacers[0]->fourStroke,
                                        g_TrackGame->mode.plateNumber);
     AppendChild(replayVcr, -1);
-    reinterpret_cast<KrustyBike*>(localRacer)->SetNetRecorder(reinterpret_cast<KbRecorder*>(replayVcr));
-    if (startBeforeFinish && localRacer->lapCount == 1 && ghostFilePlayed[0] == 0) {
+    localRacer->SetNetRecorder(reinterpret_cast<KbRecorder*>(replayVcr));
+    if (startBeforeFinish && (unsigned short)localRacer->lapCount == 1 && ghostFilePlayed[0] == 0) {
         return;
     }
     ghostVcr = new (__FILE__, 0x1103) KrustyVCR;
@@ -2817,7 +2847,7 @@ void BikeRace::RestartReplay() {
         return;
     }
     localRacer->fastestLap = bestGhostLength = ghostVcr->RecordedLength();
-    reinterpret_cast<KrustyBike*>(aiRacers[0])->SetNetRecorder(reinterpret_cast<KbRecorder*>(ghostVcr));
+    aiRacers[0]->SetNetRecorder(reinterpret_cast<KbRecorder*>(ghostVcr));
     aiRacers[0]->Enable();
     aiRacers[0]->hasFullState = 0;
     ClearAiRacerParts(0);
@@ -3154,8 +3184,8 @@ int BikeRace::RecordFrame(int kind, void* data, int flag, int recorderId, int* k
         return replayMode == 11 ? 11 : 1;
     } else if (kind == 1) {
         RacerStateMessage* state = (RacerStateMessage*)data;
-        BikeRaceKrustyBikeView* racer = localRacer;
-        if (recorderId == racer->recorderId && racer->netIndex == state->racerIndex) {
+        KrustyBike* racer = localRacer;
+        if (recorderId == racer->netId && (unsigned char)racer->aiKind == state->racerIndex) {
             if (g_TrackGame->mode.raceSettings.raceMode == 4) {
                 racer = aiRacers[0];
             }
@@ -3163,86 +3193,86 @@ int BikeRace::RecordFrame(int kind, void* data, int flag, int recorderId, int* k
                 return 0;
             }
             racer->hasFullState = 1;
-            ReceivedRacerState* oldest;
+            KbBikeNetState* oldest;
             if (g_TrackGame->mode.raceSettings.raceMode == 4) {
-                oldest = racer->receivedStates[2];
+                oldest = racer->states[2];
             } else {
-                oldest = racer->receivedStates[3];
-                racer->receivedStates[3] = racer->receivedStates[2];
+                oldest = racer->states[3];
+                racer->states[3] = racer->states[2];
             }
-            racer->receivedStates[2] = racer->receivedStates[1];
-            racer->receivedStates[1] = racer->receivedStates[0];
-            racer->receivedStates[0] = oldest;
-            oldest->messageFlags = time;
-            racer->receivedStates[0]->state = *state;
-            racer->receivedStates[0]->state.time = (int)(s_UnknownStatic578e8c * 1000.0f);
-            racer->receivedStates[0]->fresh = 1;
-            racer->deltaBaseVelocity = state->velocity;
-            racer->deltaBasePosition = state->position;
-            racer->deltaBaseAngularVelocity = state->angularVelocity;
-            racer->deltaBaseRoll = state->roll;
-            racer->deltaBasePitch = state->pitch;
-            racer->deltaBaseYaw = state->yaw;
+            racer->states[2] = racer->states[1];
+            racer->states[1] = racer->states[0];
+            racer->states[0] = oldest;
+            oldest->timeReceived = time;
+            (RacerStateMessage&)*racer->states[0] = *state;
+            racer->states[0]->time = (int)(s_UnknownStatic578e8c * 1000.0f);
+            racer->states[0]->fullState = 1;
+            (Vector3&)racer->deltaBaseVelocity = state->velocity;
+            (Vector3&)racer->deltaBasePosition = state->position;
+            (Vector3&)racer->deltaBaseAngularVelocity = state->angularVelocity;
+            (int&)racer->deltaBaseRoll = state->roll;
+            (int&)racer->deltaBasePitch = state->pitch;
+            (int&)racer->deltaBaseYaw = state->yaw;
             racer->deltaBaseTime = replayMode == 11 ? time : state->time;
             if (ghostVcr == 0) {
                 racer->fastestLap = state->fastestLap;
-                racer->timeBehindLeader = state->timeBehindLeader;
+                (int&)racer->timeBehindLeader = state->timeBehindLeader;
             }
             *keep = 1;
             if (replayMode == 11) {
-                racer->receivedStates[1]->state = racer->receivedStates[0]->state;
-                racer->receivedStates[2]->state = racer->receivedStates[1]->state;
-                racer->receivedStates[3]->state = racer->receivedStates[2]->state;
-                racer->receivedStates[1]->messageFlags = racer->receivedStates[0]->messageFlags;
-                racer->receivedStates[2]->messageFlags = racer->receivedStates[1]->messageFlags;
-                racer->receivedStates[3]->messageFlags = racer->receivedStates[2]->messageFlags;
-                racer->receivedStates[1]->fresh = 1;
-                racer->receivedStates[2]->fresh = 1;
-                racer->receivedStates[3]->fresh = 1;
+                (KbBikeMessage&)*racer->states[1] = *racer->states[0];
+                (KbBikeMessage&)*racer->states[2] = *racer->states[1];
+                (KbBikeMessage&)*racer->states[3] = *racer->states[2];
+                racer->states[1]->timeReceived = racer->states[0]->timeReceived;
+                racer->states[2]->timeReceived = racer->states[1]->timeReceived;
+                racer->states[3]->timeReceived = racer->states[2]->timeReceived;
+                racer->states[1]->fullState = 1;
+                racer->states[2]->fullState = 1;
+                racer->states[3]->fullState = 1;
                 return 11;
             }
             return 1;
         }
         for (int i = 0; i < g_TrackGame->mode.raceSettings.aiRacerCount; i++) {
-            if (aiRacers[i] != 0 && recorderId == aiRacers[i]->recorderId &&
-                aiRacers[i]->netIndex == state->racerIndex) {
+            if (aiRacers[i] != 0 && recorderId == aiRacers[i]->netId &&
+                (unsigned char)aiRacers[i]->aiKind == state->racerIndex) {
                 aiRacers[i]->hasFullState = 1;
-                ReceivedRacerState* oldest;
+                KbBikeNetState* oldest;
                 if (g_TrackGame->mode.raceSettings.raceMode == 4) {
-                    oldest = aiRacers[i]->receivedStates[2];
+                    oldest = aiRacers[i]->states[2];
                 } else {
-                    oldest = aiRacers[i]->receivedStates[3];
-                    aiRacers[i]->receivedStates[3] = aiRacers[i]->receivedStates[2];
+                    oldest = aiRacers[i]->states[3];
+                    aiRacers[i]->states[3] = aiRacers[i]->states[2];
                 }
-                aiRacers[i]->receivedStates[2] = aiRacers[i]->receivedStates[1];
-                aiRacers[i]->receivedStates[1] = aiRacers[i]->receivedStates[0];
-                aiRacers[i]->receivedStates[0] = oldest;
-                aiRacers[i]->receivedStates[0]->messageFlags = time;
-                aiRacers[i]->receivedStates[0]->state = *state;
-                aiRacers[i]->receivedStates[0]->state.time = (int)(s_UnknownStatic578e8c * 1000.0f);
-                aiRacers[i]->receivedStates[0]->fresh = 1;
-                aiRacers[i]->deltaBaseVelocity = state->velocity;
-                aiRacers[i]->deltaBasePosition = state->position;
-                aiRacers[i]->deltaBaseAngularVelocity = state->angularVelocity;
-                aiRacers[i]->deltaBaseRoll = state->roll;
-                aiRacers[i]->deltaBasePitch = state->pitch;
-                aiRacers[i]->deltaBaseYaw = state->yaw;
+                aiRacers[i]->states[2] = aiRacers[i]->states[1];
+                aiRacers[i]->states[1] = aiRacers[i]->states[0];
+                aiRacers[i]->states[0] = oldest;
+                aiRacers[i]->states[0]->timeReceived = time;
+                (RacerStateMessage&)*aiRacers[i]->states[0] = *state;
+                aiRacers[i]->states[0]->time = (int)(s_UnknownStatic578e8c * 1000.0f);
+                aiRacers[i]->states[0]->fullState = 1;
+                (Vector3&)aiRacers[i]->deltaBaseVelocity = state->velocity;
+                (Vector3&)aiRacers[i]->deltaBasePosition = state->position;
+                (Vector3&)aiRacers[i]->deltaBaseAngularVelocity = state->angularVelocity;
+                (int&)aiRacers[i]->deltaBaseRoll = state->roll;
+                (int&)aiRacers[i]->deltaBasePitch = state->pitch;
+                (int&)aiRacers[i]->deltaBaseYaw = state->yaw;
                 aiRacers[i]->deltaBaseTime = replayMode == 11 ? time : state->time;
                 if (ghostVcr == 0) {
                     aiRacers[i]->fastestLap = state->fastestLap;
-                    aiRacers[i]->timeBehindLeader = state->timeBehindLeader;
+                    (int&)aiRacers[i]->timeBehindLeader = state->timeBehindLeader;
                 }
                 *keep = 1;
                 if (replayMode == 11) {
-                    aiRacers[i]->receivedStates[1]->state = aiRacers[i]->receivedStates[0]->state;
-                    aiRacers[i]->receivedStates[2]->state = aiRacers[i]->receivedStates[1]->state;
-                    aiRacers[i]->receivedStates[3]->state = aiRacers[i]->receivedStates[2]->state;
-                    aiRacers[i]->receivedStates[1]->messageFlags = aiRacers[i]->receivedStates[0]->messageFlags;
-                    aiRacers[i]->receivedStates[2]->messageFlags = aiRacers[i]->receivedStates[1]->messageFlags;
-                    aiRacers[i]->receivedStates[3]->messageFlags = aiRacers[i]->receivedStates[2]->messageFlags;
-                    aiRacers[i]->receivedStates[1]->fresh = 1;
-                    aiRacers[i]->receivedStates[2]->fresh = 1;
-                    aiRacers[i]->receivedStates[3]->fresh = 1;
+                    (KbBikeMessage&)*aiRacers[i]->states[1] = *aiRacers[i]->states[0];
+                    (KbBikeMessage&)*aiRacers[i]->states[2] = *aiRacers[i]->states[1];
+                    (KbBikeMessage&)*aiRacers[i]->states[3] = *aiRacers[i]->states[2];
+                    aiRacers[i]->states[1]->timeReceived = aiRacers[i]->states[0]->timeReceived;
+                    aiRacers[i]->states[2]->timeReceived = aiRacers[i]->states[1]->timeReceived;
+                    aiRacers[i]->states[3]->timeReceived = aiRacers[i]->states[2]->timeReceived;
+                    aiRacers[i]->states[1]->fullState = 1;
+                    aiRacers[i]->states[2]->fullState = 1;
+                    aiRacers[i]->states[3]->fullState = 1;
                     return 11;
                 }
                 return 1;
@@ -3253,30 +3283,30 @@ int BikeRace::RecordFrame(int kind, void* data, int flag, int recorderId, int* k
         if (flag) {
             return 1;
         }
-        BikeRaceKrustyBikeView* racer = localRacer;
-        if (recorderId == racer->recorderId && racer->netIndex == message->racerIndex) {
+        KrustyBike* racer = localRacer;
+        if (recorderId == racer->netId && (unsigned char)racer->aiKind == message->racerIndex) {
             if (g_TrackGame->mode.raceSettings.raceMode == 4) {
                 racer = aiRacers[0];
             }
             if (racer == 0 || !racer->hasFullState) {
                 return 0;
             }
-            ReceivedRacerState* oldest;
+            KbBikeNetState* oldest;
             if (g_TrackGame->mode.raceSettings.raceMode == 4) {
-                oldest = racer->receivedStates[2];
+                oldest = racer->states[2];
             } else {
-                oldest = racer->receivedStates[3];
-                racer->receivedStates[3] = racer->receivedStates[2];
+                oldest = racer->states[3];
+                racer->states[3] = racer->states[2];
             }
-            racer->receivedStates[2] = racer->receivedStates[1];
-            racer->receivedStates[1] = racer->receivedStates[0];
-            racer->receivedStates[0] = oldest;
-            oldest->messageFlags = time;
-            reinterpret_cast<KrustyBike*>(racer)->ApplyStateDelta(
+            racer->states[2] = racer->states[1];
+            racer->states[1] = racer->states[0];
+            racer->states[0] = oldest;
+            oldest->timeReceived = time;
+            racer->ApplyStateDelta(
                     reinterpret_cast<const KbNetDelta*>(message),
-                    reinterpret_cast<KbNetState*>(racer->receivedStates[0]));
-            racer->receivedStates[0]->state.time = (int)(s_UnknownStatic578e8c * 1000.0f);
-            racer->receivedStates[0]->fresh = 0;
+                    reinterpret_cast<KbNetState*>(racer->states[0]));
+            racer->states[0]->time = (int)(s_UnknownStatic578e8c * 1000.0f);
+            racer->states[0]->fullState = 0;
             return 1;
         }
         int i = 0;
@@ -3284,29 +3314,29 @@ int BikeRace::RecordFrame(int kind, void* data, int flag, int recorderId, int* k
             return 1;
         }
         for (; i < g_TrackGame->mode.raceSettings.aiRacerCount; i++) {
-            if (aiRacers[i] != 0 && recorderId == aiRacers[i]->recorderId &&
-                aiRacers[i]->netIndex == message->racerIndex) {
+            if (aiRacers[i] != 0 && recorderId == aiRacers[i]->netId &&
+                (unsigned char)aiRacers[i]->aiKind == message->racerIndex) {
                 if (!aiRacers[i]->hasFullState) {
                     return 0;
                 }
-                ReceivedRacerState* oldest = aiRacers[i]->receivedStates[3];
-                aiRacers[i]->receivedStates[3] = aiRacers[i]->receivedStates[2];
-                aiRacers[i]->receivedStates[2] = aiRacers[i]->receivedStates[1];
-                aiRacers[i]->receivedStates[1] = aiRacers[i]->receivedStates[0];
-                aiRacers[i]->receivedStates[0] = oldest;
-                aiRacers[i]->receivedStates[0]->messageFlags = time;
-                reinterpret_cast<KrustyBike*>(aiRacers[i])->ApplyStateDelta(
+                KbBikeNetState* oldest = aiRacers[i]->states[3];
+                aiRacers[i]->states[3] = aiRacers[i]->states[2];
+                aiRacers[i]->states[2] = aiRacers[i]->states[1];
+                aiRacers[i]->states[1] = aiRacers[i]->states[0];
+                aiRacers[i]->states[0] = oldest;
+                aiRacers[i]->states[0]->timeReceived = time;
+                aiRacers[i]->ApplyStateDelta(
                     reinterpret_cast<const KbNetDelta*>(message),
-                    reinterpret_cast<KbNetState*>(aiRacers[i]->receivedStates[0]));
-                aiRacers[i]->receivedStates[0]->state.time = (int)(s_UnknownStatic578e8c * 1000.0f);
-                aiRacers[i]->receivedStates[0]->fresh = 0;
+                    reinterpret_cast<KbNetState*>(aiRacers[i]->states[0]));
+                aiRacers[i]->states[0]->time = (int)(s_UnknownStatic578e8c * 1000.0f);
+                aiRacers[i]->states[0]->fullState = 0;
                 return 1;
             }
         }
     } else if (kind == 10) {
         RacerScoreMessage* score = (RacerScoreMessage*)data;
-        BikeRaceKrustyBikeView* racer = localRacer;
-        if (recorderId == racer->recorderId && racer->netIndex == score->racerIndex) {
+        KrustyBike* racer = localRacer;
+        if (recorderId == racer->netId && (unsigned char)racer->aiKind == score->racerIndex) {
             if (racer == 0) {
                 return 0;
             }
@@ -3315,8 +3345,8 @@ int BikeRace::RecordFrame(int kind, void* data, int flag, int recorderId, int* k
             return 1;
         }
         for (int i = 0; i < g_TrackGame->mode.raceSettings.aiRacerCount; i++) {
-            if (aiRacers[i] != 0 && recorderId == aiRacers[i]->recorderId &&
-                aiRacers[i]->netIndex == score->racerIndex) {
+            if (aiRacers[i] != 0 && recorderId == aiRacers[i]->netId &&
+                (unsigned char)aiRacers[i]->aiKind == score->racerIndex) {
                 aiRacers[i]->score = score->racerScore;
                 *keep = 1;
                 return 1;
@@ -3381,9 +3411,9 @@ int BikeRace::RecordFrame(int kind, void* data, int flag, int recorderId, int* k
             g_TrackGame->tagEvent->followedRacer = 0;
             if (follow->followedRacerId != 0) {
                 int iterator = 0;
-                for (BikeRaceKrustyBikeView* racer = NextBike(&iterator); racer != 0;
+                for (KrustyBike* racer = NextBike(&iterator); racer != 0;
                      racer = NextBike(&iterator)) {
-                    if (racer->recorderId == follow->followedRacerId) {
+                    if (racer->netId == follow->followedRacerId) {
                         g_TrackGame->tagEvent->followedRacer = (EventKrustyBikeView*)racer;
                         break;
                     }
@@ -3396,29 +3426,29 @@ int BikeRace::RecordFrame(int kind, void* data, int flag, int recorderId, int* k
 
 // 0x00423040
 void BikeRace::ClearAiRacerParts(int index) {
-    BikeRaceKrustyBikeView* racer = aiRacers[index];
+    KrustyBike* racer = aiRacers[index];
     if (racer != 0) {
-        racer->receivedStates[0]->state.position = kVec3Zero;
-        racer->receivedStates[1]->state.position = kVec3Zero;
-        racer->receivedStates[2]->state.position = kVec3Zero;
-        racer->receivedStates[3]->state.position = kVec3Zero;
+        (Vector3&)racer->states[0]->position = kVec3Zero;
+        (Vector3&)racer->states[1]->position = kVec3Zero;
+        (Vector3&)racer->states[2]->position = kVec3Zero;
+        (Vector3&)racer->states[3]->position = kVec3Zero;
     }
 }
 
 // 0x00422ec0
 void BikeRace::ClearRacerParts() {
-    BikeRaceKrustyBikeView* racer = localRacer;
-    racer->receivedStates[0]->state.position = kVec3Zero;
-    racer->receivedStates[1]->state.position = kVec3Zero;
-    racer->receivedStates[2]->state.position = kVec3Zero;
-    racer->receivedStates[3]->state.position = kVec3Zero;
+    KrustyBike* racer = localRacer;
+    (Vector3&)racer->states[0]->position = kVec3Zero;
+    (Vector3&)racer->states[1]->position = kVec3Zero;
+    (Vector3&)racer->states[2]->position = kVec3Zero;
+    (Vector3&)racer->states[3]->position = kVec3Zero;
     for (int i = 0; i < CountRaceRacers() - 1; i++) {
         racer = aiRacers[i];
         if (racer != 0) {
-            racer->receivedStates[0]->state.position = kVec3Zero;
-            racer->receivedStates[1]->state.position = kVec3Zero;
-            racer->receivedStates[2]->state.position = kVec3Zero;
-            racer->receivedStates[3]->state.position = kVec3Zero;
+            (Vector3&)racer->states[0]->position = kVec3Zero;
+            (Vector3&)racer->states[1]->position = kVec3Zero;
+            (Vector3&)racer->states[2]->position = kVec3Zero;
+            (Vector3&)racer->states[3]->position = kVec3Zero;
         }
     }
 }
@@ -3570,17 +3600,17 @@ int BikeRace::Render3D() {
 // 0x00423790
 void BikeRace::SetDetailLevel(int level) {
     g_ActiveLodSettings = g_TrackGame->bladeRenderer ? g_BladeLodSettings : g_NonBladeLodSettings;
-    localRacer->modelNode->ApplyLodSettings(level);
-    localRacer->riderCharacter->modelNode->ApplyLodSettings(level);
+    ((D3DIMSoultreeObject*)localRacer->modelNode)->ApplyLodSettings(level);
+    ((D3DIMSoultreeObject*)localRacer->riderCharacter->modelNode)->ApplyLodSettings(level);
     if (g_TrackGame->mode.raceSettings.raceMode != 4) {
         for (int i = 0; i < g_TrackGame->mode.raceSettings.aiRacerCount; i++) {
-            aiRacers[i]->modelNode->ApplyLodSettings(level);
-            aiRacers[i]->riderCharacter->modelNode->ApplyLodSettings(level);
+            ((D3DIMSoultreeObject*)aiRacers[i]->modelNode)->ApplyLodSettings(level);
+            ((D3DIMSoultreeObject*)aiRacers[i]->riderCharacter->modelNode)->ApplyLodSettings(level);
         }
     }
     for (int j = 0; j < g_TrackGame->mode.raceSettings.networkPlayerCount; j++) {
-        racerSlots[j]->modelNode->ApplyLodSettings(level);
-        racerSlots[j]->riderCharacter->modelNode->ApplyLodSettings(level);
+        ((D3DIMSoultreeObject*)racerSlots[j]->modelNode)->ApplyLodSettings(level);
+        ((D3DIMSoultreeObject*)racerSlots[j]->riderCharacter->modelNode)->ApplyLodSettings(level);
     }
 }
 

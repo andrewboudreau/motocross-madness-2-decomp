@@ -12,7 +12,7 @@ class ObjectPicker;
 class ChatOverlay;
 class KrustyVCR;
 class VCRFile;
-class BikeRaceKrustyBikeView;
+class KrustyBike;
 class Terrain;
 class ProjectedShadow;
 class D3DIMSoultreeCharacter;
@@ -82,12 +82,12 @@ public:
     // 0x0041eb20: points the camera at racer +0x14c (when it follows a
     // racer) or at scene object +0x154 / +0x150; 0 when that one is hidden.
     int AimCamera(int caster);
-    BikeRaceKrustyBikeView* RacerAtIndex(int index);
+    KrustyBike* RacerAtIndex(int index);
     // 0x0041f1d0: the next (`forward`) or previous camera target: a racer
     // (`racers`), a scene object or a shadow caster.
     void NextCameraTarget(int forward, int racers, int objects);
     void ToggleReplayPause(int pauseOnly); // 0x0041f550: pauses, or with 0 toggles, +0x3f8
-    BikeRaceKrustyBikeView* NextBike(int* iterator); // 0x004204e0
+    KrustyBike* NextBike(int* iterator); // 0x004204e0
     void HandlePlayerLeft(int player);   // 0x00420590
     void SaveReplay(char* path, char* description); // 0x00420b00: saves the recording, copies VCRtape.dat to `path`
     // 0x00420650 (InGameProcs.cpp ExitDlg): restarts the race; `mode` 0
@@ -106,9 +106,9 @@ public:
 
     unsigned char debugDraw;                  // +0x34 toggled by control 0x1f (modifier 0x80): slot 14 draws the track, probes and debug lines
     unsigned char field_0x035[0x38 - 0x35];
-    BikeRaceKrustyBikeView* localRacer;        // its own racer
-    BikeRaceKrustyBikeView** racerSlots;       // all racers, by racer slot
-    BikeRaceKrustyBikeView** aiRacers;       // AI racers (TrackGame+0x2d94 of them)
+    KrustyBike* localRacer;        // its own racer
+    KrustyBike** racerSlots;       // all racers, by racer slot
+    KrustyBike** aiRacers;       // AI racers (TrackGame+0x2d94 of them)
     RaceSound* raceSound;          // +0x44 the RaceSound object (RaceSound::Create in the setup)
     Track* raceTrack;
     Terrain* raceTerrain;  // +0x4C  Create's terrain argument; QueryGround (Terrain 0x00507c10) puts probes/debug lines on the ground; grid scale

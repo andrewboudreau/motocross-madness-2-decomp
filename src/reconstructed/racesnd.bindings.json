@@ -91,7 +91,7 @@
   "?LoadSound@RaceSound@@QAEHPAVSound@@PBDHH@Z$ehhandler": "0x0054d99a",
   "?LockBuffer@Sound@@QAEHKKPAPAXPAK01K@Z": "0x004bd020",
   "?MarkPendingRelease@GameObject@@UAEXXZ": "0x004692c0",
-  "?NextBike@BikeRace@@QAEPAVBikeRaceKrustyBikeView@@PAH@Z": "0x004204e0",
+  "?NextBike@BikeRace@@QAEPAVKrustyBike@@PAH@Z": "0x004204e0",
   "?OnActivate@GameObject@@UAEHXZ": "0x004694d0",
   "?OnChar@GameObject@@UAEHH@Z": "0x00469c00",
   "?OnControlPress@GameObject@@UAEHPAUControlEvent@@PAUInputButtonState@@@Z": "0x004695d0",

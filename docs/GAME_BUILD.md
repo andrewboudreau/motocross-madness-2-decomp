@@ -817,7 +817,6 @@ clearly more faithful, the game now links the sample's text:
 
   | Retail | View name | Provider |
   |---|---|---|
-  | 0x0048fa60 | `BikeRaceKrustyBikeView` constructor (0x1638 bytes) | `KrustyBike` |
   | 0x00505600 | `Grid1Terrain::AcquireOwnedObject` | `Terrain::AcquireOwnedObject` |
   | 0x00404e60, 0x0040ae30, 0x00421cb0, 0x005015b0 | Wrecker and shadow vector call views | `Vec3Call`, `Vec3DotCall`, `Vec3AddCall`, `Vec3ScaleCall` |
   | 0x004a1860 | `ShadowMatrixMultiplyInto` | `MatrixMult` |
@@ -861,8 +860,8 @@ Bytes at masked score 1.000 rose from 772244 to 795446. About 2300 of the
 increase is not from switched bodies:
 
 - exact providers such as the `CollisionObject` shapes and the
-  `BikeRaceKrustyBikeView` constructor are now bound, because their alias names
-  appear in the map;
+  `KrustyBike` constructor (then reached through an alias; BikeRace.cpp calls
+  it directly now) are bound, because their names appear in the map;
 - `OrientationAxesFromAngles` (274 bytes) is newly linked.
 
 The link covers every translation unit with no unresolved symbols.

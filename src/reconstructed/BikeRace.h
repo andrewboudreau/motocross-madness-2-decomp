@@ -42,6 +42,7 @@
 // provisional.
 
 class CollisionObject;  // collision/CollisionObject.h (src/krusty2)
+class KrustyBike;  // vehicle/KrustyBikeCore.h (src/krusty2)
 class ProjectedShadow;  // shadow/ProjectedShadow.h (src/krusty2)
 class Terrain;  // broadphase/Terrain.h (src/krusty2)
 class LightManager;
@@ -154,216 +155,6 @@ struct LodBikeRaceView {
     char forceHighLod;                        // +0x18c BikeRace's "ForceHighLOD"
 };
 
-// A racer as BikeRace's own code reaches it (its primary vtable at +0 and,
-// as KrustyBike's RTTI shows, a virtual GameObject base through +4);
-// EventKrustyBikeView (RaceView.h) is the same object seen from EventManager.
-// Slot N is named after KrustyBike's slot N (vtable 0x00554548, object_offset 0);
-// slots 26, 78 and 79 are placeholders there as well.
-class BikeRaceKrustyBikeView : virtual public GameObject {
-public:
-    // 0x0048fa60: KrustyBike's constructor (0x1638 bytes; bikerace.cpp's
-    // loader `new`s it with 1 and the most-derived flag).
-    explicit BikeRaceKrustyBikeView(int flags);
-    virtual void UpdateMass();
-    virtual void ResetDynamicState();
-    virtual void InitializePhysics();
-    virtual void ApplyStaticContactImpulse();
-    virtual void ApplyBodyContactImpulse();
-    virtual void ShouldRefreshContacts();
-    virtual void ApplyDrag();
-    virtual void DistributeContactForce();
-    virtual void UpdateLocalCenterOfMass();
-    virtual void ComputeFrameSteps();
-    virtual void IsAtBaseWeight();
-    virtual void FindPlacement();
-    virtual void ClassifyOutOfBounds();
-    virtual void AccumulateContactForces();
-    virtual void IntegrateMotion();
-    virtual void ApplyWorldTorque();
-    virtual void LocalTorqueToAngularAcceleration();
-    virtual void AverageAttachmentPosition();
-    virtual void UpdateContactEffect();
-    virtual void UpdateSlideEffect();
-    virtual void UpdateScrapeEffect();
-    virtual void UpdateAttachmentEffects();
-    virtual void ShouldUpdateShadowLight();
-    virtual void ShouldEmitMovingEffects();
-    virtual void ShouldRestartSteamEffect();
-    virtual void ShouldBurstSteamEffect();
-    virtual void UnknownRacerVirtualSlot26();
-    virtual void StartWreck();
-    virtual void ResolveSubstepCollisions();
-    virtual void SaveBodyOrientation();
-    virtual void ClearContactEffectFlags();
-    virtual void UpdateContactStates();
-    virtual void EffectiveLoadWeight();
-    virtual void ResetToPlacement();
-    virtual void LoadBodyAxes();
-    virtual void StoreBodyAxes();
-    virtual void ResetBodyOrientation();
-    virtual void AddAttachment();
-    virtual void ApplyCollisionEvent();
-    virtual void ApplyPendingRespawn();
-    virtual void LoadPhysicsModel();
-    virtual void EndMotion();
-    virtual void CheckMotionComplete();
-    virtual void SnapshotRespawnPose();
-    // Its own slot 44 (0x00420590 calls it for a player who left).
-    virtual void RemoveFromRace();
-    virtual float GetSpawnProtectionDuration(); // 0x0041d2b0 passes its result to slot 50 (KrustyBike's ret 0)
-    virtual void ComputeRotationPivot();
-    virtual void GetDriveShareScale();
-    virtual void AdvancePosition();
-    virtual void SimulateFrame();
-    virtual void SetSpawnProtection(int value, float time, int c); // KrustyBike's ret 0xc
-    virtual void IsSpawnProtected();
-    virtual void CanCrash();
-    virtual void ApplySteerRate();
-    virtual void GetContactGroundNormal();
-    virtual void GetPivotAndForwardAxis();
-    virtual void UpdateLeanFromNormal();
-    virtual void GetLeanAngle();
-    virtual void SettleBodyToWheels();
-    virtual void GetMaxSteerAngle();
-    virtual void ComputeSteerRate();
-    virtual void ComputeSlideAngle();
-    virtual void ClassifyGroundContact();
-    virtual void ReadControlAxes();
-    virtual void UpdateControlInput();
-    virtual void ApplyLaunchImpulse();
-    virtual void IsRiderPoseLocked();
-    virtual void ClearCrashState();
-    virtual void GetRespawnKey();
-    virtual void ResetCrashTimer();
-    virtual void IsSpeedGainBelowLimit();
-    virtual void UpdateAirborneState();
-    virtual void ComputeGroundNormalAndTurn();
-    virtual void GetTurnRadius();
-    virtual void DeflectVelocity();
-    virtual void ComputeWheelForwardAlignment();
-    virtual void ComputeDriveTorque();
-    virtual void IsPovHatPressed();
-    virtual void UnknownRacerVirtualSlot78();
-    virtual void UnknownRacerVirtualSlot79();
-    virtual void IsThrottleRequested();
-    virtual void IsClutchRequested();
-    virtual void IsReverseRequested();
-    virtual void IsBrakeRequested();
-    virtual void QueryControlInput();
-    virtual void UpdateWheelRolls();
-    virtual void UpdateWheelDriveForces();
-    virtual void ApplyCrashedControl();
-    virtual void ClassifyInputDirection();
-    virtual void SelectRiderPose();
-    virtual void ClampSubStepsOnCrash();
-    virtual void ApplyAirControl();
-    virtual void ApplyLeanCorrection();
-    virtual void InitForceFeedback();
-    virtual void UpdateForceFeedback(); // slot 10 calls it while TrackGameMode+0xa88 is set
-
-    int ReceivedPositionChanged();              // 0x00495c00 (KrustyBike.cpp's code)
-
-    // 0x004933e0 (KrustyBike.cpp's code): applies message 13 to a state.
-    void ApplyStateDelta(RacerDeltaMessage* message, ReceivedRacerState* part);
-
-    unsigned char sceneNode[0x0c - 0x08];     // +0x008 KrustyBike sceneNode (SoultreePhysicsBaseObject) (bytes kept)
-    Vector3 position;                         // +0x00c KrustyBike position (SoultreePhysicsBaseObject)
-    Vector3 centerOfMass;                     // +0x018 KrustyBike centerOfMass (SoultreePhysicsBaseObject); the "you" indicator sits 4.25 above it
-    float invMass;                            // +0x024 KrustyBike invMass (SoultreePhysicsBaseObject)
-    float inverseLoadMass;                    // +0x028 KrustyBike inverseLoadMass (SoultreePhysicsBaseObject)
-    float bodyRoll;                           // +0x02c KrustyBike bodyRoll (SoultreePhysicsBaseObject)
-    float bodyPitch;                          // +0x030 KrustyBike bodyPitch (SoultreePhysicsBaseObject)
-    float bodyYaw;                            // +0x034 KrustyBike bodyYaw (SoultreePhysicsBaseObject)
-    float bodySinRoll;                        // +0x038 KrustyBike bodySinRoll (SoultreePhysicsBaseObject)
-    float bodyCosRoll;                        // +0x03c KrustyBike bodyCosRoll (SoultreePhysicsBaseObject)
-    float bodySinPitch;                       // +0x040 KrustyBike bodySinPitch (SoultreePhysicsBaseObject)
-    float bodyCosPitch;                       // +0x044 KrustyBike bodyCosPitch (SoultreePhysicsBaseObject)
-    unsigned char field_0x048[0x64 - 0x48];   // +0x048 savedRoll..savedCosPitch (SoultreePhysicsBaseObject), not split: declaration counter
-    Vector3 velocity;                         // +0x064 velocity (cleared for a remote player's racer)
-    Vector3 acceleration;                     // +0x070 KrustyBike acceleration (SoultreePhysicsBaseObject)
-    Vector3 prevVelocity;                     // +0x07c KrustyBike prevVelocity (SoultreePhysicsBaseObject)
-    Vector3 heading;                          // +0x088 heading (the setup puts the scene's 30SecMan ahead of it)
-    Vector3 bodyUp;                           // +0x094 KrustyBike bodyUp (SoultreePhysicsBaseObject)
-    Vector3 savedForward;                     // +0x0a0 KrustyBike savedForward (SoultreePhysicsBaseObject)
-    Vector3 savedUp;                          // +0x0ac KrustyBike savedUp (SoultreePhysicsBaseObject)
-    float prevSpeed;                          // +0x0b8 KrustyBike prevSpeed (SoultreePhysicsBaseObject)
-    int linearSpeed;  // +0xBC  SoultreePhysicsBaseObject+0xbc linearSpeed; zeroed with velocity at a network start
-    Vector3 angularAcceleration;              // +0x0c0 KrustyBike angularAcceleration (SoultreePhysicsBaseObject)
-    Vector3 worldAngularVelocity;             // +0x0cc KrustyBike worldAngularVelocity (SoultreePhysicsBaseObject)
-    Vector3 angularVelocity;                  // +0x0d8 KrustyBike angularVelocity (SoultreePhysicsBaseObject)
-    Vector3 invInertia;                       // +0x0e4 KrustyBike invInertia (SoultreePhysicsBaseObject)
-    Vector3 shapeInvInertia;                  // +0x0f0 KrustyBike shapeInvInertia (SoultreePhysicsBaseObject)
-    unsigned char field_0x0fc[0x108 - 0xfc];
-    char airborne;                            // +0x108 KrustyBike airborne (SoultreePhysicsBaseObject)
-    bool restarted;                           // +0x109 set on a restart
-    char asleep;                              // +0x10a KrustyBike asleep (SoultreePhysicsBaseObject); +0x10b is padding
-    Vector3 startPosition;                    // +0x10c start position (0x004210f0)
-    Vector3 startDirection;                   // +0x118 start direction
-    unsigned char particleManager[0x128 - 0x124];  // +0x124 KrustyBike particleManager (SoultreePhysicsBaseObject) (bytes kept)
-    CollisionObject* collisionObject;  // +0x128  SoultreePhysicsBaseObject+0x128 collisionObject; its +0x68 is set without tree collision (the loader)
-    unsigned char field_0x12c[0x3bc - 0x12c];
-    D3DIMSoultreeObject* modelNode;            // +0x3bc the bike's model (SetDetailLevel 0x00423790)
-    unsigned char field_0x3c0[0x4a0 - 0x3c0];
-    int outOfRace;                            // +0x4a0 out of the race (0x0041f1d0 skips it)
-    unsigned char field_0x4a4[0x5bc - 0x4a4];
-    int gasGyro;                              // +0x5bc TrackGameMode gasGyro copy (slot 23 key 0x22)
-    int brakeGyro;                            // +0x5c0 TrackGameMode brakeGyro copy (slot 23 key 0x30)
-    BikeRaceRiderView* riderCharacter;     // +0x5c4
-    unsigned char loadInfo[0x5e0 - 0x5c8];    // +0x5c8 KrustyBike loadTextures (Bike, a TextureContext) (bytes kept)
-    char riderName[0x10];                     // +0x5e0 KrustyBike riderName (Bike); EventKrustyBikeView racerName
-    CollisionObject* frontWheel;       // +0x5f0 paired with the other racers' (the loader)
-    CollisionObject* rearWheel;        // +0x5f4
-    void* leftBarContact;                     // +0x5f8 KrustyBike leftBarContact (Bike)
-    void* rightBarContact;                    // +0x5fc KrustyBike rightBarContact (Bike)
-    int tailContact;                          // +0x600 KrustyBike tailContact (Bike)
-    Wrecker* wrecker;  // +0x604  Bike+0x604 object (SetupWrecker with rider.col, StartAnimatedWreck: Wrecker); its collision model is paired
-    unsigned char field_0x608[0x734 - 0x608];
-    unsigned char netIndex;                   // +0x734 racer index in network messages
-    char isRemote;  // +0x735  KrustyBike loader's remote argument (1 for other players' bikes); gates the +0x1414/+0x1418 pairing
-    unsigned char isGhost;  // +0x736  KrustyBike+0x736 isGhost (KrustyBike.h: set for loader kind 0xff)
-    char fourStroke;                          // +0x737 four-stroke flag (KrustyUI "BikeFourStroke_%02d")
-    int engineSize;                           // +0x738 engine size
-    int plateNumber;                          // +0x73c plate number (the setup paints it)
-    LodBikeRaceView* bikeView;       // +0x740 the racer's view (RaceView.h)
-    RaceStatusNode* statusNode;        // +0x744 race status node (RaceView.h)
-    unsigned char finishTimeStamp[0x74c - 0x748];  // +0x748 KrustyBike finishTimeStamp (bytes kept)
-    float lastLapTime;                        // +0x74c (EventKrustyBikeView's last lap time)
-    float fastestLap;                         // +0x750 (0x0045c8b0 copies it to the entry's ZoneReport "FastestLap")
-    unsigned char field_0x754[0x768 - 0x754];
-    float score;                              // +0x768 score (network message 10)
-    unsigned char offTrackTime[0x770 - 0x76c];  // +0x76c KrustyBike offTrackTime (bytes kept)
-    int timeBehindLeader;  // +0x770  KrustyBike +0x770 timeBehindLeader; replayed from message 1's +0x2c
-    unsigned char field_0x774[0x7a0 - 0x774];
-    unsigned short lapCount;                  // +0x7a0 laps (EventKrustyBikeView)
-    unsigned char prevLapCount[0x7a4 - 0x7a2];  // +0x7a2 KrustyBike prevLapCount (bytes kept)
-    char finished;                            // +0x7a4 finished
-    unsigned char field_0x7a5[0x7b8 - 0x7a5];
-    int lapGate;                              // +0x7b8 RaceView.h's racer lapGate
-    int nextLapGate;                          // +0x7bc
-    unsigned char field_0x7c0[0x11b8 - 0x7c0];
-    unsigned char hasFullState;  // +0x11B8  set when a message 1 state arrives; message 13 deltas are ignored until it is set
-    unsigned char field_0x11b9[0x11bc - 0x11b9];
-    int recorderId;                           // +0x11bc recorder id (0x00421d50 matches records by it)
-    char aiMessageIndex;                      // +0x11c0 AI racer's index in its messages (RaceView.h)
-    unsigned char field_0x11c1[0x11c4 - 0x11c1];
-    float messageDelay;                       // +0x11c4 the player's message delay (racer slot +0xd0)
-    ReceivedRacerState* receivedStates[4]; // +0x11c8 received network states, newest first
-    unsigned char stateBuffers[0x1358 - 0x11d8];  // +0x11d8 KrustyBike stateBuffers (bytes kept)
-    Vector3 deltaBaseVelocity;  // +0x1358  base state message 13 deltas accumulate into (0x004933e0); set from message 1 velocity (+0x3c)
-    Vector3 deltaBasePosition;  // +0x1364  message 13 delta base; set from message 1 position (+0x08)
-    Vector3 deltaBaseAngularVelocity;  // +0x1370  message 13 delta base; set from message 1 angular velocity (+0x30)
-    int deltaBaseRoll;  // +0x137C  message 13 delta base; set from message 1 roll (+0x14)
-    int deltaBasePitch;  // +0x1380  message 13 delta base; set from message 1 pitch (+0x18)
-    int deltaBaseYaw;  // +0x1384  message 13 delta base; set from message 1 yaw (+0x1c)
-    int deltaBaseTime;  // +0x1388  message 13 delta base ms time (message 1 +0x4c); 0x004933e0 adds each delta's step
-    unsigned char field_0x138c[0x13f8 - 0x138c];
-    float recordStateTimer;  // +0x13F8  KrustyBike recordState(+0x1390).timer: s since the last full record; FLT_MAX/2 forces one
-    unsigned char field_0x13fc[0x1414 - 0x13fc];
-    CollisionObject* bikeAndRiderCollision;  // +0x1414  KrustyBike+0x1414 bikeAndRiderCollision (KrustyBike.h, "BikeAndRider.col"); paired between remote racers by the loader
-    CollisionObject* bikeCollision;  // +0x1418  KrustyBike+0x1418 bikeCollision (KrustyBike.h, "Bike.col"); paired between remote racers by the loader
-    unsigned char field_0x141c[0x160c - 0x141c]; // the GameObject virtual base follows (0x1638 bytes)
-};
-
 // A racer's network state (0x58 bytes, network message 1).
 struct RacerStateMessage {
     char type;                                // +0x00 SendRaw (0x004ad280) writes the type byte here
@@ -446,41 +237,15 @@ struct BikeRaceKrustyBikeCameraView {
     unsigned char followingRacer;             // +0x390 following a racer
     unsigned char targetPointCached;          // +0x391 VehicleCamera 0x0052bc50; cleared on a new target
     unsigned char targetHeadingCached;        // +0x392 VehicleCamera 0x0052bac0; cleared on a new target
-    BikeRaceKrustyBikeView* vehicle;            // +0x394 VehicleCamera's followed vehicle
+    KrustyBike* vehicle;            // +0x394 VehicleCamera's followed vehicle
     Vector3 cachedTargetHeading;              // +0x398 VehicleCamera cachedTargetHeading (targetHeadingCached)
     Vector3 cachedTargetPoint;                // +0x3a4 VehicleCamera cachedTargetPoint (targetPointCached)
-    BikeRaceKrustyBikeView* followedBike;       // +0x3b0 BikeCamera's bike (RaceSound.h)
-    BikeRaceKrustyBikeView* followedRacer;      // +0x3b4 KrustyBikeCamera's racer (RaceSound.h)
+    KrustyBike* followedBike;       // +0x3b0 BikeCamera's bike (RaceSound.h)
+    KrustyBike* followedRacer;      // +0x3b4 KrustyBikeCamera's racer (RaceSound.h)
 
     // Inline (three times in 0x0041eb20): follows `racer`, showing the
-    // previous racer's model again and hiding the new one's.
-    void StartFollowing(BikeRaceKrustyBikeView* racer) {
-        if (followedBike != 0 && !racer->bikeView->forceHighLod) {
-            followedBike->modelNode->SetLowestLod(1);
-            followedBike->riderCharacter->modelNode->SetLowestLod(1);
-            if (followedBike->modelNode->currentLod == 0) {
-                followedBike->modelNode->SetLod(1);
-            }
-            if (followedBike->riderCharacter->modelNode->currentLod == 0) {
-                followedBike->riderCharacter->modelNode->SetLod(1);
-            }
-        }
-        vehicle = racer;
-        targetPointCached = 0;
-        targetHeadingCached = 0;
-        followingRacer = true;
-        shadowCaster = 0;
-        targetCharacter = 0;
-        targetCar = 0;
-        followedBike = racer;
-        isSettled = 0;
-        followedRacer = racer;
-        if (!racer->bikeView->forceHighLod) {
-            racer->modelNode->SetLowestLod(0);
-            followedBike->riderCharacter->modelNode->SetLowestLod(0);
-        }
-        isSettled = 0;
-    }
+    // previous racer's model again and hiding the new one's (BikeRace.cpp).
+    void StartFollowing(KrustyBike* racer);
 
     // Inline (0x0041eb20): the camera targets one scene object instead.
     // Each of the three stores its own target first (the store order is

@@ -42,7 +42,7 @@ PROBES = {0x00419a57: 'no rider archive', 0x00419b43: 'replay rank', 0x00419bb8:
 ARENA = base.ARENA
 TRACK_GAME = base.TRACK_GAME
 IN_PRO_CIRCUIT = 0x00521cd0
-VIEW_CTOR = 0x0048fa60            # BikeRaceKrustyBikeView(int): a constructor, so it returns this
+VIEW_CTOR = 0x0048fa60            # KrustyBike(int): a constructor, so it returns this
 
 OPEN_ARCHIVE, RANK_BY_POINTS = 0x004e9cd0, 0x00417bc0
 PICK_RANDOM, RANDOM_NAMES = 0x0049b0d0, 0x0049b020

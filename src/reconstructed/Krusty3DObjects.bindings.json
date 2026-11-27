@@ -42,7 +42,7 @@
   "?Create@ArcadeObject@@QAEPAV1@PAXPBVLightManager@@PBUTextureContext@@PBDUVector3@@HPAVCamera@@MMME@Z": "0x00401310",
   "?SetPosition@ArcadeObject@@QAEXPBUVector3@@@Z": "0x004014f0",
   "?SetAxes@ArcadeObject@@QAEXPBUVector3@@0HH@Z": "0x00401520",
-  "?NextBike@BikeRace@@QAEPAVBikeRaceKrustyBikeView@@PAH@Z": "0x004204e0",
+  "?NextBike@BikeRace@@QAEPAVKrustyBike@@PAH@Z": "0x004204e0",
   "?TestInputEvent@@YAHHHPBUControlEvent@@H@Z": "0x0043caa0",
   "?ClearScreenRects@D3DIMSoultreeObject@@QAEXXZ": "0x004444e0",
   "?FastInvSqrt@@YAMM@Z": "0x00460c00",

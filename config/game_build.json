@@ -23,7 +23,6 @@
     "?Magnitude@@YAMABUVec3@@@Z": "?CollisionLength@@YAMPBUCollisionVec3@@@Z",
     "?RotateVector@@YA?AUVec3@@ABU1@ABUMatrix4@@@Z": "?CollisionRotateVector@@YAPAUCollisionVec3@@PAU1@PBU1@PBUMatrix4@@@Z",
     "?AddCollisionPoint@@YAPAXHPAPAXPBUVector3@@PAXMPAHMH@Z": "?AddCollisionPoint@@YAPAVCollisionPoint@@HPAPAV1@PBUCollisionVec3@@PAVCollisionContactOwner@@MPAHMH@Z",
-    "??0BikeRaceKrustyBikeView@@QAE@H@Z": "??0KrustyBike@@QAE@H@Z",
     "?AcquireOwnedObject@Grid1Terrain@@QAEPAVManagedTexture@@XZ": "?AcquireOwnedObject@Terrain@@QAEPAVBaseObject@@XZ",
     "?Vec3ScaleCall@@YA?AUVector3@@ABU1@M@Z": "?Vec3ScaleCall@@YAPAUVec3@@PAU1@PBU1@M@Z",
     "??0WreckerVec3Call@@QAE@MMM@Z": "??0Vec3Call@@QAE@MMM@Z",

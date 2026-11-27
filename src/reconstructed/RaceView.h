@@ -160,7 +160,7 @@ struct EventKrustyBikeView : virtual public GameObject {
     int engineSize;                           // +0x738 engine size; below 250 uses engine 0
     unsigned char plateNumber[0x740 - 0x73c];  // +0x73c KrustyBike plateNumber (bytes kept)
     EventBikeRaceView* bikeView;          // +0x740 the view (RaceStatus.cpp compares its +0x38 and +0x50)
-    RaceStatusNode* statusNode;        // +0x744 race status node (BikeRaceKrustyBikeView)
+    RaceStatusNode* statusNode;        // +0x744 race status node (KrustyBike statusNode)
     int finishTimeStamp;                      // +0x748 time stamp; 0x7ffffffe until finished
     float lastLapTime;                        // +0x74c last lap time (RaceStatus.cpp)
     float fastestLap;                         // +0x750 EventManager 0x0045c8b0 copies it to ZoneReport's "FastestLap" (TrackRecord reads it)

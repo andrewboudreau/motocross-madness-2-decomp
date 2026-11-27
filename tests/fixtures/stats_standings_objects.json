@@ -3,11 +3,11 @@
   "canonical": {
     "sections": 231,
     "relocations": 1031,
-    "sha256": "6bde44ccec54f34e3a275c174035d232898fe34ed7e145cbfee014c080f41a8f"
+    "sha256": "20dbe06544aac1f3beb6942413f184d6728c0905d1dbd1c44618ee97c8b24d50"
   },
   "candidate": {
     "sections": 5,
     "relocations": 27,
-    "sha256": "2adb6b28f5f2b273280356a60201b9b60b24f2cb6a98495f3123ccfc66a05152"
+    "sha256": "da29afce72f5aff0897a0674ddbc86d64becd6cb5a0d938c06c0d9d0298d44a3"
   }
 }

@@ -35,7 +35,7 @@
   "?EndQuery@QuadTree@@QAEXXZ": "0x004dd770",
   "?NextObject@QuadTree@@QAEPAVQuadTreeObject@@XZ": "0x004dd540",
   "?Remove@QuadTree@@QAEXPAVQuadTreeObject@@I@Z": "0x004dcf20",
-  "?NextBike@BikeRace@@QAEPAVBikeRaceKrustyBikeView@@PAH@Z": "0x004204e0",
+  "?NextBike@BikeRace@@QAEPAVKrustyBike@@PAH@Z": "0x004204e0",
   "?HandlePlayerLeft@BikeRace@@QAEXH@Z": "0x00420590",
   "?SaveReplay@BikeRace@@QAEXPAD0@Z": "0x00420b00",
   "?SetFrame@Camera@@QAEXPBUVector3@@00PBM1@Z": "0x0042e9b0",

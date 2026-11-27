@@ -18,7 +18,7 @@ from tools.match import compare
 from tools.run_calibration import CASES
 
 ROOT = Path(__file__).resolve().parents[1]
-SYMBOL = '?NextBike@BikeRace@@QAEPAVBikeRaceKrustyBikeView@@PAH@Z'
+SYMBOL = '?NextBike@BikeRace@@QAEPAVKrustyBike@@PAH@Z'
 SOURCES = (
     'src/reconstructed/EventManager.cpp', 'src/reconstructed/FollowRacer.cpp',
     'src/reconstructed/racesnd.cpp', 'src/reconstructed/RaceStatus.cpp',
@@ -73,7 +73,7 @@ class NextBikeConnectionsTests(unittest.TestCase):
             # Extract the unchanged function, then independently prove both
             # this execution object and the full production TU against retail.
             text = (ROOT / SOURCES[-1]).read_text()
-            start = text.index('BikeRaceKrustyBikeView* BikeRace::NextBike(int* iterator) {')
+            start = text.index('KrustyBike* BikeRace::NextBike(int* iterator) {')
             end = text.index('\n}\n', start) + 3
             extracted = output / 'iterator.cpp'
             extracted.write_text('#include "BikeRaceCore.h"\n#include "TrackGame.h"\n' + text[start:end])
@@ -84,7 +84,7 @@ class NextBikeConnectionsTests(unittest.TestCase):
                 ('event', 'RaceView.h', 'offsetof(EventBikeRaceView, localRacer) == 0x38 && offsetof(EventKrustyBikeView, position) == 0xc && offsetof(EventKrustyBikeView, bikeView) == 0x740'),
                 ('visual', 'Krusty3DObjects.h', 'offsetof(VisualCueBikeRaceView, ownRacer) == 0x38 && offsetof(VisualCueKrustyBikeView, position) == 0xc'),
                 ('bike', 'vehicle/KrustyBike.h', 'offsetof(KbRace, localRacer) == 0x38 && offsetof(KrustyBike, race) == 0x740 && sizeof(KrustyBike) == 0x1638'),
-                ('canonical', 'BikeRace.h', 'offsetof(BikeRaceKrustyBikeView, bikeView) == 0x740 && offsetof(BikeRace, replayTime) == 0x1b8'),
+                ('canonical', 'BikeRace.h', 'offsetof(BikeRace, replayTime) == 0x1b8'),
             ):
                 layout = output / (name + '_layout.cpp')
                 layout.write_text(f'#include "{header}"\n#include <stddef.h>\ntypedef char Layout[({assertions}) ? 1 : -1];\n')

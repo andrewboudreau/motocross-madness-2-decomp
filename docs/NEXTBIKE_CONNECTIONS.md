@@ -42,10 +42,11 @@ at +0x21c and a virtual GameObject at +0x160c (retail COLs 0x0055d078,
 0x0055d008 and 0x0055cff0). These secondary pointers must not replace the
 primary pointer returned by the iterator. The explicit result casts preserve
 that primary value. The event/visual views' position at +0x0c and the
-event/canonical/KrustyBike race pointer at +0x740 are checked under native VC6.
-This does **not** establish full type or virtual-base layout equivalence among
-`BikeRaceKrustyBikeView`, `EventKrustyBikeView`, `VisualCueKrustyBikeView` and
-`KrustyBike`; their partial declarations and existing access code are retained.
+event/KrustyBike race pointer at +0x740 are checked under native VC6. BikeRace
+itself returns the canonical `KrustyBike*`. This does **not** establish full type
+or virtual-base layout equivalence among `EventKrustyBikeView`,
+`VisualCueKrustyBikeView` and `KrustyBike`; their partial declarations and
+existing access code are retained.
 
 ## Shared declaration
 

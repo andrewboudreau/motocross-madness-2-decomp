@@ -28,7 +28,7 @@ from track_overlay_unit import write_unit
 
 ROOT = Path(__file__).resolve().parents[1]
 SYMBOL = '?DrawStandings@StatsOverlay@@QAEHXZ'
-ITERATOR = '?NextBike@BikeRace@@QAEPAVBikeRaceKrustyBikeView@@PAH@Z'
+ITERATOR = '?NextBike@BikeRace@@QAEPAVKrustyBike@@PAH@Z'
 OLD_ITERATOR = '?NextBike@EventBikeRaceView@@QAEPAUEventKrustyBikeView@@PAH@Z'
 DIRECT = {0x519a68:0x521970, 0x519a9f:0x518640, 0x519ab8:0x534aaf,
           0x519acb:0x4204e0, 0x519afb:0x4204e0, 0x519b11:0x534426,
@@ -42,7 +42,7 @@ INDIRECT = {0x519cbe:'dword ptr [edx + 0x44]', 0x519cd0:'dword ptr [0x550070]',
 # Each extraction is checked against both complete retail and the actual full TU.
 HELPER_GROUPS = [
     ('iteration', '#include "BikeRaceCore.h"\n#include "TrackGame.h"\n',
-     [('BikeRace', 'BikeRaceKrustyBikeView* BikeRace::NextBike(', 0x4204e0, 162)]),
+     [('BikeRace', 'KrustyBike* BikeRace::NextBike(', 0x4204e0, 162)]),
     ('format', '#include <stdio.h>\n#include "Track.h"\n',
      [('Track', 'void FormatMinutesSeconds(', 0x518640, 67)]),
     ('comparator', '#include "TrackOverlay.h"\n#include "EventManager.h"\n',

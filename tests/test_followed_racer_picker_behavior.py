@@ -14,7 +14,7 @@ from tools.match import compare
 
 ROOT = Path(__file__).resolve().parents[1]
 SYMBOL = '?PickFollowedRacer@TrackGameViewOwner@@QAEXXZ'
-NEXT = '?NextBike@BikeRace@@QAEPAVBikeRaceKrustyBikeView@@PAH@Z'
+NEXT = '?NextBike@BikeRace@@QAEPAVKrustyBike@@PAH@Z'
 DIRECT = {0x4a9d54: 0x4204e0, 0x4a9d70: 0x4204e0, 0x4a9da5: 0x534c1b,
           0x4a9dbc: 0x534a88, 0x4a9e23: 0x4ac830, 0x4a9e69: 0x4e8720}
 
@@ -95,14 +95,14 @@ class FollowedRacerPickerBehaviorTests(unittest.TestCase):
             # Execute the unchanged canonical iterator on an empty derived view
             # solely to allow the observing callback to keep its own symbol.
             source = (ROOT / 'src/reconstructed/BikeRace.cpp').read_text()
-            start = source.index('BikeRaceKrustyBikeView* BikeRace::NextBike(int* iterator) {')
+            start = source.index('KrustyBike* BikeRace::NextBike(int* iterator) {')
             end = source.index('\n}\n', start) + 3
             helper_file = output / 'iterator.cpp'
             helper_file.write_text('#include "BikeRaceCore.h"\n#include "TrackGame.h"\n'
-                'class ActualBikeRace : public BikeRace {public:BikeRaceKrustyBikeView* NextBike(int*);};\n' +
+                'class ActualBikeRace : public BikeRace {public:KrustyBike* NextBike(int*);};\n' +
                 source[start:end].replace('BikeRace::NextBike', 'ActualBikeRace::NextBike'))
             helper_path, helper = compile_source(helper_file, 'iterator')
-            helper_symbol = '?NextBike@ActualBikeRace@@QAEPAVBikeRaceKrustyBikeView@@PAH@Z'
+            helper_symbol = '?NextBike@ActualBikeRace@@QAEPAVKrustyBike@@PAH@Z'
             self.assertEqual(helper.symbol_extent(helper.find_symbol(helper_symbol))[1], 162)
             self.assertTrue(compare(image, helper, helper_symbol, 0x4204e0, 162,
                 ROOT / 'src/reconstructed/BikeRace.bindings.json')['strict_exact'])

@@ -24,7 +24,7 @@ ROOT = Path(__file__).resolve().parents[1]
 CANONICAL = 'src/reconstructed/racesnd.cpp'
 QUALIFIED = 'RaceSound::RefillStream'
 UNIT_ROWS = (107, 580)
-UNIT_DIGEST = '95e376e6456772383f2f5b5842c20a2a96208c50ce85aed0f4074e1a49880566'
+UNIT_DIGEST = '8f86eeff9cf53377fb226c1d6459a884041a621e4e87ca6ebf29628b7d59a312'
 SYMBOL = '?RefillStream@RaceSound@@QAEXXZ'
 HELPERS = (
     ('GetBufferPosition', '?GetBufferPosition@Sound@@QAEHPAK0@Z', 0x4bcd40, 57, 0x10),

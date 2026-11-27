@@ -259,7 +259,7 @@
   "?Load@Scene@@QAEHPAXPAVLightManager@@PAVParticleManager@@PAVTextureMapManager@@PBUTextureContext@@PBDP6AXH@ZH@Z": "0x004efb20",
   "?Load@Terrain@@QAEPAV1@HPAVTerrainStream@@HPAUTerrainSurfaceDesc@@HHPBDH@Z": "0x005059d0",
   "?LoadEventObjects@BaseQuarryEvent@@QAEHP6AXPAH@Z@Z$ehhandler": "0x0054d608",
-  "?NextBike@BikeRace@@QAEPAVBikeRaceKrustyBikeView@@PAH@Z": "0x004204e0",
+  "?NextBike@BikeRace@@QAEPAVKrustyBike@@PAH@Z": "0x004204e0",
   "?NextListenerNumber@AuralScape@@QAEHXZ": "0x00403000",
   "?OpenArchiveFile@SceneArchiveFinder@@QAEHPAVFileStream@@PBD1H@Z": "0x004e9cd0",
   "?PixelFormatBytesPerPixel@@YAHH@Z": "0x00511970",
