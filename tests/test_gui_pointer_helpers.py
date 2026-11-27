@@ -15,7 +15,7 @@ from tools.unit_source import standalone_source
 ROOT = Path(__file__).resolve().parents[1]
 # Both bodies live in GUIManager.cpp (ShowControlToolTip exact, SetPointerDevice
 # not); the oracle links a validation unit holding only those two definitions.
-CASES = (('?ShowControlToolTip@ToolTip@@QAEXPAVGuiControlView@@@Z', 0x486b10, 106, 106),
+CASES = (('?ShowControlToolTip@ToolTip@@QAEXPAVUIControl@@@Z', 0x486b10, 106, 106),
          ('?SetPointerDevice@GUIUser@@QAEHPAVGUIInputDevice@@@Z', 0x488120, 52, 46))
 
 

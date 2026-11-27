@@ -31,29 +31,6 @@ int CompareCashDescending(const void* a, const void* b);
 // 0x0049a105 calls it too).
 void OpenCareerDialog();
 
-// A view of EventManager's 0x50-byte race entries (EventManager.h's
-// RacerResult) as the results code reads them: +0x34..+0x3c are loaded
-// as floats.
-struct ProCircuitRacerResultView {
-    int racer;                                // +0x00: the circuit racer
-    int position;                             // +0x04: finishing position
-    float fastestLap;                         // +0x08: RacerResult fastestLap
-    int largestStuntPoints;                   // +0x0c: RacerResult largestStuntPoints
-    float totalTrickTime;                     // +0x10: RacerResult totalTrickTime
-    float totalRunningTime;                   // +0x14: RacerResult totalRunningTime
-    float bestTagRun;                         // +0x18: RacerResult bestTagRun
-    float totalTagRun;                        // +0x1c: RacerResult totalTagRun
-    int finished;                             // +0x20: RacerResult finished
-    int outOfRace;                            // +0x24: RacerResult outOfRace
-    int points;                               // +0x28: points
-    float score;                              // +0x2c: RacerResult score
-    unsigned char field_0x30[0x34 - 0x30];    // +0x30 RacerResult aiIndex, not split: declaration counter
-    float repairs;                            // +0x34: repairs (times 500 is the cost)
-    float medical;                            // +0x38: medical (times 250)
-    float stunts;                             // +0x3c: stunts (times 400)
-    char name[16];
-};
-
 // One row of the rankings 0x004d8c40 sorts (with 0x004d8c20).
 struct CircuitPointsRank {
     int points;                               // +0x00: points

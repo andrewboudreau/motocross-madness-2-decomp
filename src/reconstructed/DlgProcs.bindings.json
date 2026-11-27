@@ -351,7 +351,7 @@
   "?ShowDialog@GUIManager@@QAEPAVUIDialog@@PAV2@HHPAUCameraRect@@0HPBDH@Z": "0x00485a70",
   "?RecreateCursors@GUIManager@@QAEXPBDH@Z": "0x004865e0",
   "?ShowCursors@GUIManager@@QAEXH@Z": "0x00486630",
-  "?RequestFocus@GUIUser@@QAEHPAVGuiControlView@@PAPAV2@H@Z": "0x00487790",
+  "?RequestFocus@GUIUser@@QAEHPAVUIControl@@PAPAV2@H@Z": "0x00487790",
   "?FormatTime@@YAXPADM@Z": "0x00488bd0",
   "?BuildGarageScene@KrustyUI@@QAEXH@Z": "0x00498cf0",
   "?Shutdown@KrustyUI@@QAEXXZ": "0x004999b0",

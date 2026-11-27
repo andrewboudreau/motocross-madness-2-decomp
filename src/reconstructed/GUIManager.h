@@ -126,101 +126,6 @@ public:
     UIAnim* cursorAnimation;  // +0x5c: SetAnimation; advanced by slot 15
 };
 
-// A dialog control as GUIUser and ToolTip see it. Never constructed as such.
-class GuiControlView : public GameObject {
-public:
-    virtual void AdvanceImages();
-    virtual void ContainsPoint();
-    virtual void SetState();
-    virtual void IsInteractive();
-    virtual int EnterHover();       // takes the focus; 0 refuses it
-    virtual void LeaveHover(GuiControlView* next);
-    virtual void KillFocus(GuiControlView* next);
-
-    unsigned char screenArea[0x3c - 0x2c];  // +0x2c UIControl screenArea (bytes kept)
-    CameraRect area;                          // +0x3c: area
-    unsigned char visibleArea[0x5c - 0x4c];  // +0x4c UIControl visibleArea (bytes kept)
-    int controlType;                          // +0x5c: control type (11: edit field)
-    int currentState;                         // +0x60 UIControl currentState
-    int savedState;                           // +0x64 UIControl savedState
-    int transitionState;                      // +0x68 UIControl transitionState
-    int enabled;                              // +0x6c UIControl enabled
-    int shown;                                // +0x70 UIControl shown
-    int eventCode;                            // +0x74 UIControl eventCode
-    int groupId;                              // +0x78 UIControl groupId
-    int attachId;                             // +0x7c UIControl attachId
-    float slideX;                             // +0x80 UIControl slideX
-    float slideY;                             // +0x84 UIControl slideY
-    float zoomWidth;                          // +0x88 UIControl zoomWidth
-    float zoomHeight;                         // +0x8c UIControl zoomHeight
-    float slideStepX;                         // +0x90 UIControl slideStepX
-    float slideStepY;                         // +0x94 UIControl slideStepY
-    float zoomStepWidth;                      // +0x98 UIControl zoomStepWidth
-    float zoomStepHeight;                     // +0x9c UIControl zoomStepHeight
-    int shapeBounds;                          // +0xa0 UIControl shapeBounds
-    int sourceBlit;                           // +0xa4 UIControl sourceBlit
-    unsigned int transitionTime;              // +0xa8 UIControl transitionTime
-    unsigned int transitionDelay;             // +0xac UIControl transitionDelay
-    int transitionFrameCount;                 // +0xb0 UIControl transitionFrameCount
-    int transitionType;                       // +0xb4 UIControl transitionType
-    UIDialog* ownerDialog;            // +0xb8
-    GUIManager* ownerGui;                     // +0xbc
-    char* controlText;                        // +0xc0 UIControl controlText ("Text")
-    unsigned int textColor;                   // +0xc4 UIControl textColor
-    int dropColor;                            // +0xc8 UIControl dropColor
-    unsigned int currentTextColor;            // +0xcc UIControl currentTextColor
-    int controlTextLength;                    // +0xd0 UIControl controlTextLength
-    int textDrop;                             // +0xd4 UIControl textDrop
-    int textAlign;                            // +0xd8 UIControl textAlign
-    int textExtent[2];                        // +0xdc UIControl textExtent
-    char* textLines;                          // +0xe4 UIControl textLines
-    int textLeftMargin;                       // +0xe8 UIControl textLeftMargin
-    int textTopMargin;                        // +0xec UIControl textTopMargin
-    char* toolTipText;                        // +0xf0: tool tip text
-    char controlName[0x32];                   // +0xf4 UIControl controlName (the .dtm section name)
-    unsigned char field_0x126[0x128 - 0x126];
-    int fontHandle;                           // +0x128 UIControl fontHandle
-    int ownsFont;                             // +0x12c UIControl ownsFont
-    char fontFace[0x158 - 0x130];             // +0x130
-    int bold;                                 // +0x158: bold
-    unsigned char italic[0x160 - 0x15c];     // +0x15c: UIControl::italic (bytes kept)
-    int fontHeight;                           // +0x160
-    int transitionFrame;                      // +0x164 UIControl transitionFrame
-    int moveable;                             // +0x168 UIControl moveable
-    void* stateImages[5];                     // +0x16c UIControl stateImages
-    int mouseAnim;                            // +0x180 UIControl mouseAnim
-    void* fxAnimIn;                           // +0x184 UIControl fxAnimIn
-    void* fxAnimOut;                          // +0x188 UIControl fxAnimOut
-    void* anchorControl;                      // +0x18c UIControl anchorControl
-    int relAnchor;                            // +0x190 UIControl relAnchor
-    void* sounds[5];                          // +0x194 UIControl sounds
-    void* slideSound;                         // +0x1a8 UIControl slideSound
-    void* fxSoundIn;                          // +0x1ac UIControl fxSoundIn
-    void* fxSoundOut;                         // +0x1b0 UIControl fxSoundOut
-    int* boundValue;                          // +0x1b4 UIControl boundValue
-    int backgroundRegion;                     // +0x1b8 UIControl backgroundRegion
-    int redrawFrames;                         // +0x1bc UIControl redrawFrames
-    int needsRedraw;                          // +0x1c0 UIControl needsRedraw
-    void* tabStops;                           // +0x1c4 UIControl tabStops
-    unsigned char field_0x1c8[0x1cc - 0x1c8];
-    void* drawnTexture;                       // +0x1cc UIControl drawnTexture
-    unsigned char transitionStep[0x1d4 - 0x1d0];  // +0x1d0 UIControl transitionStep (a member-function pointer; bytes kept)
-    int heldButton;                           // +0x1d4 UIControl heldButton
-    int keyBind;                              // +0x1d8 UIControl keyBind
-    int post3D;                               // +0x1dc UIControl post3D
-    int permanent;                            // +0x1e0 UIControl permanent
-    unsigned char field_0x1e4[0x1e8 - 0x1e4];
-    int wordWrap;                             // +0x1e8 UIControl wordWrap
-    int textLength;                           // +0x1ec UIEditBox textLength
-    int textCapacity;                         // +0x1f0 UIEditBox textCapacity
-    unsigned char field_0x1f4[0x1fc - 0x1f4];
-    int textWidth;                            // +0x1fc UIEditBox textWidth
-    int textScrollX;                          // +0x200 UIEditBox textScrollX
-    unsigned char field_0x204[0x210 - 0x204];  // UIEditBox clickSound/fullSound unions; backgroundBrush (+0x20c), not split: declaration counter
-    char* acceptedCharacters;                 // +0x210: accepted characters
-    RECT caretRect;                           // +0x214  UIEditBox +0x214 caretRect (GameUi.h); EnableImeInput places the IME composition window at its top left
-};
-
 // RTTI: UIDlgContainer : GameObject (vtable 0x00553fb0; 0x2c bytes, the
 // size 0x004853b0 allocates; inline constructor).
 class UIDlgContainer : public GameObject {
@@ -239,7 +144,7 @@ public:
     virtual int RenderPost3D();               // 0x00486db0
 
     ToolTip* Create(void* target, GUIManager* gui); // 0x00486a10
-    void ShowControlToolTip(GuiControlView* control); // 0x00486b10: control's text at the pointer or below it
+    void ShowControlToolTip(UIControl* control); // 0x00486b10: control's text at the pointer or below it
     // 0x00486b80: shows `text` near `position` for `time` seconds.
     void ShowText(const char* text, int* position, float time);
 

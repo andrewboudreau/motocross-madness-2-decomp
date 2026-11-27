@@ -378,7 +378,7 @@ void PCNewDlg::HandleEvent(DialogEvent* event)
             list->AddRow(number, i, 0);
         }
         list->SelectRowByData(7);
-        guiUser->RequestFocus((GuiControlView*)FindControl("EditBox", 11), 0, 0);
+        guiUser->RequestFocus(FindControl("EditBox", 11), 0, 0);
         break;
     }
     case kDialogCommand:
@@ -1164,11 +1164,11 @@ void PCLastRaceDlg::PayOutRace()
 
     int paid = 0;
     for (int j = 0; j < g_TrackGame->eventManager->resultCount; j++) {
-        ProCircuitRacerResultView* result = &((ProCircuitRacerResultView*)g_TrackGame->eventManager->results)[j];
-        ProCircuitRacer* racer = &circuit->racers[result->racer];
-        racer->raceStats.medicalCost = (int)__min(purse * circuit->medicalCapPct, result->medical * 250.0f);
-        racer->raceStats.repairCost = (int)__min(purse * circuit->repairCapPct, result->repairs * 500.0f);
-        racer->raceStats.stuntWinnings = (int)__min(purse * circuit->stuntCapPct, result->stunts * 400.0f);
+        RacerResult* result = &g_TrackGame->eventManager->results[j];
+        ProCircuitRacer* racer = &circuit->racers[result->playerId];  // a circuit race's player ids are roster indices
+        racer->raceStats.medicalCost = (int)__min(purse * circuit->medicalCapPct, result->injuryDamage * 250.0f);
+        racer->raceStats.repairCost = (int)__min(purse * circuit->repairCapPct, result->repairDamage * 500.0f);
+        racer->raceStats.stuntWinnings = (int)__min(purse * circuit->stuntCapPct, result->stuntEarnings * 400.0f);
         racer->raceStats.purseWinnings = (int)ceil(purse * shares[result->position - 1]);
         racer->raceStats.points = result->points;
         paid += racer->raceStats.purseWinnings;

@@ -8,7 +8,6 @@ class GUIManager;
 class GUIInputDevice;
 class GUICursor;
 class ToolTip;
-class GuiControlView;
 class InputDevice;
 class Palette8;
 class BackgroundImage;
@@ -33,12 +32,12 @@ public:
     // 0x00487730 / 0x00487790: make `control` the pending hover (focus also
     // sets hover), unless the pending one is a drop-down list ("UIDDL");
     // `update` applies it at once through 0x004875c0.
-    int RequestHover(GuiControlView* control, GuiControlView** previous, int update);
-    int RequestFocus(GuiControlView* control, GuiControlView** previous, int update);
-    int SetHoverControl(GuiControlView* control, GuiControlView** previous); // 0x00487800: +0x1d8
-    int MoveFocus(GuiControlView* control, GuiControlView** previous); // 0x00487870: moves the focus
+    int RequestHover(UIControl* control, UIControl** previous, int update);
+    int RequestFocus(UIControl* control, UIControl** previous, int update);
+    int SetHoverControl(UIControl* control, UIControl** previous); // 0x00487800: +0x1d8
+    int MoveFocus(UIControl* control, UIControl** previous); // 0x00487870: moves the focus
     void EnableImeInput(int enable);   // 0x00487990: input method editor on/off
-    int ClearFocus(GuiControlView** previous); // 0x00487bf0: drops the focus, returning it
+    int ClearFocus(UIControl** previous); // 0x00487bf0: drops the focus, returning it
     int AcceptDevice(GUIInputDevice* device); // 0x00487c30: accepts a device
     void AcceptKeyboardAndJoysticks();             // 0x00487d00: accepts the keyboard and joysticks
     void ForgetDevices();             // 0x00487d60: forgets every device
@@ -64,10 +63,10 @@ public:
     char cursorImage[0x80];                   // +0xc8: cursor image ("cursor.tga")
     char waitImage[0x80];                     // +0x148: wait image ("wait.tga")
     UIAnim* cursorAnimation;  // +0x1c8
-    GuiControlView* pendingHoverControl;   // +0x1cc: set by 0x00487730/0x00487790; UpdateFocus passes it to SetHoverControl
-    GuiControlView* pendingFocusControl;   // +0x1d0: set by 0x00487790; UpdateFocus passes it to MoveFocus
-    GuiControlView* focusControl;          // +0x1d4: focus
-    GuiControlView* hoverControl;          // +0x1d8: set by SetHoverControl and MoveFocus
+    UIControl* pendingHoverControl;   // +0x1cc: set by 0x00487730/0x00487790; UpdateFocus passes it to SetHoverControl
+    UIControl* pendingFocusControl;   // +0x1d0: set by 0x00487790; UpdateFocus passes it to MoveFocus
+    UIControl* focusControl;          // +0x1d4: focus
+    UIControl* hoverControl;          // +0x1d8: set by SetHoverControl and MoveFocus
     int field_0x1dc;
     ContainerList<GUIInputDevice*> acceptedDevices; // +0x1e0: accepted devices
 };

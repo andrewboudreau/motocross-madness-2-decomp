@@ -45,7 +45,7 @@ int UIEditBox::OnChar(int character) {
     int result = 0;
     event.handled = 0;
     if (!UIControl::OnChar(character) &&
-        ownerDialog->guiUser->focusControl == (GuiControlView*)this) {
+        ownerDialog->guiUser->focusControl == this) {
         if (clickSound) {
             clickSound->SetVolume(ownerGui->soundVolume, 0);
             clickSound->PlayWithOptions(1, 0, 0);

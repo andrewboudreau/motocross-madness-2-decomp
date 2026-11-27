@@ -822,7 +822,7 @@ int ToolTip::Tick(float frameTime) {
 // bottom then loads into eax after the x store and the call gets the text in
 // eax and &position in edx, as in retail. Component assignments (ternaries or
 // if/else) hoist the bottom load into edx and swap the two (89/106).
-void ToolTip::ShowControlToolTip(GuiControlView* control) {
+void ToolTip::ShowControlToolTip(UIControl* control) {
     POINT position;
     GUIInputDevice* device = control->ownerDialog->guiUser->pointerDevice;
 
@@ -830,8 +830,8 @@ void ToolTip::ShowControlToolTip(GuiControlView* control) {
         position = device->pointerPosition;
         position.y += 16;
     } else {
-        position.x = control->area.left + (control->area.right - control->area.left) / 2;
-        position.y = control->area.bottom;
+        position.x = control->boundsRect.left + (control->boundsRect.right - control->boundsRect.left) / 2;
+        position.y = control->boundsRect.bottom;
     }
     ShowText(control->toolTipText, (int*)&position, 1.0f);
 }
@@ -1124,7 +1124,7 @@ void GUIUser::ReleaseToolTip() {
 }
 
 // 0x00487730
-int GUIUser::RequestHover(GuiControlView* control, GuiControlView** previous, int update) {
+int GUIUser::RequestHover(UIControl* control, UIControl** previous, int update) {
     if (pendingHoverControl && strstr(pendingHoverControl->classNames, "UIDDL"))
         return 0;
     if (previous)
@@ -1136,7 +1136,7 @@ int GUIUser::RequestHover(GuiControlView* control, GuiControlView** previous, in
 }
 
 // 0x00487790
-int GUIUser::RequestFocus(GuiControlView* control, GuiControlView** previous, int update) {
+int GUIUser::RequestFocus(UIControl* control, UIControl** previous, int update) {
     if (pendingFocusControl && strstr(pendingFocusControl->classNames, "UIDDL"))
         return 0;
     if (previous)
@@ -1149,14 +1149,14 @@ int GUIUser::RequestFocus(GuiControlView* control, GuiControlView** previous, in
 }
 
 // 0x00487800
-int GUIUser::SetHoverControl(GuiControlView* control, GuiControlView** previous) {
+int GUIUser::SetHoverControl(UIControl* control, UIControl** previous) {
     int result = 1;
 
     if (control && control != hoverControl)
         result = control->EnterHover();
     if (result) {
         if (hoverControl && !hoverControl->pendingRelease && hoverControl != control)
-            hoverControl->LeaveHover(control);
+            hoverControl->LeaveHover((int)control);
         if (previous)
             *previous = hoverControl;
         hoverControl = control;
@@ -1166,23 +1166,24 @@ int GUIUser::SetHoverControl(GuiControlView* control, GuiControlView** previous)
 
 // 0x00487870: moves the focus to `control`; a digits-only edit box turns the
 // IME off.
-int GUIUser::MoveFocus(GuiControlView* control, GuiControlView** previous) {
+int GUIUser::MoveFocus(UIControl* control, UIControl** previous) {
     int result = 1;
 
     if (control && control != hoverControl)
         result = control->EnterHover();
     if (result) {
         if (hoverControl && !hoverControl->pendingRelease && hoverControl != control)
-            hoverControl->LeaveHover(control);
+            hoverControl->LeaveHover((int)control);
         if (focusControl && !focusControl->pendingRelease && focusControl != control)
-            focusControl->KillFocus(control);
+            focusControl->KillFocus((int)control);
         if (previous)
             *previous = focusControl;
         hoverControl = control;
         focusControl = control;
         if (g_TrackGame->display->freezeFrameIndex) {
             if (control->controlType == 11) {
-                if (control->acceptedCharacters && !strcmp(control->acceptedCharacters, "0123456789"))
+                UIEditBox* edit = (UIEditBox*)control;
+                if (edit->acceptedCharacters && !strcmp((char*)edit->acceptedCharacters, "0123456789"))
                     EnableImeInput(0);
                 else
                     EnableImeInput(1);
@@ -1202,11 +1203,11 @@ void GUIUser::EnableImeInput(int enable) {
     LOGFONTA font;
     HWND window;
     const char* face;
-    GuiControlView* control;
+    UIControl* control;
 
     if (enable) {
         ImmAssociateContext((HWND)g_TrackGame->windowHandle, (HIMC)g_TrackGame->inputContext);
-        area = focusControl->caretRect;
+        area = *(RECT*)((UIEditBox*)focusControl)->caretRect;
         composition.dwStyle = CFS_FORCE_POSITION;
         composition.ptCurrentPos.x = area.left;
         composition.ptCurrentPos.y = area.top;
@@ -1256,7 +1257,7 @@ void GUIUser::EnableImeInput(int enable) {
 }
 
 // 0x00487bf0
-int GUIUser::ClearFocus(GuiControlView** previous) {
+int GUIUser::ClearFocus(UIControl** previous) {
     if (focusControl && !focusControl->pendingRelease)
         focusControl->KillFocus(0);
     if (previous)

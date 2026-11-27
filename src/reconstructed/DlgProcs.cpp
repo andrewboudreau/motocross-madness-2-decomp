@@ -942,7 +942,7 @@ void SPEventDlg::HandleEvent(DialogEvent* event) {
                 value = 999;
             _itoa(value, seed, 10);
             edit->SetEditText(seed);
-            guiUser->RequestFocus((GuiControlView*)edit, 0, 0);
+            guiUser->RequestFocus(edit, 0, 0);
         } else if (!_stricmp("SeedRight", event->controlName)) {
             char seed[32];
             UIEditBox* edit = static_cast<UIEditBox*>(FindControl("EditSeed", 0xb));
@@ -952,7 +952,7 @@ void SPEventDlg::HandleEvent(DialogEvent* event) {
                 value = 0;
             _itoa(value, seed, 10);
             edit->SetEditText(seed);
-            guiUser->RequestFocus((GuiControlView*)edit, 0, 0);
+            guiUser->RequestFocus(edit, 0, 0);
         } else if (!_stricmp("OpponentsLeftArrow", event->controlName) ||
                    !_stricmp("OpponentsRightArrow", event->controlName)) {
             ShowRaceModeControls();
@@ -2149,7 +2149,7 @@ void UserNameDlg::HandleEvent(DialogEvent* event) {
             EndDialog(0);
             FindControl("OkButton", 0)->SetEnabled(0);
         } else {
-            guiUser->RequestFocus((GuiControlView*)edit, 0, 0);
+            guiUser->RequestFocus(edit, 0, 0);
             FindControl("OkButton", 0)->SetEnabled(0);
         }
         break;
@@ -2170,7 +2170,7 @@ void UserNameDlg::HandleEvent(DialogEvent* event) {
         } else {
             UIEditBox* edit = static_cast<UIEditBox*>(FindControl("EditBox", 0));
             edit->SetEditText("");
-            guiUser->RequestFocus((GuiControlView*)edit, 0, 0);
+            guiUser->RequestFocus(edit, 0, 0);
         }
         break;
     case kDialogEditChange: {
@@ -3215,7 +3215,7 @@ void EditBoxDlg::HandleEvent(DialogEvent* event) {
     case kDialogInit:
         editBuffer = 0;
         editBufferSize = 0;
-        guiUser->RequestFocus((GuiControlView*)FindControl("EditBox", 0), 0, 0);
+        guiUser->RequestFocus(FindControl("EditBox", 0), 0, 0);
         break;
     case kDialogCommand:
         if (!_stricmp("OkButton", event->controlName)) {
