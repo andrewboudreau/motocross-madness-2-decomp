@@ -1577,7 +1577,7 @@ int RadarOverlay::LineThrough(const float* p0, const float* p1, float* nx, float
 }
 
 // The race object RadarOverlay's gate drawing reads (see TrackOverlay.h).
-#define RadarRace() ((RadarGateEventView*)g_TrackGame->bajaEnduroEvent)
+#define RadarRace() ((RaceGateEvent*)g_TrackGame->bajaEnduroEvent)
 
 // Cross product as 0x0051cb20 inlines it. The doubled parentheses matter:
 // with them VC6 keeps the folded zero term on the x87 stack and loads the
@@ -1772,23 +1772,23 @@ void RadarOverlay::DrawGates()
     Vector3 left;
     Vector3 right;
     Vector3 rim;
-    float width = RadarRace()->gateEntries[0]->halfWidth;
+    float width = RadarRace()->gateEntries[0]->width;
     for (int i = 0; i < RadarRace()->gateCount; i++) {
         if (RadarRace()->gateEntries[i]->drawEnabled == 0)
             continue;
-        if (i != RadarRace()->currentGate && i != RadarRace()->nextGate)
+        if (i != RadarRace()->lapGate && i != RadarRace()->nextLapGate)
             continue;
-        if (WorldToMap(RadarRace()->gates[i].position, &mapX, &mapY, &rim.x, &rim.y) != 0)
+        if (WorldToMap(RadarRace()->gateSources[i].center, &mapX, &mapY, &rim.x, &rim.y) != 0)
             continue;
-        left = RadarCross(RadarRace()->gates[i].direction, Vector3(0.0f, 1.0f, 0.0f));
+        left = RadarCross(RadarRace()->gateSources[i].direction, Vector3(0.0f, 1.0f, 0.0f));
         left.x *= width;
         left.z *= width;
-        left += RadarRace()->gates[i].position;
-        right = RadarCross(Vector3(0.0f, 1.0f, 0.0f), RadarRace()->gates[i].direction);
+        left += RadarRace()->gateSources[i].center;
+        right = RadarCross(Vector3(0.0f, 1.0f, 0.0f), RadarRace()->gateSources[i].direction);
         right.x *= width;
         right.z *= width;
-        right += RadarRace()->gates[i].position;
-        if (i == RadarRace()->currentGate) {
+        right += RadarRace()->gateSources[i].center;
+        if (i == RadarRace()->lapGate) {
             lineStart.color = 0xffff5e;
             lineEnd.color = 0xffff5e;
         } else {

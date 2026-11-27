@@ -287,32 +287,7 @@ public:
     OverlayRect mapRect;               // map rectangle
 };
 
-// The race object at TrackGame+0x560 as RadarOverlay's gate drawing reads
-// it (bikerace.cpp sees the same records as RaceGateEvent in
-// BikeRace.h): +0xac gates, +0xb0/+0xb4 the current and next gate, +0xd8 the
-// gate records (position, direction) and +0x420 one entry per gate, whose
-// +0x30 enables drawing and whose first +0x50 is the half width.
-struct RadarGatePose {
-    Vector3 position;
-    Vector3 direction;
-};
-
-struct RadarGateObjectView {
-    unsigned char field_0x00[0x30];
-    int drawEnabled;
-    unsigned char field_0x34[0x50 - 0x34];
-    float halfWidth;
-};
-
-struct RadarGateEventView {
-    unsigned char field_0x000[0xac];
-    int gateCount;
-    int currentGate;
-    int nextGate;
-    unsigned char field_0x0b8[0xd8 - 0xb8];
-    RadarGatePose gates[0x23];
-    RadarGateObjectView* gateEntries[1];
-};
+#include "RaceGateEvent.h"  // the gates RadarOverlay draws
 
 // What ChatOverlay+0x16c lists, one per name tag; only these fields are read.
 struct ChatSoultreeObjectView {
