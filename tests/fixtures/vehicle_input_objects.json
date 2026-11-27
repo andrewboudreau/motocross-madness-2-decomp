@@ -13,7 +13,7 @@
     "src/krusty2/vehicle/KrustyBike.cpp": {
       "sections": 271,
       "relocations": 1443,
-      "sha256": "edbdeb837ed6ba90db2915c58959b3f4b90933099d1b4317e73c317fb75a8082"
+      "sha256": "82fb7b66578e86d6e85c6025a48d641f895b59fafa76240197641c21f0a33404"
     },
     "src/reconstructed/VehicleDefaults.cpp": {
       "sections": 13,
@@ -38,7 +38,7 @@
     "src/krusty2/vehicle/BikeAI.cpp": {
       "sections": 98,
       "relocations": 817,
-      "sha256": "003256c4202dfa8c695c3541bdf3d832af3813e938c4950811632590bf03b25c"
+      "sha256": "f3dd300aedde32f530d9d6ec97e1d7518b025970a50b54327dece86717a06d9b"
     },
     "src/reconstructed/InputDevice.cpp": {
       "sections": 11,

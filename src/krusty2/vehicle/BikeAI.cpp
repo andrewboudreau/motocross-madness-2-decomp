@@ -32,6 +32,8 @@
 #include "broadphase/Quadtree.h"
 #include "../../reconstructed/Vegetation.h"
 #include "../../reconstructed/Suspension.h"
+#include "../../reconstructed/BikeRaceCore.h"
+#include "../../reconstructed/RaceView.h"
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
@@ -1740,6 +1742,15 @@ inline Vec3 BikeAINormalizeInline(const Vec3& v)
     return Vec3(invLen * v.x, invLen * v.y, invLen * v.z);
 }
 
+// A gate (RaceGate, BikeRaceNode.h) keeps its centre and direction as
+// Vector3s; the racing line's math is Vec3's (the same three floats).
+static inline const Vec3& GateCenter(const RaceGate* gate) {
+    return *reinterpret_cast<const Vec3*>(&gate->center);
+}
+static inline const Vec3& GateDirection(const RaceGate* gate) {
+    return *reinterpret_cast<const Vec3*>(&gate->direction);
+}
+
 // 0x00414370. Not exact (782 of 4802 bytes, 4765 compiled: retail reloads statusNode->nextGate
 // where VC6 keeps it in edi, and schedules the vector copies and setup stores in another
 // order; docs/BIKEAI.md forms tried).
@@ -1758,11 +1769,11 @@ inline Vec3 BikeAINormalizeInline(const Vec3& v)
 // (retail `cmp ebp, count; jge exit` heads and the `t` test as the back edge).
 int KrustyBike::UpdateAIRacingLine(float dt)
 {
-    KbTrackItem* list;
-    KbTrackItem** tail;
-    KbRaw3 from;
-    KbRaw3 pathPos;
-    KbGate* gate;
+    TrackListItem* list;
+    TrackListItem** tail;
+    TrackPos from;
+    TrackPos pathPos;
+    RaceGate* gate;
     Vec3 a, b, c;
     Vec3 dir;  // the roam offset, later the strip direction (one slot in retail)
     float distance;
@@ -1807,7 +1818,7 @@ int KrustyBike::UpdateAIRacingLine(float dt)
             aiPath.targetSpeed = 1000.0f;
             aiPath.accelLimitScale = aiAccelScale3;
             aiPath.lookAhead = linearSpeed * 0.25f;
-            aiStuntChance = race->aiStuntChance3;
+            aiStuntChance = race->aiSettings[10];
             if (difficulty == 3)
                 trickDelay = trickDelay3;
             else if (difficulty == 2)
@@ -1830,32 +1841,32 @@ int KrustyBike::UpdateAIRacingLine(float dt)
             }
             speed = linearSpeed;
             if (race->raceTrack) {
-                if (!race->raceTrack->ClosestPointOnNode(position, race->raceTrack->startNode,
+                if (!race->raceTrack->ClosestPointOnNode(*reinterpret_cast<TrackVec3*>(&position), race->raceTrack->startNode,
                                                                     &statusNode->placedPos, 0))
                     return 0;
-                if (!statusNode->progressPos.a) {
-                    statusNode->progressPos.a = statusNode->placedPos.a;
-                    statusNode->progressPos.b = statusNode->placedPos.b;
-                    statusNode->progressPos.c = statusNode->placedPos.c;
+                if (!statusNode->progressPos.node) {
+                    statusNode->progressPos.node = statusNode->placedPos.node;
+                    statusNode->progressPos.segment = statusNode->placedPos.segment;
+                    statusNode->progressPos.t = statusNode->placedPos.t;
                 }
                 gate = statusNode->nextGate;
-                if (!gate->trackPos.a)
-                    race->raceTrack->ClosestPointOnNode(gate->position, race->raceTrack->startNode,
+                if (!gate->trackPos.node)
+                    race->raceTrack->ClosestPointOnNode(*reinterpret_cast<TrackVec3*>(&gate->center), race->raceTrack->startNode,
                                                                   &gate->trackPos, 0);
                 gateAhead = race->raceTrack->DistanceAlong(statusNode->progressPos,
                                                                           statusNode->nextGate->trackPos);
                 bikeAhead = race->raceTrack->DistanceAlong(statusNode->placedPos,
                                                                           statusNode->nextGate->trackPos);
                 if (bikeAhead > 0.0f && gateAhead > 0.0f && bikeAhead < gateAhead) {
-                    statusNode->progressPos.a = statusNode->placedPos.a;
-                    statusNode->progressPos.b = statusNode->placedPos.b;
-                    statusNode->progressPos.c = statusNode->placedPos.c;
+                    statusNode->progressPos.node = statusNode->placedPos.node;
+                    statusNode->progressPos.segment = statusNode->placedPos.segment;
+                    statusNode->progressPos.t = statusNode->placedPos.t;
                 }
-                list = (KbTrackItem*)DebugCalloc(1, 0x10, __FILE__, 0x99f);
+                list = (TrackListItem*)DebugCalloc(1, 0x10, __FILE__, 0x99f);
                 if (!list)
                     return 0;
                 list->node = race->raceTrack->startNode;
-                list->next = (KbTrackItem*)DebugCalloc(1, 0x10, __FILE__, 0x9a3);
+                list->next = (TrackListItem*)DebugCalloc(1, 0x10, __FILE__, 0x9a3);
                 if (!list->next)
                     return 0;
                 list->next->node = race->raceTrack->startNode;
@@ -1868,35 +1879,35 @@ int KrustyBike::UpdateAIRacingLine(float dt)
                         if (!race->raceTrack->MoveAlongPath(statusNode->progressPos, &pathPos, &list,
                                                             t * linearSpeed, 0))
                             return 0;
-                        if (!race->raceTrack->PointAt(pathPos, &aiPath.points[i]))
+                        if (!race->raceTrack->PointAt(pathPos, (TrackVec3*)&aiPath.points[i]))
                             return 0;
                         aiPath.points[i].y = position.y + 2.0f;
                         i++;
                     }
                 } else {
                     path->count = 1;
-                    aiPath.points[0] = statusNode->nextGate->position;
+                    aiPath.points[0] = GateCenter(statusNode->nextGate);
                 }
             } else if (statusNode->goalDistance < 300.0f) {
                 path->count = 3;
                 gate = statusNode->nextGate;
-                if (BikeAIDot(gate->position - position, gate->direction) < 0.0f) {
-                    aiPath.points[0] = speed * gate->direction + gate->position;
-                    aiPath.points[2] = statusNode->nextGate->position - speed * statusNode->nextGate->direction;
+                if (BikeAIDot(GateCenter(gate) - position, GateDirection(gate)) < 0.0f) {
+                    aiPath.points[0] = speed * GateDirection(gate) + GateCenter(gate);
+                    aiPath.points[2] = GateCenter(statusNode->nextGate) - speed * GateDirection(statusNode->nextGate);
                 } else {
-                    aiPath.points[0] = gate->position - speed * gate->direction;
-                    aiPath.points[2] = speed * statusNode->nextGate->direction + statusNode->nextGate->position;
+                    aiPath.points[0] = GateCenter(gate) - speed * GateDirection(gate);
+                    aiPath.points[2] = speed * GateDirection(statusNode->nextGate) + GateCenter(statusNode->nextGate);
                 }
-                aiPath.points[1] = statusNode->nextGate->position;
+                aiPath.points[1] = GateCenter(statusNode->nextGate);
             } else {
                 path->count = 1;
-                aiPath.points[0] = statusNode->nextGate->position;
+                aiPath.points[0] = GateCenter(statusNode->nextGate);
             }
             gate = statusNode->nextGate;
-            dx = position.x - gate->position.x;
-            dz = position.z - gate->position.z;
+            dx = position.x - gate->center.x;
+            dz = position.z - gate->center.z;
             if (FastSqrt(dx * dx + dz * dz) < speed) {
-                if (BikeAIDot(SafeNormalize(velocity), SafeNormalize(gate->position - position)) < 0.70755f)
+                if (BikeAIDot(SafeNormalize(velocity), SafeNormalize(GateCenter(gate) - position)) < 0.70755f)
                     aiPath.targetSpeed = 40.0f;
                 else
                     aiPath.targetSpeed = 1000.0f;
@@ -1917,19 +1928,19 @@ int KrustyBike::UpdateAIRacingLine(float dt)
             aiPath.lookAhead = linearSpeed * 0.25f;
         }
     } else {
-        if (!statusNode->progressPos.a || !statusNode->progressPos.b)
+        if (!statusNode->progressPos.node || !statusNode->progressPos.segment)
             return 0;
-        if (!race->finishProbePos.a || !race->finishProbePos.b)
+        if (!race->finishProbe.trackPos.node || !race->finishProbe.trackPos.segment)
             return 0;
-        if (!race->raceTrack->ShortestPath(statusNode->progressPos, race->finishProbePos,
+        if (!race->raceTrack->ShortestPath(statusNode->progressPos, race->finishProbe.trackPos,
                                                              &list, &distance))
             return 0;
         tail = &list;
         while (*tail)
             tail = &(*tail)->next;
-        from = race->finishProbePos;
+        from = race->finishProbe.trackPos;
         from.t += 0.01f;
-        if (!race->raceTrack->ShortestPath(from, race->finishProbePos, tail, &distance))
+        if (!race->raceTrack->ShortestPath(from, race->finishProbe.trackPos, tail, &distance))
             return 0;
         if (onTrack) {
             if (list) {
@@ -1941,7 +1952,7 @@ int KrustyBike::UpdateAIRacingLine(float dt)
                     if (!race->raceTrack->MoveAlongPath(statusNode->progressPos, &pathPos, &list,
                                                         t * linearSpeed, 0))
                         return 0;
-                    if (!race->raceTrack->PointAt(pathPos, &aiPath.points[i]))
+                    if (!race->raceTrack->PointAt(pathPos, (TrackVec3*)&aiPath.points[i]))
                         return 0;
                     aiPath.points[i].y = position.y + 2.0f;
                     i++;
@@ -1971,7 +1982,7 @@ int KrustyBike::UpdateAIRacingLine(float dt)
                     if (!race->raceTrack->MoveAlongPath(statusNode->progressPos, &pathPos, &list,
                                                         g_TrackSearchAhead * t, 0))
                         return 0;
-                    if (!race->raceTrack->PointAt(pathPos, &aiPath.points[i]))
+                    if (!race->raceTrack->PointAt(pathPos, (TrackVec3*)&aiPath.points[i]))
                         return 0;
                     aiPath.points[i].y = position.y + 2.0f;
                     lenSq = BikeAISquareMagnitude(aiPath.points[0] - position);
@@ -1981,7 +1992,7 @@ int KrustyBike::UpdateAIRacingLine(float dt)
                 }
             } else {
                 pathPos = statusNode->progressPos;
-                if (!race->raceTrack->PointAt(statusNode->progressPos, &aiPath.points[0]))
+                if (!race->raceTrack->PointAt(statusNode->progressPos, (TrackVec3*)&aiPath.points[0]))
                     return 0;
             }
         }
@@ -1995,14 +2006,14 @@ int KrustyBike::UpdateAIRacingLine(float dt)
         else if (difficulty == 1)
             aiPath.accelLimitScale = aiAccelScale1;
         if (hasFinished) {
-            onTrack = race->raceTrack->PlaceNear(position, statusNode->progressPos,
+            onTrack = race->raceTrack->PlaceNear(*reinterpret_cast<Vector3*>(&position), statusNode->progressPos,
                                                                         -1.0f, -1.0f, 0, 0);
             if (onTrack) {
                 aiPath.targetSpeed = 40.0f;
-                if (!race->raceTrack->SegmentDirection(statusNode->progressPos.b, &dir))
+                if (!race->raceTrack->SegmentDirection(statusNode->progressPos.segment, (TrackVec3*)&dir))
                     return 0;
-                race->raceTrack->DistanceToStripEdge(position, statusNode->progressPos.b, &right, 10);
-                race->raceTrack->DistanceToStripEdge(position, statusNode->progressPos.b, &left, 11);
+                race->raceTrack->DistanceToStripEdge(*reinterpret_cast<TrackVec3*>(&position), statusNode->progressPos.segment, &right, 10);
+                race->raceTrack->DistanceToStripEdge(*reinterpret_cast<TrackVec3*>(&position), statusNode->progressPos.segment, &left, 11);
                 if (BikeAIDot(dir, bodyForward) < 0.0f)
                     dir = -dir;
                 if (left < right) {

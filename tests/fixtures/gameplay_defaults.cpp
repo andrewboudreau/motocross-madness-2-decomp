@@ -4,17 +4,17 @@
 #include <stddef.h>
 #include "../../src/reconstructed/MovingPart.h"
 #include "../../src/krusty2/vehicle/VehicleSpeedState.h"
-#include "../../src/krusty2/vehicle/BikeRaceHandlerView.h"
+#include "../../src/reconstructed/RaceSound.h"
 typedef char Layout[(sizeof(MovingPart)==0x4c && offsetof(MovingPart,node)==0x40 &&
     offsetof(MovingPart,ownerRef)==0x44 && sizeof(VehicleSpeedState)==0x1e4 &&
-    offsetof(VehicleSpeedState,gearTimer)==0xc && sizeof(KbRaceHandler)==1 &&
-    sizeof(void(KbRaceHandler::*)(void*,float,int))==4)?1:-1];
+    offsetof(VehicleSpeedState,gearTimer)==0xc &&
+    sizeof(void(RaceSound::*)(void*,float,int))==4)?1:-1];
 static unsigned char before[4096];
 static int Invoke(int kind,void* receiver,void* who,float value,int code) {
     __try {
         if(kind==0)((MovingPart*)receiver)->~MovingPart();
         else if(kind==1)((VehicleSpeedState*)receiver)->~VehicleSpeedState();
-        else ((KbRaceHandler*)receiver)->NotifyContactImpulse(who,value,code);
+        else ((RaceSound*)receiver)->NotifyContactImpulse(who,value,code);
     } __except(EXCEPTION_EXECUTE_HANDLER) { return 0; }
     return 1;
 }

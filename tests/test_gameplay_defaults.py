@@ -19,7 +19,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SOURCE = 'src/reconstructed/GameplayDefaults.cpp'
 PROVIDERS = (('??1MovingPart@@QAE@XZ', 0x464e90, 1),
              ('??1VehicleSpeedState@@QAE@XZ', 0x464e90, 1),
-             ('?NotifyContactImpulse@KbRaceHandler@@QAEXPAXMH@Z', 0x4de580, 3))
+             ('?NotifyContactImpulse@RaceSound@@QAEXPAXMH@Z', 0x4de580, 3))
 
 
 @unittest.skipUnless(os.name == 'nt' and os.environ.get('VC6_ROOT') and os.environ.get('MCM2_EXE'),
@@ -100,7 +100,7 @@ class GameplayDefaultTests(unittest.TestCase):
             for source in pins:compile_source(source,ROOT/source)
             obj=compile_source(SOURCE,ROOT/SOURCE,False)
             self.assertEqual([(s.name,s.raw_size,s.characteristics)for s in obj.sections if not s.name.startswith('.debug')],
-                             [('.drectve',40,0x00100a00)]+[('.text',16,0x60501020)]*3)
+                             [('.drectve',82,0x00100a00)]+[('.text',16,0x60501020)]*3)
             self.assertFalse([s for s in obj.symbols if s.storage_class==2 and s.section_number==0])
             self.assertEqual({s.name for s in obj.symbols if s.storage_class==2 and s.section_number>0},{p[0]for p in PROVIDERS})
             self.assertFalse([r for r in obj.relocations if not obj.section(r.section_number).name.startswith('.debug')])
@@ -137,10 +137,10 @@ class GameplayDefaultTests(unittest.TestCase):
                 self.assertEqual([(r.type,start+r.virtual_address-entry.value-1)for r in relocs
                                   if caller.symbol_by_index[r.symbol_index].name==destination],[(20,s)for s in sites])
             # Compiled declaration layout is independent of the decoded vbase arithmetic.
-            layout=out/'layout.cpp';layout.write_text('#include "vehicle/KrustyBike.h"\n#include <stddef.h>\n'
+            layout=out/'layout.cpp';layout.write_text('#include "vehicle/KrustyBike.h"\n#include "../reconstructed/BikeRaceCore.h"\n#include <stddef.h>\n'
                 'typedef char A[(offsetof(Bike,handlebars)==0x60c)?1:-1];\n'
                 'typedef char B[(offsetof(Vehicle,engineState)==0x480)?1:-1];\n'
-                'typedef char C[(offsetof(KrustyBike,race)==0x740&&offsetof(KbRace,handler)==0x44)?1:-1];\n')
+                'typedef char C[(offsetof(KrustyBike,race)==0x740&&offsetof(BikeRace,raceSound)==0x44)?1:-1];\n')
             compile_source('layout',layout)
             fixture='tests/fixtures/gameplay_defaults.cpp';f=compile_source(fixture,ROOT/fixture,False,('--extra','/Od'))
             for symbol,_,_ in PROVIDERS:self.assertEqual(sum(f.symbol_by_index[r.symbol_index].name==symbol for r in f.relocations if r.type==20),1)

@@ -20,6 +20,7 @@ struct TextureContext;
 struct RaceGateEvent;
 struct RaceGatePose;
 class RaceSound;
+class BonusObjectManager;
 class CollisionCharacter;
 struct RaceStatusNode;
 
@@ -125,7 +126,7 @@ public:
     unsigned char field_0x0b1[0xb4 - 0xb1];
     ObjectPicker* objectPicker;                // debug object picker
     int forceAiStep;  // +0xB8  KrustyBike slot 49 takes the BikeAI step 0x00413200 when aiKind or this is set; Create clears it
-    int scoreBoard;                           // +0xbc score board: BonusObjectManager::SetupCounter's object
+    BonusObjectManager* scoreBoard;           // +0xbc score board: BonusObjectManager::SetupCounter's object
     int digitCounter;                         // +0xc0 NumberObjectManager::SetupDigits's object
     RaceStatusNode* statusList;  // +0xC4  race status list: BuildStatusList/FreeStatusList/UpdateLapRace/UpdateGateRace operand
     RaceGate* gateList;                       // +0xc8 gate nodes linked through nextGate

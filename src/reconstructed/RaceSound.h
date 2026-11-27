@@ -91,6 +91,9 @@ public:
     // network games); `stop` rewinds it first.
     void PlayIfEnabled(Sound* sound, int network, int stop, int loop, int unused);
     void PlayScoreSounds(EventKrustyBikeView* racer, float score); // 0x004e57d0
+    // 0x004de580 (ret 0xc): KrustyBike's contact callbacks report each impulse
+    // to the race sound; the body is empty (an identical-COMDAT fold).
+    void NotifyContactImpulse(void* racer, float impulse, int eventKind);
     void PlayItSound();         // 0x004e5860: plays itSound
     // 0x004e5880 (qsort callback): orders channels by cameraDistance.
     static int CompareChannels(const void* a, const void* b);

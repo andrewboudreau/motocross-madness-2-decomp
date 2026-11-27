@@ -39,6 +39,10 @@
 #include "soultree/SoultreePhysicsObject.h"
 #include "../../reconstructed/GhostModCore.h"
 #include "../../reconstructed/MorphBastardModifierCore.h"
+#include "../../reconstructed/RaceSound.h"
+#include "../../reconstructed/TrackOverlay.h"   // ChatOverlay
+#include "../../reconstructed/KrustyBikeCamera.h"
+#include "../../reconstructed/Krusty3DObjects.h"   // BonusObjectManager (the score board)
 
 // KbFloat: identity inline standing in for the original inline float getters (tier 3).
 // Passing a member straight to a float parameter makes VC6 push the raw dword; retail
@@ -218,12 +222,12 @@ void KrustyBike::ApplyStaticContactImpulse(const Vec3* normal, const Vec3* relVe
                                      const Vec3* angScale, int eventKind, int scaleBits, float* impulseOut)
 {
     if (eventKind == 1000) {
-        race->handler->NotifyContactImpulse(this, 0, eventKind);
+        race->raceSound->NotifyContactImpulse(this, 0, eventKind);
         return;
     }
     Bike::ApplyStaticContactImpulse(normal, relVel, arm, angScale, eventKind, scaleBits, impulseOut);
     if (eventKind != 0x67)
-        race->handler->NotifyContactImpulse(this, *impulseOut, eventKind);
+        race->raceSound->NotifyContactImpulse(this, *impulseOut, eventKind);
 }
 
 void KrustyBike::ApplyBodyContactImpulse(const Vec3* normal, Vec3* velA, const Vec3* worldAngVelA,
@@ -234,7 +238,7 @@ void KrustyBike::ApplyBodyContactImpulse(const Vec3* normal, Vec3* velA, const V
 {
     Bike::ApplyBodyContactImpulse(normal, velA, worldAngVelA, armA, eventKind, invMassB, nodeB, velB,
                               worldAngVelB, armB, invInertiaB, angVelB, velBOrNull, impulseOut, scale);
-    race->handler->NotifyContactImpulse(this, *impulseOut, eventKind);
+    race->raceSound->NotifyContactImpulse(this, *impulseOut, eventKind);
 }
 
 // owner: bracket only (0x48dcd0; referenced by pointer from the collision setup, not called)
@@ -345,16 +349,16 @@ void KrustyBike::SnapshotRespawnPose()
     forceGatePass = 0;
     nextLapGate = 1;
     if (statusNode) {
-        KbRaceSub* track = race->raceTrack;
+        Track* track = race->raceTrack;
         if (track) {
             if (race->hasStartProbe) {
-                statusNode->progressPos.a = race->startProbeNode;
-                statusNode->progressPos.b = race->startProbeSegment;
-                statusNode->progressPos.c = race->startProbeT;
+                statusNode->progressPos.node = race->startProbe.trackPos.node;
+                statusNode->progressPos.segment = race->startProbe.trackPos.segment;
+                statusNode->progressPos.t = race->startProbe.trackPos.t;
             } else {
-                statusNode->progressPos.a = (int)track->startNode;
-                statusNode->progressPos.b = race->raceTrack->startNode[2];
-                statusNode->progressPos.c = 0;
+                statusNode->progressPos.node = track->startNode;
+                statusNode->progressPos.segment = race->raceTrack->startNode->firstSegment;
+                statusNode->progressPos.t = 0;
             }
             statusNode->placedPos = statusNode->progressPos;
         }
@@ -364,8 +368,8 @@ void KrustyBike::SnapshotRespawnPose()
         statusNode->progressStep = 0;
         statusNode->progressTotal = 0;
         statusNode->lapOffset = 0;
-        statusNode->previousPosition = Vec3(0.0f, 0.0f, 0.0f);
-        statusNode->currentPosition = Vec3(0.0f, 0.0f, 0.0f);
+        statusNode->previousPosition = Vector3(0.0f, 0.0f, 0.0f);
+        statusNode->currentPosition = Vector3(0.0f, 0.0f, 0.0f);
     }
     netState.timer = g_TrackGame->fullNetPacketIntervalSeconds;
     shortMessageTimer = g_TrackGame->shortNetPacketIntervalSeconds;
@@ -389,9 +393,9 @@ KrustyBike* KrustyBike::FindNearestRival(float* outDistance)
 {
     int cursor = 0;
     KrustyBike* candidate =
-        reinterpret_cast<KrustyBike*>(reinterpret_cast<BikeRace*>(race)->NextBike(&cursor));
+        race->NextBike(&cursor);
     while (candidate && candidate->outOfRace)
-        candidate = reinterpret_cast<KrustyBike*>(reinterpret_cast<BikeRace*>(race)->NextBike(&cursor));
+        candidate = race->NextBike(&cursor);
     KrustyBike* best = 0;
     float bestSq = 3.4028235e38f;
     while (candidate) {
@@ -405,9 +409,9 @@ KrustyBike* KrustyBike::FindNearestRival(float* outDistance)
                 best = candidate;
             }
         }
-        candidate = reinterpret_cast<KrustyBike*>(reinterpret_cast<BikeRace*>(race)->NextBike(&cursor));
+        candidate = race->NextBike(&cursor);
         while (candidate && candidate->outOfRace)
-            candidate = reinterpret_cast<KrustyBike*>(reinterpret_cast<BikeRace*>(race)->NextBike(&cursor));
+            candidate = race->NextBike(&cursor);
     }
     if (outDistance)
         *outDistance = FastSqrt(bestSq);
@@ -915,7 +919,7 @@ GameObject* KrustyBike::Load(void* context, const char* engineName, const char* 
     memset(&netState, 0, sizeof(netState));
     netState.timer = g_TrackGame->fullNetPacketIntervalSeconds;
     shortMessageTimer = g_TrackGame->shortNetPacketIntervalSeconds;
-    this->race = (KbRace*)race;
+    this->race = race;
     netRecorder = (KbRecorder*)recorder;
     this->aiSkill = aiSkill;
     memset(&recordState, 0, sizeof(recordState));
@@ -1177,13 +1181,13 @@ GameObject* KrustyBike::Load(void* context, const char* engineName, const char* 
             switch (g_TrackGame->mode.difficulty) {
             case 3:
             case 4:
-                aiStuntChance = this->race->aiStuntChance3;
+                aiStuntChance = this->race->aiSettings[10];
                 break;
             case 1:
-                aiStuntChance = this->race->aiStuntChance1;
+                aiStuntChance = this->race->aiSettings[8];
                 break;
             case 2:
-                aiStuntChance = this->race->aiStuntChance2;
+                aiStuntChance = this->race->aiSettings[9];
                 break;
             }
         } else {
@@ -1319,8 +1323,8 @@ void KrustyBike::UpdateLocalCenterOfMass()
 int KrustyBike::QueryControlInput(int control, int modifier)
 {
     if (!aiKind && !isRemote && !isGhost) {
-        KbSensor* chat = race->chatOverlay;
-        if (!chat || !chat->typing) {
+        ChatOverlay* chat = race->chatOverlay;
+        if (!chat || !chat->typingEnabled) {
             Bike::QueryControlInput(control, modifier);
             return inputMap->IsControlDown(control, modifier);
         }
@@ -2456,7 +2460,7 @@ void KrustyBike::InterpolateNetworkState(float dt, int copyRaceProgress)
                         if (lapGate == 0)
                             lapCount++;
                         nextLapGate = (lapGate + 1) % g_TrackGame->bajaEnduroEvent->gateCount;
-                        if (this == this->race->raceCamera->followedRacer)
+                        if (this == this->race->raceCamera->krustyBike)
                             g_TrackGame->bajaEnduroEvent->SelectLapGates(lapGate, nextLapGate, this);
                     }
                 }
@@ -2551,7 +2555,7 @@ void KrustyBike::InterpolateNetworkState(float dt, int copyRaceProgress)
                         if (lapGate == 0)
                             lapCount++;
                         nextLapGate = (lapGate + 1) % g_TrackGame->bajaEnduroEvent->gateCount;
-                        if (this == this->race->raceCamera->followedRacer)
+                        if (this == this->race->raceCamera->krustyBike)
                             g_TrackGame->bajaEnduroEvent->SelectLapGates(lapGate, nextLapGate, this);
                     }
                 }
@@ -2860,7 +2864,7 @@ Vec3 KrustyBike::LocalTorqueToAngularAcceleration(const Vec3* localTorque)
 
 int KrustyBike::ShouldUpdateShadowLight()
 {
-    if (staggerCounter == staggerPhase || race->raceCamera->followedRacer == this)
+    if (staggerCounter == staggerPhase || race->raceCamera->krustyBike == this)
         return 1;
     return 0;
 }
@@ -2922,8 +2926,8 @@ float KrustyBike::AwardTrickScore()
     if (trickChained)
         trickMultiplier += 0.5f;
     float score = trickPoints * trickMultiplier;
-    if (race->localRacer == this && race->handler)
-        race->handler->ReportTrickScore(this, score);
+    if (race->localRacer == this && race->raceSound)
+        race->raceSound->PlayScoreSounds((EventKrustyBikeView*)this, score);
     if (!g_TrackGame->mode.raceSettings.eventType ||
         (g_TrackGame->mode.raceSettings.eventType == 4 && g_TrackGame->mode.raceSettings.stuntMode && (void*)g_TrackGame->tagEvent->followedRacer == this)) {
         if (race->localRacer == this) {
@@ -2955,7 +2959,7 @@ float KrustyBike::AwardTrickScore()
                 gain = step * 400.0f;
             }
         }
-        if (this == race->raceCamera->followedRacer) {
+        if (this == race->raceCamera->krustyBike) {
             TextQueueOverlay* sink = g_TrackGame->eventManager->FindTextQueue();
             char text[0x80];
             char line[0x80];
@@ -3159,7 +3163,7 @@ void KrustyBike::SimulateFrame(float dt)
     } else {
         Bike::SimulateFrame(dt);
     }
-    if (race->raceCamera->cameraState == 3 && race->raceCamera->followedBike == this) {
+    if (race->raceCamera->cameraState == 3 && race->raceCamera->bike == this) {
         modelNode->SetPosition(lastFramePosition);
         riderCharacter->modelNode->SetPosition(lastFramePosition);
         drawnAtLastPosition = 1;
@@ -3230,7 +3234,7 @@ void KrustyBike::ApplySpawnCollisionIgnores(int protect)
     int cursor = 0;
     KrustyBike* other;
     if (protect) {
-        for (other = reinterpret_cast<KrustyBike*>(reinterpret_cast<BikeRace*>(race)->NextBike(&cursor)); other; other = reinterpret_cast<KrustyBike*>(reinterpret_cast<BikeRace*>(race)->NextBike(&cursor))) {
+        for (other = race->NextBike(&cursor); other; other = race->NextBike(&cursor)) {
             if (other != this)
                 IgnoreCollisionsWith(other);
         }
@@ -3242,7 +3246,7 @@ void KrustyBike::ApplySpawnCollisionIgnores(int protect)
             }
         }
     } else {
-        for (other = reinterpret_cast<KrustyBike*>(reinterpret_cast<BikeRace*>(race)->NextBike(&cursor)); other; other = reinterpret_cast<KrustyBike*>(reinterpret_cast<BikeRace*>(race)->NextBike(&cursor))) {
+        for (other = race->NextBike(&cursor); other; other = race->NextBike(&cursor)) {
             if (other != this && (!isRemote || !other->isRemote))
                 RestoreCollisionsWith(other);
         }
@@ -3456,7 +3460,7 @@ int KrustyBike::Tick(float dt)
         int cursor = 0;
         int overlap = 0;
         KrustyBike* bike;
-        for (bike = reinterpret_cast<KrustyBike*>(reinterpret_cast<BikeRace*>(race)->NextBike(&cursor)); bike; bike = reinterpret_cast<KrustyBike*>(reinterpret_cast<BikeRace*>(race)->NextBike(&cursor))) {
+        for (bike = race->NextBike(&cursor); bike; bike = race->NextBike(&cursor)) {
             if (!bike->outOfRace && !bike->IsSpawnProtected() && bike != this) {
                 overlap = collisionObject->TestMeshBounds(bike->collisionObject);
                 if (overlap)

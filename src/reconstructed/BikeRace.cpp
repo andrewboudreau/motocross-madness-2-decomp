@@ -453,7 +453,7 @@ BikeRace* BikeRace::Create(void* owner, ParticleManager* particles, LightManager
         }
     } else if (mode == 0 || (mode == 4 && g_TrackGame->mode.raceSettings.stuntMode)) {
         BonusObjectManager* bonus = new(__FILE__, 0x28e) BonusObjectManager(1);
-        scoreBoard = (int)bonus->SetupCounter(renderContext, lights, textures,
+        scoreBoard = bonus->SetupCounter(renderContext, lights, textures,
                                                this, raceCamera);
         if (!AppendChild((GameObject*)scoreBoard, -1))
             return 0;

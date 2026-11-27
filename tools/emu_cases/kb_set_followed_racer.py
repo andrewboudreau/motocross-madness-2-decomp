@@ -8,7 +8,7 @@ score +0x768 (+2500.0f, 0x00550bb8) and vtable slot 50 (+0xc8) SetSpawnProtectio
 
 Stubbed and logged (thiscall): slot 50 on each bike, the local racer's 0x004925a0(racer, false),
 RaceSound::PlayItSound 0x004e5860, the owner's AnnounceFollowedRacer 0x004a9f90(racer,
-previous) and KbScoreBoard::ShowValue 0x0048d1e0(2500.0f, 1.0f). Random: racer and previous
+previous) and BonusObjectManager::ShowValue 0x0048d1e0(2500.0f, 1.0f). Random: racer and previous
 (null, distinct bikes, the local racer, the same bike), the tell flag, ball and scoreboard
 present or null, and the run floats (best above, below or equal to the run, a NaN run now and
 then, which the retail fcompp/C0 test keeps on the best value).
@@ -64,5 +64,5 @@ def setup(ctx, c):
     ctx.stub_at(0x004925a0, 'KrustyBike::SendFollowedRacer', pop=8)
     ctx.stub_at(0x004e5860, 'RaceSound::PlayItSound', pop=0)
     ctx.stub_at(0x004a9f90, 'TrackGameViewOwner::AnnounceFollowedRacer', pop=8)
-    ctx.stub_at(0x0048d1e0, 'KbScoreBoard::ShowValue', pop=8)
+    ctx.stub_at(0x0048d1e0, 'BonusObjectManager::ShowValue', pop=8)
     return dict(ecx=owner, args=[racer, previous, c['tell']], ret_eax=False)

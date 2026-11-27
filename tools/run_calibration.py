@@ -35,10 +35,10 @@ CASES = [
      'target_size': 1,
      'reason': 'Complete independent default identified through actual receiver/member lifetime or argument '
                'dataflow; original TU and view names provisional, no shared-address class identity.'},
-    {'name': 'Gameplay default ?NotifyContactImpulse@KbRaceHandler@@QAEXPAXMH@Z',
+    {'name': 'Gameplay default ?NotifyContactImpulse@RaceSound@@QAEXPAXMH@Z',
      'source': 'src/reconstructed/GameplayDefaults.cpp',
      'bindings': 'src/reconstructed/GameplayDefaults.bindings.json',
-     'symbol': '?NotifyContactImpulse@KbRaceHandler@@QAEXPAXMH@Z',
+     'symbol': '?NotifyContactImpulse@RaceSound@@QAEXPAXMH@Z',
      'target_va': '0x004de580',
      'target_size': 3,
      'reason': 'Complete independent default identified through actual receiver/member lifetime or argument '

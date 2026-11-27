@@ -1,4 +1,4 @@
-"""KbScoreBoard::ShowValue 0x0048d1e0 (tools/emu_diff.py case).
+"""BonusObjectManager::ShowValue 0x0048d1e0 (tools/emu_diff.py case).
 
 Stubs: HideDigits 0x0048d540, ClearFlag14c 0x004fdb50, AddChild 0x004fd910, NextKey 0x0048cad0,
 GetPosition 0x004fc970 (writes the case's racer position) and FastSqrt 0x00460b50 (returns the
@@ -14,7 +14,7 @@ import math
 import struct
 
 RETAIL_VA = 0x0048d1e0
-SYMBOL = '?ShowValue@KbScoreBoard@@QAEXMM@Z'
+SYMBOL = '?ShowValue@BonusObjectManager@@QAEXMM@Z'
 SOURCE = 'src/bringup/Group4_ScoreBoard.cpp'
 PROBES = {0x0048d221: 'points fistp', 0x0048d33a: 'tenths fistp'}
 

@@ -18,6 +18,7 @@
 //   followedRacer(+0xa8) = racer
 #include "vehicle/KrustyBike.h"
 #include "RaceSound.h"
+#include "Krusty3DObjects.h"   // BonusObjectManager (the score board)
 #include "TrackGame.h"   // TrackGameViewOwner (AnnounceFollowedRacer, FollowRacer.cpp)
 
 // Raw view of the race view at owner +0x34 (RaceView.h EventBikeRaceView).
@@ -27,7 +28,7 @@ struct Group3FollowRaceView {
     char pad_0x3c[0x44 - 0x3c];
     RaceSound* raceSound;        // +0x44
     char pad_0x48[0xbc - 0x48];
-    KbScoreBoard* scoreBoard;    // +0xbc
+    BonusObjectManager* scoreBoard;    // +0xbc
 };
 
 // Retail reads the race view from +0x34 afresh at every use (0x4a9f0d,

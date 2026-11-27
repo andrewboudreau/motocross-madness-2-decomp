@@ -7,7 +7,7 @@ their genuine declarations. Each complete body matches authentic VC6 SP3 output:
 | --- | --- | --- |
 | `MovingPart::~MovingPart()` | `0x00464e90` | 1-byte RET |
 | `VehicleSpeedState::~VehicleSpeedState()` | `0x00464e90` | 1-byte RET |
-| `KbRaceHandler::NotifyContactImpulse(void*, float, int)` | `0x004de580` | 3-byte RET 12 |
+| `RaceSound::NotifyContactImpulse(void*, float, int)` | `0x004de580` | 3-byte RET 12 |
 
 These are separate ordinary definitions, not aliases to another class with the
 same small body. Semantic names and original translation-unit ownership remain
@@ -70,13 +70,15 @@ methods or change virtual slots.
 ## Narrow declaration ownership and preservation
 
 MovingPart comes from src/reconstructed/MovingPart.h, the one declaration Tire,
-Shock and Bike share. The VehicleSpeedEntry/VehicleSpeedState and KbRaceHandler
-declarations live in VehicleSpeedState.h and BikeRaceHandlerView.h, which their
-original headers include at the same declaration positions. There is one
+Shock and Bike share. The VehicleSpeedEntry/VehicleSpeedState declarations live in
+VehicleSpeedState.h, which their original headers include at the same declaration
+positions. NotifyContactImpulse is declared in RaceSound.h: KrustyBike calls it on
+the race's RaceSound (BikeRace+0x44). There is one
 definition of each class.
 
 The new source needs only these narrow headers. It compiles without project
-include paths into one 40-byte directive section and three 16-byte code sections,
+include paths into one 82-byte directive section (RaceSound.h's Windows headers
+add `uuid.lib`) and three 16-byte code sections,
 with no imports, nondebug relocations, data or CRT initialization. This avoids
 introducing the unrelated Math3D constants emitted by the broader headers.
 No original include order or original source-file grouping is claimed.

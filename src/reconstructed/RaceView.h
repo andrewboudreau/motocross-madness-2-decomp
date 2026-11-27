@@ -197,8 +197,8 @@ struct EventKrustyBikeView : virtual public GameObject {
     char aiIndex;                             // +0x11c0 AI racer's index in its messages
 };
 
-// The score board at EventBikeRaceView+0xbc (the krustybike sample's
-// KbScoreBoard); only 0x0048d1e0 is declared: shows `score` with `multiplier`
+// The score board at EventBikeRaceView+0xbc (BonusObjectManager, the
+// object SetupCounter returns); only 0x0048d1e0 is declared: shows `score` with `multiplier`
 // (FollowRacer.cpp passes 2500 and 1 for taking over the followed racer).
 struct EventKbScoreBoardView {
     void ShowValue(float score, float multiplier);  // 0x0048d1e0

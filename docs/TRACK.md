@@ -210,7 +210,7 @@ candidates lives in ebp for the whole function with no home. Here
 candidates gets ebp in the strip loop, a slot at +0x20 and is reloaded
 around the path loop, where ebp holds start.t. Dropping the dead
 `list = 0` removes its store (1525 bytes) but retail has it.
-This is the linked body (KbRaceSub::PlaceNear forwards to it). The
+This is the linked body (BikeAI calls it on the race's Track). The
 differential run (tools/emu_cases/track_place_near.py) found one behaviour
 difference, now fixed: the path loop's second DistanceAlong took
 (candidate, start), where retail passes (start, from). The candidate failed

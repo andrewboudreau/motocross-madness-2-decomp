@@ -1097,7 +1097,7 @@ Two more bring-up bodies that rounded with `X87FloatToInt` moved into
 | 0x0048d780 | `KrustyBike::PickTrick` (AI trick pick) | `samples/physics/bikeai/KrustyBikeTrickPick.cpp` | 0.474 | 0.773 |
 | 0x0051af00 | `DropTextOverlay::Setup` | `samples/track/DropTextOverlaySetup.cpp` | 0.501 | 0.632 |
 
-The bodies were removed from `src/bringup/Group3_KrustyBikeAISupport.cpp`
+The bodies were removed from the former `src/bringup/Group3_KrustyBikeAISupport.cpp`
 and the former `src/bringup/Group4_Overlay.cpp`. `DropTextOverlay::Tick` (0x0051b070)
 stays a bring-up body, because `dropSeconds` near zero could push its
 drop outside `int`, where the 64-bit store would differ from retail's. It now
@@ -1159,7 +1159,7 @@ or when only its low bits are kept. `FistpFloatToIntChecked` casts to
 
 | VA | Function | Unit | Helper and range | Before | Now linked |
 |---|---|---|---|---|---|
-| 0x0048d1e0 | `KbScoreBoard::ShowValue` | `Group4_ScoreBoard.cpp` | plain; small scores | 0.485 | 0.681 |
+| 0x0048d1e0 | `BonusObjectManager::ShowValue` | `Group4_ScoreBoard.cpp` | plain; small scores | 0.485 | 0.681 |
 | 0x0049e4a0 | `GridVertexSink::LightVertices` | `Group4_GridLighting.cpp` | plain; colour bytes times facing values | 0.458 | 0.745 |
 | 0x0049e6b0 | `LightAny` worker | same | same | 0.209 | 0.774 |
 | 0x0049f1c0 | `LightOne` worker | same | same | 0.168 | 0.705 |
@@ -1219,7 +1219,7 @@ semantics: the game creates DirectDraw with `DDSCL_FPUSETUP`
 
 | VA | Function | Runs | Differed before | Fix | Now linked |
 |---|---|---|---|---|---|
-| 0x0048d1e0 | `KbScoreBoard::ShowValue` | 6000 | 18 of 2000 (53-bit) | eye vector built in a local, then copied | 0.681 |
+| 0x0048d1e0 | `BonusObjectManager::ShowValue` | 6000 | 18 of 2000 (53-bit) | eye vector built in a local, then copied | 0.681 |
 | 0x0048d780 | trick pick (sample) | 6000 | 0 | none | 0.773 |
 | 0x004a8bf0 | `Character::ApplyMotionAtPhase` (motion start) | 6000 | 0 | none | unchanged |
 | 0x004a8c50 | `Character::ApplyMotionBlendAtPhase` (motion blend) | 3000 | 0 | none | unchanged |
@@ -1268,7 +1268,7 @@ run as retail code; only calls with side effects outside the function
 | 0x0040a520 | `Bike::IntegrateSteerTorque` (steer torque) | 600 | 140 of 600 | both left-bar arms stored the subtraction into `torque` and dotted it, where retail stores `offset` and dots `base` | 0.989 |
 | 0x00436720 | `CollisionObject::HullVsHull` | 600 | 29 of 600 (24-bit) | second contact-normal rotation grouped `(y + z) + x` in place as retail | 0.978 |
 | 0x00427c10 | `SegmentTriangleQuery` (sample) | 800 | 32 of 800 | end point's y row grouped `(y + z) + x` (`TransformPointYZX`) | 0.955 |
-| 0x00517340 | `Track::PlaceNear` (Track.cpp, via `KbRaceSub::PlaceNear`) | 600 | 44 of 600 | path loop's second `DistanceAlong` took (candidate, start); retail passes (start, from) | 0.842 (0.868 before) |
+| 0x00517340 | `Track::PlaceNear` (Track.cpp, called by BikeAI) | 600 | 44 of 600 | path loop's second `DistanceAlong` took (candidate, start); retail passes (start, from) | 0.842 (0.868 before) |
 | 0x00491d10 | `KrustyBike::FindPlacement` | 600 | 112 of 600 | stored-vector path returned the pointer; retail leaves the bits of `outPosition->z` in eax | 0.947 |
 | 0x00414370 | `KrustyBike::UpdateAIRacingLine` (AI racing line) | 1000 | 114 of 1000 | outside free roam retail reads the trick delay from the difficulty's frame slot (an uninitialised local that VC6 gives that slot). Later source shapes, 0 of 1000 at both control words after each: `for (t = T0, i = 0; t <= T1; t += 0.1f)` point loops with a leading count break, the finished bike's off-track exit as an else that frees the list and returns, and the kinds 1/5 count stores through an `&aiPath` pointer (aligned 1092 -> 1188 of 1302) | 0.899 -> 0.951 (strict 0.805 -> 0.921) |
 | 0x0048eea0 | `KrustyBike::UpdateRiderPose` | 1500 | 28 of 1500 | retail indexes the 16-entry `s_kbTrickFrame` (0x0056d060) with chained tricks (16..31) too and reads the next 16 words of `.data`; KrustyBike.cpp's table now has 32 entries holding those words ([below](#chained-trick-frame-overread)) | 0.955 |

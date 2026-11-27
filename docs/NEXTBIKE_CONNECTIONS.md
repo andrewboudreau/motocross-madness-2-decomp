@@ -10,7 +10,7 @@ this call boundary. There is no forwarding implementation or linker alias.
 | --- | --- |
 | `EventBikeRaceView::NextBike` | EventManager, FollowRacer, RaceSound, RaceStatus, TrackOverlay |
 | `VisualCueBikeRaceView::NextBike` | Krusty3DObjects |
-| `KbRace::NextBike` | KrustyBike |
+| `KbRace::NextBike` | KrustyBike (its race is now `BikeRace*`) |
 
 StatsOverlay's stats source and ChatOverlay's race are now typed `BikeRace*`
 (the `StatsBikeRaceView` and `ChatBikeRaceView` views are retired), so those

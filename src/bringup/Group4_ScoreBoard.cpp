@@ -34,7 +34,6 @@
 #include "../reconstructed/Krusty3DObjects.h"
 #include "../reconstructed/Camera.h"
 #include "../../samples/common/FistpFloatToInt.h"
-#include "vehicle/KrustyBikeTypes.h"   // KbScoreBoard
 
 float FastSqrt(float x); // 0x00460b50
 
@@ -57,9 +56,9 @@ static inline void Group4Ovl_ShowModel(BonusObjectManager* self, D3DIMSoultreeOb
 // with its two digits (tenths). Then starts the key animation and points the
 // frame from the camera eye at the local racer's model node, flagging a
 // re-size when that distance changed by more than 1.
-void KbScoreBoard::ShowValue(float points, float multiplier)
+void BonusObjectManager::ShowValue(float points, float multiplier)
 {
-    BonusObjectManager* self = reinterpret_cast<BonusObjectManager*>(this);
+    BonusObjectManager* self = this;
     int place;
     self->HideDigits();
     int places = points >= 10000.0f ? 5 : 4;

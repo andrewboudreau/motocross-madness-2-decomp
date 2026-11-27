@@ -16,12 +16,12 @@ struct KbBikeNetState;
 struct KbBikePing;
 struct KbBikeSetup;
 struct KbBikeState;
-struct KbGhost;
+struct RaceStatusNode;
 struct KbGhostMod;
 struct KbNetDelta;
 struct KbNetState;
 struct KbObj128;
-struct KbRace;
+class BikeRace;
 struct KbRecorder;
 class BikeRace;
 class ControlInterface;
@@ -155,8 +155,8 @@ public:
     char fourStroke;  // +0x737  KbBikeSetup+4; racesnd.cpp selects engine 2 over 1 by it (RaceView +0x737)
     int engineSize;  // +0x738  KbBikeSetup+0 (250 without a setup); +0x79c classes it (<=125, <500); racesnd below 250 uses engine 0
     int plateNumber;  // +0x73C  0x65 from the constructor; BikeRace racer +0x73c plate number (the setup paints it)
-    KbRace* race;  // +0x740  loader race argument
-    KbGhost* statusNode;  // +0x744  race status node (RaceView/BikeRace +0x744); its progressPos (+0x44) is seeded from the start probe
+    BikeRace* race;  // +0x740  the race that loads it (BikeRace::CreateRacers passes `this`)
+    RaceStatusNode* statusNode;  // +0x744  race status node (RaceView/BikeRace +0x744); its progressPos (+0x44) is seeded from the start probe
     int finishTimeStamp;  // +0x748  RaceView +0x748 time stamp; 0x7ffffffe until finished
     float lastLapTime;  // +0x74C  RaceView/BikeRace +0x74c last lap time; FormatLapTime (0x00518690) takes it as a float
     float fastestLap;  // +0x750  RaceView/BikeRace +0x750; EventManager copies it to ZoneReport "FastestLap"; FormatLapTime float
@@ -271,7 +271,7 @@ public:
     float shortMessageTimer;  // +0x15D0  seconds since the last short message (0x00492ad0); starts at shortNetPacketIntervalSec
     int aiTrickId; // 0x15D4  trick id PickTrick chose for the AI (UpdateAIRacingLine 0x00414370), then passed to StartTrick
     float aiSkill; // 0x15D8  loader argument 30: BikeRace passes the racer's skill (0 for players); never read
-    float aiStuntChance;  // +0x15DC KbRace aiStuntChance1/2/3 by difficulty (2.0 outside event type 0) for an AI bike; BikeAI tricks when rand*100 <= it
+    float aiStuntChance;  // +0x15DC BikeRace aiSettings[8..10] by difficulty (2.0 outside event type 0) for an AI bike; BikeAI tricks when rand*100 <= it
     CollisionObject* probeSegment;  // +0x15E0  AI bike's vertical probe segment (0,4,0)-(0,-1,0)
     char aiTricksEnabled;  // +0x15E4 the loader sets it for an AI bike (aiKind) and clears it otherwise; gates BikeAI's trick roll
     char field_0x15e5; // 0x15E5
