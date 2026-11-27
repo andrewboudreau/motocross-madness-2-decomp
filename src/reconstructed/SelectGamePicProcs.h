@@ -81,38 +81,6 @@ struct KrustyUIBikeRecord {
     int fourStroke;                           // +0x90: four-stroke ("BikeFourStroke_%02d")
 };
 
-// The race settings at TrackGame+0x2d70 (0x1ec bytes; InGameProcs.cpp
-// saves and restores the block). Declared as a view: TrackGame.h names the
-// same fields individually.
-struct SelectGameRaceSettingsView {
-    int raceMode;                             // +0x00: race mode (+0x2d70)
-    int eventType;                            // +0x04: event type (+0x2d74)
-    unsigned char series[0x0c - 0x08]; // +0x08: RaceSettings::series (bytes kept)
-    int races;                                // +0x0c: races (+0x2d7c)
-    int treeCollision;                        // +0x10: tree collision (+0x2d80)
-    int riderCollision;                       // +0x14 TrackGame.h RaceSettings+0x14 riderCollision
-    int shortTimeLimit;                       // +0x18 TrackGame.h RaceSettings+0x18 shortTimeLimit
-    int maxBikeClass;                         // +0x1c TrackGame.h RaceSettings+0x1c maxBikeClass
-    int laps;                                 // +0x20: laps (+0x2d90)
-    int opponents;                            // +0x24: opponents (+0x2d94)
-    int multiplayerAiRacerCount;  // +0x28  TrackGame.h RaceSettings+0x28 (the same 0x1ec block)
-    unsigned char randomGates;                // +0x2c: random gates (+0x2d9c)
-    unsigned char gateCount;                  // +0x2d: gate count (+0x2d9d)
-    unsigned char field_0x2e[0x30 - 0x2e];
-    int gateSeed;                             // +0x30: gate seed (+0x2da0)
-    unsigned char trackNumber;                // +0x34: track number (+0x2da4)
-    unsigned char networkPlayerCount;  // +0x35  TrackGame.h RaceSettings+0x35
-    char trackName[0x100];                    // +0x36: track name (+0x2da6)
-    unsigned char field_0x136[0x138 - 0x136];
-    int trackFileTime;  // +0x138  TrackGame.h RaceSettings+0x138 (st_mtime of the track scene)
-    int trackFileSize;  // +0x13C  TrackGame.h RaceSettings+0x13c (st_size of the track scene)
-    float minutes;                            // +0x140: minutes (+0x2eb0)
-    int tagBall;                              // +0x144: tag ball (+0x2eb4)
-    int stuntMode;                            // +0x148: stunt mode (+0x2eb8)
-    unsigned char gridOrder[0x18c - 0x14c];   // +0x14c TrackGame.h RaceSettings::gridOrder (bytes kept)
-    unsigned char lobbySlots[0x1ec - 0x18c];  // +0x18c TrackGame.h RaceSettings::lobbySlots
-};
-
 // One lobby slot (MultiPlayerDlg+0x7f68 holds eight).
 struct LobbySlot {
     int playerId;                             // +0x00: player id (0 when free)

@@ -1592,7 +1592,7 @@ void MPEventDlg::HandleEvent(DialogEvent* event) {
     switch (event->kind) {
     case kDialogInit: {
         selectTrackByName = 0;
-        SelectGameRaceSettingsView* settings = (SelectGameRaceSettingsView*)&g_TrackGame->mode.raceSettings.raceMode;
+        RaceSettings* settings = &g_TrackGame->mode.raceSettings;
         UIListBox* list = static_cast<UIDropDownList*>(FindControl("EventTypeDropDown", 6))->listPart;
         g_TrackGame->LoadResourceString(0x13ed, text, 0x80);
         list->AddRow(text, 1, 0);
@@ -1667,7 +1667,7 @@ void MPEventDlg::HandleEvent(DialogEvent* event) {
             EnableChangeableControls();
         } else if (!_stricmp("DDLTextBox", event->controlName)) {
             int index = static_cast<UIListBox*>(event->control)->GetRowData(-1);
-            SelectGameRaceSettingsView* settings = (SelectGameRaceSettingsView*)&g_TrackGame->mode.raceSettings.raceMode;
+            RaceSettings* settings = &g_TrackGame->mode.raceSettings;
             g_TrackGame->mode.SelectSeries(g_TrackGame->ui->entries[index].series);
             {
                 char* name = g_TrackGame->ui->entries[index].fileName;
@@ -1848,14 +1848,14 @@ void MPEventDlg::ApplyEventType() {
 
 // 0x004f7210
 void MPEventDlg::SyncValues(int apply) {
-    SelectGameRaceSettingsView* settings = (SelectGameRaceSettingsView*)&g_TrackGame->mode.raceSettings.raceMode;
+    RaceSettings* settings = &g_TrackGame->mode.raceSettings;
     if (!g_TrackGame->network || !g_TrackGame->network->isHost)
         return;
     if (apply) {
         if (settings->eventType != 0 && settings->eventType != 4)
-            settings->laps = static_cast<UIListBox*>(FindControl("LapsListBox", 3))->GetRowData(-1);
+            settings->lapCount = static_cast<UIListBox*>(FindControl("LapsListBox", 3))->GetRowData(-1);
         else
-            settings->minutes = (float)static_cast<UIListBox*>(FindControl("LapsListBox", 3))->GetRowData(-1);
+            settings->timeLimitMinutes = (float)static_cast<UIListBox*>(FindControl("LapsListBox", 3))->GetRowData(-1);
         if (!g_TrackGame->mode.championshipInProgress)
             settings->races = static_cast<UIListBox*>(FindControl("RacesListBox", 3))->GetRowData(-1);
         strcpy(settings->trackName, "");
@@ -1887,9 +1887,9 @@ void MPEventDlg::SyncValues(int apply) {
         static_cast<UIListBox*>(FindControl("RacesListBox", 3))->SelectRowByData(settings->races);
         UIListBox* laps = static_cast<UIListBox*>(FindControl("LapsListBox", 3));
         if (settings->eventType != 0 && settings->eventType != 4)
-            laps->SelectRowByData(settings->laps);
+            laps->SelectRowByData(settings->lapCount);
         else
-            laps->SelectRowByData((int)settings->minutes);
+            laps->SelectRowByData((int)settings->timeLimitMinutes);
         UIListBox* list = static_cast<UIDropDownList*>(FindControl("EventTypeDropDown", 6))->listPart;
         list->SelectRowByData(g_TrackGame->mode.raceSettings.eventType);
         list = static_cast<UIDropDownList*>(FindControl("RaceModeDropDown", 6))->listPart;

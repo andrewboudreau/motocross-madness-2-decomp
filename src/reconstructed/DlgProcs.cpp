@@ -866,7 +866,7 @@ void SPEventDlg::HandleEvent(DialogEvent* event) {
     char text[128];
     switch (event->kind) {
     case kDialogInit: {
-        SelectGameRaceSettingsView* settings = (SelectGameRaceSettingsView*)&g_TrackGame->mode.raceSettings.raceMode;
+        RaceSettings* settings = &g_TrackGame->mode.raceSettings;
         UIListBox* list = static_cast<UIDropDownList*>(FindControl("EventTypeDropDown", 6))->listPart;
         g_TrackGame->LoadResourceString(0x13ed, text, 0x80);
         list->AddRow(text, 1, 0);
@@ -889,7 +889,7 @@ void SPEventDlg::HandleEvent(DialogEvent* event) {
         g_TrackGame->LoadResourceString(0x13f6, text, 0x80);
         list->AddRow(text, 4, 1);
         list->SelectRow(settings->raceMode);
-        FindControl("OpponentsListBox", 0)->BindValue(&settings->opponents);
+        FindControl("OpponentsListBox", 0)->BindValue(&settings->aiRacerCount);
         FindControl("ChkRecordRace", 0)->Show(0, 1);
         FindControl("RadLODEasy", 0)->BindValue(&g_TrackGame->mode.difficulty);
         UIListBox* gates = static_cast<UIListBox*>(FindControl("LstNumGates", 3));
@@ -1134,12 +1134,12 @@ void SPEventDlg::ApplyEventType() {
 // 0x0044e6c0
 void SPEventDlg::SyncValues(int apply) {
     char seed[128];
-    SelectGameRaceSettingsView* settings = (SelectGameRaceSettingsView*)&g_TrackGame->mode.raceSettings.raceMode;
+    RaceSettings* settings = &g_TrackGame->mode.raceSettings;
     if (apply) {
         if (settings->eventType != 0 && settings->eventType != 4)
-            settings->laps = static_cast<UIListBox*>(FindControl("LapsListBox", 3))->GetRowData(-1);
+            settings->lapCount = static_cast<UIListBox*>(FindControl("LapsListBox", 3))->GetRowData(-1);
         else
-            settings->minutes = (float)static_cast<UIListBox*>(FindControl("LapsListBox", 3))->GetRowData(-1);
+            settings->timeLimitMinutes = (float)static_cast<UIListBox*>(FindControl("LapsListBox", 3))->GetRowData(-1);
         if (!g_TrackGame->mode.championshipInProgress)
             settings->races = static_cast<UIListBox*>(FindControl("RacesListBox", 3))->GetRowData(-1);
         settings->treeCollision = static_cast<UIMultiState*>(FindControl("ChkTreeCollision", 2))->GetSelectedState();
@@ -1185,9 +1185,9 @@ void SPEventDlg::SyncValues(int apply) {
         static_cast<UIEditBox*>(FindControl("EditSeed", 0xb))->SetEditText(seed);
         UIListBox* laps = static_cast<UIListBox*>(FindControl("LapsListBox", 3));
         if (settings->eventType != 0 && settings->eventType != 4)
-            laps->SelectRowByData(settings->laps);
+            laps->SelectRowByData(settings->lapCount);
         else
-            laps->SelectRowByData((int)settings->minutes);
+            laps->SelectRowByData((int)settings->timeLimitMinutes);
         static_cast<UIMultiState*>(FindControl("ChkTreeCollision", 2))->SetCurrentState(settings->treeCollision);
         UIListBox* list = static_cast<UIDropDownList*>(FindControl("EventTypeDropDown", 6))->listPart;
         list->SelectRowByData(g_TrackGame->mode.raceSettings.eventType);

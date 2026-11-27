@@ -248,23 +248,6 @@ public:
 
 #include "RaceGateEvent.h"  // the gates RadarOverlay draws
 
-// What ChatOverlay+0x16c lists, one per name tag; only these fields are read.
-struct ChatSoultreeObjectView {
-    unsigned char field_0x000[0x14c];
-    int hideNameTag;                          // hides the name tag
-};
-
-struct ChatKrustyBikeView {
-    unsigned char field_0x000[0x3bc];
-    ChatSoultreeObjectView* racerState;
-    unsigned char field_0x3c0[0x4a4 - 0x3c0];
-    float driveForceScale;                    // +0x4A4  Vehicle +0x4a4 driveForceScale (the racer is a KrustyBike: +0x5e0 riderName, +0x784 finishPosition); the name tag prints it while 0x0068a444 is set
-    unsigned char field_0x4a8[0x5e0 - 0x4a8];
-    char name[0x10];                          // name
-    unsigned char field_0x5f0[0x784 - 0x5f0];
-    int position;                             // +0x784 the racer's position (RaceView.h finishPosition); ChatOverlay+0x19c keeps the last value
-};
-
 // One chat history line (0x5c bytes).
 struct ChatHistoryEntry {
     int value;
@@ -349,9 +332,9 @@ public:
     int nameLineRight;                        // +0x160 right edge of the drawn cue line (0x0051e800)
     int cueTagShown;                          // +0x164 ShowCueTag's flag
     int nameChanged;                          // name changed
-    ChatKrustyBikeView* racers[11];
+    KrustyBike* racers[11];
     int racerCount;                           // +0x198 entries in racers; also the extra name tag's index
-    int lastRacerValues[11];                  // racers[i]->position last seen
+    int lastRacerValues[11];                  // racers[i]->finishPosition last seen
     Overlay* leftPanel;                       // +0x1c8 side panel left of chatRect on wide screens (0x0051cf80)
     Overlay* rightPanel;                      // +0x1cc side panel right of chatRect
     float cueSquaredDistance;                 // +0x1d0 drawn as its square root (0x0051e800)

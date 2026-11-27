@@ -1334,7 +1334,7 @@ int RadarOverlay::TakeRacers(BikeRace* view, int chat)
     racerCount = 0;
     iterator = 0;
     radarView = view;
-    while ((racer = reinterpret_cast<KrustyBike*>(reinterpret_cast<BikeRace*>(radarView)->NextBike(&iterator))) != 0) {
+    while ((racer = radarView->NextBike(&iterator)) != 0) {
         racers[racerCount] = racer;
         racerCount++;
     }
@@ -1647,12 +1647,6 @@ int RadarOverlay::IntersectLineCircle(const float* a, const float* b, const floa
     return 2;
 }
 
-// The view RadarOverlay draws (+0x12c) holds its track at +0x48.
-struct RadarBikeRaceView {
-    unsigned char field_0x00[0x48];
-    Track* track;                              // +0x48
-};
-
 // 0x0051c720. Not exact (254 of 1016 bytes, 1002 compiled: frame 0x74 against
 // retail's 0x8c, the entering clip's hit-point store order and the child loop;
 // docs/TRACKOVERLAY.md forms tried)
@@ -1663,7 +1657,7 @@ void RadarOverlay::DrawTrackOutline(int mode)
 {
     TrackListItem* list = 0;
     TrackListItem* item = (TrackListItem*)DebugCalloc(1, sizeof(TrackListItem), __FILE__, 1992);
-    item->node = ((RadarBikeRaceView*)radarView)->track->startNode;
+    item->node = radarView->raceTrack->startNode;
     item->next = list;
     list = item;
     while (list) {
@@ -1954,18 +1948,18 @@ ChatOverlay* ChatOverlay::Setup(RenderTarget* target, TextureMapManager* manager
 int ChatOverlay::CollectRacers(BikeRace* view)
 {
     int iterator;
-    ChatKrustyBikeView* racer;
+    KrustyBike* racer;
     racerCount = 0;
     iterator = 0;
     chatView = view;
-    while ((racer = reinterpret_cast<ChatKrustyBikeView*>(chatView->NextBike(&iterator))) != 0) {
+    while ((racer = chatView->NextBike(&iterator)) != 0) {
         racers[racerCount] = racer;
         racerCount++;
     }
     for (int i = 0; i < racerCount; i++) {
         nameTags[i] = (new(__FILE__, 2369) NameOverlay(1))->Create(
             (RenderTarget*)renderContext, overlayTexture, &nameTagRects[i], 0, &nameTagRects[i],
-            (KrustyBike*)racers[i],
+            racers[i],
             chatView, i);
         AppendChild(nameTags[i], -1);
     }
@@ -2191,13 +2185,13 @@ int ChatOverlay::RenderPre3D()
         RedrawNameTags(-1);
     } else {
         for (int i = 0; i < racerCount; i++) {
-            if (g_TrackGame->mode.showRiderPositions && lastRacerValues[i] != racers[i]->position) {
+            if (g_TrackGame->mode.showRiderPositions && lastRacerValues[i] != racers[i]->finishPosition) {
                 RedrawNameTags(i);
-                lastRacerValues[i] = racers[i]->position;
+                lastRacerValues[i] = racers[i]->finishPosition;
             }
-            if (racers[i]->racerState->hideNameTag)
+            if (racers[i]->modelNode->hidden)
                 nameTags[i]->Disable();
-            else if (racers[i] == (ChatKrustyBikeView*)chatView->localRacer &&
+            else if (racers[i] == chatView->localRacer &&
                      chatCamera->krustyBike == chatView->localRacer)
                 nameTags[i]->Disable();
             else
@@ -2232,7 +2226,7 @@ int ChatOverlay::Render3D()
 //   arm is no longer the last block before the "%.3f"/positions branch and the
 //   scratch rotation enters that branch one register later (racer eax, buffer
 //   ecx, game edx);
-// - the positions block reads `racers[index]->position` twice instead of through
+// - the positions block reads `racers[index]->finishPosition` twice instead of through
 //   a block-local racer pointer.
 // Forms that did not move it while the if/else was in place (966): rect.left =
 // rect.left + ..., a per-branch length, a racer local in the "%.3f" branch, a (double)
@@ -2271,15 +2265,15 @@ void ChatOverlay::DrawNameTag(void* dc, int index)
             sprintf(text, "%.3f", racers[index]->driveForceScale);
         } else {
             if (g_TrackGame->mode.showRiderPositions) {
-                if (racers[index]->position > 0)
-                    sprintf(text, "%d", racers[index]->position);
+                if (racers[index]->finishPosition > 0)
+                    sprintf(text, "%d", racers[index]->finishPosition);
                 else
                     strcpy(text, "--");
             } else {
                 strcpy(text, "");
             }
             if (g_TrackGame->mode.showRiderNames)
-                strcpy(name, racers[index]->name);
+                strcpy(name, racers[index]->riderName);
             else
                 strcpy(name, "");
             if (g_TrackGame->mode.showRiderPositions && g_TrackGame->mode.showRiderNames)
