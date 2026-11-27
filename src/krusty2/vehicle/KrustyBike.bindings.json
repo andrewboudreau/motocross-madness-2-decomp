@@ -250,7 +250,7 @@
   "?UpdateDriveShare@Tire@@QAEXPAVTireVehicle@@@Z": "0x00513f90",
   "?UpdatePlacement@CollisionObject@@QAEXXZ": "0x00435fb0",
   "?UpdateWheelsInContact@Vehicle@@QAEXXZ": "0x00529a20",
-  "?WorldToLocalDirection@KbXform@@QAE?AUVec3@@PBU2@@Z": "0x004fd710",
+  "?WorldToLocalDirection@SoultreeObject@@QAE?AUVec3@@ABU2@@Z": "0x004fd710",
   "?g_MemTagStack@@3PAVMemTagStack@@A": "0x0056df04",
   "?g_kbAllowNegative@@3HA": "0x0056cb5c",
   "?g_kbAllowWarping@@3HA": "0x0056cb44",

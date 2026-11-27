@@ -12,7 +12,6 @@ struct KbSession;
 struct KbPlayer;
 struct KbBody;
 struct KbSink;
-struct KbXform;
 struct KbChild;
 struct KbObj128;
 struct KbBonusTable;
@@ -174,13 +173,6 @@ struct KbSink {                    // view of the wheel Shock (vtable: 0 Reset, 
     virtual void UnknownVirtualSlot5();
 };
 
-// Matrix-like helper at +0x3bc (D3DIMSoultreeCharacter::d3d_field_0x1a0); 0x004FD710
-// transforms a vector.
-struct KbXform {
-    Vec3 WorldToLocalDirection(const Vec3* v);
-    // D3DIMSoultreeObject setters (names from src/reconstructed/D3DIMSoulTree.h): 0x0048fc80 calls
-    // these with 0 or 1 on the bike and rider nodes.
-};
 // Element of the array at Bike+0x12c (count at +0x130).
 struct KbChild {
     int pad_0[1];

@@ -2835,7 +2835,7 @@ void KrustyBike::RemoveFromRace()
 void KrustyBike::ApplyWorldTorque(const Vec3* worldTorque, Vec3* angularAccel)
 {
     Vec3 localAccel;
-    Vec3 localTorque = ((KbXform*)modelNode)->WorldToLocalDirection(worldTorque);
+    Vec3 localTorque = modelNode->WorldToLocalDirection(*worldTorque);
     if (!crashState) {
         localAccel.x = localTorque.x * invInertia.x;
         localAccel.y = localTorque.y * invInertia.y;
