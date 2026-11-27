@@ -138,13 +138,6 @@ struct ModifierSoultreeSurfaceView {
     int mappingOffsetV;
 };
 
-// The D3DIMSoultreeObject passed to slot 27, seen from this file: only its
-// current level of detail at +0x27c (src/reconstructed/BoundingBoxTreeBuild.h).
-struct MorphBastardSoultreeView {
-    unsigned char field_0x000[0x27c];
-    int drawUnchanged;                // nonzero: draw the mesh unchanged
-};
-
 #include "MorphBastardModifierCore.h"
 
 // 0x004a3bb0: qsort order of MorphBastardTarget by value.

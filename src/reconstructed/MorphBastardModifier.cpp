@@ -6,6 +6,7 @@
 #include <string.h>
 
 #include "MorphBastardModifier.h"
+#include "D3DIMSoulTree.h"
 
 #include "DebugAlloc.h"
 #include "Parameterblocks.h"
@@ -459,7 +460,7 @@ void MorphBastardModifier::UpdateChannels(MorphBastardObject* object)
 void MorphBastardModifier::ModifyMesh(D3DIMSoultreeObject* object, ModifierSoultreeSurfaceView* mesh,
                                       ModifierSoultreeSurfaceView** out)
 {
-    if (((MorphBastardSoultreeView*)object)->drawUnchanged) {
+    if (object->currentLod) {
         *out = mesh;
         return;
     }

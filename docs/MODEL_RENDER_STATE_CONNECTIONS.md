@@ -8,7 +8,7 @@ object layout is added or changed.
 | Existing provider | Retail entry | Complete bytes | Retired receiver views |
 | --- | --- | ---: | --- |
 | SetUseLighting(int) | `0x4444c0` | 23 | BikeA1A0, KrustyUISoultreeObjectView, SceneSoultreeObjectView, SoultreeD3DNode, StartD3DIMSoultreeObjectView |
-| ClearScreenRects() | `0x4444e0` | 55 | BikeA1A0, VehSceneNodeView::Method_004444E0 |
+| ClearScreenRects() | `0x4444e0` | 55 | BikeA1A0 |
 | SetLod(int) | `0x444d00` | 56 | KbXform, RacerD3DIMSoultreeObjectView |
 | SetLowestLod(int) | `0x444d40` | 32 | KbXform, RacerD3DIMSoultreeObjectView |
 | ApplyLodSettings(int) | `0x4451e0` | 81 | RacerD3DIMSoultreeObjectView, SceneSoultreeObjectView |

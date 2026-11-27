@@ -24,8 +24,7 @@ the values before the reset test runs. Four private constants and four normal
 initializer routes remain in this object; their extra copies do not establish
 original TU grouping or the retail executable's full initialization order.
 
-The obsolete VehSceneNodeView::SetAxesPtr call now uses the actual primary
-SoultreeObject pointer. The full reset bytes and all 15 old sample sections
+The SetAxesPtr call uses the actual primary SoultreeObject pointer. The full reset bytes and all 15 old sample sections
 are preserved under the two storage joins and one method-name join. There
 is no added wrapper or copied machine code. Its only external requirements
 are `__fltused` and these three existing complete strict methods:

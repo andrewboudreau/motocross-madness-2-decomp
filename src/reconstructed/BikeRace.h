@@ -46,7 +46,6 @@ class Terrain;  // broadphase/Terrain.h (src/krusty2)
 class LightManager;
 struct TextureContext;
 struct BikeEngineSetup;
-struct LodBikeRaceView;
 struct ReceivedRacerState;
 struct RacerDeltaMessage;
 
@@ -68,13 +67,6 @@ struct BikeEngineSetup {
     int rpmLowerLimit;                        // +0x50 "RPMLowerLimit"
     int rpmUpperLimit;                        // +0x54 "RPMUpperLimit"
     int rpmStep;                              // +0x58 a tenth of their range
-};
-
-// The object at a racer's +0x740 (its view, BikeRace): +0x18c set keeps the
-// racer's model at full detail when the camera follows another one.
-struct LodBikeRaceView {
-    unsigned char field_0x000[0x18c];
-    char forceHighLod;                        // +0x18c BikeRace's "ForceHighLOD"
 };
 
 // A racer's network state (0x58 bytes, network message 1).
