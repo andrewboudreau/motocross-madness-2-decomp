@@ -39,7 +39,11 @@ public:
 
     unsigned char field_0x000[0x10a];
     unsigned char asleep;                     // +0x10a SoultreePhysicsBaseObject::asleep; cleared when the followed racer changes (0x004a9e80)
-    unsigned char field_0x10b[0x708 - 0x10b];
+    unsigned char field_0x10b[0x21c - 0x10b];
+    // +0x21c: the ball's D3DIMSoultreeObject subobject (SoultreePhysicsObject
+    // layout); VisualCue::Tick (0x0048b100) turns the cue toward its
+    // SoultreeObject::GetPosition (0x004fc970).
+    unsigned char sceneObject[0x708 - 0x21c];
     KrustyVCR* recorder;                      // +0x708
 };
 

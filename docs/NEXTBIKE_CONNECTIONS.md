@@ -2,14 +2,14 @@
 
 Seven production callers now call the existing `BikeRace::NextBike(int*)`
 provider at **0x004204e0, 162 bytes**. The callers are EventManager, FollowRacer,
-RaceSound, RaceStatus, TrackOverlay, Krusty3DObjects and KrustyBike. They retain
-their partial object views for other operations and explicitly cast only at
-this call boundary. There is no forwarding implementation or linker alias.
+RaceSound, RaceStatus, TrackOverlay, Krusty3DObjects and KrustyBike. Each now
+holds the race as `BikeRace*`, and the results are `KrustyBike*`, so no call
+needs a cast. There is no forwarding implementation or linker alias.
 
 | Retired production method name | Existing caller view |
 | --- | --- |
 | `EventBikeRaceView::NextBike` | EventManager, FollowRacer, RaceSound, RaceStatus, TrackOverlay |
-| `VisualCueBikeRaceView::NextBike` | Krusty3DObjects |
+| `VisualCueBikeRaceView::NextBike` | Krusty3DObjects (VisualCue's race is now `BikeRace*`, its racers `KrustyBike*`) |
 | `KbRace::NextBike` | KrustyBike (its race is now `BikeRace*`) |
 
 StatsOverlay's stats source and ChatOverlay's race are now typed `BikeRace*`
@@ -40,13 +40,11 @@ creation uses the KrustyBike constructor at 0x0048fa60 and the 0x1638-byte
 allocation. KrustyBike has a primary subobject at zero, a character subobject
 at +0x21c and a virtual GameObject at +0x160c (retail COLs 0x0055d078,
 0x0055d008 and 0x0055cff0). These secondary pointers must not replace the
-primary pointer returned by the iterator. The explicit result casts preserve
-that primary value. The event/visual views' position at +0x0c and the
-event/KrustyBike race pointer at +0x740 are checked under native VC6. BikeRace
-itself returns the canonical `KrustyBike*`. This does **not** establish full type
-or virtual-base layout equivalence between `VisualCueKrustyBikeView` and
-`KrustyBike`; its partial declaration and existing access code are retained.
-(EventManager's racer view was retired for `KrustyBike` itself.)
+primary pointer returned by the iterator. KrustyBike's position at +0x0c and
+race pointer at +0x740, and VisualCue's race (+0xa8) and racer array (+0xcc),
+are checked under native VC6. BikeRace itself returns the canonical
+`KrustyBike*`; the racer views EventManager and VisualCue used are retired for
+it.
 
 ## Shared declaration
 

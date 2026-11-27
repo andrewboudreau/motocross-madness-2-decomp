@@ -14,7 +14,7 @@
   "??_GNationalRace@@UAEPAXI@Z": "0x004aa820",
   "?AppendChild@GameObject@@QAEHPAV1@H@Z": "0x00469190",
   "?SetupLights@RunwayLights@@QAEPAV1@PAXPBVLightManager@@PBUTextureContext@@PAVTerrain@@@Z": "0x0048a600",
-  "?SetRacer@RunwayLights@@QAEXPAURunwayKrustyBikeView@@@Z": "0x0048ad50",
+  "?SetRacer@RunwayLights@@QAEXPAVKrustyBike@@@Z": "0x0048ad50",
   "?Create@NationalRace@@QAEPAV1@PAVRenderTarget@@P6AXPAH@Z@Z": "0x004aa850",
   "?Create@BaseQuarryEvent@@QAEPAV1@PAVRenderTarget@@P6AXPAH@Z@Z": "0x004de3b0",
   "?Setup@DropTextOverlay@@QAEPAV1@PAXPAVTextureMapManager@@MHHPBD@Z": "0x0051af00",

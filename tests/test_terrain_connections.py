@@ -64,7 +64,9 @@ PARTIAL = (
     # the body bytes and the other 64 relocation records are identical.
     # GroundFogableObject's FogVertices declaration renumbers it ($L6476 -> $L6468);
     # the body bytes and the other 64 relocation records are identical.
-    ('?Load@Terrain@@', 2117, 'a0b43e98c152098129fc11467f582a51d4cec7060da4d7b8535652ade158cbee'),
+    # Tire.h/CollisionPoint.h's relative includes renumber it again; the body
+    # bytes and the other 64 relocation records are identical.
+    ('?Load@Terrain@@', 2117, 'dff313e9677e8d4f5067a17e27aeb927ed471ad6940a14d9e2cace97e32f3f87'),
     # Intentional cell-conversion repair, verified at the actual first-cell
     # boundary in test_terrain_cell_conversion; full interpolation remains partial.
     # The sampler, dot and triangle provider names are now canonical, with

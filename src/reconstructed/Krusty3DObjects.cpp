@@ -5,10 +5,12 @@
 #include "../krusty2/broadphase/Terrain.h"
 #include "BikeRaceCore.h"
 #include "../krusty2/vehicle/KrustyBikeCore.h"
+#include "../krusty2/tire/Tire.h"
 #include "RaceView.h"
 #include "TrackGame.h"
 #include "Krusty3DObjects.h"
 #include "KrustyBikeCamera.h"
+#include "RaceGateEvent.h"
 
 #include <math.h>
 #include <stdio.h>
@@ -93,7 +95,7 @@ int RunwayLights::Tick(float frameTime) {
         return 1;
     for (int i = 0; i < 5; i++)
         lightModels[i]->isVisible = 0;
-    if (trackedRacer->finished)
+    if (trackedRacer->hasFinished)
         return 1;
     blinkTimer += frameTime;
     if (blinkTimer > 1.375f)
@@ -103,19 +105,19 @@ int RunwayLights::Tick(float frameTime) {
     Vector3 direction;
     Vector3 position;
     Vector3 next;
-    if (trackedRacer->bikeView->raceTrack) {
-        trackedRacer->bikeView->raceTrack->PointAt(trackedRacer->statusNode->placedPos, (Vec3*)&position);
-        trackedRacer->bikeView->raceTrack->PointAt(trackedRacer->statusNode->progressPos, (Vec3*)&next);
+    if (trackedRacer->race->raceTrack) {
+        trackedRacer->race->raceTrack->PointAt(trackedRacer->statusNode->placedPos, (Vec3*)&position);
+        trackedRacer->race->raceTrack->PointAt(trackedRacer->statusNode->progressPos, (Vec3*)&next);
         direction = position - next;
     } else {
-        position = trackedRacer->trackPoint;
-        next = trackedRacer->trackPoint;
-        direction = trackedRacer->trackDirection;
+        position = *(Vector3*)&trackedRacer->respawnPosition;
+        next = *(Vector3*)&trackedRacer->respawnPosition;
+        direction = *(Vector3*)&trackedRacer->respawnHeading;
     }
     if (direction.x == 0.0f && direction.z == 0.0f) {
-        position = trackedRacer->trackPoint;
-        next = trackedRacer->trackPoint;
-        direction = trackedRacer->trackDirection;
+        position = *(Vector3*)&trackedRacer->respawnPosition;
+        next = *(Vector3*)&trackedRacer->respawnPosition;
+        direction = *(Vector3*)&trackedRacer->respawnHeading;
     } else {
         Normalize(direction);
     }
@@ -160,7 +162,7 @@ int RunwayLights::Tick(float frameTime) {
 }
 
 // 0x0048ad50
-void RunwayLights::SetRacer(RunwayKrustyBikeView* racer) {
+void RunwayLights::SetRacer(KrustyBike* racer) {
     trackedRacer = racer;
 }
 
@@ -181,7 +183,7 @@ VisualCue::VisualCue(int flags) : ArcadeObject(flags) {
 
 // 0x0048adf0
 VisualCue* VisualCue::LoadVisualCue(void* context, const LightManager* lights, const TextureContext* textures, Terrain* terrain,
-                                    Vector3 position, VisualCueBikeRaceView* view, int pixels,
+                                    Vector3 position, BikeRace* view, int pixels,
                                     Camera* camera, float size, float screenXFraction,
                                     float screenYFraction) {
     char name[0x104];
@@ -201,14 +203,14 @@ VisualCue* VisualCue::LoadVisualCue(void* context, const LightManager* lights, c
 }
 
 // 0x0048af20
-void VisualCue::CollectRacers(VisualCueBikeRaceView* view) {
+void VisualCue::CollectRacers(BikeRace* view) {
     int iterator;
-    VisualCueKrustyBikeView* racer;
+    KrustyBike* racer;
 
     cueRacerCount = 0;
     iterator = 0;
     cueView = view;
-    while ((racer = reinterpret_cast<VisualCueKrustyBikeView*>(reinterpret_cast<BikeRace*>(cueView)->NextBike(&iterator))) != 0) {
+    while ((racer = cueView->NextBike(&iterator)) != 0) {
         cueRacers[cueRacerCount] = racer;
         cueRacerCount++;
     }
@@ -220,10 +222,10 @@ void VisualCue::CollectRacers(VisualCueBikeRaceView* view) {
 int VisualCue::OnControlPress(ControlEvent* event, InputButtonState* entry) {
     int active = 0;
     for (int i = 0; i < cueRacerCount; i++)
-        if (cueRacers[i]->IsCueRacerEnabled())
+        if (cueRacers[i]->isEnabled)
             active++;
     if (TestInputEvent(0x14, 0, event, 0x80000000) && !cueView->chatOpen &&
-        cueView->racing && active > 1) {
+        cueView->isRacing && active > 1) {
         cycleCues = 1 - cycleCues;
         return 1;
     }
@@ -249,12 +251,6 @@ int VisualCue::OnControlPress(ControlEvent* event, InputButtonState* entry) {
 }
 
 #define UNKNOWN_DEGREES_TO_RADIANS(degrees) ((degrees) * 0.01745329f)
-
-// The owner a VisualCue compares its camera with (its +0x18).
-struct VisualCueRenderTargetView {
-    unsigned char field_0x00[0x08];
-    Camera* currentCamera;          // +0x08
-};
 
 // Places the cue at its screen position in front of the camera, rebuilding
 // the screen offsets when the field of view changed. The view direction goes
@@ -294,9 +290,9 @@ int VisualCue::Tick(float frameTime) {
     if (!ArcadeObject::Tick(frameTime))
         return 1;
     if (!cycleCues) {
-        if (((VisualCueRenderTargetView*)renderContext)->currentCamera != arcadeView ||
-            (RunwayKrustyBikeView*)cueView->raceCamera->bike != cueView->ownRacer || !cueView->ownRacer ||
-            cueView->ownRacer->finished) {
+        if (((RenderTarget*)renderContext)->currentCamera != arcadeView ||
+            (KrustyBike*)cueView->raceCamera->bike != cueView->localRacer || !cueView->localRacer ||
+            cueView->localRacer->hasFinished) {
             isVisible = 0;
             return 1;
         }
@@ -306,7 +302,7 @@ int VisualCue::Tick(float frameTime) {
     case 3: {
         if (!cueView->raceTrack)
             { isVisible = 0; return 1; }
-        if (cueView->ownRacer->onTrack) {
+        if (cueView->localRacer->onTrack) {
             isVisible = 0;
             return 1;
         }
@@ -314,9 +310,9 @@ int VisualCue::Tick(float frameTime) {
         UNKNOWN_PLACE_CUE();
         Vector3 target;
         if (cueView->raceTrack)
-            cueView->raceTrack->PointAt(cueView->ownRacer->statusNode->progressPos, (Vec3*)&target);
+            cueView->raceTrack->PointAt(cueView->localRacer->statusNode->progressPos, (Vec3*)&target);
         else
-            target = cueView->ownRacer->trackPoint;
+            target = *(Vector3*)&cueView->localRacer->respawnPosition;
         groundTerrain->QueryGround(reinterpret_cast<TerrainVec3*>(&target), 0, 0, 0);
         direction = target - arcadeView->eyePosition;
         SetAxes(&direction, &kVec3YAxis, 1, 1);
@@ -327,11 +323,11 @@ int VisualCue::Tick(float frameTime) {
     case 1:
     case 5: {
         UNKNOWN_PLACE_CUE();
-        CueGateKrustyBikeView* ref = (CueGateKrustyBikeView*)((CueCourseEventView*)g_TrackGame->bajaEnduroEvent)->raceView->raceCamera->krustyBike;
+        KrustyBike* ref = g_TrackGame->bajaEnduroEvent->raceView->raceCamera->krustyBike;
         if (!ref)
             return 1;
         direction =
-            ((CueCourseEventView*)g_TrackGame->bajaEnduroEvent)->gates[ref->gateIndex].position - arcadeView->eyePosition;
+            ((RaceGateEvent*)g_TrackGame->bajaEnduroEvent)->gateSources[ref->lapGate].center - arcadeView->eyePosition;
         SetAxes(&direction, &kVec3YAxis, 1, 1);
         scale = modelScale;
         break;
@@ -344,7 +340,7 @@ int VisualCue::Tick(float frameTime) {
         Vector3 target = kVec3Zero;
         for (int i = 0; i < cueRacerCount; i++) {
             if (currentRacer == i) {
-                target = cueRacers[i]->position;
+                target = *(Vector3*)&cueRacers[i]->position;
                 break;
             }
         }
@@ -358,19 +354,19 @@ int VisualCue::Tick(float frameTime) {
         UNKNOWN_PLACE_CUE();
         if (g_TrackGame->mode.raceSettings.tagBall) {
             Vector3 target;
-            ((CueTagEventView*)g_TrackGame->tagEvent)->ball->sceneObject.GetPosition(&target);
+            ((SoultreeObject*)g_TrackGame->tagEvent->ball->sceneObject)->GetPosition((Vec3*)&target);
             direction = target - arcadeView->eyePosition;
             SetAxes(&direction, &kVec3YAxis, 1, 1);
             scale = modelScale;
         } else {
-            VisualCueKrustyBikeView* followed = 0;
-            if (((CueTagEventView*)g_TrackGame->tagEvent)->raceCamera->statusFlags & 1)
-                followed = ((CueTagEventView*)g_TrackGame->tagEvent)->raceCamera->followedRacer;
-            if (!((CueTagEventView*)g_TrackGame->tagEvent)->followedRacer)
+            KrustyBike* followed = 0;
+            if (g_TrackGame->tagEvent->raceCamera->isEnabled)
+                followed = ((KrustyBikeCamera*)g_TrackGame->tagEvent->raceCamera)->krustyBike;
+            if (!g_TrackGame->tagEvent->followedRacer)
                 return 1;
-            if (followed == ((CueTagEventView*)g_TrackGame->tagEvent)->followedRacer)
+            if (followed == g_TrackGame->tagEvent->followedRacer)
                 { isVisible = 0; return 1; }
-            direction = ((CueTagEventView*)g_TrackGame->tagEvent)->followedRacer->position - arcadeView->eyePosition;
+            direction = *(Vector3*)&g_TrackGame->tagEvent->followedRacer->position - arcadeView->eyePosition;
             SetAxes(&direction, &kVec3YAxis, 1, 1);
             scale = modelScale;
         }
@@ -677,7 +673,7 @@ int BonusObjectManager::Tick(float frameTime) {
 
     if (currentKey == -1 || g_TrackGame->uiInteractionBlocked)
         return 1;
-    if (((BonusKrustyBikeView*)raceView->localRacer)->crashState && elapsed > 2.0f) {
+    if (raceView->localRacer->crashState && elapsed > 2.0f) {
         HideDigits();
         return 1;
     }
@@ -687,7 +683,7 @@ int BonusObjectManager::Tick(float frameTime) {
             NextKey();
         float t = (elapsed - g_UnknownBonusKeys[currentKey].time) / keyDuration;
         Vector3 position;
-        ((BonusKrustyBikeView*)raceView->localRacer)->modelNode->GetPosition(&position);
+        raceView->localRacer->modelNode->GetPosition((Vec3*)&position);
         position += t * keyPositionChange + keyPosition;
         baseFrame->TranslateIn(0, *(Vec3*)&position);
         if (camera != g_TrackGame->renderTarget->currentCamera || camera->fieldOfView != placedFieldOfView ||
@@ -701,7 +697,7 @@ int BonusObjectManager::Tick(float frameTime) {
             cameraDistance = distance;
             sizeFactor = width / (CameraZoom(camera) * frameWidth);
         }
-        position += ((BonusKrustyBikeView*)raceView->localRacer)->rearWheel->rollDirection * 5.0f;
+        position += *(Vector3*)&raceView->localRacer->rearWheel->rollDirection * 5.0f;
         if (keyAngleChange == 0.0f && keyAngle == 0.0f) {
             eyeToFrame = position - camera->eyePosition;
             Vector3 forward = eyeToFrame;

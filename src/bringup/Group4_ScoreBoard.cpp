@@ -31,6 +31,7 @@
 // the reference (0.816), the y,x,z and x,y,z sum orders (0.816). Remaining: the asm fistp
 // helper, and retail's places = 5 block placed at the function end.
 #include "../reconstructed/BikeRaceCore.h"
+#include "../krusty2/vehicle/KrustyBikeCore.h"
 #include "../reconstructed/Krusty3DObjects.h"
 #include "../reconstructed/Camera.h"
 #include "../../samples/common/FistpFloatToInt.h"
@@ -91,7 +92,7 @@ void BonusObjectManager::ShowValue(float points, float multiplier)
     int resize = 0;
     self->NextKey();
     Vec3 position;
-    reinterpret_cast<SoultreeObject*>(((BonusKrustyBikeView*)self->raceView->localRacer)->modelNode)->GetPosition(&position);
+    self->raceView->localRacer->modelNode->GetPosition(&position);
     // Retail stores the three differences, copies them into eyeToFrame and
     // squares the stored floats; assigning the fields directly let VC6 keep
     // the unrounded z in ST0 (a last-bit difference under 53-bit precision,

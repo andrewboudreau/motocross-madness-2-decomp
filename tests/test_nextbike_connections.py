@@ -82,7 +82,7 @@ class NextBikeConnectionsTests(unittest.TestCase):
             layouts = []
             for name, header, assertions in (
                 ('event', 'vehicle/KrustyBikeCore.h"\n#include "BikeRaceCore.h','offsetof(BikeRace, localRacer) == 0x38 && offsetof(KrustyBike, position) == 0xc && offsetof(KrustyBike, race) == 0x740'),
-                ('visual', 'Krusty3DObjects.h', 'offsetof(VisualCueBikeRaceView, ownRacer) == 0x38 && offsetof(VisualCueKrustyBikeView, position) == 0xc'),
+                ('visual', 'Krusty3DObjects.h', 'offsetof(VisualCue, cueView) == 0xa8 && offsetof(VisualCue, cueRacers) == 0xcc'),
                 ('bike', 'vehicle/KrustyBike.h', 'offsetof(KrustyBike, race) == 0x740 && sizeof(KrustyBike) == 0x1638'),
                 ('canonical', 'BikeRace.h', 'offsetof(BikeRace, replayTime) == 0x1b8 && offsetof(BikeRace, localRacer) == 0x38'),
             ):

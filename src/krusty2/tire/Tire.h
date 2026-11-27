@@ -30,9 +30,9 @@
 #define TIRE_H
 
 #include <stddef.h>
-#include "collision/CollisionObject.h"
+#include "../collision/CollisionObject.h"
 
-#include "collision/CollisionPoint.h"
+#include "../collision/CollisionPoint.h"
 
 #include "../../reconstructed/MovingPart.h"
 class TireNode;

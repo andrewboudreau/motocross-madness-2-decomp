@@ -105,15 +105,18 @@ BonusObjectManager `0x0048c330` `LoadDigitModels`, `0x0048c8a0`
 `CreateFrameNode` and `0x0048ca60` `SetupCounter`; RunwayLights `0x0048a600`
 `SetupLights` and VisualCue `0x0048adf0` `LoadVisualCue` (NationalRace.cpp and
 QuarryStuntEvent.cpp keep their own address-named declarations).
-The view structs' fields with a recorded use are named (each keeps its
-`// +0xNN`): the camera views' `eyePosition`/`viewDirection` (Camera's
-names for +0x170/+0x17c), the racer views' `position`, `countdown`,
-`trackPoint`, `trackDirection`, `finished` and `gateIndex`, the cue view's
-`ownRacer` and `racing`, the game's `cameraMode` (+0x2d74) and the bonus
-key's `frame`, `time` and `rotationAngle`. No calibration byte changed. The racer, view, camera and
-game-global structs in the header are this unit's views of objects whose
-classes live elsewhere (RaceView.h, TrackGame.h, Camera.h); QuarryEvent.h
-keeps its own partial VisualCue view.
+The racer, race, camera and event view structs are retired. VisualCue's race
+is `BikeRace*` (+0xa8) and its racers `KrustyBike*`; RunwayLights tracks a
+`KrustyBike*` (its respawnPosition/respawnHeading at +0x10c/+0x118 are the
+track point the lights fall back to); the bonus counter reads its race's
+localRacer's crashState, modelNode (+0x3bc, SoultreeObject::GetPosition
+0x004fc970) and rear Tire's rollDirection. VisualCue::Tick reads the gate
+event (TrackGame+0x560) as TrackGameViewOwner for its race and as
+RaceGateEvent for the gate centers, and the tag event (+0x568) as
+TrackGameViewOwner (its KrustyBikeCamera, followed racer and ball). The
+game's `cameraMode` (+0x2d74) and the bonus key's `frame`, `time` and
+`rotationAngle` keep their names. QuarryEvent.h keeps its own partial
+VisualCue view.
 
 ## Reproduce
 

@@ -31,7 +31,7 @@ NationalRace* NationalRace::Create(RenderTarget* target, LoadProgressFn progress
     if (!BaseQuarryEvent::Create(target, progress))
         return 0;
     if (runwayLights)
-        runwayLights->SetRacer((RunwayKrustyBikeView*)raceView->localRacer);
+        runwayLights->SetRacer(raceView->localRacer);
     return this;
 }
 

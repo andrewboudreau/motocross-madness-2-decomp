@@ -708,7 +708,7 @@ int BaseQuarryEvent::LoadEventObjects(LoadProgressFn progress) {
     if (radarOverlay)
         radarOverlay->TakeRacers(raceView, (int)chatOverlay);
     if (visualCue)
-        visualCue->CollectRacers((VisualCueBikeRaceView*)raceView);
+        visualCue->CollectRacers(raceView);
     g_MemTagStack->Pop(0);
 
     if (!g_TrackGame->mode.instrumentOverlayOn)
@@ -809,7 +809,7 @@ int BaseQuarryEvent::Create3DObjects(const TextureContext* textures) {
     char message[388];
     visualCue = (new(__FILE__, 1369) VisualCue(g_TrackGame->mode.visualCuesOn))
                      ->LoadVisualCue(renderContext, lightManager, textures, eventTerrain,
-                                     Vector3(0.0f, 0.0f, 0.0f), (VisualCueBikeRaceView*)raceView, 45,
+                                     Vector3(0.0f, 0.0f, 0.0f), raceView, 45,
                                      (Camera*)raceCamera, 3.0f, 0.1f, 0.85f);
     if (!AppendChild(visualCue, -1)) {
         sprintf(message, "Visual Cue not loaded.\n");
