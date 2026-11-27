@@ -59,24 +59,7 @@ struct EcoSphereShape {              // type 4
     float centreScale;                        // +0x18: centre scale
     Matrix4 transform;                        // +0x1c
 };
-#include "../krusty2/collision/CollisionTypes.h"
-class CollisionObject : public QuadTreeObject, public GameObject {
-public:
-    explicit CollisionObject(int flags);      // 0x00431e70
-    void Configure(void* context, int useBroadphase, int collisionEnabled, int collidable); // 0x004320f0
-    void SetTriangleMeshHullShape(const CollisionVec3* vertices, const int* indices, int triangleCount,
-                               int vertexCount);                       // 0x004328b0: hull
-    void SetSphereShape(CollisionVec3 center, float radius);    // 0x004329a0: sphere
-    void SetCapsuleShape(CollisionVec3 p0, CollisionVec3 p1, float radius); // 0x00432a20: capsule
-    void SetTransform(const Matrix4* m);                      // 0x00435830: SetTransform
-
-    unsigned char field_0x38[0x50 - 0x38];
-    int shapeType;                            // +0x50: 0 hull, 3 capsule, 4 sphere
-    void* shapeData;                          // +0x54: the shape (by shapeType)
-    unsigned char field_0x58[0x64 - 0x58];
-    int ownerType;                            // +0x64
-    unsigned char field_0x68[0xb8 - 0x68];    // 0xb8 bytes (operator new at 0x00457f74)
-};
+#include "../krusty2/collision/CollisionObject.h"   // 0xb8 bytes (operator new at 0x00457f74)
 
 #include "LightEmitter.h"
 
@@ -325,14 +308,8 @@ public:
 #include "EcoSystemGlobal.h"
 
 // NormalDistribution.cpp (src/krusty2/effects): the tabulated bell curve
-// the generator weighs the slope and altitude with. The pointer at
-// 0x0056ece0 holds 0x006886e8, that file's static object, and 0x004b0070
-// is its Lookup; only the method EcoSystem calls is declared here.
-class NormalDistribution {
-public:
-    float Lookup(float value, float mean, float sigma); // 0x004b0070
-};
-extern NormalDistribution* g_SharedNormalDistribution;
+// the generator weighs the slope and altitude with (Lookup 0x004b0070).
+#include "../krusty2/effects/NormalDistribution.h"
 
 // 0x0045c040 (cdecl): loads every texture a .esb names ahead of the
 // ecosystem itself.

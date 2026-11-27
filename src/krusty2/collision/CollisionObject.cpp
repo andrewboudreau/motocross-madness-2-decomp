@@ -116,11 +116,7 @@ void CollisionObject::FreeShape() {
 }
 
 // Type-id registry (TypeRegistry.cpp): 0x00521ea0 looks a type name up and returns its id.
-class TypeRegistry {
-public:
-    char FindTypeId(const char* name);           // 0x00521ea0
-};
-extern TypeRegistry* g_TypeRegistry;             // 0x00575744
+#include "../../reconstructed/TypeRegistry.h"   // g_TypeRegistry 0x00575744
 
 static char g_CollisionObjectTypeId = (char)0xff;   // 0x00568610
 static char g_VegetationTypeId = (char)0xff;        // 0x00568611
@@ -1437,15 +1433,7 @@ struct CollisionGameContext {      // object at *0x0056e26c (tier 3; root of the
     char field_0x00[0x34];
     GameObject* root;              // +0x34
 };
-// gameobj.cpp's iterator (src/reconstructed/GameObjectIterator.h; local stand-in, 0x94 bytes).
-class GameObjectIterator {
-public:
-    GameObjectIterator(GameObject* root, int mode, const char* filter);   // 0x00469950
-    ~GameObjectIterator();                                                  // 0x00469a40
-    GameObject* Next();                                                     // 0x00469a50
-private:
-    char field_0x00[0x94];
-};
+#include "../../reconstructed/GameObjectIterator.h"   // gameobj.cpp's iterator (0x94 bytes)
 struct CollisionBoundingSphere;
 int SphereContainsPointXZ(const CollisionBoundingSphere* sphere, const Vec3* p, float r);   // 0x0043a1e0
 int BoundingSpheresOverlap(const CollisionBoundingSphere* a, const CollisionBoundingSphere* b);   // 0x0043a270

@@ -4,21 +4,10 @@
 // __FILE__ reference, and ObjectPlacement (0x004b0df0) is the main caller.
 // No literal ties it to either file, so the file name is ours (tier 3).
 
-// The quadtree of collision objects (krusty2 broadphase/Quadtree.h).
-class QuadTreeObject;
-class QuadTree {
-public:
-    int BeginQuery(float x0, float z0, float x1, float z1);  // 0x004dd270
-    QuadTreeObject* NextObject();                            // 0x004dd540
-    void EndQuery();                                         // 0x004dd770
-};
-extern QuadTree* g_collisionQuadTree;                        // 0x0068aba4
+// The quadtree of collision objects (BeginQuery/NextObject/EndQuery, g_collisionQuadTree).
+#include "../krusty2/broadphase/QuadTreeDeclarations.h"
 
-class TypeRegistry {
-public:
-    char FindTypeId(const char* name);                       // 0x00521ea0
-};
-extern TypeRegistry* g_TypeRegistry;                         // 0x00575744
+#include "TypeRegistry.h"                                    // g_TypeRegistry 0x00575744
 
 struct CollisionVec3 {
     float x;

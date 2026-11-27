@@ -506,22 +506,9 @@ int PathSteeringDirection(Vec3* outDir, Vec3 pos, BikeAIRacingLine* path, float 
 // 0x00415640 and its helpers.
 // ---------------------------------------------------------------------------
 
-// Type-id registry (TypeRegistry.cpp, stand-in as in CollisionObject.cpp).
-class TypeRegistry {
-public:
-    char FindTypeId(const char* name);           // 0x00521ea0
-};
-extern TypeRegistry* g_TypeRegistry;             // 0x00575744
+#include "../../reconstructed/TypeRegistry.h"   // g_TypeRegistry 0x00575744
 
-// gameobj.cpp's iterator (src/reconstructed/GameObjectIterator.h; local stand-in, 0x94 bytes).
-class GameObjectIterator {
-public:
-    GameObjectIterator(GameObject* root, int mode, const char* filter);   // 0x00469950
-    ~GameObjectIterator();                                                  // 0x00469a40
-    GameObject* Next();                                                     // 0x00469a50
-private:
-    char field_0x00[0x94];
-};
+#include "../../reconstructed/GameObjectIterator.h"   // gameobj.cpp's iterator (0x94 bytes)
 
 // CollisionObject.cpp: 0x00439820 (segment) and 0x00439600 (capsule) object tests, both in
 // src/krusty2/collision/CollisionObject.cpp.

@@ -182,4 +182,15 @@ public:
     virtual int OnControlPress(ControlEvent* a, InputButtonState* b);            // 0x0052eec0
 };
 
+// The debug box strip DrawBox fills and draws (FVF 0x1e2, the D3DLVERTEX layout); the ctor
+// resets every vertex's colour so the lines come out 0x2000ffff.
+struct VisibilityBoxVertex {   // 0x20 bytes, 16 of them at 0x0068a768
+    float x, y, z;
+    int reserved;
+    int color;
+    int specular;
+    float tu, tv;
+};
+extern VisibilityBoxVertex g_visibilityBoxVertices[16];   // 0x0068a768 (ends at the frozen camera, 0x0068a968)
+
 #endif

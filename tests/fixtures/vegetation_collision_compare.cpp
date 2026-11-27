@@ -139,7 +139,7 @@ static void HullGuard(int n,int available){
  hullAvailable=-1;checks++;faults++;
 }
 int main(int argc,char**argv){if(argc!=2||!MapReference(argv[1]))return 90;
- typedef char Layout[sizeof(Vegetation)==0x1c&&offsetof(Vegetation,definitionIndex)==0x12&&offsetof(CollisionObject,shapeData)==0x54?1:-1];
+ typedef char Layout[sizeof(Vegetation)==0x1c&&offsetof(Vegetation,definitionIndex)==0x12&&offsetof(CollisionObject,shape)==0x54?1:-1];
  page=(BYTE*)VirtualAlloc(0,8192,MEM_COMMIT|MEM_RESERVE,PAGE_READWRITE);DWORD old;if(!page||!VirtualProtect(page+4096,4096,PAGE_NOACCESS,&old))return 93;
  InitFastSqrtTable();memcpy((void*)0x5dafe0,g_FastSqrtTable,1024);
  int pcs[3]={_PC_24,_PC_53,_PC_64};int rcs[4]={_RC_NEAR,_RC_DOWN,_RC_UP,_RC_CHOP};

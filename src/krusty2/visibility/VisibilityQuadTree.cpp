@@ -22,17 +22,6 @@ PeakHold g_visibilityTickStat(5000);        // 0x0068ab90
 // separate active traversal context at 0x00689b78. Names are provisional.
 QuadTree* g_collisionQuadTree;  // 0x0068aba4
 
-// The debug box strip DrawBox fills and draws (FVF 0x1e2, the D3DLVERTEX layout); the ctor
-// resets every vertex's colour so the lines come out 0x2000ffff.
-struct VisibilityBoxVertex {   // 0x20 bytes, 16 of them at 0x0068a768
-    float x, y, z;
-    int reserved;
-    int color;
-    int specular;
-    float tu, tv;
-};
-extern VisibilityBoxVertex g_visibilityBoxVertices[16];   // 0x0068a768 (ends at the frozen camera, 0x0068a968)
-
 // Debug toggles and the frozen camera snapshot (slot 23).  Names tier 3.
 extern int g_visibilityDebugDraw;          // 0x0068ab9c toggled by key 0x44 in slot 23; gates slot 14
 extern int g_visibilityFreeze;             // 0x0068aba0 toggled by key 0x57 in slot 23; selects g_frozenCamera in slot 12

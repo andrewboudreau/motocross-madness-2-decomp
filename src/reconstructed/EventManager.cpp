@@ -20,6 +20,7 @@
 #include "GameUi.h"
 #include "MenuId.h"
 #include "QuarryEvent.h"
+#include "Vegetation.h"
 #include "TrackGame.h"
 #include "SoundInterface.h"
 #include "UIDialog.h"
@@ -1336,11 +1337,9 @@ void EventManager::RemovePlayer(int player) {
 
 // The quadtree members 0x0045fce0 and 0x0045fdc0 use the krusty2 QuadTree,
 // QuadTreeObject and CollisionObject (through ArcadeObject.h's Wrecker.h).
-// RTTI: Vegetation : QuadTreeObject (vtable 0x005524f8); Vegetation.h
-// declares it over EcoSystem's quadtree view, so the cast here names a
-// local Vegetation on the krusty2 base. It overrides ComputeQuadTreeCode
-// (0x00456720, ret 4) with the object's quadtree code.
-class Vegetation : public QuadTreeObject {};
+// RTTI: Vegetation : QuadTreeObject (vtable 0x005524f8, Vegetation.h); it
+// overrides ComputeQuadTreeCode (0x00456720, ret 4) with the object's
+// quadtree code.
 
 // 0x0045fce0
 void EventManager::RemoveVegetationInRect(float x0, float z0, float x1, float z1) {

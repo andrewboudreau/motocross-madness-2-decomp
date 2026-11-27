@@ -12,6 +12,7 @@
 #include "visibility/VisibilityClipper.h"
 #include "ManagedTexture.h"
 #include "effects/ParticleManager.h"
+#include "visibility/VisibilityQuadTree.h"   // VisibilityBoxVertex
 
 // 0x00575a98 (initialized .data): retail stores 0x0068acd4, the address of a .bss object
 // that no method reads fields from (see docs/CLIPPER_GLOBAL_CONNECTIONS.md).
@@ -36,13 +37,6 @@ int g_gridBoxTests;
 ParticleUVRect g_particleCellUVs[61];
 
 // VisibilityQuadTree.cpp's debug box strip: one 16-entry D3DLVERTEX-shaped array, as in
-// retail. The constructor's colour reset (0x2000ffff) lands in the vertices DrawBox
-// emits. The layout repeats VisibilityQuadTree.cpp's declaration.
-struct VisibilityBoxVertex {
-    float x, y, z;
-    int reserved;
-    int color;
-    int specular;
-    float tu, tv;
-};
+// retail (VisibilityQuadTree.h declares it). The constructor's colour reset (0x2000ffff)
+// lands in the vertices DrawBox emits.
 VisibilityBoxVertex g_visibilityBoxVertices[16];   // 0x0068a768

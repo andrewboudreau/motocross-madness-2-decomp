@@ -100,16 +100,8 @@ struct SceneStaticModels {
     SceneStaticModel* casters;              // +0x04
 };
 
-// Minimal view of RTTI class D3DIMSoultreeShadow (0x48 bytes), declared in
-// full in src/krusty2/shadow/D3DIMSoultreeShadow.h, whose header tree cannot
-// be mixed with this one. Only what Scene 0x004edf20 calls is declared.
-class D3DIMSoultreeShadow : public GameObject {
-public:
-    explicit D3DIMSoultreeShadow(int flags);                       // 0x00446840
-    D3DIMSoultreeShadow* Attach(int host, D3DIMSoultreeObject* caster, ProjectedShadow* shadow); // 0x004468b0
-
-    unsigned char field_0x2c[0x48 - 0x2c];
-};
+// RTTI class D3DIMSoultreeShadow (0x48 bytes; Scene 0x004edf20 builds and attaches them).
+#include "../krusty2/shadow/D3DIMSoultreeShadow.h"
 
 // What 0x004f00e0 counts: a record with a texture name at +0x2c, built by
 // its two callers (0x004f0390, 0x004f0ec0) on the stack. Only the name is

@@ -23,27 +23,9 @@
 #include "core/DebugAlloc.h"
 #include "broadphase/Quadtree.h"
 #include "../../reconstructed/FileStream.h"
+#include "../../reconstructed/Parameterblocks.h"   // ParameterBlock (0x5c4 bytes, operator new at 0x004fdb83)
 
-// src/reconstructed/Parameterblocks.h declares the full class; only the members
-// this unit calls are listed (same mangled names).
-class ParameterBlock {
-public:
-    ParameterBlock();                                                     // 0x004b7130
-    ~ParameterBlock();                                                    // 0x004b7190
-    void Attach(FileStream* stream, int offset, int index); // 0x004b77a0
-    int BeginRows(const char* name);                                 // 0x004b7f70
-    int ReadRow(char* raw);                                        // 0x004b8010
-    int GetRowFloat(int index, float* out);                            // 0x004b81c0
-    int GetRowString(int index, char* out);                             // 0x004b8200
-    char field_0x00[0x5c4];        // operator new(0x5c4) at 0x004fdb83 (tier 1)
-};
-
-// Type-id registry (0x00575744), same declaration as collision/CollisionObject.cpp.
-class TypeRegistry {
-public:
-    char FindTypeId(const char* name);           // 0x00521ea0
-};
-extern TypeRegistry* g_TypeRegistry;             // 0x00575744
+#include "../../reconstructed/TypeRegistry.h"   // g_TypeRegistry 0x00575744
 
 extern QuadTree* g_collisionQuadTree;                     // 0x0068aba4
 

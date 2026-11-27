@@ -47,14 +47,7 @@ public:
 
 // Debug allocator iterator over a GameObject tree: heap allocated, 0x94 bytes
 // (operator new(0x94, __FILE__, line) at 0x504719 and 0x504829).
-class GameObjectIterator {
-public:
-    GameObjectIterator(GameObject* root, int mode, const char* filter);   // 0x00469950 (ret 0xc)
-    ~GameObjectIterator();                                                  // 0x00469a40
-    GameObject* Next();                                                     // 0x00469a50
-private:
-    char field_0x00[0x94];
-};
+#include "../../reconstructed/GameObjectIterator.h"   // gameobj.cpp's iterator (0x94 bytes)
 
 // TrackGame's Game base stores its DebugOverlay pointer at +0x38.
 #include "../../reconstructed/DebugOverlay.h"
@@ -68,12 +61,7 @@ struct SoultreeStats {
 #include "core/DebugAlloc.h"
 #include "broadphase/Quadtree.h"
 
-// Type-id registry (0x00575744), same declaration as collision/CollisionObject.cpp.
-class TypeRegistry {
-public:
-    char FindTypeId(const char* name);           // 0x00521ea0
-};
-extern TypeRegistry* g_TypeRegistry;             // 0x00575744
+#include "../../reconstructed/TypeRegistry.h"   // g_TypeRegistry 0x00575744
 
 extern QuadTree* g_collisionQuadTree;                     // 0x0068aba4
 extern SoultreeObject** g_soultreeNodes;     // 0x00689ec4 node array (RegisterNode 0x4fedb0)

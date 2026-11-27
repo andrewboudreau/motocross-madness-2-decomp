@@ -752,7 +752,7 @@ void EcoSystem::BuildCollisionObjects(VegetationDefinition* definition) {
             definition->collisionObjects[i]->ownerType = 0x3e9;
             definition->collisionObjects[i]->SetTriangleMeshHullShape((CollisionVec3*)hull, hullIndices, definition->modelIndexCount[0] / 3,
                                                                definition->modelVertexCount[0]);
-            EcoSetIdentity(&((EcoHullShape*)definition->collisionObjects[i]->shapeData)->transform);
+            EcoSetIdentity(&((EcoHullShape*)definition->collisionObjects[i]->shape)->transform);
             delete hull;
             delete hullIndices;
         } else if (shape->type == 2) {
@@ -782,7 +782,7 @@ void EcoSystem::BuildCollisionObjects(VegetationDefinition* definition) {
                 indices[j * 6 + 5] = j + 16;
             }
             definition->collisionObjects[i]->SetTriangleMeshHullShape((CollisionVec3*)vertices, indices, 32, 32);
-            EcoSetIdentity(&((EcoHullShape*)definition->collisionObjects[i]->shapeData)->transform);
+            EcoSetIdentity(&((EcoHullShape*)definition->collisionObjects[i]->shape)->transform);
         }
     }
     g_MemTagStack->Pop(category);
