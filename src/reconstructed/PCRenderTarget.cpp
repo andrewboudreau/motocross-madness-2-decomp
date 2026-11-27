@@ -6,6 +6,7 @@
 #include "DebugAlloc.h"
 #include "Tgafile.h"
 #include "Camera.h"
+#include "PCTextureMap.h"
 #include "D3DConstants.h"
 
 // 0x004c4ee0: every cached render state starts as {i, 0}.
@@ -161,7 +162,7 @@ int PCRenderTarget::EndScene() {
 
 // 0x004c53f0
 int PCRenderTarget::Blit(void* destination, void* source, void* sourceRect, int flags) {
-    return renderSurface->Blt(destination, static_cast<BlitPCTextureMapView*>(source)->systemSurface,
+    return renderSurface->Blt(destination, static_cast<PCTextureMap*>(source)->systemSurface,
                                       sourceRect, flags, 0) == 0;
 }
 

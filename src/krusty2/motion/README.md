@@ -122,7 +122,7 @@ Those decoded writes distinguish TU-local constants from similarly named
 constants in other files. `Spheres.bindings.json` records this reviewed mapping.
 
 ## Motnctrl.cpp
-Promoted to `src/krusty2/motion/Motnctrl.cpp` (types in `Motnctrl.h`, `Motnctrl.bindings.json`); the near misses
+Promoted to `src/krusty2/motion/Motnctrl.cpp` (types in `Motnctrl.h`, the `Motion` record in `Motion.h`, `Motnctrl.bindings.json`); the near misses
 stay in `samples/physics/motion/Motnctrl.cpp`.
 - `__FILE__` string `D:\aardvark\VC\krusty2\Motnctrl.cpp` at `0x0056e034`. Its xrefs run from `0x4a5659` (the
   MotionManager `$E` initialiser, line 9) to `0x4a9a87` (FreeMotion, line 0x5a7). The line numbers rise with the

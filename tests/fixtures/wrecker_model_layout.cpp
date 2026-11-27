@@ -1,6 +1,7 @@
 #include <stddef.h>
 #include "../../src/reconstructed/Wrecker.h"
-#include "../../src/krusty2/motion/Motnctrl.h"
+#include "../../src/krusty2/core/SoultreeObject.h"
+#include "../../src/krusty2/motion/Motion.h"
 
 // The local views carry identical storage at the explicit call boundaries.
 typedef char vector_sizes[sizeof(Vector3) == sizeof(Vec3) && sizeof(Vec3) == 12 ? 1 : -1];
@@ -18,8 +19,8 @@ typedef char character_frame[offsetof(Character, currentFrame) == 0x1c ? 1 : -1]
 typedef char character_blend[offsetof(Character, blendActive) == 0x34 ? 1 : -1];
 typedef char character_pose[offsetof(Character, poseList) == 0x190 ? 1 : -1];
 typedef char character_model[offsetof(D3DIMSoultreeCharacter, modelNode) == 0x1a0 ? 1 : -1];
-typedef char motion_count[offsetof(WreckerMotionView, frameCount) == offsetof(Motion, frameCount) ? 1 : -1];
-typedef char motion_fps[offsetof(WreckerMotionView, fps) == offsetof(Motion, fps) ? 1 : -1];
+typedef char motion_count[offsetof(Motion, frameCount) == 0xa8 ? 1 : -1];
+typedef char motion_fps[offsetof(Motion, fps) == 0xb4 ? 1 : -1];
 typedef char pose_frame[offsetof(MotionPoseList, frameIndex) == 0 ? 1 : -1];
 typedef char pose_size[sizeof(MotionPoseList) == 12 ? 1 : -1];
 typedef char wrecker_size[sizeof(Wrecker) == 0x53c ? 1 : -1];

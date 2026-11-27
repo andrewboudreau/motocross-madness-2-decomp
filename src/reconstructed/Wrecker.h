@@ -63,14 +63,6 @@ struct WreckerD3DMatrix {
 // declaration is needed only by wrecker.cpp; other consumers use pointer types.
 #include "../krusty2/math/Vec3.h"
 
-// The character's current motion (src/krusty2 Motion, Motnctrl.h).
-struct WreckerMotionView {
-    unsigned char field_0x00[0xa8];
-    int frameCount;                    // +0xa8 "FrameCount"
-    unsigned char field_0xac[0xb4 - 0xac];
-    int fps;                           // +0xb4 "FPS"
-};
-
 // Rider is the primary Character/D3DIM subobject; its GameObject base remains virtual.
 #include "../krusty2/motion/D3DIMSoultreeCharacter.h"
 

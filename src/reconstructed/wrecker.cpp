@@ -3,6 +3,7 @@
 
 #include "Wrecker.h"
 #include "../krusty2/core/SoultreeObject.h"
+#include "../krusty2/motion/Motion.h"
 
 #include <math.h>
 #include <stdlib.h>
@@ -345,7 +346,7 @@ int Wrecker::Tick(float frameTime) {
         }
         if (wreckState) {
             if (wreckState == 1) {
-                WreckerMotionView* motion = reinterpret_cast<WreckerMotionView*>(character->currentMotion);
+                Motion* motion = character->currentMotion;
                 if ((float)(motion->frameCount - character->currentFrame->frameIndex) / motion->fps < 0.5f) {
                     ContinueAsTumble();
                     RebuildPoseSteps();

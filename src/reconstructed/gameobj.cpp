@@ -2,6 +2,8 @@
 #include "GameObjectIterator.h"
 #include "DebugAlloc.h"
 #include "MemTag.h"
+#include "PCVideoCard.h"
+#include "RenderTarget.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -10,17 +12,6 @@
 // 0x0065b548: zero-filled retail storage. Every active iterator increments this
 // count, and exhaustion/Stop decrements it; mutation methods test it before work.
 int g_ActiveGameObjectIterators;
-
-// The render target's display (RenderTarget +0x04, a VideoCard) as Tick sees
-// it: +0x70 bit 2 (lastFlipFailed) gates a RetryFlip(0) call (slot 4).
-class RenderTargetDisplayView {
-public:
-    virtual void UnknownVirtualSlot0();
-    virtual void ReleaseResources();
-    virtual void SetDisplayMode();
-    virtual void Present();
-    virtual void RetryFlip(int value);
-};
 
 // Methods from gameobj.cpp, in retail address order. Child walks visit
 // firstChild then each sibling's nextSibling; pendingRelease skips a child.
@@ -295,10 +286,10 @@ int GameObject::Tick(float frameTime) {
         for (GameObject* child = firstChild; child; child = child->nextSibling) {
             if (child->isEnabled && !child->isPaused && !child->pendingRelease) {
                 child->Tick(frameTime);
-                char* target = static_cast<char*>(renderContext);
+                RenderTarget* target = static_cast<RenderTarget*>(renderContext);
                 if (target) {
-                    RenderTargetDisplayView* display = *reinterpret_cast<RenderTargetDisplayView**>(target + 0x04);
-                    if (reinterpret_cast<unsigned char*>(display)[0x70] & 0x04)
+                    PCVideoCard* display = target->targetDisplay;
+                    if (display->lastFlipFailed)
                         display->RetryFlip(0);
                 }
             }

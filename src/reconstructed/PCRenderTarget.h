@@ -4,13 +4,6 @@
 #include "RenderInterfaces.h"
 #include "RenderTarget.h"
 
-// Object passed as the Blt source to PCRenderTarget slot 3; its surface is at
-// +0x70.
-struct BlitPCTextureMapView {
-    unsigned char field_0x00[0x70];
-    DirectDrawSurface* systemSurface;
-};
-
 // One cached render state (PCRenderTarget+0x264, 300 entries).
 struct CachedRenderState {
     int state;
