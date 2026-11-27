@@ -24,7 +24,7 @@ SYMBOL = '?LeaveRaceForMenu@EventManager@@QAEXH@Z'
 RANGES = {0x45e710: 531, 0x54ab30: 23, 0x54ab47: 10}
 CANONICAL = 'src/reconstructed/EventManager.cpp'
 BINDINGS = 'src/reconstructed/EventManager.bindings.json'
-PRELUDE = '''#include "GUIManagerCore.h"
+PRELUDE = '''#include "GUIManager.h"
 #include "DebugAlloc.h"
 #include "GameUi.h"
 #include "SoundInterface.h"

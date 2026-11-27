@@ -39,7 +39,7 @@ float FastSqrt(float value);
 
 // 0x00484f10
 void GroundFogableObject::FogVertices(GroundFogVertex* vertices, int count) {
-    GroundFogView* fog;
+    GroundFog* fog;
     Camera* camera;
     float eyeX;
     float eyeY;
@@ -57,12 +57,12 @@ void GroundFogableObject::FogVertices(GroundFogVertex* vertices, int count) {
     int alpha;
     int i;
 
-    if (groundFog == (GroundFogView*)1)
+    if (groundFog == (GroundFog*)1)
         return;
     if (!groundFog) {
-        groundFog = (GroundFogView*)g_TrackGame->childRoot->FindByClassName(1, "GroundFog");
+        groundFog = (GroundFog*)g_TrackGame->childRoot->FindByClassName(1, "GroundFog");
         if (!groundFog) {
-            groundFog = (GroundFogView*)1;
+            groundFog = (GroundFog*)1;
             return;
         }
     }

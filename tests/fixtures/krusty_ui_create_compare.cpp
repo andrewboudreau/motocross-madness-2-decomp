@@ -7,7 +7,7 @@
 #include <stddef.h>
 #include <float.h>
 #include <new>
-#include "../../src/reconstructed/GUIManagerCore.h"
+#include "../../src/reconstructed/GUIManager.h"
 #include "../../src/reconstructed/TrackGame.h"
 #include "../../src/reconstructed/Net.h"
 #include "../../src/reconstructed/PCJoystickDevice.h"
@@ -18,7 +18,7 @@ extern "C" void __cdecl __CxxFrameHandler();
 static BYTE referenceSpace[0x800000]={1};
 struct World {
     BYTE games[2][sizeof(TrackGame)],ui[sizeof(KrustyUI)],guis[2][sizeof(GUIManager)],intro[sizeof(Intro1Dlg)];
-    BYTE users[2][sizeof(GUIUser)],tips[2][sizeof(KrustyUIToolTipView)];
+    BYTE users[2][sizeof(GUIUser)],tips[2][sizeof(ToolTip)];
     BYTE displays[2][0x70],controls[2][0x20],networks[2][sizeof(NetworkInterface)],joysticks[2][sizeof(PCJoystickDevice)],managers[2][sizeof(ResourceManager)];
 };
 static World world;

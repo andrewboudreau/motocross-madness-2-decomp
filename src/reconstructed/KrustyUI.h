@@ -17,12 +17,6 @@ class GUIUser;
 typedef GUIManager KrustyUIGuiManager;
 typedef GUIUser KrustyUIGuiUser;
 
-// Tooltip option boundary used without importing the Windows drawing types.
-struct KrustyUIToolTipView {
-    unsigned char field_0x00[0x5c];
-    int enabled;
-};
-
 // LoadingDlg publishes its UIDialog base at +0x490.
 class UIDialog;
 

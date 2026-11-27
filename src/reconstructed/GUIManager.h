@@ -89,9 +89,11 @@ struct GuiDirectDrawSurface {
     virtual long __stdcall SetClipper(GuiDirectDrawClipper* clipper); // SetClipper
 };
 
-// The fog object 0x00484f10 finds by name ("GroundFog") under Game+0x34.
-// Only the members it reads are declared; its class is not established.
-struct GroundFogView {
+// The fog object 0x00484f10 finds under Game+0x34 by its class name
+// "GroundFog" (FindByClassName matches the class list at +0x28; there is
+// no RTTI for it). A GameObject (+0x18 is the render target); only the
+// members FogVertices reads are declared.
+struct GroundFog {
     unsigned char field_0x00[0x18];
     RenderTarget* renderContext;              // +0x18 GameObject+0x18
     unsigned char field_0x1c[0x30 - 0x1c];

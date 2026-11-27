@@ -1,4 +1,4 @@
-#include "GUIManagerCore.h"
+#include "GUIManager.h"
 #include "../krusty2/shadow/D3DIMSoultreeShadow.h"
 #include "../krusty2/motion/D3DIMSoultreeCharacter.h"
 #include "KrustyUI.h"
@@ -198,9 +198,8 @@ GameObject* KrustyUI::Create(RenderTarget* target, int showIntro) {
     g_TrackGame->mode.LoadProfile();
     gui->uiAnimations = g_TrackGame->mode.uiAnimations;
     if (!g_TrackGame->mode.toolTips) {
-        KrustyUIToolTipView* view =
-            (KrustyUIToolTipView*)gui->GetUser(0)->userToolTip;
-        view->enabled = 0;
+        ToolTip* toolTip = gui->GetUser(0)->userToolTip;
+        toolTip->enabled = 0;
     }
     if (g_TrackGame->controlInterface->activeJoystick)
         ((PCJoystickDevice*)g_TrackGame->controlInterface->activeJoystick)
