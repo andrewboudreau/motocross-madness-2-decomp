@@ -1608,9 +1608,10 @@ int KrustyBike::SimulateAIFrame(float dt)
     linearSpeed = BikeAILength(velocity);
     turnRate = 0.0f;
 
-    frontWheel->primaryAux->ClampAndStep(-lookAheadFrontTravel, 0, frontWheel->primaryAux->axis * -lookAheadFrontTravel);
-    rearWheel->secondaryAux->length = lookAheadRearTravel;
-    rearWheel->secondaryAux->ClampAndStep(lookAheadRearTravel, 0);
+    ((InlineShock*)frontWheel->inlineShock)->ClampAndStep(-lookAheadFrontTravel, 0,
+        ((InlineShock*)frontWheel->inlineShock)->axis * -lookAheadFrontTravel);
+    ((RotatingShock*)rearWheel->rotatingShock)->length = lookAheadRearTravel;
+    ((RotatingShock*)rearWheel->rotatingShock)->ClampAndStep(lookAheadRearTravel, 0);
     if (!airborne)
         anyWheelInContact = 1;
     else
@@ -1661,13 +1662,13 @@ int KrustyBike::SimulateAIFrame(float dt)
     else
         movingForward = 0;
     if (frontWheel->inContact)
-        ((Tire*)frontWheel)->SetRollDistance(forwardSpeed / frontWheel->wheelRadius * dt);
+        frontWheel->SetRollDistance(forwardSpeed / frontWheel->wheelRadius * dt);
     else
-        ((Tire*)frontWheel)->SetRollDistance(forwardSpeed / frontWheel->wheelRadius * dt);
+        frontWheel->SetRollDistance(forwardSpeed / frontWheel->wheelRadius * dt);
     if (rearWheel->inContact)
-        ((Tire*)rearWheel)->SetRollDistance(forwardSpeed / rearWheel->wheelRadius * dt);
+        rearWheel->SetRollDistance(forwardSpeed / rearWheel->wheelRadius * dt);
     else
-        ((Tire*)rearWheel)->SetRollDistance(forwardSpeed / rearWheel->wheelRadius * dt);
+        rearWheel->SetRollDistance(forwardSpeed / rearWheel->wheelRadius * dt);
     modelNode->SetPosition(position);
     UpdateAirborneState(airborneOut);
     airborne = airborneOut;
@@ -1710,8 +1711,8 @@ int KrustyBike::SimulateAIFrame(float dt)
     SaveBodyOrientation(1);
     prevSpeed = linearSpeed;
     Vec3 moved = position - start;
-    frontWheel->groundPoint += moved;
-    rearWheel->groundPoint += moved;
+    (Vec3&)frontWheel->surfacePosition += moved;
+    (Vec3&)rearWheel->surfacePosition += moved;
     UpdateAttachmentEffects();
     scratchVector = modelNode->WorldToLocalDirection(velocity);
     smoothedForwardAccel = BikeAISmoothValue(forwardAccelSmoother,

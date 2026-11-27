@@ -44,8 +44,8 @@ struct BikeCameraBikeView {
     BikeCameraRiderView* riderCharacter;   // +0x5c4
     unsigned char loadInfo[0x5e0 - 0x5c8];    // +0x5c8 Bike loadTextures (a TextureContext) (bytes kept)
     char riderName[0x10];                     // +0x5e0 Bike riderName
-    unsigned char frontWheel[0x5f4 - 0x5f0];  // +0x5f0 Bike frontWheel (BikeWheel*) (bytes kept)
-    unsigned char rearWheel[0x5f8 - 0x5f4];   // +0x5f4 Bike rearWheel (BikeWheel*) (bytes kept)
+    unsigned char frontWheel[0x5f4 - 0x5f0];  // +0x5f0 Bike frontWheel (Tire*) (bytes kept)
+    unsigned char rearWheel[0x5f8 - 0x5f4];   // +0x5f4 Bike rearWheel (Tire*) (bytes kept)
     unsigned char leftBarContact[0x5fc - 0x5f8];// +0x5f8 Bike leftBarContact (bytes kept)
     unsigned char rightBarContact[0x600 - 0x5fc];// +0x5fc Bike rightBarContact (bytes kept)
     int tailContact;                          // +0x600 Bike tailContact

@@ -51,6 +51,7 @@
 #include <float.h>
 
 #include "vehicle/KrustyBike.h"
+#include "tire/Tire.h"
 #include "../../common/FistpFloatToInt.h"
 
 static inline float KbAtLeast(float x, float lo)

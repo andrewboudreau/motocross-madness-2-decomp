@@ -178,7 +178,6 @@ extern int g_kbAllowNegative;        // 0x0056CB5C
 extern int g_kbInterpolate;          // 0x0056CB60
 extern float g_kbStallThreshold;     // 0x0056CB64  interval time at which slot 50 holds
 extern float g_kbStallHoldSec;       // 0x0056CB68  length of that hold
-// BikeWheel view for 0x00513560 (tier 3 name).
 
 // Part table at Vehicle+0x1f0 -> +0xb4 (tier 3): count at +0, 0x44-byte records at +4.  A record
 // with flag bit 3 clear owns a collision object at record+8 -> +0x3c.

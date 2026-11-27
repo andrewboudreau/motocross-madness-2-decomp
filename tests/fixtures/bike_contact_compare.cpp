@@ -10,6 +10,7 @@
 #include <float.h>
 #include "collision/CollisionPoint.h"
 #include "vehicle/Bike.h"
+#include "tire/Tire.h"
 #include "soultree/SoultreePhysicsContact.h"
 
 typedef char ContactSize[sizeof(CollisionPoint) == 0xc4 ? 1 : -1];
@@ -22,7 +23,7 @@ typedef char ListView[offsetof(SoultreeContact,ownerNode) == offsetof(CollisionP
     offsetof(SoultreeContact,worldPosition) == offsetof(CollisionPoint,worldPosition) &&
     offsetof(SoultreeContact,contactNormal) == offsetof(CollisionPoint,surfaceNormal) &&
     offsetof(SoultreeContact,touching) == offsetof(CollisionPoint,inContact) ? 1 : -1];
-typedef char WheelContact[offsetof(BikeWheel,contactPoint_0x0b8) == 0xb8 ? 1 : -1];
+typedef char WheelContact[offsetof(Tire,ownerNode) == 0xb8 + offsetof(CollisionPoint,ownerNode) ? 1 : -1];
 
 // Link-only guards for methods outside this fixture's two exercised bodies.
 // Any accidental entry into those dependencies terminates the test.

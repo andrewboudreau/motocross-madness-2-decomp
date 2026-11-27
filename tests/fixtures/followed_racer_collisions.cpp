@@ -32,7 +32,7 @@ static void Prepare(int seed,int aliases,int filled){
  for(int b=0;b<4;++b){
   KrustyBike*k=Bike(b);int base=aliases==1?0:b*5;
   k->bikeCollision=Collider(base);k->bikeAndRiderCollision=Collider(aliases==2?base:base+1);
-  k->frontWheel=(BikeWheel*)Collider(base+2);k->rearWheel=(BikeWheel*)Collider(aliases==3?base+2:base+3);
+  k->frontWheel=(Tire*)Collider(base+2);k->rearWheel=(Tire*)Collider(aliases==3?base+2:base+3);
   k->wrecker=(Wrecker*)world.wrecker[b];k->wrecker->collisionModel=(ConstraintMethodCollisionModel*)Collider(base+4);
  }
  for(int n=0;n<20;++n){

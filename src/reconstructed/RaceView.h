@@ -54,7 +54,7 @@ class ChatOverlay;
 // position at +0x200 for gate races.
 struct EventBikeWheelView {
     unsigned char field_0x000[0x200];
-    Vector3 nodePosition;  // +0x200  racer +0x5f0 is Bike::frontWheel (BikeWheel); VehicleWheel +0x200 nodePosition; RaceStatus 0x004e6a50 reads it
+    Vector3 nodePosition;  // +0x200  racer +0x5f0 is Bike::frontWheel (a Tire); Tire +0x200 wheelCenter; RaceStatus 0x004e6a50 reads it
 };
 struct BikeCameraRiderView;
 struct BikeCameraWreckerView;

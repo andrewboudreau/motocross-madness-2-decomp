@@ -10,7 +10,7 @@ struct BikeA644;
 class DirtChunkParticleEmitter;
 class DustParticleEmitter;
 class SteamParticleEmitter;
-struct BikeWheel;
+class Tire;
 class Wrecker;
 
 // Indices into riderPoseHandles[] and bikePoseHandles[] (and the values of poseIndex and
@@ -129,8 +129,8 @@ public:
     D3DIMSoultreeCharacter* riderCharacter;  // +0x5c4 slot 8/89 (0x406ae0): calls ApplyMotionBlendAtPhase(poseA, poseB, poseParam, w) on it and riderCharacter->c_0x1a0 scene node; slot 97 passes it with "rider.col" to the 0x604 object
     TextureContext loadTextures;  // +0x5c8 copy of LoadBike's textures (when given), which it also passes to LoadVehicle and the rider's LoadCharacter
     char riderName[16];           // +0x5e0 ctor strcpy from global 0x00577738 (empty string in the image); tier 3 name
-    BikeWheel* frontWheel;       // +0x5f0 front wheel (largest config z, see 0x4079c0 loop at 0x408705); tier 3
-    BikeWheel* rearWheel;       // +0x5f4 rear wheel (smallest config z, 0x408728); tier 3
+    Tire* frontWheel;            // +0x5f0 front wheel (largest config z, see 0x4079c0 loop at 0x408705); a Tire built by the loader (0x00512f10)
+    Tire* rearWheel;             // +0x5f4 rear wheel (smallest config z, 0x408728); a Tire
     CollisionPoint* leftBarContact;      // +0x5f8 cleared in the ctor (0x00407700); LoadBike adds it at (-1.305, 0.225, -0.228) on the "Handlebars" node; IntegrateSteerTorque reads it
     CollisionPoint* rightBarContact;     // +0x5fc cleared in the ctor; the mirror point (+1.305, 0.225, -0.228) on the "Handlebars" node
     CollisionPoint* tailContact;              // +0x600  the loader's contact point at the tail (0, 3.345, -3.206) on modelNode, beside the handlebar contacts

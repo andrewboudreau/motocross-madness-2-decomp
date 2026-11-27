@@ -6,8 +6,8 @@
 // UpdateContactPatch and UpdateSuspensionProbe); nothing here re-implements a
 // Tire function. Two directions are bridged:
 //   * The vehicle code's flat call view VehicleWheel (src/krusty2/vehicle/Vehicle.h)
-//     and Bike's BikeWheel (Bike.h) name the same retail functions under their own
-//     class names. Each shim forwards to the Tire member at the same address; the
+//     names the same retail functions under its own class name (Bike uses Tire
+//     directly). Each shim forwards to the Tire member at the same address; the
 //     constructor builds the Tire in the storage Bike's loader allocated.
 //   * Tire.cpp calls its callees through provisional area-local views (TireNode,
 //     TireDot ...). Each is forwarded to the existing provider at the
@@ -178,15 +178,4 @@ void VehicleWheel::UpdateSuspensionProbe(SoultreeProbe* world, const Vec3* veloc
     AsTire(this)->UpdateSuspensionProbe((Terrain*)world, (const CollisionVec3*)velocity, angle,
                                         radiusScale, yaw, (const CollisionVec3*)forward,
                                         (const CollisionVec3*)up, (TireNode*)node);
-}
-
-// KrustyBike's view of the same wheel (src/krusty2/vehicle/Bike.h BikeWheel) calls
-// 0x00513f90 with the bike as an untyped pointer.
-struct BikeWheel {
-    void UpdateDriveShare(void* vehicle);
-};
-
-void BikeWheel::UpdateDriveShare(void* vehicle)
-{
-    ((Tire*)this)->UpdateDriveShare((TireVehicle*)vehicle);
 }

@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "../../src/krusty2/vehicle/Bike.h"
+#include "../../src/krusty2/tire/Tire.h"
 #include "../../src/reconstructed/GearRatios.h"
 
 #define CHECK(name, condition) typedef char name[(condition) ? 1 : -1]
@@ -16,9 +17,9 @@ FIELD(randomStart, upShiftRpm); FIELD(lastUpdateRpm, lastUpdateRpm);
 CHECK(aux_field8c, offsetof(VehicleWheelAux, throttleTimeScale) == offsetof(EngineGearbox, throttleTimeScale));
 CHECK(aux_field90, offsetof(VehicleWheelAux, gearCount) == offsetof(EngineGearbox, gearCount));
 CHECK(vehicle_aux, offsetof(VehicleWheel, aux) == 0x2a8);
-CHECK(bike_aux, offsetof(BikeWheel, aux) == 0x2a8);
+CHECK(bike_aux, offsetof(Tire, engine) == 0x2a8);
 CHECK(vehicle_magnitude, offsetof(VehicleWheel, driveMagnitude) == 0x280);
-CHECK(bike_magnitude, offsetof(BikeWheel, driveForceMagnitude) == 0x280);
+CHECK(bike_magnitude, offsetof(Tire, driveMagnitude) == 0x280);
 CHECK(vector_size, sizeof(Vec3) == sizeof(Vector3) && sizeof(Vec3) == 12);
 CHECK(vector_x, offsetof(Vec3, x) == offsetof(Vector3, x));
 CHECK(vector_y, offsetof(Vec3, y) == offsetof(Vector3, y));

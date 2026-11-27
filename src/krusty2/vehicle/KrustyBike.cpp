@@ -1442,7 +1442,7 @@ int KrustyBike::ApplyPendingRespawn(float dt)
 // halved; the wheel is then always updated.
 void KrustyBike::UpdateWheelDriveForces()
 {
-    BikeWheel* wheel = rearWheel;
+    Tire* wheel = rearWheel;
     if (!wheel->inContact)
         return;
     if (race->isRacing) {
@@ -1451,17 +1451,17 @@ void KrustyBike::UpdateWheelDriveForces()
             ramp = (0.4762f - backUpPhase) * (360.0f / 0.3562f);
         else
             ramp = 0;
-        if (wheel->aux)
-            reinterpret_cast<EngineGearbox*>(wheel->aux)->DriveForce(
+        if (wheel->engine)
+            reinterpret_cast<EngineGearbox*>(wheel->engine)->DriveForce(
                 KbFloat(linearSpeed), reinterpret_cast<const Vector3*>(&wheel->rollDirection),
                 KbFloat(driveForceScale), backingUp, ramp, reinterpret_cast<Vector3*>(&wheel->driveForce),
-                &wheel->driveForceMagnitude);
+                &wheel->driveMagnitude);
         if (g_TrackGame->mode.raceSettings.raceMode && !onTrack) {
-            rearWheel->driveForce *= 0.5f;
-            rearWheel->driveForceMagnitude *= 0.5f;
+            (Vec3&)rearWheel->driveForce *= 0.5f;
+            rearWheel->driveMagnitude *= 0.5f;
         }
     }
-    rearWheel->UpdateDriveShare(this);
+    rearWheel->UpdateDriveShare((TireVehicle*)this);
 }
 
 Vec3 KrustyBike::ComputeDriveTorque(const Vec3* arm, const Vec3* force)
@@ -1585,7 +1585,7 @@ int KrustyBike::IsThrottleRequested()
 
 int KrustyBike::IsBrakeRequested(VehicleWheel* wheel)
 {
-    BikeWheel* input = (BikeWheel*)wheel;
+    Tire* input = (Tire*)wheel;
     if (aiBrakeRequest > 0.0f ||
         (QueryControlInput(5, 0x3f) && !IsPovHatPressed(input->rampLevel == 0.0f)))
         return 1;
@@ -2283,8 +2283,8 @@ void KrustyBike::InterpolateNetworkState(float dt, int copyRaceProgress)
         riderCharacter->modelNode->SetAxesPtr(&bodyForward, &bodyUp, 1, 1);
         centerNode->GetPositionIn(0, &centerOfMass);
         worldAngularVelocity = modelNode->LocalToWorldDirection(angularVelocity);
-        ((KbSink*)frontWheel->primaryAux)->Reset();
-        ((KbSink*)rearWheel->secondaryAux)->Reset();
+        ((KbSink*)frontWheel->inlineShock)->Reset();
+        ((KbSink*)rearWheel->rotatingShock)->Reset();
         PlaceWheels();
         allWheelsInContact = wheelsInContact == wheelCount;
         anyWheelInContact = wheelsInContact != 0;
@@ -2309,8 +2309,8 @@ void KrustyBike::InterpolateNetworkState(float dt, int copyRaceProgress)
                 roll = 1.0f;
             else
                 roll = FastSqrt(speedSq);
-            ((Tire*)frontWheel)->SetRollDistance(roll * g_TrackGame->frameTime);
-            ((Tire*)rearWheel)->SetRollDistance(roll * g_TrackGame->frameTime);
+            frontWheel->SetRollDistance(roll * g_TrackGame->frameTime);
+            rearWheel->SetRollDistance(roll * g_TrackGame->frameTime);
         }
         if (!g_kbInterpolate)
             turnRate = states[0]->angularVelocity.y;
@@ -3038,8 +3038,8 @@ void KrustyBike::AdvancePosition()
     Vec3 tripled = velocity * 3.0f;
     Vec3 stepVelocity = (tripled - prevVelocity) * 0.5f;
     position += stepVelocity * stepTime;
-    rearWheel->driveForce = kVec3Zero;
-    rearWheel->driveForceMagnitude = 0;
+    (Vec3&)rearWheel->driveForce = kVec3Zero;
+    rearWheel->driveMagnitude = 0;
 }
 
 // 0x004965e0 (slot 14, exact): outside a race, the base integration with the force's x and

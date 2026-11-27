@@ -7,6 +7,7 @@
 #include "collision/CollisionObject.h"
 #include "soultree/SoultreePhysicsObject.h"
 #include "collision/CollisionPoint.h"
+#include "tire/Tire.h"
 #include "broadphase/Terrain.h"
 #include "../../reconstructed/Wrecker.h"
 #include "../../reconstructed/TrackGame.h"
@@ -59,7 +60,7 @@ static inline float BikeDot(const Vec3* a, const Vec3* b)
 
 float Bike::ComputeWheelForwardAlignment()
 {
-    float alignment = BikeDot(&savedForward, &rearWheel->rollDirection);
+    float alignment = BikeDot(&savedForward, (const Vec3*)&rearWheel->rollDirection);
     if (alignment < 0.0f)
         alignment = -alignment;
     return alignment;
@@ -135,22 +136,22 @@ float Bike::IntegrateSteerTorque()
     int driven = 0;
 
     if (airborne) {
-        Vec3 spin = frontWheel->wheelRadius * frontWheel->wheelForwardAxis;
+        Vec3 spin = frontWheel->wheelRadius * (const Vec3&)frontWheel->wheelForwardAxis;
         torque = CrossProduct(spin, torque);
         result = 0.0f;
     } else {
         if (frontWheel->inContact) {
             {
                 Vec3 callResult;
-                offset = *Vec3SubtractCall(&callResult, &frontWheel->wheelPosition, &frontWheel->nodePosition);
+                offset = *Vec3SubtractCall(&callResult, (const Vec3*)&frontWheel->worldPosition, (const Vec3*)&frontWheel->wheelCenter);
             }
             driven = 1;
-            torque = CrossProduct(offset, frontWheel->normalLoadVector);
-            frontWheel->w_0x16c = 2;
+            torque = CrossProduct(offset, (const Vec3&)frontWheel->normalLoadVector);
+            frontWheel->contactState = 2;
             if (leftBarContact->inContact) {
                 {
                     Vec3 callResult;
-                    offset = *Vec3SubtractCall(&callResult, (const Vec3*)&leftBarContact->worldPosition, &frontWheel->nodePosition);
+                    offset = *Vec3SubtractCall(&callResult, (const Vec3*)&leftBarContact->worldPosition, (const Vec3*)&frontWheel->wheelCenter);
                 }
                 const Vec3& axis = (const Vec3&)leftBarContact->surfaceNormal;
                 float d = Vec3DotCall(&base, &axis);
@@ -173,7 +174,7 @@ float Bike::IntegrateSteerTorque()
                 }
                 {
                     Vec3 callResult;
-                    offset = *Vec3SubtractCall(&callResult, (const Vec3*)&rightBarContact->worldPosition, &frontWheel->nodePosition);
+                    offset = *Vec3SubtractCall(&callResult, (const Vec3*)&rightBarContact->worldPosition, (const Vec3*)&frontWheel->wheelCenter);
                 }
                 torque += CrossProduct(offset, push);
                 rightBarContact->contactState = 2;
@@ -182,7 +183,7 @@ float Bike::IntegrateSteerTorque()
             driven = 1;
             {
                 Vec3 callResult;
-                offset = *Vec3SubtractCall(&callResult, (const Vec3*)&leftBarContact->worldPosition, &frontWheel->nodePosition);
+                offset = *Vec3SubtractCall(&callResult, (const Vec3*)&leftBarContact->worldPosition, (const Vec3*)&frontWheel->wheelCenter);
             }
             const Vec3& axis = (const Vec3&)leftBarContact->surfaceNormal;
             float d = Vec3DotCall(&base, &axis);
@@ -206,7 +207,7 @@ float Bike::IntegrateSteerTorque()
             }
             {
                 Vec3 callResult;
-                offset = *Vec3SubtractCall(&callResult, (const Vec3*)&rightBarContact->worldPosition, &frontWheel->nodePosition);
+                offset = *Vec3SubtractCall(&callResult, (const Vec3*)&rightBarContact->worldPosition, (const Vec3*)&frontWheel->wheelCenter);
             }
             torque = CrossProduct(offset, push);
             rightBarContact->contactState = 2;
@@ -225,7 +226,7 @@ float Bike::IntegrateSteerTorque()
             }
         }
         offset = modelNode->WorldToLocalDirection(torque);
-        float d = BikeDotZ(offset, frontWheel->ownerRef->axis);
+        float d = BikeDotZ(offset, ((SteeringControl*)frontWheel->ownerRef)->axis);
         if (d < 0.0f)
             d = -d;
         result = d / len;
@@ -238,7 +239,7 @@ float Bike::IntegrateSteerTorque()
     }
 integrate:
     float sign = -1.0f;
-    if (BikeDotZ(steerTorque, frontWheel->ownerRef->axis) >= 0.0f)
+    if (BikeDotZ(steerTorque, ((SteeringControl*)frontWheel->ownerRef)->axis) >= 0.0f)
         sign = 1.0f;
     float lenSq = Vec3DotCall(&steerTorque, &steerTorque);
     if (lenSq == 1.0f)
@@ -470,12 +471,12 @@ Bike::~Bike()
         delete poseSmoother;
     if (frontWheel)
         RemoveCollisionPoint(reinterpret_cast<CollisionPoint**>(collisionPoints),
-                             reinterpret_cast<CollisionPoint*>(frontWheel->contactPoint_0x0b8), &collisionPointCount);
+                             frontWheel, &collisionPointCount);
     if (handlebars)
         delete handlebars;
     if (rearWheel)
         RemoveCollisionPoint(reinterpret_cast<CollisionPoint**>(collisionPoints),
-                             reinterpret_cast<CollisionPoint*>(rearWheel->contactPoint_0x0b8), &collisionPointCount);
+                             rearWheel, &collisionPointCount);
 }
 
 // owner: Bike.cpp (neighbour of slot 1 0x00407630; Bike's __FILE__ xrefs start at 0x00407c3a)
@@ -735,11 +736,11 @@ GameObject* Bike::LoadBike(int context, const char* engineName, const char* mode
     minZ = 3.402823466e+38f;
     for (i = 0; i < wheelCount; i++) {
         if (wheelPos[i].z > maxZ) {
-            frontWheel = (BikeWheel*)wheelList[i];
+            frontWheel = (Tire*)wheelList[i];
             maxZ = wheelPos[i].z;
         }
         if (wheelPos[i].z < minZ) {
-            rearWheel = (BikeWheel*)wheelList[i];
+            rearWheel = (Tire*)wheelList[i];
             minZ = wheelPos[i].z;
         }
     }
@@ -771,8 +772,8 @@ GameObject* Bike::LoadBike(int context, const char* engineName, const char* mode
         reinterpret_cast<CollisionPoint**>(collisionPoints), reinterpret_cast<const CollisionVec3*>(&tailPoint),
         reinterpret_cast<CollisionContactOwner*>(modelNode), -0.3f, &collisionPointCount, 0.6f,
         reinterpret_cast<int>(track));
-    AddAttachment(1, dustEmitter, rearWheel ? (SoultreeAttachTarget*)&rearWheel->contactPoint_0x0b8 : 0, 0);
-    AddAttachment(2, dirtChunkEmitter, rearWheel ? (SoultreeAttachTarget*)&rearWheel->contactPoint_0x0b8 : 0, 0);
+    AddAttachment(1, dustEmitter, (SoultreeAttachTarget*)(CollisionPoint*)rearWheel, 0);
+    AddAttachment(2, dirtChunkEmitter, (SoultreeAttachTarget*)(CollisionPoint*)rearWheel, 0);
     Vec3 steamOffset = Vec3(0.0f, 2.5f, -2.75f);
     AddAttachment(4, steamEmitter, 0, &steamOffset);
     if (centerNode == 0) {
@@ -783,10 +784,10 @@ GameObject* Bike::LoadBike(int context, const char* engineName, const char* mode
     modelNode->GetMatrixIn(0, &riderMatrix);
     riderCharacter->modelNode->SetMatrixIn(0, &riderMatrix);
     CreateWrecker();
-    steerState->SetAxisFromPoints(frontWheel->sceneNode, handlebars->node, poseNode);
+    steerState->SetAxisFromPoints(frontWheel->node, handlebars->node, poseNode);
     steerState->SetAngle(0.0f, poseNode);
-    frontWheel->sceneNode->GetPositionIn(0, &frontPoint);
-    rearWheel->sceneNode->GetPositionIn(0, &rearPoint);
+    frontWheel->node->GetPositionIn(0, &frontPoint);
+    rearWheel->node->GetPositionIn(0, &rearPoint);
     scratchVector = frontPoint;
     scratchVector.y = 0.0f;
     scratchVector2 = rearPoint;
@@ -794,7 +795,7 @@ GameObject* Bike::LoadBike(int context, const char* engineName, const char* mode
     wheelBase = BikeDistanceAcc(scratchVector2, scratchVector);
     centerNode->GetPositionIn(0, &centerOfMass);
     localCenterOfMass = poseNode->WorldToLocalPoint(centerOfMass);
-    scratchVector = poseNode->WorldToLocalPoint(frontWheel->nodePosition);
+    scratchVector = poseNode->WorldToLocalPoint((const Vec3&)frontWheel->wheelCenter);
     float share = scratchVector.z - localCenterOfMass.z;
     if (share < 0.0f)
         share = -share;
@@ -960,26 +961,26 @@ static inline Vec3 BikeNormalized(const Vec3& v)
 
 Vec3* Bike::GetPivotAndForwardAxis(Vec3* out, Vec3* pos)
 {
-    *pos = modelNode->WorldToLocalPoint(rearWheel->wheelPosition);
-    *out = BikeNormalized(frontWheel->wheelPosition - rearWheel->wheelPosition);
+    *pos = modelNode->WorldToLocalPoint((const Vec3&)rearWheel->worldPosition);
+    *out = BikeNormalized((const Vec3&)frontWheel->worldPosition - (const Vec3&)rearWheel->worldPosition);
     return out;
 }
 
 Vec3* Bike::GetContactGroundNormal(Vec3* out)
 {
     if (wheelsInContact == 0) {
-        *out = rearWheel->groundNormal;
+        *out = (const Vec3&)rearWheel->surfaceNormal;
         return out;
     }
     if (frontWheel->inContact != 0) {
         if (rearWheel->inContact != 0) {
-            *out = BikeNormalized((frontWheel->groundNormal + rearWheel->groundNormal) * 0.5f);
+            *out = BikeNormalized(((const Vec3&)frontWheel->surfaceNormal + (const Vec3&)rearWheel->surfaceNormal) * 0.5f);
             return out;
         }
-        *out = frontWheel->groundNormal;
+        *out = (const Vec3&)frontWheel->surfaceNormal;
         return out;
     }
-    *out = rearWheel->groundNormal;
+    *out = (const Vec3&)rearWheel->surfaceNormal;
     return out;
 }
 
@@ -996,7 +997,7 @@ int Bike::ApplyPendingRespawn(float dt)
             } else if (crashTimer <= 0.0f) {
                 if (crashTimer == 0.0f)
                     crashTimer = -0.1f;
-                if (rearWheel->groundNormal.y > 0.866 || prevSpeed < 1.0f) {
+                if (rearWheel->surfaceNormal.y > 0.866 || prevSpeed < 1.0f) {
                     ClearCrashState();
                     return 1;
                 }
@@ -1018,7 +1019,7 @@ void Bike::ApplyLaunchImpulse(float arg)
 {
     if (smoothedVerticalAccel <= 5.0f || arg == 0.0f)
         return;
-    BikeWheel* rear = rearWheel;
+    Tire* rear = rearWheel;
     if (rear->shockEngaged == 0 && frontWheel->shockEngaged == 0)
         return;
     arg = (controlInput.y - prevControlInput.y) / arg;
@@ -1029,12 +1030,12 @@ void Bike::ApplyLaunchImpulse(float arg)
     impulse = impulse * arg * 5.0f;
     impulse = BikeMin(impulse, 10000.0f);
     if (rear->shockEngaged && rear->tangentSpeed > 30.0f) {
-        rear->secondaryAux->impulseScale = impulse;
+        ((RotatingShock*)rear->rotatingShock)->impulseScale = impulse;
         return;
     }
-    BikeWheel* front = frontWheel;
+    Tire* front = frontWheel;
     if (front->shockEngaged && front->tangentSpeed > 30.0f)
-        front->primaryAux->impulseScale = impulse;
+        ((InlineShock*)front->inlineShock)->impulseScale = impulse;
 }
 
 void Bike::UpdateLocalCenterOfMass()
@@ -1209,21 +1210,21 @@ void Bike::ComputeGroundNormalAndTurn(Vec3* out, VehicleWheel*)
 {
     if (crashState)
         return;
-    BikeWheel* front = frontWheel;
+    Tire* front = frontWheel;
     if (!(front->inContact || (rearWheel->inContact && front->penetration > -0.2f) || frontWheelLifted)) {
-        *out = rearWheel->groundNormal;
+        *out = (const Vec3&)rearWheel->surfaceNormal;
     } else {
-        *out = front->groundNormal;
-        BikeWheel* rear = rearWheel;
-        float weight = frontWheel->contactLoad;
+        *out = (const Vec3&)front->surfaceNormal;
+        Tire* rear = rearWheel;
+        float weight = frontWheel->surfaceGrip;
         if (rear->penetration > -0.2f) {
-            out->x += rear->groundNormal.x;
-            out->y += rear->groundNormal.y;
-            out->z += rear->groundNormal.z;
-            weight += rearWheel->contactLoad;
+            out->x += rear->surfaceNormal.x;
+            out->y += rear->surfaceNormal.y;
+            out->z += rear->surfaceNormal.z;
+            weight += rearWheel->surfaceGrip;
             BikeNormalizeInPlace(out);
             weight *= 0.5f;
-            const Vec3& rollDir = frontWheel->rollDirection;
+            const Vec3& rollDir = (const Vec3&)frontWheel->rollDirection;
             Vec3 cross = CrossProduct(rollDir, *out);
             Vec3 perp = BikeNormalized(cross);
             float scale;
@@ -1235,7 +1236,7 @@ void Bike::ComputeGroundNormalAndTurn(Vec3* out, VehicleWheel*)
                 scale = 1.0f;
             }
             float clampedWeight = (weight < 1.0f) ? weight : 1.0f;
-            turnAngle = DeflectVelocity(&frontWheel->sideAxis, &perp, clampedWeight, scale);
+            turnAngle = DeflectVelocity((Vec3*)&frontWheel->sideAxis, &perp, clampedWeight, scale);
             turnRate = turnAngle * invStepTime;
             return;
         }
@@ -1271,7 +1272,7 @@ float Bike::ComputeSlideAngle(float threshold)
 {
     float result = 0.0f;
     if (allWheelsInContact) {
-        BikeWheel* rear = rearWheel;
+        Tire* rear = rearWheel;
         if (rear->tangentSpeed > 7.0f && rear->tangentSin >= 0.0001f && frontWheel->tangentSin < 0.5f) {
             Vec3 slipAxis;
             slipAxis.x = rear->frictionDirection.z * rear->rollDirection.y
@@ -1301,11 +1302,11 @@ float Bike::ComputeSlideAngle(float threshold)
     }
     bool decay = false;
     if (allWheelsInContact) {
-        BikeWheel* rear = rearWheel;
-        if (rear->driveShare < 0.9f && rear->driveForceMagnitude > 0.0f) {
+        Tire* rear = rearWheel;
+        if (rear->driveShare < 0.9f && rear->driveMagnitude > 0.0f) {
             float halfWheelBase = wheelBase * 0.5f;
             float slide = (halfWheelBase + halfWheelBase * rear->driveShareComplement) * invInertia.y * stepTime
-                          * rear->driveShareComplement * rear->driveForceMagnitude;
+                          * rear->driveShareComplement * rear->driveMagnitude;
             float absLean = leanAngle;
             if (absLean < 0.0f)
                 absLean = -absLean;
@@ -1620,41 +1621,41 @@ void Bike::DistributeContactForce(const Vec3* force)
     }
     if (motionActive) {
         BikeSteerToward(steerAxis, 0.5f, stepTime);
-        rearWheel->loadWeight = rearWheel->restLoadWeight;
-        rearWheel->appliedShare = *force * rearWheel->loadWeight;
-        frontWheel->loadWeight = frontWheel->restLoadWeight;
-        frontWheel->appliedShare = *force * frontWheel->loadWeight;
+        rearWheel->blendWeight = rearWheel->restLoadWeight;
+        (Vec3&)rearWheel->appliedShare = *force * rearWheel->blendWeight;
+        frontWheel->blendWeight = frontWheel->restLoadWeight;
+        (Vec3&)frontWheel->appliedShare = *force * frontWheel->blendWeight;
         return;
     }
     int mode = wheelsInContact;
     if (mode > 1) {
         BikeSteerToward(steerAxis, controlInput.y * 0.25f + 0.5f, stepTime);
         // weight rear/front by the opposite wheel's distance from the centre of mass
-        float lf = BikeWheelDistance(centerOfMass, frontWheel->wheelPosition);
-        float lr = BikeWheelDistance(centerOfMass, rearWheel->wheelPosition);
-        rearWheel->loadWeight = lf / (lr + lf);
-        rearWheel->appliedShare = *force * rearWheel->loadWeight;
-        frontWheel->loadWeight = 1.0f - rearWheel->loadWeight;
-        frontWheel->appliedShare = *force * frontWheel->loadWeight;
+        float lf = BikeWheelDistance(centerOfMass, (const Vec3&)frontWheel->worldPosition);
+        float lr = BikeWheelDistance(centerOfMass, (const Vec3&)rearWheel->worldPosition);
+        rearWheel->blendWeight = lf / (lr + lf);
+        (Vec3&)rearWheel->appliedShare = *force * rearWheel->blendWeight;
+        frontWheel->blendWeight = 1.0f - rearWheel->blendWeight;
+        (Vec3&)frontWheel->appliedShare = *force * frontWheel->blendWeight;
     } else if (mode == 1) {
         BikeSteerToward(steerAxis, controlInput.y * 0.25f + 0.5f, stepTime);
         if (frontWheel->inContact) {
-            frontWheel->loadWeight = 1.0f;
-            frontWheel->appliedShare = *force;
-            rearWheel->loadWeight = 0.0f;
-            rearWheel->appliedShare = kVec3Zero;
+            frontWheel->blendWeight = 1.0f;
+            (Vec3&)frontWheel->appliedShare = *force;
+            rearWheel->blendWeight = 0.0f;
+            (Vec3&)rearWheel->appliedShare = kVec3Zero;
         } else {
-            frontWheel->loadWeight = 0.0f;
-            frontWheel->appliedShare = kVec3Zero;
-            rearWheel->loadWeight = 1.0f;
-            rearWheel->appliedShare = *force;
+            frontWheel->blendWeight = 0.0f;
+            (Vec3&)frontWheel->appliedShare = kVec3Zero;
+            rearWheel->blendWeight = 1.0f;
+            (Vec3&)rearWheel->appliedShare = *force;
         }
     } else {
         BikeSteerToward(steerAxis, controlInput.y * 0.25f + 0.5f, stepTime);
-        rearWheel->loadWeight = 0.0f;
-        rearWheel->appliedShare = kVec3Zero;
-        frontWheel->loadWeight = 0.0f;
-        frontWheel->appliedShare = kVec3Zero;
+        rearWheel->blendWeight = 0.0f;
+        (Vec3&)rearWheel->appliedShare = kVec3Zero;
+        frontWheel->blendWeight = 0.0f;
+        (Vec3&)frontWheel->appliedShare = kVec3Zero;
     }
 }
 
@@ -1764,14 +1765,14 @@ Vec3* Bike::ComputeRotationPivot(Vec3* out, float slideAngle)
     }
     if (wheelsInContact == 2) {
         if (slideAngle != 0.0f) {
-            *out = modelNode->WorldToLocalDirection(scratchVector = frontWheel->wheelPosition - position);
+            *out = modelNode->WorldToLocalDirection(scratchVector = (const Vec3&)frontWheel->worldPosition - position);
             return out;
         } else if (rearWheel->driveShare < 0.9f) {
             float rearBias = rearWheel->driveShare - 0.4f;
             if (!(rearBias > 0.0f))
                 rearBias = 0.0f;
-            Vec3 span = rearWheel->wheelPosition - frontWheel->wheelPosition;
-            Vec3 anchor = span * rearBias + frontWheel->wheelPosition;
+            Vec3 span = (const Vec3&)rearWheel->worldPosition - (const Vec3&)frontWheel->worldPosition;
+            Vec3 anchor = span * rearBias + (const Vec3&)frontWheel->worldPosition;
             *out = modelNode->WorldToLocalDirection(scratchVector = anchor - position);
             return out;
         } else {
@@ -1779,7 +1780,7 @@ Vec3* Bike::ComputeRotationPivot(Vec3* out, float slideAngle)
             // a separate statement lets the transform's result reuse a dead
             // temporary slot
             scratchVector = BikeOolSub(BikeOolAdd(BikeOolHalf(
-                BikeOolSub(rearWheel->wheelPosition, frontWheel->wheelPosition)), frontWheel->wheelPosition), position);
+                BikeOolSub((const Vec3&)rearWheel->worldPosition, (const Vec3&)frontWheel->worldPosition)), (const Vec3&)frontWheel->worldPosition), position);
             *out = modelNode->WorldToLocalDirection(scratchVector);
             return out;
         }
@@ -1788,9 +1789,9 @@ Vec3* Bike::ComputeRotationPivot(Vec3* out, float slideAngle)
         // wheel positions; the half vector is built with the out-of-line
         // constructor and the sum/difference go through the out-of-line
         // operators, all as temporaries of one statement
-        const Vec3& rear = rearWheel->wheelPosition;
-        const Vec3& front = frontWheel->wheelPosition;
-        scratchVector = frontWheel->wheelPosition + BikeOolHalf(BikeOolSub(rear, front)) - position;
+        const Vec3& rear = (const Vec3&)rearWheel->worldPosition;
+        const Vec3& front = (const Vec3&)frontWheel->worldPosition;
+        scratchVector = (const Vec3&)frontWheel->worldPosition + BikeOolHalf(BikeOolSub(rear, front)) - position;
         *out = modelNode->WorldToLocalDirection(scratchVector);
         return out;
     }

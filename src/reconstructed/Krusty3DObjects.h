@@ -168,7 +168,7 @@ struct BonusSoultreeObjectView {
 
 struct BonusBikeWheelView {
     unsigned char field_0x000[0x230];
-    Vector3 rollDirection;                    // +0x230  Bike.h BikeWheel rollDirection (this is the localRacer's rearWheel, Bike +0x5f4)
+    Vector3 rollDirection;                    // +0x230  Tire rollDirection (this is the localRacer's rearWheel, Bike +0x5f4)
 };
 
 // BikeRace's localRacer as the bonus counter reads it.
