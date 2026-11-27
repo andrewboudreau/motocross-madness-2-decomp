@@ -576,62 +576,53 @@ void CollisionObject::RemoveIgnoredOwner(void* owner)
     }
 }
 
-struct HullPositionView { char pad[0xf8]; CollisionVec3 position; };
-struct ModelPositionView { char pad[0xb8]; CollisionVec3 position; };
-struct MeshPositionView { char pad[0x38]; CollisionVec3 position; };
-
-// 0x00436000
+// 0x00436000: the translation row of the payload's body transform.
 void CollisionObject::GetShapePosition(CollisionVec3* out)
 {
     switch (shapeType) {
     case 0:
         {
-            HullPositionView* view = (HullPositionView*)shape;
-            out->x = view->position.x;
-            out->y = view->position.y;
-            out->z = view->position.z;
+            CollisionHullBody* hull = (CollisionHullBody*)shape;
+            out->x = hull->bodyTransform._41;
+            out->y = hull->bodyTransform._42;
+            out->z = hull->bodyTransform._43;
         }
         break;
     case 1:
         {
-            ModelPositionView* view = (ModelPositionView*)shape;
-            out->x = view->position.x;
-            out->y = view->position.y;
-            out->z = view->position.z;
+            CollisionModelBody* model = (CollisionModelBody*)shape;
+            out->x = model->bodyTransform._41;
+            out->y = model->bodyTransform._42;
+            out->z = model->bodyTransform._43;
         }
         break;
     case 2:
         {
-            MeshPositionView* view = (MeshPositionView*)shape;
-            out->x = view->position.x;
-            out->y = view->position.y;
-            out->z = view->position.z;
+            CollisionMeshBody* mesh = (CollisionMeshBody*)shape;
+            out->x = mesh->bodyTransform._41;
+            out->y = mesh->bodyTransform._42;
+            out->z = mesh->bodyTransform._43;
         }
         break;
     }
 }
 
-// Primary scene-graph pointers held by the shape payloads (GetMatrixIn = 0x004fca80).
-
-struct HullNodeView { int swept; CollisionSceneNode* node; };      // hull: node at +4
-struct ModelNodeView { char pad[0x10]; CollisionSceneNode* node; };     // model: node at +0x10
-struct MeshNodeView { CollisionSceneNode* node; };                      // mesh: node at +0
-
-// 0x00435f10
+// 0x00435f10: takes the body transform from the payload's scene node
+// (GetMatrixIn = 0x004fca80).
 void CollisionObject::SyncTransformFromNode()
 {
     Matrix4 m;
     switch (shapeType) {
     case 0:
-        reinterpret_cast<SoultreeObject*>(((HullNodeView*)shape)->node)->GetMatrixIn(0, &m);
+        reinterpret_cast<SoultreeObject*>(((CollisionHullBody*)shape)->sceneNode)->GetMatrixIn(0, &m);
         SetTransform(&m);
         break;
     case 1:
-        reinterpret_cast<SoultreeObject*>(((ModelNodeView*)shape)->node)->GetMatrixIn(0, &m);
+        reinterpret_cast<SoultreeObject*>(((CollisionModelBody*)shape)->sceneNode)->GetMatrixIn(0, &m);
         SetTransform(&m);
         break;
     case 2:
-        reinterpret_cast<SoultreeObject*>(((MeshNodeView*)shape)->node)->GetMatrixIn(0, &m);
+        reinterpret_cast<SoultreeObject*>(((CollisionMeshBody*)shape)->sceneNode)->GetMatrixIn(0, &m);
         SetTransform(&m);
         break;
     case 4:
