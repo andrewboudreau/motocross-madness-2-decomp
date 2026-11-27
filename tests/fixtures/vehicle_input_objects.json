@@ -38,7 +38,7 @@
     "src/krusty2/vehicle/BikeAI.cpp": {
       "sections": 98,
       "relocations": 817,
-      "sha256": "f3dd300aedde32f530d9d6ec97e1d7518b025970a50b54327dece86717a06d9b"
+      "sha256": "e0d16097ab0706f16a93e9788252db6182ddf41c0cc993af26e1fae4ce3074ad"
     },
     "src/reconstructed/InputDevice.cpp": {
       "sections": 11,

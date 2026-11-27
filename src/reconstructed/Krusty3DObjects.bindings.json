@@ -65,7 +65,7 @@
   "?HideDigits@BonusObjectManager@@QAEXXZ": "0x0048d540",
   "?SetPosition@SoultreeObject@@QAEXABUVec3@@@Z": "0x004fc660",
   "?RemoveChild@SoultreeObject@@QAEXPAV1@@Z": "0x004fd990",
-  "?PointAt@Track@@QAEHUTrackPos@@PAUTrackVec3@@@Z": "0x00518080",
+  "?PointAt@Track@@QAEHUTrackPos@@PAUVec3@@@Z": "0x00518080",
   "?Tick@BonusObjectManager@@UAEHM@Z": "0x0048ccc0",
   "?Tick@GameObject@@UAEHM@Z": "0x004693d0",
   "?Tick@NumberObjectManager@@UAEHM@Z": "0x0048bfc0",

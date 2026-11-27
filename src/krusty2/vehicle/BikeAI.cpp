@@ -1841,7 +1841,7 @@ int KrustyBike::UpdateAIRacingLine(float dt)
             }
             speed = linearSpeed;
             if (race->raceTrack) {
-                if (!race->raceTrack->ClosestPointOnNode(*reinterpret_cast<TrackVec3*>(&position), race->raceTrack->startNode,
+                if (!race->raceTrack->ClosestPointOnNode(position, race->raceTrack->startNode,
                                                                     &statusNode->placedPos, 0))
                     return 0;
                 if (!statusNode->progressPos.node) {
@@ -1851,7 +1851,7 @@ int KrustyBike::UpdateAIRacingLine(float dt)
                 }
                 gate = statusNode->nextGate;
                 if (!gate->trackPos.node)
-                    race->raceTrack->ClosestPointOnNode(*reinterpret_cast<TrackVec3*>(&gate->center), race->raceTrack->startNode,
+                    race->raceTrack->ClosestPointOnNode(GateCenter(gate), race->raceTrack->startNode,
                                                                   &gate->trackPos, 0);
                 gateAhead = race->raceTrack->DistanceAlong(statusNode->progressPos,
                                                                           statusNode->nextGate->trackPos);
@@ -1879,7 +1879,7 @@ int KrustyBike::UpdateAIRacingLine(float dt)
                         if (!race->raceTrack->MoveAlongPath(statusNode->progressPos, &pathPos, &list,
                                                             t * linearSpeed, 0))
                             return 0;
-                        if (!race->raceTrack->PointAt(pathPos, (TrackVec3*)&aiPath.points[i]))
+                        if (!race->raceTrack->PointAt(pathPos, &aiPath.points[i]))
                             return 0;
                         aiPath.points[i].y = position.y + 2.0f;
                         i++;
@@ -1952,7 +1952,7 @@ int KrustyBike::UpdateAIRacingLine(float dt)
                     if (!race->raceTrack->MoveAlongPath(statusNode->progressPos, &pathPos, &list,
                                                         t * linearSpeed, 0))
                         return 0;
-                    if (!race->raceTrack->PointAt(pathPos, (TrackVec3*)&aiPath.points[i]))
+                    if (!race->raceTrack->PointAt(pathPos, &aiPath.points[i]))
                         return 0;
                     aiPath.points[i].y = position.y + 2.0f;
                     i++;
@@ -1982,7 +1982,7 @@ int KrustyBike::UpdateAIRacingLine(float dt)
                     if (!race->raceTrack->MoveAlongPath(statusNode->progressPos, &pathPos, &list,
                                                         g_TrackSearchAhead * t, 0))
                         return 0;
-                    if (!race->raceTrack->PointAt(pathPos, (TrackVec3*)&aiPath.points[i]))
+                    if (!race->raceTrack->PointAt(pathPos, &aiPath.points[i]))
                         return 0;
                     aiPath.points[i].y = position.y + 2.0f;
                     lenSq = BikeAISquareMagnitude(aiPath.points[0] - position);
@@ -1992,7 +1992,7 @@ int KrustyBike::UpdateAIRacingLine(float dt)
                 }
             } else {
                 pathPos = statusNode->progressPos;
-                if (!race->raceTrack->PointAt(statusNode->progressPos, (TrackVec3*)&aiPath.points[0]))
+                if (!race->raceTrack->PointAt(statusNode->progressPos, &aiPath.points[0]))
                     return 0;
             }
         }
@@ -2010,10 +2010,10 @@ int KrustyBike::UpdateAIRacingLine(float dt)
                                                                         -1.0f, -1.0f, 0, 0);
             if (onTrack) {
                 aiPath.targetSpeed = 40.0f;
-                if (!race->raceTrack->SegmentDirection(statusNode->progressPos.segment, (TrackVec3*)&dir))
+                if (!race->raceTrack->SegmentDirection(statusNode->progressPos.segment, &dir))
                     return 0;
-                race->raceTrack->DistanceToStripEdge(*reinterpret_cast<TrackVec3*>(&position), statusNode->progressPos.segment, &right, 10);
-                race->raceTrack->DistanceToStripEdge(*reinterpret_cast<TrackVec3*>(&position), statusNode->progressPos.segment, &left, 11);
+                race->raceTrack->DistanceToStripEdge(position, statusNode->progressPos.segment, &right, 10);
+                race->raceTrack->DistanceToStripEdge(position, statusNode->progressPos.segment, &left, 11);
                 if (BikeAIDot(dir, bodyForward) < 0.0f)
                     dir = -dir;
                 if (left < right) {

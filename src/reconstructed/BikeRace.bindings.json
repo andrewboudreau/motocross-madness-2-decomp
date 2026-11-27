@@ -309,7 +309,7 @@
   "?Push@MemTagStack@@QAEHPBD@Z": "0x004a2d00",
   "?RemoveVegetationInRect@EventManager@@QAEXMMMM@Z": "0x0045fce0",
   "?Scale@SoultreeObject@@QAEXMMM@Z": "0x004fd340",
-  "?SegmentDirection@Track@@QAEHPAUTrackSegment@@PAUTrackVec3@@@Z": "0x00518130",
+  "?SegmentDirection@Track@@QAEHPAUTrackSegment@@PAUVec3@@@Z": "0x00518130",
   "?SetAcquired@PCInputDevice@@QAEHH@Z": "0x004c26d0",
   "?SetAxes@ArcadeObject@@QAEXPBUVector3@@0HH@Z": "0x00401520",
   "?SetUseLighting@D3DIMSoultreeObject@@QAEXH@Z": "0x004444c0",

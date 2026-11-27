@@ -1,6 +1,7 @@
 #pragma once
 
 #include "MatrixUtil.h"
+#include "../krusty2/math/Vec3.h"
 #include "Tokenizer.h"
 
 // Track.cpp (literal __FILE__ "D:\aardvark\VC\krusty2\Track.cpp", 0x0057508c).
@@ -28,15 +29,9 @@ struct TrackNode {
 // A segment point (calloc(1, 0x30), Track.cpp line 141), kept in a doubly
 // linked list per node.
 struct TrackSegment {
-    float pointX;                             // +0x00 the centre point
-    float pointY;                             // +0x04
-    float pointZ;                             // +0x08
-    float edgeAX;                             // +0x0c the first strip edge point (mode 10)
-    float edgeAY;                             // +0x10
-    float edgeAZ;                             // +0x14
-    float edgeBX;                             // +0x18 the second strip edge point (mode 11)
-    float edgeBY;                             // +0x1c
-    float edgeBZ;                             // +0x20
+    Vec3 point;                               // +0x00 the centre point
+    Vec3 edgeA;                               // +0x0c the first strip edge point (mode 10)
+    Vec3 edgeB;                               // +0x18 the second strip edge point (mode 11)
     float horizontalLength;                   // +0x24 horizontal distance to the next point
     TrackSegment* previous;                   // +0x28
     TrackSegment* next;                       // +0x2c
@@ -47,12 +42,6 @@ struct TrackPos {
     TrackNode* node;
     TrackSegment* segment;
     float t;                        // 0..1 along the segment
-};
-
-struct TrackVec3 {
-    float x;
-    float y;
-    float z;
 };
 
 // Work-list entry of the graph walks (calloc(1, 0x10)); only +0x00, +0x04 and
@@ -91,8 +80,8 @@ public:
     // 0x00516980 (RaceStatus.cpp): places `p` on the track (the closest
     // position over every reachable node) and optionally returns its distance.
     int ClosestPointOnTrack(Vector3 p, TrackPos* out, float* outDistance);
-    int ClosestPointOnNode(TrackVec3 p, TrackNode* node, TrackPos* out, float* outDistance);
-    int IsInsideStrip(TrackVec3 p, TrackSegment* segment, TrackSegment* next);
+    int ClosestPointOnNode(Vec3 p, TrackNode* node, TrackPos* out, float* outDistance);
+    int IsInsideStrip(Vec3 p, TrackSegment* segment, TrackSegment* next);
     int NodeHasSegment(TrackSegment* segment, TrackNode* node);
     // 0x00517340 (RaceStatus.cpp): places `p` on the track near `from`. Every
     // segment whose strip contains p is a candidate; one within `distance`
@@ -105,9 +94,9 @@ public:
     int ShortestPath(TrackPos a, TrackPos b, TrackListItem** path, float* distance);
     float DistanceAlong(TrackPos a, TrackPos b);
     int MoveAlongPath(TrackPos pos, TrackPos* out, TrackListItem** path, float distance, unsigned char flags);
-    int PointAt(TrackPos pos, TrackVec3* out);
-    int SegmentDirection(TrackSegment* segment, TrackVec3* out);
-    int DistanceToStripEdge(TrackVec3 p, TrackSegment* segment, float* out, int mode);
+    int PointAt(TrackPos pos, Vec3* out);
+    int SegmentDirection(TrackSegment* segment, Vec3* out);
+    int DistanceToStripEdge(Vec3 p, TrackSegment* segment, float* out, int mode);
 
     TrackNode* startNode;                     // +0x00
     float lapLength;                          // +0x04

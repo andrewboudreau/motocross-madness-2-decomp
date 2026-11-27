@@ -104,8 +104,8 @@ int RunwayLights::Tick(float frameTime) {
     Vector3 position;
     Vector3 next;
     if (trackedRacer->bikeView->raceTrack) {
-        trackedRacer->bikeView->raceTrack->PointAt(trackedRacer->statusNode->placedPos, (TrackVec3*)&position);
-        trackedRacer->bikeView->raceTrack->PointAt(trackedRacer->statusNode->progressPos, (TrackVec3*)&next);
+        trackedRacer->bikeView->raceTrack->PointAt(trackedRacer->statusNode->placedPos, (Vec3*)&position);
+        trackedRacer->bikeView->raceTrack->PointAt(trackedRacer->statusNode->progressPos, (Vec3*)&next);
         direction = position - next;
     } else {
         position = trackedRacer->trackPoint;
@@ -314,7 +314,7 @@ int VisualCue::Tick(float frameTime) {
         UNKNOWN_PLACE_CUE();
         Vector3 target;
         if (cueView->raceTrack)
-            cueView->raceTrack->PointAt(cueView->ownRacer->statusNode->progressPos, (TrackVec3*)&target);
+            cueView->raceTrack->PointAt(cueView->ownRacer->statusNode->progressPos, (Vec3*)&target);
         else
             target = cueView->ownRacer->trackPoint;
         groundTerrain->QueryGround(reinterpret_cast<TerrainVec3*>(&target), 0, 0, 0);

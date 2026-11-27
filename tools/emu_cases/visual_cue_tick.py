@@ -120,7 +120,7 @@ def setup(ctx, c):
     ctx.stub_at(0x004014f0, 'ArcadeObject::SetPosition', pop=4, log=False,
                 ret=lambda cx, e, a: cx.note('SetPosition', e, vec(cx, a[0])))
 
-    def point_at(cx, e, a):            # thiscall (TrackPos by value, TrackVec3* out)
+    def point_at(cx, e, a):            # thiscall (TrackPos by value, Vec3* out)
         cx.note('PointAt', e, a[0], a[1], a[2])
         cx.pack(a[3], '3f', *[cx.rng.uniform(-50, 50) for _ in range(3)])
         return 1

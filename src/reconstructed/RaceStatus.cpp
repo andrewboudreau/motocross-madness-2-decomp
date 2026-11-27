@@ -452,10 +452,10 @@ int UpdateLapRace(RaceStatusNode** list, Track* track, float frameTime, RaceGate
         }
     next:
         if (status->progressPos.node && status->progressPos.segment && status->progressPos.segment->next) {
-            if (!track->PointAt(status->progressPos, (TrackVec3*)&status->racer->trackPoint))
+            if (!track->PointAt(status->progressPos, (Vec3*)&status->racer->trackPoint))
                 racer->trackPoint = racer->position;
             if (!track->SegmentDirection(status->progressPos.segment,
-                                              (TrackVec3*)&status->racer->trackDirection))
+                                              (Vec3*)&status->racer->trackDirection))
                 racer->trackDirection = racer->bodyForward;
             status->racer->trackPoint -= status->racer->trackDirection * 3.5f;
         }

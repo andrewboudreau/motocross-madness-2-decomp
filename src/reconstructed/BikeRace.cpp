@@ -2942,8 +2942,8 @@ void BikeRace::WriteRelativePositions(Vector3* a, Vector3* b, void* reference, i
         if (raceTrack->startNode != 0 && raceTrack->startNode->firstSegment != 0 &&
             raceTrack->startNode->firstSegment->next != 0 &&
             raceTrack->startNode->firstSegment->next->next != 0) {
-            TrackVec3 p0;
-            TrackVec3 p1;
+            Vec3 p0;
+            Vec3 p1;
             raceTrack->SegmentDirection(raceTrack->startNode->firstSegment, &p0);
             raceTrack->SegmentDirection(raceTrack->startNode->firstSegment->next, &p1);
             if (p1.x * p0.z - p0.x * p1.z <= 0.0f) {
@@ -3455,23 +3455,23 @@ void BikeRace::DrawTrack(Track* track) {
                 Vector3 a;
                 Vector3 b;
                 SetDrawColor(0, 0xff, 0);
-                a = *(Vector3*)&segment->edgeAX;
-                b = *(Vector3*)&segment->next->edgeAX;
+                a = *(Vector3*)&segment->edgeA;
+                b = *(Vector3*)&segment->next->edgeA;
                 raceTerrain->QueryGround(reinterpret_cast<TerrainVec3*>(&a), 0, 0, 0);
                 raceTerrain->QueryGround(reinterpret_cast<TerrainVec3*>(&b), 0, 0, 0);
                 a.y += 5.0f;
                 b.y += 5.0f;
                 DrawLine((const Vec3*)&a, (const Vec3*)&b);
-                a = *(Vector3*)&segment->edgeBX;
-                b = *(Vector3*)&segment->next->edgeBX;
+                a = *(Vector3*)&segment->edgeB;
+                b = *(Vector3*)&segment->next->edgeB;
                 raceTerrain->QueryGround(reinterpret_cast<TerrainVec3*>(&a), 0, 0, 0);
                 raceTerrain->QueryGround(reinterpret_cast<TerrainVec3*>(&b), 0, 0, 0);
                 a.y += 5.0f;
                 b.y += 5.0f;
                 DrawLine((const Vec3*)&a, (const Vec3*)&b);
                 SetDrawColor(0, 0, 0xff);
-                a = *(Vector3*)&segment->pointX;
-                b = *(Vector3*)&segment->next->pointX;
+                a = *(Vector3*)&segment->point;
+                b = *(Vector3*)&segment->next->point;
                 raceTerrain->QueryGround(reinterpret_cast<TerrainVec3*>(&a), 0, 0, 0);
                 raceTerrain->QueryGround(reinterpret_cast<TerrainVec3*>(&b), 0, 0, 0);
                 a.y += 5.0f;

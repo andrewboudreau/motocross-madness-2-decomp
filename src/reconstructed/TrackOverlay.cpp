@@ -1678,9 +1678,9 @@ void RadarOverlay::DrawTrackOutline(int mode)
         TrackSegment* first = node->firstSegment;
         Vector3 point;
         if (mode == 1)
-            point = *(Vector3*)&first->edgeBX;
+            point = *(Vector3*)&first->edgeB;
         else if (mode == 2)
-            point = *(Vector3*)&first->edgeAX;
+            point = *(Vector3*)&first->edgeA;
         int startX;
         int startY;
         float rim[2];
@@ -1694,9 +1694,9 @@ void RadarOverlay::DrawTrackOutline(int mode)
         TrackSegment* segment = first->next;
         if (segment) do {
             if (mode == 1)
-                point = *(Vector3*)&segment->edgeBX;
+                point = *(Vector3*)&segment->edgeB;
             else if (mode == 2)
-                point = *(Vector3*)&segment->edgeAX;
+                point = *(Vector3*)&segment->edgeA;
             int wasOutside = outside;
             float from[2];
             from[0] = (float)x;

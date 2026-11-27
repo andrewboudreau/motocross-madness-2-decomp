@@ -119,13 +119,13 @@ It is exact; see the shapes below.
 - `0x00518230` (called from BikeAI.cpp `0x00415326`/`0x0041535c` with modes
   10 and 11): the edge differences come from Track.cpp's file-static
   inline `operator-`, which returns its result through an inline
-  `MakeTrackVec3(x, y, z)` (an aggregate temporary filled in place
+  `MakeVec3(x, y, z)` (an aggregate temporary filled in place
   schedules the copy into the direction before the last component is
-  stored). The helpers stay in Track.cpp: TrackVec3 constructors or
-  operators declared in Track.h shift VC6's operand-order tie-break in TUs
+  stored). The helpers stay in Track.cpp: free Vec3 operators
+  declared in Track.h shift VC6's operand-order tie-break in TUs
   that include it (TrackGame slot 1 `0x00520ab0`, Scene::ReadLight
   `0x004eb570` and SelectGamePicProcs `0x004f17a0` stop matching). The
-  perpendicular is a TrackVec3 local whose `.x`/`.z` are written before the
+  perpendicular is a Vec3 local whose `.x`/`.z` are written before the
   `0x0047b800` call (a plain float is pushed directly). The first edge's closest point is `d = d * t; a += d;
   a -= p` component-wise in place; the second edge uses `d2 * t + a2` and
   accumulates its squared distance in the `u` out-parameter local
@@ -139,7 +139,7 @@ It is exact; see the shapes below.
   frame without `this` in ebp. The link pass reuses `index` and `slot`
   (function-scope, address-taken) as its counters, which is why retail
   stores them to their frame slots each iteration. The probe extents are
-  scaled through a `TrackVec3*` helper, so one base register serves all
+  scaled through a `Vec3*` helper, so one base register serves all
   three components.
 - `0x00518080`: writing the clamp into the by-value `pos.t`, plus a local
   difference vector.
@@ -162,12 +162,20 @@ tier 1 offsets; each keeps its `// +0xNN`): the node's `flags`,
 `pathLength`, `firstSegment`, `lastSegment`, `linkCount` and `links`; the
 segment's `horizontalLength`, `previous` and `next`; the work-list entry's
 `flags` and `node`; and Track's `startNode` and `lapLength`. The segment's
-centre point is `pointX`..`pointZ` (+0x00..+0x08, read as the point by
-`0x00518130`) and its edge points `edgeAX`..`edgeAZ` (+0x0c, mode 10 of
-`0x00518230`) and `edgeBX`..`edgeBZ` (+0x18, mode 11); which edge is left
+centre `point` (+0x00, read as the point by `0x00518130`) and its edge
+points `edgeA` (+0x0c, mode 10 of `0x00518230`) and `edgeB` (+0x18, mode
+11); which edge is left
 is not settled. Physics keeps
 its own views (`KbTrack` and the list entry in KrustyBikeTypes.h). The
 renames changed no calibration bytes.
+
+Track's points are the shared `Vec3` (krusty2/math/Vec3.h); the former
+`TrackVec3` was a plain three-float struct. A D3DVECTOR-shaped replacement
+compiles identically in every unit that includes Track.h, and the fold
+proof (126 units) changed only mangled names, goto-label counters and one
+debug `.file` chain index in BikeAI (Vec3.h is now first reached through
+Track.h's `../krusty2/math/Vec3.h`). SegmentDirection's difference is built
+with Vec3's constructor, which replaced a file-local `TrackVector`.
 
 ## Function names
 

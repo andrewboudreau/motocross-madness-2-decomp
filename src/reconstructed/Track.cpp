@@ -12,36 +12,28 @@
 
 // Vector helpers for 0x00518230. They are file-local: declared in Track.h
 // they shift operand order in other TUs that include it (docs/TRACK.md).
-static inline TrackVec3 MakeTrackVec3(float x, float y, float z)
+static inline Vec3 MakeVec3(float x, float y, float z)
 {
-    TrackVec3 v;
+    Vec3 v;
     v.x = x;
     v.y = y;
     v.z = z;
     return v;
 }
 
-static inline TrackVec3 operator-(const TrackVec3& a, const TrackVec3& b)
+static inline Vec3 operator-(const Vec3& a, const Vec3& b)
 {
-    return MakeTrackVec3(a.x - b.x, a.y - b.y, a.z - b.z);
+    return MakeVec3(a.x - b.x, a.y - b.y, a.z - b.z);
 }
 
-static inline TrackVec3 operator+(const TrackVec3& a, const TrackVec3& b)
+static inline Vec3 operator+(const Vec3& a, const Vec3& b)
 {
-    return MakeTrackVec3(a.x + b.x, a.y + b.y, a.z + b.z);
+    return MakeVec3(a.x + b.x, a.y + b.y, a.z + b.z);
 }
 
-static inline TrackVec3 operator*(const TrackVec3& v, float s)
+static inline Vec3 operator*(const Vec3& v, float s)
 {
-    return MakeTrackVec3(v.x * s, v.y * s, v.z * s);
-}
-
-static inline TrackVec3& operator+=(TrackVec3& a, const TrackVec3& b)
-{
-    a.x += b.x;
-    a.y += b.y;
-    a.z += b.z;
-    return a;
+    return MakeVec3(v.x * s, v.y * s, v.z * s);
 }
 
 // 0x00515dc0: an empty string leaves nothing to split.
@@ -103,15 +95,15 @@ int Track::FreeNodeArray(FileStream* stream, TrackNode** nodes, int count)
 // frame and registers off retail's.
 // The start / finish probe the loader fills (bikerace.cpp's 0x3c-byte gate).
 struct TrackProbe {
-    TrackVec3 centre;               // +0x00
-    TrackVec3 direction;            // +0x0c
-    TrackVec3 halfExtents;          // +0x18
+    Vec3 centre;                    // +0x00
+    Vec3 direction;                 // +0x0c
+    Vec3 halfExtents;               // +0x18
     float width;                    // +0x24, as BikeRaceNode.h
     float height;                   // +0x28 RaceGate::height; 150 after loading
     TrackPos pos;                   // +0x2c
 };
 
-static inline void ScaleTrackVec3(TrackVec3* v, float scale)
+static inline void ScaleVec3(Vec3* v, float scale)
 {
     v->x *= scale;
     v->y *= scale;
@@ -196,17 +188,17 @@ int Track::LoadTrack(FileStream* stream, void* start, void* finish, int* hasStar
                 FreeNodeArray(stream, nodes, count);
                 return 0;
             }
-            stream->Read(&nodes[index]->lastSegment->pointX, 4, 1);
-            stream->Read(&nodes[index]->lastSegment->pointY, 4, 1);
-            stream->Read(&nodes[index]->lastSegment->pointZ, 4, 1);
-            nodes[index]->lastSegment->pointX = scale * nodes[index]->lastSegment->pointX + offsetX;
-            nodes[index]->lastSegment->pointY = scale * nodes[index]->lastSegment->pointY;
-            nodes[index]->lastSegment->pointZ = scale * nodes[index]->lastSegment->pointZ + offsetZ;
+            stream->Read(&nodes[index]->lastSegment->point.x, 4, 1);
+            stream->Read(&nodes[index]->lastSegment->point.y, 4, 1);
+            stream->Read(&nodes[index]->lastSegment->point.z, 4, 1);
+            nodes[index]->lastSegment->point.x = scale * nodes[index]->lastSegment->point.x + offsetX;
+            nodes[index]->lastSegment->point.y = scale * nodes[index]->lastSegment->point.y;
+            nodes[index]->lastSegment->point.z = scale * nodes[index]->lastSegment->point.z + offsetZ;
             TrackSegment* segment = nodes[index]->lastSegment;
             TrackSegment* previous = segment->previous;
             if (previous) {
-                float dx = segment->pointX - previous->pointX;
-                float dz = segment->pointZ - previous->pointZ;
+                float dx = segment->point.x - previous->point.x;
+                float dz = segment->point.z - previous->point.z;
                 previous->horizontalLength = (float)sqrt(dz * dz + dx * dx);
             }
         } else if (chunk == 10) {
@@ -214,23 +206,23 @@ int Track::LoadTrack(FileStream* stream, void* start, void* finish, int* hasStar
                 FreeNodeArray(stream, nodes, count);
                 return 0;
             }
-            stream->Read(&nodes[index]->lastSegment->edgeAX, 4, 1);
-            stream->Read(&nodes[index]->lastSegment->edgeAY, 4, 1);
-            stream->Read(&nodes[index]->lastSegment->edgeAZ, 4, 1);
-            nodes[index]->lastSegment->edgeAX = scale * nodes[index]->lastSegment->edgeAX + offsetX;
-            nodes[index]->lastSegment->edgeAY = scale * nodes[index]->lastSegment->edgeAY;
-            nodes[index]->lastSegment->edgeAZ = scale * nodes[index]->lastSegment->edgeAZ + offsetZ;
+            stream->Read(&nodes[index]->lastSegment->edgeA.x, 4, 1);
+            stream->Read(&nodes[index]->lastSegment->edgeA.y, 4, 1);
+            stream->Read(&nodes[index]->lastSegment->edgeA.z, 4, 1);
+            nodes[index]->lastSegment->edgeA.x = scale * nodes[index]->lastSegment->edgeA.x + offsetX;
+            nodes[index]->lastSegment->edgeA.y = scale * nodes[index]->lastSegment->edgeA.y;
+            nodes[index]->lastSegment->edgeA.z = scale * nodes[index]->lastSegment->edgeA.z + offsetZ;
         } else if (chunk == 11) {
             if (!nodes[index] || !nodes[index]->lastSegment) {
                 FreeNodeArray(stream, nodes, count);
                 return 0;
             }
-            stream->Read(&nodes[index]->lastSegment->edgeBX, 4, 1);
-            stream->Read(&nodes[index]->lastSegment->edgeBY, 4, 1);
-            stream->Read(&nodes[index]->lastSegment->edgeBZ, 4, 1);
-            nodes[index]->lastSegment->edgeBX = scale * nodes[index]->lastSegment->edgeBX + offsetX;
-            nodes[index]->lastSegment->edgeBY = scale * nodes[index]->lastSegment->edgeBY;
-            nodes[index]->lastSegment->edgeBZ = scale * nodes[index]->lastSegment->edgeBZ + offsetZ;
+            stream->Read(&nodes[index]->lastSegment->edgeB.x, 4, 1);
+            stream->Read(&nodes[index]->lastSegment->edgeB.y, 4, 1);
+            stream->Read(&nodes[index]->lastSegment->edgeB.z, 4, 1);
+            nodes[index]->lastSegment->edgeB.x = scale * nodes[index]->lastSegment->edgeB.x + offsetX;
+            nodes[index]->lastSegment->edgeB.y = scale * nodes[index]->lastSegment->edgeB.y;
+            nodes[index]->lastSegment->edgeB.z = scale * nodes[index]->lastSegment->edgeB.z + offsetZ;
         } else if (chunk == 12) {
             int unused;
             stream->Read(&unused, 4, 1);
@@ -275,7 +267,7 @@ int Track::LoadTrack(FileStream* stream, void* start, void* finish, int* hasStar
             stream->Read(&probe->halfExtents.y, 4, 1);
             stream->Read(&probe->halfExtents.z, 4, 1);
             stream->Read(&probe->width, 4, 1);
-            ScaleTrackVec3(&probe->halfExtents, scale);
+            ScaleVec3(&probe->halfExtents, scale);
             probe->width *= scale;
             probe->centre.x = probe->centre.x * scale + offsetX;
             probe->centre.y *= scale;
@@ -293,7 +285,7 @@ int Track::LoadTrack(FileStream* stream, void* start, void* finish, int* hasStar
             stream->Read(&probe->halfExtents.y, 4, 1);
             stream->Read(&probe->halfExtents.z, 4, 1);
             stream->Read(&probe->width, 4, 1);
-            ScaleTrackVec3(&probe->halfExtents, scale);
+            ScaleVec3(&probe->halfExtents, scale);
             probe->width *= scale;
             probe->centre.x = probe->centre.x * scale + offsetX;
             probe->centre.y *= scale;
@@ -421,8 +413,8 @@ int Track::ClosestPointOnTrack(Vector3 p, TrackPos* out, float* outDistance)
             TrackSegment* segment = list->node->firstSegment;
             if (segment) {
                 if (!segment->next) {
-                    float dx = p.x - segment->pointX;
-                    float dz = p.z - segment->pointZ;
+                    float dx = p.x - segment->point.x;
+                    float dz = p.z - segment->point.z;
                     float distanceSquared = dz * dz + dx * dx;
                     if (distanceSquared < best || best < 0.0f) {
                         best = distanceSquared;
@@ -435,29 +427,29 @@ int Track::ClosestPointOnTrack(Vector3 p, TrackPos* out, float* outDistance)
                     TrackSegment* next = segment->next;
                     if (!next)
                         break;
-                    float ex = next->pointX - segment->pointX;
-                    float ez = next->pointZ - segment->pointZ;
+                    float ex = next->point.x - segment->point.x;
+                    float ez = next->point.z - segment->point.z;
                     float t;
                     float dx;
                     float dz;
                     if (ex == 0.0f && ez == 0.0f)
                         t = 0.0f;
                     else {
-                        t = ((p.z - segment->pointZ) * ez + (p.x - segment->pointX) * ex) / (ez * ez + ex * ex);
+                        t = ((p.z - segment->point.z) * ez + (p.x - segment->point.x) * ex) / (ez * ez + ex * ex);
                         if (t > 1.0f)
                             t = 1.0f;
                         else if (t < 0.0f)
                             t = 0.0f;
                     }
                     if (t == 1.0f) {
-                        dx = p.x - next->pointX;
-                        dz = p.z - next->pointZ;
+                        dx = p.x - next->point.x;
+                        dz = p.z - next->point.z;
                     } else if (t == 0.0f) {
-                        dx = p.x - segment->pointX;
-                        dz = p.z - segment->pointZ;
+                        dx = p.x - segment->point.x;
+                        dz = p.z - segment->point.z;
                     } else {
-                        dx = (p.x - segment->pointX) - t * ex;
-                        dz = (p.z - segment->pointZ) - t * ez;
+                        dx = (p.x - segment->point.x) - t * ex;
+                        dz = (p.z - segment->point.z) - t * ez;
                     }
                     float distanceSquared = dz * dz + dx * dx;
                     if (distanceSquared < best || best < 0.0f) {
@@ -497,7 +489,7 @@ int Track::ClosestPointOnTrack(Vector3 p, TrackPos* out, float* outDistance)
 // point, t == 0: the segment start, otherwise the interpolation). VC6 then
 // recomputes `p - segment` in the t == 0 copies as retail does and reuses
 // the projection's differences only in the interpolation.
-int Track::ClosestPointOnNode(TrackVec3 p, TrackNode* node, TrackPos* out, float* outDistance)
+int Track::ClosestPointOnNode(Vec3 p, TrackNode* node, TrackPos* out, float* outDistance)
 {
     float best = -1.0f;
     if (!node || !out)
@@ -509,8 +501,8 @@ int Track::ClosestPointOnNode(TrackVec3 p, TrackNode* node, TrackPos* out, float
             out->segment = segment;
             out->t = 0.0f;
             if (outDistance) {
-                float dx = p.x - segment->pointX;
-                float dz = p.z - segment->pointZ;
+                float dx = p.x - segment->point.x;
+                float dz = p.z - segment->point.z;
                 *outDistance = FastSqrt(dz * dz + dx * dx);
             }
             return 1;
@@ -519,29 +511,29 @@ int Track::ClosestPointOnNode(TrackVec3 p, TrackNode* node, TrackPos* out, float
             TrackSegment* next = segment->next;
             if (!next)
                 break;
-            float ex = next->pointX - segment->pointX;
-            float ez = next->pointZ - segment->pointZ;
+            float ex = next->point.x - segment->point.x;
+            float ez = next->point.z - segment->point.z;
             float t;
             float dx;
             float dz;
             if (ex == 0.0f && ez == 0.0f)
                 t = 0.0f;
             else {
-                t = ((p.z - segment->pointZ) * ez + (p.x - segment->pointX) * ex) / (ez * ez + ex * ex);
+                t = ((p.z - segment->point.z) * ez + (p.x - segment->point.x) * ex) / (ez * ez + ex * ex);
                 if (t > 1.0f)
                     t = 1.0f;
                 else if (t < 0.0f)
                     t = 0.0f;
             }
             if (t == 1.0f) {
-                dx = p.x - next->pointX;
-                dz = p.z - next->pointZ;
+                dx = p.x - next->point.x;
+                dz = p.z - next->point.z;
             } else if (t == 0.0f) {
-                dx = p.x - segment->pointX;
-                dz = p.z - segment->pointZ;
+                dx = p.x - segment->point.x;
+                dz = p.z - segment->point.z;
             } else {
-                dx = (p.x - segment->pointX) - t * ex;
-                dz = (p.z - segment->pointZ) - t * ez;
+                dx = (p.x - segment->point.x) - t * ex;
+                dz = (p.z - segment->point.z) - t * ez;
             }
             float distanceSquared = dz * dz + dx * dx;
             if (distanceSquared < best || best < 0.0f) {
@@ -576,22 +568,22 @@ int Track::ClosestPointOnNode(TrackVec3 p, TrackNode* node, TrackPos* out, float
 // through pointer locals: retail computes b.z - a.z first in the second
 // product of edge 3 (edge B to the centre), which VC6 does only when the
 // centre is a local pointer (MoveBox 0x00428db0 uses the same lever).
-int Track::IsInsideStrip(TrackVec3 p, TrackSegment* segment, TrackSegment* next)
+int Track::IsInsideStrip(Vec3 p, TrackSegment* segment, TrackSegment* next)
 {
     int inside = 0;
-    const TrackVec3* centre = (TrackVec3*)&segment->pointX;
-    const TrackVec3* nextCentre = (TrackVec3*)&next->pointX;
-    if (TRACK_EDGE_CROSSES((TrackVec3*)&segment->edgeAX, (TrackVec3*)&next->edgeAX))
+    const Vec3* centre = &segment->point;
+    const Vec3* nextCentre = &next->point;
+    if (TRACK_EDGE_CROSSES(&segment->edgeA, &next->edgeA))
         inside = 1 - inside;
-    if (TRACK_EDGE_CROSSES((TrackVec3*)&segment->edgeAX, centre))
+    if (TRACK_EDGE_CROSSES(&segment->edgeA, centre))
         inside = 1 - inside;
-    if (TRACK_EDGE_CROSSES((TrackVec3*)&segment->edgeBX, centre))
+    if (TRACK_EDGE_CROSSES(&segment->edgeB, centre))
         inside = 1 - inside;
-    if (TRACK_EDGE_CROSSES((TrackVec3*)&segment->edgeBX, (TrackVec3*)&next->edgeBX))
+    if (TRACK_EDGE_CROSSES(&segment->edgeB, &next->edgeB))
         inside = 1 - inside;
-    if (TRACK_EDGE_CROSSES((TrackVec3*)&next->edgeAX, nextCentre))
+    if (TRACK_EDGE_CROSSES(&next->edgeA, nextCentre))
         inside = 1 - inside;
-    if (TRACK_EDGE_CROSSES((TrackVec3*)&next->edgeBX, nextCentre))
+    if (TRACK_EDGE_CROSSES(&next->edgeB, nextCentre))
         inside = 1 - inside;
     return inside;
 }
@@ -641,13 +633,13 @@ int Track::PlaceNear(Vector3 p, TrackPos from, float distance, float range, int 
             TrackSegment* next;
             for (TrackSegment* segment = list->node->firstSegment; segment && (next = segment->next) != 0;
                  segment = segment->next) {
-                if (IsInsideStrip(*(TrackVec3*)&p, segment, next)) {
-                    float ex = next->pointX - segment->pointX;
-                    float ez = next->pointZ - segment->pointZ;
+                if (IsInsideStrip(*(Vec3*)&p, segment, next)) {
+                    float ex = next->point.x - segment->point.x;
+                    float ez = next->point.z - segment->point.z;
                     if (ex == 0.0f && ez == 0.0f) {
                         t = 0.0f;
                     } else {
-                        t = ((p.x - segment->pointX) * ex + (p.z - segment->pointZ) * ez) / (ez * ez + ex * ex);
+                        t = ((p.x - segment->point.x) * ex + (p.z - segment->point.z) * ez) / (ez * ez + ex * ex);
                         if (t > 1.0f)
                             t = 1.0f;
                         else if (t < 0.0f)
@@ -972,7 +964,7 @@ int Track::MoveAlongPath(TrackPos pos, TrackPos* out, TrackListItem** path, floa
 }
 
 // 0x00518080: the point at pos.
-int Track::PointAt(TrackPos pos, TrackVec3* out)
+int Track::PointAt(TrackPos pos, Vec3* out)
 {
     TrackSegment* segment = pos.segment;
     if (!segment)
@@ -980,9 +972,9 @@ int Track::PointAt(TrackPos pos, TrackVec3* out)
     TrackSegment* next = segment->next;
     if (!next) {
         if (pos.t == 0.0f) {
-            out->x = segment->pointX;
-            out->y = segment->pointY;
-            out->z = segment->pointZ;
+            out->x = segment->point.x;
+            out->y = segment->point.y;
+            out->z = segment->point.z;
         }
         return 0;
     }
@@ -990,33 +982,19 @@ int Track::PointAt(TrackPos pos, TrackVec3* out)
         pos.t = 0.0f;
     else if (pos.t > 1.0f)
         pos.t = 1.0f;
-    TrackVec3 d;
-    d.x = next->pointX - segment->pointX;
-    d.y = next->pointY - segment->pointY;
-    d.z = next->pointZ - segment->pointZ;
-    out->x = d.x * pos.t + segment->pointX;
-    out->y = d.y * pos.t + segment->pointY;
-    out->z = d.z * pos.t + segment->pointZ;
+    Vec3 d;
+    d.x = next->point.x - segment->point.x;
+    d.y = next->point.y - segment->point.y;
+    d.z = next->point.z - segment->point.z;
+    out->x = d.x * pos.t + segment->point.x;
+    out->y = d.y * pos.t + segment->point.y;
+    out->z = d.z * pos.t + segment->point.z;
     return 1;
 }
 
-// TrackVec3 built by a constructor. The constructor's by-value parameters
-// give the components fresh leaves (docs/VC6_OPERAND_ORDER.md), which
-// 0x00518130 needs; MakeTrackVec3's copy through a local does not. Kept
-// file-local like the operators above: a constructor in Track.h adds symbols
-// to every unit that includes it.
-struct TrackVector : TrackVec3 {
-    TrackVector(float x_, float y_, float z_)
-    {
-        x = x_;
-        y = y_;
-        z = z_;
-    }
-};
-
 // The unit vector along v (v itself when it already has unit length). The
 // squared length needs the (y*y + x*x) + z*z grouping.
-static inline TrackVec3 TrackNormalized(const TrackVec3& v)
+static inline Vec3 TrackNormalized(const Vec3& v)
 {
     float lengthSquared = (v.y * v.y + v.x * v.x) + v.z * v.z;
     if (lengthSquared == 1.0f)
@@ -1025,17 +1003,19 @@ static inline TrackVec3 TrackNormalized(const TrackVec3& v)
     return v * scale;
 }
 
-// 0x00518130: the unit direction of a segment. Built through TrackVector's
-// constructor, the difference gives retail's scaling: x scalar-first
+// 0x00518130: the unit direction of a segment. Built through Vec3's
+// constructor (whose by-value parameters give the components fresh leaves,
+// docs/VC6_OPERAND_ORDER.md; MakeVec3's copy through a local does not), the
+// difference gives retail's scaling: x scalar-first
 // (`fld st(0); fmul x`), y and z component-first (`fld y; fmul st(1)`), the
 // scale kept on the x87 stack until a final `fstp st(0)`. Per-component
 // stores into a named local scale all three scalar-first.
-int Track::SegmentDirection(TrackSegment* segment, TrackVec3* out)
+int Track::SegmentDirection(TrackSegment* segment, Vec3* out)
 {
     if (out && segment && segment->next && segment->horizontalLength > 0.0f) {
         TrackSegment* next = segment->next;
-        TrackVec3 d = TrackVector(next->pointX - segment->pointX, next->pointY - segment->pointY,
-                                  next->pointZ - segment->pointZ);
+        Vec3 d = Vec3(next->point.x - segment->point.x, next->point.y - segment->point.y,
+                         next->point.z - segment->point.z);
         *out = TrackNormalized(d);
         return 1;
     }
@@ -1048,14 +1028,14 @@ int Track::SegmentDirection(TrackSegment* segment, TrackVec3* out)
 // the x/z plane (the y/z plane for an edge with no x/z extent) and the cut is
 // clamped to the edge's ends. BikeAI.cpp calls it with modes 10 and 11
 // (0x00415326, 0x0041535c).
-int Track::DistanceToStripEdge(TrackVec3 p, TrackSegment* segment, float* out, int mode)
+int Track::DistanceToStripEdge(Vec3 p, TrackSegment* segment, float* out, int mode)
 {
-    TrackVec3 startA;
-    TrackVec3 directionA;
-    TrackVec3 startB;
-    TrackVec3 directionB;
-    TrackVec3 n;
-    TrackVec3 q;
+    Vec3 startA;
+    Vec3 directionA;
+    Vec3 startB;
+    Vec3 directionB;
+    Vec3 n;
+    Vec3 q;
     float t;
     float u;    // the second parameter of the cut, then the second distance
     if (!segment || !segment->next || !out)
@@ -1063,18 +1043,18 @@ int Track::DistanceToStripEdge(TrackVec3 p, TrackSegment* segment, float* out, i
     TrackSegment* next = segment->next;
     switch (mode) {
     case 17:
-        startA = *(TrackVec3*)&segment->edgeAX;
-        directionA = *(TrackVec3*)&next->edgeAX - *(TrackVec3*)&segment->edgeAX;
-        startB = *(TrackVec3*)&segment->edgeBX;
-        directionB = *(TrackVec3*)&next->edgeBX - *(TrackVec3*)&segment->edgeBX;
+        startA = segment->edgeA;
+        directionA = next->edgeA - segment->edgeA;
+        startB = segment->edgeB;
+        directionB = next->edgeB - segment->edgeB;
         break;
     case 11:
-        startA = *(TrackVec3*)&segment->edgeBX;
-        directionA = *(TrackVec3*)&next->edgeBX - *(TrackVec3*)&segment->edgeBX;
+        startA = segment->edgeB;
+        directionA = next->edgeB - segment->edgeB;
         break;
     case 10:
-        startA = *(TrackVec3*)&segment->edgeAX;
-        directionA = *(TrackVec3*)&next->edgeAX - *(TrackVec3*)&segment->edgeAX;
+        startA = segment->edgeA;
+        directionA = next->edgeA - segment->edgeA;
         break;
     }
     if (directionA.x == 0.0f && directionA.z == 0.0f) {
