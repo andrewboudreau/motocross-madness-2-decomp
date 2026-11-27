@@ -11,6 +11,7 @@
 #include "KeyboardDevice.h"
 #include "Parameterblocks.h"
 #include "RaceView.h"
+#include "SceneManager.h"
 #include "TextureMap.h"
 #include "TrackGame.h"
 #include "EventManager.h"

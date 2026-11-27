@@ -176,7 +176,8 @@ against retail, 600 runs with 0 mismatches):
   them back (13400); replacing the constraint unit's `ConVec3` with `Vec3`
   swapped them again (13394); retiring the Krusty3DObjects and TrackOverlay
   race views moved them back (13400); merging the duplicate EcoSystem,
-  CollisionObject, QuadTree and soultree declarations swapped them again (13394).
+  CollisionObject, QuadTree and soultree declarations swapped them again (13394);
+  typing TrackGameViewOwner's event scene as `Scene` moved them back (13400).
 
 Facts the two loaders establish:
 - Racers are KrustyBike (constructor `0x0048fa60`, 0x1638 bytes, the

@@ -26,10 +26,7 @@ class FollowCamera;
 // bits). Their members at +0x2c..+0x9c sit where BaseQuarryEvent
 // (QuarryEvent.h) keeps its scene, overlays and AuralScape; the exact
 // class of each owner is not established.
-struct TrackGameSceneView {
-    unsigned char field_0x00[0xc4];
-    GameObject* soundGroup;  // +0xC4  racesnd.cpp mutes it with slot 16 beside the engine/effects groups; the podium's sound group
-};
+class Scene;  // SceneManager.h
 
 // The object at TrackGameViewOwner+0xdc: bikerace.cpp 0x00420650 passes it
 // the new replay recorder (0x004a9d10). It is the tag ball BikeRace.h
@@ -78,7 +75,7 @@ struct TrackGameViewOwner : public GameObject {
     // flagging the two it leaves; `racer` is unused.
     void SelectLapGates(int gate, int nextGate, void* racer);
 
-    TrackGameSceneView* eventScene;     // +0x2C  BaseQuarryEvent::eventScene (0x004df108 stores the Scene that 0x004ea7e0 sets up)
+    Scene* eventScene;                  // +0x2C  BaseQuarryEvent::eventScene (0x004df108 stores the Scene that 0x004ea7e0 sets up)
     unsigned char skyCube[0x34 - 0x30];  // +0x30 BaseQuarryEvent skyCube (bytes kept)
     EventBikeRaceView* raceView;          // +0x34
     unsigned char visualCue[0x3c - 0x38];  // +0x38 BaseQuarryEvent visualCue (bytes kept)
@@ -442,7 +439,10 @@ public:
     int saveReplay;                           // +0x2dbc saves a replay (EventManager 0x0045cdc0)
 };
 
-// Object returned by (TrackGame+0x56c)->+0x2c->0x00485df0.
+// Object returned by (TrackGame+0x56c)->+0x2c->0x00485df0. Unused: EventManager
+// calls UIDialog::EndDialog on it. Deleting the declaration moves
+// ProCircuitProcs.cpp AddCircuitRow (0x004d59a0) out of its declaration-count
+// window, so it stays until that function no longer depends on the count.
 class TrackGameUIDialogView {
 public:
     void EndDialog(int value);    // 0x0046ff30 (EventManager 0x0045e710)
