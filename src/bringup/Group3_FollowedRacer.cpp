@@ -63,8 +63,8 @@ void KbPlayer::SetFollowedRacer(Vehicle* racerVehicle, Vehicle* previousVehicle,
         RACE_VIEW()->raceSound->PlayItSound();
         racer->SetSpawnProtection(1, 5.0f, 0);
     }
-    ((TrackGameViewOwner*)this)->AnnounceFollowedRacer((EventKrustyBikeView*)racer,
-                                                       (EventKrustyBikeView*)previous);
+    ((TrackGameViewOwner*)this)->AnnounceFollowedRacer((KrustyBike*)racer,
+                                                       (KrustyBike*)previous);
     if (racer == RACE_VIEW()->localRacer && previous && previous != racer) {
         racer->score += 2500.0f;
         if (RACE_VIEW()->scoreBoard)

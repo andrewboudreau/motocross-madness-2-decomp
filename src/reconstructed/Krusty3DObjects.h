@@ -38,7 +38,7 @@ struct ControlEvent;
 struct InputButtonState;
 
 // A racer as VisualCue sees it (the objects 0x004204e0 returns; RaceView.h's
-// EventKrustyBikeView): a vfptr at +0, GameObject reached through the vbptr at
+// KrustyBike): a vfptr at +0, GameObject reached through the vbptr at
 // +4. Only the +0x25 bit 0 test is used.
 struct VisualCueKrustyBikeView : virtual public GameObject {
     virtual void UnknownVirtualSlot0();
@@ -52,7 +52,7 @@ struct VisualCueKrustyBikeView : virtual public GameObject {
 float FastInvSqrt(float value);
 
 // The racer the lights point for (NationalRace.cpp passes its view's
-// +0x38; RaceView.h's EventKrustyBikeView).
+// +0x38; RaceView.h's KrustyBike).
 struct RunwayKrustyBikeView {
     unsigned char field_0x000[0x10c];
     Vector3 trackPoint;                       // +0x10c

@@ -25,6 +25,7 @@
 #include "SelectGamePicProcs.h"
 #include "TrackGame.h"
 #include "EventManager.h"
+#include "../krusty2/vehicle/KrustyBikeCore.h"
 #include "BaseQuarryEvent.h"
 #include "TrackRecordDlg.h"
 
@@ -2324,7 +2325,7 @@ void HandleMenuCancel(int menu, DialogEvent* event) {
         TrackGameViewOwner* owner = g_TrackGame->tagEvent;
         if (owner && g_TrackGame->network && g_TrackGame->network->isHost &&
             owner->followedRacer && owner->raceView && owner->followedRacer == owner->raceView->localRacer) {
-            EventKrustyBikeView* racer = owner->raceView->localRacer;
+            KrustyBike* racer = owner->raceView->localRacer;
             if (racer)
                 racer->outOfRace = 1;
             g_TrackGame->tagEvent->PickFollowedRacer();

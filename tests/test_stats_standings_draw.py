@@ -29,7 +29,7 @@ from track_overlay_unit import write_unit
 ROOT = Path(__file__).resolve().parents[1]
 SYMBOL = '?DrawStandings@StatsOverlay@@QAEHXZ'
 ITERATOR = '?NextBike@BikeRace@@QAEPAVKrustyBike@@PAH@Z'
-OLD_ITERATOR = '?NextBike@EventBikeRaceView@@QAEPAUEventKrustyBikeView@@PAH@Z'
+OLD_ITERATOR = '?NextBike@EventBikeRaceView@@QAEPAVKrustyBike@@PAH@Z'
 DIRECT = {0x519a68:0x521970, 0x519a9f:0x518640, 0x519ab8:0x534aaf,
           0x519acb:0x4204e0, 0x519afb:0x4204e0, 0x519b11:0x534426,
           0x519bb2:0x534aaf, 0x519c33:0x534aaf, 0x519ca7:0x4b6710,
@@ -205,14 +205,14 @@ class StatsStandingsTests(unittest.TestCase):
                     self.assertTrue(report['strict_exact'],report);strict+=1
             layout=output/'layout.cpp'
             layout.write_text('#include <stddef.h>\n#include "TrackOverlay.h"\n#include "TrackGame.h"\n'
-                '#include "BikeRaceCore.h"\n#include "PCTextureMap.h"\n#include "PCVideoCard.h"\n'
+                '#include "BikeRaceCore.h"\n#include "vehicle/KrustyBikeCore.h"\n#include "PCTextureMap.h"\n#include "PCVideoCard.h"\n'
                 'typedef char Layout[(sizeof(StatsOverlay)==0x9b8 && sizeof(int(StatsOverlay::*)())==4 && '
                 'sizeof(BikeRace)==0x400 && sizeof(PCTextureMap)==0x80 && sizeof(RacerScoreRank)==8 && '
                 'offsetof(StatsOverlay,largeFont)==0x11c && offsetof(StatsOverlay,rowRects)==0x130 && '
                 'offsetof(StatsOverlay,drawnRowText)==0x1b0 && offsetof(StatsOverlay,rowText)==0x5b0 && '
                 'offsetof(StatsOverlay,rowExtent)==0x9b0 && offsetof(TrackGame,quarryEvent)==0x55c && '
                 'offsetof(TrackGameViewOwner,raceView)==0x34 && offsetof(BikeRace,localRacer)==0x38 && '
-                'offsetof(EventKrustyBikeView,riderName)==0x5e0 && offsetof(EventKrustyBikeView,score)==0x768 && '
+                'offsetof(KrustyBike,riderName)==0x5e0 && offsetof(KrustyBike,score)==0x768 && '
                 'offsetof(Overlay,overlayTexture)==0x2c && offsetof(Overlay,backingTexture)==0x30 && '
                 'offsetof(Overlay,sharedTexture)==0x34 && offsetof(Overlay,sourceRect)==0xf8 && '
                 'offsetof(TextureMap,textureWidth)==0x14 && offsetof(TextureMap,mapFormat)==0x20 && '

@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include "../../src/reconstructed/BikeRace.h"
 #include "../../src/reconstructed/TrackGame.h"
+#include "../../src/krusty2/vehicle/KrustyBikeCore.h"
 
 #ifndef UNKNOWN_RANDOM_UNIT
 #define UNKNOWN_RANDOM_UNIT() (rand() * (1.0f / 32768.0f))
@@ -18,15 +19,15 @@ void TrackGameViewOwner::PickFollowedRacer()
     int racing = 0;
     int iterator = 0;
     int tries = 0;
-    EventKrustyBikeView* last = 0;
-    EventKrustyBikeView* racer = reinterpret_cast<EventKrustyBikeView*>(
+    KrustyBike* last = 0;
+    KrustyBike* racer = reinterpret_cast<KrustyBike*>(
             reinterpret_cast<BikeRace*>(raceView)->NextBike(&iterator));
     while (racer) {
         if (racer->outOfRace == 0) {
             last = racer;
             racing++;
         }
-        racer = reinterpret_cast<EventKrustyBikeView*>(
+        racer = reinterpret_cast<KrustyBike*>(
             reinterpret_cast<BikeRace*>(raceView)->NextBike(&iterator));
     }
     if (racing == 0) {

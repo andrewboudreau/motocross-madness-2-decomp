@@ -44,9 +44,9 @@ primary pointer returned by the iterator. The explicit result casts preserve
 that primary value. The event/visual views' position at +0x0c and the
 event/KrustyBike race pointer at +0x740 are checked under native VC6. BikeRace
 itself returns the canonical `KrustyBike*`. This does **not** establish full type
-or virtual-base layout equivalence among `EventKrustyBikeView`,
-`VisualCueKrustyBikeView` and `KrustyBike`; their partial declarations and
-existing access code are retained.
+or virtual-base layout equivalence between `VisualCueKrustyBikeView` and
+`KrustyBike`; its partial declaration and existing access code are retained.
+(EventManager's racer view was retired for `KrustyBike` itself.)
 
 ## Shared declaration
 

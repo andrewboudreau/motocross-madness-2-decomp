@@ -33,7 +33,7 @@ SOURCES = (
 # See docs/FOLLOWED_RACER_PICKER.md; all other rows retain their prior hashes.
 PARTIAL = [
     ('samples/race/FollowRacerNearMisses.cpp', '?PickFollowedRacer@TrackGameViewOwner@@QAEXXZ', 4889888, 340, 342, 67, '458488750e4bac7e802c4cfedbd485c6a2abb98a503c88e044ab31a9f57a78fc'),
-    ('samples/race/FollowRacerNearMisses.cpp', '?SetFollowedRacer@TrackGameViewOwner@@QAEXPAUEventKrustyBikeView@@0H@Z', 4890240, 272, 272, 259, '6f7a0fdf97b1e244baeb6a3f3af7cf634acda08a0ea738fd1e3de094ccc7032d'),
+    ('samples/race/FollowRacerNearMisses.cpp', '?SetFollowedRacer@TrackGameViewOwner@@QAEXPAVKrustyBike@@0H@Z', 4890240, 272, 272, 259, '6f7a0fdf97b1e244baeb6a3f3af7cf634acda08a0ea738fd1e3de094ccc7032d'),
     ('src/krusty2/vehicle/KrustyBike.cpp', 'IsSpeedGainBelowLimit@KrustyBike', 4790688, 229, 230, 151, '3124025ed125d088a9cf9d706154f76eb28d5e8661543863782a91d540c2e19f'),
     ('src/krusty2/vehicle/KrustyBike.cpp', 'FindPlacement@KrustyBike', 4791568, 1296, 1296, 548, '177e575d9440c2edf215c83c48a6b94d43a5e3dbb3b1280061429e44149630a4'),
     ('src/krusty2/vehicle/KrustyBike.cpp', 'SendStateDelta@KrustyBike', 4795088, 2315, 2312, 192, '1941ddbc72fdfd7b01b5ad4ea65fcace024e8e828a4019450c91e9f4d1fb6a95'),
@@ -81,7 +81,7 @@ class NextBikeConnectionsTests(unittest.TestCase):
             # matching selected offsets does not assert complete type identity.
             layouts = []
             for name, header, assertions in (
-                ('event', 'RaceView.h', 'offsetof(EventBikeRaceView, localRacer) == 0x38 && offsetof(EventKrustyBikeView, position) == 0xc && offsetof(EventKrustyBikeView, race) == 0x740'),
+                ('event', 'vehicle/KrustyBikeCore.h"\n#include "RaceView.h','offsetof(EventBikeRaceView, localRacer) == 0x38 && offsetof(KrustyBike, position) == 0xc && offsetof(KrustyBike, race) == 0x740'),
                 ('visual', 'Krusty3DObjects.h', 'offsetof(VisualCueBikeRaceView, ownRacer) == 0x38 && offsetof(VisualCueKrustyBikeView, position) == 0xc'),
                 ('bike', 'vehicle/KrustyBike.h', 'offsetof(KrustyBike, race) == 0x740 && sizeof(KrustyBike) == 0x1638'),
                 ('canonical', 'BikeRace.h', 'offsetof(BikeRace, replayTime) == 0x1b8 && offsetof(BikeRace, localRacer) == 0x38'),
@@ -118,8 +118,8 @@ class NextBikeConnectionsTests(unittest.TestCase):
 
             retired = {
                 '?NextBike@KbRace@@QAEPAVKrustyBike@@PAH@Z',
-                '?NextBike@EventBikeRaceView@@QAEPAUEventKrustyBikeView@@PAH@Z',
-                '?NextBike@StatsBikeRaceView@@QAEPAUEventKrustyBikeView@@PAH@Z',
+                '?NextBike@EventBikeRaceView@@QAEPAVKrustyBike@@PAH@Z',
+                '?NextBike@StatsBikeRaceView@@QAEPAVKrustyBike@@PAH@Z',
                 '?NextBike@VisualCueBikeRaceView@@QAEPAUVisualCueKrustyBikeView@@PAH@Z',
             }
             for source in SOURCES[:-1]:

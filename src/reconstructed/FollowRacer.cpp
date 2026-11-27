@@ -55,11 +55,11 @@ void TrackGameTagBallView::SetRecorder(KrustyVCR* vcr)
 
 // 0x004a9f90: every other racer hears about the new and the previous racer,
 // and the new racer hears about each of them.
-void TrackGameViewOwner::AnnounceFollowedRacer(EventKrustyBikeView* racer, EventKrustyBikeView* previous)
+void TrackGameViewOwner::AnnounceFollowedRacer(KrustyBike* racer, KrustyBike* previous)
 {
     int iterator = 0;
-    for (EventKrustyBikeView* other = reinterpret_cast<EventKrustyBikeView*>(reinterpret_cast<BikeRace*>(raceView)->NextBike(&iterator)); other;
-         other = reinterpret_cast<EventKrustyBikeView*>(reinterpret_cast<BikeRace*>(raceView)->NextBike(&iterator))) {
+    for (KrustyBike* other = reinterpret_cast<KrustyBike*>(reinterpret_cast<BikeRace*>(raceView)->NextBike(&iterator)); other;
+         other = reinterpret_cast<KrustyBike*>(reinterpret_cast<BikeRace*>(raceView)->NextBike(&iterator))) {
         if (other == racer)
             continue;
         if (racer)

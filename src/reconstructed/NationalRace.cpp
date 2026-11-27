@@ -7,6 +7,7 @@
 #include "RenderTarget.h"
 #include "TrackGame.h"
 #include "EventManager.h"
+#include "../krusty2/vehicle/KrustyBikeCore.h"
 #include "TrackOverlay.h"
 #include "Krusty3DObjects.h"   // RunwayLights
 

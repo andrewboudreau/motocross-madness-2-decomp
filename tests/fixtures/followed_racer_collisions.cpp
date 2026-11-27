@@ -104,7 +104,7 @@ static void AnnounceCases(){
   if(!blocked)for(i=0;i<limit;++i){KrustyBike*other=(KrustyBike*)world.racers[i];if(!other)break;if(other==a)continue;
    if(a)NotifyExpected(a,other);if(old&&old!=other)NotifyExpected(other,old);if(a)NotifyExpected(other,a);
   }
-  __try{v->AnnounceFollowedRacer((EventKrustyBikeView*)a,(EventKrustyBikeView*)old);}__except(Filter(GetExceptionInformation())){}
+  __try{v->AnnounceFollowedRacer((KrustyBike*)a,(KrustyBike*)old);}__except(Filter(GetExceptionInformation())){}
   Finish();
  }
 }

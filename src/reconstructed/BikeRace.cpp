@@ -2610,7 +2610,7 @@ void BikeRace::HandlePlayerLeft(int player) {
         if (id != self && id == player && racerSlots[i] != 0) {
             racerSlots[i]->RemoveFromRace();
             TrackGameViewOwner* owner = g_TrackGame->tagEvent;
-            if (owner != 0 && owner->followedRacer == (EventKrustyBikeView*)racerSlots[i]) {
+            if (owner != 0 && owner->followedRacer == (KrustyBike*)racerSlots[i]) {
                 if (g_TrackGame->mode.raceSettings.tagBall) {
                     owner->followedRacer = 0;
                 } else if (g_TrackGame->network->isHost) {
@@ -3385,7 +3385,7 @@ int BikeRace::RecordFrame(int kind, void* data, int flag, int recorderId, int* k
                 for (KrustyBike* racer = NextBike(&iterator); racer != 0;
                      racer = NextBike(&iterator)) {
                     if (racer->netId == follow->followedRacerId) {
-                        g_TrackGame->tagEvent->followedRacer = (EventKrustyBikeView*)racer;
+                        g_TrackGame->tagEvent->followedRacer = (KrustyBike*)racer;
                         break;
                     }
                 }

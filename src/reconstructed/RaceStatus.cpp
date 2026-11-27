@@ -5,6 +5,8 @@
 #include "BikeRace.h"
 #include "DebugAlloc.h"
 #include "EventManager.h"
+#include "../krusty2/vehicle/KrustyBikeCore.h"
+#include "../krusty2/tire/Tire.h"
 #include "FollowCamera.h"
 #include "TrackGame.h"
 
@@ -121,7 +123,7 @@ int AdvanceGate(Vector3* from, Vector3* to, RaceGate** current, RaceGate* first,
 }
 
 // 0x004e5c70
-int HasStatusNode(RaceStatusNode* list, EventKrustyBikeView* racer) {
+int HasStatusNode(RaceStatusNode* list, KrustyBike* racer) {
     for (; list; list = list->next) {
         if (list->racer == racer)
             return 1;
@@ -173,7 +175,7 @@ int BuildStatusList(RaceStatusNode** list, EventBikeRaceView* view) {
     status->nextGate = view->gateList;
     view->localRacer->statusNode = status;
     status->creationOrder = index;
-    status->currentPosition = view->localRacer->position;
+    status->currentPosition = (Vector3&)view->localRacer->position;
     *list = status;
     tail = &status->next;
     if (g_TrackGame->playerCount == 1 && g_TrackGame->mode.raceSettings.raceMode != 4) {
@@ -187,7 +189,7 @@ int BuildStatusList(RaceStatusNode** list, EventBikeRaceView* view) {
                 status->nextGate = view->gateList;
                 view->aiRacers[i]->statusNode = status;
                 status->creationOrder = index;
-                status->currentPosition = view->aiRacers[i]->position;
+                status->currentPosition = (Vector3&)view->aiRacers[i]->position;
                 *tail = status;
                 tail = &status->next;
             }
@@ -204,7 +206,7 @@ int BuildStatusList(RaceStatusNode** list, EventBikeRaceView* view) {
                 status->nextGate = view->gateList;
                 view->racerSlots[i]->statusNode = status;
                 status->creationOrder = index;
-                status->currentPosition = view->racerSlots[i]->position;
+                status->currentPosition = (Vector3&)view->racerSlots[i]->position;
                 *tail = status;
                 tail = &status->next;
             }
@@ -316,7 +318,7 @@ int ComputeTimeBehind(RaceStatusNode* list, int mode) {
     RaceStatusNode* status;
 
     for (status = list; status; status = status->next) {
-        EventKrustyBikeView* racer = status->racer;
+        KrustyBike* racer = status->racer;
         if (racer->finishPosition > 1) {
             if (mode == 1)
                 racer->timeBehindLeader = racer->gateTimes[racer->gatesPassed % 600] -
@@ -342,9 +344,9 @@ int RankByScore(int keepRacing) {
     if (g_TrackGame->mode.raceSettings.eventType == 0) {
         count = 0;
         EventBikeRaceView* view = g_TrackGame->quarryEvent->raceView;
-        EventKrustyBikeView* racer;
+        KrustyBike* racer;
         iterator = 0;
-        for (racer = reinterpret_cast<EventKrustyBikeView*>(reinterpret_cast<BikeRace*>(view)->NextBike(&iterator)); racer; racer = reinterpret_cast<EventKrustyBikeView*>(reinterpret_cast<BikeRace*>(view)->NextBike(&iterator))) {
+        for (racer = reinterpret_cast<KrustyBike*>(reinterpret_cast<BikeRace*>(view)->NextBike(&iterator)); racer; racer = reinterpret_cast<KrustyBike*>(reinterpret_cast<BikeRace*>(view)->NextBike(&iterator))) {
             if (racer->isEnabled) {
                 scores[count].value = racer->score;
                 scores[count].racer = racer;
@@ -371,7 +373,7 @@ int UpdateLapRace(RaceStatusNode** list, Track* track, float frameTime, RaceGate
                           RaceGate* finish, int lapLimit, int unlimited) {
     RaceStatusNode* previous = 0;
     RaceStatusNode* status;
-    EventKrustyBikeView* racer;
+    KrustyBike* racer;
 
     if (!list || !track)
         return 0;
@@ -379,7 +381,7 @@ int UpdateLapRace(RaceStatusNode** list, Track* track, float frameTime, RaceGate
     for (status = *list; status; previous = status, status = status->next) {
         racer = status->racer;
         if (!racer->hasFinished) {
-            status->previousPosition = racer->bodyForward * 3.5f + racer->position;
+            status->previousPosition = (Vector3&)racer->bodyForward * 3.5f + (Vector3&)racer->position;
             if (!status->placedPos.node) {
                 status->progressPos.node = start->trackPos.node;
                 status->progressPos.segment = start->trackPos.segment;
@@ -457,7 +459,7 @@ int UpdateLapRace(RaceStatusNode** list, Track* track, float frameTime, RaceGate
             if (!track->SegmentDirection(status->progressPos.segment,
                                               (Vec3*)&status->racer->respawnHeading))
                 racer->respawnHeading = racer->bodyForward;
-            status->racer->respawnPosition -= status->racer->respawnHeading * 3.5f;
+            (Vector3&)status->racer->respawnPosition -= (Vector3&)status->racer->respawnHeading * 3.5f;
         }
     }
     if (!OrderByLapDistance(list, track, finish))
@@ -482,7 +484,7 @@ int UpdateGateRace(RaceStatusNode** list, RaceGate* firstGate, float frameTime, 
                           int unlimited) {
     RaceStatusNode* previous = 0;
     RaceStatusNode* status;
-    EventKrustyBikeView* racer;
+    KrustyBike* racer;
 
     if (!list || !firstGate)
         return 0;
@@ -493,9 +495,9 @@ int UpdateGateRace(RaceStatusNode** list, RaceGate* firstGate, float frameTime, 
             continue;
         {
             int gate = racer->lapGate;
-            status->previousPosition.x = racer->frontWheel->nodePosition.x;
-            status->previousPosition.y = racer->frontWheel->nodePosition.y;
-            status->previousPosition.z = racer->frontWheel->nodePosition.z;
+            status->previousPosition.x = racer->frontWheel->wheelCenter.x;
+            status->previousPosition.y = racer->frontWheel->wheelCenter.y;
+            status->previousPosition.z = racer->frontWheel->wheelCenter.z;
             if (!AdvanceGate(&status->previousPosition, &status->currentPosition, &status->nextGate, firstGate,
                                        &racer->gatesPassed, &racer->lapGate, racer->gateTimes, racer->totalRunningTime,
                                        0, &racer->lapCount, &racer->lastLapTime, &racer->fastestLap,
@@ -504,7 +506,7 @@ int UpdateGateRace(RaceStatusNode** list, RaceGate* firstGate, float frameTime, 
                 return 0;
             if (g_TrackGame->bajaEnduroEvent && gate != racer->lapGate) {
                 racer->nextLapGate = (racer->lapGate + 1) % g_TrackGame->bajaEnduroEvent->gateCount;
-                if (racer == (EventKrustyBikeView*)((KrustyBikeCamera*)racer->race->raceCamera)->krustyBike)
+                if (racer == (KrustyBike*)((KrustyBikeCamera*)racer->race->raceCamera)->krustyBike)
                     g_TrackGame->bajaEnduroEvent->SelectLapGates(racer->lapGate, racer->nextLapGate,
                                                                               racer);
             }

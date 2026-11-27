@@ -38,7 +38,7 @@ int AdvanceGate(Vector3* from, Vector3* to, RaceGate** current, RaceGate* first,
                           unsigned short* laps, float* lapTime, float* bestLap, float* lapStart, char* finished,
                           int lapLimit, int unlimited, int skipTest, int forced);
 // 0x004e5c70: whether `list` has a node for `racer`.
-int HasStatusNode(RaceStatusNode* list, EventKrustyBikeView* racer);  // 0x004e5c70
+int HasStatusNode(RaceStatusNode* list, KrustyBike* racer);  // 0x004e5c70
 // 0x004e5ca0: frees the nodes of racers whose GameObject +0x25 bit 0 is
 // clear, detaching them from their racers.
 int PruneStatusList(RaceStatusNode** list);  // 0x004e5ca0

@@ -118,11 +118,11 @@ class FollowedRacerPickerBehaviorTests(unittest.TestCase):
                 self.assertTrue(compare(image, provider, name, va, size,
                     ROOT / f'src/reconstructed/{owner}.bindings.json')['strict_exact'])
             layout = output / 'layout.cpp'
-            layout.write_text('#include "BikeRace.h"\n#include "TrackGame.h"\n#include <stddef.h>\n'
+            layout.write_text('#include "BikeRace.h"\n#include "TrackGame.h"\n#include "vehicle/KrustyBikeCore.h"\n#include <stddef.h>\n'
                 'typedef char Layout[(sizeof(VcrFollowRecord)==12 && '
                 'offsetof(VcrFollowRecord,request)==4 && offsetof(VcrFollowRecord,followedRacerId)==8 && '
                 'offsetof(TrackGameViewOwner,raceView)==0x34 && offsetof(TrackGameViewOwner,followedRacer)==0xa8 && '
-                'offsetof(EventKrustyBikeView,outOfRace)==0x4a0 && offsetof(EventKrustyBikeView,netId)==0x11bc && '
+                'offsetof(KrustyBike,outOfRace)==0x4a0 && offsetof(KrustyBike,netId)==0x11bc && '
                 'offsetof(BikeRace,racerSlots)==0x3c && offsetof(BikeRace,replayVcr)==0x1a0 && '
                 'offsetof(EventBikeRaceView,racerSlots)==0x3c && offsetof(EventBikeRaceView,replayVcr)==0x1a0) ? 1 : -1];\n')
             compile_source(layout, 'layout')

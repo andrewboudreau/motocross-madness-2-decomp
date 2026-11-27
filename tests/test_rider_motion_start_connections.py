@@ -21,7 +21,7 @@ SOURCES={
  # Emitter joins preserve every prior byte/target under the verified constructor and Spark setter names.
  'src/krusty2/vehicle/Bike.cpp':(243,1105,3,'ef6ea7eecdff46c1a7a0dbf41986b4257726994fb1e16ba62a4930df395ec94f'),
  # Verified collision/debug-overlay connections change only three external names.
- 'src/krusty2/vehicle/KrustyBike.cpp':(271,1443,8,'11504fc511142c120eae538670a56ff52df36065c243c031ac2a8d27ed15dd7c'),
+ 'src/krusty2/vehicle/KrustyBike.cpp':(271,1443,8,'56bf9de375b3a16a2c2e0184a0fdee0c8feb96295fede496c81b70f6fea08c59'),
 }
 
 def view(obj, normalize_paths=()):

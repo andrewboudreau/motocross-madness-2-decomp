@@ -6,12 +6,12 @@
     "src/reconstructed/FollowRacer.cpp": {
       "sections": 7,
       "relocations": 17,
-      "sha256": "90538a31d991365f7f96ce3df4a553eb00759b3558bfb4c773846808557cc063"
+      "sha256": "1723b1e3a99e920ad2e19996a8b021e3e724259b1013f21209c37e62a1e7d48f"
     },
     "samples/race/FollowRacerNearMisses.cpp": {
       "sections": 11,
       "relocations": 32,
-      "sha256": "80add1428cfc2c3fab7ab29d3d0b480dd247b9abe4318021ac6573a5598489e3"
+      "sha256": "8a3fabe73300cb24ec533dedbf22facaa8fd0b70914a25ed12270cb1517b6c0f"
     },
     "samples/race/FollowedRacerPicker.cpp": {
       "sections": 4,
@@ -30,7 +30,7 @@
       "resolved_sha256": "458488750e4bac7e802c4cfedbd485c6a2abb98a503c88e044ab31a9f57a78fc"
     },
     {
-      "symbol": "?SetFollowedRacer@TrackGameViewOwner@@QAEXPAUEventKrustyBikeView@@0H@Z",
+      "symbol": "?SetFollowedRacer@TrackGameViewOwner@@QAEXPAVKrustyBike@@0H@Z",
       "va": 4890240,
       "retail_size": 272,
       "size": 272,

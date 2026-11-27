@@ -164,7 +164,7 @@
   "?Print@DebugOverlay@@QAAXHPBDZZ": "0x00447f40",
   "?Push@MemTagStack@@QAEHPBD@Z": "0x004a2d00",
   "?RemoveIgnoredOwner@CollisionObject@@QAEXPAX@Z": "0x00439490",
-  "?PlayScoreSounds@RaceSound@@QAEXPAUEventKrustyBikeView@@M@Z": "0x004e57d0",
+  "?PlayScoreSounds@RaceSound@@QAEXPAVKrustyBike@@M@Z": "0x004e57d0",
   "?SetAxesIn@SoultreeObject@@QAEXPAV1@PBUVec3@@1HH@Z": "0x004fc050",
   "?SetAxesPtr@SoultreeObject@@QAEXPBUVec3@@0HH@Z": "0x004fbd70",
   "?SetIgnoreListMode@CollisionObject@@QAEXH@Z": "0x00439400",

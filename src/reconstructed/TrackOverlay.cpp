@@ -271,7 +271,7 @@ NameOverlay::~NameOverlay()
 // 0x00518e30
 NameOverlay* NameOverlay::Create(RenderTarget* target, TextureMap* texture,
                                                 const OverlayRect* rect, int scaleRect,
-                                                const OverlayRect* source, EventKrustyBikeView* racer,
+                                                const OverlayRect* source, KrustyBike* racer,
                                                 BikeRace* nameWorld, int phase)
 {
     if (!Attach(target, texture, rect, scaleRect, source, 0.00001f, 0, 0, 0, 0, 1555, 0)) {
@@ -656,8 +656,8 @@ int StatsOverlay::DrawStandings()
         sprintf(rowText[0], "%s", label);
     }
     iterator = 0;
-    EventKrustyBikeView* racer;
-    while ((racer = reinterpret_cast<EventKrustyBikeView*>(reinterpret_cast<BikeRace*>(view)->NextBike(&iterator))) != 0) {
+    KrustyBike* racer;
+    while ((racer = reinterpret_cast<KrustyBike*>(reinterpret_cast<BikeRace*>(view)->NextBike(&iterator))) != 0) {
         if (racer->isEnabled) {
             scores[count].value = racer->score;
             scores[count].racer = racer;
@@ -754,8 +754,8 @@ int StatsOverlay::DrawViewModePanel()
     g_TrackGame->LoadResourceString(0x835, label, 0x80);
     int finished = 0;
     iterator = 0;
-    EventKrustyBikeView* racer;
-    while ((racer = reinterpret_cast<EventKrustyBikeView*>(statsSource->NextBike(&iterator))) != 0) {
+    KrustyBike* racer;
+    while ((racer = reinterpret_cast<KrustyBike*>(statsSource->NextBike(&iterator))) != 0) {
         if (racer->outOfRace)
             finished++;
     }
@@ -866,8 +866,8 @@ int StatsOverlay::DrawRacePanel()
     char time[0x80];
     int finished = 0;
     iterator = 0;
-    EventKrustyBikeView* racer;
-    while ((racer = reinterpret_cast<EventKrustyBikeView*>(statsSource->NextBike(&iterator))) != 0) {
+    KrustyBike* racer;
+    while ((racer = reinterpret_cast<KrustyBike*>(statsSource->NextBike(&iterator))) != 0) {
         if (racer->outOfRace)
             finished++;
     }
@@ -963,8 +963,8 @@ int StatsOverlay::DrawTagStandings()
         int own;
         EventBikeRaceView* view = g_TrackGame->tagEvent->raceView;
         iterator = 0;
-        EventKrustyBikeView* racer;
-        while ((racer = reinterpret_cast<EventKrustyBikeView*>(reinterpret_cast<BikeRace*>(view)->NextBike(&iterator))) != 0) {
+        KrustyBike* racer;
+        while ((racer = reinterpret_cast<KrustyBike*>(reinterpret_cast<BikeRace*>(view)->NextBike(&iterator))) != 0) {
             scores[count].value = racer->score;
             scores[count].racer = racer;
             count++;
@@ -1330,11 +1330,11 @@ RadarOverlay* RadarOverlay::LoadMap(RenderTarget* target, TextureMapManager* man
 int RadarOverlay::TakeRacers(EventBikeRaceView* view, int chat)
 {
     int iterator;
-    EventKrustyBikeView* racer;
+    KrustyBike* racer;
     racerCount = 0;
     iterator = 0;
     radarView = view;
-    while ((racer = reinterpret_cast<EventKrustyBikeView*>(reinterpret_cast<BikeRace*>(radarView)->NextBike(&iterator))) != 0) {
+    while ((racer = reinterpret_cast<KrustyBike*>(reinterpret_cast<BikeRace*>(radarView)->NextBike(&iterator))) != 0) {
         racers[racerCount] = racer;
         racerCount++;
     }
@@ -1456,8 +1456,8 @@ void RadarOverlay::DrawRacers(int mode)
     Vector3 rim;
     Vector3 point;
     for (i = 0; i < racerCount; i++) {
-        if (racers[i] == (EventKrustyBikeView*)radarCamera->bike) {
-            mapOrigin = racers[i]->position;
+        if (racers[i] == (KrustyBike*)radarCamera->bike) {
+            mapOrigin = (Vector3&)racers[i]->position;
             mapAngle = -racers[i]->savedYaw;
             if (racers[i]->crashState)
                 mapAngle = heldMapAngle;
@@ -1471,10 +1471,10 @@ void RadarOverlay::DrawRacers(int mode)
     mapAngleSin = sin(mapAngle);
     for (i = 0; i < racerCount; i++) {
         if (i != followedIndex && racers[i]->isEnabled) {
-            outside = WorldToMap(racers[i]->position, &x, &y, &rim.x, &rim.y);
+            outside = WorldToMap((Vector3&)racers[i]->position, &x, &y, &rim.x, &rim.y);
             if (cueShown && cueIndex == i) {
                 if (radarView->chatOverlay) {
-                    Vector3& own = racers[followedIndex]->position;
+                    Vector3& own = (Vector3&)racers[followedIndex]->position;
                     float dx = racers[i]->position.x - own.x;
                     float dz = racers[i]->position.z - own.z;
                     float distance = dz * dz + dx * dx;
@@ -1965,7 +1965,7 @@ int ChatOverlay::CollectRacers(BikeRace* view)
     for (int i = 0; i < racerCount; i++) {
         nameTags[i] = (new(__FILE__, 2369) NameOverlay(1))->Create(
             (RenderTarget*)renderContext, overlayTexture, &nameTagRects[i], 0, &nameTagRects[i],
-            (EventKrustyBikeView*)racers[i],
+            (KrustyBike*)racers[i],
             chatView, i);
         AppendChild(nameTags[i], -1);
     }

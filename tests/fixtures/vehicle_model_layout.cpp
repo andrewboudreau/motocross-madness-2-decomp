@@ -3,6 +3,7 @@
 #include "../../src/reconstructed/BikeCamera.h"
 #include "../../src/reconstructed/AuralScape.h"
 #include "../../src/reconstructed/RaceView.h"
+#include "../../src/krusty2/vehicle/KrustyBikeCore.h"
 #include "../../src/reconstructed/CarProcedural.h"
 #include "../../src/krusty2/motion/CollisionCharacter.h"
 #include "../../src/krusty2/math/Vec3.h"
@@ -25,7 +26,7 @@ typedef char character_node[offsetof(CollisionCharacter, modelNode) == 0x1a0 ? 1
 typedef char character_velocity[offsetof(CollisionCharacter, nodeVelocity) == 0x224 ? 1 : -1];
 typedef char car_node[offsetof(CarProcedural, carModel) == 0x34 ? 1 : -1];
 typedef char car_velocity[offsetof(CarProcedural, pathVelocity) == 0x40 ? 1 : -1];
-typedef char racer_node[offsetof(EventKrustyBikeView, vehicleModel) == 0x3bc ? 1 : -1];
+typedef char racer_node[offsetof(KrustyBike, modelNode) == 0x3bc ? 1 : -1];
 typedef char followed_node[offsetof(SoultreeSoundEmitter, followedPart) == 0x1a4 ? 1 : -1];
 typedef char followed_child[offsetof(SoultreeSoundEmitter, childPart) == 0x1a8 ? 1 : -1];
 

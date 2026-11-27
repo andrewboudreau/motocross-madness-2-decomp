@@ -18,6 +18,7 @@
 #include "BaseQuarryEvent.h"
 #include "Wrecker.h"
 #include "../krusty2/vehicle/BikeCore.h"
+#include "../krusty2/vehicle/KrustyBikeCore.h"
 
 #define SoundSystem() ((PCSoundInterface*)g_TrackGame->soundInterface)
 
@@ -157,7 +158,7 @@ RaceSound* RaceSound::Create(void* owner, EventBikeRaceView* view,
     char section[0x50];
     char file[0x50];
     ParameterBlock parameters;
-    EventKrustyBikeView* racer;
+    KrustyBike* racer;
     int i;
     int k;
 
@@ -180,7 +181,7 @@ RaceSound* RaceSound::Create(void* owner, EventBikeRaceView* view,
     enginePresent[1] = 0;
     enginePresent[2] = 0;
     iterator = 0;
-    while ((racer = reinterpret_cast<EventKrustyBikeView*>(reinterpret_cast<BikeRace*>(raceView)->NextBike(&iterator))) != 0) {
+    while ((racer = reinterpret_cast<KrustyBike*>(reinterpret_cast<BikeRace*>(raceView)->NextBike(&iterator))) != 0) {
         if (racer->engineSize < 250) {
             enginePresent[0] = 1;
             if (racer == raceView->localRacer)
@@ -462,7 +463,7 @@ void RaceSound::AssignChannels() {
     int i;
     int count;
     int kind;
-    EventKrustyBikeView* racer;
+    KrustyBike* racer;
     float volume;
 
     for (i = 0; i < 11; i++) {
@@ -489,7 +490,7 @@ void RaceSound::AssignChannels() {
 
     iterator = 0;
     count = 0;
-    while ((racer = reinterpret_cast<EventKrustyBikeView*>(reinterpret_cast<BikeRace*>(raceView)->NextBike(&iterator))) != 0) {
+    while ((racer = reinterpret_cast<KrustyBike*>(reinterpret_cast<BikeRace*>(raceView)->NextBike(&iterator))) != 0) {
         engineChannels[count].channelRacer = racer;
         if (racer->engineSize < 250)
             engineChannels[count].engine = 0;
@@ -567,7 +568,7 @@ int RaceSound::Tick(float frameTime) {
         ohClock += frameTime;
         applauseClock += frameTime;
         stuntApplauseClock += frameTime;
-        listenerRacer = (EventKrustyBikeView*)listenerCamera->krustyBike;
+        listenerRacer = (KrustyBike*)listenerCamera->krustyBike;
         if (listenerRacer != lastListenerRacer) {
             lastListenerRacer = listenerRacer;
             lastListenerLap = listenerRacer->lapCount;
@@ -580,14 +581,14 @@ int RaceSound::Tick(float frameTime) {
         SoundSystem()->SetListenerVelocity(*reinterpret_cast<const Vector3*>(&listenerCamera->bike->velocity));
         for (i = 0; i < channelsInUse; i++) {
             if (engineChannels[i].channelSound) {
-                engineChannels[i].channelRacer->vehicleModel->GetPosition(reinterpret_cast<Vec3*>(&position));
+                engineChannels[i].channelRacer->modelNode->GetPosition(reinterpret_cast<Vec3*>(&position));
                 engineChannels[i].channelSound->Set3DPosition(position, 0);
-                engineChannels[i].channelSound->Set3DVelocity(engineChannels[i].channelRacer->velocity, 0);
+                engineChannels[i].channelSound->Set3DVelocity((Vector3&)engineChannels[i].channelRacer->velocity, 0);
             }
         }
-        listenerRacer->vehicleModel->GetPosition(reinterpret_cast<Vec3*>(&position));
+        listenerRacer->modelNode->GetPosition(reinterpret_cast<Vec3*>(&position));
         landHardSound->Set3DPosition(position, 0);
-        landHardSound->Set3DVelocity(listenerRacer->velocity, 0);
+        landHardSound->Set3DVelocity((Vector3&)listenerRacer->velocity, 0);
         SoundSystem()->CommitListenerSettings();
     }
     return 1;
@@ -603,7 +604,7 @@ int RaceSound::UpdateRacerSounds(float frameTime) {
     for (i = 0; i < channelsInUse; i++) {
         if (!engineChannels[i].channelRacer->outOfRace) {
             engineChannels[i].cameraDistance =
-                (int)GroundDistance(&listenerCamera->eyePosition, &engineChannels[i].channelRacer->position);
+                (int)GroundDistance(&listenerCamera->eyePosition, (Vector3*)&engineChannels[i].channelRacer->position);
         } else {
             engineChannels[i].cameraDistance = 1000000;
             engineChannels[i].channelSound = 0;
@@ -812,7 +813,7 @@ int RaceSound::UpdateRacerSounds(float frameTime) {
 // 0x004e42e0: plays one of the six wreck sounds that is not playing (at most
 // ten random picks) at the racer's position; returns its index, 0 when
 // none was free.
-int RaceSound::PlayWreckSound(EventKrustyBikeView* racer) {
+int RaceSound::PlayWreckSound(KrustyBike* racer) {
     Vector3 position;
     int tries = 0;
     int index = rand() % 6;
@@ -822,7 +823,7 @@ int RaceSound::PlayWreckSound(EventKrustyBikeView* racer) {
             return 0;
         index = rand() % 6;
     }
-    racer->vehicleModel->GetPosition(reinterpret_cast<Vec3*>(&position));
+    racer->modelNode->GetPosition(reinterpret_cast<Vec3*>(&position));
     wreckSounds[index]->Set3DPosition(position, 0);
     PlayIfEnabled(wreckSounds[index], 0, 0, 0, 0);
     return index;
@@ -831,7 +832,7 @@ int RaceSound::PlayWreckSound(EventKrustyBikeView* racer) {
 // 0x004e43a0: plays one of the six fall sounds that is not playing (at most
 // ten random picks) at the racer's position; returns its index, 0 when
 // none was free.
-int RaceSound::PlayFallSound(EventKrustyBikeView* racer) {
+int RaceSound::PlayFallSound(KrustyBike* racer) {
     Vector3 position;
     int tries = 0;
     int index = rand() % 6;
@@ -841,7 +842,7 @@ int RaceSound::PlayFallSound(EventKrustyBikeView* racer) {
             return 0;
         index = rand() % 6;
     }
-    racer->vehicleModel->GetPosition(reinterpret_cast<Vec3*>(&position));
+    racer->modelNode->GetPosition(reinterpret_cast<Vec3*>(&position));
     fallSounds[index]->Set3DPosition(position, 0);
     PlayIfEnabled(fallSounds[index], 0, 0, 0, 0);
     return index;
@@ -1235,7 +1236,7 @@ void RaceSound::PlayIfEnabled(Sound* sound, int network, int stop, int loop, int
 
 // 0x004e57d0: bonus.wav for the listener's scores of 10000 and more
 // (modes 0 and 4); applause01 in mode 3 at most every 15 seconds.
-void RaceSound::PlayScoreSounds(EventKrustyBikeView* racer, float score) {
+void RaceSound::PlayScoreSounds(KrustyBike* racer, float score) {
     if (listenerRacer == racer && score >= 10000.0f &&
         (!g_TrackGame->mode.raceSettings.eventType || g_TrackGame->mode.raceSettings.eventType == 4))
         PlayIfEnabled(bonusSound, 0, 0, 0, 0);

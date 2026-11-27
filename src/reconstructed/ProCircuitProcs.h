@@ -39,7 +39,7 @@ struct ProCircuitRacerResultView {
     int position;                             // +0x04: finishing position
     float fastestLap;                         // +0x08: RacerResult fastestLap
     int largestStuntPoints;                   // +0x0c: RacerResult largestStuntPoints
-    int totalTrickTime;                       // +0x10: RacerResult totalTrickTime
+    float totalTrickTime;                     // +0x10: RacerResult totalTrickTime
     float totalRunningTime;                   // +0x14: RacerResult totalRunningTime
     float bestTagRun;                         // +0x18: RacerResult bestTagRun
     float totalTagRun;                        // +0x1c: RacerResult totalTagRun

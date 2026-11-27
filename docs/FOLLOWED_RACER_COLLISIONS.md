@@ -23,8 +23,8 @@ Announce. Its two direct retail callers are a primary KrustyBike slot-28 method
 and the GameObject-facing Tick implementation. The latter explicitly subtracts
 `0x160c` before passing the previous racer. The picker independently stores the
 same iterator/local/array primary pointers in the followed-racer field. These
-are call-boundary claims; `TrackGameViewOwner` and `EventKrustyBikeView` remain
-provisional views rather than recovered complete class identities.
+are call-boundary claims; `TrackGameViewOwner` remains a provisional view rather
+than a recovered complete class identity (the racers themselves are `KrustyBike`).
 
 The provider uses the two primary CollisionObjects stored at KrustyBike
 `+0x1414/+0x1418`, the primary Tire pointers in the front/rear wheel fields,

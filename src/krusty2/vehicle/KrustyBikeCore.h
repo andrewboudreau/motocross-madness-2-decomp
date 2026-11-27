@@ -150,7 +150,7 @@ public:
 
 public:
     char aiKind;  // +0x734  loader kind (0 for a ghost); nonzero bikes take the BikeAI step 0x00413200 and racing line 0x00414370
-    char isRemote;  // +0x735  Load's remote: BikeRace's loader passes 1 for network/remote racers, 0 for the local player; RaceStatus skips the gate test
+    unsigned char isRemote;  // +0x735  (zero-extended where RaceStatus 0x004e63e0 passes it on)  Load's remote: BikeRace's loader passes 1 for network/remote racers, 0 for the local player; RaceStatus skips the gate test
     char isGhost;  // +0x736  set for loader kind 0xff (a ghost); the loader then creates the KbGhostMod at +0x15e8
     char fourStroke;  // +0x737  KbBikeSetup+4; racesnd.cpp selects engine 2 over 1 by it (RaceView +0x737)
     int engineSize;  // +0x738  KbBikeSetup+0 (250 without a setup); +0x79c classes it (<=125, <500); racesnd below 250 uses engine 0
@@ -179,8 +179,8 @@ public:
     int field_0x794; // 0x794
     int field_0x798; // 0x798
     int engineClass;  // +0x79C loader: 0 for engineSize <= 125, 1 below 500, else 2; BikeAI indexes its speed table (0x00566f74) with it
-    short lapCount;  // +0x7A0  RaceView/BikeRace +0x7a0 laps
-    short prevLapCount;                       // +0x7A2  lapCount of the previous frame (slot 49); compared for the first-lap check (tier 3)
+    unsigned short lapCount;  // +0x7A0  laps; RaceStatus, racesnd and NationalRace zero-extend it
+    unsigned short prevLapCount;                    // +0x7A2  lapCount of the previous frame (slot 49); compared for the first-lap check (tier 3)
     char hasFinished;  // +0x7A4  RaceView +0x7a4 finished (BikeRace racer +0x7a4 finished)
     char spawnProtectEndPending;              // +0x7A5  slot 50 sets it on an off request while spawnProtected; cleared with ApplySpawnCollisionIgnores(0) once the bike is clear (tier 3)
     char pad_0x07A6[0x2];
@@ -219,7 +219,7 @@ public:
     char hasFullState;  // +0x11B8  BikeRace racer +0x11b8: set when a message 1 state arrives; message 13 deltas wait for it
     char pad_0x11B9[0x3];
     int netId;  // +0x11BC  loader netId; the id passed with every Send/recorder message
-    unsigned char loaderKind;  // +0x11C0  raw loader kind (0xff for a ghost), sent in messages 1 and 10
+    char loaderKind;  // +0x11C0  (sign-extended by EventManager 0x0045e9d0)  raw loader kind (0xff for a ghost), sent in messages 1 and 10
     char pad_0x11C1[0x3];
     float clockOffset;  // +0x11C4  clock offset subtracted by 0x00493660 (not UseTimeReceived)
     KbBikeNetState* states[4]; // 0x11C8  received states, newest first (buffers at 0x11d8..)

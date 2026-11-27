@@ -68,13 +68,13 @@ public:
 
     NameOverlay* Create(RenderTarget* target, TextureMap* texture,
                                        const OverlayRect* rect, int scaleRect,
-                                       const OverlayRect* source, EventKrustyBikeView* racer,
+                                       const OverlayRect* source, KrustyBike* racer,
                                        BikeRace* nameWorld, int phase); // 0x00518e30
     int IsPointVisible(const Vector3* point);                           // 0x00519000
     void SetFixedPosition(Vector3 point);                // 0x00519080
     void SetRadarAnchor(Vector3 point, int leftOfAnchor, int outsideMap); // 0x005190a0
 
-    EventKrustyBikeView* trackedRacer;
+    KrustyBike* trackedRacer;
     int sourceWidth;                          // source width
     int drawWidth;                            // +0x124 drawn width (screen rectangle; ChatOverlay sets it)
     int sourceHeight;                         // source height
@@ -223,7 +223,7 @@ public:
     float frameRateSum;                       // frame rate summed
     EventBikeRaceView* radarView;
     KrustyBikeCamera* radarCamera;
-    EventKrustyBikeView* racers[11];
+    KrustyBike* racers[11];
     int racerCount;                           // racer count
     int showFrameRate;                        // shows the frame rate
     int readoutCount;                         // readouts so far

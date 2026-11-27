@@ -67,9 +67,9 @@ struct TrackGameViewOwner : public GameObject {
     void PickFollowedRacer();
     // 0x004a9e80: follows `racer` after `previous` (KrustyBike.cpp 0x00497986
     // passes itself, 0, 1); `tell` lets the view's own racer know.
-    void SetFollowedRacer(EventKrustyBikeView* racer, EventKrustyBikeView* previous, int tell);
+    void SetFollowedRacer(KrustyBike* racer, KrustyBike* previous, int tell);
     // 0x004a9f90: lets every other racer know about the switch.
-    void AnnounceFollowedRacer(EventKrustyBikeView* racer, EventKrustyBikeView* previous);
+    void AnnounceFollowedRacer(KrustyBike* racer, KrustyBike* previous);
     // 0x00404df0: bikerace.cpp passes a racer's +0x7b8, +0x7bc and the racer
     // (0x00420650 passes 0, 1): picks entries `a` and `b` at +0x420 after
     // flagging the two it leaves; `racer` is unused.
@@ -91,7 +91,7 @@ struct TrackGameViewOwner : public GameObject {
     unsigned char field_0x78[0x9c - 0x78];
     GameObject* auralScape;                   // +0x9C  BaseQuarryEvent::auralScape (0x004dee7d stores AuralScape::Create); racesnd.cpp enables it with sound on
     unsigned char field_0xa0[0xa8 - 0xa0];
-    EventKrustyBikeView* followedRacer;         // +0xa8 the followed racer (0x004a9d20 picks it, 0x004a9e80 switches it)
+    KrustyBike* followedRacer;         // +0xa8 the followed racer (0x004a9d20 picks it, 0x004a9e80 switches it)
     // One struct stands in for the three owners at TrackGame +0x55c/+0x560/
     // +0x568; +0xac is a gate count in the quarry/course owners and a float
     // (stored through a cast: a float member here moves TrackGame slot 1 and

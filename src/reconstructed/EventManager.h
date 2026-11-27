@@ -14,14 +14,14 @@ class Camera;
 
 // 8-byte record sorted with 0x0045e930.
 struct RacerTimeRank {
-    EventKrustyBikeView* racer;
+    KrustyBike* racer;
     float value;
 };
 
 // 8-byte record sorted with TrackOverlay's 0x005199f0 (higher value first).
 struct RacerScoreRank {
     float value;
-    EventKrustyBikeView* racer;
+    KrustyBike* racer;
 };
 int CompareScoresDescending(const void* a, const void* b); // cdecl 0x005199f0
 
@@ -30,7 +30,7 @@ struct RacerStanding {
     int points;                                    // the result's points (EventManager.cpp)
     float field_0x04;
     float field_0x08;
-    EventKrustyBikeView* racer;                      // its +0x5e0 name breaks ties
+    KrustyBike* racer;                      // its +0x5e0 name breaks ties
 };
 
 // cdecl 0x0045d3d0: qsort order for standings (more points first, then
@@ -66,13 +66,13 @@ struct RacerResult {
     // 0x0045c8b0: copies the racer's id, name and the fields noted below
     // (dword moves; int/float types are from other readers). With racer
     // +0x4a0 set it clears them instead and sets position 99.
-    void CopyFromRacer(EventKrustyBikeView* racer);  // 0x0045c8b0
+    void CopyFromRacer(KrustyBike* racer);  // 0x0045c8b0
 
     int playerId;                                  // +0x00: network player id (racer +0x11bc)
     int position;                                  // +0x04: finishing position (99 when racer +0x4a0 is set)
     float fastestLap;                              // +0x08: racer +0x750 (ZoneReport "FastestLap"); TrackRecord.cpp 0x0051f3c0 loads it as a float
     int largestStuntPoints;                        // +0x0c: racer +0x788 (ZoneReport "LargestSingleStuntPoints")
-    int totalTrickTime;                       // +0x10  racer +0x758 totalTrickTime
+    float totalTrickTime;                     // +0x10  racer +0x758 totalTrickTime (copied, never converted)
     float totalRunningTime;                        // +0x14: racer +0x754 (ZoneReport "TotalrunningTime")
     float bestTagRun;                              // +0x18: racer +0x760 bestTagRun
     float totalTagRun;                             // +0x1c: racer +0x764 totalTagRun
@@ -131,7 +131,7 @@ public:
     // 0x0045e550: once every remote racer is ready, ends the network wait.
     void WaitForRemoteRacers(float frameTime);  // 0x0045e550
     // 0x0045f180: adds the championship points for `racer`'s position.
-    void AddChampionshipPoints(EventKrustyBikeView* racer, int* points);  // 0x0045f180
+    void AddChampionshipPoints(KrustyBike* racer, int* points);  // 0x0045f180
     // 0x0045e600: starts the end-of-race block (or finishes at once), and
     // once it has run its course clears it and moves to the results.
     void EndRace();

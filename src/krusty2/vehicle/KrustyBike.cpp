@@ -2927,7 +2927,7 @@ float KrustyBike::AwardTrickScore()
         trickMultiplier += 0.5f;
     float score = trickPoints * trickMultiplier;
     if (race->localRacer == this && race->raceSound)
-        race->raceSound->PlayScoreSounds((EventKrustyBikeView*)this, score);
+        race->raceSound->PlayScoreSounds(this, score);
     if (!g_TrackGame->mode.raceSettings.eventType ||
         (g_TrackGame->mode.raceSettings.eventType == 4 && g_TrackGame->mode.raceSettings.stuntMode && (void*)g_TrackGame->tagEvent->followedRacer == this)) {
         if (race->localRacer == this) {

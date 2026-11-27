@@ -14,7 +14,7 @@
 // slot 18 (0x00499af0, a body shared with KrustyUI) and slot 23 (0x004e44e0). bikerace.cpp allocates 0x12b0 bytes for it
 // (0x004195e4) and constructs it with 1.
 
-struct EventKrustyBikeView;
+class KrustyBike;
 struct EventBikeRaceView;
 
 class KrustyBikeCamera;
@@ -23,7 +23,7 @@ class KrustyBikeCamera;
 // Each owns a 44100-byte sample buffer; the channel at RaceSound+0x434 is
 // streamed into its Sound in two halves (0x004e4a30 / 0x004e4d10).
 struct EngineSoundChannel {
-    EventKrustyBikeView* channelRacer;        // racer
+    KrustyBike* channelRacer;        // racer
     Sound* channelSound;
     int voiceIndex;                        // +0x08, -1 when reset
     int engine;                            // +0x0c, engine (125/250/400 section) indexing the sample sets
@@ -75,8 +75,8 @@ public:
     int UpdateRacerSounds(float frameTime); // 0x004e39b0: per-racer sounds
     // 0x004e42e0 / 0x004e43a0: plays a random "wreck%02d.wav" (wreckSounds)
     // or "fall%02d.wav" (fallSounds) sound at `racer`; the index, or 0 after ten busy tries.
-    int PlayWreckSound(EventKrustyBikeView* racer);
-    int PlayFallSound(EventKrustyBikeView* racer);
+    int PlayWreckSound(KrustyBike* racer);
+    int PlayFallSound(KrustyBike* racer);
     // 0x004e4460: the ground distance between two points, 500 when either
     // axis is further apart than that.
     float GroundDistance(Vector3* a, Vector3* b);
@@ -90,7 +90,7 @@ public:
     // 0x004e5780: plays `sound` while sound is on (`network` sounds only in
     // network games); `stop` rewinds it first.
     void PlayIfEnabled(Sound* sound, int network, int stop, int loop, int unused);
-    void PlayScoreSounds(EventKrustyBikeView* racer, float score); // 0x004e57d0
+    void PlayScoreSounds(KrustyBike* racer, float score); // 0x004e57d0
     // 0x004de580 (ret 0xc): KrustyBike's contact callbacks report each impulse
     // to the race sound; the body is empty (an identical-COMDAT fold).
     void NotifyContactImpulse(void* racer, float impulse, int eventKind);
@@ -98,7 +98,7 @@ public:
     // 0x004e5880 (qsort callback): orders channels by cameraDistance.
     static int CompareChannels(const void* a, const void* b);
 
-    EventKrustyBikeView* listenerRacer;        // listener's racer
+    KrustyBike* listenerRacer;        // listener's racer
     int field_0x30;
     EventBikeRaceView* raceView;
     KrustyBikeCamera* listenerCamera;
@@ -117,7 +117,7 @@ public:
     int channelsInUse;                       // channels in use
     EngineSoundChannel engineChannels[11];
     EngineSoundChannel* streamChannel; // streamed channel
-    EventKrustyBikeView* currentRacer;       // racer being updated
+    KrustyBike* currentRacer;       // racer being updated
     Sound* engineVoices[4];                // the four engine voices
     int engineVoiceInUse[4];                   // voice in use
     // Engines present in the race (audio_*.ini sections "125", "250", "400",
@@ -183,7 +183,7 @@ public:
     int lastListenerGate;                 // +0x1294 listener's gate (racer +0x7b8) last frame
     int bytesPerSample;                    // +0x1298, 2 with audio_16.ini, 1 with audio_08.ini
     int lastListenerPosition;                 // +0x129c, listener's last position (99 initially)
-    EventKrustyBikeView* lastListenerRacer;     // +0x12a0, listener's racer last frame
+    KrustyBike* lastListenerRacer;     // +0x12a0, listener's racer last frame
     float ohClock;                            // +0x12a4, seconds since oh_01.wav
     float applauseClock;                      // +0x12a8, seconds since applause01/02
     float stuntApplauseClock;                 // +0x12ac, seconds since 0x004e57d0's applause
