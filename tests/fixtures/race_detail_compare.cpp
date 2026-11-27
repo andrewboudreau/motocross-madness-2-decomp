@@ -2,6 +2,7 @@
 #include "../../src/reconstructed/BikeRace.h"
 #include "../../src/reconstructed/D3DIMSoulTree.h"
 #include "../../src/krusty2/vehicle/KrustyBikeCore.h"
+#include "../../src/krusty2/motion/D3DIMSoultreeCharacter.h"
 #include <windows.h>
 #include <stddef.h>
 #include <float.h>
@@ -15,7 +16,7 @@ LAYOUT(race_net,offsetof(BikeRace,racerSlots)==0x3c);
 LAYOUT(race_ai,offsetof(BikeRace,aiRacers)==0x40);
 LAYOUT(racer_model,offsetof(KrustyBike,modelNode)==0x3bc);
 LAYOUT(racer_rider,offsetof(KrustyBike,riderCharacter)==0x5c4);
-LAYOUT(rider_model,offsetof(BikeRaceRiderView,modelNode)==0x1a0);
+LAYOUT(rider_model,offsetof(D3DIMSoultreeCharacter,modelNode)==0x1a0);
 LAYOUT(model_size,sizeof(D3DIMSoultreeObject)==0x2d8);
 LAYOUT(model_threshold,offsetof(D3DIMSoultreeObject,inverseLodThreshold)==0x284);
 LAYOUT(model_dirty,offsetof(D3DIMSoultreeObject,subtreeDirty)==0x18c);
@@ -28,7 +29,7 @@ struct State {
     Raw<BikeRace> race;
     Raw<TrackGame> game;
     Raw<KrustyBike> racers[5];
-    Raw<BikeRaceRiderView> riders[5];
+    Raw<D3DIMSoultreeCharacter> riders[5];
     Raw<D3DIMSoultreeObject> models[10];
     DWORD arrayGuard0[4]; KrustyBike* ai[2]; DWORD arrayGuard1[4];
     KrustyBike* net[2]; DWORD arrayGuard2[4];
@@ -82,7 +83,7 @@ static void Run(int level,int blade,int mode,int aiCount,int netCount,int alias,
  state.race.ptr()->aiRacers=state.ai;state.race.ptr()->racerSlots=state.net;
  for(int i=0;i<2;i++){state.ai[i]=state.racers[i+1].ptr();state.net[i]=state.racers[i+3].ptr();}
  for(i=0;i<5;i++){
-  state.racers[i].ptr()->riderCharacter=(D3DIMSoultreeCharacter*)state.riders[i].ptr();
+  state.racers[i].ptr()->riderCharacter=state.riders[i].ptr();
   state.racers[i].ptr()->modelNode=(D3DIMSoultreeObject*)state.models[alias?i%2:2*i].ptr();
   state.riders[i].ptr()->modelNode=(D3DIMSoultreeObject*)state.models[alias?i%2:2*i+1].ptr();
  }

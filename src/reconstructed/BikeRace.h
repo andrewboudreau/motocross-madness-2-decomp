@@ -54,11 +54,6 @@ struct RacerDeltaMessage;
 // Shared chat overlay stored at BikeRace+0x19c and by the race events.
 class ChatOverlay;
 
-struct BikeRaceRiderView {
-    unsigned char field_0x000[0x1a0];
-    D3DIMSoultreeObject* modelNode;            // +0x1a0 the rider's model (SetDetailLevel 0x00423790)
-};
-
 class BikeRace;
 
 // A bike's engine setup (0x5c bytes): the loader copies TrackGameMode

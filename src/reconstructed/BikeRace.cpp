@@ -1799,7 +1799,7 @@ int BikeRace::Tick(float frameTime) {
                 name[0x14] = 0;
                 SceneAnimation* entry = &raceScene->animationTable->entries[targetIndex];
                 if (entry->keyFramed) {
-                    model = ((BikeRaceRiderView*)entry->character)->modelNode;
+                    model = (D3DIMSoultreeObject*)entry->character->modelNode;
                 } else {
                     model = entry->proceduralObject->carModel;
                 }
