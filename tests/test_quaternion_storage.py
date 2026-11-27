@@ -146,7 +146,7 @@ class QuaternionStorageTests(unittest.TestCase):
             result=execute(paths['state'],'actual')
             self.assertEqual(result.returncode,0,result.stdout+result.stderr)
             self.assertEqual(result.stdout.strip(),'Quaternion storage: 2 initial, 10848 normalize, 128 reset, 156 guarded reset (148 AV) cases')
-            control=out/'wrong-identity.cpp';control.write_text((ROOT/STATE).read_text().replace('Quat g_QuatIdentity;','Quat g_QuatIdentity = {1,0,0,0};'))
+            control=out/'wrong-identity.cpp';control.write_text((ROOT/STATE).read_text().replace('Quat g_QuatIdentity;','Quat g_QuatIdentity = {1,0,0,0};').replace('"../krusty2/math/Quat.h"','"'+str(ROOT/'src/krusty2/math/Quat.h').replace('\\','/')+'"'))
             compile_source(control,'wrong-identity',False)
             negative=execute(paths['wrong-identity'],'wrong-identity')
             self.assertEqual(negative.returncode,2,negative.stdout+negative.stderr)

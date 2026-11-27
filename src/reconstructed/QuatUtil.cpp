@@ -14,14 +14,9 @@ static const Vector3 kVec3XAxis = Vector3(1.0f, 0.0f, 0.0f);  // 0x00685090, $E 
 static const Vector3 kVec3YAxis = Vector3(0.0f, 1.0f, 0.0f);  // 0x006850a0, $E 0x004a22b0
 static const Vector3 kVec3ZAxis = Vector3(0.0f, 0.0f, 1.0f);  // 0x00685070, $E 0x004a2300
 
-// Scalar part first (krusty2 math/Math3D.h). It has no constructors: with
+// Scalar part first (krusty2 math/Quat.h). It has no constructors: with
 // them, QuatNormalize's result components land in other registers.
-struct Quat {
-    float w;
-    float x;
-    float y;
-    float z;
-};
+#include "../krusty2/math/Quat.h"
 
 extern Quat g_QuatIdentity;   // 0x006850b0: loader-zero fallback; legacy name
 
