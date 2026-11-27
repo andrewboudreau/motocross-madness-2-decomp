@@ -27,6 +27,5 @@ public:
     virtual void ShowSubject();
     virtual bool ShouldFollowSubject();
 
-protected:
     Bike* bike; // +0x3b0 the followed bike
 };

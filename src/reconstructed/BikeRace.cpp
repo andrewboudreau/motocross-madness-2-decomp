@@ -2,6 +2,7 @@
 #include "GUIManagerCore.h"
 #include "../krusty2/motion/CollisionCharacter.h"
 #include "BikeRace.h"
+#include "KrustyBikeCameraFollow.h"
 #include "TrackOverlay.h"
 
 #include <stdio.h>
@@ -500,7 +501,7 @@ BikeRace* BikeRace::Create(void* owner, ParticleManager* particles, LightManager
                                                    vcrFile);
                 AppendChild(replayVcr, -1);
             }
-            savedCameraState = RaceCameraView()->cameraState;
+            savedCameraState = raceCamera->cameraState;
             raceCamera->SetCameraState(1);
         }
     }
@@ -562,7 +563,7 @@ BikeRace* BikeRace::Create(void* owner, ParticleManager* particles, LightManager
 
     g_MemTagStack->Push("Audio");
     RaceSound* sound = new(__FILE__, 0x347) RaceSound(1);
-    raceSound = sound->Create(renderContext, (EventBikeRaceView*)this, (RaceSoundKrustyBikeCameraView*)raceCamera, 6);
+    raceSound = sound->Create(renderContext, (EventBikeRaceView*)this, raceCamera, 6);
     AppendChild((GameObject*)raceSound, -1);
     g_MemTagStack->Push("BikeRace");
     if (g_TrackGame->mode.joystickOn) {
@@ -1329,7 +1330,7 @@ BikeRace::~BikeRace() {
         delete vcrFile;
         vcrFile = 0;
         if (g_TrackGame->playingReplay) {
-            RaceCameraView()->cameraState = savedCameraState;
+            raceCamera->cameraState = savedCameraState;
             raceCamera->SaveCameraState();
         }
         g_TrackGame->playingReplay = 0;
@@ -1413,8 +1414,8 @@ static inline float MaxFloat(float a, float b) {
 // 0x0041d2b0
 int BikeRace::Tick(float frameTime) {
     if (!g_TrackGame->uiInteractionBlocked) {
-        if (RaceCameraView()->followingRacer &&
-            RaceCameraView()->followedBike->outOfRace != 0) {
+        if (raceCamera->vehicleMode &&
+            raceCamera->bike->outOfRace != 0) {
             NextCameraTarget(0, 1, 0);
         }
         if (!g_TrackGame->paused) {
@@ -1622,7 +1623,7 @@ int BikeRace::Tick(float frameTime) {
                             startGateTimer = 0;
                             raceScene->RestartEntry(startGateEntry, 0.0f, 0, 0);
                             startGate->Disable();
-                            if (!RaceCameraView()->followingRacer && targetEntry == startGateEntry) {
+                            if (!raceCamera->vehicleMode && targetEntry == startGateEntry) {
                                 NextCameraTarget(1, 1, 0);
                             }
                             if (startGate->collisionObject != 0) {
@@ -1658,7 +1659,7 @@ int BikeRace::Tick(float frameTime) {
                         if (thirtySecondMan != 0) {
                             raceScene->RestartEntry(thirtySecondManEntry, 0.0f, 0, 0);
                             thirtySecondMan->Disable();
-                            if (!RaceCameraView()->followingRacer && targetEntry == thirtySecondManEntry) {
+                            if (!raceCamera->vehicleMode && targetEntry == thirtySecondManEntry) {
                                 NextCameraTarget(1, 1, 0);
                             }
                             if (thirtySecondMan->collisionObject != 0) {
@@ -1932,45 +1933,15 @@ void BikeRace::ReplaceMeshId(D3DIMSoultreeCharacter* character, int from, int to
     }
 }
 
-// BikeRace.h's camera view (inline three times in 0x0041eb20): follows `racer`,
-// showing the previous racer's model again and hiding the new one's.
-inline void BikeRaceKrustyBikeCameraView::StartFollowing(KrustyBike* racer) {
-    if (followedBike != 0 && !((BikeRace*)racer->race)->forceHighLod) {
-        ((D3DIMSoultreeObject*)followedBike->modelNode)->SetLowestLod(1);
-        ((D3DIMSoultreeObject*)followedBike->riderCharacter->modelNode)->SetLowestLod(1);
-        if (((D3DIMSoultreeObject*)followedBike->modelNode)->currentLod == 0) {
-            ((D3DIMSoultreeObject*)followedBike->modelNode)->SetLod(1);
-        }
-        if (((D3DIMSoultreeObject*)followedBike->riderCharacter->modelNode)->currentLod == 0) {
-            ((D3DIMSoultreeObject*)followedBike->riderCharacter->modelNode)->SetLod(1);
-        }
-    }
-    vehicle = racer;
-    targetPointCached = 0;
-    targetHeadingCached = 0;
-    followingRacer = true;
-    shadowCaster = 0;
-    targetCharacter = 0;
-    targetCar = 0;
-    followedBike = racer;
-    isSettled = 0;
-    followedRacer = racer;
-    if (!((BikeRace*)racer->race)->forceHighLod) {
-        ((D3DIMSoultreeObject*)racer->modelNode)->SetLowestLod(0);
-        ((D3DIMSoultreeObject*)followedBike->riderCharacter->modelNode)->SetLowestLod(0);
-    }
-    isSettled = 0;
-}
-
 // 0x0041eb20
 int BikeRace::AimCamera(int caster) {
-    if (RaceCameraView()->followingRacer) {
+    if (raceCamera->vehicleMode) {
         targetKind = 0xff;
         targetIndex = 0;
         if (g_TrackGame->playerCount > 1) {
-            RaceCameraView()->followedBike->modelNode->ClearFlag14c();
-            RaceCameraView()->followedBike->riderCharacter->modelNode->ClearFlag14c();
-            RaceCameraView()->StartFollowing(racerSlots[targetRacer]);
+            raceCamera->bike->modelNode->ClearFlag14c();
+            raceCamera->bike->riderCharacter->modelNode->ClearFlag14c();
+            raceCamera->StartFollowing(racerSlots[targetRacer]);
             if (raceShadow != 0) {
                 raceShadow->ClearCasters();
                 raceShadow->AddCaster((D3DIMSoultreeObject*)racerSlots[targetRacer]->modelNode);
@@ -1982,9 +1953,9 @@ int BikeRace::AimCamera(int caster) {
                                                                           racer->nextLapGate, racer);
             }
         } else if (targetRacer == 0) {
-            RaceCameraView()->followedBike->modelNode->ClearFlag14c();
-            RaceCameraView()->followedBike->riderCharacter->modelNode->ClearFlag14c();
-            RaceCameraView()->StartFollowing(localRacer);
+            raceCamera->bike->modelNode->ClearFlag14c();
+            raceCamera->bike->riderCharacter->modelNode->ClearFlag14c();
+            raceCamera->StartFollowing(localRacer);
             if (raceShadow != 0) {
                 raceShadow->ClearCasters();
                 raceShadow->AddCaster((D3DIMSoultreeObject*)localRacer->modelNode);
@@ -1996,10 +1967,10 @@ int BikeRace::AimCamera(int caster) {
                                                                           racer->nextLapGate, racer);
             }
         } else {
-            RaceCameraView()->followedBike->modelNode->ClearFlag14c();
-            RaceCameraView()->followedBike->riderCharacter->modelNode->ClearFlag14c();
+            raceCamera->bike->modelNode->ClearFlag14c();
+            raceCamera->bike->riderCharacter->modelNode->ClearFlag14c();
             int index = targetRacer - 1;
-            RaceCameraView()->StartFollowing(aiRacers[index]);
+            raceCamera->StartFollowing(aiRacers[index]);
             if (raceShadow != 0) {
                 raceShadow->ClearCasters();
                 raceShadow->AddCaster((D3DIMSoultreeObject*)aiRacers[index]->modelNode);
@@ -2019,10 +1990,10 @@ int BikeRace::AimCamera(int caster) {
             if (raceShadow != 0) {
                 raceShadow->ClearCasters();
             }
-            RaceCameraView()->TargetShadowCaster(
+            raceCamera->TargetShadowCaster(
                 raceScene->staticModels->casters[targetCaster].model);
         } else {
-            RaceCameraView()->followingRacer = 1;
+            raceCamera->vehicleMode = 1;
         }
     } else {
         targetKind = 1;
@@ -2035,23 +2006,23 @@ int BikeRace::AimCamera(int caster) {
             if (entry->keyFramed) {
                 CollisionCharacter* character = entry->character;
                 if (character->isEnabled) {
-                    RaceCameraView()->TargetSceneCharacter(character);
+                    raceCamera->TargetSceneCharacter(character);
                 } else {
                     return 0;
                 }
             } else {
                 CarProcedural* object = entry->proceduralObject;
                 if (object->isEnabled) {
-                    RaceCameraView()->TargetSceneObject(object);
+                    raceCamera->TargetSceneObject(object);
                 } else {
                     return 0;
                 }
             }
         } else {
-            RaceCameraView()->followingRacer = 1;
+            raceCamera->vehicleMode = 1;
         }
     }
-    if (RaceCameraView()->followingRacer) {
+    if (raceCamera->vehicleMode) {
         targetKind = 0xff;
         targetIndex = 0;
     }
@@ -2082,13 +2053,13 @@ void BikeRace::NextCameraTarget(int forward, int racers, int objects) {
     if (g_TrackGame->uiInteractionBlocked) {
         return;
     }
-    BikeRaceKrustyBikeCameraView* camera = RaceCameraView();
+    KrustyBikeCamera* camera = raceCamera;
     if ((camera->overrideActive || camera->cameraState == 7) &&
         (camera->cameraState != 7 || racers || objects)) {
         return;
     }
-    if (camera->followingRacer != racers) {
-        camera->followingRacer = racers;
+    if (camera->vehicleMode != racers) {
+        camera->vehicleMode = racers;
         if (AimCamera(objects == 0)) {
             return;
         }
@@ -2120,7 +2091,7 @@ void BikeRace::NextCameraTarget(int forward, int racers, int objects) {
                 targetRacer = 0;
             }
             if (old == targetRacer) {
-                RaceCameraView()->followingRacer = 1;
+                raceCamera->vehicleMode = 1;
                 return;
             }
         } while (RacerAtIndex(targetRacer)->outOfRace != 0);
@@ -2128,7 +2099,7 @@ void BikeRace::NextCameraTarget(int forward, int racers, int objects) {
         caster = 0;
         Scene* scene = raceScene;
         if (scene->animationTable == 0 || scene->animationTable->entryCount <= 0) {
-            RaceCameraView()->followingRacer = 1;
+            raceCamera->vehicleMode = 1;
             return;
         }
         int hidden = 1;
@@ -2158,18 +2129,18 @@ void BikeRace::NextCameraTarget(int forward, int racers, int objects) {
                 hidden = 1;
             }
             if (old == targetEntry) {
-                BikeRaceKrustyBikeCameraView* view = RaceCameraView();
+                KrustyBikeCamera* view = raceCamera;
                 if (view->targetCharacter != 0 || view->targetCar != 0) {
                     return;
                 }
                 entry = &scene->animationTable->entries[targetEntry];
                 if (entry->keyFramed) {
                     if (!entry->character->isEnabled) {
-                        view->followingRacer = 1;
+                        view->vehicleMode = 1;
                         return;
                     }
                 } else if (!entry->proceduralObject->isEnabled) {
-                    view->followingRacer = 1;
+                    view->vehicleMode = 1;
                     return;
                 }
                 AimCamera(caster);
@@ -2180,7 +2151,7 @@ void BikeRace::NextCameraTarget(int forward, int racers, int objects) {
         caster = 1;
         SceneStaticModels* casters = raceScene->staticModels;
         if (casters == 0 || casters->casterCount <= 0) {
-            RaceCameraView()->followingRacer = 1;
+            raceCamera->vehicleMode = 1;
             return;
         }
         int old = targetCaster;
@@ -2191,7 +2162,7 @@ void BikeRace::NextCameraTarget(int forward, int racers, int objects) {
         if (targetCaster >= raceScene->staticModels->casterCount) {
             targetCaster = 0;
         }
-        if (old == targetCaster && RaceCameraView()->shadowCaster != 0) {
+        if (old == targetCaster && raceCamera->targetCaster != 0) {
             return;
         }
     }
@@ -2451,13 +2422,13 @@ int BikeRace::OnControlPress(ControlEvent* event, InputButtonState* entry) {
                             SceneStaticModel* caster = &raceScene->staticModels->casters[i];
                             if (caster->physics) {
                                 if (picked == (int)caster->physicsObject->collisionObject) {
-                                    RaceCameraView()->followingRacer = 1;
+                                    raceCamera->vehicleMode = 1;
                                     targetCaster = i;
                                     NextCameraTarget(1, 0, 0);
                                     return 1;
                                 }
                             } else if (picked == (int)caster->collisionObject) {
-                                RaceCameraView()->followingRacer = 1;
+                                raceCamera->vehicleMode = 1;
                                 targetCaster = i;
                                 NextCameraTarget(1, 0, 0);
                                 return 1;
@@ -2469,13 +2440,13 @@ int BikeRace::OnControlPress(ControlEvent* event, InputButtonState* entry) {
                             SceneAnimation* entry = &raceScene->animationTable->entries[i];
                             if (entry->keyFramed) {
                                 if (picked == (int)entry->character->collisionObject) {
-                                    RaceCameraView()->followingRacer = 1;
+                                    raceCamera->vehicleMode = 1;
                                     targetEntry = i;
                                     NextCameraTarget(1, 0, 1);
                                     return 1;
                                 }
                             } else if (picked == (int)entry->proceduralObject->bodyCollider) {
-                                RaceCameraView()->followingRacer = 1;
+                                raceCamera->vehicleMode = 1;
                                 targetEntry = i;
                                 NextCameraTarget(1, 0, 1);
                                 return 1;
@@ -2755,7 +2726,7 @@ void BikeRace::RestartRace(int mode, char* path, char* description) {
         reinterpret_cast<BaseQuarryEvent*>(g_TrackGame->tagEvent)->ResetClock();
     }
     if (g_TrackGame->bajaEnduroEvent != 0) {
-        g_TrackGame->bajaEnduroEvent->SelectLapGates(0, 1, RaceCameraView()->followedRacer);
+        g_TrackGame->bajaEnduroEvent->SelectLapGates(0, 1, raceCamera->krustyBike);
     }
 }
 

@@ -6,7 +6,7 @@
 #include "RaceSound.h"
 #include "D3DIMSoulTree.h"
 
-#include "BikeCamera.h"
+#include "KrustyBikeCamera.h"
 #include "DebugAlloc.h"
 #include "KeyboardDevice.h"
 #include "Parameterblocks.h"
@@ -17,6 +17,7 @@
 #include "EventManager.h"
 #include "BaseQuarryEvent.h"
 #include "Wrecker.h"
+#include "../krusty2/vehicle/BikeCore.h"
 
 #define SoundSystem() ((PCSoundInterface*)g_TrackGame->soundInterface)
 
@@ -147,7 +148,7 @@ RaceSound::~RaceSound() {
 // audio_08.ini: the sample counts (divided down when several engines share
 // the race) and names of eight sample sets, and three engine speeds.
 RaceSound* RaceSound::Create(void* owner, EventBikeRaceView* view,
-                                            RaceSoundKrustyBikeCameraView* camera, int racers) {
+                                            KrustyBikeCamera* camera, int racers) {
     int count;
     FileStream* stream;
     int iterator;
@@ -566,7 +567,7 @@ int RaceSound::Tick(float frameTime) {
         ohClock += frameTime;
         applauseClock += frameTime;
         stuntApplauseClock += frameTime;
-        listenerRacer = listenerCamera->followedRacer;
+        listenerRacer = (EventKrustyBikeView*)listenerCamera->krustyBike;
         if (listenerRacer != lastListenerRacer) {
             lastListenerRacer = listenerRacer;
             lastListenerLap = listenerRacer->lapCount;
@@ -574,9 +575,9 @@ int RaceSound::Tick(float frameTime) {
             lastListenerPosition = listenerRacer->finishPosition;
         }
         UpdateRacerSounds(frameTime);
-        SoundSystem()->SetListenerPosition(listenerCamera->listenerPosition);
-        SoundSystem()->SetListenerOrientation(listenerCamera->listenerForward, listenerCamera->listenerUp);
-        SoundSystem()->SetListenerVelocity(listenerCamera->followedBike->velocity);
+        SoundSystem()->SetListenerPosition(listenerCamera->eyePosition);
+        SoundSystem()->SetListenerOrientation(listenerCamera->viewDirection, listenerCamera->upDirection);
+        SoundSystem()->SetListenerVelocity(*reinterpret_cast<const Vector3*>(&listenerCamera->bike->velocity));
         for (i = 0; i < channelsInUse; i++) {
             if (engineChannels[i].channelSound) {
                 engineChannels[i].channelRacer->vehicleModel->GetPosition(reinterpret_cast<Vec3*>(&position));
@@ -602,7 +603,7 @@ int RaceSound::UpdateRacerSounds(float frameTime) {
     for (i = 0; i < channelsInUse; i++) {
         if (!engineChannels[i].channelRacer->outOfRace) {
             engineChannels[i].cameraDistance =
-                (int)GroundDistance(&listenerCamera->listenerPosition, &engineChannels[i].channelRacer->position);
+                (int)GroundDistance(&listenerCamera->eyePosition, &engineChannels[i].channelRacer->position);
         } else {
             engineChannels[i].cameraDistance = 1000000;
             engineChannels[i].channelSound = 0;

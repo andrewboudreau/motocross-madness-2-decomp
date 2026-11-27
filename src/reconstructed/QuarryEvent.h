@@ -21,25 +21,6 @@ class Terrain;
 class FileStream;
 struct EventBikeRaceView;
 
-// The race camera at BaseQuarryEvent+0x3c (a KrustyBikeCamera: 0x004de590
-// constructs it with 0x00497cb0, which writes vtable 0x00554754) as this file
-// reads it: the listener's position and axes, and the followed bike
-// (velocity at +0x64). These are Camera's protected +0x170..+0x188 and
-// BikeCamera's +0x3b0.
-struct QuarryEventKrustyBikeView {
-    unsigned char field_0x00[0x64];
-    Vector3 velocity;                         // +0x64 krusty2 SoultreePhysicsBaseObject::velocity
-};
-
-struct QuarryEventKrustyBikeCameraView {
-    unsigned char field_0x000[0x170];
-    Vector3 eyePosition;                      // +0x170 position
-    Vector3 viewDirection;                    // +0x17c forward
-    Vector3 upDirection;                      // +0x188 up
-    unsigned char field_0x194[0x3b0 - 0x194];
-    QuarryEventKrustyBikeView* followedBike; // +0x3b0 followed bike
-};
-
 // RTTI: EcoSystem (vtable 0x00552508, 0x5c4 bytes); constructed by 0x004de590
 // with 0x00457250.
 #include "EcoSystem.h"

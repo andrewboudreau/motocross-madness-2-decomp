@@ -17,7 +17,6 @@ class Terrain;
 class ProjectedShadow;
 class D3DIMSoultreeCharacter;
 struct TextureContext;
-struct BikeRaceKrustyBikeCameraView;
 struct RaceGateEvent;
 struct RaceGatePose;
 class RaceSound;
@@ -44,10 +43,6 @@ public:
     virtual int OnControlPress(ControlEvent* event, InputButtonState* entry);
     // 0x00423880: control 6 (modifier 0x80) toggles drawChildren (+0x3fd).
     virtual int OnControlRelease(ControlEvent* event, InputButtonState* entry);
-
-    BikeRaceKrustyBikeCameraView* RaceCameraView() {
-        return (BikeRaceKrustyBikeCameraView*)raceCamera;
-    }
 
     // Inline (bikerace.h line 0xd3; the destructor 0x0041cf30): frees the
     // +0xc8 gate list.

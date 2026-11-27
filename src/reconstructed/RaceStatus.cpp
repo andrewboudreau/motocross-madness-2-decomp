@@ -465,13 +465,6 @@ int UpdateLapRace(RaceStatusNode** list, Track* track, float frameTime, RaceGate
     return ComputeTimeBehind(*list, 0) != 0;
 }
 
-// The view's camera (+0x50), whose +0x3b4 racer is the one followed (as
-// RaceSound.h's RaceSoundKrustyBikeCameraView; KrustyBikeCamera keeps it protected).
-struct RaceStatusKrustyBikeCameraView {
-    unsigned char field_0x000[0x3b4];
-    EventKrustyBikeView* followedRacer;         // +0x3b4 (RaceSound.h)
-};
-
 // |v|, exact for unit vectors (as CarProcedural.cpp).
 static inline float Length(Vector3 v) {
     float squared = v.z * v.z + (v.x * v.x + v.y * v.y);
@@ -511,7 +504,7 @@ int UpdateGateRace(RaceStatusNode** list, RaceGate* firstGate, float frameTime, 
                 return 0;
             if (g_TrackGame->bajaEnduroEvent && gate != racer->lapGate) {
                 racer->nextLapGate = (racer->lapGate + 1) % g_TrackGame->bajaEnduroEvent->gateCount;
-                if (racer == ((RaceStatusKrustyBikeCameraView*)racer->bikeView->raceCamera)->followedRacer)
+                if (racer == (EventKrustyBikeView*)((KrustyBikeCamera*)racer->bikeView->raceCamera)->krustyBike)
                     g_TrackGame->bajaEnduroEvent->SelectLapGates(racer->lapGate, racer->nextLapGate,
                                                                               racer);
             }

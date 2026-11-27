@@ -17,19 +17,7 @@
 struct EventKrustyBikeView;
 struct EventBikeRaceView;
 
-// The camera at RaceSound+0x38 as this file reads it: the listener's
-// position and orientation, the followed bike (velocity at +0x64) and the
-// racer it follows. These are KrustyBikeCamera's Camera and BikeCamera
-// offsets; the declared class there keeps them protected.
-struct RaceSoundKrustyBikeCameraView {
-    unsigned char field_0x000[0x170];
-    Vector3 listenerPosition;                  // position
-    Vector3 listenerForward;                  // forward
-    Vector3 listenerUp;                  // up
-    unsigned char field_0x194[0x3b0 - 0x194];
-    EventKrustyBikeView* followedBike;       // followed bike
-    EventKrustyBikeView* followedRacer;       // racer the listener follows
-};
+class KrustyBikeCamera;
 
 // One 0x54-byte engine channel per racer (RaceSound+0x98, eleven of them).
 // Each owns a 44100-byte sample buffer; the channel at RaceSound+0x434 is
@@ -79,7 +67,7 @@ public:
     // 0x004e23f0 (thiscall, ret 0x10; bikerace.cpp 0x00419628 passes its
     // +0x18, itself, its +0x50 camera and 6): creates the sound groups and
     // loads every sample; returns this.
-    RaceSound* Create(void* owner, EventBikeRaceView* view, RaceSoundKrustyBikeCameraView* camera,
+    RaceSound* Create(void* owner, EventBikeRaceView* view, KrustyBikeCamera* camera,
                                      int racers);
     // 0x004e3430: assigns the racers to channels and resets the listener and
     // the 3D distances.
@@ -110,7 +98,7 @@ public:
     EventKrustyBikeView* listenerRacer;        // listener's racer
     int field_0x30;
     EventBikeRaceView* raceView;
-    RaceSoundKrustyBikeCameraView* listenerCamera;
+    KrustyBikeCamera* listenerCamera;
     SoundGroup* engineGroup;               // +0x3c, engine voices and LandHard01
     SoundGroup* field_0x40;
     SoundGroup* effectsGroup;              // +0x44, launch, bonus, wreck/fall and waypoint sounds, racer +0xb8 * 0.68182 against the *MaxSpeed limits

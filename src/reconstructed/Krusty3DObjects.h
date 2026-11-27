@@ -82,12 +82,7 @@ public:
     ArcadeObject* lightModels[5];
 };
 
-// The object at a view's +0x50 (KrustyBikeCamera; +0x3b0 is the racer it
-// follows).
-struct VisualCueKrustyBikeCameraView {
-    unsigned char field_0x000[0x3b0];
-    RunwayKrustyBikeView* followedBike;         // +0x3b0 (RaceSound.h)
-};
+class KrustyBikeCamera;
 
 // The view VisualCue follows (its +0xa8; RaceView.h's EventBikeRaceView).
 struct VisualCueBikeRaceView {
@@ -99,7 +94,7 @@ struct VisualCueBikeRaceView {
     unsigned char field_0x03c[0x48 - 0x3c];
     Track* raceTrack;                      // +0x48 BikeRace's raceTrack
     unsigned char raceTerrain[0x50 - 0x4c];  // +0x4c BikeRace raceTerrain (bytes kept)
-    VisualCueKrustyBikeCameraView* raceCamera;       // +0x50 BikeRace's raceCamera
+    KrustyBikeCamera* raceCamera;       // +0x50 BikeRace's raceCamera
     unsigned char field_0x054[0x18a - 0x54];
     bool racing;                              // +0x18a
     unsigned char field_0x18b[0x190 - 0x18b];
@@ -186,14 +181,9 @@ struct CueGateKrustyBikeView {
     int gateIndex;                            // +0x7b8
 };
 
-struct CueKrustyBikeCameraView {
-    unsigned char field_0x000[0x3b4];
-    CueGateKrustyBikeView* followedRacer;     // +0x3b4 (RaceSound.h)
-};
-
 struct CueBikeRaceView {
     unsigned char field_0x00[0x50];
-    CueKrustyBikeCameraView* raceCamera;          // +0x50 BikeRace's raceCamera
+    KrustyBikeCamera* raceCamera;          // +0x50 BikeRace's raceCamera
 };
 
 // One 24-byte gate record of the course at the global's +0x560.

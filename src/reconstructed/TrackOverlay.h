@@ -9,6 +9,7 @@
 #include "RaceView.h"
 
 class TextureMapManager;
+class KrustyBikeCamera;
 
 // 0x0050a590 (Texmap.cpp, cdecl): loads the texture file `name`; 0 on failure.
 #include "TextureLoader.h"
@@ -18,41 +19,6 @@ class TextureMapManager;
 struct TrackOverlayRect : public OverlayRect {
     TrackOverlayRect();                                    // 0x00518d50
     TrackOverlayRect(int left, int right, int top, int bottom); // 0x00518d60
-};
-
-// The object InstrumentOverlay+0x184 points to (its +0x3b4 is read the same
-// way as KrustyBikeCamera+0x3b4); only that pointer is known.
-struct InstrumentKrustyBikeView {
-    unsigned char field_0x000[0xbc];
-    float gaugeValue;                         // the gauge value before scaling
-    Vector3 angularAcceleration;              // +0x0c0 KrustyBike angularAcceleration (SoultreePhysicsBaseObject)
-    Vector3 worldAngularVelocity;             // +0x0cc KrustyBike worldAngularVelocity (SoultreePhysicsBaseObject)
-    Vector3 angularVelocity;                  // +0x0d8 KrustyBike angularVelocity (SoultreePhysicsBaseObject)
-    Vector3 invInertia;                       // +0x0e4 KrustyBike invInertia (SoultreePhysicsBaseObject)
-    Vector3 shapeInvInertia;                  // +0x0f0 KrustyBike shapeInvInertia (SoultreePhysicsBaseObject)
-    unsigned char field_0x0fc[0x108 - 0xfc];
-    bool airborne;                            // +0x108 RaceView.h's racer airborne flag; the gauge winds down while set
-    unsigned char field_0x109[0x736 - 0x109];
-    unsigned char isGhost;  // +0x736  the followed racer (camera +0x3b4); KrustyBike +0x736 isGhost (RaceView.h racer view)
-    unsigned char field_0x737[0x74c - 0x737];
-    float lastLapTime;                        // last lap time (StatsOverlay 0x0051a560)
-    float fastestLap;                         // +0x750 string 0x838 "Best Lap:" row (StatsOverlay 0x00519ef0, 0x0051a560)
-    float trtTime;                            // +0x754 string 0x13b8 "TRT" row (StatsOverlay 0x00519ef0); drawn by 0x0051a480
-    unsigned char field_0x758[0x770 - 0x758];
-    float tblTime;                            // +0x770 string 0x839 "TBL:" row (StatsOverlay 0x00519ef0, 0x0051a560)
-    unsigned char field_0x774[0x784 - 0x774];
-    int position;                             // position
-    unsigned char field_0x788[0x7a0 - 0x788];
-    unsigned short lapsDone;                  // laps done
-    unsigned char prevLapCount[0x7a4 - 0x7a2];  // +0x7a2 KrustyBike prevLapCount (bytes kept)
-    char finished;                            // +0x7a4 RaceView.h's racer hasFinished
-    unsigned char field_0x7a5[0x7b8 - 0x7a5];
-    int lapGate;                              // gate of the lap
-};
-
-struct InstrumentKrustyBikeCameraView {
-    unsigned char field_0x000[0x3b4];
-    InstrumentKrustyBikeView* state;
 };
 
 // A dial needle (InstrumentOverlay+0x11c), 0x28 bytes.
@@ -76,13 +42,13 @@ public:
     virtual ~InstrumentOverlay();             // 0x00518c00 (deleting wrapper 0x00518750)
     virtual int Render3D();       // 0x00518940
 
-    InstrumentOverlay* Setup(RenderTarget* target, TextureMapManager* manager, InstrumentKrustyBikeCameraView* source); // 0x00518770
+    InstrumentOverlay* Setup(RenderTarget* target, TextureMapManager* manager, KrustyBikeCamera* source); // 0x00518770
     void PlaceNeedle(GaugeNeedle* gauge, TLVertex* vertices);           // 0x00518c60
     void PlaceNeedleTip(GaugeNeedle* gauge, TLVertex* vertex);          // 0x00518cc0
 
     GaugeNeedle dial;
     TLVertex dialNeedle[2];       // the needle, a line from tip to centre
-    InstrumentKrustyBikeCameraView* instrumentSource;
+    KrustyBikeCamera* instrumentSource;
 };
 
 class Camera;
@@ -149,7 +115,7 @@ public:
 
     // 0x005194b0 (QuarryStuntEvent.cpp 0x004e0a9c): loads the panel for the
     // screen rectangle `screen`; returns this, or 0.
-    StatsOverlay* LoadPanel(RenderTarget* target, TextureMapManager* manager, InstrumentKrustyBikeCameraView* camera,
+    StatsOverlay* LoadPanel(RenderTarget* target, TextureMapManager* manager, KrustyBikeCamera* camera,
                                         OverlayRect screen);
     // 0x00464e80: the shared empty `ret 4` body (QuarryStuntEvent.cpp
     // 0x004de4a3 passes the visual cue index).
@@ -166,7 +132,7 @@ public:
     void* largeFont;                          // +0x11c 16-high font, rows 0-1 (0x005194b0; DeleteObject)
     void* smallFont;                          // +0x120 12-high font, the other rows (DeleteObject)
     BikeRace* statsSource;                    // SetStatsSource (0x00519880); read when TrackGame+0x3428 is set
-    InstrumentKrustyBikeCameraView* instrumentSource;
+    KrustyBikeCamera* instrumentSource;
     float timeSinceRedraw;                    // seconds since the last redraw
     TrackOverlayRect rowRects[8];
     char drawnRowText[8][0x80];               // +0x1b0 the rows last drawn; a row is redrawn when its text changes
@@ -210,13 +176,6 @@ public:
 // RTTI: RadarOverlay : Overlay (vtable 0x005587d0): the radar map in a
 // screen corner (radar128.tga, or radar256.tga above 800 pixels) with the
 // racers on it, and an optional frame-rate readout.
-// The camera RadarOverlay's loader is given (KrustyBikeCamera; see
-// RaceSound.h's view of it): only the followed racer at +0x3b0 is read.
-struct RadarKrustyBikeCameraView {
-    unsigned char field_0x000[0x3b0];
-    EventKrustyBikeView* followedRacer;
-};
-
 class RadarOverlay : public Overlay {
 public:
     explicit RadarOverlay(int flags);         // 0x0051b690
@@ -227,7 +186,7 @@ public:
 
     // 0x0051b840: loads the map for the screen rectangle `screen` (only its
     // top and right edges are read).
-    RadarOverlay* LoadMap(RenderTarget* target, TextureMapManager* manager, RadarKrustyBikeCameraView* camera,
+    RadarOverlay* LoadMap(RenderTarget* target, TextureMapManager* manager, KrustyBikeCamera* camera,
                                         OverlayRect screen);
     int TakeRacers(EventBikeRaceView* view, int chat); // 0x0051baf0: collects the racers
     int DrawForViewMode();                    // 0x0051bc60: draws for the view mode
@@ -263,7 +222,7 @@ public:
     float averageFrameTime;                   // average frame time
     float frameRateSum;                       // frame rate summed
     EventBikeRaceView* radarView;
-    RadarKrustyBikeCameraView* radarCamera;
+    KrustyBikeCamera* radarCamera;
     EventKrustyBikeView* racers[11];
     int racerCount;                           // racer count
     int showFrameRate;                        // shows the frame rate
@@ -304,12 +263,6 @@ struct ChatKrustyBikeView {
     char name[0x10];                          // name
     unsigned char field_0x5f0[0x784 - 0x5f0];
     int position;                             // +0x784 the racer's position (RaceView.h finishPosition); ChatOverlay+0x19c keeps the last value
-};
-
-// ChatOverlay+0x128 and +0x12c: only these fields are read.
-struct ChatKrustyBikeCameraView {
-    unsigned char field_0x000[0x3b4];
-    ChatKrustyBikeView* followedRacer;
 };
 
 // One chat history line (0x5c bytes).
@@ -359,7 +312,7 @@ public:
 
     // 0x0051cf80 (QuarryStuntEvent.cpp 0x004e0965): sets the overlay up for
     // the screen and the cue rectangle; returns this, or 0.
-    ChatOverlay* Setup(RenderTarget* target, TextureMapManager* manager, ChatKrustyBikeCameraView* camera,
+    ChatOverlay* Setup(RenderTarget* target, TextureMapManager* manager, KrustyBikeCamera* camera,
                                        OverlayRect screen, OverlayRect cue);
     // 0x0051d730 (QuarryStuntEvent.cpp 0x004e02c7): collects the racers of
     // `view` and gives each a name tag; in view mode 0 one more.
@@ -385,7 +338,7 @@ public:
     void* pen;                                // +0x11c CreatePen(0, 3, 0xc0c0c0) in 0x0051cf80 (DeleteObject)
     void* chatFont;                           // +0x120 9-high font, selected by RedrawChat (DeleteObject)
     void* nameTagFont;                        // +0x124 10-high font, selected by DrawNameTag (DeleteObject)
-    ChatKrustyBikeCameraView* chatCamera;
+    KrustyBikeCamera* chatCamera;
     BikeRace* chatView;
     float timeSum;                            // time summed
     int largeLayout;                          // the large layout (set by 0x0051cf80)

@@ -40,6 +40,7 @@
 #include "../krusty2/soultree/SoultreeQuadTreeRenderer.h"
 #include "../krusty2/visibility/VisibilityQuadTree.h"
 #include "DirectPlayMessages.h"   // DPMsgDestroyPlayerOrGroup
+#include "KrustyBikeCameraFollow.h"
 
 // Reconstruction of D:\aardvark\VC\krusty2\QuarryStuntEvent.cpp (literal
 // __FILE__ at 0x00572154): BaseQuarryEvent, 0x004de2a0..0x004e1fa7, between
@@ -109,7 +110,7 @@ int BaseQuarryEvent::Tick(float frameTime) {
     GameObject::Tick(frameTime);
     if (auralScape)
         auralScape->SetListener(auralScapeListener, &raceCamera->eyePosition, &raceCamera->viewDirection,
-                                          &raceCamera->upDirection, &raceCamera->followedBike->velocity);
+                                          &raceCamera->upDirection, reinterpret_cast<Vector3*>(&raceCamera->bike->velocity));
     if (g_TrackGame->uiInteractionBlocked)
         return 1;
     if (radarOverlay && visualCue && statsOverlay) {
@@ -164,87 +165,6 @@ struct QuarryLoadPhysicsObjectView {
 struct QuarryLoadTerrainView {
     unsigned char field_0x00[0x40];
     void* worldScale;                          // +0x40 SoultreeProbe::worldScale
-};
-
-// A racer as the loader reads it.
-struct QuarryLoadRiderView {
-    unsigned char field_0x000[0x1a0];
-    D3DIMSoultreeObject* modelNode;               // +0x1a0
-};
-struct QuarryLoadWreckerView {
-    unsigned char field_0x00[0x38];
-    CollisionObject* collisionModel;    // +0x38 Wrecker.h
-};
-struct QuarryLoadLodBikeRaceView {
-    unsigned char field_0x000[0x18c];
-    unsigned char forceHighLod;                // +0x18c BikeRace.h's "ForceHighLOD"
-};
-struct QuarryLoadKrustyBikeView {
-    unsigned char field_0x000[0x3bc];
-    D3DIMSoultreeObject* modelNode;             // +0x3bc bike model
-    unsigned char field_0x3c0[0x5c4 - 0x3c0];
-    QuarryLoadRiderView* riderCharacter;      // +0x5c4
-    unsigned char loadInfo[0x5e0 - 0x5c8];    // +0x5c8 KrustyBike loadTextures (Bike, a TextureContext) (bytes kept)
-    char riderName[0x10];                     // +0x5e0 KrustyBike riderName (Bike)
-    CollisionObject* frontWheel;           // +0x5f0
-    CollisionObject* rearWheel;            // +0x5f4
-    unsigned char field_0x5f8[0x604 - 0x5f8];
-    QuarryLoadWreckerView* wrecker;  // +0x604  Bike +0x604 wrecker (its +0x38 collisionModel gets the car's ignore list)
-    unsigned char field_0x608[0x735 - 0x608];
-    unsigned char isRemote;  // +0x735  KrustyBike +0x735 isRemote
-    unsigned char field_0x736[0x740 - 0x736];
-    QuarryLoadLodBikeRaceView* race;  // +0x740  KrustyBike +0x740 race
-    unsigned char field_0x744[0x1414 - 0x744];
-    CollisionObject* bikeAndRiderCollision;  // +0x1414  KrustyBike +0x1414 bikeAndRiderCollision; the loader adds it as an ignored collision owner
-    CollisionObject* bikeCollision;  // +0x1418  KrustyBike +0x1418 bikeCollision; the loader adds it as an ignored collision owner
-};
-
-// The KrustyBikeCamera members the loader writes (FollowCamera's +0x274,
-// VehicleCamera's +0x384..+0x394, BikeCamera's +0x3b0 and KrustyBikeCamera's
-// +0x3b4, which those headers keep protected).
-struct QuarryLoadKrustyBikeCameraView {
-    unsigned char field_0x000[0x274];
-    unsigned char isSettled;                      // +0x274 FollowCamera isSettled
-    unsigned char field_0x275[0x384 - 0x275];
-    void* targetCharacter;                        // +0x384 VehicleCamera targetCharacter
-    void* targetCar;                              // +0x388 VehicleCamera targetCar
-    void* targetCaster;                           // +0x38c VehicleCamera targetCaster
-    unsigned char vehicleMode;                    // +0x390 VehicleCamera vehicleMode
-    unsigned char targetPointCached;              // +0x391 VehicleCamera targetPointCached
-    unsigned char targetHeadingCached;            // +0x392 VehicleCamera targetHeadingCached
-    QuarryLoadKrustyBikeView* vehicle;            // +0x394 VehicleCamera vehicle
-    unsigned char field_0x398[0x3b0 - 0x398];
-    QuarryLoadKrustyBikeView* bike;               // +0x3b0 BikeCamera bike
-    QuarryLoadKrustyBikeView* krustyBike;         // +0x3b4 KrustyBikeCamera krustyBike
-
-    // Inline: the same sequence as BikeRace.h's StartFollowing (three times
-    // in 0x0041eb20). Follows `racer`, showing the previous racer's model
-    // again and hiding the new one's.
-    void StartFollowing(QuarryLoadKrustyBikeView* racer) {
-        if (bike && !racer->race->forceHighLod) {
-            bike->modelNode->SetLowestLod(1);
-            bike->riderCharacter->modelNode->SetLowestLod(1);
-            if (!bike->modelNode->currentLod)
-                bike->modelNode->SetLod(1);
-            if (!bike->riderCharacter->modelNode->currentLod)
-                bike->riderCharacter->modelNode->SetLod(1);
-        }
-        vehicle = racer;
-        targetPointCached = 0;
-        targetHeadingCached = 0;
-        vehicleMode = 1;
-        targetCaster = 0;
-        targetCharacter = 0;
-        targetCar = 0;
-        bike = racer;
-        isSettled = 0;
-        krustyBike = racer;
-        if (!racer->race->forceHighLod) {
-            racer->modelNode->SetLowestLod(0);
-            bike->riderCharacter->modelNode->SetLowestLod(0);
-        }
-        isSettled = 0;
-    }
 };
 
 // The bytes the render target's colour buffers take.
@@ -478,7 +398,7 @@ int BaseQuarryEvent::LoadEventObjects(LoadProgressFn progress) {
     presets[5] = 5;
     presets[6] = 6;
     presets[7] = 7;
-    raceCamera = (QuarryEventKrustyBikeCameraView*)(new(__FILE__, 585) KrustyBikeCamera(1))
+    raceCamera = (new(__FILE__, 585) KrustyBikeCamera(1))
                      ->SetupFlyby(renderContext, 0.55f, 0.3f, 27.0f, 7.0f, 1.048f, 2, 8, presets);
     if (!AppendChild((GameObject*)raceCamera, -1)) {
         sprintf(text, "KrustyBikeCamera not created.\n");
@@ -629,7 +549,7 @@ int BaseQuarryEvent::LoadEventObjects(LoadProgressFn progress) {
     g_MemTagStack->Push("BikeRace");
     raceView = (EventBikeRaceView*)((BikeRace*)raceView)
                      ->Create(renderContext, particleManager, lightManager, &modelTextures,
-                              eventTerrain, (KrustyBikeCamera*)raceCamera, eventScene,
+                              eventTerrain, raceCamera, eventScene,
                               (RaceGateEvent*)this, (ProjectedShadow*)projectedShadow);
     if (!raceView) {
         sprintf(text, "BikeRace create failed.\n");
@@ -675,8 +595,8 @@ int BaseQuarryEvent::LoadEventObjects(LoadProgressFn progress) {
                     character->collisionObject->SetIgnoreListMode(0);
                     if (i != ((BikeRace*)raceView)->thirtySecondManEntry && i != ((BikeRace*)raceView)->startGateEntry) {
                         int iterator = 0;
-                        for (QuarryLoadKrustyBikeView* racer = (QuarryLoadKrustyBikeView*)((BikeRace*)raceView)->NextBike(&iterator);
-                             racer; racer = (QuarryLoadKrustyBikeView*)((BikeRace*)raceView)->NextBike(&iterator)) {
+                        for (KrustyBike* racer = ((BikeRace*)raceView)->NextBike(&iterator);
+                             racer; racer = ((BikeRace*)raceView)->NextBike(&iterator)) {
                             if (!racer->isRemote) {
                                 character->collisionObject->AddIgnoredOwner(racer->bikeCollision);
                                 character->collisionObject->AddIgnoredOwner(racer->bikeAndRiderCollision);
@@ -709,8 +629,8 @@ int BaseQuarryEvent::LoadEventObjects(LoadProgressFn progress) {
                 car->bodyCollider->SetOwner(car, 0x69);
                 car->bodyCollider->SetIgnoreListMode(0);
                 int iterator = 0;
-                for (QuarryLoadKrustyBikeView* racer = (QuarryLoadKrustyBikeView*)((BikeRace*)raceView)->NextBike(&iterator); racer;
-                     racer = (QuarryLoadKrustyBikeView*)((BikeRace*)raceView)->NextBike(&iterator)) {
+                for (KrustyBike* racer = ((BikeRace*)raceView)->NextBike(&iterator); racer;
+                     racer = ((BikeRace*)raceView)->NextBike(&iterator)) {
                     if (!racer->isRemote) {
                         car->bodyCollider->AddIgnoredOwner(racer->bikeCollision);
                         car->bodyCollider->AddIgnoredOwner(racer->bikeAndRiderCollision);
@@ -757,9 +677,9 @@ int BaseQuarryEvent::LoadEventObjects(LoadProgressFn progress) {
     g_MemTagStack->Push("Shadow");
     if (projectedShadow) {
         AppendChild((GameObject*)projectedShadow, -1);
-        ((ProjectedShadow*)projectedShadow)->AddCaster(((QuarryLoadKrustyBikeView*)((BikeRace*)raceView)->localRacer)->modelNode);
+        ((ProjectedShadow*)projectedShadow)->AddCaster((D3DIMSoultreeObject*)((BikeRace*)raceView)->localRacer->modelNode);
         ((ProjectedShadow*)projectedShadow)
-            ->AddCaster(((QuarryLoadKrustyBikeView*)((BikeRace*)raceView)->localRacer)->riderCharacter->modelNode);
+            ->AddCaster((D3DIMSoultreeObject*)((BikeRace*)raceView)->localRacer->riderCharacter->modelNode);
         ((ProjectedShadow*)projectedShadow)->SetLight((const ShadowVec3*)&shadowLight->position,
                                                 (const ShadowVec3*)&shadowLight->look, 3);
         ((ProjectedShadow*)projectedShadow)->SetShadowStrength(0x80);
@@ -779,8 +699,8 @@ int BaseQuarryEvent::LoadEventObjects(LoadProgressFn progress) {
     g_MemTagStack->Push("3DObjects");
     CreateRacer3DObjects((int)((BikeRace*)raceView)->localRacer);
     g_MemTagStack->Push("BikeRace");
-    ((FollowCamera*)(KrustyBikeCamera*)raceCamera)->SetSubject((FollowCameraTerrainView*)eventTerrain);
-    ((QuarryLoadKrustyBikeCameraView*)raceCamera)->StartFollowing((QuarryLoadKrustyBikeView*)((BikeRace*)raceView)->localRacer);
+    raceCamera->SetSubject((FollowCameraTerrainView*)eventTerrain);
+    raceCamera->StartFollowing(((BikeRace*)raceView)->localRacer);
     if (statsOverlay)
         statsOverlay->SetStatsSource((BikeRace*)raceView);
     if (chatOverlay)
@@ -910,7 +830,7 @@ void BaseQuarryEvent::CreateOverlays() {
 
     instrumentOverlay = new(__FILE__, 1412) InstrumentOverlay(g_TrackGame->mode.instrumentOverlayOn);
     instrumentOverlay = instrumentOverlay->Setup((RenderTarget*)renderContext, g_TrackGame->textureManager,
-                                                   (InstrumentKrustyBikeCameraView*)raceCamera);
+                                                   raceCamera);
     if (!instrumentOverlay)
         sprintf(message, "Instrument Overlay not created.\n");
 
@@ -934,20 +854,20 @@ void BaseQuarryEvent::CreateOverlays() {
 
     chatOverlay = new(__FILE__, 1433) ChatOverlay(1);
     chatOverlay = chatOverlay->Setup((RenderTarget*)renderContext, g_TrackGame->textureManager,
-                                     (ChatKrustyBikeCameraView*)raceCamera, screen, cue);
+                                     raceCamera, screen, cue);
     if (!chatOverlay)
         sprintf(message, "Chat Overlay not created.\n");
     if (chatOverlay && g_TrackGame->mode.chatInputLine == 1)
         chatOverlay->ShowInputLine();
 
     radarOverlay = new(__FILE__, 1444) RadarOverlay(1);
-    radarOverlay = radarOverlay->LoadMap((RenderTarget*)renderContext, g_TrackGame->textureManager, (RadarKrustyBikeCameraView*)raceCamera, screen);
+    radarOverlay = radarOverlay->LoadMap((RenderTarget*)renderContext, g_TrackGame->textureManager, raceCamera, screen);
     if (!radarOverlay)
         sprintf(message, "Radar Overlay not created.\n");
 
     statsOverlay = new(__FILE__, 1451) StatsOverlay(1);
     statsOverlay = statsOverlay->LoadPanel((RenderTarget*)renderContext, g_TrackGame->textureManager,
-                                           (InstrumentKrustyBikeCameraView*)raceCamera, screen);
+                                           raceCamera, screen);
     if (!statsOverlay)
         sprintf(message, "Stats Overlay not created.\n");
 

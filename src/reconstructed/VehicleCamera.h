@@ -68,11 +68,41 @@ public:
         return vehicle->crashState == 0;
     }
 
-protected:
+    // Inline (BikeRace::AimCamera 0x0041eb20): the camera targets one scene
+    // object instead of the racer. Each stores its own target first (the
+    // store order is what makes AimCamera exact).
+    void TargetShadowCaster(SoultreeObject* caster) {
+        targetCaster = caster;
+        isSettled = 0;
+        targetPointCached = 0;
+        targetHeadingCached = 0;
+        vehicleMode = 0;
+        targetCharacter = 0;
+        targetCar = 0;
+    }
+    void TargetSceneCharacter(CollisionCharacter* character) {
+        targetCharacter = character;
+        isSettled = 0;
+        targetPointCached = 0;
+        targetHeadingCached = 0;
+        vehicleMode = 0;
+        targetCar = 0;
+        targetCaster = 0;
+    }
+    void TargetSceneObject(CarProcedural* object) {
+        targetCar = object;
+        isSettled = 0;
+        targetPointCached = 0;
+        targetHeadingCached = 0;
+        vehicleMode = 0;
+        targetCharacter = 0;
+        targetCaster = 0;
+    }
+
     CollisionCharacter* targetCharacter;  // +0x384  BikeRace TargetCharacter stores a key-framed scene character; slots 33/41/TargetPoint read its node
     CarProcedural* targetCar;  // +0x388  BikeRace TargetObject stores a scene procedural object (CarProcedural)
     SoultreeObject* targetCaster;  // +0x38C  BikeRace view +0x38c shadowCaster (TargetCaster); TargetPoint takes its translation
-    bool vehicleMode;                    // +0x390, vehicle mode
+    unsigned char vehicleMode;           // +0x390 following the vehicle (BikeRace::NextCameraTarget stores its int argument as a byte)
     unsigned char targetPointCached;     // +0x391 cachedTargetPoint is valid (cleared on a new target)
     unsigned char targetHeadingCached;   // +0x392 cachedTargetHeading is valid
     Vehicle* vehicle;                    // +0x394 the followed vehicle (BikeRace's KrustyBike racers)

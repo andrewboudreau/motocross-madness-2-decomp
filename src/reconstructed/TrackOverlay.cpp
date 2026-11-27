@@ -12,7 +12,7 @@
 #include "../bringup/X87FloatToInt.h"
 #include "D3DIMSoulTree.h"
 #include "DebugAlloc.h"
-#include "BikeCamera.h"
+#include "KrustyBikeCamera.h"
 #include "Camera.h"
 #include "ControlInterface.h"
 #include "FollowCamera.h"
@@ -95,7 +95,7 @@ InstrumentOverlay::InstrumentOverlay(int flags) : Overlay(flags, 1)
 
 // 0x00518770: loads the dial texture and places the needle for the
 // render target's size (the layout is for 640x480).
-InstrumentOverlay* InstrumentOverlay::Setup(RenderTarget* target, TextureMapManager* manager, InstrumentKrustyBikeCameraView* source)
+InstrumentOverlay* InstrumentOverlay::Setup(RenderTarget* target, TextureMapManager* manager, KrustyBikeCamera* source)
 {
     OverlayRect rect;
     char name[260];
@@ -159,16 +159,16 @@ int InstrumentOverlay::Render3D()
             dial.degreesPerUnit = 130.0f;
             PlaceNeedle(&dial, dialNeedle);
         }
-        InstrumentKrustyBikeView* state = instrumentSource->state;
+        KrustyBike* state = instrumentSource->krustyBike;
         if (state->airborne) {
-            s_UnknownGlobal68a448 = (!s_UnknownGlobal575140 ? state->gaugeValue * 0.68182f : s_UnknownGlobal68a448) - 0.5f;
+            s_UnknownGlobal68a448 = (!s_UnknownGlobal575140 ? state->linearSpeed * 0.68182f : s_UnknownGlobal68a448) - 0.5f;
             if (s_UnknownGlobal68a448 < 0.0f)
                 s_UnknownGlobal68a448 = 0.0f;
             dial.value = s_UnknownGlobal68a448;
         } else {
-            dial.value = state->gaugeValue * 0.68182f;
+            dial.value = state->linearSpeed * 0.68182f;
         }
-        s_UnknownGlobal575140 = instrumentSource->state->airborne;
+        s_UnknownGlobal575140 = instrumentSource->krustyBike->airborne;
         PlaceNeedleTip(&dial, dialNeedle);
         if (!Target()->DrawPrimitive(D3DPT_LINESTRIP, D3DFVF_TLVERTEX, (int)dialNeedle, 2, 0))
             return 0;
@@ -457,7 +457,7 @@ StatsOverlay::~StatsOverlay()
 // written last, as retail stores them. The source rectangle is written
 // top/bottom first.
 StatsOverlay* StatsOverlay::LoadPanel(RenderTarget* target, TextureMapManager* manager,
-                                      InstrumentKrustyBikeCameraView* camera,
+                                      KrustyBikeCamera* camera,
                                                   OverlayRect screen)
 {
     const char* font;
@@ -768,9 +768,9 @@ int StatsOverlay::DrawViewModePanel()
     } else {
         total = g_TrackGame->mode.raceSettings.multiplayerAiRacerCount + g_TrackGame->playerCount;
     }
-    sprintf(rowText[0], "%s %d / %d", label, instrumentSource->state->position, total - finished);
+    sprintf(rowText[0], "%s %d / %d", label, instrumentSource->krustyBike->finishPosition, total - finished);
     g_TrackGame->LoadResourceString(0x836, label, 0x80);
-    int lap = instrumentSource->state->lapsDone + 1;
+    int lap = (unsigned short)instrumentSource->krustyBike->lapCount + 1;  // retail zero-extends it
     if (g_TrackGame->mode.raceSettings.raceMode != 0 && g_TrackGame->mode.raceSettings.raceMode != 4) {
         if (lap > g_TrackGame->mode.raceSettings.lapCount)
             lap = g_TrackGame->mode.raceSettings.lapCount;
@@ -781,29 +781,29 @@ int StatsOverlay::DrawViewModePanel()
         sprintf(rowText[1], "%s %d", label, lap);
     if (s_UnknownGlobal68a440) {
         FormatLapTime(time, g_TrackGame->eventManager->endTimer);
-        sprintf(rowText[2], "%s %s %d", "End Timer", time, instrumentSource->state->finished);
+        sprintf(rowText[2], "%s %s %d", "End Timer", time, instrumentSource->krustyBike->hasFinished);
     } else {
         g_TrackGame->LoadResourceString(0x837, label, 0x80);
-        if (g_TrackGame->mode.raceSettings.raceMode == 4 && instrumentSource->state->isGhost)
+        if (g_TrackGame->mode.raceSettings.raceMode == 4 && instrumentSource->krustyBike->isGhost)
             FormatLapTime(time, ((KrustyBike*)statsSource->localRacer)->fastestLap);
         else
-            FormatLapTime(time, instrumentSource->state->lastLapTime);
+            FormatLapTime(time, instrumentSource->krustyBike->lastLapTime);
         sprintf(rowText[2], "%s %s", label, time);
     }
     g_TrackGame->LoadResourceString(0x838, label, 0x80);
     if (g_TrackGame->mode.raceSettings.raceMode == 4)
         FormatLapTime(time, ((KrustyBike*)statsSource->localRacer)->fastestLap);
     else
-        FormatLapTime(time, instrumentSource->state->fastestLap);
+        FormatLapTime(time, instrumentSource->krustyBike->fastestLap);
     sprintf(rowText[3], "%s %s", label, time);
     g_TrackGame->LoadResourceString(0x839, label, 0x80);
-    FormatLapTime(time, instrumentSource->state->tblTime);
+    FormatLapTime(time, instrumentSource->krustyBike->timeBehindLeader);
     sprintf(rowText[4], "%s %s", label, time);
     g_TrackGame->LoadResourceString(0x13b8, label, 0x80);
     if (g_TrackGame->playingReplay)
         FormatLapTime(time, statsSource->replayTime);
     else
-        FormatLapTime(time, instrumentSource->state->trtTime);
+        FormatLapTime(time, instrumentSource->krustyBike->totalRunningTime);
     sprintf(rowText[5], "%s:", label);
     for (i = 0; i <= 5; i++) {
         if (strcmp(rowText[i], drawnRowText[i]) != 0)
@@ -846,7 +846,7 @@ void StatsOverlay::DrawLapTime()
     if (g_TrackGame->playingReplay)
         FormatLapTime(text, statsSource->replayTime);
     else
-        FormatLapTime(text, instrumentSource->state->trtTime);
+        FormatLapTime(text, instrumentSource->krustyBike->totalRunningTime);
     rect = rowRects[5];
     rect.left += rowExtent.cx + 4;
     sprintf(rowText[5], "%s", text);
@@ -881,9 +881,9 @@ int StatsOverlay::DrawRacePanel()
     } else {
         total = g_TrackGame->mode.raceSettings.multiplayerAiRacerCount + g_TrackGame->playerCount;
     }
-    sprintf(rowText[0], "%s %d / %d", label, instrumentSource->state->position, total - finished);
+    sprintf(rowText[0], "%s %d / %d", label, instrumentSource->krustyBike->finishPosition, total - finished);
     g_TrackGame->LoadResourceString(0x836, label, 0x80);
-    int lap = instrumentSource->state->lapsDone + 1;
+    int lap = (unsigned short)instrumentSource->krustyBike->lapCount + 1;  // retail zero-extends it
     if (g_TrackGame->mode.raceSettings.raceMode != 0 && g_TrackGame->mode.raceSettings.raceMode != 4) {
         if (lap > g_TrackGame->mode.raceSettings.lapCount)
             lap = g_TrackGame->mode.raceSettings.lapCount;
@@ -894,20 +894,20 @@ int StatsOverlay::DrawRacePanel()
         sprintf(rowText[1], "%s %d", label, lap);
     if (s_UnknownGlobal68a440) {
         FormatLapTime(time, g_TrackGame->eventManager->endTimer);
-        sprintf(rowText[2], "%s %s %d", "End Timer", time, instrumentSource->state->finished);
+        sprintf(rowText[2], "%s %s %d", "End Timer", time, instrumentSource->krustyBike->hasFinished);
     } else {
         g_TrackGame->LoadResourceString(0x837, label, 0x80);
-        FormatLapTime(time, instrumentSource->state->lastLapTime);
+        FormatLapTime(time, instrumentSource->krustyBike->lastLapTime);
         sprintf(rowText[2], "%s %s", label, time);
     }
     g_TrackGame->LoadResourceString(0x838, label, 0x80);
-    FormatLapTime(time, instrumentSource->state->fastestLap);
+    FormatLapTime(time, instrumentSource->krustyBike->fastestLap);
     sprintf(rowText[3], "%s %s", label, time);
     g_TrackGame->LoadResourceString(0x839, label, 0x80);
-    FormatLapTime(time, instrumentSource->state->tblTime);
+    FormatLapTime(time, instrumentSource->krustyBike->timeBehindLeader);
     sprintf(rowText[4], "%s %s", label, time);
     g_TrackGame->LoadResourceString(0x13ad, label, 0x80);
-    sprintf(rowText[5], "%s %d / %d", label, instrumentSource->state->lapGate + 1,
+    sprintf(rowText[5], "%s %d / %d", label, instrumentSource->krustyBike->lapGate + 1,
             g_TrackGame->bajaEnduroEvent->gateCount);
     for (i = 0; i <= 5; i++) {
         if (strcmp(rowText[i], drawnRowText[i]) != 0)
@@ -1269,7 +1269,7 @@ RadarOverlay::~RadarOverlay()
 
 // 0x0051b840
 RadarOverlay* RadarOverlay::LoadMap(RenderTarget* target, TextureMapManager* manager,
-                                                  RadarKrustyBikeCameraView* camera, OverlayRect screen)
+                                                  KrustyBikeCamera* camera, OverlayRect screen)
 {
     const char* font;
     OverlayRect source;
@@ -1456,7 +1456,7 @@ void RadarOverlay::DrawRacers(int mode)
     Vector3 rim;
     Vector3 point;
     for (i = 0; i < racerCount; i++) {
-        if (racers[i] == radarCamera->followedRacer) {
+        if (racers[i] == (EventKrustyBikeView*)radarCamera->bike) {
             mapOrigin = racers[i]->position;
             mapAngle = -racers[i]->heading;
             if (racers[i]->crashState)
@@ -1850,7 +1850,7 @@ ChatOverlay::~ChatOverlay()
 // 0x0051cf80: sets the chat overlay up: the chat and cue rectangles, the
 // texture, the side panels on wide screens, the pen, two fonts and the
 // thirteen name-tag rectangles.
-ChatOverlay* ChatOverlay::Setup(RenderTarget* target, TextureMapManager* manager, ChatKrustyBikeCameraView* camera,
+ChatOverlay* ChatOverlay::Setup(RenderTarget* target, TextureMapManager* manager, KrustyBikeCamera* camera,
                                                 OverlayRect screen, OverlayRect cue)
 {
     const char* font;
@@ -2198,7 +2198,7 @@ int ChatOverlay::RenderPre3D()
             if (racers[i]->racerState->hideNameTag)
                 nameTags[i]->Disable();
             else if (racers[i] == (ChatKrustyBikeView*)chatView->localRacer &&
-                     chatCamera->followedRacer == (ChatKrustyBikeView*)chatView->localRacer)
+                     chatCamera->krustyBike == chatView->localRacer)
                 nameTags[i]->Disable();
             else
                 nameTags[i]->Enable();

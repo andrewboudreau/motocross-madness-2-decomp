@@ -8,7 +8,7 @@
 #include "RaceView.h"
 #include "TrackGame.h"
 #include "Krusty3DObjects.h"
-#include "Camera.h"
+#include "KrustyBikeCamera.h"
 
 #include <math.h>
 #include <stdio.h>
@@ -295,7 +295,7 @@ int VisualCue::Tick(float frameTime) {
         return 1;
     if (!cycleCues) {
         if (((VisualCueRenderTargetView*)renderContext)->currentCamera != arcadeView ||
-            cueView->raceCamera->followedBike != cueView->ownRacer || !cueView->ownRacer ||
+            (RunwayKrustyBikeView*)cueView->raceCamera->bike != cueView->ownRacer || !cueView->ownRacer ||
             cueView->ownRacer->finished) {
             isVisible = 0;
             return 1;
@@ -327,7 +327,7 @@ int VisualCue::Tick(float frameTime) {
     case 1:
     case 5: {
         UNKNOWN_PLACE_CUE();
-        CueGateKrustyBikeView* ref = ((CueCourseEventView*)g_TrackGame->bajaEnduroEvent)->raceView->raceCamera->followedRacer;
+        CueGateKrustyBikeView* ref = (CueGateKrustyBikeView*)((CueCourseEventView*)g_TrackGame->bajaEnduroEvent)->raceView->raceCamera->krustyBike;
         if (!ref)
             return 1;
         direction =

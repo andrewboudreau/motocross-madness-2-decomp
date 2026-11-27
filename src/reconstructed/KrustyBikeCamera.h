@@ -39,7 +39,11 @@ public:
     virtual void SaveCameraState();
     virtual void RestoreCameraState();
 
-protected:
+    // Inline (three times in BikeRace::AimCamera 0x0041eb20, once in the
+    // quarry loader 0x004de590): follows `racer`, showing the previous racer's
+    // model again and hiding the new one's (KrustyBikeCameraFollow.h).
+    void StartFollowing(KrustyBike* racer);
+
     KrustyBike* krustyBike;          // +0x3b4 the followed racer
     EventBikeRaceView* raceView;     // +0x3b8
 };

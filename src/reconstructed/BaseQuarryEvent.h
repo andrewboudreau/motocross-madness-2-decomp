@@ -20,7 +20,7 @@ class FileStream;
 class VisualCue;
 class Fog;
 struct EventBikeRaceView;
-struct QuarryEventKrustyBikeCameraView;
+class KrustyBikeCamera;
 
 // Progress callback the events' initialisers take (EventManager passes the
 // cdecl 0x0045cb20).
@@ -88,7 +88,7 @@ public:
     void* skyCube;                         // SkyCube
     EventBikeRaceView* raceView;
     VisualCue* visualCue;
-    QuarryEventKrustyBikeCameraView* raceCamera;
+    KrustyBikeCamera* raceCamera;
     Terrain* eventTerrain;                          // src/krusty2/broadphase/Terrain.h
     FileStream* terrainStream;        // +0x44 opened on the env's terrain file and handed to the terrain loader; the destructor deletes it
     EcoSystem* ecoSystem;

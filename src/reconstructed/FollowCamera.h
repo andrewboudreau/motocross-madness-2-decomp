@@ -225,8 +225,8 @@ public:
     // 0x00463600: stores the subject and copies its +0x40.
     void SetSubject(FollowCameraTerrainView* subject);
 
-protected:
-    friend class VCRDlg;        // InGameProcs.cpp: ButCamera restores the saved state
+    // The camera data is public: BikeRace, the quarry loader, the overlays,
+    // the race sound and VCRDlg (InGameProcs.cpp) read and write it directly.
     // Layout from the constructor (0x00462ee0) and destructor (0x00463350).
     float followDistance;                     // +0x220 distance behind the target (slot 49 scales the direction by -it); presets in slots 63-67
     float initialDistance;                    // +0x224 copy of followDistance (constructor)

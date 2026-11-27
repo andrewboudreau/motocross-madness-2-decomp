@@ -218,67 +218,6 @@ struct ReceivedRacerState {
 // bit this file tests, is a virtual base reached through the vbptr at +4. The
 // colliders at +0x210 are CollisionObjects (GameObject part at +0xc).
 
-// The members of BikeRace+0x50's KrustyBikeCamera that bikerace.cpp
-// reads and writes (FollowCamera's +0x244 and +0x274, VehicleCamera's
-// +0x384..+0x394, BikeCamera's +0x3b0 and KrustyBikeCamera's +0x3b4, which
-// those headers keep protected and type by their own readers). The racer
-// pointers are the racers this file follows.
-struct BikeRaceKrustyBikeCameraView {
-    unsigned char field_0x000[0x244];
-    int cameraState;                          // +0x244 camera state
-    unsigned char field_0x248[0x268 - 0x248];
-    int overrideActive;                       // +0x268 override active
-    unsigned char field_0x26c[0x274 - 0x26c];
-    unsigned char isSettled;  // +0x274  FollowCamera isSettled (the comment above names FollowCamera's +0x274)
-    unsigned char field_0x275[0x384 - 0x275];
-    CollisionCharacter* targetCharacter;  // +0x384  VehicleCamera+0x384 target; TargetSceneCharacter stores its scene character
-    CarProcedural* targetCar;  // +0x388  VehicleCamera+0x388 targetCar; TargetSceneObject stores its scene procedural object
-    void* shadowCaster;                       // +0x38c a scene shadow caster
-    unsigned char followingRacer;             // +0x390 following a racer
-    unsigned char targetPointCached;          // +0x391 VehicleCamera 0x0052bc50; cleared on a new target
-    unsigned char targetHeadingCached;        // +0x392 VehicleCamera 0x0052bac0; cleared on a new target
-    KrustyBike* vehicle;            // +0x394 VehicleCamera's followed vehicle
-    Vector3 cachedTargetHeading;              // +0x398 VehicleCamera cachedTargetHeading (targetHeadingCached)
-    Vector3 cachedTargetPoint;                // +0x3a4 VehicleCamera cachedTargetPoint (targetPointCached)
-    KrustyBike* followedBike;       // +0x3b0 BikeCamera's bike (RaceSound.h)
-    KrustyBike* followedRacer;      // +0x3b4 KrustyBikeCamera's racer (RaceSound.h)
-
-    // Inline (three times in 0x0041eb20): follows `racer`, showing the
-    // previous racer's model again and hiding the new one's (BikeRace.cpp).
-    void StartFollowing(KrustyBike* racer);
-
-    // Inline (0x0041eb20): the camera targets one scene object instead.
-    // Each of the three stores its own target first (the store order is
-    // what makes AimCamera 0x0041eb20 exact).
-    void TargetShadowCaster(void* caster) {
-        shadowCaster = caster;
-        isSettled = 0;
-        targetPointCached = 0;
-        targetHeadingCached = 0;
-        followingRacer = false;
-        targetCharacter = 0;
-        targetCar = 0;
-    }
-    void TargetSceneCharacter(CollisionCharacter* character) {
-        targetCharacter = character;
-        isSettled = 0;
-        targetPointCached = 0;
-        targetHeadingCached = 0;
-        followingRacer = false;
-        targetCar = 0;
-        shadowCaster = 0;
-    }
-    void TargetSceneObject(CarProcedural* object) {
-        targetCar = object;
-        isSettled = 0;
-        targetPointCached = 0;
-        targetHeadingCached = 0;
-        followingRacer = false;
-        targetCharacter = 0;
-        shadowCaster = 0;
-    }
-};
-
 // The replay recorder's record kinds -1 (a tick) carry the time played and
 // the tick count.
 struct VcrTickRecord {

@@ -206,7 +206,7 @@ public:
     Vec3 invInertia;  // +0xe4 body-frame inverse inertia diagonal in use: slot 16 multiplies torque by it per axis; passed as the inverse inertia to ContactSolveImpulse / ResolveContactImpulse; slot 2 initialises it from shapeInvInertia
     Vec3 shapeInvInertia;  // +0xf0 computed by slot 2 from the shape: 1/(0.4 m r^2) for a sphere (collisionShape == 1), box formula m/12 (h^2 + d^2) per axis otherwise; slots 15/16 use it instead of invInertia while slot 10 reports the body unloaded
     char field_0xfc[12];
-    char airborne;  // +0x108 Vehicle slot 49: airborne = !wheel contact && !pointsTouching (no body point touching); slot 23 (moving on ground) requires !airborne; cleared by slot 1. Vehicle's comment calls it 'settled', which the assignment contradicts
+    unsigned char airborne;  // +0x108 (unsigned: InstrumentOverlay::Render3D 0x00518940 widens it with movzx) Vehicle slot 49: airborne = !wheel contact && !pointsTouching (no body point touching); slot 23 (moving on ground) requires !airborne; cleared by slot 1. Vehicle's comment calls it 'settled', which the assignment contradicts
     char respawnPending;  // +0x109 slot 39: when set, position = respawnPosition and the node is moved there; slot 11 uses respawnHeading as the placement heading while set; slot 2 clears it
     char asleep;  // +0x10a rest check UpdateRestState (0x00502c40) zeroes the velocities and sets it once the body has rested 0.5 s on its contacts; GameObject slot 10 (0x005036f0) skips the whole update while it is set; slot 38 clears the other body's flag on a body-to-body hit; the ctor clears it
     Vec3 respawnPosition;  // +0x10c slot 2 stores the start position (a3) here; Vehicle slot 43 snapshots position into it; slot 39 restores position from it
