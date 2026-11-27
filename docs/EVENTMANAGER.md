@@ -153,7 +153,12 @@ Near miss:
   `ArcadeObject` and +0x3f0 as the camera's look target. The podium calls
   `Terrain::QueryGround`, `SoultreeObject`, `ArcadeObject`,
   `D3DIMSoultreeObject` and `Sound` directly; the bring-up forwarders
-  (`Group1_PodiumViews.cpp`) are retired. EventManager.cpp includes
+  (`Group1_PodiumViews.cpp`) are retired. The race mode it reads is the
+  `BaseQuarryEvent` (eventScene, raceView, lightManager, texture groups),
+  the podium position, direction, environment and crowd sound group are
+  `Scene` members, the race is a `BikeRace` (raceTerrain, startGate) and
+  its racers `KrustyBike`s (finishPosition, riderCharacter); the local
+  podium views are gone and the object is unchanged. EventManager.cpp includes
   `<windows.h>` and `<imm.h>` for its date, time and IME calls, so its
   `.drectve` names `uuid.lib`; its code bytes are unchanged.
 

@@ -22,6 +22,8 @@
 #include "GameUi.h"
 #include "MenuId.h"
 #include "QuarryEvent.h"
+#include "SceneManager.h"
+#include "../krusty2/motion/CollisionCharacter.h"
 #include "Vegetation.h"
 #include "TrackGame.h"
 #include "../krusty2/vehicle/KrustyBikeCore.h"
@@ -410,81 +412,6 @@ int CompareStandings(const void* a, const void* b) {
     return 1;
 }
 
-// Views for the podium scene 0x0045d480. Only what it calls is declared.
-struct PodiumSceneEnvironmentView {                         // the view part's +0xa4
-    unsigned char field_0x000[0x398];
-    float terrainBreadth;                           // +0x398 SceneEnvironment terrainBreadth
-};
-struct PodiumSceneView {                          // TrackGameViewOwner+0x2c
-    unsigned char field_0x00[0x8c];
-    Vector3 position;                               // +0x8c podium position
-    Vector3 direction;                              // +0x98 podium direction (0 when none)
-    PodiumSceneEnvironmentView* model;                      // +0xa4
-    unsigned char field_0xa8[0xc4 - 0xa8];
-    GameObject* soundGroup;                         // +0xc4
-};
-struct PodiumBaseQuarryEventView : public GameObject {     // TrackGameViewOwner
-    PodiumSceneView* grid;                        // +0x2c
-    unsigned char skyCube[0x34 - 0x30];  // +0x30 BaseQuarryEvent skyCube (bytes kept)
-    BikeRace* raceView;                // +0x34
-    unsigned char field_0x38[0x7c - 0x38];
-    LightManager* lights;                           // +0x7c
-    unsigned char field_0x80[0x94 - 0x80];
-    int opaqueTextureGroup;                         // +0x94, as BaseQuarryEvent.h
-    int alphaTextureGroup;                          // +0x98
-};
-struct PodiumStartGateView {                     // the view's +0x64
-    unsigned char field_0x000[0x1a0];
-    SoultreeObject* modelNode;                      // +0x1a0 the characters' model node
-};
-struct PodiumBikeRaceView {
-    unsigned char field_0x00[0x4c];
-    Terrain* trackObject;                           // +0x4c
-    unsigned char field_0x50[0x64 - 0x50];
-    PodiumStartGateView* nodeOwner;              // +0x64
-};
-struct PodiumRiderView {                    // racer +0x5c4
-    unsigned char field_0x000[0x1a0];
-    D3DIMSoultreeObject* modelNode;                 // +0x1a0
-};
-struct PodiumKrustyBikeView {
-    unsigned char field_0x000[0x5c4];
-    PodiumRiderView* riderCharacter;      // +0x5c4
-    unsigned char loadInfo[0x5e0 - 0x5c8];    // +0x5c8 Bike loadTextures (a TextureContext; bytes kept)
-    char riderName[16];                       // +0x5e0 Bike riderName
-    void* frontWheel;                         // +0x5f0 Bike frontWheel
-    void* rearWheel;                          // +0x5f4 Bike rearWheel
-    void* leftBarContact;                     // +0x5f8 Bike leftBarContact
-    void* rightBarContact;                    // +0x5fc Bike rightBarContact
-    int tailContact;                          // +0x600 Bike tailContact
-    void* wrecker;                            // +0x604 Bike wrecker
-    unsigned char field_0x608[0x734 - 0x608];
-    char aiKind;                              // +0x734 KrustyBike aiKind
-    char isRemote;                            // +0x735 KrustyBike isRemote
-    char isGhost;                             // +0x736 KrustyBike isGhost
-    char fourStroke;                          // +0x737 KrustyBike fourStroke
-    int engineSize;                           // +0x738 KrustyBike engineSize
-    int plateNumber;                          // +0x73c KrustyBike plateNumber
-    void* race;                               // +0x740 KrustyBike race
-    void* statusNode;                         // +0x744 KrustyBike statusNode
-    int finishTimeStamp;                      // +0x748 KrustyBike finishTimeStamp
-    float lastLapTime;                        // +0x74c KrustyBike lastLapTime
-    float fastestLap;                         // +0x750 KrustyBike fastestLap
-    float totalRunningTime;                   // +0x754 KrustyBike totalRunningTime
-    float totalTrickTime;                     // +0x758 KrustyBike totalTrickTime
-    float tagRun;                             // +0x75c KrustyBike tagRun
-    float bestTagRun;                         // +0x760 KrustyBike bestTagRun
-    float totalTagRun;                        // +0x764 KrustyBike totalTagRun
-    float score;                              // +0x768 KrustyBike score
-    float offTrackTime;                       // +0x76c KrustyBike offTrackTime
-    float timeBehindLeader;                   // +0x770 KrustyBike timeBehindLeader
-    float lapStartTime;                       // +0x774 KrustyBike lapStartTime
-    float aiCrashImpactLimit;                 // +0x778 KrustyBike aiCrashImpactLimit
-    float* lapStartTimes;                     // +0x77c KrustyBike lapStartTimes
-    float* gateTimes;                         // +0x780 KrustyBike gateTimes
-    int place;                                      // +0x784
-};
-
 extern "C" Vector3* __stdcall D3DRMVectorRotate(Vector3* result, Vector3* vector, Vector3* axis,
                                                 float theta);
 
@@ -508,8 +435,6 @@ static inline Vector3 operator-(const Vector3& a, const Vector3& b) {
     return Vector3(a.x - b.x, a.y - b.y, a.z - b.z);
 }
 
-#define PODIUM_OWNER(o) ((PodiumBaseQuarryEventView*)(o))
-#define PODIUM_VIEW(v) ((PodiumBikeRaceView*)(v))
 #define PODIUM_MODEL(c) ((D3DIMSoultreeObject*)(c)->modelNode)
 
 // Whether v is the zero vector (the grid's "no podium direction").
@@ -539,7 +464,7 @@ int EventManager::CreatePodiumScene() {
     char path[0x104];
     char message[0x184];
     ProCircuit* circuit = g_TrackGame->proCircuit;
-    TrackGameViewOwner* owner = FindRaceMode();
+    BaseQuarryEvent* owner = (BaseQuarryEvent*)FindRaceMode();
     BikeRace* view = FindRaceView();
     int iterator = 0;
     int ok;
@@ -565,29 +490,29 @@ int EventManager::CreatePodiumScene() {
         return 0;
     ((RenderTarget*)renderContext)->SetCamera(podiumCamera);
     podiumCamera->InsertBefore(view->raceCamera, -1);
-    PodiumSceneView* grid = PODIUM_OWNER(owner)->grid;
-    float rows = grid->model->terrainBreadth;
+    Scene* scene = owner->eventScene;
+    float rows = scene->environment->terrainBreadth;
     if (!((int)rows & 1))
         rows -= 1.0f;
     float column = rows * 0.5f;
     float row = rows * 0.5f;
     Vector3 direction;
     Vector3 up;
-    if (!PodiumIsZero(grid->direction)) {
-        podiumPosition = grid->position;
-        direction = PODIUM_OWNER(owner)->grid->direction;
+    if (!PodiumIsZero(scene->podiumDirection)) {
+        podiumPosition = scene->podiumPosition;
+        direction = owner->eventScene->podiumDirection;
     } else {
-        if (g_TrackGame->mode.raceSettings.eventType == 3 && PODIUM_VIEW(PODIUM_OWNER(owner)->raceView)->nodeOwner) {
-            PODIUM_VIEW(PODIUM_OWNER(owner)->raceView)->nodeOwner->modelNode->GetPosition((Vec3*)&podiumPosition);
-            PODIUM_VIEW(PODIUM_OWNER(owner)->raceView)->nodeOwner->modelNode->GetAxes((Vec3*)&direction, (Vec3*)&up);
+        if (g_TrackGame->mode.raceSettings.eventType == 3 && owner->raceView->startGate) {
+            owner->raceView->startGate->modelNode->GetPosition((Vec3*)&podiumPosition);
+            owner->raceView->startGate->modelNode->GetAxes((Vec3*)&direction, (Vec3*)&up);
         } else {
-            float spacing = PODIUM_VIEW(PODIUM_OWNER(owner)->raceView)->trackObject->gridCellSize;
+            float spacing = owner->raceView->raceTerrain->gridCellSize;
             podiumPosition = Vector3((int)column * spacing * 256.0f, 0.0f, (int)row * spacing * 256.0f);
             direction = kVec3ZAxis;
         }
     }
     up = kVec3YAxis;
-    PODIUM_VIEW(PODIUM_OWNER(owner)->raceView)->trackObject->QueryGround((TerrainVec3*)&podiumPosition, 0, 0, 0);
+    owner->raceView->raceTerrain->QueryGround((TerrainVec3*)&podiumPosition, 0, 0, 0);
     float angle = (float)atan2(direction.x, direction.z);
     Vector3 offsets[3];
     Vector3 facings[3];
@@ -628,15 +553,15 @@ int EventManager::CreatePodiumScene() {
     }
     TextureContext context;
     context.manager = g_TrackGame->textureManager;
-    context.opaqueGroup = (ManagedTextureGroup*)PODIUM_OWNER(owner)->opaqueTextureGroup;
-    context.alphaGroup = (ManagedTextureGroup*)PODIUM_OWNER(owner)->alphaTextureGroup;
+    context.opaqueGroup = (ManagedTextureGroup*)owner->opaqueTextureGroup;
+    context.alphaGroup = (ManagedTextureGroup*)owner->alphaTextureGroup;
     context.opaqueFormat = ((RenderTarget*)renderContext)->surfacePixelFormat;
     context.alphaFormat = 0x115c;
     context.halvings = 0;
     podiumObject->Enable();
     podiumObject->SetPosition(&podiumPosition);
     podiumObject->SetAxes(&direction, &up, 0, 1);
-    if (PODIUM_OWNER(owner)->lights && PODIUM_OWNER(owner)->lights->isEnabled)
+    if (owner->lightManager && owner->lightManager->isEnabled)
         podiumObject->arcadeModel->SetUseLighting(1);
     FileStream* stream = new(__FILE__, 0x2f5) FileStream(g_ResourceManager);
     podiumCharacterCount = resultCount < 3 ? resultCount : 3;
@@ -644,13 +569,13 @@ int EventManager::CreatePodiumScene() {
     for (int place = 1; place - 1 < podiumCharacterCount; place++) {
         KrustyBike* racer = 0;
         iterator = 0;
-        racer = reinterpret_cast<KrustyBike*>(reinterpret_cast<BikeRace*>(PODIUM_OWNER(owner)->raceView)->NextBike(&iterator));
-        while (racer && ((PodiumKrustyBikeView*)racer)->place != place)
-            racer = reinterpret_cast<KrustyBike*>(reinterpret_cast<BikeRace*>(PODIUM_OWNER(owner)->raceView)->NextBike(&iterator));
+        racer = owner->raceView->NextBike(&iterator);
+        while (racer && racer->finishPosition != place)
+            racer = owner->raceView->NextBike(&iterator);
         if (g_TrackGame->InProCircuitCareer()) {
             ProCircuit* circuit = g_TrackGame->proCircuit;
             if ((circuit->careerFlags & 2) &&
-                racer == PODIUM_OWNER(owner)->raceView->localRacer)
+                racer == owner->raceView->localRacer)
                 sprintf(name, "%s\\Winnerd.mcf", "Res");
             else
                 sprintf(name, "%s\\Winner.mcf", "Res");
@@ -664,11 +589,11 @@ int EventManager::CreatePodiumScene() {
         }
         D3DIMSoultreeCharacter*& character = podiumCharacters[place - 1];
         character = new(__FILE__, 0x31d) D3DIMSoultreeCharacter(isEnabled);
-        character->LoadCharacter((int)renderContext, path, PODIUM_OWNER(owner)->lights,
+        character->LoadCharacter((int)renderContext, path, owner->lightManager,
                                        &context, 1, 1);
         view->AppendChild(character, -1);
         if (character) {
-            if (PODIUM_OWNER(owner)->lights && PODIUM_OWNER(owner)->lights->isEnabled)
+            if (owner->lightManager && owner->lightManager->isEnabled)
                 PODIUM_MODEL(character)->SetUseLighting(1);
             int mode = g_TrackGame->mode.GetSelectedSeries();
             if (mode == 3 || mode == 2 || mode == 4) {
@@ -686,7 +611,7 @@ int EventManager::CreatePodiumScene() {
             character->SetMotion(podiumMotions[place - 1]);
             character->motionTime = 0.0f;
             if (racer) {
-                SoultreeMaterial** texture = ((PodiumKrustyBikeView*)racer)->riderCharacter->modelNode->materialTable;
+                SoultreeMaterial** texture = ((D3DIMSoultreeObject*)racer->riderCharacter->modelNode)->materialTable;
                 if (texture)
                     PODIUM_MODEL(character)->ReplaceMaterialTexture(0, (*texture)->textureName, &context);
             }
@@ -694,7 +619,7 @@ int EventManager::CreatePodiumScene() {
     }
     delete stream;
     if (g_TrackGame->mode.soundOn && g_TrackGame->mode.networkGame) {
-        Sound* sound = new(__FILE__, 0x34e) Sound((SoundGroup*)PODIUM_OWNER(owner)->grid->soundGroup, 1);
+        Sound* sound = new(__FILE__, 0x34e) Sound(owner->eventScene->soundGroup, 1);
         FileStream* audio = new(__FILE__, 0x34f) FileStream(g_ResourceManager);
         if (!g_TrackGame->sceneObject->OpenArchiveFile(audio, "CrowdLoop.wav", "rb", 0)) {
             char text[0x80];
