@@ -116,7 +116,7 @@ GUICursor::~GUICursor() {
 }
 
 // 0x00485150
-void GUICursor::SetAnimation(CursorUIAnimView* animation) {
+void GUICursor::SetAnimation(UIAnim* animation) {
     cursorAnimation = animation;
     if (!animation)
         currentFrame = 0;
@@ -125,8 +125,7 @@ void GUICursor::SetAnimation(CursorUIAnimView* animation) {
 // 0x00485170
 int GUICursor::RenderPost3D() {
     if (cursorAnimation)
-        currentFrame = reinterpret_cast<int>(
-            reinterpret_cast<UIAnim*>(cursorAnimation)->AdvancePastSounds());
+        currentFrame = reinterpret_cast<int>(cursorAnimation->AdvancePastSounds());
     return GameCursor::RenderPost3D();
 }
 
@@ -1334,8 +1333,8 @@ void GUIUser::CreateCursor(const char* image, int visible) {
 }
 
 // 0x00487fb0
-void GUIUser::SetCursorAnimation(CursorUIAnimView* animation) {
-    CursorUIAnimView* current;
+void GUIUser::SetCursorAnimation(UIAnim* animation) {
+    UIAnim* current;
 
     if (!userCursor)
         return;

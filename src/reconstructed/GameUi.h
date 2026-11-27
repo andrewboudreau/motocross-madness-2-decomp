@@ -310,7 +310,7 @@ public:
     int transitionFrame;                      // +0x164: the transition step's frame (or ANIM phase)
     int moveable;                             // +0x168: "Moveable"
     UIAnim* stateImages[5];                   // +0x16c: "AnimNorm", "AnimFocus", "AnimPush", ...
-    int mouseAnim;                            // +0x180: "MouseAnim" (a CursorUIAnimView*)
+    UIAnim* mouseAnim;                        // +0x180: "MouseAnim", the cursor over the control
     UIAnim* fxAnimIn;                         // +0x184: "FXAnimIn"
     UIAnim* fxAnimOut;                        // +0x188: "FXAnimOut"
     UIControl* anchorControl;      // +0x18c: "Anchor"

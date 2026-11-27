@@ -578,6 +578,6 @@
   "?AddImageFileRow@UIListBox@@QAEHPBDHHH@Z": "0x00477110",
   "?AddImageFileRow@UIListBox@@QAEHPBDHHH@Z$ehhandler": "0x0054b39e",
   "?OpenAndReadHeader@@YAPAUTgaFile@@PBDPAU1@H@Z": "0x00511d00",
-  "?SetCursorAnimation@GUIUser@@QAEXPAUCursorUIAnimView@@@Z": "0x00487fb0",
+  "?SetCursorAnimation@GUIUser@@QAEXPAVUIAnim@@@Z": "0x00487fb0",
   "?Tick@UIDialog@@UAEHM@Z": "0x0046ef00"
 }

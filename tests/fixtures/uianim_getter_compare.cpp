@@ -11,10 +11,8 @@
 typedef char AnimationLayout[(sizeof(UIAnim) == 0xf8 && sizeof(UIFrame) == 0x24 &&
     offsetof(UIAnim, currentFrame) == 8 && offsetof(UIAnim, frameList) == 0x28 &&
     offsetof(UIFrame, isSound) == 8 && offsetof(UIFrame, frameTexture) == 0x18 &&
-    offsetof(CursorUIAnimView, currentFrame) == 8 &&
-    offsetof(CursorUIAnimView, playForwards) == 0xc &&
-    offsetof(CursorUIAnimView, frameCount) == 0x10 &&
-    offsetof(CursorUIAnimView, lastStepTime) == 0x20 &&
+    offsetof(UIAnim, playForwards) == 0xc && offsetof(UIAnim, frameCount) == 0x10 &&
+    offsetof(UIAnim, lastStepTime) == 0x20 &&
     offsetof(GUICursor, cursorAnimation) == 0x5c &&
     sizeof(TextureMap* (UIAnim::*)()) == 4) ? 1 : -1];
 

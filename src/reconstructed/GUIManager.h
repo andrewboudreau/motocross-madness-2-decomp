@@ -134,22 +134,6 @@ struct GroundFogCacheOwner {
     GroundFogView* groundFog;              // +0x00: FindByClassName(1, "GroundFog"), or 1 when none
 };
 
-// Cursor animation passed to GUICursor 0x00485150 (GUIUser+0x1c8). Its
-// AdvancePastSounds is UIAnim's (0x004730b0) and dialogs cast a control's
-// "MouseAnim" UIAnim to it, so the members follow GameUi.h's UIAnim.
-struct CursorUIAnimView {
-    int AdvancePastSounds();              // 0x004730b0: current frame
-    unsigned char field_0x00[0x04];           // +0x00 vfptr (BaseObject)
-    int refCount;                             // +0x04 BaseObject refCount
-    int currentFrame;                         // +0x08 UIAnim::currentFrame
-    int playForwards;                         // +0x0c UIAnim::playForwards
-    int frameCount;                           // +0x10 UIAnim::frameCount
-    int passesLeft;                           // +0x14 UIAnim::passesLeft
-    int passCountdown;                        // +0x18 UIAnim::passCountdown
-    int frameDelay;                           // +0x1c UIAnim::frameDelay
-    int lastStepTime;                         // +0x20 UIAnim::lastStepTime
-};
-
 // RTTI: GUICursor : GameCursor (vtable 0x00553ed0; 0x60 bytes, the size
 // 0x00487dd0 allocates).
 class GUICursor : public GameCursor {
@@ -157,9 +141,9 @@ public:
     explicit GUICursor(int flags);            // 0x00485100
     virtual ~GUICursor();                     // 0x00485140 (deleting wrapper 0x00485120)
     virtual int RenderPost3D();               // 0x00485170
-    void SetAnimation(CursorUIAnimView* animation); // 0x00485150
+    void SetAnimation(UIAnim* animation); // 0x00485150
 
-    CursorUIAnimView* cursorAnimation;  // +0x5c: SetAnimation; advanced by slot 15
+    UIAnim* cursorAnimation;  // +0x5c: SetAnimation; advanced by slot 15
 };
 
 // A dialog control as GUIUser and ToolTip see it. Never constructed as such.

@@ -500,7 +500,7 @@ int UIDialog::ReadDialogResource(void* stream, int offset) {
                     }
                     parameters.GetString("MouseCursorAnim", "", buffer, -1);
                     if (buffer[0])
-                        cursorAnimation = (CursorUIAnimView*)FindSectionObject(buffer);
+                        cursorAnimation = (UIAnim*)FindSectionObject(buffer);
                     parameters.GetString("BackgroundFile", "", buffer, -1);
                     if (buffer[0] && dialogBackground) {
                         TgaFile* file = LoadFile(buffer, 0, (int)g_ResourceManager);
@@ -1213,7 +1213,7 @@ int UIDialog::ReadDialogResource(void* stream, int offset) {
                 control->SetSound(3, FindSectionObject(soundClick));
                 control->SetEnabled(enable != 0);
                 control->Show(show != 0, 1);
-                control->mouseAnim = (int)FindSectionObject(mouseAnim);
+                control->mouseAnim = (UIAnim*)FindSectionObject(mouseAnim);
                 control->keyBind = keyBind;
                 control->post3D = pre3D == 0;
                 control->permanent = permanent;
