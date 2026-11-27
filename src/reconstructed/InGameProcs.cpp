@@ -267,7 +267,7 @@ void VCRDlg::HandleEvent(DialogEvent* event) {
         if (!_stricmp("SliderTime", event->controlName)) {
             float fraction = static_cast<UIScrollBar*>(event->control)->GetScrollValue() / 1000.0f;
             BikeRace* replay = g_TrackGame->eventManager->FindRaceView();
-            replay->replaySeekTarget = fraction * replay->replayVcr->recordedLength;
+            replay->replaySeekTarget = fraction * replay->replayVcr->header.lengthSeconds;
         }
         break;
     case kDialogClose:
@@ -292,11 +292,11 @@ int VCRDlg::Tick(float frameTime) {
     FormatTime(text, view->replayTime);
     control->SetText(text);
     control = FindControl("TxtTimeEnd", 12);
-    FormatTime(text, view->replayVcr->recordedLength);
+    FormatTime(text, view->replayVcr->header.lengthSeconds);
     control->SetText(text);
     if (view->replaySeekTarget == -1.0f)
         slider->SetThumbPosition((int)(view->replayTime * 1000.0f),
-                                      (int)(view->replayVcr->recordedLength * 1000.0f));
+                                      (int)(view->replayVcr->header.lengthSeconds * 1000.0f));
     ShowReplayMode();
     return UIDialog::Tick(frameTime);
 }

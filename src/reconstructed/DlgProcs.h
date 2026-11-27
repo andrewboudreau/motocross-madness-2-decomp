@@ -92,7 +92,6 @@ public:
     SPRaceInfoDlg* raceInfoPage;              // +0x7f60: SPRaceInfoDlg page
 };
 
-struct KrustyVCRHeader;
 
 // RTTI: SPEventDlg : UIDialog (vtable 0x00551d34; 0x7f68 bytes).
 class SPEventDlg : public UIDialog {
@@ -325,41 +324,6 @@ public:
 // cdecl 0x0047b570 (gameui.cpp): resizes a DebugMalloc'd block (also
 // declared in ProCircuitProcs.h).
 void* ResizeDebugBlock(void* block, unsigned int size);
-
-// A ghost or replay file's 0xeb0-byte header, as GhostFilesDlg and
-// ReplayFilesDlg read it (0x00454640). +0x34..+0x220 is a copy of the race
-// settings at TrackGame+0x2d70 (KrustyUI+0x4e8 keeps another copy, whose
-// eight records at +0x14c are KrustyUI+0x634).
-struct KrustyVCRHeader {
-    unsigned char field_0x00[0x10];
-    char description[0x20];                   // +0x10: description
-    float lengthSeconds;                      // +0x30: length in seconds
-    int raceMode;                             // +0x34: the race mode (TrackGame+0x2d70)
-    int eventType;                            // +0x38: the event type (TrackGame+0x2d74)
-    int series;                               // +0x3c: the series (TrackGame+0x2d78)
-    int races;                                // +0x40: RaceSettings races (TrackGame+0x2d7c)
-    int treeCollision;                        // +0x44: RaceSettings treeCollision (TrackGame+0x2d80)
-    int riderCollision;                       // +0x48: RaceSettings riderCollision (TrackGame+0x2d84)
-    int shortTimeLimit;                       // +0x4c: RaceSettings shortTimeLimit (TrackGame+0x2d88)
-    int maxBikeClass;                         // +0x50: RaceSettings maxBikeClass (TrackGame+0x2d8c)
-    int laps;                                 // +0x54: laps (TrackGame+0x2d90)
-    int aiRacerCount;                         // +0x58: RaceSettings aiRacerCount (TrackGame+0x2d94)
-    int multiplayerAiRacerCount;              // +0x5c: RaceSettings multiplayerAiRacerCount (TrackGame+0x2d98)
-    unsigned char randomGates;                // +0x60: random gates (TrackGame+0x2d9c)
-    unsigned char gateCount;                  // +0x61: RaceSettings gateCount (TrackGame+0x2d9d)
-    unsigned char field_0x62[0x64 - 0x62];
-    int eventNumber;                          // +0x64: the event number shown with the track
-    unsigned char trackIndex;                 // +0x68: the track index (TrackGame+0x2da4)
-    unsigned char networkPlayerCount;        // +0x69: RaceSettings+0x35 (TrackGame+0x2da5)
-    char trackName[0x180 - 0x6a];             // +0x6a: the track (TrackGame+0x2da6)
-    KrustyUIGridEntryView gridOrder[8];         // +0x180: RaceSettings::gridOrder (TrackGame+0x2ebc)
-    unsigned char lobbySlots[0x220 - 0x1c0];  // +0x1c0: RaceSettings lobbySlots (TrackGame+0x2efc)
-    unsigned char field_0x220[0x229 - 0x220];
-    char riderName[0x33c - 0x229];            // +0x229: the rider
-    int engineSize;                           // +0x33c: garage engine size, copied to TrackGame+0x1550
-    int fourStroke;                           // +0x340: garage 4-stroke flag (TrackGame+0x1554)
-    unsigned char field_0x344[0xeb0 - 0x344];
-};
 
 class GhostFilesDlg;
 class ReplayFilesDlg;

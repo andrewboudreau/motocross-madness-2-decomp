@@ -18,14 +18,21 @@ struct RaceGatePose {
     Vector3 direction;  // +0xC  AppendNode copies it into the node's direction
 };
 
-// The per-gate object at RaceGateEvent+0x420. 0x00404df0 (SelectLapGates)
-// flags the object at its +0x58 when the gate stops being the lap gate.
+// The object at a gate's +0x58. SelectLapGates (0x00404df0) raises its +0x44
+// flag on the two gates it leaves and clears it on the two it picks.
+struct RaceGateMarker {
+    unsigned char field_0x00[0x44];
+    int field_0x44;
+};
+
+// The per-gate object at RaceGateEvent+0x420 (TrackGameViewOwner+0x420).
 struct RaceGateObject {
     unsigned char field_0x00[0x30];
     int drawEnabled;  // +0x30  RadarOverlay skips the gate while it is 0
     unsigned char field_0x34[0x50 - 0x34];
     float width;  // +0x50  BuildNodeList passes it as AppendNode's scale (the node's width); the radar draws it as a half width
     int height;  // +0x54 BuildNodeList passes it as AppendNode's height
+    RaceGateMarker* marker;  // +0x58  SelectLapGates (0x00404df0) flags it; skipped while null
 };
 
 // The gate event as 0x0041d170 and the radar walk it: +0xac counts the

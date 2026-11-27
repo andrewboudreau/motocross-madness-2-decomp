@@ -769,7 +769,7 @@ void SinglePlayerDlg::HandleEvent(DialogEvent* event) {
                 g_TrackGame->mode.savedDifficulty = g_TrackGame->mode.difficulty;
                 if (g_TrackGame->mode.raceSettings.raceMode == 4 && g_TrackGame->mode.ghostFile[0]) {
                     // The ghost's header (KrustyUI+0x4b4) holds the settings it was raced with.
-                    memcpy(&g_TrackGame->mode.raceSettings, g_TrackGame->ui->ghostRaceSettings,
+                    memcpy(&g_TrackGame->mode.raceSettings, &g_TrackGame->ui->ghostHeader.raceSettings,
                            sizeof(g_TrackGame->mode.savedSettings));
                 } else {
                     g_TrackGame->mode.ghostFile[0] = 0;
@@ -1173,7 +1173,7 @@ void SPEventDlg::SyncValues(int apply) {
         if (settings->raceMode == 4 && ghost != -1) {
             COPY_TEXT(g_TrackGame->mode.ghostFile, ghostPaths[ghost], 0x104);
             // KrustyUI+0x4b4 holds the header of the ghost raced against.
-            *(KrustyVCRHeader*)((unsigned char*)g_TrackGame->ui + 0x4b4) = ghostHeaders[ghost];
+            g_TrackGame->ui->ghostHeader = ghostHeaders[ghost];
         } else {
             g_TrackGame->mode.ghostFile[0] = 0;
         }
@@ -1230,9 +1230,9 @@ int SPEventDlg::AddGhost(const char* path) {
         if (fread(&header, sizeof(header), 1, file)) {
             UIListBox* tracks = static_cast<UIDropDownList*>(FindControl("DDLTextBox", 6))->listPart;
             int row = tracks->GetRowData(-1);
-            if (!_stricmp(header.trackName, g_TrackGame->ui->entries[row].fileName) &&
+            if (!_stricmp(header.raceSettings.trackName, g_TrackGame->ui->entries[row].fileName) &&
                 header.lengthSeconds > 0.0f &&
-                g_TrackGame->ui->entries[row].scene == header.trackIndex) {
+                g_TrackGame->ui->entries[row].scene == header.raceSettings.trackNumber) {
                 ghostHeaders = (KrustyVCRHeader*)ResizeDebugBlock(
                     ghostHeaders, (ghostHeaderCount + 1) * sizeof(KrustyVCRHeader));
                 ghostHeaders[ghostHeaderCount] = header;
@@ -1659,17 +1659,6 @@ void SPBikeRiderDlg::SyncValues(int apply) {
     g_TrackGame->mode.SaveProfile();
 }
 
-// The replay tape's header ("VCRtape.dat", 0xeb0 bytes): the race settings
-// at +0x34 and the garage engine size and stroke at +0x33c.
-struct ReplayTapeHeader {
-    unsigned char field_0x00[0x34];
-    RaceSettings raceSettings;      // +0x34
-    unsigned char field_0x220[0x33c - 0x220];
-    int engineSize;
-    int fourStroke;
-    unsigned char field_0x344[0xeb0 - 0x344];
-};
-
 // 0x004507a0. Not exact (589 of 1668 bytes, 1652 compiled: inside the per-racer loops
 // retail reloads TrackGame/EventManager where VC6 keeps them live; docs/DIALOGPROCS.md forms tried).
 // Fills the result lists (by event type) when the page opens;
@@ -1773,7 +1762,7 @@ void SPRaceInfoDlg::HandleEvent(DialogEvent* event) {
     }
     case kDialogCommand:
         if (!_stricmp("ButViewReplay", event->controlName)) {
-            ReplayTapeHeader header;
+            KrustyVCRHeader header;
             FILE* file = fopen("VCRtape.dat", "rb");
             if (file) {
                 fread(&header, sizeof(header), 1, file);
@@ -1782,8 +1771,8 @@ void SPRaceInfoDlg::HandleEvent(DialogEvent* event) {
                 g_TrackGame->mode.SelectSeries(g_TrackGame->mode.raceSettings.eventType);
                 g_TrackGame->playingReplay = 1;
                 g_TrackGame->useReplayTape = 1;
-                UNKNOWN_GARAGE_SETTINGS->engineSize = header.engineSize;
-                UNKNOWN_GARAGE_SETTINGS->fourStroke = header.fourStroke;
+                UNKNOWN_GARAGE_SETTINGS->engineSize = header.racers[0].engineSize;
+                UNKNOWN_GARAGE_SETTINGS->fourStroke = header.racers[0].fourStroke;
                 COPY_TEXT(g_TrackGame->mode.replayFile, "VCRtape.dat", 0x104);
                 LeaveMenusForRace();
                 parentDialog->MarkPendingRelease();
@@ -2948,12 +2937,12 @@ int GhostFilesDlg::AddGhostFile(const char* path) {
             UIListBox* rider = static_cast<UIListBox*>(FindControl("LstRider", 3));
             UIListBox* length = static_cast<UIListBox*>(FindControl("LstLength", 3));
             UIListBox* description = static_cast<UIListBox*>(FindControl("LstDesc", 3));
-            g_TrackGame->mode.SelectSeries(header.series);
+            g_TrackGame->mode.SelectSeries(header.raceSettings.series);
             g_TrackGame->mode.FindFileDirectory(g_TrackGame->mode.currentSeriesDirectory,
-                                                              header.trackName, "env", env);
+                                                              header.raceSettings.trackName, "env", env);
             g_TrackGame->sceneObject->SetSceneDirectory(env);
-            rider->AddRow(header.riderName, 0, 0);
-            g_TrackGame->sceneObject->ReadSceneName(text, header.trackName, 0, "scn", 0, 0);
+            rider->AddRow(header.racers[0].name, 0, 0);
+            g_TrackGame->sceneObject->ReadSceneName(text, header.raceSettings.trackName, 0, "scn", 0, 0);
             COPY_TEXT(name, text, 128);
             if (!_stricmp(name, "no name"))
                 g_TrackGame->LoadResourceString(0x143b, name, 128);
@@ -2972,10 +2961,10 @@ int GhostFilesDlg::AddGhostFile(const char* path) {
 void GhostFilesDlg::RaceSelectedGhost() {
     UIListBox* list = static_cast<UIListBox*>(FindControl("LstTrack", 3));
     KrustyVCRHeader* header = &fileHeaders[list->GetRowData(-1)];
-    memcpy(&g_TrackGame->mode.raceSettings, &header->raceMode, sizeof(g_TrackGame->mode.savedSettings));
+    memcpy(&g_TrackGame->mode.raceSettings, &header->raceSettings, sizeof(g_TrackGame->mode.savedSettings));
     COPY_TEXT(g_TrackGame->mode.ghostFile, filePaths[list->GetRowData(-1)], 0x104);
     parentDialog->MarkPendingRelease();
-    g_TrackGame->mode.SelectSeries(header->series);
+    g_TrackGame->mode.SelectSeries(header->raceSettings.series);
     LeaveMenusForRace();
 }
 
@@ -3103,34 +3092,34 @@ int ReplayFilesDlg::AddReplayFile(const char* path) {
             UIListBox* laps = static_cast<UIListBox*>(FindControl("LstLaps", 3));
             UIListBox* length = static_cast<UIListBox*>(FindControl("LstLength", 3));
             UIListBox* description = static_cast<UIListBox*>(FindControl("LstDesc", 3));
-            g_TrackGame->mode.SelectSeries(header.series);
+            g_TrackGame->mode.SelectSeries(header.raceSettings.series);
             g_TrackGame->mode.FindFileDirectory(g_TrackGame->mode.currentSeriesDirectory,
-                                                              header.trackName, "env", env);
+                                                              header.raceSettings.trackName, "env", env);
             g_TrackGame->sceneObject->SetSceneDirectory(env);
             strcpy(name, "--");
-            switch (header.eventType) {
+            switch (header.raceSettings.eventType) {
             case 3:
-                _itoa(header.laps, name, 10);
+                _itoa(header.raceSettings.lapCount, name, 10);
                 break;
             case 2:
-                _itoa(header.laps, name, 10);
+                _itoa(header.raceSettings.lapCount, name, 10);
                 break;
             case 1:
-                _itoa(header.laps, name, 10);
+                _itoa(header.raceSettings.lapCount, name, 10);
                 break;
             case 5:
-                _itoa(header.laps, name, 10);
+                _itoa(header.raceSettings.lapCount, name, 10);
                 break;
             }
             laps->AddRow(name, 0, 0);
-            rider->AddRow(header.riderName, 0, 0);
-            g_TrackGame->sceneObject->ReadSceneName(text, header.trackName, header.trackIndex,
+            rider->AddRow(header.racers[0].name, 0, 0);
+            g_TrackGame->sceneObject->ReadSceneName(text, header.raceSettings.trackName, header.raceSettings.trackNumber,
                                                                       "scn", 0, 0);
             if (!_stricmp(text, "no name")) {
                 g_TrackGame->LoadResourceString(0x143b, name, 128);
-            } else if ((header.eventType == 1 || header.eventType == 5) && header.randomGates) {
-                g_TrackGame->sceneObject->ReadSceneName(text, header.trackName, 0, "scn", 0, 0);
-                sprintf(name, "%s, #%d", text, header.eventNumber);
+            } else if ((header.raceSettings.eventType == 1 || header.raceSettings.eventType == 5) && header.raceSettings.randomGates) {
+                g_TrackGame->sceneObject->ReadSceneName(text, header.raceSettings.trackName, 0, "scn", 0, 0);
+                sprintf(name, "%s, #%d", text, header.raceSettings.gateSeed);
             } else {
                 strcpy(name, text);
             }
@@ -3149,12 +3138,12 @@ int ReplayFilesDlg::AddReplayFile(const char* path) {
 void ReplayFilesDlg::PlaySelectedReplay() {
     UIListBox* list = static_cast<UIListBox*>(FindControl("LstTrack", 3));
     KrustyVCRHeader* header = &fileHeaders[list->GetRowData(-1)];
-    memcpy(&g_TrackGame->mode.raceSettings, &header->raceMode, sizeof(g_TrackGame->mode.savedSettings));
-    g_TrackGame->mode.SelectSeries(header->series);
+    memcpy(&g_TrackGame->mode.raceSettings, &header->raceSettings, sizeof(g_TrackGame->mode.savedSettings));
+    g_TrackGame->mode.SelectSeries(header->raceSettings.series);
     g_TrackGame->playingReplay = 1;
     g_TrackGame->useReplayTape = 1;
-    *(int*)&g_TrackGame->mode.garageOptions[0] = header->engineSize;
-    *(int*)&g_TrackGame->mode.garageOptions[4] = header->fourStroke;
+    *(int*)&g_TrackGame->mode.garageOptions[0] = header->racers[0].engineSize;
+    *(int*)&g_TrackGame->mode.garageOptions[4] = header->racers[0].fourStroke;
     COPY_TEXT(g_TrackGame->mode.replayFile, filePaths[list->GetRowData(-1)], 0x104);
     parentDialog->MarkPendingRelease();
     LeaveMenusForRace();

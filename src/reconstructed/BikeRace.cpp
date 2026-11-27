@@ -701,7 +701,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, TextureContext* te
             racerCount = CountRaceRacers();
         recordIndex = 0;
         if (replayVcr)
-            replayVcr->racerCount = racerCount;
+            replayVcr->header.racerCount = racerCount;
     }
     if (g_TrackGame->playingReplay || g_TrackGame->playerCount == 1) {
         if (g_TrackGame->mode.raceSettings.raceMode == 2) {
@@ -1057,7 +1057,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, TextureContext* te
     ((FollowCamera*)raceCamera)->AppendTableEntry(position, 140.0f, 5.0f, 5.0f, 2.5f, 2.3f);
 
     int fromEvent = 0;
-    if ((g_TrackGame->playingReplay && replayVcr->racerCount > 1) || g_TrackGame->playerCount == 1) {
+    if ((g_TrackGame->playingReplay && replayVcr->header.racerCount > 1) || g_TrackGame->playerCount == 1) {
         if (g_TrackGame->mode.raceSettings.raceMode == 4) {
             // The ghost.
             aiRacers = new(__FILE__, 0x674) KrustyBike*[1];
@@ -3053,7 +3053,7 @@ int BikeRace::RecordFrame(int kind, void* data, int flag, int recorderId, int* k
         if (g_TrackGame->mode.raceSettings.raceMode == 4) {
             return 1;
         }
-        replayTime = replayVcr->recordedLength;
+        replayTime = replayVcr->header.lengthSeconds;
         if (replaySeekTarget != -1.0f && replayTime > replaySeekTarget) {
             replayMode = 11;
             ToggleReplayPause(0);

@@ -5,6 +5,7 @@
 #include "Camera.h"
 #include "DebugAlloc.h"
 #include "PCGame.h"
+#include "RaceGateEvent.h"
 #include "TrackGame.h"
 
 // The render target the image belongs to (GameObject+0x18).
@@ -519,12 +520,12 @@ int BackgroundImage::OnActivate() {
 // the +0x58 objects of the two entries the owner currently picks, then
 // picks `a` and `b` and clears theirs.
 void TrackGameViewOwner::SelectLapGates(int gate, int nextGate, void* racer) {
-    if (gates[lapGate]->field_0x58) {
-        gates[lapGate]->field_0x58->field_0x44 = 1;
-        gates[nextLapGate]->field_0x58->field_0x44 = 1;
+    if (gates[lapGate]->marker) {
+        gates[lapGate]->marker->field_0x44 = 1;
+        gates[nextLapGate]->marker->field_0x44 = 1;
         lapGate = gate;
         nextLapGate = nextGate;
-        gates[lapGate]->field_0x58->field_0x44 = 0;
-        gates[nextLapGate]->field_0x58->field_0x44 = 0;
+        gates[lapGate]->marker->field_0x44 = 0;
+        gates[nextLapGate]->marker->field_0x44 = 0;
     }
 }
