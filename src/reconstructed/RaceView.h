@@ -113,7 +113,7 @@ struct EventKrustyBikeView : virtual public GameObject {
     float bodyCosPitch;                       // +0x044 KrustyBike bodyCosPitch (SoultreePhysicsBaseObject)
     float savedRoll;                          // +0x048 KrustyBike savedRoll (SoultreePhysicsBaseObject)
     float savedPitch;                         // +0x04c KrustyBike savedPitch (SoultreePhysicsBaseObject)
-    float heading;                            // +0x050 heading; RadarOverlay 0x0051bed0 negates it for the map
+    float savedYaw;                            // +0x050 heading; RadarOverlay 0x0051bed0 negates it for the map
     float savedSinRoll;                       // +0x054 KrustyBike savedSinRoll (SoultreePhysicsBaseObject)
     float savedCosRoll;                       // +0x058 KrustyBike savedCosRoll (SoultreePhysicsBaseObject)
     float savedSinPitch;                      // +0x05c KrustyBike savedSinPitch (SoultreePhysicsBaseObject)
@@ -125,12 +125,12 @@ struct EventKrustyBikeView : virtual public GameObject {
     Vector3 bodyUp;                           // +0x094 KrustyBike bodyUp (SoultreePhysicsBaseObject)
     Vector3 savedForward;                     // +0x0a0 KrustyBike savedForward (SoultreePhysicsBaseObject)
     Vector3 savedUp;                          // +0x0ac KrustyBike savedUp (SoultreePhysicsBaseObject)
-    float previousSpeed;                      // +0x0b8 racesnd.cpp scales it to an engine speed
+    float prevSpeed;                      // +0x0b8 racesnd.cpp scales it to an engine speed
     unsigned char field_0x0bc[0x108 - 0xbc];
     bool airborne;                            // +0x108 racesnd.cpp 0x004e39b0 (airborne sounds)
     unsigned char field_0x109[0x10c - 0x109];
-    Vector3 trackPoint;                       // +0x10c track point (RaceStatus.cpp 0x004e63e0)
-    Vector3 trackDirection;                   // +0x118 track direction there
+    Vector3 respawnPosition;                       // +0x10c track point (RaceStatus.cpp 0x004e63e0)
+    Vector3 respawnHeading;                   // +0x118 track direction there
     unsigned char field_0x124[0x3bc - 0x124];
     UnknownVehiclePart* vehicleModel;         // +0x3bc model; racesnd.cpp reads its position
     unsigned char field_0x3c0[0x444 - 0x3c0];
@@ -147,8 +147,8 @@ struct EventKrustyBikeView : virtual public GameObject {
     int outOfRace;                            // +0x4a0 EventManager 0x0045eef0: counts as done when set
     unsigned char field_0x4a4[0x5c4 - 0x4a4];
     D3DIMSoultreeCharacter* riderCharacter;  // +0x5c4 Bike riderCharacter (TrackOverlay 0x005190e0)
-    unsigned char loadInfo[0x5e0 - 0x5c8]; // +0x5c8: Bike::loadInfo (bytes kept)
-    char racerName[0x10];                     // +0x5e0 name
+    unsigned char loadTextures[0x5e0 - 0x5c8]; // +0x5c8: Bike::loadInfo (bytes kept)
+    char riderName[0x10];                     // +0x5e0 name
     EventBikeWheelView* frontWheel;       // +0x5f0 RaceStatus.cpp 0x004e6a50 takes its +0x200 position
     unsigned char field_0x5f4[0x604 - 0x5f4];
     Wrecker* wrecker;                        // +0x604 the racer's Wrecker; racesnd.cpp 0x004e39b0 reads its contactThisFrame
@@ -159,7 +159,7 @@ struct EventKrustyBikeView : virtual public GameObject {
     char fourStroke;                          // +0x737 selects engine 2 over 1 (racesnd.cpp 0x004e3430)
     int engineSize;                           // +0x738 engine size; below 250 uses engine 0
     unsigned char plateNumber[0x740 - 0x73c];  // +0x73c KrustyBike plateNumber (bytes kept)
-    EventBikeRaceView* bikeView;          // +0x740 the view (RaceStatus.cpp compares its +0x38 and +0x50)
+    EventBikeRaceView* race;          // +0x740 the view (RaceStatus.cpp compares its +0x38 and +0x50)
     RaceStatusNode* statusNode;        // +0x744 race status node (KrustyBike statusNode)
     int finishTimeStamp;                      // +0x748 time stamp; 0x7ffffffe until finished
     float lastLapTime;                        // +0x74c last lap time (RaceStatus.cpp)
@@ -193,8 +193,8 @@ struct EventKrustyBikeView : virtual public GameObject {
     int nextLapGate;                          // +0x7bc lapGate + 1 wrapped by the owner's gate count (RaceStatus.cpp 0x004e6a50)
     int forceGatePass;  // +0x7C0  passed as CountLap/AdvanceGate `forced`: with skipTest the gate/lap counts only when set
     unsigned char field_0x7c4[0x11bc - 0x7c4];
-    int networkPlayerId;                      // +0x11bc network player id
-    char aiIndex;                             // +0x11c0 AI racer's index in its messages
+    int netId;                      // +0x11bc network player id
+    char loaderKind;                             // +0x11c0 AI racer's index in its messages
 };
 
 // The score board at EventBikeRaceView+0xbc (BonusObjectManager, the

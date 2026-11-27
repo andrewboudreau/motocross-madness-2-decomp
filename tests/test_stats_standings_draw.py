@@ -212,7 +212,7 @@ class StatsStandingsTests(unittest.TestCase):
                 'offsetof(StatsOverlay,drawnRowText)==0x1b0 && offsetof(StatsOverlay,rowText)==0x5b0 && '
                 'offsetof(StatsOverlay,rowExtent)==0x9b0 && offsetof(TrackGame,quarryEvent)==0x55c && '
                 'offsetof(TrackGameViewOwner,raceView)==0x34 && offsetof(BikeRace,localRacer)==0x38 && '
-                'offsetof(EventKrustyBikeView,racerName)==0x5e0 && offsetof(EventKrustyBikeView,score)==0x768 && '
+                'offsetof(EventKrustyBikeView,riderName)==0x5e0 && offsetof(EventKrustyBikeView,score)==0x768 && '
                 'offsetof(Overlay,overlayTexture)==0x2c && offsetof(Overlay,backingTexture)==0x30 && '
                 'offsetof(Overlay,sharedTexture)==0x34 && offsetof(Overlay,sourceRect)==0xf8 && '
                 'offsetof(TextureMap,textureWidth)==0x14 && offsetof(TextureMap,mapFormat)==0x20 && '

@@ -170,8 +170,8 @@ public:
     float timeBehindLeader;  // +0x770  RaceView +0x770 time behind the leader (RaceStatus 0x004e6210)
     float lapStartTime;  // +0x774  RaceView +0x774 lap start time; CountLap (0x004e58c0) subtracts it with fsub dword
     float aiCrashImpactLimit; // 0x778  100.0f from the loader; the AI step 0x00413200 crashes the bike when |impact| exceeds it (fcomp 0x00413f3a)
-    void* heapBufferA; // 0x77C  heap buffer released in the destructor (tier 3: type unknown)
-    void* heapBufferB; // 0x780  heap buffer released in the destructor
+    float* lapStartTimes; // 0x77C  lap start times by lap % 100 (100 floats; not for event types 0, 1, 5)
+    float* gateTimes;     // 0x780  gate times by gate count % 600 (600 floats; event types 1 and 5)
     int finishPosition;  // +0x784  RaceView +0x784 finishing position (1-based)
     int largestStuntPoints;  // +0x788  RaceView +0x788 ZoneReport "LargestSingleStuntPoints"
     int onTrack;  // +0x78C  RaceView +0x78c: Track::PlaceNear placed the racer (RaceStatus); BikeAI follows the track only when set

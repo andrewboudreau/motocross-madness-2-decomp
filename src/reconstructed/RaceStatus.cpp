@@ -408,7 +408,7 @@ int UpdateLapRace(RaceStatusNode** list, Track* track, float frameTime, RaceGate
                         status->progressPos.t = finish->trackPos.t + 1e-5f;
                     }
                 }
-                if (racer->hasFinished && racer == racer->bikeView->localRacer)
+                if (racer->hasFinished && racer == racer->race->localRacer)
                     g_ViewRacerFinished = 1;
                 status->progressStep = track->DistanceAlong(status->progressPos, status->placedPos);
                 if (status->progressStep > 0.0f && status->progressStep < g_TrackSearchAhead &&
@@ -439,7 +439,7 @@ int UpdateLapRace(RaceStatusNode** list, Track* track, float frameTime, RaceGate
                         racer->lastLapTime = racer->totalRunningTime;
                     else if (racer->lapCount < 1)
                         racer->lastLapTime = UNKNOWN_RANDOM_UNIT() * 10 +
-                                             racer->bikeView->localRacer->lastLapTime + 1.0f;
+                                             racer->race->localRacer->lastLapTime + 1.0f;
                     if (racer->lastLapTime < racer->fastestLap || racer->fastestLap <= 0.0f)
                         racer->fastestLap = racer->lastLapTime;
                     racer->lapCount = lapLimit;
@@ -452,12 +452,12 @@ int UpdateLapRace(RaceStatusNode** list, Track* track, float frameTime, RaceGate
         }
     next:
         if (status->progressPos.node && status->progressPos.segment && status->progressPos.segment->next) {
-            if (!track->PointAt(status->progressPos, (Vec3*)&status->racer->trackPoint))
-                racer->trackPoint = racer->position;
+            if (!track->PointAt(status->progressPos, (Vec3*)&status->racer->respawnPosition))
+                racer->respawnPosition = racer->position;
             if (!track->SegmentDirection(status->progressPos.segment,
-                                              (Vec3*)&status->racer->trackDirection))
-                racer->trackDirection = racer->bodyForward;
-            status->racer->trackPoint -= status->racer->trackDirection * 3.5f;
+                                              (Vec3*)&status->racer->respawnHeading))
+                racer->respawnHeading = racer->bodyForward;
+            status->racer->respawnPosition -= status->racer->respawnHeading * 3.5f;
         }
     }
     if (!OrderByLapDistance(list, track, finish))
@@ -504,12 +504,12 @@ int UpdateGateRace(RaceStatusNode** list, RaceGate* firstGate, float frameTime, 
                 return 0;
             if (g_TrackGame->bajaEnduroEvent && gate != racer->lapGate) {
                 racer->nextLapGate = (racer->lapGate + 1) % g_TrackGame->bajaEnduroEvent->gateCount;
-                if (racer == (EventKrustyBikeView*)((KrustyBikeCamera*)racer->bikeView->raceCamera)->krustyBike)
+                if (racer == (EventKrustyBikeView*)((KrustyBikeCamera*)racer->race->raceCamera)->krustyBike)
                     g_TrackGame->bajaEnduroEvent->SelectLapGates(racer->lapGate, racer->nextLapGate,
                                                                               racer);
             }
         }
-        if (racer->hasFinished && racer == racer->bikeView->localRacer)
+        if (racer->hasFinished && racer == racer->race->localRacer)
             g_ViewRacerFinished = 1;
         float before = Length(status->nextGate->center - status->currentPosition);
         float after = Length(status->nextGate->center - status->previousPosition);
@@ -535,7 +535,7 @@ int UpdateGateRace(RaceStatusNode** list, RaceGate* firstGate, float frameTime, 
                     racer->lastLapTime = racer->totalRunningTime;
                 else if (racer->lapCount < 1)
                     racer->lastLapTime =
-                        UNKNOWN_RANDOM_UNIT() * 10 + racer->bikeView->localRacer->lastLapTime + 1.0f;
+                        UNKNOWN_RANDOM_UNIT() * 10 + racer->race->localRacer->lastLapTime + 1.0f;
                 if (racer->lastLapTime < racer->fastestLap || racer->fastestLap <= 0.0f)
                     racer->fastestLap = racer->lastLapTime;
                 racer->lapCount = lapLimit;

@@ -6,7 +6,7 @@ name tags sit at +0x2d8 + 4k with trackedRacer +0x11c), radarCamera +0x130 (foll
 +0x3b0), racers +0x134 (count +0x160), cueIndex +0x16c, followedIndex +0x170, cueShown
 +0x174, mapOrigin +0x17c, mapAngle/held angle/cos/sin +0x188..+0x194, mapCenterX +0x1a0,
 the two TL line vertices +0x1b8/+0x1d8 and mapRect.top +0x1fc. A racer has position +0x0c,
-heading +0x50, crashState +0x444, racerName +0x5e0 and its enabled bit at +0x29 of a
+savedYaw +0x50, crashState +0x444, riderName +0x5e0 and its enabled bit at +0x29 of a
 virtual base found through the vbtable at +4. g_TrackGame (0x0056e26c) +0x2d74 is the
 event type (2 and 3 hide outside racers).
 

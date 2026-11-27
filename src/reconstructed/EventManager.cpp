@@ -93,10 +93,10 @@ void RacerResult::Reset() {
 // position 99 with nothing else; in modes 0 and 4 every racer counts as
 // finished.
 void RacerResult::CopyFromRacer(EventKrustyBikeView* racer) {
-    playerId = racer->networkPlayerId;
-    int length = strlen(racer->racerName);
+    playerId = racer->netId;
+    int length = strlen(racer->riderName);
     int count = length > 15 ? 15 : length;
-    strncpy(name, racer->racerName, count);
+    strncpy(name, racer->riderName, count);
     name[count] = 0;
     outOfRace = racer->outOfRace;
     if (!outOfRace) {
@@ -108,7 +108,7 @@ void RacerResult::CopyFromRacer(EventKrustyBikeView* racer) {
         totalTrickTime = racer->totalTrickTime;
         bestTagRun = racer->bestTagRun;
         totalTagRun = racer->totalTagRun;
-        aiIndex = racer->aiIndex;
+        aiIndex = racer->loaderKind;
         repairDamage = racer->repairDamage;
         injuryDamage = racer->injuryDamage;
         stuntEarnings = racer->stuntEarnings;
@@ -264,7 +264,7 @@ void EventManager::CloseRace(int mode) {
                 scene, g_TrackGame->sceneObject->sceneFile, 0);
             GetDateFormatA(0, 0, 0, "yyyyMMdd", date, sizeof(date));
             GetTimeFormatA(0, 0, 0, "HHmm", time, sizeof(time));
-            sprintf(name, "%s_%s_%s_%s", scene, view->localRacer->racerName, date, time);
+            sprintf(name, "%s_%s_%s_%s", scene, view->localRacer->riderName, date, time);
             int length = strlen(name);
             int count = 0;
             filtered[0] = 0;
@@ -285,7 +285,7 @@ void EventManager::CloseRace(int mode) {
                 scene, g_TrackGame->sceneObject->sceneFile, 0);
             GetDateFormatA(0, 0, 0, "yyyyMMdd", date, sizeof(date));
             GetTimeFormatA(0, 0, 0, "HHmm", time, sizeof(time));
-            sprintf(name, "%s_%s_%s_%s", scene, view->localRacer->racerName, date, time);
+            sprintf(name, "%s_%s_%s_%s", scene, view->localRacer->riderName, date, time);
             int length = strlen(name);
             int count = 0;
             filtered[0] = 0;
@@ -401,7 +401,7 @@ int CompareStandings(const void* a, const void* b) {
             if (first->field_0x08 < second->field_0x08)
                 return -1;
             if (first->field_0x08 == second->field_0x08)
-                return strcmp(first->racer->racerName, second->racer->racerName);
+                return strcmp(first->racer->riderName, second->racer->riderName);
         }
     }
     return 1;
@@ -477,8 +477,8 @@ struct PodiumKrustyBikeView {
     float timeBehindLeader;                   // +0x770 KrustyBike timeBehindLeader
     float lapStartTime;                       // +0x774 KrustyBike lapStartTime
     float aiCrashImpactLimit;                 // +0x778 KrustyBike aiCrashImpactLimit
-    void* heapBufferA;                        // +0x77c KrustyBike heapBufferA
-    void* heapBufferB;                        // +0x780 KrustyBike heapBufferB
+    float* lapStartTimes;                     // +0x77c KrustyBike lapStartTimes
+    float* gateTimes;                         // +0x780 KrustyBike gateTimes
     int place;                                      // +0x784
 };
 
@@ -983,7 +983,7 @@ void EventManager::RankRacers() {
                 }
             }
             for (i = 0; i < standing; i++) {
-                if (results[i].playerId == racer->networkPlayerId && results[i].aiIndex == racer->aiIndex) {
+                if (results[i].playerId == racer->netId && results[i].aiIndex == racer->loaderKind) {
                     results[i].position = racer->finishPosition;
                     break;
                 }
@@ -1294,7 +1294,7 @@ void EventManager::SendRacerResults() {
         message.totalTrickTime = view->aiRacers[i]->totalTrickTime;
         message.bestTagRun = view->aiRacers[i]->bestTagRun;
         message.totalTagRun = view->aiRacers[i]->totalTagRun;
-        message.racerIndex = view->aiRacers[i]->aiIndex;
+        message.racerIndex = view->aiRacers[i]->loaderKind;
         g_TrackGame->network->Send(
             0x86, &message, sizeof(message), g_TrackGame->network->localPlayer, 0);
     }

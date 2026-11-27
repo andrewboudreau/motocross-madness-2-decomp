@@ -681,15 +681,15 @@ int StatsOverlay::DrawStandings()
     int row;
     int shown = 0;
     for (row = first; row < count - 1; row++) {
-        sprintf(rowText[row], "%d) %s : %.0f", shown + 1, scores[shown].racer->racerName,
+        sprintf(rowText[row], "%d) %s : %.0f", shown + 1, scores[shown].racer->riderName,
                 scores[shown].racer->score);
         shown++;
     }
     if (own >= shown)
-        sprintf(rowText[row], "%d) %s : %.0f", own + 1, scores[own].racer->racerName,
+        sprintf(rowText[row], "%d) %s : %.0f", own + 1, scores[own].racer->riderName,
                 scores[own].racer->score);
     else
-        sprintf(rowText[row], "%d) %s : %.0f", shown + 1, scores[shown].racer->racerName,
+        sprintf(rowText[row], "%d) %s : %.0f", shown + 1, scores[shown].racer->riderName,
                 scores[shown].racer->score);
     for (i = 0; i <= row; i++) {
         if (strcmp(rowText[i], drawnRowText[i]) != 0)
@@ -986,20 +986,20 @@ int StatsOverlay::DrawTagStandings()
         int row;
         int shown = 0;
         for (row = first; row < count - 1; row++) {
-            sprintf(rowText[row], "%d) %s : %.0f", shown + 1, scores[shown].racer->racerName,
+            sprintf(rowText[row], "%d) %s : %.0f", shown + 1, scores[shown].racer->riderName,
                     scores[shown].racer->score);
             shown++;
         }
         if (own >= shown)
-            sprintf(rowText[row], "%d) %s : %.0f", own + 1, scores[own].racer->racerName,
+            sprintf(rowText[row], "%d) %s : %.0f", own + 1, scores[own].racer->riderName,
                     scores[own].racer->score);
         else
-            sprintf(rowText[row], "%d) %s : %.0f", shown + 1, scores[shown].racer->racerName,
+            sprintf(rowText[row], "%d) %s : %.0f", shown + 1, scores[shown].racer->riderName,
                     scores[shown].racer->score);
     }
     if (g_TrackGame->tagEvent->followedRacer) {
         g_TrackGame->LoadResourceString(0x14b8, tag, 0x40);
-        sprintf(rowText[5], "  %s %s", g_TrackGame->tagEvent->followedRacer->racerName, tag);
+        sprintf(rowText[5], "  %s %s", g_TrackGame->tagEvent->followedRacer->riderName, tag);
     } else if (g_TrackGame->tagEvent->ball) {
         g_TrackGame->LoadResourceString(0x14b7, tag, 0x40);
         sprintf(rowText[5], "  %s", tag);
@@ -1458,7 +1458,7 @@ void RadarOverlay::DrawRacers(int mode)
     for (i = 0; i < racerCount; i++) {
         if (racers[i] == (EventKrustyBikeView*)radarCamera->bike) {
             mapOrigin = racers[i]->position;
-            mapAngle = -racers[i]->heading;
+            mapAngle = -racers[i]->savedYaw;
             if (racers[i]->crashState)
                 mapAngle = heldMapAngle;
             else
@@ -1478,7 +1478,7 @@ void RadarOverlay::DrawRacers(int mode)
                     float dx = racers[i]->position.x - own.x;
                     float dz = racers[i]->position.z - own.z;
                     float distance = dz * dz + dx * dx;
-                    radarView->chatOverlay->SetCueRacer(distance, racers[i]->racerName);
+                    radarView->chatOverlay->SetCueRacer(distance, racers[i]->riderName);
                 }
                 if (outside && (g_TrackGame->mode.raceSettings.eventType == 3 ||
                                 g_TrackGame->mode.raceSettings.eventType == 2)) {

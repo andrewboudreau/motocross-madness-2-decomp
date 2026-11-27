@@ -1005,18 +1005,18 @@ GameObject* KrustyBike::Load(void* context, const char* engineName, const char* 
     SnapshotRespawnPose();
 
     if (g_TrackGame->mode.raceSettings.eventType != 0 && g_TrackGame->mode.raceSettings.eventType != 5 && g_TrackGame->mode.raceSettings.eventType != 1) {
-        heapBufferA = DebugCalloc(100, 4, __FILE__, 0x6fa);
-        if (!heapBufferA)
+        lapStartTimes = (float*)DebugCalloc(100, sizeof(float), __FILE__, 0x6fa);
+        if (!lapStartTimes)
             return 0;
     } else {
-        heapBufferA = 0;
+        lapStartTimes = 0;
     }
     if (g_TrackGame->mode.raceSettings.eventType == 1 || g_TrackGame->mode.raceSettings.eventType == 5) {
-        heapBufferB = DebugCalloc(600, 4, __FILE__, 0x702);
-        if (!heapBufferB)
+        gateTimes = (float*)DebugCalloc(600, sizeof(float), __FILE__, 0x702);
+        if (!gateTimes)
             return 0;
     } else {
-        heapBufferB = 0;
+        gateTimes = 0;
     }
 
     LoadBodyAxes();
@@ -1304,13 +1304,13 @@ void KrustyBike::CreateWrecker()
 }
 
 // Destructor body (0x00491540, reached through the vbase-adjusted scalar deleting
-// destructor 0x00497c40): releases two debug-heap buffers (__FILE__ lines 0x8bb, 0x8be).
+// destructor 0x00497c40): releases the lap and gate time tables (__FILE__ lines 0x8bb, 0x8be).
 KrustyBike::~KrustyBike()
 {
-    if (heapBufferA)
-        DebugFree(heapBufferA, __FILE__, 0x8bb);
-    if (heapBufferB)
-        DebugFree(heapBufferB, __FILE__, 0x8be);
+    if (lapStartTimes)
+        DebugFree(lapStartTimes, __FILE__, 0x8bb);
+    if (gateTimes)
+        DebugFree(gateTimes, __FILE__, 0x8be);
 }
 
 void KrustyBike::UpdateLocalCenterOfMass()

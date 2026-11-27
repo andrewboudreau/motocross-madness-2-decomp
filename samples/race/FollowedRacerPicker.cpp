@@ -48,8 +48,8 @@ void TrackGameViewOwner::PickFollowedRacer()
     }
     VcrFollowRecord follow;
     follow.request = 0;
-    follow.followedRacerId = followedRacer->networkPlayerId;
+    follow.followedRacerId = followedRacer->netId;
     g_TrackGame->network->Send(0x87, &follow, sizeof(follow), g_TrackGame->network->localPlayer, 0);
     if (raceView->replayVcr && g_TrackGame->mode.saveReplay && !g_TrackGame->playingReplay)
-        ((VCRInterface*)raceView->replayVcr)->QueueRecord(0x87, followedRacer->networkPlayerId, &follow, 1);
+        ((VCRInterface*)raceView->replayVcr)->QueueRecord(0x87, followedRacer->netId, &follow, 1);
 }

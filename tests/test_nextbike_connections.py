@@ -81,7 +81,7 @@ class NextBikeConnectionsTests(unittest.TestCase):
             # matching selected offsets does not assert complete type identity.
             layouts = []
             for name, header, assertions in (
-                ('event', 'RaceView.h', 'offsetof(EventBikeRaceView, localRacer) == 0x38 && offsetof(EventKrustyBikeView, position) == 0xc && offsetof(EventKrustyBikeView, bikeView) == 0x740'),
+                ('event', 'RaceView.h', 'offsetof(EventBikeRaceView, localRacer) == 0x38 && offsetof(EventKrustyBikeView, position) == 0xc && offsetof(EventKrustyBikeView, race) == 0x740'),
                 ('visual', 'Krusty3DObjects.h', 'offsetof(VisualCueBikeRaceView, ownRacer) == 0x38 && offsetof(VisualCueKrustyBikeView, position) == 0xc'),
                 ('bike', 'vehicle/KrustyBike.h', 'offsetof(KrustyBike, race) == 0x740 && sizeof(KrustyBike) == 0x1638'),
                 ('canonical', 'BikeRace.h', 'offsetof(BikeRace, replayTime) == 0x1b8 && offsetof(BikeRace, localRacer) == 0x38'),

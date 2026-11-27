@@ -687,7 +687,7 @@ int RaceSound::UpdateRacerSounds(float frameTime) {
                         StartStream();
                     }
                     if (streamChannel->sampleKind == 1 || streamChannel->sampleKind == 5) {
-                        streamChannel->speed = (int)(streamChannel->channelRacer->previousSpeed * 0.68182f);
+                        streamChannel->speed = (int)(streamChannel->channelRacer->prevSpeed * 0.68182f);
                         if (streamChannel->speed < lowTorqueMaxSpeed[streamChannel->engine]) {
                             j = rand() % lowTorqueCount[streamChannel->engine];
                             streamChannel->streamSample = lowTorqueSamples[streamChannel->engine][j];

@@ -122,7 +122,7 @@ class FollowedRacerPickerBehaviorTests(unittest.TestCase):
                 'typedef char Layout[(sizeof(VcrFollowRecord)==12 && '
                 'offsetof(VcrFollowRecord,request)==4 && offsetof(VcrFollowRecord,followedRacerId)==8 && '
                 'offsetof(TrackGameViewOwner,raceView)==0x34 && offsetof(TrackGameViewOwner,followedRacer)==0xa8 && '
-                'offsetof(EventKrustyBikeView,outOfRace)==0x4a0 && offsetof(EventKrustyBikeView,networkPlayerId)==0x11bc && '
+                'offsetof(EventKrustyBikeView,outOfRace)==0x4a0 && offsetof(EventKrustyBikeView,netId)==0x11bc && '
                 'offsetof(BikeRace,racerSlots)==0x3c && offsetof(BikeRace,replayVcr)==0x1a0 && '
                 'offsetof(EventBikeRaceView,racerSlots)==0x3c && offsetof(EventBikeRaceView,replayVcr)==0x1a0) ? 1 : -1];\n')
             compile_source(layout, 'layout')
