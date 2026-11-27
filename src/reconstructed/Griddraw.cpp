@@ -1111,7 +1111,7 @@ void DrawableGridNode::SubmitUnlitRange(int detailPass, GridVertex* vertices, in
                     return;
             }
         } else {
-            terrain->vertexLighter.FogVertices(vertices, vertexCount);
+            terrain->groundFogable.FogVertices((GroundFogVertex*)vertices, vertexCount);
             if (block >= 0)
                 BindBlockTexture(block);
             else
@@ -1147,7 +1147,7 @@ void DrawableGridNode::SubmitUnlitRange(int detailPass, GridVertex* vertices, in
             }
         }
     } else {
-        terrain->vertexLighter.FogVertices(vertices, vertexCount);
+        terrain->groundFogable.FogVertices((GroundFogVertex*)vertices, vertexCount);
         if (block >= 0)
             BindBlockTexture(block);
         else

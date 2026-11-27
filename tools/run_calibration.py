@@ -8378,7 +8378,7 @@ CASES = [
         'name': 'GUIManager.cpp ground fog vertex shading 0x00484f10',
         'bindings': 'src/reconstructed/GUIManager.bindings.json',
         'source': 'src/reconstructed/GUIManager.cpp',
-        'symbol': '?FogVertices@GroundFogCacheOwner@@QAEXPAUGroundFogVertex@@H@Z',
+        'symbol': '?FogVertices@GroundFogableObject@@QAEXPAUGroundFogVertex@@H@Z',
         'target_va': '0x00484f10',
         'target_size': 492,
         'reason': 'uses "GroundFog" 0x0056c338, first string of the TU .data',

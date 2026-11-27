@@ -7,6 +7,7 @@
 #include "GameCursor.h"
 #include "GameObject.h"
 #include "GameObjectIterator.h"
+#include "GroundFogableObject.h"
 #include "RenderTarget.h"
 #include "UIDialog.h"
 
@@ -90,21 +91,9 @@ struct GuiDirectDrawSurface {
 
 // The fog object 0x00484f10 finds by name ("GroundFog") under Game+0x34.
 // Only the members it reads are declared; its class is not established.
-struct GroundFogCameraView {
-    unsigned char field_0x000[0x170];
-    float eyeX;                               // +0x170 eye position
-    float eyeY;                               // +0x174
-    float eyeZ;                               // +0x178
-};
-
-struct GroundFogRenderTargetView {
-    unsigned char field_0x00[0x08];
-    GroundFogCameraView* currentCamera;    // +0x08
-};
-
 struct GroundFogView {
     unsigned char field_0x00[0x18];
-    GroundFogRenderTargetView* renderContext;     // +0x18 GameObject+0x18
+    RenderTarget* renderContext;              // +0x18 GameObject+0x18
     unsigned char field_0x1c[0x30 - 0x1c];
     float planeHeight;                        // +0x30: fog plane height (compared with each vertex's y)
     float depthLimit;                         // +0x34
@@ -123,15 +112,6 @@ struct GroundFogVertex {
     unsigned long specular;
     float tu;
     float tv;
-};
-
-// The object whose first member 0x00484f10 caches the fog in (0 before
-// the lookup, 1 when there is none). Its class is not established.
-struct GroundFogCacheOwner {
-    // 0x00484f10: fogs `count` vertices by their depth below the fog plane.
-    void FogVertices(GroundFogVertex* vertices, int count);
-
-    GroundFogView* groundFog;              // +0x00: FindByClassName(1, "GroundFog"), or 1 when none
 };
 
 // RTTI: GUICursor : GameCursor (vtable 0x00553ed0; 0x60 bytes, the size

@@ -12,6 +12,7 @@
 
 #include "TrackGameGlobal.h"
 #include "Gridbase.h"
+#include "GroundFogableObject.h"
 
 class FileStream;
 struct GridVertex;
@@ -81,16 +82,6 @@ public:
     unsigned char mapFlags;  // +0x68  TextureMap.h mapFlags; bit 0 (ManagedTexture) enables the texture coordinate remap
 };
 
-// Object embedded at Terrain+0x2c; 0x00484f10 (the next TU) prepares a
-// vertex range before an unlit draw. Tier 3.
-class GridVertexLighter {
-public:
-    void FogVertices(GridVertex* vertices, int count);  // 0x00484f10 (ret 8)
-    int groundFog;
-    int field_0x04;
-    int field_0x08;
-};
-
 // The game object at 0x0056e26c as this file sees it (other views name it
 // TrackGame). +0x2d0 disables terrain drawing; +0x550/+0x554 are the
 // texture-stage values restored after a close-up draw.
@@ -132,7 +123,8 @@ struct GridTerrain {
     unsigned char field_0x000[0x18];
     GridRenderDevice* renderer;                // +0x18
     unsigned char field_0x01c[0x2c - 0x1c];
-    GridVertexLighter vertexLighter;           // +0x2c
+    GroundFogableObject groundFogable;         // +0x2c Terrain's second base (0x00484f10 fogs unlit vertices)
+    unsigned char field_0x030[0x38 - 0x30];
     int updateTextureCoordinates;              // +0x38 enables texture coordinate updates
     void* stream;                               // +0x3c Terrain stream (a TerrainStream*)
     float gridCellSize;                        // +0x40

@@ -191,9 +191,9 @@ All type, member and function names are provisional. `GridTerrain`,
 `GridCamera`, `GridVisibilityClipper`, `GridAgeManager` and
 `GridVertexSink` are boundary views of classes reconstructed elsewhere, or
 not yet reconstructed, as are `GridRenderDevice` (Terrain+0x18, thiscall
-virtuals), `GridVertexLighter` (Terrain+0x2c, `0x00484f10`),
-`GridManagedTexture` (`0x00510910`) and `GridGameSettings` (`0x0056e26c`);
-only their called slots and touched fields are known. The fifth argument of
+virtuals), `GridManagedTexture` (`0x00510910`) and `GridGameSettings` (`0x0056e26c`);
+only their called slots and touched fields are known. GridTerrain+0x2c is the
+canonical `GroundFogableObject` base, whose `FogVertices` (`0x00484f10`) fogs unlit vertices. The fifth argument of
 `0x00482dd0` is the originating cell (`0x00483200` compares it with cell
 addresses), not a flag. The shared row tables are written as per-TU statics
 because three identical copies exist. The header that supplied them, and

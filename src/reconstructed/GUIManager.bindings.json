@@ -138,7 +138,7 @@
   "?SetShown@UIDialog@@QAEXH@Z": "0x0046ea60",
   "?SetBackground@UIDialog@@QAEXPAX@Z": "0x0046ffd0",
   "?SetModalPause@UIDialog@@QAEXHHPAUCameraRect@@@Z": "0x00470070",
-  "?FogVertices@GroundFogCacheOwner@@QAEXPAUGroundFogVertex@@H@Z": "0x00484f10",
+  "?FogVertices@GroundFogableObject@@QAEXPAUGroundFogVertex@@H@Z": "0x00484f10",
   "?SetAnimation@GUICursor@@QAEXPAVUIAnim@@@Z": "0x00485150",
   "?AttachDialog@GUIManager@@QAEXPAVUIDialog@@HH@Z": "0x00485bd0",
   "?SetDialogDirectory@GUIManager@@QAEXPBD@Z": "0x00485d70",

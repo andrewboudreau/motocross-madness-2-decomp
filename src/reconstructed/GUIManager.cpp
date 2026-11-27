@@ -10,6 +10,7 @@
 #include "GameUi.h"
 
 #include "BackgroundImage.h"
+#include "Camera.h"
 #include "DebugAlloc.h"
 #include "DebugOverlay.h"
 #include "JoystickDevice.h"
@@ -37,9 +38,9 @@ float FastSqrt(float value);
 #define SoundSystem() ((PCSoundInterface*)g_TrackGame->soundInterface)
 
 // 0x00484f10
-void GroundFogCacheOwner::FogVertices(GroundFogVertex* vertices, int count) {
+void GroundFogableObject::FogVertices(GroundFogVertex* vertices, int count) {
     GroundFogView* fog;
-    GroundFogCameraView* camera;
+    Camera* camera;
     float eyeX;
     float eyeY;
     float eyeZ;
@@ -68,9 +69,9 @@ void GroundFogCacheOwner::FogVertices(GroundFogVertex* vertices, int count) {
     fog = groundFog;
     camera = fog->renderContext->currentCamera;
     alphaLimit = fog->alphaLimit;
-    eyeX = camera->eyeX;
-    eyeY = camera->eyeY;
-    eyeZ = camera->eyeZ;
+    eyeX = camera->eyePosition.x;
+    eyeY = camera->eyePosition.y;
+    eyeZ = camera->eyePosition.z;
     depthLimit = (int)fog->depthLimit;
     density = fog->density;
     for (i = 0; i < count; i++) {
