@@ -1,5 +1,7 @@
 #include "BikeCamera.h"
 #include "D3DIMSoulTree.h"
+#include "Wrecker.h"
+#include "../krusty2/vehicle/BikeCore.h"
 
 // The unit's per-file vectors (Math3D.h's four constants); their initializers
 // 0x00417350..0x0041746b sit after slot 0x00417340 and build 0x00578e20,
@@ -81,11 +83,11 @@ Vector3 BikeCamera::GetStateFiveFollowPoint(float dt) {
     if (isCrashView) {
         bike->riderCharacter->modelNode->GetPositionIn(0, reinterpret_cast<Vec3*>(&result));
         if (targetDistance < 500.0f) {
-            Vector3 lead = bike->wrecker->rigidBody->velocity * dt;
+            Vector3 lead = *reinterpret_cast<const Vector3*>(&bike->wrecker->rigidBody->velocity) * dt;
             lead = lead * (4.0f - targetDistance * 0.006f);
             result += lead;
         } else {
-            result += bike->wrecker->rigidBody->velocity * dt;
+            result += *reinterpret_cast<const Vector3*>(&bike->wrecker->rigidBody->velocity) * dt;
         }
     } else {
         float dot = BikeCameraDot(GetTargetVelocity(), followHeading);

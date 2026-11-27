@@ -4,6 +4,9 @@
 
 #include "EventManager.h"
 #include "BikeRaceCore.h"
+#include "Wrecker.h"
+#include "../krusty2/vehicle/KrustyBikeCore.h"
+#include "../krusty2/tire/Tire.h"
 
 // The four Math3D vector constants (.CRT$XCU 159-162, initialisers
 // 0x004986b0..0x004987eb, after the last method): 0x0067c3c8, 0x0067c3d8,
@@ -217,11 +220,11 @@ Vector3 KrustyBikeCamera::GetStateFiveFollowPoint(float dt) {
     if (isCrashView) {
         bike->riderCharacter->modelNode->GetPositionIn(0, reinterpret_cast<Vec3*>(&result));
         if (targetDistance < 500.0f) {
-            Vector3 lead = bike->wrecker->rigidBody->velocity * dt;
+            Vector3 lead = *reinterpret_cast<const Vector3*>(&bike->wrecker->rigidBody->velocity) * dt;
             lead = lead * (4.0f - targetDistance * 0.006f);
             result += lead;
         } else {
-            result += bike->wrecker->rigidBody->velocity * dt;
+            result += *reinterpret_cast<const Vector3*>(&bike->wrecker->rigidBody->velocity) * dt;
         }
     } else if (raceView->replayPaused) {
         result = targetPoint;

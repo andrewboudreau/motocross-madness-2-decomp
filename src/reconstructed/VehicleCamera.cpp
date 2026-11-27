@@ -4,6 +4,7 @@
 #include "CarProcedural.h"
 #include "../krusty2/motion/CollisionCharacter.h"
 #include "TrackGame.h"
+#include "../krusty2/tire/Tire.h"
 
 // The four Math3D vector constants (.CRT$XCU 336-339, initialisers
 // 0x0052ced0..0x0052d00b): 0x0068a728, 0x0068a738, 0x0068a748 and
@@ -42,7 +43,7 @@ VehicleCamera* VehicleCamera::SetupVehicleCamera(void* context, float fieldOfVie
 // first set target, else the global default.
 Vector3 VehicleCamera::GetTargetVelocity() {
     if (vehicleMode)
-        return vehicle->velocity;
+        return *reinterpret_cast<const Vector3*>(&vehicle->velocity);
     if (targetCharacter)
         return *reinterpret_cast<const Vector3*>(&targetCharacter->nodeVelocity);
     if (targetCar)
@@ -54,7 +55,7 @@ Vector3 VehicleCamera::GetTargetVelocity() {
 Vector3 VehicleCamera::CachedTargetHeading() {
     if (vehicleMode) {
         targetHeadingCached = 0;
-        return vehicle->takeoffVelocity;
+        return *reinterpret_cast<const Vector3*>(&vehicle->takeoffVelocity);
     }
     if (!targetHeadingCached) {
         cachedTargetHeading = GetTargetVelocity();
@@ -95,7 +96,7 @@ Vector3 VehicleCamera::TargetPoint() {
 Vector3 VehicleCamera::CachedTargetPoint() {
     if (vehicleMode) {
         targetPointCached = 0;
-        return vehicle->takeoffPosition;
+        return *reinterpret_cast<const Vector3*>(&vehicle->takeoffPosition);
     }
     if (!targetPointCached) {
         cachedTargetPoint = TargetPoint();
@@ -211,11 +212,11 @@ Vector3 VehicleCamera::ComputeFollowHeading() {
                 velocity = Vector3(-velocity.x, -velocity.y, -velocity.z);
             velocity.y = 0.0f;
             if (velocity.x == 0.0f && velocity.z == 0.0f)
-                velocity = vehicle->bodyForward;
+                velocity = *reinterpret_cast<const Vector3*>(&vehicle->bodyForward);
             float scale = vehicle->linearSpeed;
             if (scale <= 0.01f)
                 scale = 0.01f;
-            Vector3 facing = vehicle->bodyForward * scale;
+            Vector3 facing = *reinterpret_cast<const Vector3*>(&vehicle->bodyForward) * scale;
             facing.y = 0.0f;
             if (facing.x == 0.0f && facing.z == 0.0f)
                 facing = velocity;
@@ -308,6 +309,19 @@ static inline float ClimbScale(float y, float length, float value) {
     return value;
 }
 
+// Inlined by slot 35: the first wheel with an engine attached when the
+// vehicle has any (+0x56c), else the first wheel. The wheels are Tires
+// (Bike's loader reads them as `(Tire*)wheelList[i]`).
+static inline Tire* PickCameraWheel(Vehicle* vehicle) {
+    if (vehicle->auxWheelCount) {
+        for (int i = 0; i < vehicle->wheelCount; i++) {
+            if (((Tire*)vehicle->wheelList[i])->engine)
+                return (Tire*)vehicle->wheelList[i];
+        }
+    }
+    return (Tire*)vehicle->wheelList[0];
+}
+
 // 0x0052c510: the chase position: behind the vehicle along the heading
 // (+0x29c) turned by +0x308 (and, in state 3, pitched by the vehicle's
 // +0x4c), at a distance scaled by the preset angles, zoom and speed, raised
@@ -369,8 +383,8 @@ Vector3 VehicleCamera::ComputeLookAheadPoint(unsigned char a, float dt) {
     Vector3 position = Add(direction, targetPoint);
     Vector3 result = position;
     result.y = position.y + offset;
-    if (vehicle->riderCount > 0) {
-        if (vehicle->PickCameraWheel()->penetration > -0.5f) {
+    if (vehicle->wheelCount > 0) {
+        if (PickCameraWheel(vehicle)->penetration > -0.5f) {
             float reach = (float)(FollowCameraAbs(followPitch) * 0.63661975f) * 1.2f + 0.3f;
             Vector3 ahead = Add(direction * reach, targetPoint);
             Vector3 ground = ahead;

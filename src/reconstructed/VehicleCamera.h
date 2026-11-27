@@ -1,78 +1,9 @@
 #pragma once
 
 #include "FollowCamera.h"
+#include "../krusty2/vehicle/VehicleCore.h"
 
 class SoultreeObject;
-
-// An entry of the vehicle's +0x53c list (VehicleCamera slot 35).
-struct VehicleCameraWheelView {
-    unsigned char field_0x000[0x150];
-    float penetration;                        // +0x150  VehicleWheel penetration (CollisionPoint+0x98, reset to -999); slot 35 lifts the camera while it is above -0.5
-    unsigned char field_0x154[0x2a8 - 0x154];
-    int aux;  // +0x2A8  element of Vehicle+0x53c wheelList = VehicleWheel, whose +0x2a8 is aux (counted by auxWheelCount)
-};
-
-struct VehicleCameraVehicleView {
-    unsigned char field_0x000[0x48];
-    float savedRoll;                          // +0x48 VehicleCamera slot 51; krusty2 SoultreePhysicsBaseObject
-    float savedPitch;                         // +0x4c VehicleCamera slot 35 pitch angle
-    float savedYaw;                           // +0x050 Vehicle savedYaw (SoultreePhysicsBaseObject)
-    float savedSinRoll;                       // +0x054 Vehicle savedSinRoll (SoultreePhysicsBaseObject)
-    float savedCosRoll;                       // +0x058 Vehicle savedCosRoll (SoultreePhysicsBaseObject)
-    float savedSinPitch;                      // +0x05c Vehicle savedSinPitch (SoultreePhysicsBaseObject)
-    float savedCosPitch;                      // +0x060 Vehicle savedCosPitch (SoultreePhysicsBaseObject)
-    Vector3 velocity;                         // +0x64 VehicleCamera slot 33
-    Vector3 acceleration;                     // +0x070 Vehicle acceleration (SoultreePhysicsBaseObject)
-    Vector3 prevVelocity;                     // +0x07c Vehicle prevVelocity (SoultreePhysicsBaseObject)
-    Vector3 bodyForward;                      // +0x88 VehicleCamera slot 41 heading fallback
-    Vector3 bodyUp;                           // +0x094 Vehicle bodyUp (SoultreePhysicsBaseObject)
-    Vector3 savedForward;                     // +0x0a0 Vehicle savedForward (SoultreePhysicsBaseObject)
-    Vector3 savedUp;                          // +0x0ac Vehicle savedUp (SoultreePhysicsBaseObject)
-    float prevSpeed;                          // +0x0b8 Vehicle prevSpeed (SoultreePhysicsBaseObject)
-    float linearSpeed;                        // +0xbc |velocity|; VehicleCamera slot 41 (at least 0.01)
-    Vector3 angularAcceleration;              // +0x0c0 Vehicle angularAcceleration (SoultreePhysicsBaseObject)
-    Vector3 worldAngularVelocity;             // +0x0cc Vehicle worldAngularVelocity (SoultreePhysicsBaseObject)
-    Vector3 angularVelocity;                  // +0x0d8 Vehicle angularVelocity (SoultreePhysicsBaseObject)
-    Vector3 invInertia;                       // +0x0e4 Vehicle invInertia (SoultreePhysicsBaseObject)
-    Vector3 shapeInvInertia;                  // +0x0f0 Vehicle shapeInvInertia (SoultreePhysicsBaseObject)
-    unsigned char field_0x0fc[0x108 - 0xfc];
-    char airborne;                            // +0x108 Vehicle airborne (SoultreePhysicsBaseObject)
-    char respawnPending;                      // +0x109 Vehicle respawnPending (SoultreePhysicsBaseObject)
-    char asleep;                              // +0x10a Vehicle asleep (SoultreePhysicsBaseObject)
-    unsigned char field_0x10b[0x3bc - 0x10b];
-    SoultreeObject* modelNode;            // +0x3bc VehicleCamera slot 50
-    unsigned char field_0x3c0[0x434 - 0x3c0];
-    float forwardSpeed;  // +0x434  Vehicle +0x434 = dot(velocity, bodyForward) (BikeAI); KrustyBike compares it with 60 mph in ft/s
-    float referenceSpeed;                     // +0x438  Vehicle +0x438 referenceSpeed (180); the bike cameras divide by it
-    float turnRate;                           // +0x43c VehicleCamera slot 42 scale
-    int movingForward;                        // +0x440
-    int crashState;                           // +0x444 VehicleCamera slots 72, 74, 75
-    unsigned char field_0x448[0x45c - 0x448];
-    float crashYaw;  // +0x45C  Vehicle::CheckCrash stores savedYaw here on a crash; VehicleCamera slot 39 returns it
-    int crashReason;                          // +0x460 BikeCamera slot 75 tests 6
-    int crashedUpsideDown;  // +0x464  Vehicle::CheckCrash stores savedUp.y < 0 on a crash; VehicleCamera slot 39 turns the camera by pi
-    unsigned char field_0x468[0x488 - 0x468];
-    Vector3 takeoffPosition;                  // +0x488 0x0052bc50 in vehicle mode
-    Vector3 takeoffVelocity;                  // +0x494 0x0052bac0 in vehicle mode
-    unsigned char field_0x4a0[0x53c - 0x4a0];
-    VehicleCameraWheelView** riders;              // +0x53c riders (VehicleCamera slot 35)
-    int wheelCapacity;                        // +0x540
-    int riderCount;                           // +0x544 rider count
-    unsigned char field_0x548[0x56c - 0x548];
-    int auxWheelCount;                        // +0x56c nonzero: look for a rider with +0x2a8 set
-
-    // Inlined by VehicleCamera slot 35: the first rider with +0x2a8 set
-    // when +0x56c asks for one, else the first rider.
-    VehicleCameraWheelView* PickCameraWheel() {
-        if (auxWheelCount) {
-            for (int i = 0; i < riderCount; i++) {
-                if (riders[i]->aux)
-                    return riders[i];
-            }
-        }
-        return riders[0];
-    }
-};
 
 // Optional targets at VehicleCamera+0x384 / +0x388 (slot 33). The character
 // target is a scene CollisionCharacter (krusty2/motion/CollisionCharacter.h):
@@ -144,7 +75,7 @@ protected:
     bool vehicleMode;                    // +0x390, vehicle mode
     unsigned char targetPointCached;     // +0x391 cachedTargetPoint is valid (cleared on a new target)
     unsigned char targetHeadingCached;   // +0x392 cachedTargetHeading is valid
-    VehicleCameraVehicleView* vehicle;       // +0x394
+    Vehicle* vehicle;                    // +0x394 the followed vehicle (BikeRace's KrustyBike racers)
     Vector3 cachedTargetHeading;         // +0x398 slot 33's value
     Vector3 cachedTargetPoint;           // +0x3a4 TargetPoint's value
 };

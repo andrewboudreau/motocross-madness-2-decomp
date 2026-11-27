@@ -16,6 +16,7 @@
 #include "TrackGame.h"
 #include "EventManager.h"
 #include "BaseQuarryEvent.h"
+#include "Wrecker.h"
 
 #define SoundSystem() ((PCSoundInterface*)g_TrackGame->soundInterface)
 

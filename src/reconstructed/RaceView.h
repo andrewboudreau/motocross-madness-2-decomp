@@ -56,8 +56,8 @@ struct EventBikeWheelView {
     unsigned char field_0x000[0x200];
     Vector3 nodePosition;  // +0x200  racer +0x5f0 is Bike::frontWheel (a Tire); Tire +0x200 wheelCenter; RaceStatus 0x004e6a50 reads it
 };
-struct BikeCameraRiderView;
-struct BikeCameraWreckerView;
+class D3DIMSoultreeCharacter;
+class Wrecker;
 class SoultreeObject;
 // Keep the local race-view name while using the actual scene-node type.
 typedef SoultreeObject UnknownVehiclePart;
@@ -146,12 +146,12 @@ struct EventKrustyBikeView : virtual public GameObject {
     Vector3 takeoffVelocity;                  // +0x494 KrustyBike takeoffVelocity (Vehicle)
     int outOfRace;                            // +0x4a0 EventManager 0x0045eef0: counts as done when set
     unsigned char field_0x4a4[0x5c4 - 0x4a4];
-    BikeCameraRiderView* riderCharacter;   // +0x5c4 as BikeCamera's bike +0x5c4 (TrackOverlay 0x005190e0)
+    D3DIMSoultreeCharacter* riderCharacter;  // +0x5c4 Bike riderCharacter (TrackOverlay 0x005190e0)
     unsigned char loadInfo[0x5e0 - 0x5c8]; // +0x5c8: Bike::loadInfo (bytes kept)
     char racerName[0x10];                     // +0x5e0 name
     EventBikeWheelView* frontWheel;       // +0x5f0 RaceStatus.cpp 0x004e6a50 takes its +0x200 position
     unsigned char field_0x5f4[0x604 - 0x5f4];
-    BikeCameraWreckerView* wrecker;          // +0x604 the racer's Wrecker; racesnd.cpp 0x004e39b0 reads its contactThisFrame
+    Wrecker* wrecker;                        // +0x604 the racer's Wrecker; racesnd.cpp 0x004e39b0 reads its contactThisFrame
     unsigned char field_0x608[0x734 - 0x608];
     char aiKind;  // +0x734  KrustyBike +0x734 aiKind; RaceStatus estimates finish times only for racers with it set
     unsigned char isRemote;  // +0x735  KrustyBike isRemote; passed as CountLap/AdvanceGate skipTest; selects ClosestPointOnTrack over PlaceNear

@@ -20,7 +20,7 @@ typedef char node_child[offsetof(SoultreeObject, firstChild) == 0x140 ? 1 : -1];
 typedef char node_flag[offsetof(SoultreeObject, hidden) == 0x14c ? 1 : -1];
 typedef char screen_rect[offsetof(D3DIMSoultreeObject, screenRect) == 0x298 ? 1 : -1];
 typedef char second_rect[offsetof(D3DIMSoultreeObject, field_0x2a8) == 0x2a8 ? 1 : -1];
-typedef char vehicle_node[offsetof(VehicleCameraVehicleView, modelNode) == 0x3bc ? 1 : -1];
+typedef char vehicle_node[offsetof(D3DIMSoultreeCharacter, modelNode) == 0x1a0 ? 1 : -1];  // Vehicle +0x3bc (base at +0x21c)
 typedef char character_node[offsetof(CollisionCharacter, modelNode) == 0x1a0 ? 1 : -1];
 typedef char character_velocity[offsetof(CollisionCharacter, nodeVelocity) == 0x224 ? 1 : -1];
 typedef char car_node[offsetof(CarProcedural, carModel) == 0x34 ? 1 : -1];
