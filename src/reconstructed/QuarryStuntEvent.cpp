@@ -17,6 +17,7 @@
 #include "RaceView.h"
 #include "RenderTarget.h"
 #include "SceneManager.h"
+#include "../krusty2/soultree/SoultreePhysicsObject.h"
 #include "SelectGamePicProcs.h"
 #include "TextureMap.h"
 #include "TrackGame.h"
@@ -151,21 +152,6 @@ extern int g_UnknownGlobal59af10;
 // 0x0045c040 (cdecl): preloads the ecosystem `path` from `stream`.
 int PreloadEcosystem(TextureMapManager* manager, char* path, FileStream* stream,
                      int format);
-
-// A physics static model (Scene caster +0x08).
-struct QuarryLoadPhysicsObjectView {
-    unsigned char field_0x000[0x128];
-    CollisionObject* collisionObject;   // +0x128 SoultreePhysicsBaseObjectCore.h
-    unsigned char field_0x12c[0x1f4 - 0x12c];
-    Terrain* terrain;                              // +0x1f4
-    void* terrainScale;                        // +0x1f8 copied from the terrain's +0x40
-};
-
-// The terrain as the loader reads it.
-struct QuarryLoadTerrainView {
-    unsigned char field_0x00[0x40];
-    void* worldScale;                          // +0x40 SoultreeProbe::worldScale
-};
 
 // The bytes the render target's colour buffers take.
 static inline int FrameBufferBytes(RenderTarget* target) {
@@ -564,13 +550,13 @@ int BaseQuarryEvent::LoadEventObjects(LoadProgressFn progress) {
             SceneStaticModel* caster = &eventScene->staticModels->casters[i];
             if (caster->physics) {
                 Terrain* terrain = eventTerrain;
-                QuarryLoadPhysicsObjectView* physics = (QuarryLoadPhysicsObjectView*)caster->physicsObject;
-                physics->terrain = terrain;
+                SoultreePhysicsObject* physics = caster->physicsObject;
+                physics->terrain = (SoultreeProbe*)terrain;
                 if (terrain)
-                    physics->terrainScale = ((QuarryLoadTerrainView*)terrain)->worldScale;
-                ((QuarryLoadPhysicsObjectView*)caster->physicsObject)->collisionObject->SnapPlacement();
-                ((QuarryLoadPhysicsObjectView*)caster->physicsObject)->collisionObject->SetUseBroadphase(1);
-                ((QuarryLoadPhysicsObjectView*)caster->physicsObject)->collisionObject->SetOwner(caster->physicsObject, 0x68);
+                    physics->terrainScale = terrain->gridCellSize;
+                caster->physicsObject->collisionObject->SnapPlacement();
+                caster->physicsObject->collisionObject->SetUseBroadphase(1);
+                caster->physicsObject->collisionObject->SetOwner(caster->physicsObject, 0x68);
             } else if (caster->collisionObject && ((D3DIMSoultreeObject*)caster->model)->CountNodes() == 1) {
                 ((CollisionObject*)caster->collisionObject)->SnapPlacement();
                 ((CollisionObject*)caster->collisionObject)->SetUseBroadphase(1);

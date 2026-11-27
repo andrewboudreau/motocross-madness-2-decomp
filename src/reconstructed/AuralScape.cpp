@@ -5,6 +5,7 @@
 #include <string.h>
 
 #include "AuralScape.h"
+#include "SceneManager.h"
 #include "D3DIMSoulTree.h"
 
 #include "DebugAlloc.h"

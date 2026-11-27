@@ -112,17 +112,7 @@ public:
     SoultreeObject* childPart;            // +0x1a8
 };
 
-// What AuralScape+0x94 points at: +0xa4 holds a table whose +0x410 has four
-// reverb presets (tier 3).
-struct AuralScapeSceneEnvironmentView {
-    unsigned char field_0x000[0x410];
-    unsigned long enviroID[4];                // +0x410 SceneEnvironment::enviroID, per reverb zone
-};
-
-struct AuralScapeSceneView {
-    unsigned char field_0x00[0xa4];
-    AuralScapeSceneEnvironmentView* environment; // +0xa4 Scene::environment
-};
+class Scene;  // SceneManager.h
 
 // RTTI: AuralScape : GameObject. Created by QuarryStuntEvent.cpp
 // (0x004dee5c..0x004deec4).
@@ -154,7 +144,7 @@ public:
     ContainerList<SoundEmitter*> audibleEmitters; // +0x58 audible
     ContainerList<SoundEmitter*> playingEmitters; // +0x6c playing
     ContainerList<SoundEmitter*> waitingEmitters; // +0x80 waiting for a sound
-    AuralScapeSceneView* reverbOwner; // +0x94
+    Scene* reverbOwner;                       // +0x94 the event scene; its environment->enviroID[zone] picks the reverb
     FollowCameraTerrainView* groundSubject; // +0x98
     int debugPage;                            // +0x9c debug page
     unsigned char reverbEnabled : 1;          // +0xa0 reverb enabled
