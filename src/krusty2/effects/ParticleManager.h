@@ -98,14 +98,6 @@ struct ParticleUVRect {
     float u0, v0, u1, v1, u2, v2, u3, v3;
 };
 
-// The global at 0x0056e26c (tier 3 name).  Only the two words the particle code tests are known.
-struct ParticleGameContext {
-    char field_0x00[0x1c4];
-    int frozen;                    // +0x1c4 nonzero: every emitter and the manager skip their update (slot 10)
-    char field_0x1c8[0x2d0 - 0x1c8];
-    int hidden;                    // +0x2d0 nonzero: the manager skips drawing (slot 14)
-};
-
 struct ParticleVec3 {
     float x, y, z;
     ParticleVec3() {}

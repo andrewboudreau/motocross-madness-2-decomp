@@ -3,6 +3,7 @@
 // Ownership: the file's own __FILE__ references (0x004ba4f1, 0x004ba5c8) are the two debug
 // `new`s in ParticleManager's slot 27; the other ParticleManager methods are contiguous with it.
 #include "../../reconstructed/TrackGameGlobal.h"
+#include "../../reconstructed/TrackGame.h"
 #include "effects/ParticleManager.h"
 
 extern "C" void qsort(void* base, unsigned int num, unsigned int width,
@@ -74,7 +75,7 @@ int ParticleManager::AddParticle(float age, const ParticleVec3* position, int fr
 
 int ParticleManager::Tick(float dt)
 {
-    if (reinterpret_cast<ParticleGameContext*>(g_TrackGame)->frozen)
+    if (g_TrackGame->paused)
         return 1;
     float ms = dt * 1000.0f;
     for (int i = 0; i < activeCount; i++) {

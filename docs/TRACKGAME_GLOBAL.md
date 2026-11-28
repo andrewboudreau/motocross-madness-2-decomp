@@ -19,10 +19,10 @@ TrackGame layout or promote these local types to confirmed class identities.
 | Former declaration | Retained provisional view |
 | --- | --- |
 | `g_Bike_0056e26c` | `BikeGlobal_0056e26c` |
-| `g_collisionGameContext` | `CollisionGameContext` |
+| `g_collisionGameContext` | none: reads `Game::childRoot` (+0x34) through `TrackGame` |
 | `g_gridGameSettings` | `GridGameSettings` |
 | `g_kbGame` | `KbGame` |
-| `g_gameContext` | `ParticleGameContext` |
+| `g_gameContext` | none: the particle code reads `Game::paused` (+0x1c4); the old `hidden` word is `Game::bladeRenderer` (+0x2d0) |
 | `g_0056e26c` | `SoultreeGlobals` |
 | `g_soultreeStats` | `SoultreeStats` |
 | `g_terrainGame` | `TerrainGameSettings` |
@@ -98,8 +98,8 @@ physics suites check their canonical and partial callers against retail;
 shared-header dependents also require the full calibration gate.
 
 `tests/test_trackgame_global.py` compiles three independent native VC6
-translation units. The two reader/writer units use the `ParticleGameContext`
-view and the complete `TrackGame` class, as EcoSystem.cpp reads it. Their COFF files import
+translation units. The two reader/writer units both use the complete `TrackGame`
+class (`Game::bladeRenderer`), as EcoSystem.cpp and the particle code read it. Their COFF files import
 the same canonical external pointer. The executable checks cross-view writes
 at offset `0x2d0`, switches the shared pointer between two backing buffers,
 and verifies both readers observe each reassignment. This fixture owns

@@ -1,12 +1,13 @@
 #include "TrackGameGlobal.h"
+#include "TrackGame.h"
 #include "effects/ParticleManager.h"
 
 int ReadParticleRendererFlag()
 {
-    return reinterpret_cast<ParticleGameContext*>(g_TrackGame)->hidden;
+    return g_TrackGame->bladeRenderer;
 }
 
 void WriteParticleRendererFlag(int value)
 {
-    reinterpret_cast<ParticleGameContext*>(g_TrackGame)->hidden = value;
+    g_TrackGame->bladeRenderer = value;
 }

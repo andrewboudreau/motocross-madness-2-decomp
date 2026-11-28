@@ -1,5 +1,6 @@
 // SteamParticleEmitter.cpp -- ownership uncertain, see ParticleEmitters.h.
 #include "TrackGameGlobal.h"
+#include "TrackGame.h"
 #include "ParticleEmitters.h"
 #include <stdlib.h>
 #include "math/FastMath.h"
@@ -83,7 +84,7 @@ void SteamParticleEmitter::SetColor(unsigned char r, unsigned char g, int b)
 // 0x004ba070.  Emits a trail of puffs between the previous and the current position each tick.
 int SteamParticleEmitter::Tick(float dt)
 {
-    if (reinterpret_cast<ParticleGameContext*>(g_TrackGame)->frozen == 0 && emitting != 0 && pulseActive != 0) {
+    if (g_TrackGame->paused == 0 && emitting != 0 && pulseActive != 0) {
         if (pulseTimeLeft <= 0.0f) {
             pulseTimeLeft = 0;
             pulseActive = 0;

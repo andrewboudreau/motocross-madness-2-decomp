@@ -5,6 +5,7 @@
 // shape setters pass that string.  The sections below were separate sample files during
 // matching; the section banners keep their original notes.
 #include "../../reconstructed/TrackGameGlobal.h"
+#include "../../reconstructed/TrackGame.h"
 #include "../../reconstructed/ControlInterface.h"
 #include "collision/CollisionObject.h"
 #include "collision/CollisionShapeTests.h"
@@ -1400,10 +1401,6 @@ struct CollisionVegetationGrid {   // object at *0x0059aebc (tier 3): a view of 
     float cellSize;                // +0x5a8 world size of one vegetation cell
 };
 
-struct CollisionGameContext {      // object at *0x0056e26c (tier 3; root of the object tree at +0x34)
-    char field_0x00[0x34];
-    GameObject* root;              // +0x34
-};
 #include "../../reconstructed/GameObjectIterator.h"   // gameobj.cpp's iterator (0x94 bytes)
 struct CollisionBoundingSphere;
 int SphereContainsPointXZ(const CollisionBoundingSphere* sphere, const Vec3* p, float r);   // 0x0043a1e0
@@ -1466,7 +1463,7 @@ int CollisionObject::QueryCollisions()
         g_collisionQuadTree->EndQuery();
     } else {
         queryTouched = 1;
-        GameObjectIterator* it = new(__FILE__, 0x7da) GameObjectIterator(reinterpret_cast<CollisionGameContext*>(g_TrackGame)->root, 1, "");
+        GameObjectIterator* it = new(__FILE__, 0x7da) GameObjectIterator(g_TrackGame->childRoot, 1, "");
         // Retail null-checks the CollisionObject* and then the GameObject* again (three tests
         // per step), which is this round trip through the derived pointer type.
         GameObject* object;

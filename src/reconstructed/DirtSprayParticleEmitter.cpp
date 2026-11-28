@@ -1,5 +1,6 @@
 // DirtSprayParticleEmitter.cpp -- ownership uncertain, see ParticleEmitters.h.
 #include "TrackGameGlobal.h"
+#include "TrackGame.h"
 #include "ParticleEmitters.h"
 #include <stdlib.h>
 
@@ -54,7 +55,7 @@ int DirtSprayParticleEmitter::Create(void* context, ParticleManager* m)
 // remainder) times the rate is the number of particles, spread along the segment moved this tick.
 int DirtSprayParticleEmitter::Tick(float dt)
 {
-    if (reinterpret_cast<ParticleGameContext*>(g_TrackGame)->frozen == 0) {
+    if (g_TrackGame->paused == 0) {
         if (firstUpdate) {
             firstUpdate = 0;
             previousPosition = position;

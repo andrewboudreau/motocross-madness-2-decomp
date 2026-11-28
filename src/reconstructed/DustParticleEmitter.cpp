@@ -1,5 +1,6 @@
 // DustParticleEmitter.cpp -- ownership uncertain, see ParticleEmitters.h.
 #include "TrackGameGlobal.h"
+#include "TrackGame.h"
 #include "ParticleEmitters.h"
 #include "math/FastMath.h"
 
@@ -56,7 +57,7 @@ void DustParticleEmitter::SetColor(unsigned char r, unsigned char g, int b)
 // particles' lifetime follow the speed (distance / dt, scaled by intensity when it is nonzero).
 int DustParticleEmitter::Tick(float dt)
 {
-    if (reinterpret_cast<ParticleGameContext*>(g_TrackGame)->frozen == 0) {
+    if (g_TrackGame->paused == 0) {
         if (activeThisFrame == 0) {
             field_0x68 = 0;
             spacingRemainder = 0;
