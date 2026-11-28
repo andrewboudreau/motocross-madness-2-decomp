@@ -572,18 +572,6 @@ void D3DIMSoultreeObject::TransformVertexGroups(int lod)
     currentLod = saved;
 }
 
-// soultree.cpp node calls only these near misses use. They are kept out of
-// D3DIMSoulTree.h: more declarations there change VC6's operand order in
-// SceneManager.cpp's exact 0x004eb570.
-class DrawSoultreeObjectView : public SoultreeObject {
-public:
-    void GetMatrixIn(SoultreeObject* frame, Matrix4* out); // 0x004fca80: matrix in `frame` (0: world)
-    void GetPositionIn(SoultreeObject* frame, Vector3* out); // 0x004fc9a0: position in `frame` (0: world)
-    Vector3 WorldToLocalDirection(const Vector3* v);                 // 0x004fd710: world to local direction
-    Vector3 WorldToLocalPoint(const Vector3* v);                 // 0x004fd7f0: world to local point
-    Vector3 LocalToWorldDirection(const Vector3* v);                 // 0x004fd5c0: local to world direction
-};
-
 // The box test at 0x00575a98 (VisibilityClipper, 0x0052f570, ret 0x1c):
 // camera, view matrix, box centre and half extent, screen rectangle,
 // corner count, and an unused last argument. Declared as
@@ -792,10 +780,11 @@ void D3DIMSoultreeObject::DrawCurrentLod()
                     SoultreeVertexGroup* group = &surface->groups[j];
                     int vertices = group->vertexCount;
                     Vector3 position;
-                    ((DrawSoultreeObjectView*)group->node)->GetPositionIn(0, &position);
+                    group->node->GetPositionIn(0, reinterpret_cast<Vec3*>(&position));
                     Vector3 direction = position - lightPosition;
                     direction = NormalizedByCall(direction);
-                    direction = ((DrawSoultreeObjectView*)group->node)->WorldToLocalDirection(&direction);
+                    reinterpret_cast<Vec3&>(direction) =
+                        group->node->WorldToLocalDirection(reinterpret_cast<const Vec3&>(direction));
                     for (int v = 0; v < vertices; v++) {
                         const Vector3& normal = group->normals[v];
                         group->vertices[v].tu =
@@ -814,9 +803,10 @@ void D3DIMSoultreeObject::DrawCurrentLod()
                     SoultreeVertexGroup* group = &surface->groups[j];
                     int vertices = group->vertexCount;
                     Vector3 position;
-                    ((DrawSoultreeObjectView*)group->node)->GetPositionIn(0, &position);
+                    group->node->GetPositionIn(0, reinterpret_cast<Vec3*>(&position));
                     Vector3 direction = NormalizedByCall(position - eye);
-                    direction = ((DrawSoultreeObjectView*)group->node)->WorldToLocalDirection(&direction);
+                    reinterpret_cast<Vec3&>(direction) =
+                        group->node->WorldToLocalDirection(reinterpret_cast<const Vec3&>(direction));
                     for (int v = 0; v < vertices; v++) {
                         const Vector3& normal = group->normals[v];
                         group->vertices[v].tu =
@@ -842,7 +832,7 @@ void D3DIMSoultreeObject::DrawCurrentLod()
                     (Vector3&)eye = ((RenderTarget*)renderContext)->currentCamera->eyePosition;
                 for (int j = 0; j < surface->groupCount; j++) {
                     SoultreeVertexGroup* group = &surface->groups[j];
-                    Vector3 localEye = ((DrawSoultreeObjectView*)group->node)->WorldToLocalPoint(&eye);
+                    Vec3 localEye = group->node->WorldToLocalPoint(reinterpret_cast<const Vec3&>(eye));
                     if (!count)
                         continue;
                     for (int v = 0; v < group->vertexCount; v++) {
@@ -854,7 +844,7 @@ void D3DIMSoultreeObject::DrawCurrentLod()
                         Vector3 reflected;
                         ReflectAndNormalize(&direction, &group->normals[v], &reflected);
                         if (drawReflections) {
-                            Vector3 world = ((DrawSoultreeObjectView*)group->node)->LocalToWorldDirection(&reflected);
+                            Vec3 world = group->node->LocalToWorldDirection(reinterpret_cast<const Vec3&>(reflected));
                             line[0].position.x = group->vertices[v].position.x;
                             line[0].position.y = group->vertices[v].position.y;
                             line[0].position.z = group->vertices[v].position.z;
@@ -919,7 +909,7 @@ void D3DIMSoultreeObject::DrawCurrentLod()
             }
             case 5: {
                 Vector3 center(0.0f, 15.8278f, 0.0f);
-                ((DrawSoultreeObjectView*)this)->GetPositionIn(0, &center);
+                GetPositionIn(0, reinterpret_cast<Vec3*>(&center));
                 center.y = 15.8278f;
                 Vector3 circle[16];
                 int i;
@@ -1042,13 +1032,14 @@ void D3DIMSoultreeObject::DrawCurrentLod()
                 static float exponent = 20.0f;             // 0x00568940
                 for (int j = 0; j < surface->groupCount; j++) {
                     SoultreeVertexGroup* group = &surface->groups[j];
-                    Vector3 lightPosition = ((DrawSoultreeObjectView*)group->node)->WorldToLocalDirection(&light->lightPosition);
-                    Vector3 eye = ((DrawSoultreeObjectView*)group->node)->WorldToLocalDirection(
-                        &((RenderTarget*)renderContext)->currentCamera->eyePosition);
+                    Vec3 lightPosition = group->node->WorldToLocalDirection(
+                        reinterpret_cast<const Vec3&>(light->lightPosition));
+                    Vec3 eye = group->node->WorldToLocalDirection(reinterpret_cast<const Vec3&>(
+                        ((RenderTarget*)renderContext)->currentCamera->eyePosition));
                     for (int v = 0; v < group->vertexCount; v++) {
                         Vector3 position = group->vertices[v].position;
-                        Vector3 toLight = Normalized(position - lightPosition);
-                        Vector3 toEye = Normalized(eye - position);
+                        Vector3 toLight = Normalized(position - reinterpret_cast<Vector3&>(lightPosition));
+                        Vector3 toEye = Normalized(reinterpret_cast<Vector3&>(eye) - position);
                         Vector3& normal = group->normals[v];
                         float twiceDot =
                             (toLight.x * normal.x + toLight.y * normal.y + toLight.z * normal.z) * 2.0f;
@@ -1400,7 +1391,7 @@ int D3DIMSoultreeObject::PrepareGeometry()
         if (subtreeDirty)
             UpdateSubtreeBounds();
         Matrix4 world;
-        ((DrawSoultreeObjectView*)this)->GetMatrixIn(0, &world);
+        GetMatrixIn(0, &world);
         Vector3 center;
         Vector3 extents;
         GetSubtreeBounds(reinterpret_cast<Vec3*>(&center), reinterpret_cast<Vec3*>(&extents));

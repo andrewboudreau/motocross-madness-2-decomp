@@ -1854,9 +1854,10 @@ the source, including inline header helpers and the bound COMDATs. All are clean
 needed a fix. The emu counts below are at 0x007f with seed 11.
 - Forwarders to the soultree.obj transforms, which are strict-exact: 0x004fd5c0 and
   0x004fd710 (CarProcedural and KrustyBike::ApplyWorldTorque now call them on SoultreeObject directly), 0x004fd660 (the constraint unit now calls it on SoultreeObject directly), SoultreeObject 0x004fd7f0. The forwarders are
-  `TireNode::LocalToWorldDirection`, the
-  `DrawSoultreeObjectView` views and, until it became a link alias, Group4_SoultreeBridge. They
-  call those bodies and copy the result back, with no arithmetic of their own.
+  `TireNode::LocalToWorldDirection` and, until they were retired, the drawing function's
+  `DrawSoultreeObjectView` forwarders (D3DIMSoulTree.cpp now calls SoultreeObject directly) and
+  Group4_SoultreeBridge (now a link alias). They call those bodies and copy the result back,
+  with no arithmetic of their own.
 - `Camera::SetFrame` 0x0042e9b0 (ProjectedShadow now calls it on its `ShadowCamera`). The inline normalise
   at 0x0042e9e1..0x0042ea03 sums (x\*x + y\*y) + z\*z and compares the unrounded sum with 1.0,
   as src/reconstructed/Camera.cpp writes it. `FastInvSqrt` is bound to 0x00460c00. Case

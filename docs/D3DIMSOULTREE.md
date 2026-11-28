@@ -75,11 +75,14 @@ bodies they are:
   grouping the emu case differs from retail in 17 of 480 runs (751 against
   758 bytes for the scored form, which is the one kept).
 
-Header note: adding the node calls `0x004fca80`, `0x004fc9a0`,
-`0x004fd710`, `0x004fd7f0` and `0x004fd5c0` to `SoultreeObject` here
-changes VC6's operand order in SceneManager.cpp's exact `0x004eb570`, so
-the unit declares them on a local view class (`DrawSoultreeObjectView`,
-forwarded by `src/bringup/Group5_SoultreeNodeView.cpp`).
+Node calls: the drawing function and PrepareGeometry call GetMatrixIn
+`0x004fca80`, GetPositionIn `0x004fc9a0`, WorldToLocalDirection `0x004fd710`,
+WorldToLocalPoint `0x004fd7f0` and LocalToWorldDirection `0x004fd5c0`
+directly on `SoultreeObject` (core/SoultreeObject.h), the soultree.cpp
+bodies. Those take and return Vec3, so the unit's Vector3 locals are cast
+at the call sites. No declaration is added to D3DIMSoulTree.h or
+SoultreeObject.h: more declarations there change VC6's operand order in
+SceneManager.cpp's exact `0x004eb570`.
 
 ## Function names
 

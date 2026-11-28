@@ -217,7 +217,6 @@ CLEAN_CASES = {
     'radar_draw_track_outline': 150,
     'tire_cross': 60,
     'shock_scale_call': 60,
-    'soultree_local_to_world_direction': 60,
     'tire_node_local_to_world_direction': 60,
     'shock_inline_clamp_and_step': 150,
     'shock_rotating_clamp_and_step': 150,

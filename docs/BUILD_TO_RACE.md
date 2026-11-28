@@ -117,7 +117,7 @@ case. The other 73 were checked:
 | `RotatingShock::ClampAndStep` (then the bring-up `BikeQ::ClampAndStep`; now Shock.cpp's body) | 0x4fa8b0 | Case `shock_rotating_clamp_and_step`, non-finite angles included; 800 runs. |
 | `Vec3Normalize` (CollisionVec3) | 0x5087b0 | Case `collision_vec3_normalize`, unit and zero vectors; 800 runs. |
 | `TireCross`, `ShockScaleCall` | 0x515600, 0x5015b0 | Cases `tire_cross`, `shock_scale_call` (forwarders; a swapped operand order is caught in 63 of 100 runs); 400 runs each. |
-| `LocalToWorldDirection` (two views) | 0x4fd5c0 | Cases `soultree_local_to_world_direction`, `tire_node_local_to_world_direction`; 400 runs each. |
+| `LocalToWorldDirection` (TireNode view) | 0x4fd5c0 | Case `tire_node_local_to_world_direction`; 400 runs. The drawing function's view and its case `soultree_local_to_world_direction` were retired: D3DIMSoulTree.cpp calls the SoultreeObject body directly. |
 | `Vec3::operator-=` | 0x413160 | Strict exact (33 of 33 bytes). |
 | `MainDlg::HandleEvent` | 0x44b200 | Instruction review: retail overlaps the two `connections[5]` arrays (frame 0x6c4 against 0xc64), keeps the constant 1 in `edi`, and swaps the operands of one 16-byte `repe cmpsd` equality test. |
 | `MPRaceInfoDlg::HandleEvent` | 0x4513a0 | Instruction review: register choice, and one reload of `g_TrackGame+0x570` with no store or call in between. |
