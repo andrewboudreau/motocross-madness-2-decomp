@@ -3,6 +3,7 @@
 
 #include "Wrecker.h"
 #include "../krusty2/core/SoultreeObject.h"
+#include "../krusty2/effects/ParticleManager.h"
 #include "../krusty2/motion/Motion.h"
 
 #include <math.h>
@@ -486,12 +487,12 @@ void Wrecker::SprayContactParticles(Vector3 from, Vector3 to, Vector3 normal, fl
     Vector3 step = delta * inv;                           // the step per particle
     // The gravity drift per particle; nested, the inner temporary shares the
     // particle drift's slot as retail's does.
-    Vector3 dirStep = WreckerScaleCtorCall(WreckerScaleCtorCall(particles->gravity, frameTime), inv);
+    Vector3 dirStep = WreckerScaleCtorCall(WreckerScaleCtorCall(reinterpret_cast<const Vector3&>(particles->gravity), frameTime), inv);
     for (int i = 0; i < count; i++) {
         if (particles->activeCount != 1000) {
             WRECKER_NEXT_PARTICLE()->age = 0.0f;
             Vector3 along = WreckerScaleCtorCall(step, (float)i);
-            WRECKER_NEXT_PARTICLE()->position = WreckerAddCtorCall(along, from);
+            reinterpret_cast<Vector3&>(WRECKER_NEXT_PARTICLE()->position) = WreckerAddCtorCall(along, from);
             WRECKER_NEXT_PARTICLE()->frame = sprayFrame;
             WRECKER_NEXT_PARTICLE()->size = WRECKER_RANDOM_TABLE() * 0.15f;
             WRECKER_NEXT_PARTICLE()->growth = WRECKER_RANDOM_TABLE() * 0.3f;
@@ -503,7 +504,7 @@ void Wrecker::SprayContactParticles(Vector3 from, Vector3 to, Vector3 normal, fl
             Vector3 sideways = WreckerScaleCtorCall(spread, jitter);
             Vector3 sum = WreckerAddCtorCall(sideways, scaled);
             Vector3 result;
-            WRECKER_NEXT_PARTICLE()->velocity = *WreckerAddCall(&result, &sum, &drift);
+            reinterpret_cast<Vector3&>(WRECKER_NEXT_PARTICLE()->velocity) = *WreckerAddCall(&result, &sum, &drift);
             WRECKER_NEXT_PARTICLE()->flags = 0x14;
             particles->activeCount++;
         }
@@ -555,7 +556,8 @@ void Wrecker::EmitProbeTrail(Vector3 from, Vector3 to, float frameTime) {
     Vector3 step = delta / (float)count;
     for (int i = 0; i < count; i++) {
         Vector3 position = from + step * (float)i;
-        particles->AddParticle(age, &position, trailFrame, speed, lifetime, speed + speed, 10, 0xffffff);
+        particles->AddParticle(age, reinterpret_cast<const ParticleVec3*>(&position), trailFrame, speed, lifetime,
+                               speed + speed, 10, 0xffffff);
         if (++trailFrame >= 13)
             trailFrame = 0;
     }

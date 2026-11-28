@@ -18,7 +18,7 @@ import random
 import struct
 
 RETAIL_VA = 0x004aced0
-SYMBOL = '?DispatchMessages@NetworkInterface@@QAEXH@Z'
+SYMBOL = '?DispatchMessages@NetworkInterface@@QAEXM@Z'
 SOURCE = 'src/reconstructed/Net.cpp'
 TRACK_GAME = 0x0056e26c
 MESSAGE_SIZE = 0x8f4

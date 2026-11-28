@@ -80,8 +80,9 @@ int Game::Tick() {
     if (delta > 0.2f)
         delta = 0.2f;
 
-    // These existing provisional declarations carry opaque DWORD arguments.
-    // The caller passes float bits, not a numeric float-to-int conversion.
+    // ControlInterface's provisional declaration carries an opaque DWORD
+    // argument. The caller passes float bits, not a numeric float-to-int
+    // conversion.
     union { float seconds; int bits; } argument;
     argument.seconds = delta;
     if (controlInterface)
@@ -89,7 +90,7 @@ int Game::Tick() {
     if (!inputSuspended) {
         unsigned int start = ReadClock();
         if (network)
-            network->Update(argument.bits);
+            network->Update(delta);
         unsigned int now = ReadClock();
         g_NetTime = now - start;
         start = now;

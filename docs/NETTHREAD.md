@@ -35,14 +35,19 @@ reallocation assigns, and only the place of its reload differs (retail has
 one load at the loop head, VC6 here one before the loop and one after the
 dispatch).
 
-Open question: `0x004af6a0` passes a float (`fstp [esp]`) to
-NetworkInterface `0x004acc50`, but Net.cpp's body uses that argument as an
-int, as the initial value of the lost player id. The real parameter type
-is unresolved. NetThread.h therefore calls the method through
-`NetKeepAliveView`. A float overload in Net.h was tried and
-rejected: it makes VC6 swap the operands of `availPhys + availPageFile` in
-TrackGame slot 1 (`0x00520ab0`). Equal-cost commutative operand order can
-depend on unrelated declarations in included headers.
+The keep-alive pass calls `NetworkInterface::ResendPending(float elapsed)`
+directly. `0x004af6a0` pushes a float (`fstp [esp]` at `0x004af806`), and
+Game::Tick pushes its clamped frame time (the dword it stores to
+Game+0x2f0) to `NetworkInterface::Update` `0x004acde0`, which hands it on
+through DispatchMessages to ResendPending, so the chain Update,
+DispatchMessages, ResendPending, FlushHeldMessages, NetFile::Update and
+NetPendingList::ResendExpired takes `float elapsed` (none of them computes
+with it). The load of the argument into ebp before ResendPending's loop is
+VC6's register for the uninitialised `lostPlayer`, not an `int` copy: with
+`int lostPlayer;` the float body is still 73/73. An extra float overload
+beside the int one (an earlier attempt) swapped `availPhys + availPageFile`
+in TrackGame slot 1 (`0x00520ab0`); retyping in place adds no declaration
+and keeps it 584/584.
 
 ## Forms tried
 

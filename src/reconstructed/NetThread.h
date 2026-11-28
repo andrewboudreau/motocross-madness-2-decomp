@@ -4,18 +4,6 @@
 // (0x004af680..0x004aff73). Every name is provisional (tier 3); the calling
 // conventions and argument order are decoded from retail call sites.
 
-// NetworkInterface 0x004acc50 as this file calls it. Retail pushes a float
-// here (0x004af809, fstp [esp]): the seconds since the previous keep-alive
-// pass. Net.cpp's body uses the argument as an int (the initial lost
-// player id), so its declaration keeps int and the true type is unresolved.
-// The thread calls the method through this view, as ControlInterface.h's
-// FollowCameraKeyboardDeviceView does for a similar conflict. A second overload in
-// Net.h is not used: it reorders operands in TrackGame slot 1.
-class NetKeepAliveView {
-public:
-    void ResendPending(float elapsed);  // 0x004acc50
-};
-
 // 0x004af680: NetworkInterface+0x78 read under the +0x60 lock.
 int IsKeepAliveRunning(NetworkInterface* net);  // 0x004af680
 

@@ -234,7 +234,7 @@ public:
     ~NetPendingList();                                  // 0x004aae30
     void Append(int type, short sequence, void* data, unsigned int size, int from,  // 0x004aae50
                                int to);
-    long ResendExpired(NetworkInterface* net, int unused);  // 0x004aaf20
+    long ResendExpired(NetworkInterface* net, float elapsed);  // 0x004aaf20; elapsed unused (the timers advance by g_TrackGame->frameTime)
     void Acknowledge(short sequence);  // 0x004aafe0
 
     NetPendingMessage* head;
@@ -273,7 +273,7 @@ class NetFile {
 public:
     NetFile();                                          // 0x004ab0f0
     ~NetFile();                                         // 0x004ab160
-    void Update(int unused);  // 0x004ab190
+    void Update(float elapsed);  // 0x004ab190; elapsed unused
     void SendNextChunk();  // 0x004ab1b0
     void BeginReceive(int id, NetFileHeader* header);  // 0x004ab280
     void ReceiveChunk(int id, NetFileChunk* chunk);  // 0x004ab380
@@ -351,7 +351,7 @@ class NetworkInterface {
 public:
     NetworkInterface();                                 // 0x004ab480
     ~NetworkInterface();                                // 0x004ab570
-    virtual void FlushHeldMessages(int value);        // 0x004ad050
+    virtual void FlushHeldMessages(float elapsed);    // 0x004ad050; elapsed unused
 
     long Initialize(int mode);  // 0x004ab6b0
     long ConnectUsingLobby();  // 0x004ab960
@@ -380,13 +380,13 @@ public:
     void RemovePlayer(int player);  // 0x004aca80
     void QueueMessage(void* data, unsigned int size, int from, int to, int flags);  // 0x004acb00
     void SendGuaranteed(int type, void* data, int size, int from);  // 0x004acbc0
-    void ResendPending(int value);  // 0x004acc50
+    void ResendPending(float elapsed);  // 0x004acc50
     void AcknowledgeMessage(short sequence);  // 0x004acca0
     int CreateGroup(unsigned long player);  // 0x004accd0
     int FindGroup();  // 0x004acd20
     void GetSessionFlags(unsigned long* flags);  // 0x004acdb0
-    int Update(int value);  // 0x004acde0
-    void DispatchMessages(int value);  // 0x004aced0
+    int Update(float elapsed);  // 0x004acde0: Game::Tick passes its clamped frame time
+    void DispatchMessages(float elapsed);  // 0x004aced0
     static int __stdcall EnumGroupsCallback(unsigned long id, unsigned long type,  // 0x004acd70
                                                const NetName* name, unsigned long flags,
                                                void* context);

@@ -77,38 +77,12 @@ struct WreckerD3DMatrix {
 // and sets manualStep (+0x38) so slot 10 leaves the stepping to Wrecker.
 #include "../krusty2/gravity/SelectiveGravityModel.h"
 
-// One particle of the manager below (the layout src/krusty2/effects/
-// ParticleManager.h documents; 0x00531740 fills position, frame, age,
-// lifetime, size, growth, flags and velocity directly).
-struct WreckerParticleView {
-    Vector3 position;          // +0x00 position
-    int color;                 // +0x0c colour
-    int frame;                 // +0x10 sprite frame
-    float age;                 // +0x14 age
-    float lifetime;            // +0x18 lifetime
-    float size;                // +0x1c size
-    float growth;              // +0x20 growth per tick
-    unsigned char field_0x24[0x34 - 0x24];
-    unsigned int flags;        // +0x34 flags (4: integrate position, 0x10: gravity)
-    Vector3 velocity;          // +0x38 velocity
-    void* vertex;              // +0x44
-};
-
-// Particle system at Wrecker+0x11c (Bike hands over its own; RTTI
-// ParticleManager). 0x004baa50 (thiscall, ret 0x20) adds one particle;
-// 0x00531740 takes the next free entry of particles itself.
-class WreckerParticleManagerView : public GameObject {
-public:
-    int AddParticle(float age, const Vector3* position, int frame, float size,
-                              float lifetime, float growth, unsigned int flags, int color);
-
-    int activeCount;           // +0x2c live particle count (the next free index)
-    int visibleCount;                         // +0x30  ParticleManager +0x30 (src/krusty2/effects/ParticleManager.h); not read here
-    unsigned char field_0x34[0x40 - 0x34];
-    WreckerParticleView* particles[1000]; // +0x40
-    unsigned char field_0xfe0[0x1f98 - 0xfe0];
-    Vector3 gravity;           // +0x1f98 gravity (0, -64, 0)
-};
+// Particle system at Wrecker+0x11c: Bike's loader hands over the
+// ParticleManager its emitters use (src/krusty2/effects/ParticleManager.h).
+// 0x00531da0 adds particles through AddParticle 0x004baa50; 0x00531740
+// fills the next free Particle of the table itself (activeCount +0x2c,
+// particles +0x40, gravity +0x1f98).
+class ParticleManager;
 
 // 0x00460b50 (cdecl): table-driven square root (FollowCamera.h declares the
 // same function).
@@ -185,7 +159,7 @@ public:
     int* probeHits;            // +0x108 one per collision-model probe
     Vector3 pushImpulse;       // +0x10c
     float pushScale;           // +0x118
-    WreckerParticleManagerView* particles; // +0x11c
+    ParticleManager* particles; // +0x11c
     int trailFrame;            // +0x120 particle frame, cycles 0..12
     int sprayFrame;            // +0x124
     float randomTable[256];    // +0x128 random values in [0, 1)

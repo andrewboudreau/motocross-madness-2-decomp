@@ -180,7 +180,7 @@ void NetPendingList::Append(int type, short sequence, void* data,
 }
 
 // 0x004aaf20: resends every message unacknowledged for four seconds.
-long NetPendingList::ResendExpired(NetworkInterface* net, int unused)
+long NetPendingList::ResendExpired(NetworkInterface* net, float elapsed)
 {
     long result = 0;
     for (NetPendingMessage* message = head; message; message = message->next) {
@@ -271,7 +271,7 @@ NetFile::~NetFile()
 }
 
 // 0x004ab190
-void NetFile::Update(int unused)
+void NetFile::Update(float elapsed)
 {
     if (sending)
         SendNextChunk();
@@ -1078,15 +1078,20 @@ void NetworkInterface::SendGuaranteed(int type, void* data, int size, int from)
 }
 
 // 0x004acc50: resends pending messages; drops a player DirectPlay no longer knows.
-void NetworkInterface::ResendPending(int value)
+// Both callers push a float (Update's frame time, the receive thread's
+// seconds since the last keep-alive pass at 0x004af809). lostPlayer is set
+// only when a player is lost; VC6 keeps the uninitialised id in ebp and
+// seeds it with the argument dword (`mov ebp, [esp+0x14]`), which is all
+// that retail's load of the argument before the loop is.
+void NetworkInterface::ResendPending(float elapsed)
 {
     int lost = 0;
     NetPlayer* player = players;
     if (!player)
         return;
-    int lostPlayer = value;
+    int lostPlayer;
     for (; player; player = player->next) {
-        if (player->pending->ResendExpired(this, value) == NET_DPERR_INVALIDPLAYER) {
+        if (player->pending->ResendExpired(this, elapsed) == NET_DPERR_INVALIDPLAYER) {
             lostPlayer = player->id;
             lost = 1;
         }
@@ -1164,15 +1169,15 @@ void NetworkInterface::GetSessionFlags(unsigned long* flags)
 }
 
 // 0x004acde0: the per-frame update.
-int NetworkInterface::Update(int value)
+int NetworkInterface::Update(float elapsed)
 {
     EnterCriticalSection(NET_LOCK(lock));
-    DispatchMessages(value);
+    DispatchMessages(elapsed);
     if (connectionMode == 3 && isHost)
-        FlushHeldMessages(value);
+        FlushHeldMessages(elapsed);
     for (int i = 0; i < files.m_count; i++) {
         NetFile* file = files.Get(i);
-        file->Update(value);
+        file->Update(elapsed);
         if (file->sent || file->received) {
             files.Remove(file);
             if (file)
@@ -1195,7 +1200,7 @@ static inline NetMessage& MessageAt(NetMessage* messages, int offset)
 // Not exact (361 of 370 bytes: in the system-message block retail loads the
 // sender before forming the message pointer with `lea`, VC6 forms it first;
 // docs/NET.md lists the forms tried).
-void NetworkInterface::DispatchMessages(int value)
+void NetworkInterface::DispatchMessages(float elapsed)
 {
     char name[16];
     char systemName[16];
@@ -1203,7 +1208,7 @@ void NetworkInterface::DispatchMessages(int value)
     int last;
     int more;
 
-    ResendPending(value);
+    ResendPending(elapsed);
     if (nextMessage || wrappedMessages) {
         if (!wrappedMessages) {
             index = 0;
@@ -1255,7 +1260,7 @@ void NetworkInterface::DispatchMessages(int value)
 }
 
 // 0x004ad050 (slot 0): sends the held messages to the group.
-void NetworkInterface::FlushHeldMessages(int)
+void NetworkInterface::FlushHeldMessages(float)
 {
     for (int i = 0; i < heldMessages.m_count; i++) {
         NetIncomingMessage* message = heldMessages.Get(i);

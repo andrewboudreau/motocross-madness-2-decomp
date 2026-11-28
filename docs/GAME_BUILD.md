@@ -914,10 +914,10 @@ body was unregistered:
   |---|---|---|---|
   | 0x004b8d90 | `VehicleImpactSink::SetPosition(Vec3, float)` | `DustParticleEmitter::SetPosition` | body in `Group3_VehicleStubs.cpp` |
   | 0x004b9dc0 | `VehicleImpactSink::SetPosition(Vec3)` | `SparkParticleEmitter::SetPosition` | body in `Group3_VehicleStubs.cpp` |
-  | 0x004baa50 | `WreckerParticleManagerView::AddParticle` | `ParticleManager::AddParticle` | `Group1_WreckerParticles.cpp` |
 
-  Each stand-in's bytes equalled the provider's apart from relocations, and
-  the linker already folded each pair (`/OPT:ICF`). The argument dwords and
+  (wrecker.cpp now calls `ParticleManager::AddParticle` 0x004baa50 itself,
+  so its `WreckerParticleManagerView` alias is gone.) Each stand-in's bytes
+  equalled the provider's apart from relocations, and the linker already folded each pair (`/OPT:ICF`). The argument dwords and
   the `ret` count agree, and neither side adjusts `this`. Every linked score
   is unchanged. An alias binds a call to the code at one retail address. It
   does not prove that the receivers have the same class: the `Vec3` setter

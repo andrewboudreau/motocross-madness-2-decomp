@@ -15,8 +15,15 @@ struct InputButtonState;
 
 // Global at 0x0056c470: initialised .data pointing at the HiResMeter
 // 0x0067b468 (GUIManager.h; g_HiResMeterInstance). Game's initialiser adds
-// it as a child of the root and calls its slot 5 when +0x2c is set. A view
-// rather than HiResMeter itself, so Game.cpp keeps its own declarations.
+// it as a child of the root and calls its slot 5 when +0x2c is set. The
+// pointer is a HiResMeter* (RTTI HiResMeter, GameObject base at offset 0).
+// Deferred: retyping it and deleting this view moves
+// ManagedTextureGroup::DrawSelection 0x50ef70 (1834/1834) off its
+// declaration-count window whether Game.h forward-declares HiResMeter (1029),
+// includes HiResMeter.h (1025) or HiResMeter.h declares the global (1828);
+// it also moves FillFileList 0x4f17a0 and CreateRacers 0x419970, which
+// pairing with DlgProcs.h's DialogUIAnimView restores. DrawSelection's
+// headers hold no other view to pair it with.
 class GameHiResMeterView : public GameObject {
 public:
 

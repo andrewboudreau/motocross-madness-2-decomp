@@ -3,7 +3,7 @@
   "?NextPlayer@NetworkInterface@@QAEPAVNetPlayer@@PAH@Z": "0x004ac7c0",
   "?Send@NetworkInterface@@QAEHHPAXHHH@Z": "0x004ac830",
   "?RemovePlayer@NetworkInterface@@QAEXH@Z": "0x004aca80",
-  "?ResendPending@NetKeepAliveView@@QAEXM@Z": "0x004acc50",
+  "?ResendPending@NetworkInterface@@QAEXM@Z": "0x004acc50",
   "?ReportDirectPlayError@@YAXJPBDH@Z": "0x004ad5a0",
   "?IsKeepAliveRunning@@YAHPAVNetworkInterface@@@Z": "0x004af680",
   "?ReceiveThreadProc@@YGIPAX@Z": "0x004af6a0",

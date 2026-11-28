@@ -82,8 +82,7 @@ unsigned int __stdcall ReceiveThreadProc(void* arg)
                 int message[2];
                 message[1] = net->localPlayer;
                 net->Send(0x4b, message, 8, net->localPlayer, 0);
-                ((NetKeepAliveView*)net)->ResendPending(
-                    (float)(s_KeepAliveTime - s_LastKeepAliveTime) / 1000.0f);
+                net->ResendPending((float)(s_KeepAliveTime - s_LastKeepAliveTime) / 1000.0f);
                 s_LastKeepAliveTime = s_KeepAliveTime;
                 float interval = net->keepAliveInterval;
                 LeaveCriticalSection(NET_LOCK(net->keepAliveLock));

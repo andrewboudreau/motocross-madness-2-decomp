@@ -88,7 +88,10 @@ void Game::ResetClock() {
     frameClock = ReadClock(); previousFrameClock = frameClock;
 }
 int ControlInterface::DispatchInput(int bits) { Record(4, this, bits); Touch(4); return -8; }
-int NetworkInterface::Update(int bits) { Record(5, this, bits); Touch(5); return 0; }
+int NetworkInterface::Update(float elapsed) {
+    union { float f; int i; } arg; arg.f = elapsed;
+    Record(5, this, arg.i); Touch(5); return 0;
+}
 void HiResMeter::ClearTickTimes() {
     Record(7, this, 0);
     for (int i = 0; i < timerCount; ++i) {
