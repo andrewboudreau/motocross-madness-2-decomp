@@ -8132,6 +8132,15 @@ CASES = [
         'reason': 'entries copied through the inline Set; j and found initialised in the for header',
     },
     {
+        'name': 'dirlist.cpp DirectoryList entry count',
+        'bindings': 'src/reconstructed/dirlist.bindings.json',
+        'source': 'src/reconstructed/dirlist.cpp',
+        'symbol': '?GetCount@DirectoryList@@QAEHXZ',
+        'target_va': '0x004673b0',
+        'target_size': 4,
+        'reason': 'count at +0x04; folded with the identical FontTexture.cpp accessor, which SelectGamePicProcs.cpp calls',
+    },
+    {
         'name': 'ResourceManager.cpp global init 0x4e8d30',
         'bindings': 'src/reconstructed/ResourceManager.bindings.json',
         'source': 'src/reconstructed/ResourceManager.cpp',
@@ -11874,6 +11883,15 @@ CASES = [
         'target_va': '0x004b5ec0',
         'target_size': 140,
         'reason': 'releases shared texture 0x689110, text +0x38, icon service +0x3c',
+    },
+    {
+        'name': 'overlay.cpp Overlay slot 10 base tick',
+        'bindings': 'src/reconstructed/Overlay.bindings.json',
+        'source': 'src/reconstructed/Overlay.cpp',
+        'symbol': '?Tick@Overlay@@UAEHM@Z',
+        'target_va': '0x00499ae0',
+        'target_size': 13,
+        'reason': 'Overlay vtable 0x555a28 slot 10; returns GameObject::Tick; folded with the identical krustyui.cpp body',
     },
     {
         'name': 'overlay.cpp Overlay 0x4b5f50 setup',

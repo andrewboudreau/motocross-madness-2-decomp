@@ -47,6 +47,12 @@ float Vehicle::GetLeanAngle() { return leanAngle; }
 float Vehicle::GetMaxSteerAngle() { return steerState->maxAngle; }
 float Vehicle::ComputeSlideAngle(float threshold) { return 0.0f; }
 
+// Slots 65 and 91 do nothing here (Bike overrides both). The linker folded them
+// (/OPT:ICF) into the shared empty stubs 0x00464e80 (`ret 4`) and 0x00464e90 (`ret`),
+// so their places in this unit are not known.
+void Vehicle::ApplyLaunchImpulse(float) {}
+void Vehicle::ApplyAirControl() {}
+
 int Vehicle::ClassifyGroundContact(float slideAngle)
 {
     return anyWheelInContact && crashState == 0;
@@ -1708,6 +1714,13 @@ void Vehicle::RotateByAngularVelocity()
 }
 
 // ---- wave 3: non-virtual helpers ----
+
+// 0x00478fe0 (folded with other `xor eax, eax; ret` bodies, so its place here is not
+// known): the base vehicle never reports a crash of its own.
+int Vehicle::DetectCrash()
+{
+    return 0;
+}
 
 // 0x00526830: asks the shared stub 0x00478fe0 (always zero here) whether the vehicle crashed; when it
 // did, the control state is cleared and the horizontal heading is recorded (tier 3 reading;

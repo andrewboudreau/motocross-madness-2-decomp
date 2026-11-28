@@ -6,5 +6,5 @@ from tools.emu_cases.halve555 import cases, setup  # noqa: F401
 
 RETAIL_VA = 0x004cea10
 SYMBOL = '?Halve565@@YAHPAX0HHHHHG@Z'
-SOURCE = 'src/bringup/Group0_Pixtrans.cpp'
+SOURCE = 'src/reconstructed/Pixtrans.cpp'
 FPCWS = (0x027f,)   # integer only

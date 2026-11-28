@@ -57,5 +57,6 @@
   "__stricmp": "0x00536070",
   "_qsort": "0x00534426",
   "_sprintf": "0x00534aaf",
-  "_strncpy": "0x00534b10"
+  "_strncpy": "0x00534b10",
+  "?GetCount@DirectoryList@@QAEHXZ": "0x004673b0"
 }

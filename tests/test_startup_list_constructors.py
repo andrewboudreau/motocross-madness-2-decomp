@@ -129,7 +129,7 @@ class StartupListConstructorTests(unittest.TestCase):
                                  case['target_size'], ROOT/case['bindings'])
                 self.assertTrue(result['strict_exact'], (case, result))
                 strict += 1
-            self.assertEqual(strict, 102)
+            self.assertEqual(strict, 103)
             self.assertTrue(any(s.name == '__imp__lstrlenA@4' for s in compiled[SOURCES[1]].symbols))
             fixture = 'tests/fixtures/startup_list_constructors.cpp'
             compile_source(fixture, ROOT/fixture, ('--include', str(ROOT/'src/reconstructed'), '--extra', '/Od'))

@@ -2,9 +2,9 @@
   "baseline": "5a590967; actual published build-qvu1tpyh objects and unchanged same-path BVH aggregate. All old nondebug bytes/flags and relocation destinations retained; Vehicle has one verified external-to-canonical operator name join and adds a separately strict canonical33B COMDAT. Complete recognized __FILE__ paths, and the literal names that spell them, normalized to source suffix only.",
   "objects": {
     "src/krusty2/vehicle/Vehicle.cpp": {
-      "sections": 150,
+      "sections": 153,
       "relocations": 720,
-      "sha256": "68cec170d2358e41dddc232bf0ba2e24ace6ac5b8a385690ab7e6d8fb61507c7"
+      "sha256": "95e64380df6059fc1796b2af45644120004187a06b1c42473fca964c36a64394"
     },
     "src/krusty2/bvh/BoundingBoxTreeQuery.cpp": {
       "sections": 64,

@@ -1555,6 +1555,13 @@ int DrawableGridNode::TestVisibility(void* stream, void* screenMatrix)
     return WalkVisibilityQuadrants(stream, screenMatrix, &center.x, &extent.x, 0, 0, 16, 0, 0, 0);
 }
 
+// Called when the visibility walk clears a block's mask; it does nothing. The
+// linker folded it (/OPT:ICF) into the shared empty body 0x00464e90, so its
+// place in this unit is not known; it precedes its first caller.
+void DrawableGridNode::OnMaskCleared()
+{
+}
+
 // 0x00481de0. Not exact (73 of 1750 bytes, 1712 compiled: VC6 keeps extent in
 // ebp and screenMatrix in ebx where retail keeps size in ebx and screenMatrix in
 // ebp, and places the subdivision block after the general tests;

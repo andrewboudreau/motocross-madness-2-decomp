@@ -6,9 +6,9 @@
   },
   "objects": {
     "src/reconstructed/Pixtrans.cpp": {
-      "sections": 54,
+      "sections": 57,
       "relocations": 153,
-      "sha256": "fe875252176d6e691e70b8b5d702e01c3a6691fc748b5218c31edc110696454f"
+      "sha256": "aba00a0ba0690b2b3df0477870e9993d1a5ebea8c1a5e71547131e21167c8034"
     }
   },
   "getter_calls": {

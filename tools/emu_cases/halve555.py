@@ -9,7 +9,7 @@ import struct
 
 RETAIL_VA = 0x004ce5f0
 SYMBOL = '?Halve555@@YAHPAX0HHHHHG@Z'
-SOURCE = 'src/bringup/Group0_Pixtrans.cpp'
+SOURCE = 'src/reconstructed/Pixtrans.cpp'
 FPCWS = (0x027f,)   # integer only
 
 

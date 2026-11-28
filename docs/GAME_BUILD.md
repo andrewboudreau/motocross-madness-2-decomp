@@ -914,10 +914,18 @@ body was unregistered:
   |---|---|---|---|
   | 0x004b8d90 | `VehicleImpactSink::SetPosition(Vec3, float)` | `DustParticleEmitter::SetPosition` | body in `Group3_VehicleStubs.cpp` |
   | 0x004b9dc0 | `VehicleImpactSink::SetPosition(Vec3)` | `SparkParticleEmitter::SetPosition` | body in `Group3_VehicleStubs.cpp` |
+  | 0x005087b0 | `Vec3Normalize(CollisionVec3*, const CollisionVec3*)` | `Vec3Normalize(const Vec3&)` (Math3D.cpp) | body in `Group0_Math.cpp` |
+  | 0x004fd660 | `SoultreeObject::LocalToWorldPoint(const Vector3&)` | `SoultreeObject::LocalToWorldPoint(const Vec3&)` (soultree.cpp) | `Group4_SoultreeBridge.cpp`, `Group4_SoultreeReal.cpp` |
 
   (wrecker.cpp now calls `ParticleManager::AddParticle` 0x004baa50 itself,
-  so its `WreckerParticleManagerView` alias is gone.) Each stand-in's bytes
-  equalled the provider's apart from relocations, and the linker already folded each pair (`/OPT:ICF`). The argument dwords and
+  so its `WreckerParticleManagerView` alias is gone.) The two
+  `VehicleImpactSink` stand-ins' bytes equalled the provider's apart from
+  relocations, and the linker already folded each pair (`/OPT:ICF`). The `Vec3Normalize` stand-in was a
+  paraphrase; its provider is strict exact at 0x005087b0 and takes the same cdecl dwords
+  (hidden result pointer first, returned in eax), and `tools/emu_cases/collision_vec3_normalize.py`
+  agrees with retail in 800 runs. The `Vector3` `LocalToWorldPoint` stand-in forwarded to the
+  strict-exact `Vec3` body (168/168) and copied the result back; both are thiscall with a hidden
+  result pointer and one reference to a 12-byte vector. The argument dwords and
   the `ret` count agree, and neither side adjusts `this`. Every linked score
   is unchanged. An alias binds a call to the code at one retail address. It
   does not prove that the receivers have the same class: the `Vec3` setter
@@ -1847,7 +1855,7 @@ needed a fix. The emu counts below are at 0x007f with seed 11.
 - Forwarders to the soultree.obj transforms, which are strict-exact: 0x004fd5c0 and
   0x004fd710 (CarProcedural and KrustyBike::ApplyWorldTorque now call them on SoultreeObject directly), 0x004fd660 (the constraint unit now calls it on SoultreeObject directly), SoultreeObject 0x004fd7f0. The forwarders are
   `TireNode::LocalToWorldDirection`, the
-  `DrawSoultreeObjectView` views, Group4_SoultreeBridge and `Group4Veh_LocalToWorldPoint`. They
+  `DrawSoultreeObjectView` views and, until it became a link alias, Group4_SoultreeBridge. They
   call those bodies and copy the result back, with no arithmetic of their own.
 - `Camera::SetFrame` 0x0042e9b0 (ProjectedShadow now calls it on its `ShadowCamera`). The inline normalise
   at 0x0042e9e1..0x0042ea03 sums (x\*x + y\*y) + z\*z and compares the unrounded sum with 1.0,

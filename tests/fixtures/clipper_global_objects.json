@@ -35,9 +35,9 @@
       "sha256": "6fcd7c6482ae9f0d0b8da7de7aad5f2ec49eed4f424c8f144baeb3a3d07fef50"
     },
     "src/reconstructed/Griddraw.cpp": {
-      "sections": 99,
+      "sections": 100,
       "relocations": 615,
-      "sha256": "fdc8f9527230b2f61e15a25fe70dfcc5c4d4558dc841f2ca7c5211746cdf8f16"
+      "sha256": "2941572127181d3b7275decd7f9c0fd86b6b90369b1b968948b3fe8d7dca19d7"
     },
     "src/krusty2/shadow/D3DIMSoultreeShadow.cpp": {
       "sections": 47,

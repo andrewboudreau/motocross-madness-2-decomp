@@ -22,5 +22,6 @@
   "_kVec3YAxis": "0x00685060",
   "_kVec3ZAxis": "0x00685030",
   "_kVec3Zero": "0x00685040",
-  "?ProjectPoints@@YAXPAXPBXPBUMatrix4@@HHH@Z": "0x004a1a50"
+  "?ProjectPoints@@YAXPAXPBXPBUMatrix4@@HHH@Z": "0x004a1a50",
+  "?TransformPoints@@YAXPAXPBXPBUMatrix4@@HHH@Z": "0x004a1b00"
 }

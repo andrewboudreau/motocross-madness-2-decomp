@@ -14,6 +14,8 @@
     "?Vec3Add@@YA?AUVec3@@ABU1@0@Z": "?Vec3AddCall@@YAPAUVec3@@PAU1@PBU1@1@Z",
     "?Vec3Scale@@YA?AUVec3@@ABU1@M@Z": "?Vec3ScaleCall@@YAPAUVec3@@PAU1@PBU1@M@Z",
     "?Vec3LengthRef@@YAMABUVec3@@@Z": "?CollisionLength@@YAMPBUCollisionVec3@@@Z",
+    "?Vec3Normalize@@YAPAUCollisionVec3@@PAU1@PBU1@@Z": "?Vec3Normalize@@YA?AUVec3@@ABU1@@Z",
+    "?LocalToWorldPoint@SoultreeObject@@QAE?AUVector3@@ABU2@@Z": "?LocalToWorldPoint@SoultreeObject@@QAE?AUVec3@@ABU2@@Z",
     "?Vec3Equal@@YAHPBUVec3@@0@Z": "?VehVec3Equal@@YAHPBUVec3@@0@Z",
     "??0ContactVec3@@QAE@MMM@Z": "??0CollisionVec3@@QAE@MMM@Z",
     "??YContactVec3@@QAEAAU0@ABU0@@Z": "??YVec3AddAssignCall@@QAEAAU0@ABUVec3@@@Z",

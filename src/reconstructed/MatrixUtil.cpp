@@ -254,6 +254,56 @@ void ProjectPoints(void* target, const void* source, const Matrix4* matrix, int 
     }
 }
 
-// 0x004a1b00 is hand-scheduled x87 code (an ebp frame, fxch pairing and a
-// negative-index loop ending in `cmp edx, 0`): inline assembly in the
-// original, not reconstructed (src/reconstructed/D3DIMSoulTree.h declares it).
+// 0x004a1b00: transforms `count` points by `matrix` (p' = p * M, translation
+// row 3), writing through `target` and reading `source` (D3DIMSoulTree.h
+// declares it; its callers pass a fresh count * 12 byte buffer first and the
+// vertex array second). A zero `sourceStride` means `targetStride`; strides
+// are in bytes.
+// Not exact (4 of 196 bytes, 171 compiled). Retail is hand-scheduled x87 code, inline assembly in
+// the original: an ebp frame, both pointers biased to the end and indexed by
+// a negated offset that counts up to zero (`cmp edx, 0`), and all three sums
+// kept live at once with fxch pairing, where VC6 finishes one sum at a time
+// whatever the statement order (also tried: retail's product order, nine
+// named products, the translation added in the store). Moved in from the
+// Group0_Math.cpp bring-up. As in retail, the loop is a do-while that stops
+// when the source offset reaches the end (zero strides on both sides
+// transform one point); each sum adds the x, y and z products and then the
+// translation (compound adds: VC6 reassociates the single expression
+// `x*a + y*b + z*c + t` into `(y*b + z*c) + x*a + t`); and all three results
+// are computed before the first store, so an in-place transform reads the old
+// point. Checked differentially (tools/emu_cases/transform_points.py).
+void TransformPoints(void* target, const void* source, const Matrix4* matrix, int count,
+                     int targetStride, int sourceStride)
+{
+    if (count == 0)
+        return;
+    if (sourceStride == 0)
+        sourceStride = targetStride;
+    int fromOffset = count * sourceStride;
+    int toOffset = count * targetStride;
+    const unsigned char* fromEnd = (const unsigned char*)source + fromOffset;
+    unsigned char* toEnd = (unsigned char*)target + toOffset;
+    fromOffset = -fromOffset;
+    toOffset = -toOffset;
+    do {
+        const float* p = (const float*)(fromEnd + fromOffset);
+        float* out = (float*)(toEnd + toOffset);
+        float x = p[0] * matrix->m[0][0];
+        x += p[1] * matrix->m[1][0];
+        x += p[2] * matrix->m[2][0];
+        float y = p[0] * matrix->m[0][1];
+        y += p[1] * matrix->m[1][1];
+        y += p[2] * matrix->m[2][1];
+        float z = p[0] * matrix->m[0][2];
+        z += p[1] * matrix->m[1][2];
+        z += p[2] * matrix->m[2][2];
+        x += matrix->m[3][0];
+        y += matrix->m[3][1];
+        z += matrix->m[3][2];
+        out[0] = x;
+        out[1] = y;
+        out[2] = z;
+        toOffset += targetStride;
+        fromOffset += sourceStride;
+    } while (fromOffset != 0);
+}

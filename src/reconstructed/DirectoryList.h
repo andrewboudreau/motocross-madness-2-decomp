@@ -71,7 +71,7 @@ public:
     int Contains(const char* name);           // 0x0044a910: whether `name` is listed
     // 0x004673b0: the entry count (an out-of-line accessor that the linker
     // folded with FontTexture's identical 0x004673b0).
-    int GetFontName();
+    int GetCount();
     // 0x0044a960: deletes the directory `path` and everything below it.
     int DeleteTree(const char* path);
     void SortByName();                          // 0x0044aab0: sorts the entries by name

@@ -878,6 +878,14 @@ void SoultreeObject::CreateNode(SoultreeObject** out)
     *out = new(__FILE__, 0x3aa) SoultreeObject(1);
 }
 
+// Slot 5 (vtable 0x00557c18): the base node has no geometry of its own to bound,
+// so this does nothing (D3DIMSoultreeObject overrides it). The linker folded it
+// (/OPT:ICF) into the shared empty body 0x00464e90, so its place in this unit is
+// not known; it follows slot 4.
+void SoultreeObject::UpdateLocalBounds()
+{
+}
+
 // 0x004fe0a0.
 void SoultreeObject::GetLocalBounds(Vec3* center, Vec3* halfExtent)
 {

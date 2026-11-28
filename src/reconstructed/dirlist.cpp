@@ -278,6 +278,13 @@ int DirectoryList::Contains(const char* name) {
     return 0;
 }
 
+// The entry count. The linker folded this body (/OPT:ICF) into FontTexture.cpp's
+// identical `mov eax, [ecx + 4]; ret` at 0x004673b0, which SelectGamePicProcs.cpp
+// calls, so its place in dirlist.cpp is not known; it follows the class declaration.
+int DirectoryList::GetCount() {
+    return count;
+}
+
 // 0x0044a960
 int DirectoryList::DeleteTree(const char* path) {
     char child[MAX_PATH];

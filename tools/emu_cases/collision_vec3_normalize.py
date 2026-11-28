@@ -1,13 +1,15 @@
 """Vec3Normalize 0x005087b0, the CollisionVec3 pointer-form normaliser (tools/emu_diff.py case).
 
-src/bringup/Group0_Math.cpp re-implements it. Random vectors of any scale, exact unit
-vectors (the `squared == 1` copy), vectors whose sum of squares rounds to 1, tiny and zero
-vectors (FastInvSqrt 0x00460c00 runs as retail code in both bodies), and the output aliased
+The game build links the pointer form to src/reconstructed/Math3D.cpp's strict-exact
+Vec3Normalize(const Vec3&) through a link alias (the same cdecl arguments: hidden result
+pointer, then the source; the result pointer is returned), so the case runs that body.
+Random vectors of any scale, exact unit vectors (the `squared == 1` copy), vectors whose
+sum of squares rounds to 1, tiny and zero vectors (FastInvSqrt 0x00460c00 runs as retail code in both bodies), and the output aliased
 to the input. The returned pointer is compared too.
 """
 RETAIL_VA = 0x005087b0
-SYMBOL = '?Vec3Normalize@@YAPAUCollisionVec3@@PAU1@PBU1@@Z'
-SOURCE = 'src/bringup/Group0_Math.cpp'
+SYMBOL = '?Vec3Normalize@@YA?AUVec3@@ABU1@@Z'
+SOURCE = 'src/reconstructed/Math3D.cpp'
 
 
 def cases(rng, n):

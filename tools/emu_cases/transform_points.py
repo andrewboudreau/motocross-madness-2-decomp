@@ -7,7 +7,7 @@ strides on both sides (one point), and in-place transforms (destination == sourc
 """
 RETAIL_VA = 0x004a1b00
 SYMBOL = '?TransformPoints@@YAXPAXPBXPBUMatrix4@@HHH@Z'
-SOURCE = 'src/bringup/Group0_Math.cpp'
+SOURCE = 'src/reconstructed/MatrixUtil.cpp'
 
 
 def cases(rng, n):

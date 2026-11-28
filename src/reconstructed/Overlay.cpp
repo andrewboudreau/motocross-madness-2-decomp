@@ -52,6 +52,14 @@ Overlay::~Overlay() {
     }
 }
 
+// Slot 10 runs the GameObject update. Retail's copy of this body was folded
+// (/OPT:ICF) into the identical 13-byte 0x00499ae0 in krustyui.cpp's code, so
+// its place in overlay.cpp is not known; it follows the destructor, as in the
+// class declaration.
+int Overlay::Tick(float frameTime) {
+    return GameObject::Tick(frameTime);
+}
+
 // 0x004b5f50
 Overlay* Overlay::Attach(RenderTarget* target, TextureMap* texture,
                                         const OverlayRect* rect, int scaleRect,

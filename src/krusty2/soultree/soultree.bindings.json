@@ -113,5 +113,6 @@
   "?FastInvSqrt@@YAMM@Z": "0x00460c00",
   "?Vec3DotCall@@YAMPBUVec3@@0@Z": "0x0040ae30",
   "?Vec3ScaleCall@@YAPAUVec3@@PAU1@PBU1@M@Z": "0x005015b0",
-  "?ComputeQuadTreeCode@QuadTreeObject@@UAEIPAVQuadTree@@@Z": "0x00434ce0"
+  "?ComputeQuadTreeCode@QuadTreeObject@@UAEIPAVQuadTree@@@Z": "0x00434ce0",
+  "?UpdateLocalBounds@SoultreeObject@@UAEXXZ": "0x00464e90"
 }

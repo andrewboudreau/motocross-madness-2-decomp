@@ -194,7 +194,7 @@ class ClipperGlobalConnectionsTests(unittest.TestCase):
             # VisibilityQuadTree.cpp (88 -> 89 sections, 342 -> 395 relocations): the
             # sample's duplicate directive section disappears, and the exact Traverse
             # keeps one recursive call that the sample's cross-jump had merged.
-            self.assertEqual(sum(row['sections'] for row in pins['objects'].values()), 939)
+            self.assertEqual(sum(row['sections'] for row in pins['objects'].values()), 940)
             # The corrected camera loader adds its explicit first-cross call relocation.
             # QueryGround's emulation-found normal/height repairs drop one Terrain relocation.
             # The D3DIMSoultreeShadow slot 30 frame pragma takes ebp, so the shadow-point

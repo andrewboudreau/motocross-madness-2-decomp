@@ -129,5 +129,7 @@
   "_kVec3YAxis": "0x0068a708",
   "_kVec3ZAxis": "0x0068a6d8",
   "_kVec3Zero": "0x0068a6e8",
-  "_rand": "0x00534c1b"
+  "_rand": "0x00534c1b",
+  "?ApplyLaunchImpulse@Vehicle@@UAEXM@Z": "0x00464e80",
+  "?ApplyAirControl@Vehicle@@UAEXXZ": "0x00464e90"
 }
