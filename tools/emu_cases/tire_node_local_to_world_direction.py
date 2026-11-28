@@ -1,16 +1,16 @@
-"""SoultreeObject::LocalToWorldDirection 0x004fd5c0 through TireNode (tools/emu_diff.py case).
+"""SoultreeObject::LocalToWorldDirection 0x004fd5c0 (tools/emu_diff.py case).
 
-src/bringup/Group2_VehicleWheel.cpp forwards it to SoultreeObject::LocalToWorldDirection,
-bound to the same retail body; the case checks the forwarding (the hidden return slot, `this`,
-the vector and the returned pointer). The node's world rotation rows are at +0xf8..+0x120.
+Tire.cpp calls it through TireNode, a link alias of the soultree.cpp member
+(config/game_build.json); the case checks the hidden return slot, `this`, the vector and the
+returned pointer. The node's world rotation rows are at +0xf8..+0x120.
 Stubbed: 0x004fb4f0 (refreshes the world matrix; `this` noted). Random matrices and vectors,
 the output aliased to the input.
 """
 import random
 
 RETAIL_VA = 0x004fd5c0
-SYMBOL = '?LocalToWorldDirection@TireNode@@QAEPAUCollisionVec3@@PAU2@PBU2@@Z'
-SOURCE = 'src/bringup/Group2_VehicleWheel.cpp'
+SYMBOL = '?LocalToWorldDirection@SoultreeObject@@QAE?AUVec3@@ABU2@@Z'
+SOURCE = 'src/krusty2/soultree/soultree.cpp'
 
 
 def cases(rng, n):

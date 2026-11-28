@@ -78,7 +78,7 @@ the function were wrong, not a finding that it is.
 | 9 | `0x00413200` | KrustyBike::SimulateAIFrame | src/krusty2/vehicle/BikeAI.cpp | 2153/4112 (was 2044) | R | low | yes, same file (0.991) | 207 | 1122/1120 insns, frame 0x74 equal, 24 masked diffs: a/b/c slot offsets, operand order of the second lever cross, lean clamp kept on the x87 stack. |
 | 10 | `0x00425900` | BoxCapsuleOverlap | src/krusty2/bvh/BoundingBoxTreeQuery.cpp:264 | 2450/4321 | R | low | yes, same file (0.995) | 187 | 1301/1300 insns, 8 masked diffs: retail calls DotProduct (0x40ae30) in the seventh normalisation where the candidate expands it (26 vs 27 calls), two fxch, and a permuted frame that accounts for most of the byte gap. |
 | 11 | `0x00459ce0` | EcoSystem::GenerateObjects | src/reconstructed/EcoSystem.cpp:1315 | 366/3257 | S | low | yes, src/reconstructed/EcoSystem.cpp (0.914) | 179 | 3300 vs 3257 B, 68 vs 72 conditional jumps: the candidate materialises `word & 0x3e0` as 0/1 (`neg/sbb/neg`) and tests it later, retail tests in place and branches; plus slot order. |
-| 12 | `0x00514550` | UpdateSuspensionProbe | src/krusty2/tire/Tire.cpp:71 | 2566/4258 | R | med | yes, src/bringup/Group2_VehicleWheel.cpp (0.993) | 169 | 1215/1215 insns, frame 0xc0 equal, same calls and stores; 16 masked diffs: four call/ctor temporaries in `rolled`'s slot, the owner branch's late pointer load, lateral cross load order. |
+| 12 | `0x00514550` | UpdateSuspensionProbe | src/krusty2/tire/Tire.cpp:71 | 2566/4258 | R | med | yes, same file (Vehicle.cpp calls it directly) | 169 | 1215/1215 insns, frame 0xc0 equal, same calls and stores; 16 masked diffs: four call/ctor temporaries in `rolled`'s slot, the owner branch's late pointer load, lateral cross load order. |
 | 13 | `0x00414370` | KrustyBike::UpdateAIRacingLine | src/krusty2/vehicle/BikeAI.cpp | 782/4802 (was 645) | S | low | yes, same file (0.951) | 166 | Unit body (the former bring-up's) 1294/1302 insns, 53 masked hunks: retail reloads `statusNode->nextGate` at 0x4149e2 where VC6 keeps it in edi, and schedules the vector copies and setup stores in another order. Stores and calls agree. |
 | 14 | `0x0046a920` | UIDialog::ReadDialogResource | src/reconstructed/GameUi.cpp | 1615/16130 (the sample form, without the Set_Default FontName fix, was 1627); index 684/2323 (masked) | S | low | yes, same file (0.967) | 145 | True extent is 16120 B (the index row says 2323). 4415/4418 insns, same 417 calls; frame 0x9bf4 vs 0x9c74. Header: retail has an unreferenced 0x80-byte local no source form reproduces, and keeps the control in ebx. |
 | 15 | `0x00440f30` | D3DIMSoultreeObject::DrawCurrentLod | src/reconstructed/D3DIMSoulTree.cpp | 751/7851 (was 722; index 714) | S | low | yes, src/reconstructed/D3DIMSoulTree.cpp | 143 | 1884/1895 insns, frame 0x9c4 vs 0x9e8, 294 masked diffs: retail holds vector temporaries on the x87 stack (header: 21 pops against 11), `this` in ebx vs esi. |
@@ -277,9 +277,8 @@ would plausibly write, singled out by the bytes).
     call/constructor temporaries land in `rolled`'s slot, the owner branch
     loads its pointer late, and the lateral cross product loads in another
     order. Next: narrow the scope of `rolled` so its slot is free for the
-    temporaries, as retail's sharing implies. The game links the bring-up copy
-    (src/bringup/Group2_VehicleWheel.cpp), so a fix in
-    src/krusty2/tire/Tire.cpp must be carried over.
+    temporaries, as retail's sharing implies. Vehicle.cpp's PlaceWheels calls
+    the Tire.cpp body directly, so a fix there is what the game links.
 
 13. **0x00405190 Bike::ApplyCollisionEvent** (1758/2874; risk now low).
     Not a matching priority: the remaining difference is slot offsets. It was

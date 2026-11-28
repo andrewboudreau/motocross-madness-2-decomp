@@ -8,7 +8,7 @@
     "src/krusty2/vehicle/Vehicle.cpp": {
       "sections": 154,
       "relocations": 720,
-      "sha256": "241cc63dd1cc5212126131069132bc41dc15b80e427adac7813aa9e08f8e7576"
+      "sha256": "8754a503a6b2bc1405fd01a8333220e75fbec41ee201ff6e2915a33b7a1089f5"
     },
     "src/reconstructed/DustParticleEmitter.cpp": {
       "sections": 28,

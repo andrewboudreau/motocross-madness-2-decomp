@@ -36,7 +36,9 @@ Its declarations are `src/reconstructed/Suspension.h`; `InlineShock::UpdateAxis`
 calibration case and native-test provider (`docs/INLINE_SHOCK_AXIS.md`). The game build compiles
 that body only inside Shock.cpp (`included_sources` in `config/game_build.json`).
 
-The game links the unit through `src/bringup/Group4_VehicleShock.cpp`: Vehicle.h's
-VehicleShock/VehicleInlineShock/VehicleRotatingShock views and Tire's TireAttachA/B forward to
-the members above, and Suspension.h's ShockNode and Shock*Call names forward to SoultreeObject,
-`src/reconstructed/VectorCalls.cpp` and CollisionObject.cpp's CollisionLength.
+The game links the unit directly. Vehicle.h's VehicleShock/VehicleInlineShock/VehicleRotatingShock
+views and Tire's TireAttachA/B are `link_aliases` (`config/game_build.json`) of the members above,
+and Suspension.h's ShockNode and Shock*Call names are link aliases of SoultreeObject,
+`src/reconstructed/VectorCalls.cpp` and CollisionObject.cpp's CollisionLength. Each pair has the
+same calling convention, argument dwords and `ret`; ApplyDamping's fourth argument (a pointer in
+the view, a float here) is never read by the retail body.

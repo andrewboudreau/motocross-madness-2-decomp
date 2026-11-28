@@ -812,6 +812,13 @@ clearly more faithful, the game now links the sample's text:
     `Grid1.cpp` (texture use tables), `Griddraw.cpp` (`g_gridBoxTests`),
     `Particles.cpp` (`g_particleCellUVs`) and `VisibilityQuadTree.cpp`
     (`g_visibilityClipper` and `g_visibilityBoxVertices`).
+  - `Group2_VehicleWheel.cpp`, `Group4_VehicleShock.cpp` and
+    `Group0_ContactArrays.cpp` (2026-11-28): every body in them forwarded to
+    Tire.cpp, Shock.cpp, CollisionPoint.cpp, soultree.cpp or a vector call.
+    Vehicle.cpp now calls the two Tire near misses (`UpdateContactPatch`
+    0x005135f0, `UpdateSuspensionProbe` 0x00514550) on the real `Tire`, and
+    the other views are link aliases of strict-exact providers (the
+    `link_aliases` table below).
 - `Group4_EcoBridges.cpp` lost its five forwarders, then its shared
   normal-distribution pointer, which `NormalDistribution.cpp` now defines.
 - The BikeRace near misses (`Create`, `CreateRacers`, `AimCamera`,
@@ -916,7 +923,7 @@ least 0.99 masked was checked for a strict match and for a registration
 (calibration case or any `targets.json`) at its VA. No strict-exact bring-up
 body was unregistered:
 
-- Most masked-1.000 rows (the Track, Tire, Shock, soultree, PCAudio and
+- Most masked-1.000 rows (the Track, soultree, PCAudio and
   similar views) are forwarders. `linked_accuracy.py` follows them to a
   canonical provider that is already registered exact.
 - `CreateRacers` (0x00419970), `GatherModelTriangles` (0x0042c260),
@@ -938,6 +945,14 @@ body was unregistered:
   | 0x00421cb0 / 0x00421d00 | `TerrainShadowSum` / `TerrainShadowDifference` (TerrainShadow sample) | `Vec3AddCall` / `Vec3SubtractCall` (VectorCalls.cpp, 69/69 each) | forwarders in `Group6_TerrainShadow.cpp` |
   | 0x00404e60 | `TerrainShadowVecCall::TerrainShadowVecCall(float, float, float)` (TerrainShadow sample) | `Vec3Call::Vec3Call` (BoundingBoxTreeQuery.cpp, 25/25) | body in `Group6_TerrainShadow.cpp` |
   | 0x00506e90 | `TerrainShadowCaster::CastSegment` (TerrainShadow sample) | `Terrain::CastSegment` (Terrain.cpp, 1654/1654) | forwarder in `Group6_TerrainShadow.cpp` |
+  | 0x0040ae30, 0x00515600, 0x0042a510, 0x0042a580 | `TireDot`, `TireCross`, `TireTransformPoint`, `TireTransformDirection` (Tire.cpp) | `Vec3DotCall`, `CrossProductCall`, `Vec3TransformPoint`, `TransformPointPtr` | forwarders in `Group2_VehicleWheel.cpp` |
+  | 0x004fc630, 0x004fc9a0, 0x004fca30, 0x004fcce0, 0x004fceb0, 0x004fd5c0, 0x004fe0a0 | `TireNode` members (Tire.h) | `SoultreeObject::SetPosition(float, float, float)`, `GetPositionIn`, `SetLocalMatrix`, `RotateAbout`, `Rotate`, `LocalToWorldDirection`, `GetLocalBounds` (soultree.cpp) | forwarders in `Group2_VehicleWheel.cpp` |
+  | 0x00512f10, 0x005143d0, 0x00513c70, 0x00513f90, 0x00514170 | `VehicleWheel` constructor, `UpdateRoll`, `UpdateShock`, `UpdateDriveShare`, `ApplyDrive` (Vehicle.h) | the `Tire` members (Tire.cpp) | forwarders in `Group2_VehicleWheel.cpp` |
+  | 0x004fc630, 0x004fc660, 0x004fc9a0, 0x004fca30, 0x004fceb0 | `ShockNode` members (Suspension.h) | `SoultreeObject::SetPosition` (both overloads), `GetPositionIn`, `SetLocalMatrix`, `Rotate` | forwarders in `Group4_VehicleShock.cpp` |
+  | 0x0040ae30, 0x005015b0, 0x00421cb0, 0x00435ec0 | `ShockDotCall`, `ShockScaleCall`, `ShockAddCall`, `ShockLength` (Shock.cpp) | `Vec3DotCall`, `Vec3ScaleCall`, `Vec3AddCall`, `CollisionLength` | forwarders in `Group4_VehicleShock.cpp` |
+  | 0x004fa400, 0x004f9f80, 0x004fac60, 0x004fa8a0 | `TireAttachA/B::SolveContact` and destructors (Tire.cpp) | `InlineShock`/`RotatingShock` members (Shock.cpp) | forwarders in `Group4_VehicleShock.cpp` |
+  | 0x004f9c70, 0x004f9d30, 0x004f9ee0, 0x004fa310, 0x004fa700, 0x004fab60 | `VehicleShock`, `VehicleInlineShock`, `VehicleRotatingShock` members and constructors (Vehicle.h) | `Shock::ClearForces`, `Shock::ApplyDamping`, the `InlineShock`/`RotatingShock` constructors and `Retract` | forwarders in `Group4_VehicleShock.cpp` |
+  | 0x0043ad80, 0x0043aa30, 0x0043a570 | `SoultreeRefreshContacts`/`VehContactsA`, `SoultreeMergeContacts`/`VehContactsB`, `VehAddContact` (contact-array views) | `SoultreeRefreshContacts`, `SoultreeMergeContacts`, `AddExistingCollisionPoint` (CollisionPoint.cpp) | forwarders in `Group0_ContactArrays.cpp` |
 
   (wrecker.cpp now calls `ParticleManager::AddParticle` 0x004baa50 itself,
   so its `WreckerParticleManagerView` alias is gone.) The two

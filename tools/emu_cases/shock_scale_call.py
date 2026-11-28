@@ -1,14 +1,14 @@
-"""ShockScaleCall 0x005015b0, a ShockVec3 times a scalar (tools/emu_diff.py case).
+"""Vec3ScaleCall 0x005015b0, a vector times a scalar (tools/emu_diff.py case).
 
-src/bringup/Group4_VehicleShock.cpp forwards it to Vec3ScaleCall, which is bound to the same
-retail body; the case checks the forwarding (the hidden return slot, the vector and the scalar
-in place, the returned pointer). Random, zero, negative and huge scalars.
+Shock.cpp calls it as ShockScaleCall, a link alias of Vec3ScaleCall (config/game_build.json);
+the case checks the hidden return slot, the vector and the scalar in place and the returned
+pointer. Random, zero, negative and huge scalars.
 """
 import struct
 
 RETAIL_VA = 0x005015b0
-SYMBOL = '?ShockScaleCall@@YA?AUShockVec3@@ABU1@M@Z'
-SOURCE = 'src/bringup/Group4_VehicleShock.cpp'
+SYMBOL = '?Vec3ScaleCall@@YAPAUVec3@@PAU1@PBU1@M@Z'
+SOURCE = 'src/reconstructed/VectorCalls.cpp'
 
 
 def cases(rng, n):

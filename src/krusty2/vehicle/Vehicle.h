@@ -340,9 +340,11 @@ struct VehicleWheel {
     char pad_0x2B4[0x4];
     float driveShare;  // +0x2B8 UpdateDriveShare (0x00513f90) stores the drive share here (fst [esi+0x2b8]; 1.0 on the other path)
     float driveShareComplement;  // +0x2BC UpdateDriveShare (0x00513f90) stores 1 - driveShare here (0 on the other path)
+    // UpdateContactPatch 0x005135f0 and UpdateSuspensionProbe 0x00514550 are called on the
+    // real Tire (Vehicle.cpp casts the wheel); the members below are link aliases of the
+    // strict-exact Tire members at the same addresses (config/game_build.json).
     // 0x005143d0
     void UpdateRoll(float dt, float distanceScale, int locked, int driven, int crashState, float driveScale);
-    void UpdateContactPatch(Vec3* origin, Vec3 position, Vec3 velocity, float speed, float* outA, int* outB);   // 0x005135f0 (Tire.h name)
     void UpdateShock(float bias, int flag, int crashState, float speed, Vec3* velocity, Vec3* anchor);   // 0x00513c70 (Tire.h UpdateShock, tier 3 name; sets shockEngaged/shockExtending)
     void UpdateDriveShare(Vehicle* owner);       // 0x00513f90, Tire.h: drive share +0x2b8 from the vehicle speed
     void UpdateAttachment();                    // 0x00515660, called per wheel by Bike slot 41 (0x0040cbd0)
@@ -350,11 +352,6 @@ struct VehicleWheel {
     // reciprocal of the driven-wheel count, the body's step time, direction flag and mass.
     void ApplyDrive(float share, float stepTime, int movingForward, float bodyMass,
                          float* speed, Vec3* torque, Vec3* force);
-    // 0x00514550 (ret 0x20): places the wheel on the ground (src/krusty2/tire/Tire.h
-    // UpdateSuspensionProbe); PlaceWheels passes the body's probe, position, saved
-    // pitch/sin-roll/yaw, saved forward/up and the pose node.
-    void UpdateSuspensionProbe(Terrain* world, const Vec3* position, float pitch, float sinRoll,
-                         float yaw, const Vec3* forward, const Vec3* up, SoultreeObject* node);
 };
 
 #include "VehicleCore.h"

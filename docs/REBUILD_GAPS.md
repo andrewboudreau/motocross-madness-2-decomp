@@ -963,7 +963,7 @@ constructors copy them (version, directory, separator, handles).
 96 VAs carry two or more different linked bodies (a bring-up stand-in next to the
 reconstruction, or two reconstructions of one function); they are listed for
 review, not findings. 0x004b5a60 was one of them: `Vehicle.cpp` called a `void`
-`VehBasisToBlock` stand-in in `Group0_ContactArrays.cpp`, and the canonical
+`VehBasisToBlock` stand-in in the former `Group0_ContactArrays.cpp`, and the canonical
 `int OrientationAnglesFromVectors` (`src/reconstructed/OrientationAngles.cpp`)
 was linked too. The parameter order is the same, and none of retail's 13
 callers reads EAX. Vehicle now calls the canonical function, and the stand-in

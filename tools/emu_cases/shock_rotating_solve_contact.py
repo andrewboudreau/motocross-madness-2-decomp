@@ -1,7 +1,7 @@
 """RotatingShock::SolveContact 0x004fac60 (tools/emu_diff.py case).
 
-The linked body is canonical src/krusty2/suspension/Shock.cpp (TireAttachB::SolveContact in
-Group4_VehicleShock.cpp jumps to it). The shock's 0x100 bytes are random floats; from the
+The linked body is canonical src/krusty2/suspension/Shock.cpp (Tire.cpp's
+TireAttachB::SolveContact is a link alias of it). The shock's 0x100 bytes are random floats; from the
 retail body, +0x44 is the scene node and +0xe0 the swing axis selector (jump table of 4
 entries; out-of-range values leave the swing uninitialised, so the case keeps 0..3). The
 lengths (+0x90 cleared length, +0xc8 arm length, +0xc4/+0x98..) are positive in most runs so

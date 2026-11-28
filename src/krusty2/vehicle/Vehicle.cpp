@@ -10,6 +10,7 @@
 #include "soultree/SoultreePhysicsObject.h"
 #include "soultree/SoultreePhysicsCallees.h"
 #include "collision/CollisionPoint.h"
+#include "tire/Tire.h"
 #include "../../reconstructed/ParticleEmitters.h"
 #include "../../reconstructed/SceneManager.h"
 
@@ -1946,7 +1947,10 @@ void Vehicle::UpdateWheelsInContact()
     for (; i < wheelCount; i++) {
         VehicleWheel* wheel = wheelList[i];
         if (wheel->inContact) {
-            wheel->UpdateContactPatch(&centerOfMass, worldAngularVelocity, velocity, linearSpeed, &forwardSpeed, &movingForward);
+            ((Tire*)wheel)->UpdateContactPatch((const CollisionVec3*)&centerOfMass,
+                                               *(const CollisionVec3*)&worldAngularVelocity,
+                                               *(const CollisionVec3*)&velocity, linearSpeed,
+                                               &forwardSpeed, &movingForward);
             wheel->UpdateShock(lastStepTime, (unsigned char)pointsTouching, crashState, linearSpeed, &velocity, &savedForward);
             if (wheel->pointInContact)
                 wheelPointInContact = 1;
@@ -2299,15 +2303,19 @@ void Vehicle::PlaceWheels()
             ((VehicleInlineShock*)wheel->primaryAux)->Retract(lastStepTime * 0.25f, wheel);
         else if (wheel->secondaryAux)
             ((VehicleRotatingShock*)wheel->secondaryAux)->Retract(lastStepTime * 0.25f, wheel);
-        wheel->UpdateSuspensionProbe(terrain, &position, savedPitch, savedSinRoll, savedYaw,
-                               &savedForward, &savedUp, poseNode);
+        ((Tire*)wheel)->UpdateSuspensionProbe(terrain, (const CollisionVec3*)&position, savedPitch,
+                                              savedSinRoll, savedYaw,
+                                              (const CollisionVec3*)&savedForward,
+                                              (const CollisionVec3*)&savedUp, (TireNode*)poseNode);
         if (!wheel->inContact) {
             if (wheel->primaryAux)
                 ((VehicleInlineShock*)wheel->primaryAux)->Retract(lastStepTime * 0.75f, wheel);
             else if (wheel->secondaryAux)
                 ((VehicleRotatingShock*)wheel->secondaryAux)->Retract(lastStepTime * 0.75f, wheel);
-            wheel->UpdateSuspensionProbe(terrain, &position, savedPitch, savedSinRoll, savedYaw,
-                                   &savedForward, &savedUp, poseNode);
+            ((Tire*)wheel)->UpdateSuspensionProbe(terrain, (const CollisionVec3*)&position, savedPitch,
+                                                  savedSinRoll, savedYaw,
+                                                  (const CollisionVec3*)&savedForward,
+                                                  (const CollisionVec3*)&savedUp, (TireNode*)poseNode);
         } else if (wheel->primaryAux) {
             ((VehicleShock*)wheel->primaryAux)->ClearForces();
         } else if (wheel->secondaryAux) {

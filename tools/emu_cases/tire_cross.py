@@ -1,14 +1,14 @@
-"""TireCross 0x00515600, the CollisionVec3 cross product (tools/emu_diff.py case).
+"""CrossProductCall 0x00515600, the out-of-line Vec3 cross product (tools/emu_diff.py case).
 
-src/bringup/Group2_VehicleWheel.cpp forwards it to CrossProductCall, which is bound to the same
-retail body; the case checks the forwarding (operand order, the hidden return slot and the
-returned pointer). Random, parallel, zero and aliased operands.
+Tire.cpp calls it as TireCross, a link alias of CrossProductCall (config/game_build.json); the
+case checks the operand order, the hidden return slot and the returned pointer. Random,
+parallel, zero and aliased operands.
 """
 import struct
 
 RETAIL_VA = 0x00515600
-SYMBOL = '?TireCross@@YA?AUCollisionVec3@@ABU1@0@Z'
-SOURCE = 'src/bringup/Group2_VehicleWheel.cpp'
+SYMBOL = '?CrossProductCall@@YA?AUVec3@@ABU1@0@Z'
+SOURCE = 'src/reconstructed/CrossProduct.cpp'
 
 
 def cases(rng, n):

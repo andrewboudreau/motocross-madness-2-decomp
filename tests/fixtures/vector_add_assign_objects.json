@@ -4,7 +4,7 @@
     "src/krusty2/vehicle/Vehicle.cpp": {
       "sections": 153,
       "relocations": 720,
-      "sha256": "ead0b32fc8b587bd30864ceaeffb529c667723c598c760f5afe06f9145d7ecdf"
+      "sha256": "24398d506db463728fec69b66734e8ecbe26cbd711de4ce94887ddf6a7d46d45"
     },
     "src/krusty2/bvh/BoundingBoxTreeQuery.cpp": {
       "sections": 64,
