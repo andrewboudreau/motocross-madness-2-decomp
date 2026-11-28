@@ -30,7 +30,7 @@ class RenderTarget;
 
 struct VisibilityResultList {
     QuadTreeResultLink* head;
-    QuadTreeResultLink* field_0x04;
+    QuadTreeResultLink* item;  // +0x04 overlays QuadTreeResultLink::item: Query passes the list as a link; never accessed
 };
 
 // The query timer uses the same 12-byte peak holder as Game's profile page.

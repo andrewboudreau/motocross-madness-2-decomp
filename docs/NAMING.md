@@ -4749,3 +4749,55 @@ DrawSelection; a dash is unchanged):
 ABE and ADE are the largest sets that hold every window; ABE retires more and
 was kept. C and D stay deferred with notes at their definitions. The other C
 spellings are in the `GameHiResMeterView` row above.
+
+## Scalar offset members named (2026-11-28)
+
+A sweep of the 200 scalar `field_0xNN` members that were left. Each row is
+a rename only. No declaration, type or size changed. "No retail access"
+means a search of the whole retail listing (work/naming/retail.asm) found
+no `+ 0xNN]` operand of the member's width on any non-stack base. The
+`pad_` rows are alignment holes. In each one the next member's natural
+alignment already fixes the following offset, and no access was found.
+
+| Owner | Old | New | Tier | Evidence |
+|---|---|---|---|---|
+| QuadTree (QuadTreeDeclarations.h) | `field_0x6e` | `pad_0x6e` | 2 | The only word operands at +0x6c..+0x6f are queryStamp's (0x004dc73b, 0x004dd336, 0x0052d575...). Nothing reads +0x6e; the pointer at +0x70 is 4-aligned. |
+| VisibilityResultList (VisibilityQuadTree.h) | `field_0x04` | `item` | 2 | Query 0x0052d560 passes `(QuadTreeResultLink*)&list` as the walk's tail link. The struct therefore stands in for a QuadTreeResultLink `{next; item}`, and +0x04 overlays `item`. Nothing accesses it. |
+| TgaFile (Tgafile.h) | `field_0x03`, `field_0x09` | `pad_0x03`, `pad_0x09` | 2 | The header reader and writer handle each field in turn and skip these bytes. Each one sits before an `unsigned short` (colorMapStart, x) at an even offset. |
+| DDDeviceIdentifier2 (PCVideoCard.h) | `field_0x42c` | `pad_0x42c` | 2 | DDDEVICEIDENTIFIER2 ends at 0x42c (dwWHQLLevel). The LARGE_INTEGER driver version 8-aligns it to 0x430, the size the profile saves. Nothing accesses it. |
+| ZoneRaceRecord, ZoneRaceStatus (TrackGame.h) | `field_0x03` | `pad_0x03` | 2 | Builder 0x0049c770 stores the status bytes +0x2a4 and +0x2a6 (0x0049dbe9 stores +0x2a5) and the dword +0x2a8, with no access to +0x2a7 anywhere. Each record gets bytes [ebx], [ebx+1], [ebx+2] and dwords +4/+8/+0xc. Byte +3 is never written in either; the 0x88-byte block is sent whole. |
+| SceneAnimation (SceneManager.h) | `field_0x27` | `pad_0x27` | 2 | No retail access. The `char*` motionSequence at +0x28 is 4-aligned after the three signed chars at +0x24..+0x26. |
+| GridNodeDrawData (Griddraw.h) | `field_0x12e`, `field_0x17a` | `pad_0x12e`, `pad_0x17a` | 2 | No retail access at either offset. Each sits between a `short` and a 4-aligned int or pointer (+0x130 testFrame, +0x17c blockRanges). |
+
+Left unnamed, with the reasons:
+
+- Union arms are kept by policy.
+- Members read from a stream or file but never interpreted:
+  - Cube `field_0x12`, `field_0x20`, `field_0x2c`;
+  - GridNode `field_0x2b`;
+  - CubeFace's per-texture arrays.
+- Constructor-only or write-only members (tier 3 at best):
+  - Camera +0x1e8..+0x1fc;
+  - the particle emitters' +0x38 (6.0 / 3.0 / 0) and +0x68/+0x6c, which are
+    cleared while inactive and never read. The +0x38 hits inside slot 10 use
+    the particle, not the emitter.
+  - CarProcedural `field_0x58`, `field_0x68`, `field_0x1b8`, `field_0x1e8`.
+    Its `field_0x178`..`field_0x180` are Create's last three float
+    arguments (a13..a15; Scene passes 0, 0, 0) and are never read.
+  - KrustyBike +0x794/+0x798/+0x810/+0x1534/+0x15cc/+0x15e5;
+  - the UIDialog, RaceSound and TrackGame option-block words.
+  - TrackGameSoundOptions `field_0x0c` (1) and `field_0x24` (100) look like a
+    third on/volume pair, but nothing reads them and no dialog binds them.
+- Terrain `field_0xc94`/`field_0xc98` (5, 6) are write-only. Terrain::Load
+  passes the same 5 and 6 to TerrainLoadTexture as `addressU`/`addressV`.
+  PCTextureMap stores those arguments as render states 0x13/0x14, which are
+  D3DRENDERSTATE_SRCBLEND/DESTBLEND (5 = SRCALPHA, 6 = INVSRCALPHA), not
+  address modes. With an alpha format PCTextureMap first clears 0x29
+  (COLORKEYENABLE) and sets 0x1b (ALPHABLENDENABLE), so the pair is the blend
+  factors: the parameters are now `srcBlend`/`destBlend`, ManagedTextureGroup's
+  members `groupSrcBlend`/`groupDestBlend`, and 0x0050abd0 (which rewrites the
+  0x13/0x14 state pairs) `TextureMap::SetBlendModes` (was SetAddressModes;
+  tier 2, D3D constants).
+- Excluded because a concurrent patch owns the headers: the tire,
+  suspension, shock and VehicleWheel headers and the probe declarations
+  (ConstraintMethodCollisionModel.h).

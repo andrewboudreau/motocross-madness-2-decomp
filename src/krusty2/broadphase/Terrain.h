@@ -62,14 +62,14 @@ public:
     virtual int CreateSurface(int bits, int width, int height, int stride, int minimumSize,
                               int sourceFormat, int format, BaseObject* palette, int flags,
                               TerrainComObject* surfacePalette, int checkMemory, int unused,
-                              int addressU, int addressV, void* choice, int alphaThreshold,
+                              int srcBlend, int destBlend, void* choice, int alphaThreshold,
                               int key);
     // Slot 5 (+0x14, 15 stack arguments): loads the texture from a stream (TextureMap.h's
     // LoadSurface; argument roles from there, tier 3).
     virtual int LoadSurface(TerrainStream* stream, int width, int height, int minimumSize,
                             int fileFormat, int dataSize, int format, BaseObject* palette,
-                            int flags, TerrainComObject* surfacePalette, int addressU,
-                            int addressV, void* choice, int alphaThreshold, unsigned int key);
+                            int flags, TerrainComObject* surfacePalette, int srcBlend,
+                            int destBlend, void* choice, int alphaThreshold, unsigned int key);
     virtual TerrainSurfaceBase* Clone();
     virtual int IsResident();
     virtual int CreateTextureSurface(int upload, int asRenderTarget, int localVideo);      // slot 8, +0x20

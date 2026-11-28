@@ -27,6 +27,6 @@ struct TextureContext {
 // A ManagedTexture when `choice` has a group for the format, else a
 // PCTextureMap; 0 on failure.
 TextureMap* TerrainLoadTexture(TextureMapManager* manager, const char* name, int format,
-                              Palette8* palette, int flags, int addressU, int addressV,
+                              Palette8* palette, int flags, int srcBlend, int destBlend,
                               TextureContext* choice, int alphaThreshold,
                               unsigned int key, int addRef, int fromArchive);

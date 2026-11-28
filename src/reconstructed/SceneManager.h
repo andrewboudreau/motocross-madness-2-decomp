@@ -51,7 +51,7 @@ struct SceneAnimation {
     char currentMotion;                   // index into motions
     signed char sequenceLength;           // motionSequence count ("NumberInSequence")
     signed char sequenceIndex;            // index into motionSequence
-    unsigned char field_0x27;
+    unsigned char pad_0x27;               // +0x27 no retail access
     char* motionSequence;                 // motion numbers (1-based, "MotionSequence")
     char fileName[0x18];                      // +0x2c the MCF or SLT file name, at most 0x14 characters
 };

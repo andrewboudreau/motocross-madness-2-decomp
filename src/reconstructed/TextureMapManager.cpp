@@ -229,8 +229,8 @@ int TextureMapManager::OnControlPress(ControlEvent* event, InputButtonState* ent
 }
 
 // 0x00511180
-ManagedTextureGroup* TextureMapManager::CreateGroup(int format, int pages, int addressU, int addressV) {
-    ManagedTextureGroup* cache = new(__FILE__, 431) ManagedTextureGroup(this, format, addressU, addressV);
+ManagedTextureGroup* TextureMapManager::CreateGroup(int format, int pages, int srcBlend, int destBlend) {
+    ManagedTextureGroup* cache = new(__FILE__, 431) ManagedTextureGroup(this, format, srcBlend, destBlend);
     cache->SetPageCount(pages);
     groups.Add(cache);
     if (!debugGroup)

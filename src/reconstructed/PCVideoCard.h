@@ -27,7 +27,7 @@ struct DDDeviceIdentifier2 {
     unsigned long revision;
     unsigned char deviceGuid[16];
     unsigned long whqlLevel;
-    unsigned long field_0x42c;
+    unsigned long pad_0x42c;                      // +0x42c tail padding to the 8-aligned 0x430 size; never accessed
 };
 
 // RTTI PCVideoCard : VideoCard (COL 0x0055e4a8, vtable 0x00556df4, 0xb78

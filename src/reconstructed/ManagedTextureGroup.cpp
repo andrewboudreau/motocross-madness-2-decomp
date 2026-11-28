@@ -33,10 +33,10 @@ void ManagedTextureGroup::OnOutOfPageSpace() {
 }
 
 // 0x0050bed0
-ManagedTextureGroup::ManagedTextureGroup(TextureMapManager* manager, int format, int addressU, int addressV)
+ManagedTextureGroup::ManagedTextureGroup(TextureMapManager* manager, int format, int srcBlend, int destBlend)
     : texelsBlittedHistory(5000), blitTimeHistory(5000), texturesBlittedHistory(5000) {
-    groupAddressU = addressU;
-    groupAddressV = addressV;
+    groupSrcBlend = srcBlend;
+    groupDestBlend = destBlend;
     groupManager = manager;
     groupFormat = format;
     pageMemory = 0;
@@ -91,7 +91,7 @@ int ManagedTextureGroup::SetPageCount(int count) {
     if (count > 0 && !surfaceTexture) {
         surfaceTexture = new(__FILE__, 107) PCTextureMap(groupManager, 1);
         if (!surfaceTexture->CreateSurface(0, 256, 256, 0, 1, groupFormat, groupFormat, 0, 2, groupPalette, 1, 0,
-                                              groupAddressU, groupAddressV, 0, 0x80, 0xff00ff)) {
+                                              groupSrcBlend, groupDestBlend, 0, 0x80, 0xff00ff)) {
             delete surfaceTexture;
             return 0;
         }
@@ -102,7 +102,7 @@ int ManagedTextureGroup::SetPageCount(int count) {
             page->systemSurface = surfaceTexture->systemSurface;
             page->systemSurface->AddRef();
             if (!page->CreateSurface(0, 256, 256, 0, 1, groupFormat, groupFormat, 0, 2, groupPalette, 1, 0,
-                                     groupAddressU, groupAddressV, 0, 0x80, 0xff00ff)) {
+                                     groupSrcBlend, groupDestBlend, 0, 0x80, 0xff00ff)) {
                 delete page;
                 return 0;
             }

@@ -42,12 +42,12 @@ public:
     virtual int CreateSurface(void* bits, int width, int height, int stride, int minimumSize,
                               int sourceFormat, int format, ColorMapper* palette,
                               int flags, void* surfacePalette, int checkMemory, int unused,
-                              int addressU, int addressV, TextureContext* choice,
+                              int srcBlend, int destBlend, TextureContext* choice,
                               int alphaThreshold, unsigned int key);
     // 0x004c6080: reads the texture from `stream`, then creates it through slot 4.
     virtual int LoadSurface(FileStream* stream, int width, int height, int minimumSize,
                             int fileFormat, int dataSize, int format, ColorMapper* palette,
-                            int flags, void* surfacePalette, int addressU, int addressV,
+                            int flags, void* surfacePalette, int srcBlend, int destBlend,
                             TextureContext* choice, int alphaThreshold, unsigned int key);
     virtual TextureMap* Clone();               // 0x004c71c0: a copy of the texture
     virtual int IsResident();                 // 0x004c7470: whether +0x74 exists

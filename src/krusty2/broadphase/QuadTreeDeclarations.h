@@ -82,7 +82,7 @@ public:
     BlockAllocator* resultPool;        // +0x64 pool of QuadTreeResultLink (8 byte elements)
     unsigned int stateFlags;         // +0x68 bit 1 (2) = tree is being torn down
     unsigned short queryStamp;  // +0x6c ++ in BeginQuery/RestartQuery; compared with QuadTreeObject stamp (maxDepth) to return each object once
-    unsigned short field_0x6e;
+    unsigned short pad_0x6e;      // +0x6e no retail access: only word accesses to +0x6c (queryStamp)
     QuadTreeResultLink* queryListHead;  // +0x70 BeginQuery stores the Gather result; RestartQuery copies it to the cursor
     QuadTreeResultLink* queryCursor;  // +0x74 current result cell iterated by NextObject/NextObjectSorted
     int itemSlotIndex;  // +0x78 0..3 index into the current item block, reset to 0 per block

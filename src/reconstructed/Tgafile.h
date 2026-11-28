@@ -37,11 +37,11 @@ struct TgaFile {
     unsigned char idLength;
     unsigned char colorMapType;
     unsigned char imageType;                  // 2: uncompressed true colour
-    unsigned char field_0x03;
+    unsigned char pad_0x03;
     unsigned short colorMapStart;
     unsigned short colorMapLength;
     unsigned char colorMapDepth;
-    unsigned char field_0x09;
+    unsigned char pad_0x09;
     unsigned short x;
     unsigned short y;
     short width;

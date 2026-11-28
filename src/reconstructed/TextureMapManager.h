@@ -51,7 +51,7 @@ class PCTextureMap;
 class ManagedTextureGroup : public BaseObject {
 public:
     // 0x0050bed0
-    ManagedTextureGroup(TextureMapManager* manager, int format, int addressU, int addressV);
+    ManagedTextureGroup(TextureMapManager* manager, int format, int srcBlend, int destBlend);
     virtual ~ManagedTextureGroup();           // 0x0050c2e0 (deleting wrapper 0x0050c2c0)
     int SetPageCount(int count);     // 0x0050c4a0: sets the page count; 0 on failure
     void AddTexture(ManagedTexture* texture); // 0x0050c6c0: adds a texture
@@ -68,8 +68,8 @@ public:
 
     unsigned char noRepacking;                // +0x08 toggled by debug key 0x21; set: no repacking
     int groupFormat;                          // +0x0c pixel format
-    int groupAddressU;                        // +0x10 address mode u
-    int groupAddressV;                        // +0x14 address mode v
+    int groupSrcBlend;                       // +0x10 D3DRENDERSTATE_SRCBLEND value
+    int groupDestBlend;                      // +0x14 D3DRENDERSTATE_DESTBLEND value
     int pagesByLevel[9];                      // +0x18 region slots per size level kept by the last partial-blit repack
     int pageMemory;                           // +0x3c pages' memory
     TextureMapManager* groupManager;          // +0x40
@@ -121,7 +121,7 @@ public:
     virtual int OnControlPress(ControlEvent* event, InputButtonState* entry);
 
     // 0x00511180: creates and registers a texture group with `pages` pages.
-    ManagedTextureGroup* CreateGroup(int format, int pages, int addressU, int addressV);
+    ManagedTextureGroup* CreateGroup(int format, int pages, int srcBlend, int destBlend);
     void RegisterTexture(TextureMap* texture); // 0x005112f0: registers a texture
     void UnregisterTexture(TextureMap* texture); // 0x00511300: unregisters it
     // 0x005113d0: shares the texture cache limit out among the groups (on

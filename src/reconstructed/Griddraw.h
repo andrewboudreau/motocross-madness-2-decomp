@@ -149,7 +149,7 @@ struct GridNodeDrawData {
     unsigned short previousUpperErrorLimit;  // +0x128  copy of +0x124 before 0x004815e0 recomputes it (0x00482760 retests the band)
     short triangleCount;                       // +0x12a triangles in this node's index list
     short childTriangleCount;                  // +0x12c children's +0x12a/+0x12c summed into the parent
-    short field_0x12e;
+    short pad_0x12e;                          // +0x12e no retail access
     int testFrame;                            // +0x130  GridTerrain::frameCount when 0x004826d0/0x00482760 last tested the node; 0x00482f00 then runs the full drop test
     void* vertexBuffer;                        // +0x134 32-byte vertices (DebugFree'd, line 0x330/0x35a)
     void* indexBuffer;                         // +0x138 16-bit indices (line 0x337/0x361)
@@ -167,7 +167,7 @@ struct GridNodeDrawData {
     float gridMaxZ;  // +0x170  gridMinZ + (16 << shift) (0x0047e600)
     float inverseErrorScale;  // +0x174  abs(1 / (heightScale * reliefScale)) (0x0047e600); scales the error limits
     short visibleBlockMask;  // +0x178  bit n set when 4x4 block n passes the frustum test (0x00481a20)
-    short field_0x17a;
+    short pad_0x17a;                          // +0x17a no retail access
     void* blockRanges;  // +0x17C  sixteen GridBlockRange records (data + 0x180) or null (0x0047e600)
 };
 

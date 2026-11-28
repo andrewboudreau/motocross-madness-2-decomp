@@ -37,7 +37,7 @@ TextureMap::TextureMap(TextureMapManager* manager, int registered) {
 
 // 0x0050a590: see TextureMap.h.
 TextureMap* TerrainLoadTexture(TextureMapManager* manager, const char* name, int format,
-                                  Palette8* palette, int flags, int addressU, int addressV,
+                                  Palette8* palette, int flags, int srcBlend, int destBlend,
                                   TextureContext* choice, int alphaThreshold,
                                   unsigned int key, int addRef, int fromArchive)
 {
@@ -135,13 +135,13 @@ failed:
     if (fromFile) {
         int sourceFormat = file->bitsPerPixel == 16 ? 0x22b : (file->bitsPerPixel == 24 ? 0x378 : 0x22b8);
         map->CreateSurface(file->bits, width, height, width, minimumSize, sourceFormat, format,
-                           texturePalette, flags, surfacePalette, 1, 0, addressU, addressV, choice,
+                           texturePalette, flags, surfacePalette, 1, 0, srcBlend, destBlend, choice,
                            alphaThreshold, key);
         FreeFile(file);
         if (!entry)
             g_ResourceManager->AddObject(name, map);
     } else if (map->LoadSurface(entry->archive, width, height, minimumSize, fileFormat, dataSize,
-                                format, texturePalette, flags, surfacePalette, addressU, addressV,
+                                format, texturePalette, flags, surfacePalette, srcBlend, destBlend,
                                 choice, alphaThreshold, key)) {
         g_ResourceManager->SetItemObject(entry, map);
     }
@@ -163,13 +163,13 @@ TextureMap::~TextureMap() {
 }
 
 // 0x0050abd0
-int TextureMap::SetAddressModes(int addressU, int addressV) {
+int TextureMap::SetBlendModes(int srcBlend, int destBlend) {
     if (IsFormat4444Or8888(mapFormat)) {
         for (int i = 0; i < statePairCount; i++) {
             if (statePairs[i].state == 0x13)
-                statePairs[i].value = addressU;
+                statePairs[i].value = srcBlend;
             else if (statePairs[i].state == 0x14)
-                statePairs[i].value = addressV;
+                statePairs[i].value = destBlend;
         }
         return 1;
     }

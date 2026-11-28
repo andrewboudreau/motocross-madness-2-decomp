@@ -501,7 +501,7 @@ StatsOverlay* StatsOverlay::LoadPanel(RenderTarget* target, TextureMapManager* m
     }
     overlayTexture = backingTexture->Clone();
     if (overlayTexture->mapFormat == 4444)
-        overlayTexture->SetAddressModes(5, 6);
+        overlayTexture->SetBlendModes(5, 6);
     overlayTexture->CreateTextureSurface(1, 0, 0);
     source.top = 0;
     source.bottom = 128;
@@ -1313,7 +1313,7 @@ RadarOverlay* RadarOverlay::LoadMap(RenderTarget* target, TextureMapManager* man
     }
     overlayTexture = backingTexture->Clone();
     if (overlayTexture->mapFormat == 4444)
-        overlayTexture->SetAddressModes(5, 6);
+        overlayTexture->SetBlendModes(5, 6);
     overlayTexture->CreateTextureSurface(1, 0, 0);
     source.left = 0;
     source.right = largeMap ? 256 : 128;
@@ -1869,7 +1869,7 @@ ChatOverlay* ChatOverlay::Setup(RenderTarget* target, TextureMapManager* manager
     }
     overlayTexture = backingTexture->Clone();
     if (overlayTexture->mapFormat == 4444)
-        overlayTexture->SetAddressModes(5, 6);
+        overlayTexture->SetBlendModes(5, 6);
     overlayTexture->CreateTextureSurface(1, 0, 0);
     source.left = 0;
     source.right = largeLayout ? 256 : 128;

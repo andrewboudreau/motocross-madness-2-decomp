@@ -31,11 +31,11 @@ public:
     virtual int CreateSurface(void* bits, int width, int height, int stride, int minimumSize,
                               int sourceFormat, int format, ColorMapper* palette,
                               int flags, void* surfacePalette, int checkMemory, int unused,
-                              int addressU, int addressV, TextureContext* choice,
+                              int srcBlend, int destBlend, TextureContext* choice,
                               int alphaThreshold, unsigned int key) = 0;
     virtual int LoadSurface(FileStream* stream, int width, int height, int minimumSize,
                             int fileFormat, int dataSize, int format, ColorMapper* palette,
-                            int flags, void* surfacePalette, int addressU, int addressV,
+                            int flags, void* surfacePalette, int srcBlend, int destBlend,
                             TextureContext* choice, int alphaThreshold, unsigned int key) = 0;
     virtual TextureMap* Clone() = 0;
     virtual int IsResident() = 0;
@@ -53,9 +53,9 @@ public:
     virtual void Bind() = 0;
     virtual int DumpAllLevels() = 0;
 
-    // 0x0050abd0: sets the address-mode render states (0x13, 0x14) of an
+    // 0x0050abd0: sets the SRCBLEND/DESTBLEND render states (0x13, 0x14) of an
     // alpha texture; 0 for other formats.
-    int SetAddressModes(int addressU, int addressV);
+    int SetBlendModes(int srcBlend, int destBlend);
 
     TextureMap* nextTexture;                  // +0x08 next in the manager's list
     TextureMap* previousTexture;              // +0x0c previous in the manager's list

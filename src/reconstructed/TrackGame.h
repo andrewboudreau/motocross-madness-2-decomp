@@ -426,7 +426,7 @@ struct ZoneRaceRecord {
     unsigned char bikeManufacturer;           // +0x00: "Bike %d-%d": the bike manufacturer
     unsigned char bikeType;                   // +0x01: and the bike type
     unsigned char position;                   // +0x02: "Position"
-    unsigned char field_0x03;
+    unsigned char pad_0x03;                  // +0x03 never written by 0x0049c770 (bytes +0..+2, then dwords)
     int fastestLap;                           // +0x04: "FastestLap" (x100)
     int totalRunningTime;                     // +0x08: "TotalrunningTime" (x100)
     int largestStuntPoints;                   // +0x0c: "LargestSingleStuntPoints"
@@ -437,7 +437,7 @@ struct ZoneRaceStatus {
     unsigned char eventType;                  // +0x00: event type index plus one
     unsigned char trackEntry;                 // +0x01: 0x0049ca60(2): the track's 1-based entry, 0 when not found
     unsigned char laps;                       // +0x02: laps
-    unsigned char field_0x03;
+    unsigned char pad_0x03;                  // +0x03 never written by 0x0049c770
     int longestRunningTime;                   // +0x04: the longest total running time
     ZoneRaceRecord records[8];         // +0x08
 };

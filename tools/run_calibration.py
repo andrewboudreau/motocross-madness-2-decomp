@@ -3969,7 +3969,7 @@ CASES = [
         'name': 'TextureMap address modes 0x50abd0',
         'bindings': 'src/reconstructed/Texmap.bindings.json',
         'source': 'src/reconstructed/Texmap.cpp',
-        'symbol': '?SetAddressModes@TextureMap@@QAEHHH@Z',
+        'symbol': '?SetBlendModes@TextureMap@@QAEHHH@Z',
         'target_va': '0x0050abd0',
         'target_size': 88,
         'reason': 'positive alpha test wraps the loop so return 0 comes last',

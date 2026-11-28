@@ -73,7 +73,7 @@ static inline int ReadRows(FileStream* stream, void* bits, int rowSize, int rows
 // and handed to slot 4.
 int PCTextureMap::LoadSurface(FileStream* stream, int width, int height, int minimumSize,
                               int fileFormat, int dataSize, int format, ColorMapper* palette,
-                              int flags, void* surfacePalette, int addressU, int addressV,
+                              int flags, void* surfacePalette, int srcBlend, int destBlend,
                               TextureContext* choice, int alphaThreshold, unsigned int key) {
     int offsets[12];
     DDSCaps2 caps;
@@ -100,7 +100,7 @@ int PCTextureMap::LoadSurface(FileStream* stream, int width, int height, int min
             }
         }
         if (!CreateSurface(0, levelWidth, height, levelWidth, minimumSize, sourceFormat, format, palette,
-                           flags, surfacePalette, 1, 0, addressU, addressV, 0, alphaThreshold, key))
+                           flags, surfacePalette, 1, 0, srcBlend, destBlend, 0, alphaThreshold, key))
             return 0;
 
         int side = 1;
@@ -237,7 +237,7 @@ int PCTextureMap::LoadSurface(FileStream* stream, int width, int height, int min
         }
     }
     return CreateSurface(bits, width, height, width, minimumSize, sourceFormat, format, palette, flags,
-                         surfacePalette, 1, 0, addressU, addressV, 0, alphaThreshold, key);
+                         surfacePalette, 1, 0, srcBlend, destBlend, 0, alphaThreshold, key);
 }
 
 // 0x004c68e0: tries `formats` in turn (0-terminated) until the display
@@ -280,7 +280,7 @@ static inline void AppendRenderStatePair(TextureMap* map, int state, int value) 
 int PCTextureMap::CreateSurface(void* bits, int width, int height, int stride, int minimumSize,
                                 int sourceFormat, int format, ColorMapper* palette,
                                 int flags, void* surfacePalette, int checkMemory, int unused,
-                                int addressU, int addressV, TextureContext* choice,
+                                int srcBlend, int destBlend, TextureContext* choice,
                                 int alphaThreshold, unsigned int key) {
     int formats[5];
     int mipmapped;
@@ -489,8 +489,8 @@ int PCTextureMap::CreateSurface(void* bits, int width, int height, int stride, i
     if (IsFormat4444Or8888(mapFormat)) {
         AppendRenderStatePair(this, 0x29, 0);
         AppendRenderStatePair(this, 0x1b, 1);
-        AppendRenderStatePair(this, 0x13, addressU);
-        AppendRenderStatePair(this, 0x14, addressV);
+        AppendRenderStatePair(this, 0x13, srcBlend);
+        AppendRenderStatePair(this, 0x14, destBlend);
     } else {
         AppendRenderStatePair(this, 0x29, 0);
         AppendRenderStatePair(this, 0x1b, 0);
