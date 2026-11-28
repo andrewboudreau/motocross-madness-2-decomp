@@ -74,7 +74,7 @@ public:
     unsigned int triDestBlendCaps;       // dpcTriCaps.dwDestBlendCaps (ProjectedShadow::Init: 1 ZERO, 0x20 INVSRCALPHA, 0x10 SRCALPHA)
     unsigned int triAlphaCmpCaps;        // dpcTriCaps.dwAlphaCmpCaps: GREATER, NOTEQUAL (slot 18)
     unsigned int triShadeCaps;           // dpcTriCaps.dwShadeCaps (ProjectedShadow::Init tests 0x2000 ALPHAFLATSTIPPLED)
-    unsigned int triTextureCaps;         // dpcTriCaps.dwTextureCaps (0x8 TRANSPARENCY before colour keying)
+    unsigned int triTextureCaps;         // +0x1c0 dpcTriCaps.dwTextureCaps (0x8 TRANSPARENCY: EcoSystem colour-keys its trees with it)
     unsigned int triTextureFilterCaps;   // dpcTriCaps.dwTextureFilterCaps (LINEAR, LINEARMIPLINEAR)
     unsigned int triTextureBlendCaps;    // dpcTriCaps.dwTextureBlendCaps (the shadow draws test 4 MODULATE)
     unsigned char field_0x1cc[0x250 - 0x1cc];

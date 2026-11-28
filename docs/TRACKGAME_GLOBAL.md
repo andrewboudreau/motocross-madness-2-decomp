@@ -9,9 +9,9 @@ These addresses and pointer behavior are confirmed. The original translation
 unit ownership of the pointer definition is not established.
 
 Fourteen provisional views previously declared different C++ extern names or
-types for this same address. Thirteen now read `g_TrackGame` and explicitly
-cast its current value to their local view. The BikeAI sample reads the
-complete `TrackGame` class instead (see below). There is one supplied pointer, with no
+types for this same address. Twelve now read `g_TrackGame` and explicitly
+cast its current value to their local view. BikeAI.cpp and EcoSystem.cpp read
+the complete `TrackGame` class instead (see below). There is one supplied pointer, with no
 additional pointer copies, reference aliases, or cached view pointers.
 This consolidates storage identity; it does not establish the complete
 TrackGame layout or promote these local types to confirmed class identities.
@@ -27,7 +27,7 @@ TrackGame layout or promote these local types to confirmed class identities.
 | `g_soultreeStats` | `SoultreeStats` |
 | `g_terrainGame` | `TerrainGameSettings` |
 | `g_profiler` | `VisibilityProfiler` |
-| `g_TrackGame` in EcoSystem | `EcoTrackGameView` |
+| `g_TrackGame` in EcoSystem | none: reads `TrackGame` (the view was removed) |
 | `g_pGame` | `SurfaceGame` |
 | `g_pShadowSettings` | `ShadowSettings` |
 | `g_BikeAIGame_0056e26c` | none: reads `TrackGame` (the view was removed) |
@@ -98,8 +98,8 @@ physics suites check their canonical and partial callers against retail;
 shared-header dependents also require the full calibration gate.
 
 `tests/test_trackgame_global.py` compiles three independent native VC6
-translation units. The two reader/writer units use the existing
-`ParticleGameContext` and `EcoTrackGameView` views. Their COFF files import
+translation units. The two reader/writer units use the `ParticleGameContext`
+view and the complete `TrackGame` class, as EcoSystem.cpp reads it. Their COFF files import
 the same canonical external pointer. The executable checks cross-view writes
 at offset `0x2d0`, switches the shared pointer between two backing buffers,
 and verifies both readers observe each reassignment. This fixture owns

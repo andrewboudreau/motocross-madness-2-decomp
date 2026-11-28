@@ -12,7 +12,6 @@
 // 0x00455de0 and the loaders. Member names are provisional (tier 3) unless
 // a literal names them ("NumberOfLOD", "MeanHeight", ...).
 
-#include "TrackGameGlobal.h"
 #include <stdio.h>
 #include <float.h>
 
@@ -174,52 +173,7 @@ int ReadXorDecoded(unsigned char* data, int size, int count, FILE* file, unsigne
 
 #include "../krusty2/visibility/VisibilityClipperGlobal.h"        // 0x00575a98
 
-// TrackGame.h: the game object 0x0056e26c, as far as this file reads it
-// (slot 22 is the registry query).
-struct EcoVideoCardView {
-    unsigned char field_0x000[0x28];
-    int colorKeyFormat;                       // +0x28: colour-key texture format
-    unsigned char field_0x02c[0x1c0 - 0x2c];
-    int driverColorKeyCaps;                   // +0x1c0: DDCAPS dwCKeyCaps (PCVideoCard::driverColorKeyCaps)
-};
 #include "DebugOverlay.h"
-class EcoTrackGameView {
-public:
-    virtual void UnknownVirtualSlot0();
-    virtual void Startup();
-    virtual void Initialize();
-    virtual void OpenResources();
-    virtual void CreateGameObjects();
-    virtual void OnActivate();
-    virtual void OnDeactivate();
-    virtual void SetRenderStates();
-    virtual void RenderFrame();
-    virtual void PresentFrame();
-    virtual void Tick();
-    virtual void SetInputSuspended();
-    virtual void OnInputEvent();
-    virtual void OnControlRelease();
-    virtual void OnControlPress();
-    virtual void Shutdown();
-    virtual void CreateNetworkInterface();
-    virtual void OnNetworkMessage();
-    virtual void FindDataFile();
-    virtual void SwitchDisplayMode();
-    virtual int GetRegistryInt(const char* name, int defaultValue);       // Game.h slot 20
-    virtual float GetRegistryFloat(const char* name, float defaultValue); // Game.h slot 21
-    virtual int GetRegistryFlag(const char* name, int defaultValue); // registry value (Game slot 22)
-
-    unsigned char field_0x004[0x10 - 4];
-    EcoVideoCardView* display;               // +0x10
-    unsigned char field_0x014[0x38 - 0x14];
-    DebugOverlay* debugOverlay;            // +0x38 the debug overlay (DebugOverlay.h), or 0
-    unsigned char field_0x03c[0x2d0 - 0x3c];
-    int bladeRenderer;                        // +0x2d0 the "Blade" software renderer (Game.h)
-    unsigned char field_0x2d4[0x54c - 0x2d4];
-    int magFilter;                            // +0x54C  PCGame magFilter; PCGame 0x004c0960 picks it from the device caps
-    int minFilter;                            // +0x550  PCGame minFilter
-    int mipFilter;                            // +0x554  PCGame mipFilter
-};
 unsigned int ReadClock();                     // 0x004bfa80
 int TestInputEvent(int control, int kind, const ControlEvent* event, int modifier); // 0x0043caa0
 

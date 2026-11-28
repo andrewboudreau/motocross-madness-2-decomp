@@ -1,11 +1,13 @@
+#include "TrackGame.h"
 #include "EcoSystem.h"
 
+// EcoSystem.cpp reads the renderer flag through the complete class.
 int ReadEcoRendererFlag()
 {
-    return reinterpret_cast<EcoTrackGameView*>(g_TrackGame)->bladeRenderer;
+    return g_TrackGame->bladeRenderer;
 }
 
 void WriteEcoRendererFlag(int value)
 {
-    reinterpret_cast<EcoTrackGameView*>(g_TrackGame)->bladeRenderer = value;
+    g_TrackGame->bladeRenderer = value;
 }

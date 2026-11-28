@@ -4,7 +4,7 @@
 // match state. Line numbers in the allocation calls are the retail
 // __LINE__ values.
 
-#include "TrackGameGlobal.h"
+#include "TrackGame.h"
 #include <float.h>
 #include <math.h>
 #include <stdio.h>
@@ -177,9 +177,9 @@ int VegetationDefinition::LoadModel(TextureMapManager* textures, int modelFlags)
             block->SelectSection("Material - 0");
             block->ReadString("TextureMap", path, -1);
             int format = 1555;
-            if (!reinterpret_cast<EcoTrackGameView*>(g_TrackGame)->bladeRenderer && (reinterpret_cast<EcoTrackGameView*>(g_TrackGame)->display->driverColorKeyCaps & 8)
-                && reinterpret_cast<EcoTrackGameView*>(g_TrackGame)->GetRegistryFlag("KeyColorTrees", 0))
-                format = reinterpret_cast<EcoTrackGameView*>(g_TrackGame)->display->colorKeyFormat;
+            if (!g_TrackGame->bladeRenderer && (((PCRenderTarget*)g_TrackGame->renderTarget)->triTextureCaps & 8)
+                && g_TrackGame->GetRegistryFlag("KeyColorTrees", 0))
+                format = g_TrackGame->renderTarget->surfacePixelFormat;
             modelTexture = TerrainLoadTexture(textures, path, format, 0, 2, 5, 6, 0, 0x80, 0xff00ff, 1, 1);
             if (!modelTexture->IsResident()) {
                 int loaded = modelTexture->mapFormat;
@@ -735,7 +735,7 @@ void EcoSystem::BuildCollisionObjects(VegetationDefinition* definition) {
     for (i = 0; i < definition->collisionCount; i++) {
         VegetationCollisionDefinition* shape = &definition->collisionDefinitions[i];
         definition->collisionObjects[i] = new(__FILE__, 0x3ad) CollisionObject(1);
-        definition->collisionObjects[i]->Configure(reinterpret_cast<EcoTrackGameView*>(g_TrackGame)->display, 0, 0, 1);
+        definition->collisionObjects[i]->Configure(g_TrackGame->renderTarget, 0, 0, 1);
         AppendChild(definition->collisionObjects[i], -1);
         definition->collisionObjects[i]->ownerType = 0x3e8;
         if (shape->type == 0) {
@@ -1080,7 +1080,7 @@ EcoSystem* EcoSystem::Create(void* view, TextureMapManager* textures, Terrain* t
                                             int textureFormat, int collisions, int level) {
     int i;
     GameObject::SetRenderContext(view);
-    g_UnknownGlobal59af14 = reinterpret_cast<EcoTrackGameView*>(g_TrackGame)->bladeRenderer ? g_UnknownGlobal56a600 : g_UnknownGlobal56a740;
+    g_UnknownGlobal59af14 = g_TrackGame->bladeRenderer ? g_UnknownGlobal56a600 : g_UnknownGlobal56a740;
     SetDetailLevel(level);
     groundTerrain = terrain;
     textureManager = textures;
@@ -1349,7 +1349,7 @@ int EcoSystem::GenerateObjects(int checkCodes) {
             count++;
         }
     }
-    int mode = reinterpret_cast<EcoTrackGameView*>(g_TrackGame)->GetRegistryInt("EcoGen", 0);
+    int mode = g_TrackGame->GetRegistryInt("EcoGen", 0);
     rangeX = g_collisionQuadTree->extentX;
     rangeZ = g_collisionQuadTree->extentZ;
     if (mode == 5) {
@@ -1622,7 +1622,7 @@ int EcoSystem::PrepareGeometry() {
 void EcoSystem::SetRenderStates(int format) {
     float alphaReference;
     if (format == 1555) {
-        alphaReference = (float)(reinterpret_cast<EcoTrackGameView*>(g_TrackGame)->bladeRenderer ? 0 : 0xc0);
+        alphaReference = (float)(g_TrackGame->bladeRenderer ? 0 : 0xc0);
         ECO_VIEW->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, 0, 0);
         ECO_VIEW->SetRenderState(D3DRENDERSTATE_COLORKEYENABLE, 0, 0);
     } else if (format == 4444 || format == 8888) {
@@ -1667,7 +1667,7 @@ void EcoSystem::SetRenderStates(int format) {
     }
     if (format == 1555) {
         ECO_VIEW->SetTextureStageState(0, D3DTSS_MIPFILTER, D3DTFP_NONE);
-        if (reinterpret_cast<EcoTrackGameView*>(g_TrackGame)->bladeRenderer) {
+        if (g_TrackGame->bladeRenderer) {
             ECO_VIEW->SetTextureStageState(0, D3DTSS_MAGFILTER, D3DTFG_POINT);
             ECO_VIEW->SetTextureStageState(0, D3DTSS_MINFILTER, D3DTFN_POINT);
         } else {
@@ -1808,7 +1808,7 @@ int EcoSystem::Render3D() {
     float cosine = inverse * camera->viewDirection.z;
     s_billboardsDrawn = 0;
     s_geometryDrawn = 0;
-    if (reinterpret_cast<EcoTrackGameView*>(g_TrackGame)->bladeRenderer)
+    if (g_TrackGame->bladeRenderer)
         ECO_VIEW->SetRenderState(D3DRENDERSTATE_TEXTUREPERSPECTIVE, g_UnknownGlobal59af14[detailLevel].fog, 0);
     if (geometryCount) {
         SetRenderStates(definitionTable[vegetation[0].definitionIndex]->modelTexture->mapFormat);
@@ -1819,7 +1819,7 @@ int EcoSystem::Render3D() {
         }
     }
     s_geometryRenderTicks = ReadClock() - start;
-    if (reinterpret_cast<EcoTrackGameView*>(g_TrackGame)->bladeRenderer)
+    if (g_TrackGame->bladeRenderer)
         ECO_VIEW->SetRenderState(D3DRENDERSTATE_TEXTUREPERSPECTIVE, 0, 0);
     if (billboardCount) {
         definitionTable[vegetation[0].definitionIndex]->billboardTexture->Bind();
@@ -1951,35 +1951,35 @@ int EcoSystem::Render3D() {
         }
     }
     s_renderTicks = ReadClock() - start;
-    DebugOverlay* overlay = reinterpret_cast<EcoTrackGameView*>(g_TrackGame)->debugOverlay;
+    DebugOverlay* overlay = g_TrackGame->debugOverlay;
     if (overlay) {
         if (s_debugPage < 0)
             { int page = overlay->nextPage++; s_debugPage = page; }
         s_prepareGeometryPeak.Record(s_prepareGeometryTicks);
         s_renderPeak.Record(s_renderTicks);
-        reinterpret_cast<EcoTrackGameView*>(g_TrackGame)->debugOverlay->Title(s_debugPage, "Ecosystem:%d objects", totalObjects);
-        reinterpret_cast<EcoTrackGameView*>(g_TrackGame)->debugOverlay->Print(s_debugPage, "Visible  2D %d 3D %d", billboardCount,
+        g_TrackGame->debugOverlay->Title(s_debugPage, "Ecosystem:%d objects", totalObjects);
+        g_TrackGame->debugOverlay->Print(s_debugPage, "Visible  2D %d 3D %d", billboardCount,
                                                        geometryCount);
-        reinterpret_cast<EcoTrackGameView*>(g_TrackGame)->debugOverlay->Print(s_debugPage, "Rendered 2D %d 3D %d",
+        g_TrackGame->debugOverlay->Print(s_debugPage, "Rendered 2D %d 3D %d",
                                                        s_billboardsDrawn, s_geometryDrawn);
-        reinterpret_cast<EcoTrackGameView*>(g_TrackGame)->debugOverlay->Print(s_debugPage, "Memory %d",
+        g_TrackGame->debugOverlay->Print(s_debugPage, "Memory %d",
                                                        g_MemTagStack->GetBytes("EcoSystem"));
-        reinterpret_cast<EcoTrackGameView*>(g_TrackGame)->debugOverlay->Print(s_debugPage, "PrepareGeometry %d %d",
+        g_TrackGame->debugOverlay->Print(s_debugPage, "PrepareGeometry %d %d",
                                                        s_prepareGeometryTicks, s_prepareGeometryPeak.Peak());
-        reinterpret_cast<EcoTrackGameView*>(g_TrackGame)->debugOverlay->Print(s_debugPage, "Render %d(3d:%d) %d",
+        g_TrackGame->debugOverlay->Print(s_debugPage, "Render %d(3d:%d) %d",
                                                        s_renderTicks, s_geometryRenderTicks,
                                                        s_renderPeak.Peak());
-        reinterpret_cast<EcoTrackGameView*>(g_TrackGame)->debugOverlay->Print(s_debugPage, "Total Transforms %d",
+        g_TrackGame->debugOverlay->Print(s_debugPage, "Total Transforms %d",
                                                        ECO_VIEW->verticesDrawn - verticesBefore);
-        reinterpret_cast<EcoTrackGameView*>(g_TrackGame)->debugOverlay->Print(s_debugPage, "Total Triangles  %d",
+        g_TrackGame->debugOverlay->Print(s_debugPage, "Total Triangles  %d",
                                                        ECO_VIEW->trianglesDrawn - trianglesBefore);
     }
     g_MemTagStack->Pop(category);
     ECO_VIEW->SetRenderState(D3DRENDERSTATE_SHADEMODE, savedShadeMode, 0);
     ECO_VIEW->SetRenderState(D3DRENDERSTATE_TEXTUREPERSPECTIVE, savedPerspective, 0);
-    ECO_VIEW->SetTextureStageState(0, D3DTSS_MAGFILTER, reinterpret_cast<EcoTrackGameView*>(g_TrackGame)->magFilter);
-    ECO_VIEW->SetTextureStageState(0, D3DTSS_MINFILTER, reinterpret_cast<EcoTrackGameView*>(g_TrackGame)->minFilter);
-    ECO_VIEW->SetTextureStageState(0, D3DTSS_MIPFILTER, reinterpret_cast<EcoTrackGameView*>(g_TrackGame)->mipFilter);
+    ECO_VIEW->SetTextureStageState(0, D3DTSS_MAGFILTER, g_TrackGame->magFilter);
+    ECO_VIEW->SetTextureStageState(0, D3DTSS_MINFILTER, g_TrackGame->minFilter);
+    ECO_VIEW->SetTextureStageState(0, D3DTSS_MIPFILTER, g_TrackGame->mipFilter);
     ECO_VIEW->DisableAlphaTest();
     return GameObject::Render3D();
 }
@@ -2092,9 +2092,9 @@ int PreloadEcosystem(TextureMapManager* textures, char* path, FileStream* stream
                     block->SelectSection("Material - 0");
                     block->ReadString("TextureMap", sltName, -1);
                     int format = 1555;
-                    if (!reinterpret_cast<EcoTrackGameView*>(g_TrackGame)->bladeRenderer && (reinterpret_cast<EcoTrackGameView*>(g_TrackGame)->display->driverColorKeyCaps & 8)
-                        && reinterpret_cast<EcoTrackGameView*>(g_TrackGame)->GetRegistryFlag("KeyColorTrees", 0))
-                        format = reinterpret_cast<EcoTrackGameView*>(g_TrackGame)->display->colorKeyFormat;
+                    if (!g_TrackGame->bladeRenderer && (((PCRenderTarget*)g_TrackGame->renderTarget)->triTextureCaps & 8)
+                        && g_TrackGame->GetRegistryFlag("KeyColorTrees", 0))
+                        format = g_TrackGame->renderTarget->surfacePixelFormat;
                     TextureMap* texture = TerrainLoadTexture(textures, sltName, format, 0, 2, 5, 6, 0, 0x80, 0xff00ff, 1, 1);
                     if (!texture->IsResident()) {
                         g_UnknownGlobal59af10++;
