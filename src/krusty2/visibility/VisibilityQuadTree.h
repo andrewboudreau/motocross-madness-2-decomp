@@ -37,10 +37,6 @@ struct VisibilityResultList {
 #include "../../reconstructed/PeakHold.h"
 #include "../../reconstructed/DebugOverlay.h"
 
-struct VisibilityProfiler {
-    char field_0x00[0x38];
-    DebugOverlay* log;          // +0x38 first argument of the 0x00447fa0 / 0x00447f40 line writers
-};
 #include "../core/MemTag.h"
 
 struct VisibilityBoxVec;

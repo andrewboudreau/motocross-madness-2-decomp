@@ -1,5 +1,6 @@
 // Terrain.cpp -- reconstruction of D:\aardvark\VC\krusty2\Terrain.cpp.
 #include "../../reconstructed/TrackGameGlobal.h"
+#include "../../reconstructed/TrackGame.h"
 #include "../../reconstructed/ControlInterface.h"
 #include "Terrain.h"
 #include "../../reconstructed/AgeManager.h"
@@ -98,28 +99,6 @@ void Terrain::RetireOwnedObject(BaseObject* object)
 }
 
 // Boundary declarations for Terrain::Load (tier 1 addresses, tier 3 names).
-
-struct TerrainGameSettings {                                    // TrackGame (src/reconstructed/Game.h)
-    virtual void Slot0(); virtual void Slot1(); virtual void Slot2(); virtual void Slot3();
-    virtual void Slot4(); virtual void Slot5(); virtual void Slot6(); virtual void Slot7();
-    virtual void Slot8(); virtual void Slot9(); virtual void Slot10(); virtual void Slot11();
-    virtual void Slot12(); virtual void Slot13(); virtual void Slot14(); virtual void Slot15();
-    virtual void Slot16(); virtual void Slot17(); virtual void Slot18(); virtual void Slot19();
-    virtual int GetRegistryInt(const char* name, int defaultValue);   // slot 20 (+0x50)
-    virtual void Slot21(); virtual void Slot22(); virtual void Slot23(); virtual void Slot24();
-    virtual int SetRegistryInt(const char* name, int value);          // slot 25 (+0x64)
-    char pad_0x004[0x0c - 0x04];
-    PCVideoCard* display;                                       // +0x00c
-    char pad_0x010[0x38 - 0x10];
-    DebugOverlay* overlay;                               // +0x038 profile page printer
-    char pad_0x03c[0x2d0 - 0x3c];
-    int softwareRendering;                                      // +0x2d0
-    unsigned char debugFlags;                                   // +0x2d4 bit 2: print the terrain profile page
-    char pad_0x2d5[0x54c - 0x2d5];
-    int magFilter;                                              // +0x54c texture stage state 0x10 value
-    int minFilter;                                              // +0x550 state 0x11
-    int mipFilter;                                              // +0x554 state 0x12
-};
 extern TerrainQualityEntry g_terrainQualityHardware[10];        // 0x00574920 (Terrain.cpp .data)
 extern TerrainQualityEntry g_terrainQualitySoftware[10];        // 0x005749c0
 extern int g_gridSize;                                // 0x0067a684 width of the last surface record
@@ -143,7 +122,7 @@ Terrain* Terrain::Load(int host, TerrainStream* stream, int loadChildren, Terrai
     GameObject::SetRenderContext((void*)host);
     int surfaceFlags = halfFormat ? 8 : 0;
     surfaceDesc = *desc;
-    g_pTerrainQualityTable = reinterpret_cast<TerrainGameSettings*>(g_TrackGame)->softwareRendering ? g_terrainQualityHardware : g_terrainQualitySoftware;
+    g_pTerrainQualityTable = g_TrackGame->bladeRenderer ? g_terrainQualityHardware : g_terrainQualitySoftware;
     SelectQuality(quality);
     if (field0xc40)
         hasLightManager = 1;
@@ -374,19 +353,19 @@ int Terrain::Render3D()
     unsigned int start = ReadClock();
 
     if (!g_terrainDualTextureProbed) {
-        if (reinterpret_cast<TerrainGameSettings*>(g_TrackGame)->softwareRendering) {
+        if (g_TrackGame->bladeRenderer) {
             canSinglePassDual = 0;
             lowestQualityOverride = 0;
         } else {
             char key[256];
             sprintf(key, "DriverInfo\\%s\\CanRenderDualTextureInSinglePass",
-                    reinterpret_cast<TerrainGameSettings*>(g_TrackGame)->display->driverGuidText);
-            int canDual = reinterpret_cast<TerrainGameSettings*>(g_TrackGame)->GetRegistryInt(key, -1);
+                    g_TrackGame->display->driverGuidText);
+            int canDual = g_TrackGame->GetRegistryInt(key, -1);
             if (canDual == 0 || canDual == 1) {
                 canSinglePassDual = canDual;
                 sprintf(key, "DriverInfo\\%s\\TerrainDetailTextureMethod",
-                        reinterpret_cast<TerrainGameSettings*>(g_TrackGame)->display->driverGuidText);
-                int method = reinterpret_cast<TerrainGameSettings*>(g_TrackGame)->GetRegistryInt(key, 1);
+                        g_TrackGame->display->driverGuidText);
+                int method = g_TrackGame->GetRegistryInt(key, 1);
                 if (method < 0 || method > 2)
                     method = 1;
                 if (method == 2) {
@@ -422,13 +401,13 @@ int Terrain::Render3D()
                     ((TerrainRenderTarget*)renderContext)->SetTextureStageState(1, 1, 1);
                     ((TerrainRenderTarget*)renderContext)->SetTextureStageState(1, 4, 1);
                     ((TerrainRenderTarget*)renderContext)->device->SetTexture(1, 0);
-                    reinterpret_cast<TerrainGameSettings*>(g_TrackGame)->SetRegistryInt(key, passes == 1);
+                    g_TrackGame->SetRegistryInt(key, passes == 1);
                     if (passes == 1) {
                         canSinglePassDual = 1;
                         lowestQualityOverride = 0;
                         sprintf(key, "DriverInfo\\%s\\TerrainDetailTextureMethod",
-                                reinterpret_cast<TerrainGameSettings*>(g_TrackGame)->display->driverGuidText);
-                        reinterpret_cast<TerrainGameSettings*>(g_TrackGame)->SetRegistryInt(key, 1);
+                                g_TrackGame->display->driverGuidText);
+                        g_TrackGame->SetRegistryInt(key, 1);
                     }
                     g_terrainQualityValue = g_pTerrainQualityTable[qualityIndex].hasDetailPass;
                 }
@@ -460,7 +439,7 @@ int Terrain::Render3D()
         ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 1, 4);
         ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 2, 2);
         ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 3, 0);
-        if (reinterpret_cast<TerrainGameSettings*>(g_TrackGame)->softwareRendering)
+        if (g_TrackGame->bladeRenderer)
             ((TerrainRenderTarget*)renderContext)->SetRenderState(9, 1, 0);
         else
             ((TerrainRenderTarget*)renderContext)->SetRenderState(9, 2, 0);
@@ -468,12 +447,12 @@ int Terrain::Render3D()
     ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 4, 1);
 
     if (lowestQualityOverride && detailTexture) {
-        ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 0x10, reinterpret_cast<TerrainGameSettings*>(g_TrackGame)->magFilter);
-        ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 0x11, reinterpret_cast<TerrainGameSettings*>(g_TrackGame)->minFilter);
-        ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 0x12, reinterpret_cast<TerrainGameSettings*>(g_TrackGame)->mipFilter);
-        ((TerrainRenderTarget*)renderContext)->SetTextureStageState(1, 0x10, reinterpret_cast<TerrainGameSettings*>(g_TrackGame)->magFilter);
-        ((TerrainRenderTarget*)renderContext)->SetTextureStageState(1, 0x11, reinterpret_cast<TerrainGameSettings*>(g_TrackGame)->minFilter);
-        ((TerrainRenderTarget*)renderContext)->SetTextureStageState(1, 0x12, reinterpret_cast<TerrainGameSettings*>(g_TrackGame)->mipFilter);
+        ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 0x10, g_TrackGame->magFilter);
+        ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 0x11, g_TrackGame->minFilter);
+        ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 0x12, g_TrackGame->mipFilter);
+        ((TerrainRenderTarget*)renderContext)->SetTextureStageState(1, 0x10, g_TrackGame->magFilter);
+        ((TerrainRenderTarget*)renderContext)->SetTextureStageState(1, 0x11, g_TrackGame->minFilter);
+        ((TerrainRenderTarget*)renderContext)->SetTextureStageState(1, 0x12, g_TrackGame->mipFilter);
         closeUpStateSet = 0;
         ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 0xb, 1);
         ((TerrainRenderTarget*)renderContext)->SetTextureStageState(1, 0xb, 0);
@@ -491,7 +470,7 @@ int Terrain::Render3D()
             return 0;
         ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 0xb, 0);
     } else {
-        if (!reinterpret_cast<TerrainGameSettings*>(g_TrackGame)->softwareRendering && detailTexture && g_terrainQualityValue) {
+        if (!g_TrackGame->bladeRenderer && detailTexture && g_terrainQualityValue) {
             ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 1, 4);
             ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 2, 2);
             ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 3, 0);
@@ -506,7 +485,7 @@ int Terrain::Render3D()
             ((TerrainRenderTarget*)renderContext)->SetRenderState(0x1d, 0, 0);
             ((DrawableGridNode*)heightField)->DrawVisible(renderContext);
         }
-        if (!reinterpret_cast<TerrainGameSettings*>(g_TrackGame)->softwareRendering && detailTexture && g_terrainQualityValue) {
+        if (!g_TrackGame->bladeRenderer && detailTexture && g_terrainQualityValue) {
             detailTexture->SetAsTexture();
             ((TerrainRenderTarget*)renderContext)->SetRenderState(0x1b, 1, 0);
             ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 1, 4);
@@ -514,14 +493,14 @@ int Terrain::Render3D()
             ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 3, 0);
             ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 4, 2);
             ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 5, 2);
-            ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 0x10, reinterpret_cast<TerrainGameSettings*>(g_TrackGame)->magFilter);
+            ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 0x10, g_TrackGame->magFilter);
             ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 0x11, 2);
             ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 0x12, 1);
             if (!((DrawableGridNode*)heightField)->DrawVisibleWithDetail(renderContext, reinterpret_cast<int>(detailTexture)))
                 return 0;
-            ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 0x10, reinterpret_cast<TerrainGameSettings*>(g_TrackGame)->magFilter);
-            ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 0x11, reinterpret_cast<TerrainGameSettings*>(g_TrackGame)->minFilter);
-            ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 0x12, reinterpret_cast<TerrainGameSettings*>(g_TrackGame)->mipFilter);
+            ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 0x10, g_TrackGame->magFilter);
+            ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 0x11, g_TrackGame->minFilter);
+            ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 0x12, g_TrackGame->mipFilter);
         }
     }
     ((TerrainRenderTarget*)renderContext)->SetRenderState(4, savedPerspective, 0);
@@ -530,9 +509,9 @@ int Terrain::Render3D()
     GameObject::Render3D();
     g_terrainRender3DTicks = ReadClock() - start;
 
-    if ((reinterpret_cast<TerrainGameSettings*>(g_TrackGame)->debugFlags & 4) && reinterpret_cast<TerrainGameSettings*>(g_TrackGame)->overlay) {
+    if (g_TrackGame->testKey && g_TrackGame->debugOverlay) {
         if (g_terrainDebugPage < 0) {
-            int page = reinterpret_cast<TerrainGameSettings*>(g_TrackGame)->overlay->nextPage++;
+            int page = g_TrackGame->debugOverlay->nextPage++;
             g_terrainDebugPage = page;
         }
         g_terrainAgeTime0Peak.Record(g_terrainAgeTime0);
@@ -545,46 +524,46 @@ int Terrain::Render3D()
         g_terrainRender3DPeak.Record(g_terrainRender3DTicks);
         g_terrainTotalTicks = g_terrainPrepareGeometryTicks + g_terrainRender3DTicks;
         g_terrainTotalPeak.Record(g_terrainTotalTicks);
-        reinterpret_cast<TerrainGameSettings*>(g_TrackGame)->overlay->Title(g_terrainDebugPage, "Terrain Tolerance:%d",
+        g_TrackGame->debugOverlay->Title(g_terrainDebugPage, "Terrain Tolerance:%d",
                                                       drawDistance);
-        reinterpret_cast<TerrainGameSettings*>(g_TrackGame)->overlay->Print(g_terrainDebugPage, "Memory %d",
+        g_TrackGame->debugOverlay->Print(g_terrainDebugPage, "Memory %d",
                                                       g_MemTagStack->GetBytes("Terrain"));
-        reinterpret_cast<TerrainGameSettings*>(g_TrackGame)->overlay->Print(g_terrainDebugPage, "AgeTime %d(%d) %d(%d)",
+        g_TrackGame->debugOverlay->Print(g_terrainDebugPage, "AgeTime %d(%d) %d(%d)",
                                                       g_terrainAgeTime0, g_terrainAgeTime1,
                                                       g_terrainAgeTime0Peak.Peak(),
                                                       g_terrainAgeTime1Peak.Peak());
-        reinterpret_cast<TerrainGameSettings*>(g_TrackGame)->overlay->Print(g_terrainDebugPage, "Setup   %d %d",
+        g_TrackGame->debugOverlay->Print(g_terrainDebugPage, "Setup   %d %d",
                                                       profileSetup, g_terrainSetupPeak.Peak());
-        reinterpret_cast<TerrainGameSettings*>(g_TrackGame)->overlay->Print(g_terrainDebugPage, "Eval    %d[%d] %d",
+        g_TrackGame->debugOverlay->Print(g_terrainDebugPage, "Eval    %d[%d] %d",
                                                       profileEval, vertexErrorTests,
                                                       g_terrainEvalPeak.Peak());
-        reinterpret_cast<TerrainGameSettings*>(g_TrackGame)->overlay->Print(g_terrainDebugPage, "Mesh    %d[%d] %d",
+        g_TrackGame->debugOverlay->Print(g_terrainDebugPage, "Mesh    %d[%d] %d",
                                                       profileMesh, bufferRebuilds,
                                                       g_terrainMeshPeak.Peak());
-        reinterpret_cast<TerrainGameSettings*>(g_TrackGame)->overlay->Print(g_terrainDebugPage, "Cache   %d[%f] %d[%f]",
+        g_TrackGame->debugOverlay->Print(g_terrainDebugPage, "Cache   %d[%f] %d[%f]",
                                                       g_terrainCacheCount,
                                                       g_terrainCacheBytes * (1.0f / 1048576.0f),
                                                       g_terrainCacheCountPeak.Peak(),
                                                       g_terrainCacheBytesPeak.Peak() * (1.0f / 1048576.0f));
-        reinterpret_cast<TerrainGameSettings*>(g_TrackGame)->overlay->Print(g_terrainDebugPage, "  [%f]",
+        g_TrackGame->debugOverlay->Print(g_terrainDebugPage, "  [%f]",
                                                       (ownedObjectArrayCount << 17) * (1.0f / 786432.0f));
-        reinterpret_cast<TerrainGameSettings*>(g_TrackGame)->overlay->Print(g_terrainDebugPage, "Total   %d %d",
+        g_TrackGame->debugOverlay->Print(g_terrainDebugPage, "Total   %d %d",
                                                       g_terrainTotalTicks, g_terrainTotalPeak.Peak());
-        reinterpret_cast<TerrainGameSettings*>(g_TrackGame)->overlay->Print(g_terrainDebugPage, "Vertex Buffers %d (%d)",
+        g_TrackGame->debugOverlay->Print(g_terrainDebugPage, "Vertex Buffers %d (%d)",
                                                       g_gridDrawMemory, g_gridDrawMemoryPeak);
-        reinterpret_cast<TerrainGameSettings*>(g_TrackGame)->overlay->Print(g_terrainDebugPage, "PrepareGeometry% 3d (%d)",
+        g_TrackGame->debugOverlay->Print(g_terrainDebugPage, "PrepareGeometry% 3d (%d)",
                                                       g_terrainPrepareGeometryTicks, g_terrainPrepareGeometryPeak.Peak());
-        reinterpret_cast<TerrainGameSettings*>(g_TrackGame)->overlay->Print(g_terrainDebugPage, "Render3D%        3d (%d)",
+        g_TrackGame->debugOverlay->Print(g_terrainDebugPage, "Render3D%        3d (%d)",
                                                       g_terrainRender3DTicks, g_terrainRender3DPeak.Peak());
-        reinterpret_cast<TerrainGameSettings*>(g_TrackGame)->overlay->Print(g_terrainDebugPage, "Total%           3d (%d)",
+        g_TrackGame->debugOverlay->Print(g_terrainDebugPage, "Total%           3d (%d)",
                                                       g_terrainTotalTicks, g_terrainTotalPeak.Peak());
-        reinterpret_cast<TerrainGameSettings*>(g_TrackGame)->overlay->Print(g_terrainDebugPage, "Total Transforms %d",
+        g_TrackGame->debugOverlay->Print(g_terrainDebugPage, "Total Transforms %d",
                                                       ((TerrainRenderTarget*)renderContext)->transformCount - transforms);
-        reinterpret_cast<TerrainGameSettings*>(g_TrackGame)->overlay->Print(g_terrainDebugPage, "Total Triangles  %d",
+        g_TrackGame->debugOverlay->Print(g_terrainDebugPage, "Total Triangles  %d",
                                                       ((TerrainRenderTarget*)renderContext)->triangleCount - triangles);
-        reinterpret_cast<TerrainGameSettings*>(g_TrackGame)->overlay->Print(g_terrainDebugPage, "CanSinglePassDual %s",
+        g_TrackGame->debugOverlay->Print(g_terrainDebugPage, "CanSinglePassDual %s",
                                                       canSinglePassDual ? "TRUE" : "FALSE");
-        reinterpret_cast<TerrainGameSettings*>(g_TrackGame)->overlay->Print(g_terrainDebugPage, "SinglePassDual    %s",
+        g_TrackGame->debugOverlay->Print(g_terrainDebugPage, "SinglePassDual    %s",
                                                       lowestQualityOverride ? "TRUE" : "FALSE");
     }
     g_MemTagStack->Pop(previousTag);

@@ -1,5 +1,6 @@
 // VisibilityQuadTree.cpp -- reconstruction of D:\aardvark\VC\krusty2\VisibilityQuadTree.cpp.
 #include "../../reconstructed/TrackGameGlobal.h"
+#include "../../reconstructed/TrackGame.h"
 #include "../../reconstructed/ControlInterface.h"
 #include "visibility/VisibilityQuadTree.h"
 #include "../../reconstructed/PCCamera.h"
@@ -320,16 +321,16 @@ int VisibilityQuadTree::PrepareGeometry()
         cam = View()->currentCamera;
     Query(cam->eyePosition.x, cam->eyePosition.z, cam);
     g_visibilityQueryTicks = ReadClock() - start;
-    if (reinterpret_cast<VisibilityProfiler*>(g_TrackGame)->log) {
+    if (g_TrackGame->debugOverlay) {
         if (statsId < 0) {
-            DebugOverlay* log = reinterpret_cast<VisibilityProfiler*>(g_TrackGame)->log;
+            DebugOverlay* log = g_TrackGame->debugOverlay;
             int line = log->nextPage++;
             statsId = line;
         }
         g_visibilityTickStat.Record(g_visibilityQueryTicks);
-        reinterpret_cast<VisibilityProfiler*>(g_TrackGame)->log->Title(statsId, "QuadTree");
-        reinterpret_cast<VisibilityProfiler*>(g_TrackGame)->log->Print(statsId, "Memory %d", g_MemTagStack->GetBytes("QuadTree"));
-        reinterpret_cast<VisibilityProfiler*>(g_TrackGame)->log->Print(statsId, "PrepareGeometry %d %d", g_visibilityQueryTicks,
+        g_TrackGame->debugOverlay->Title(statsId, "QuadTree");
+        g_TrackGame->debugOverlay->Print(statsId, "Memory %d", g_MemTagStack->GetBytes("QuadTree"));
+        g_TrackGame->debugOverlay->Print(statsId, "PrepareGeometry %d %d", g_visibilityQueryTicks,
                 g_visibilityTickStat.Peak());
     }
     return 1;

@@ -4,6 +4,7 @@
 // referrer of that string (InsertNodesInQuadtree, RemoveNodesFromQuadtree) or a method of the same class laid out
 // contiguously with them, so the promotion rule is met.
 #include "../../reconstructed/TrackGameGlobal.h"
+#include "../../reconstructed/TrackGame.h"
 #include "../../reconstructed/ControlInterface.h"
 #include "SoultreeQuadTreeRenderer.h"
 
@@ -51,14 +52,9 @@ public:
 // (operator new(0x94, __FILE__, line) at 0x504719 and 0x504829).
 #include "../../reconstructed/GameObjectIterator.h"   // gameobj.cpp's iterator (0x94 bytes)
 
-// TrackGame's Game base stores its DebugOverlay pointer at +0x38.
+// Game::debugOverlay (+0x38) prints the counters; Game::testKey (+0x2d4 bit 2)
+// enables the debug keys (slot 23).
 #include "../../reconstructed/DebugOverlay.h"
-struct SoultreeStats {
-    char pad_0x00[0x38];
-    DebugOverlay* log;            // +0x38
-    char pad_0x3c[0x2d4 - 0x3c];
-    unsigned char debugFlags;         // +0x2d4 bit 2 enables the debug keys (slot 23)
-};
 
 #include "core/DebugAlloc.h"
 #include "broadphase/Quadtree.h"
@@ -89,16 +85,16 @@ SoultreeQuadTreeRenderer::~SoultreeQuadTreeRenderer()
 // slot 14, 0x00504570: publishes the node counters on the statistics overlay.
 int SoultreeQuadTreeRenderer::Render3D()
 {
-    DebugOverlay* log = reinterpret_cast<SoultreeStats*>(g_TrackGame)->log;
+    DebugOverlay* log = g_TrackGame->debugOverlay;
     if (log) {
         if (statsId < 0) {
             int line = log->nextPage++;
             statsId = line;
         }
-        reinterpret_cast<SoultreeStats*>(g_TrackGame)->log->Title(statsId, "SoultreeQuadTreeRenderer");
-        reinterpret_cast<SoultreeStats*>(g_TrackGame)->log->Print(statsId, "Total Objects in scene : %i\n", sceneObjectCount);
-        reinterpret_cast<SoultreeStats*>(g_TrackGame)->log->Print(statsId, "Objects Visible        : %i\n", visibleCount);
-        reinterpret_cast<SoultreeStats*>(g_TrackGame)->log->Print(statsId, "Objects in list        : %i\n", g_soultreeNodeCount);
+        g_TrackGame->debugOverlay->Title(statsId, "SoultreeQuadTreeRenderer");
+        g_TrackGame->debugOverlay->Print(statsId, "Total Objects in scene : %i\n", sceneObjectCount);
+        g_TrackGame->debugOverlay->Print(statsId, "Objects Visible        : %i\n", visibleCount);
+        g_TrackGame->debugOverlay->Print(statsId, "Objects in list        : %i\n", g_soultreeNodeCount);
     }
     return GraphicsTest::Render3D();
 }
@@ -176,7 +172,7 @@ void SoultreeQuadTreeRenderer::RemoveNodesFromQuadtree()
 // node on (InsertNodesInQuadtree) or, when some are on, off again (RemoveNodesFromQuadtree).
 int SoultreeQuadTreeRenderer::OnControlPress(ControlEvent* event, InputButtonState* entry)
 {
-    if ((reinterpret_cast<SoultreeStats*>(g_TrackGame)->debugFlags & 4) && TestInputEvent(0x2d, 0, event, 0x80)) {
+    if (g_TrackGame->testKey && TestInputEvent(0x2d, 0, event, 0x80)) {
         if (!sceneObjectCount)
             InsertNodesInQuadtree();
         else

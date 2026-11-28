@@ -9,9 +9,10 @@ These addresses and pointer behavior are confirmed. The original translation
 unit ownership of the pointer definition is not established.
 
 Fourteen provisional views previously declared different C++ extern names or
-types for this same address. Twelve now read `g_TrackGame` and explicitly
-cast its current value to their local view. BikeAI.cpp and EcoSystem.cpp read
-the complete `TrackGame` class instead (see below). There is one supplied pointer, with no
+types for this same address. Five still read `g_TrackGame` and explicitly
+cast its current value to their local view. The other nine callers read the
+complete `TrackGame` class (see below), whose Game and PCGame bases already
+declare every offset they use. There is one supplied pointer, with no
 additional pointer copies, reference aliases, or cached view pointers.
 This consolidates storage identity; it does not establish the complete
 TrackGame layout or promote these local types to confirmed class identities.
@@ -20,13 +21,13 @@ TrackGame layout or promote these local types to confirmed class identities.
 | --- | --- |
 | `g_Bike_0056e26c` | `BikeGlobal_0056e26c` |
 | `g_collisionGameContext` | none: reads `Game::childRoot` (+0x34) through `TrackGame` |
-| `g_gridGameSettings` | `GridGameSettings` |
+| `g_gridGameSettings` | none: Griddraw.cpp reads `Game::bladeRenderer` (+0x2d0) and `PCGame::minFilter`/`mipFilter` (+0x550/+0x554) |
 | `g_kbGame` | `KbGame` |
 | `g_gameContext` | none: the particle code reads `Game::paused` (+0x1c4); the old `hidden` word is `Game::bladeRenderer` (+0x2d0) |
-| `g_0056e26c` | `SoultreeGlobals` |
-| `g_soultreeStats` | `SoultreeStats` |
-| `g_terrainGame` | `TerrainGameSettings` |
-| `g_profiler` | `VisibilityProfiler` |
+| `g_0056e26c` | none: SoulTreePhysics.cpp reads `TrackGame::sceneObject` (+0x574) |
+| `g_soultreeStats` | none: SoultreeQuadTreeRenderer.cpp reads `Game::debugOverlay` (+0x38) and `Game::testKey` (+0x2d4 bit 2) |
+| `g_terrainGame` | none: Terrain.cpp reads `Game::display` (+0x0c), `debugOverlay` (+0x38), `bladeRenderer` (+0x2d0), `testKey` (+0x2d4 bit 2) and `PCGame::magFilter`/`minFilter`/`mipFilter` (+0x54c..+0x554), and calls `GetRegistryInt`/`SetRegistryInt` (slots 20/25) |
+| `g_profiler` | none: VisibilityQuadTree.cpp reads `Game::debugOverlay` (+0x38) |
 | `g_TrackGame` in EcoSystem | none: reads `TrackGame` (the view was removed) |
 | `g_pGame` | `SurfaceGame` |
 | `g_pShadowSettings` | `ShadowSettings` |
@@ -37,6 +38,29 @@ The last four declarations occur only in partial sample callers. Their bodies
 remain in `samples/` and their acceptance status is unchanged. Canonical and
 sample binding files now bind `?g_TrackGame@@3PAVTrackGame@@A` to `0x0056e26c`.
 Ten unresolved names in the source game build are removed by this change.
+
+The terrain, grid, soultree and visibility views named only offsets that
+Game, PCGame and TrackGame already declare, so no member was added. Retail
+loads `[0x0056e26c]` and then reads, with the same width:
+
+- `+0x2d0` dword: Terrain::Load `0x00505a2a`, Terrain::Render3D `0x00506280`,
+  `0x0050661e`, DrawableGridNode `0x00480cc9`, `0x00480fb9`.
+- `+0x2d4` byte, mask 4: Terrain::Render3D `0x005069fb` (`test byte ptr`),
+  SoultreeQuadTreeRenderer slot 23 `0x005048d9`.
+- `+0x0c` and `+0x38` dwords: Render3D `0x00506299`, `0x00506a08`;
+  SoultreeQuadTreeRenderer slot 14 `0x00504578`; VisibilityQuadTree
+  PrepareGeometry `0x0052ef9d`.
+- `+0x54c/+0x550/+0x554` dwords: Render3D `0x0050666f`..`0x005066e9`;
+  DrawableGridNode `0x004810cf`, `0x004810ea`.
+- `+0x574` dword: the slot 40 loaders `0x00503b68`, `0x00503fdc`.
+- vtable `+0x50`/`+0x64` (slots 20 and 25): Render3D `0x005062c3`, `0x00506411`.
+
+Every object of the game build is identical before and after, apart from
+renumbered compiler `$T`/`$L` labels. Including `TrackGame.h` changes the
+order in which SoulTreePhysics.obj emits its vtordisp and deleting-destructor
+thunk COMDATs, so the linked build places SoultreePhysicsObject's two
+`$4` thunks before SoultreePhysicsCharacter's (retail order: `0x00504260`,
+`0x00504270`, then `0x005042e0`..`0x00504350`); each body is unchanged.
 
 `TrackGameGlobal.h` provides the forward declaration used by the local views.
 `TrackGame.h` retains its original, identically typed extern declaration after

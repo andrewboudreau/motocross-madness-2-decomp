@@ -4641,3 +4641,18 @@ finds every edited file still CRLF.
 | `Group4Vis_*` helpers, `kGroup4Light*` (Group4_GridLighting.cpp); `Group4Vis_ColorByte` (Group4_GridLightColor.cpp) | `Lighting*` (`LightingOverAmbient` for `Group4Vis_LightOverAmbient`), `kLight*`; `LightingColorByte` | 3 | Prefix renames only. `?Group4Vis_ColorByte@@YAHM@Z` becomes `?LightingColorByte@@YAHM@Z`. The files are `samples/render/LightManagerLighting.cpp` and `LightColorByte.cpp`. |
 | `Group4Ovl_ShowModel` (Group4_ScoreBoard.cpp) | `ShowBonusModel` | 3 | Static helper with no retail body. The file is `samples/race/BonusObjectManagerShowValue.cpp`. |
 | `s_group4BoxCorners` (Group4_Visibility.cpp) | `s_boxCorners` (0x0068abc8) | 3 | File static. The file is `samples/physics/visibility/VisibilityTestBox.cpp`; the visibility_testbox binding is `_s_boxCorners`. |
+
+## TrackGame views retired (2026-11-28)
+
+Each view named only offsets the `TrackGame`/`PCGame`/`Game` classes already
+declare; the callers include `TrackGame.h` and read `g_TrackGame` directly.
+No member was added and no mangled name changed. Evidence VAs are in
+[TRACKGAME_GLOBAL.md](TRACKGAME_GLOBAL.md).
+
+| Old | New | Tier | Evidence |
+|---|---|---|---|
+| `TerrainGameSettings` (Terrain.cpp): `display`, `overlay`, `softwareRendering`, `debugFlags & 4`, `magFilter`/`minFilter`/`mipFilter`, slots `GetRegistryInt`/`SetRegistryInt` | `Game::display` (+0x0c), `Game::debugOverlay` (+0x38), `Game::bladeRenderer` (+0x2d0), `Game::testKey` (+0x2d4 bit 2), `PCGame::magFilter`/`minFilter`/`mipFilter` (+0x54c..+0x554), `PCGame::GetRegistryInt`/`SetRegistryInt` (slots 20/25) | 2 | Same offsets, widths and vtable slots in Terrain::Load and Render3D. |
+| `GridGameSettings` (Griddraw.h): `softwareRenderer`, `minFilter`, `mipFilter` | `Game::bladeRenderer`, `PCGame::minFilter`, `PCGame::mipFilter` | 2 | DrawableGridNode 0x00480c90 and 0x00480fb0 read +0x2d0, +0x550 and +0x554. |
+| `SoultreeGlobals` (SoulTreePhysics.cpp): `sceneObject` | `TrackGame::sceneObject` (+0x574) | 2 | The slot 40 loaders read +0x574 (the wave row above already named it). |
+| `SoultreeStats` (SoultreeQuadTreeRenderer.cpp): `log`, `debugFlags & 4` | `Game::debugOverlay`, `Game::testKey` | 2 | Slot 14 0x00504570 reads +0x38; slot 23 0x005048d0 tests +0x2d4 bit 2. |
+| `VisibilityProfiler` (VisibilityQuadTree.h): `log` | `Game::debugOverlay` | 2 | PrepareGeometry 0x0052ef50 reads +0x38. |

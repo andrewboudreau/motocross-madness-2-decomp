@@ -3,6 +3,7 @@
 // Translation-unit ownership of the neighbouring functions is tier 2 (proximity
 // plus the same __FILE__ string).
 #include "../../reconstructed/TrackGameGlobal.h"
+#include "../../reconstructed/TrackGame.h"
 #include "../../reconstructed/ParticleEmitters.h"
 #include <math.h>
 #include <string.h>
@@ -1112,16 +1113,12 @@ int SoultreePhysicsObject::Tick(float dt)
 // 0x134-byte file object; retail pushes this TU's __FILE__ string 0x00574320 at 0x00503b13 and
 // 0x00503f87 (tier 1), which places both functions here.
 
-// Shared archive stream and scene-file finder. The finder pointer is read
-// from TrackGame+0x574; its complete layout is declared independently.
+// Shared archive stream and scene-file finder. The finder pointer is
+// TrackGame::sceneObject (+0x574).
 #include "../../reconstructed/FileStream.h"
 #include "../../reconstructed/SceneArchiveFinder.h"
 #include "../../reconstructed/LightEmitter.h"
 
-struct SoultreeGlobals {
-    char field_0x000[0x574];
-    SceneArchiveFinder* sceneObject;   // TrackGame::sceneObject (+0x574)
-};
 class ResourceManager;
 extern ResourceManager* g_ResourceManager; // pointer stored at 0x00572b44
 
@@ -1159,7 +1156,7 @@ GameObject* SoultreePhysicsObject::LoadPhysicsModel(int renderContext, const cha
     strcpy(strrchr(name, '.'), ".col");
 
     FileStream* file = new(SP_FILE, 0x84e) FileStream(g_ResourceManager);
-    if (!reinterpret_cast<SoultreeGlobals*>(g_TrackGame)->sceneObject->OpenArchiveFile(file, name, "rb", (int)colPath)) {
+    if (!g_TrackGame->sceneObject->OpenArchiveFile(file, name, "rb", (int)colPath)) {
         colPath[0] = 0;
     }
     delete file;
@@ -1230,7 +1227,7 @@ GameObject* SoultreePhysicsCharacter::LoadPhysicsModel(int renderContext, int cr
     strcpy(strrchr(name, '.'), ".col");
 
     FileStream* file = new(SP_FILE, 0x8cd) FileStream(g_ResourceManager);
-    if (!reinterpret_cast<SoultreeGlobals*>(g_TrackGame)->sceneObject->OpenArchiveFile(file, name, "rb", (int)colPath)) {
+    if (!g_TrackGame->sceneObject->OpenArchiveFile(file, name, "rb", (int)colPath)) {
         colPath[0] = 0;
     }
     delete file;

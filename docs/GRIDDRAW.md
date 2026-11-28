@@ -189,8 +189,10 @@ exact or a documented near miss.
 
 All type, member and function names are provisional. `GridTerrain`,
 `GridAgeManager` is a boundary view of a class reconstructed elsewhere, or
-not yet reconstructed, as are `GridRenderDevice` (Terrain+0x18, thiscall
-virtuals) and `GridGameSettings` (`0x0056e26c`). The frustum test is the
+not yet reconstructed, as is `GridRenderDevice` (Terrain+0x18, thiscall
+virtuals). The game object at `0x0056e26c` is read through `TrackGame`
+(`Game::bladeRenderer` +0x2d0, `PCGame::minFilter`/`mipFilter`
++0x550/+0x554). The frustum test is the
 real `VisibilityClipper::TestBox` (`0x0052f570`), the node texture
 (GridNodeExtra+0x08) the real `ManagedTexture` and the vertex lighting
 object (Terrain+0xc40) the real `LightManager`. Of the boundary views,

@@ -55,17 +55,6 @@ public:
     Camera* camera;                            // +0x08 the camera the box test takes (0x00481de0)
 };
 
-// The game object at 0x0056e26c as this file sees it (other views name it
-// TrackGame). +0x2d0 disables terrain drawing; +0x550/+0x554 are the
-// texture-stage values restored after a close-up draw.
-struct GridGameSettings {
-    unsigned char field_0x000[0x2d0];
-    int softwareRenderer;
-    unsigned char field_0x2d4[0x550 - 0x2d4];
-    int minFilter;
-    int mipFilter;
-};
-
 #include "../krusty2/visibility/VisibilityClipperGlobal.h"   // 0x00575a98
 
 // Boundary view of Terrain (RTTI .?AVTerrain@@; reconstructed in

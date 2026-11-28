@@ -2,6 +2,7 @@
 // See Griddraw.h and docs/GRIDDRAW.md.
 
 #include "TrackGameGlobal.h"
+#include "TrackGame.h"
 #include "Griddraw.h"
 #include "Camera.h"
 #include "../krusty2/visibility/VisibilityClipper.h"
@@ -1093,7 +1094,7 @@ void DrawableGridNode::SubmitUnlitRange(int detailPass, GridVertex* vertices, in
         detail = extra->detail;
     else
         detail = extra->blockRecords[block].detail;
-    if (reinterpret_cast<GridGameSettings*>(g_TrackGame)->softwareRenderer) {
+    if (g_TrackGame->bladeRenderer) {
         if (terrain->qualityParamB < detail)
             terrain->renderer->SetRenderState(D3DRENDERSTATE_TEXTUREPERSPECTIVE, 1, 0);
         else
@@ -1182,7 +1183,7 @@ void DrawableGridNode::SubmitUnlitRange(int detailPass, GridVertex* vertices, in
 void DrawableGridNode::SubmitLitRange(int detailPass, GridVertex* vertices, int vertexCount, unsigned short* indices,
                                             int indexCount, int block)
 {
-    if (reinterpret_cast<GridGameSettings*>(g_TrackGame)->softwareRenderer || !detailPass)
+    if (g_TrackGame->bladeRenderer || !detailPass)
         return;
     float detail;
     if (block == -1)
@@ -1211,8 +1212,8 @@ void DrawableGridNode::SubmitLitRange(int detailPass, GridVertex* vertices, int 
             terrain->closeUpStateSet = 1;
         }
     } else if (terrain->closeUpStateSet != 0) {
-        terrain->renderer->SetTextureStageState(1, D3DTSS_MINFILTER, reinterpret_cast<GridGameSettings*>(g_TrackGame)->minFilter);
-        terrain->renderer->SetTextureStageState(1, D3DTSS_MIPFILTER, reinterpret_cast<GridGameSettings*>(g_TrackGame)->mipFilter);
+        terrain->renderer->SetTextureStageState(1, D3DTSS_MINFILTER, g_TrackGame->minFilter);
+        terrain->renderer->SetTextureStageState(1, D3DTSS_MIPFILTER, g_TrackGame->mipFilter);
         terrain->closeUpStateSet = 0;
     }
     terrain->ageManager->MarkUsed(&data->ageEntry);
