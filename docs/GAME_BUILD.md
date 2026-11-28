@@ -998,9 +998,8 @@ body was unregistered:
     identity: 0x00464e90, 0x00478fe0, 0x004624d0, 0x004de270, 0x004500d0,
     0x00499ae0 and 0x00523c80;
   - bodies in files covered by other work:
-    - `ManagedTextureGroup.cpp` (the `UnknownTimer` pair, linked to
-      PeakHold.cpp's `Peak`/`Record` through aliases, and
-      `ContainerList::Reserve`);
+    - `ManagedTextureGroup.cpp` (`ContainerList::Reserve`; its histories
+      are `PeakHold` since 2026-11-28 and call PeakHold.cpp directly);
     - the `Vec3` call views of `src/krusty2/vehicle/BikeAI.cpp` (linked to the
       Math3D definitions through aliases).
 

@@ -219,7 +219,7 @@ struct KbBody { int TestMeshBounds(KbBody* other); };
 // ---- loader (0x0048fc80) support ----
 // 0x5c-byte setup record the loader copies and forwards field by field: +0 -> KrustyBike+0x738,
 // +4 -> +0x737, +8 is converted to float, +0x24 is passed by address, the rest by value.  The
-// layout is the garage settings record (OptionProcs.h UnknownOptGarageSettings, 0x5c bytes,
+// layout is the garage settings record (TrackGame.h's TrackGameGarageOptions, 0x5c bytes,
 // TrackGame+0x1550) and the names follow it (tier 2; the slider literals are tier 1 there).
 struct KbBikeSetup {
     int engineSize;              // +0x00 -> KrustyBike::engineSize

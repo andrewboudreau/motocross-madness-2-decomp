@@ -26,9 +26,9 @@ struct DialogEvent {
     int handled;                              // +0x20 set to 1 once handled
 };
 
-// The garage settings at TrackGame+0x1550 (OptionProcs.h's
-// UnknownOptGarageSettings; TrackGame.h declares the block as bytes).
-#define UNKNOWN_GARAGE_SETTINGS ((UnknownOptGarageSettings*)g_TrackGame->mode.garageOptions)
+// The garage settings at TrackGame+0x1550 (TrackGame.h declares the
+// block as bytes).
+#define UNKNOWN_GARAGE_SETTINGS ((TrackGameGarageOptions*)g_TrackGame->mode.garageOptions)
 
 // Loads bike class `bikeClass`'s garage defaults (KrustyUI's tables) and its
 // chosen power curve into the garage settings, counting the bands with

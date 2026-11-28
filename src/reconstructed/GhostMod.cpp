@@ -16,15 +16,15 @@ GhostMod1::GhostMod1(int flags)
 }
 
 // 0x0047bb70
-void GhostMod1::ModifyMesh(D3DIMSoultreeObject* object, ModifierSoultreeSurfaceView* mesh,
-                           ModifierSoultreeSurfaceView** out)
+void GhostMod1::ModifyMesh(D3DIMSoultreeObject* object, SoultreeSurface* mesh,
+                           SoultreeSurface** out)
 {
     *out = mesh;
     if (timeRemaining > 0.0f) {
         unsigned int alpha = (unsigned char)(int)(200.0f - timeRemaining / totalDuration * 100.0f) << 24;
         for (int i = 0; i < mesh->vertexCount; i++) {
-            ((SoultreeVertex*)mesh->vertices)[i].diffuse &= 0xffffff;
-            ((SoultreeVertex*)mesh->vertices)[i].diffuse |= alpha;
+            mesh->vertices[i].diffuse &= 0xffffff;
+            mesh->vertices[i].diffuse |= alpha;
         }
     }
 }

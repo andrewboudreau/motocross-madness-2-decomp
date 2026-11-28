@@ -8,93 +8,25 @@
 // back into the settings, 0 shows the settings). The classes are RTTI names;
 // every one derives directly from UIDialog. Member names are provisional.
 
-// The settings blocks. OptionsDlg (0x004b4280) copies each from the global
-// game object (TrackGame +0xc24, +0xf98, +0xfc4, +0xfe0, +0x1550 and
-// +0x19d4; the sizes are its rep movsd counts) into this file's globals when
-// the options open, and back when they are accepted; the controls are bound
-// to the copies (their slot 54 keeps a pointer). Field roles are the control
-// names. These five are TrackGame.h's TrackGameInterfaceOptions, -Sound-,
-// -Graphics-, -Control- and -GarageOptions; the fold is blocked because it
-// moved BikeRace.cpp's CreateRacers window (13400 -> 13394).
-struct UnknownOptGameSettings {               // 0x374 bytes (TrackGame+0xc24)
-    int showGauges;                           // +0x00: GuagesCheckBox
-    int showRaceStats;                        // +0x04: RaceStatsCheckBox
-    int chatMode;                             // +0x08: MultChatMode state (0..2)
-    int showOverview;                         // +0x0c: OverviewCheckBox
-    int showRiderNames;                       // +0x10: RiderNamesCheckBox
-    int showRiderPositions;                   // +0x14: RiderPositionCheckBox
-    int showPodiums;                          // +0x18: ChkPodiums
-    int uiAnimations;                         // +0x1c: ChkUIAnims
-    int introMovie;                           // +0x20: ChkIntroMovie
-    int playerIndicator;                      // +0x24: ChkPlayerIndicator
-    int toolTips;                             // +0x28: ChkToolTips
-    int wreckResetOnTrack;                    // +0x2c: ChkWreckResetOnTrack
-    unsigned char field_0x30[0x360 - 0x30];
-    int curveRows[5];                         // +0x360: chosen DDLCurves row per bike class
-};
+struct TrackGameInterfaceOptions;
+struct TrackGameSoundOptions;
+struct TrackGameGraphicsOptions;
+struct TrackGameControlOptions;
+struct TrackGameGarageOptions;
 
-struct UnknownOptSoundSettings {              // 0x2c bytes (TrackGame+0xf98)
-    int cdAudioOn;                            // +0x00: TrackGameMode::cdAudioOn (no control edits it)
-    int uiSounds;                             // +0x04: UserInterfaceSoundsCheckBox
-    int inGameSoundEffects;                   // +0x08: InGameSoundEffectsCheck
-    int field_0x0c;
-    int soundHardware;                        // +0x10: SoundHardwareCheckBox
-    int eax;                                  // +0x14: ChkEAX
-    int waypointChime;                        // +0x18: ChkWaypointChime
-    int uiVolume;                             // +0x1c: UserInterfaceVolumeSlider
-    int inGameVolume;                         // +0x20: InGameVolumeSlider
-    int field_0x24;
-    int sound16Bit;                           // +0x28: 16-bit sound (else 8-bit)
-};
-
-struct UnknownOptGraphicsSettings {           // 0x1c bytes (TrackGame+0xfc4)
-    int resolutionRow;                        // +0x00: display resolution row
-    int shadows;                              // +0x04: ShadowsCheckBox
-    int particles;                            // +0x08: ParticlesCheckBox
-    int field_0x0c;
-    int sky;                                  // +0x10: SkyCheckBox
-    int field_0x14;
-    int terrainQuality;                       // +0x18: TerrainQualitySliderBar
-};
-
-struct UnknownOptControlSettings {            // 0x30 bytes (TrackGame+0xfe0)
-    int steering;                             // +0x00: SteeringSlider
-    int crossup;                              // +0x04: CrossupSlider
-    int pitch;                                // +0x08: PitchSlider
-    int pressThrottle;                        // +0x0c: PressThrottleSlider
-    int pressBrakes;                          // +0x10: PressBrakesSlider
-    int releaseThrottle;                      // +0x14: ReleaseThrottleSlider
-    int releaseBrakes;                        // +0x18: ReleaseBrakesSlider
-    int feedback;                             // +0x1c: FeedbackSlider
-    int forceFeedback;                        // +0x20: ForceFeedCheck
-    int gasGyro;                              // +0x24: ChkGasGyro
-    int brakeGyro;                            // +0x28: ChkBrakeGyro
-    int analogAxes;                           // +0x2c: ChkAnalogAxes
-};
-
-struct UnknownOptGarageSettings {             // 0x5c bytes (TrackGame+0x1550)
-    int engineSize;                           // +0x00: engine size in cc ("%dcc")
-    int fourStroke;                           // +0x04: 4-stroke engine (the 400cc and 600cc DDLEngineSize rows)
-    int weight;                               // +0x08: KrustyUI "Weight" for the bike class
-    float suspension[6];                      // +0x0c: suspension sliders (SldFrontComp ...)
-    int eqBands[11];                          // +0x24: SldEQ1..11
-    int firstBand;                            // +0x50: first band ("%2.1fk" after * 0.001)
-    int lastBand;                             // +0x54: KrustyUI "RPMUpperLimit" (firstBand + 10 * bandStep)
-    int bandStep;                             // +0x58: band step
-};
-
-// The copies the options dialogs edit: OptionsDlg's init (0x004b4280)
+// The copies the options dialogs edit (TrackGame.h's settings blocks; the
+// sizes are OptionsDlg's rep movsd counts): OptionsDlg's init (0x004b4280)
 // copies TrackGame's garage, game, sound, graphics and control settings and
 // its Message0..9 texts into them, its close copies them back, and the pages
 // bind their controls to them. 0x00688898 (game), 0x00688798 (sound),
 // 0x006887d8 (graphics), 0x00688868 (controls), 0x00688808 (garage) and
 // 0x00688c10 (messages). HandleMenuOk (0x00452930) also commits the game,
 // sound and graphics copies when their page's OK is pressed.
-extern UnknownOptGameSettings g_EditedGameSettings;
-extern UnknownOptSoundSettings g_EditedSoundSettings;
-extern UnknownOptGraphicsSettings g_EditedGraphicsSettings;
-extern UnknownOptControlSettings g_EditedControlSettings;
-extern UnknownOptGarageSettings g_EditedGarageSettings;
+extern TrackGameInterfaceOptions g_EditedGameSettings;
+extern TrackGameSoundOptions g_EditedSoundSettings;
+extern TrackGameGraphicsOptions g_EditedGraphicsSettings;
+extern TrackGameControlOptions g_EditedControlSettings;
+extern TrackGameGarageOptions g_EditedGarageSettings;
 extern char g_EditedMessages[10][128]; // Message0..9 (TrackGame+0x19d4)
 
 // 0x0056cb6c: the engine sizes (cc) of the five bike classes, 125, 250,

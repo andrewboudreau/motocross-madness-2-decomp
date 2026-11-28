@@ -74,8 +74,9 @@ PARTIAL = (
     # bytes and the other 64 relocation records are identical.
     # Retiring the TerrainGameSettings view (Terrain.cpp now includes TrackGame.h)
     # renumbers it again ($L9485 -> $L9378); the body bytes and the other 64
-    # relocation records are identical.
-    ('?Load@Terrain@@', 2117, 'd33b3d6e75ea3a9952daf50a62e6e984d8d68132ef81d0592c2ff4792d2e5ea2'),
+    # relocation records are identical. The option-record and PeakHold folds
+    # (TrackGame.h, TextureMapManager.h) renumber the EH label once more.
+    ('?Load@Terrain@@', 2117, 'f1111c87295e16c67f9418d1890e676fe8a87494c3d13e4639f0a6066508da21'),
     # Intentional cell-conversion repair, verified at the actual first-cell
     # boundary in test_terrain_cell_conversion; full interpolation remains partial.
     # The sampler, dot and triangle provider names are now canonical, with

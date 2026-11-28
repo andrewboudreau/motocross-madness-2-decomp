@@ -41,8 +41,6 @@
     "?Vec3TransformNormal@@YAXPAUVector3@@U1@PBUMatrix4@@@Z": "?Vec3TransformNormal@@YAXPAUVec3@@U1@PBUMatrix4@@@Z",
     "?CrossProduct@@YA?AUVector3@@PBU1@0@Z": "?CrossProductCall@@YA?AUVec3@@ABU1@0@Z",
     "??0MbVector3Call@@QAE@MMM@Z": "??0Vec3Call@@QAE@MMM@Z",
-    "?LargestRecentSample@UnknownTimer@@QAEHXZ": "?Peak@PeakHold@@QAEHXZ",
-    "?RecordSample@UnknownTimer@@QAEXH@Z": "?Record@PeakHold@@QAEXH@Z",
     "??0BikeAIVec3Call@@QAE@MMM@Z": "??0Vec3@@QAE@MMM@Z",
     "?BikeAIVec3Scale@@YA?AUVec3@@ABU1@M@Z": "??D@YA?AUVec3@@ABU0@M@Z",
     "?g_ObstacleDebugUpperLine@@3PAUVec3@@A": "?g_ObstacleDebugUpperLine@@3PAUVector3@@A",

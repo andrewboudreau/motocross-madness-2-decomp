@@ -82,17 +82,17 @@ extern "C" const GUID DPSPGUID_TCPIP;                   // 0x005567e0
 extern "C" const GUID DPSPGUID_SERIAL;                  // 0x005567f0
 extern "C" const GUID DPSPGUID_MODEM;                   // 0x00556800
 
-// TrackGame's settings blocks, as OptionProcs.cpp names them.
-static inline UnknownOptGameSettings* UnknownGameSettingsOf(TrackGame* game) {
-    return (UnknownOptGameSettings*)((char*)game + 0xc24);
+// TrackGame's settings blocks (see OptionProcs.cpp).
+static inline TrackGameInterfaceOptions* InterfaceOptionsOf(TrackGame* game) {
+    return (TrackGameInterfaceOptions*)((char*)game + 0xc24);
 }
 
-static inline UnknownOptSoundSettings* UnknownSoundSettingsOf(TrackGame* game) {
-    return (UnknownOptSoundSettings*)((char*)game + 0xf98);
+static inline TrackGameSoundOptions* SoundOptionsOf(TrackGame* game) {
+    return (TrackGameSoundOptions*)((char*)game + 0xf98);
 }
 
-static inline UnknownOptGraphicsSettings* UnknownGraphicsSettingsOf(TrackGame* game) {
-    return (UnknownOptGraphicsSettings*)&game->mode.displayModeIndex;
+static inline TrackGameGraphicsOptions* GraphicsOptionsOf(TrackGame* game) {
+    return (TrackGameGraphicsOptions*)&game->mode.displayModeIndex;
 }
 
 // 0x0059adbc: the profile row "ButRemoveProfile" asked to remove; a type 9
@@ -2356,15 +2356,15 @@ void HandleMenuOk(int menu, DialogEvent* event) {
     switch (menu) {
     case 0xc9:
         event->dialog->UpdateBoundValues(1);
-        *UnknownGameSettingsOf(g_TrackGame) = g_EditedGameSettings;
-        g_TrackGame->ui->gui->uiAnimations = UnknownGameSettingsOf(g_TrackGame)->uiAnimations;
+        *InterfaceOptionsOf(g_TrackGame) = g_EditedGameSettings;
+        g_TrackGame->ui->gui->uiAnimations = InterfaceOptionsOf(g_TrackGame)->uiAnimations;
         g_TrackGame->ui->OpenMenu(kMenuOptions);
         event->dialog->EndDialog(0);
         event->handled = 1;
         break;
     case 0xca:
         event->dialog->UpdateBoundValues(1);
-        *UnknownSoundSettingsOf(g_TrackGame) = g_EditedSoundSettings;
+        *SoundOptionsOf(g_TrackGame) = g_EditedSoundSettings;
         g_TrackGame->MuteSound();
         g_TrackGame->ui->OpenMenu(kMenuOptions);
         event->dialog->EndDialog(0);
@@ -2373,8 +2373,8 @@ void HandleMenuOk(int menu, DialogEvent* event) {
     case 0xcb: {
         event->dialog->UpdateBoundValues(1);
         UIListBox* modes = static_cast<UIDropDownList*>(event->dialog->FindControl("ModeDDL", 0))->listPart;
-        g_EditedGraphicsSettings.resolutionRow = modes->GetRowData(-1);
-        *UnknownGraphicsSettingsOf(g_TrackGame) = g_EditedGraphicsSettings;
+        g_EditedGraphicsSettings.displayMode = modes->GetRowData(-1);
+        *GraphicsOptionsOf(g_TrackGame) = g_EditedGraphicsSettings;
         g_TrackGame->ui->OpenMenu(kMenuOptions);
         event->dialog->EndDialog(0);
         event->handled = 1;

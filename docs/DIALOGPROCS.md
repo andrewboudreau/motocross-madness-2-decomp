@@ -69,8 +69,8 @@ Header changes, all layout-preserving:
 
 The option pages edit copies of TrackGame's settings blocks. `0x004b4280`
 copies +0xc24, +0xf98, +0xfc4, +0xfe0, +0x1550 and +0x19d4 into the file's
-globals with `rep movsd`. OptionProcs.h models these as
-`UnknownOpt*Settings`.
+globals with `rep movsd`. OptionProcs.h declares the globals with
+TrackGame.h's `TrackGame*Options` types.
 
 Exact: 36 calibration cases. These are the eight `$E`, ten slot-29
 procedures, five slot-31 handlers, OptControlsDlg's slots 22 and 23 and

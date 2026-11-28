@@ -21,9 +21,9 @@ struct InputButtonState;
 // ManagedTextureGroup::DrawSelection 0x50ef70 (1834/1834) off its
 // declaration-count window whether Game.h forward-declares HiResMeter (1029),
 // includes HiResMeter.h (1025) or HiResMeter.h declares the global (1828);
-// it also moves FillFileList 0x4f17a0 and CreateRacers 0x419970, which
-// pairing with DlgProcs.h's DialogUIAnimView restores. DrawSelection's
-// headers hold no other view to pair it with.
+// it also moves FillFileList 0x4f17a0 and CreateRacers 0x419970. Rechecked
+// 2026-11-28 with TextureMapManager.h's PeakHold fold (DrawSelection's only
+// other edited header) at three include positions: still 1029 or 1025.
 class GameHiResMeterView : public GameObject {
 public:
 

@@ -17,6 +17,5 @@
 // 200 - 100 * remaining / duration while time remains.
 
 #include "D3DIMSoultreeModifier.h"
-#include "MorphBastardModifier.h"   // ModifierSoultreeSurfaceView
 
 #include "GhostModCore.h"

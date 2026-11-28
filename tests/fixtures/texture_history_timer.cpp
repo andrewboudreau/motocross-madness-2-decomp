@@ -1,4 +1,4 @@
-// Validation only: actual timer constructor and actual ReadClock/WinMM backend.
+// Validation only: actual PeakHold constructor and actual ReadClock/WinMM backend.
 #include <windows.h>
 #include <mmsystem.h>
 #include <stdio.h>
@@ -6,8 +6,8 @@
 #include <stddef.h>
 #include <new>
 #include "../../src/reconstructed/TextureMapManager.h"
-typedef char Layout[(sizeof(ManagedTextureGroup)==0x258 && sizeof(UnknownTimer)==12 && offsetof(UnknownTimer,timerStart)==0 &&
-    offsetof(UnknownTimer,peakSample)==4 && offsetof(UnknownTimer,timerInterval)==8 &&
+typedef char Layout[(sizeof(ManagedTextureGroup)==0x258 && sizeof(PeakHold)==12 && offsetof(PeakHold,peakTime)==0 &&
+    offsetof(PeakHold,peak)==4 && offsetof(PeakHold,holdTime)==8 &&
     offsetof(ManagedTextureGroup,texelsBlittedHistory)==0x1d4 &&
     offsetof(ManagedTextureGroup,blitTimeHistory)==0x1e0 &&
     offsetof(ManagedTextureGroup,texturesBlittedHistory)==0x1ec)?1:-1];
@@ -24,7 +24,7 @@ static int Filter(EXCEPTION_POINTERS* e) {
     return EXCEPTION_EXECUTE_HANDLER;
 }
 static void* Construct(void* target,int interval) {
-    return new(target) UnknownTimer(interval);
+    return new(target) PeakHold((unsigned int)interval);
 }
 static void Run(void* target,int interval) {
     complete=code=address=access=returned=0;
@@ -59,10 +59,10 @@ static void Check(int offset,DWORD value,int mode) {
 // Controlled platform-only boundary: the actual strict ReadClock body remains intact.
 static int throwStage,phase,scriptCalls,scriptThrows;
 static DWORD scriptTime,oldTime,oldInterval;
-static UnknownTimer* active;
+static PeakHold* active;
 static void Boundary(int stage) {
-    if(stage!=phase+1 || active->peakSample!=0 ||
-       (DWORD)active->timerStart!=oldTime || (DWORD)active->timerInterval!=oldInterval)ExitProcess(20);
+    if(stage!=phase+1 || active->peak!=0 ||
+       (DWORD)active->peakTime!=oldTime || (DWORD)active->holdTime!=oldInterval)ExitProcess(20);
     phase=stage;
     if(throwStage==stage)RaiseException(0xe1234567,0,0,0);
 }
@@ -97,8 +97,8 @@ static void Scripted() {
     }
     for(int seed=0;seed<32;++seed)for(throwStage=0;throwStage<4;++throwStage) {
         for(int n=0;n<4096;++n)page[n]=(BYTE)(seed+37*n);
-        memcpy(expected,page,4096);active=(UnknownTimer*)(page+32);
-        oldTime=(DWORD)active->timerStart;oldInterval=(DWORD)active->timerInterval;
+        memcpy(expected,page,4096);active=(PeakHold*)(page+32);
+        oldTime=(DWORD)active->peakTime;oldInterval=(DWORD)active->holdTime;
         scriptTime=0xfffffff0u+seed;phase=0;
         DWORD interval=0x80000000u+seed;int arg;memcpy(&arg,&interval,4);
         Run(active,arg);memset(expected+36,0,4);

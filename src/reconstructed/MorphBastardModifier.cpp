@@ -457,8 +457,8 @@ void MorphBastardModifier::UpdateChannels(MorphBastardObject* object)
 // copied mesh.
 // Not exact (185 of 1571 bytes in place: the object and channel loops' registers;
 // docs/MORPHBASTARDMODIFIER.md).
-void MorphBastardModifier::ModifyMesh(D3DIMSoultreeObject* object, ModifierSoultreeSurfaceView* mesh,
-                                      ModifierSoultreeSurfaceView** out)
+void MorphBastardModifier::ModifyMesh(D3DIMSoultreeObject* object, SoultreeSurface* mesh,
+                                      SoultreeSurface** out)
 {
     if (object->currentLod) {
         *out = mesh;
@@ -466,7 +466,7 @@ void MorphBastardModifier::ModifyMesh(D3DIMSoultreeObject* object, ModifierSoult
     }
     if (!meshCopy)
         CopyMesh(mesh);
-    memcpy(meshCopy->localVertices, mesh->localVertices, meshCopy->vertexCount * sizeof(MorphBastardVertex));
+    memcpy(meshCopy->localVertices, mesh->localVertices, meshCopy->vertexCount * sizeof(SoultreeVertex));
 
     float value;
     for (int i = 0; i < objectCount; i++) {
@@ -476,7 +476,7 @@ void MorphBastardModifier::ModifyMesh(D3DIMSoultreeObject* object, ModifierSoult
         OnChannelsUpdated(i);
         // As in retail, group is not initialised: a mesh without this object's node
         // leaves it undefined (retail then reads whatever its stack slot holds).
-        MorphBastardMeshGroup* group;
+        SoultreeVertexGroup* group;
         for (int g = 0; g < mesh->groupCount; g++) {
             if (mesh->groups[g].node == morphObjects[i].node)
                 group = &mesh->groups[g];
@@ -571,33 +571,35 @@ void MorphBastardModifier::ModifyMesh(D3DIMSoultreeObject* object, ModifierSoult
 
         for (int v = 0; v < group->vertexCount; v++) {
             Vector3 offset = deltaSums[v];
-            meshCopy->localVertices[base + v].x = offset.x + mesh->localVertices[base + v].x;
-            meshCopy->localVertices[base + v].y = offset.y + mesh->localVertices[base + v].y;
-            meshCopy->localVertices[base + v].z = offset.z + mesh->localVertices[base + v].z;
+            meshCopy->localVertices[base + v].position.x = offset.x + mesh->localVertices[base + v].position.x;
+            meshCopy->localVertices[base + v].position.y = offset.y + mesh->localVertices[base + v].position.y;
+            meshCopy->localVertices[base + v].position.z = offset.z + mesh->localVertices[base + v].position.z;
         }
     }
     *out = meshCopy;
 }
 
 // 0x004a5290
-void MorphBastardModifier::CopyMesh(ModifierSoultreeSurfaceView* mesh)
+void MorphBastardModifier::CopyMesh(SoultreeSurface* mesh)
 {
-    meshCopy = new (__FILE__, 854) ModifierSoultreeSurfaceView;
+    meshCopy = new (__FILE__, 854) SoultreeSurface;
     meshCopy->groupCount = mesh->groupCount;
     meshCopy->vertexCount = mesh->vertexCount;
     meshCopy->faceCount = mesh->faceCount;
-    meshCopy->vertices = new (__FILE__, 858) MorphBastardVertex[meshCopy->vertexCount];
-    meshCopy->localVertices = new (__FILE__, 859) MorphBastardVertex[meshCopy->vertexCount];
+    meshCopy->vertices = new (__FILE__, 858) SoultreeVertex[meshCopy->vertexCount];
+    meshCopy->localVertices = new (__FILE__, 859) SoultreeVertex[meshCopy->vertexCount];
     meshCopy->normals = new (__FILE__, 860) Vector3[meshCopy->vertexCount];
-    meshCopy->indices = new (__FILE__, 861) MorphBastardFace[meshCopy->faceCount];
+    meshCopy->indices = new (__FILE__, 861) unsigned short[meshCopy->faceCount * 3];
     meshCopy->materials = mesh->materials;
-    meshCopy->uvs = new (__FILE__, 863) int[meshCopy->vertexCount * 2];
-    memcpy(meshCopy->vertices, mesh->vertices, meshCopy->vertexCount * sizeof(MorphBastardVertex));
-    memcpy(meshCopy->localVertices, mesh->localVertices, meshCopy->vertexCount * sizeof(MorphBastardVertex));
+    meshCopy->uvs = new (__FILE__, 863) SoultreeUV[meshCopy->vertexCount];
+    memcpy(meshCopy->vertices, mesh->vertices, meshCopy->vertexCount * sizeof(SoultreeVertex));
+    memcpy(meshCopy->localVertices, mesh->localVertices, meshCopy->vertexCount * sizeof(SoultreeVertex));
     memcpy(meshCopy->normals, mesh->normals, meshCopy->vertexCount * sizeof(Vector3));
-    memcpy(meshCopy->indices, mesh->indices, meshCopy->faceCount * sizeof(MorphBastardFace));
-    memcpy(meshCopy->uvs, mesh->uvs, meshCopy->vertexCount * sizeof(int));
-    meshCopy->groups = new (__FILE__, 871) MorphBastardMeshGroup[meshCopy->groupCount];
+    memcpy(meshCopy->indices, mesh->indices, meshCopy->faceCount * 3 * sizeof(unsigned short));
+    // As in retail (0x004a53fb), only vertexCount floats: the first half of the
+    // texture coordinates.
+    memcpy(meshCopy->uvs, mesh->uvs, meshCopy->vertexCount * sizeof(float));
+    meshCopy->groups = new (__FILE__, 871) SoultreeVertexGroup[meshCopy->groupCount];
     int offset = 0;
     for (int i = 0; i < meshCopy->groupCount; i++) {
         meshCopy->groups[i].node = mesh->groups[i].node;

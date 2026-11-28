@@ -11,14 +11,6 @@ from mcm2tool.pe import PEImage  # noqa: E402
 from match import compare  # noqa: E402
 
 CASES = [
-    {'name': 'Texture history timer constructor',
-     'source': 'src/reconstructed/TextureHistoryTimer.cpp',
-     'bindings': 'src/reconstructed/TextureHistoryTimer.bindings.json',
-     'symbol': '??0UnknownTimer@@QAE@H@Z',
-     'target_va': '0x004cb670',
-     'target_size': 30,
-     'reason': 'Complete constructor at three actual embedded owner sites; unchanged existing view, actual '
-               'clock helper and field/store ordering. Original class and TU remain provisional.'},
     {'name': 'Gameplay default ??1MovingPart@@QAE@XZ',
      'source': 'src/reconstructed/GameplayDefaults.cpp',
      'bindings': 'src/reconstructed/GameplayDefaults.bindings.json',
@@ -12527,7 +12519,7 @@ CASES = [
         'name': 'MorphBastardModifier.cpp MorphBastardModifier 0x4a5290 mesh copy',
         'bindings': 'src/reconstructed/MorphBastardModifier.bindings.json',
         'source': 'src/reconstructed/MorphBastardModifier.cpp',
-        'symbol': '?CopyMesh@MorphBastardModifier@@QAEXPAUModifierSoultreeSurfaceView@@@Z',
+        'symbol': '?CopyMesh@MorphBastardModifier@@QAEXPAUSoultreeSurface@@@Z',
         'target_va': '0x004a5290',
         'target_size': 603,
         'reason': 'MorphBastardModifier.cpp __FILE__ lines 854-871; called from slot 27',
@@ -21255,7 +21247,7 @@ CASES = [
         'name': 'TransparencyMod slot 27',
         'bindings': 'src/reconstructed/TransparencyMod.bindings.json',
         'source': 'src/reconstructed/TransparencyMod.cpp',
-        'symbol': '?ModifyMesh@TransparencyMod@@UAEXPAVD3DIMSoultreeObject@@PAUModifierSoultreeSurfaceView@@PAPAU3@@Z',
+        'symbol': '?ModifyMesh@TransparencyMod@@UAEXPAVD3DIMSoultreeObject@@PAUSoultreeSurface@@PAPAU3@@Z',
         'target_va': '0x005206f0',
         'target_size': 287,
         'reason': 'slot 27 of 0x5588c4; vertex alpha / material flags',
@@ -21291,7 +21283,7 @@ CASES = [
         'name': 'GhostMod1 slot 27',
         'bindings': 'src/reconstructed/GhostMod.bindings.json',
         'source': 'src/reconstructed/GhostMod.cpp',
-        'symbol': '?ModifyMesh@GhostMod1@@UAEXPAVD3DIMSoultreeObject@@PAUModifierSoultreeSurfaceView@@PAPAU3@@Z',
+        'symbol': '?ModifyMesh@GhostMod1@@UAEXPAVD3DIMSoultreeObject@@PAUSoultreeSurface@@PAPAU3@@Z',
         'target_va': '0x0047bb70',
         'target_size': 124,
         'reason': 'slot 27 fade alpha',

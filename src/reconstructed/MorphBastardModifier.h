@@ -94,50 +94,6 @@ struct MorphBastardObject {
     Matrix4 inverseRestMatrix;        // its inverse rest matrix
 };
 
-// 32-byte vertex (position, normal, texture coordinates) with an empty
-// constructor, like D3DVERTEX under D3D_OVERLOADS.
-struct MorphBastardVertex {
-    MorphBastardVertex() {}
-    float x, y, z;
-    float nx, ny, nz;
-    float tu, tv;
-};
-
-struct MorphBastardFace {
-    unsigned short vertexIndices[3];  // SoultreeSurface indices, three per face
-};
-
-// A vertex group of a mesh (0x14 bytes); the pointers index the mesh arrays.
-struct MorphBastardMeshGroup {
-    MorphBastardNode* node;           // the node the group belongs to
-    int vertexCount;                  // vertex count
-    MorphBastardVertex* vertices;
-    MorphBastardVertex* localVertices;
-    Vector3* normals;
-};
-
-struct MorphBastardMeshPair {
-    int materialCount;
-    int materialIndices;
-};
-
-// The mesh slot 27 receives and returns (0x38 bytes).
-struct ModifierSoultreeSurfaceView {
-    int groupCount;                   // group count
-    MorphBastardMeshGroup* groups;  // +0x4  SoultreeSurface+0x04 groups (D3DIMSoulTree.h)
-    int vertexCount;                  // vertex count
-    int faceCount;                    // face count
-    MorphBastardVertex* vertices;  // +0x10  SoultreeSurface+0x10 vertices
-    MorphBastardVertex* localVertices;  // +0x14  SoultreeSurface+0x14 local (node-space) vertices
-    Vector3* normals;  // +0x18  SoultreeSurface+0x18 normals
-    MorphBastardFace* indices;  // +0x1C  SoultreeSurface+0x1c indices, three per face
-    MorphBastardMeshPair materials;  // +0x20 SoultreeSurface materialCount/materialIndices, copied as one 8-byte value
-    int* uvs;  // +0x28  SoultreeSurface+0x28 texture coordinates
-    int mappingScale;  // +0x2c SoultreeSurface mappingScale (a float there)
-    int mappingOffsetU;
-    int mappingOffsetV;
-};
-
 #include "MorphBastardModifierCore.h"
 
 // 0x004a3bb0: qsort order of MorphBastardTarget by value.

@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "../../src/reconstructed/GhostMod.h"
+#include "../../src/reconstructed/MorphBastardModifier.h"
 
 typedef char GhostSize[(sizeof(GhostMod1) == 0x48) ? 1 : -1];
 typedef char MorphSize[(sizeof(MorphBastardModifier) == 0x58) ? 1 : -1];

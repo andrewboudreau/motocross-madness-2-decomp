@@ -1924,9 +1924,9 @@ int BikeRace::AnyRacerRemote() {
 void BikeRace::ReplaceMeshId(D3DIMSoultreeCharacter* character, int from, int to) {
     for (int i = 0; i < reinterpret_cast<D3DIMSoultreeObject*>(character->modelNode)->lodCount; i++) {
         for (int j = 0; j < reinterpret_cast<D3DIMSoultreeObject*>(character->modelNode)->lodTable[i].surfaceCount; j++) {
-            for (int k = 0; k < reinterpret_cast<D3DIMSoultreeObject*>(character->modelNode)->lodTable[i].surfaces[j].materialCount; k++) {
-                if (reinterpret_cast<D3DIMSoultreeObject*>(character->modelNode)->lodTable[i].surfaces[j].materialIndices[k] == from) {
-                    reinterpret_cast<D3DIMSoultreeObject*>(character->modelNode)->lodTable[i].surfaces[j].materialIndices[k] = to;
+            for (int k = 0; k < reinterpret_cast<D3DIMSoultreeObject*>(character->modelNode)->lodTable[i].surfaces[j].materials.count; k++) {
+                if (reinterpret_cast<D3DIMSoultreeObject*>(character->modelNode)->lodTable[i].surfaces[j].materials.indices[k] == from) {
+                    reinterpret_cast<D3DIMSoultreeObject*>(character->modelNode)->lodTable[i].surfaces[j].materials.indices[k] = to;
                 }
             }
         }

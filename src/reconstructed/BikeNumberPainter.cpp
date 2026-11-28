@@ -135,8 +135,8 @@ void BikeNumberPainter::PaintNumber(D3DIMSoultreeObject* model, int number) {
     for (int lod = 0; lod < model->lodCount; lod++) {
         for (int s = 0; s < model->lodTable[lod].surfaceCount; s++) {
             int uses = 0;
-            for (int m = 0; m < model->lodTable[lod].surfaces[s].materialCount; m++) {
-                if (model->lodTable[lod].surfaces[s].materialIndices[m] == plate)
+            for (int m = 0; m < model->lodTable[lod].surfaces[s].materials.count; m++) {
+                if (model->lodTable[lod].surfaces[s].materials.indices[m] == plate)
                     uses = 1;
             }
             if (!uses)

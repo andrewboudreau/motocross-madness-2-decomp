@@ -68,6 +68,15 @@ struct SoultreeUV {
     float v;
 };
 
+// A surface's materials. 0x004a5290 copies the pair as one 8-byte value:
+// it reloads meshCopy between the two stores (0x004a538d), as VC6 does for a
+// structure assignment and not for two member assignments. The grouping is
+// tier 2, the names tier 3.
+struct SoultreeMaterialList {
+    int count;                                 // material count
+    int* indices;                              // material indices
+};
+
 // One 0x38-byte surface of a level of detail ("LOD %i - Surface %i").
 // The destructor frees +0x1c, +0x04, +0x10, +0x14, +0x18, +0x28 and +0x24.
 struct SoultreeSurface {
@@ -79,8 +88,7 @@ struct SoultreeSurface {
     SoultreeVertex* localVertices;             // node-space vertices as loaded; 0x00440d40 transforms them into vertices
     Vector3* normals;                          // normals
     unsigned short* indices;                   // indices, three per face
-    int materialCount;                         // material count
-    int* materialIndices;                      // material indices
+    SoultreeMaterialList materials;            // +0x20 copied as one value by 0x004a5290
     SoultreeUV* uvs;                           // texture coordinates
     float mappingScale;                        // 1.0 after loading
     int mappingOffsetU;

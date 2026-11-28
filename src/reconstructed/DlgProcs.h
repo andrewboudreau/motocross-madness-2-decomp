@@ -224,10 +224,10 @@ public:
 };
 
 // The image a dialog resource names (UIDialog 0x0046e9a0 returns its entry);
-// it is a UIAnim (GameUi.h). Deferred: deleting this view moved FillFileList
-// 0x4f17a0 and CreateRacers 0x419970 off their declaration-count windows,
-// and pairing it with TrackGame.h's unused TrackGameUIDialogView (since
-// deleted) moved Scene::ReadLight 0x4eb570 instead; not rechecked since.
+// it is a UIAnim (GameUi.h). Deferred: deleting this view alone moves
+// FillFileList 0x4f17a0 (2254) and CreateRacers 0x419970 (13394). Rechecked
+// 2026-11-28: with the OptionProcs.h and PeakHold folds all windows hold, but
+// adding it to those and the soultree-surface fold moves CreateRacers again.
 class DialogUIAnimView {
 public:
     int GetCurrentTexture();              // 0x00472f90: the current frame's texture

@@ -79,7 +79,7 @@ D3DIMSoultreeObject::~D3DIMSoultreeObject()
                 DebugFree(lodTable[i].surfaces[j].localVertices, __FILE__, 0x6a);
                 DebugFree(lodTable[i].surfaces[j].normals, __FILE__, 0x6b);
                 DebugFree(lodTable[i].surfaces[j].uvs, __FILE__, 0x6c);
-                DebugFree(lodTable[i].surfaces[j].materialIndices, __FILE__, 0x6d);
+                DebugFree(lodTable[i].surfaces[j].materials.indices, __FILE__, 0x6d);
             }
             DebugFree(lodTable[i].surfaces, __FILE__, 0x70);
         }
@@ -217,7 +217,7 @@ void D3DIMSoultreeObject::LoadHierarchy(FileStream* stream)
                 stream->Read(&surface->groupCount, 4, 1);
                 stream->Read(&surface->vertexCount, 4, 1);
                 stream->Read(&surface->faceCount, 4, 1);
-                stream->Read(&surface->materialCount, 4, 1);
+                stream->Read(&surface->materials.count, 4, 1);
                 surface->mappingOffsetU = 0;
                 surface->mappingOffsetV = 0;
                 surface->mappingScale = 1.0f;
@@ -231,8 +231,8 @@ void D3DIMSoultreeObject::LoadHierarchy(FileStream* stream)
                 stream->Read(surface->indices, 6, surface->faceCount);
                 surface->uvs = (SoultreeUV*)DebugMalloc(surface->vertexCount * 8, __FILE__, 0x18d);
                 stream->Read(surface->uvs, 4, surface->vertexCount * 2);
-                surface->materialIndices = (int*)DebugMalloc(surface->materialCount * 4, __FILE__, 0x191);
-                stream->Read(surface->materialIndices, 4, surface->materialCount);
+                surface->materials.indices = (int*)DebugMalloc(surface->materials.count * 4, __FILE__, 0x191);
+                stream->Read(surface->materials.indices, 4, surface->materials.count);
                 surface->groups = (SoultreeVertexGroup*)DebugMalloc(surface->groupCount * 0x14, __FILE__, 0x194);
                 stream->Read(surface->groups, 0x14, surface->groupCount);
                 for (int j = 0; j < surface->groupCount; j++) {
@@ -331,19 +331,19 @@ int D3DIMSoultreeObject::ReadLods()
             parameterBlock->SelectSection(section);
             parameterBlock->GetInt("NumberOfVertices", 0, &surface->vertexCount);
             parameterBlock->GetInt("NumberOfFaces", 0, &surface->faceCount);
-            parameterBlock->GetInt("NumberOfMaterials", 0, &surface->materialCount);
-            if (surface->materialCount > 0) {
-                surface->materialIndices = (int*)DebugMalloc(surface->materialCount * 4, __FILE__, 0x216);
-                for (int m = 0; m < surface->materialCount; m++) {
+            parameterBlock->GetInt("NumberOfMaterials", 0, &surface->materials.count);
+            if (surface->materials.count > 0) {
+                surface->materials.indices = (int*)DebugMalloc(surface->materials.count * 4, __FILE__, 0x216);
+                for (int m = 0; m < surface->materials.count; m++) {
                     char key[0x80];
                     sprintf(key, "Material#%i", m);
-                    parameterBlock->GetInt(key, 0, &surface->materialIndices[m]);
+                    parameterBlock->GetInt(key, 0, &surface->materials.indices[m]);
                 }
             } else {
                 untextured = 1;
-                surface->materialIndices = (int*)DebugMalloc(4, __FILE__, 0x21e);
-                surface->materialIndices[0] = 0;
-                surface->materialCount = 1;
+                surface->materials.indices = (int*)DebugMalloc(4, __FILE__, 0x21e);
+                surface->materials.indices[0] = 0;
+                surface->materials.count = 1;
             }
             surface->vertices = (SoultreeVertex*)DebugMalloc(surface->vertexCount * 0x20, __FILE__, 0x223);
             surface->localVertices = (SoultreeVertex*)DebugMalloc(surface->vertexCount * 0x20, __FILE__, 0x224);
@@ -511,8 +511,8 @@ void D3DIMSoultreeObject::UpdateMaterialTexelRatios()
             if (best <= ratio)
                 best = ratio;
         }
-        for (int k = 0; k < surface->materialCount; k++) {
-            SoultreeMaterial* material = materialTable[surface->materialIndices[k]];
+        for (int k = 0; k < surface->materials.count; k++) {
+            SoultreeMaterial* material = materialTable[surface->materials.indices[k]];
             if (material->surfaceMap) {
                 float scale = best / material->surfaceMap->texture->textureHeight;
                 float current = *(float*)&material->texelRatio;
@@ -535,8 +535,8 @@ void D3DIMSoultreeObject::TransformVertexGroups(int lod)
         SoultreeSurface& surfaceRef = *surface;
         int colored = 0;
         int k;
-        for (k = 0; k < surface->materialCount; k++) {
-            SoultreeMaterial* material = materialTable[surface->materialIndices[k]];
+        for (k = 0; k < surface->materials.count; k++) {
+            SoultreeMaterial* material = materialTable[surface->materials.indices[k]];
             if (!material->hasTextureName || material->useVertexColor)
                 colored = 1;
         }
@@ -544,7 +544,7 @@ void D3DIMSoultreeObject::TransformVertexGroups(int lod)
         if (secondModifierCount > 0) {
             for (k = 0; k < secondModifierCount; k++)
                 ((D3DIMSoultreeModifier*)secondModifierList[k])->ModifyMesh(
-                    this, (ModifierSoultreeSurfaceView*)surface, (ModifierSoultreeSurfaceView**)&drawn);
+                    this, surface, &drawn);
         } else {
             drawn = surface;
         }
@@ -736,8 +736,8 @@ void D3DIMSoultreeObject::DrawCurrentLod()
         int count = surface->vertexCount;
         int modified = 0;
         int restore = 0;
-        for (int materialIndex = 0; materialIndex < surface->materialCount; materialIndex++) {
-            SoultreeMaterial* material = materialTable[surface->materialIndices[materialIndex]];
+        for (int materialIndex = 0; materialIndex < surface->materials.count; materialIndex++) {
+            SoultreeMaterial* material = materialTable[surface->materials.indices[materialIndex]];
             if (useLighting)
                 ((RenderTarget*)renderContext)->SetTextureBlend(2, 0);
             material->ApplyRenderStates();
@@ -1062,7 +1062,7 @@ void D3DIMSoultreeObject::DrawCurrentLod()
             if (modifierCount > 0) {
                 for (int i = 0; i < modifierCount; i++)
                     ((D3DIMSoultreeModifier*)modifierList[i])->ModifyMesh(
-                        this, (ModifierSoultreeSurfaceView*)surface, (ModifierSoultreeSurfaceView**)&drawn);
+                        this, surface, &drawn);
             } else {
                 drawn = surface;
             }
@@ -1662,11 +1662,11 @@ void D3DIMSoultreeObject::CloneFrom(SoultreeObject* sourceNode)
                 SoultreeSurface* fromSurface = &from->surfaces[i];
                 toSurface->vertexCount = fromSurface->vertexCount;
                 toSurface->faceCount = fromSurface->faceCount;
-                toSurface->materialCount = fromSurface->materialCount;
-                toSurface->materialIndices = (int*)DebugMalloc(toSurface->materialCount * 4, __FILE__, 0x8b3);
+                toSurface->materials.count = fromSurface->materials.count;
+                toSurface->materials.indices = (int*)DebugMalloc(toSurface->materials.count * 4, __FILE__, 0x8b3);
                 int k;
-                for (k = 0; k < toSurface->materialCount; k++)
-                    toSurface->materialIndices[k] = fromSurface->materialIndices[k];
+                for (k = 0; k < toSurface->materials.count; k++)
+                    toSurface->materials.indices[k] = fromSurface->materials.indices[k];
                 toSurface->mappingScale = fromSurface->mappingScale;
                 toSurface->mappingOffsetU = fromSurface->mappingOffsetU;
                 toSurface->mappingOffsetV = fromSurface->mappingOffsetV;

@@ -365,8 +365,8 @@ void ManagedTextureGroup::RepackWholePages() {
 
     if (reinterpret_cast<Game*>(g_TrackGame)->debugOverlay) {
         int now = ReadClock();
-        texelsBlittedHistory.RecordSample(texelsBlitted);
-        blitTimeHistory.RecordSample(now - blitStartTime);
+        texelsBlittedHistory.Record(texelsBlitted);
+        blitTimeHistory.Record(now - blitStartTime);
         char format[12];
         strcpy(format, "Unknown");
         texture = managedTextures.First();
@@ -382,7 +382,7 @@ void ManagedTextureGroup::RepackWholePages() {
         }
         if (debugPage < 0)
             debugPage = reinterpret_cast<Game*>(g_TrackGame)->debugOverlay->NewPage();
-        texturesBlittedHistory.RecordSample(filled);
+        texturesBlittedHistory.Record(filled);
         reinterpret_cast<Game*>(g_TrackGame)->debugOverlay->Title(debugPage, "TextureManager no partial");
         reinterpret_cast<Game*>(g_TrackGame)->debugOverlay->Print(debugPage, "PixelFormat:%s", format);
         reinterpret_cast<Game*>(g_TrackGame)->debugOverlay->Print(
@@ -390,13 +390,13 @@ void ManagedTextureGroup::RepackWholePages() {
             PageMegabytes(this, cachePages.m_count));
         int managedCount = managedTextures.m_count;
         reinterpret_cast<Game*>(g_TrackGame)->debugOverlay->Print(debugPage, "ManagedTextures:%d", managedCount);
-        float peak = (float)texelsBlittedHistory.LargestRecentSample();
+        float peak = (float)texelsBlittedHistory.Peak();
         reinterpret_cast<Game*>(g_TrackGame)->debugOverlay->Print(
             debugPage, "TexMem Blted: %.2fM, Peak: %.2fM",
             (float)PixelFormatBytesPerPixel(groupFormat) * texelsBlitted * 9.536743e-07f,
             PixelFormatBytesPerPixel(groupFormat) * peak * 9.536743e-07f);
         reinterpret_cast<Game*>(g_TrackGame)->debugOverlay->Print(debugPage, "BltTime %d (%d)", now - blitStartTime,
-                                                                blitTimeHistory.LargestRecentSample());
+                                                                blitTimeHistory.Peak());
         reinterpret_cast<Game*>(g_TrackGame)->debugOverlay->Print(debugPage, "Size Requested Granted");
         reinterpret_cast<Game*>(g_TrackGame)->debugOverlay->Print(debugPage, "256:    %02d        %02d",
                                                                 requestedBySize[8], grantedBySize[8]);
@@ -413,7 +413,7 @@ void ManagedTextureGroup::RepackWholePages() {
         reinterpret_cast<Game*>(g_TrackGame)->debugOverlay->Print(
             debugPage, "TexMemManaged:%.2fM", TexelMegabytes(this, texelsManaged));
         reinterpret_cast<Game*>(g_TrackGame)->debugOverlay->Print(debugPage, "Textures Blted %d (%d)", filled,
-                                                                texturesBlittedHistory.LargestRecentSample());
+                                                                texturesBlittedHistory.Peak());
     }
     unplacedTextures.Clear();
     growingTextures.Clear();
@@ -744,8 +744,8 @@ void ManagedTextureGroup::RepackWithPartialBlits() {
 
     if (reinterpret_cast<Game*>(g_TrackGame)->debugOverlay) {
         int now = ReadClock();
-        texelsBlittedHistory.RecordSample(texelsBlitted);
-        blitTimeHistory.RecordSample(now - blitStartTime);
+        texelsBlittedHistory.Record(texelsBlitted);
+        blitTimeHistory.Record(now - blitStartTime);
         int managedTexels = managedTextures.m_count << 16;
         char format[8];
         int wantedTexels = 0;
@@ -779,13 +779,13 @@ void ManagedTextureGroup::RepackWithPartialBlits() {
         reinterpret_cast<Game*>(g_TrackGame)->debugOverlay->Print(debugPage, "Ideal   %0.2fM",
                                                                 (wantedF = (float)wantedTexels) * 9.536743e-07f);
         reinterpret_cast<Game*>(g_TrackGame)->debugOverlay->Print(debugPage, "  ratio %0.2fM", wantedF / managedF);
-        float peak = (float)texelsBlittedHistory.LargestRecentSample();
+        float peak = (float)texelsBlittedHistory.Peak();
         reinterpret_cast<Game*>(g_TrackGame)->debugOverlay->Print(
             debugPage, "TexMem Blted: %.2fM, (%.2fM)",
             (float)PixelFormatBytesPerPixel(groupFormat) * texelsBlitted * 9.536743e-07f,
             PixelFormatBytesPerPixel(groupFormat) * peak * 9.536743e-07f);
         reinterpret_cast<Game*>(g_TrackGame)->debugOverlay->Print(debugPage, "BltTime %d (%d)", now - blitStartTime,
-                                                                blitTimeHistory.LargestRecentSample());
+                                                                blitTimeHistory.Peak());
         reinterpret_cast<Game*>(g_TrackGame)->debugOverlay->Print(debugPage, "256:    %02d        %02d",
                                                                 requestedBySize[8], grantedBySize[8]);
         reinterpret_cast<Game*>(g_TrackGame)->debugOverlay->Print(debugPage, "128:    %02d        %02d",

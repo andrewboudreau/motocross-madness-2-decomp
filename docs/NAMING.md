@@ -685,10 +685,9 @@ Left as placeholders:
   `field_0x1d8`. A scan of retail operands finds them written only inside
   0x004d2940..0x004d3340 (the constructor), so no consumer gives a role.
 - UIListBoxRow `field_0x2c` and `field_0x30`.
-- `UnknownSoultreeMesh` (MorphBastardModifier.h). It is a view of
-  `SoultreeSurface` with MorphBastard member types (`MorphBastardVertex*`,
-  `MorphBastardFace*`, `int* uvs`), so merging it is a type change, not a
-  rename.
+- `UnknownSoultreeMesh` (MorphBastardModifier.h), later
+  `ModifierSoultreeSurfaceView`: a view of `SoultreeSurface` with MorphBastard
+  member types. Retired on 2026-11-28 ("Three deferred views retired").
 - `UnknownSoultreeScreenRect` and `UnknownSoultreeCameraView`. The first
   holds two 16-byte blocks, and only the one at +0x298 is shown to be a
   rectangle. The second is a partial camera view that ObjectPicker.h's
@@ -1488,7 +1487,7 @@ agrees with the same SDK tables.
 | `UnknownStream` (Track.h) | `FileStream` | merged (e77fe250). Track::FreeNodeArray (0x00515e70) receives the loader's FileStream, and the forward-declared view only forced 14 casts in LoadTrack. 181 units: 143 IDENTICAL, 3 IDENTICAL-COMDAT-ORDER, 35 NAME-ONLY-LABELS. |
 | `UnknownCursorAnimation` (GUIManager.h) | `UIAnim` | blocked: samples/race/BikeRaceNearMisses.cpp gives DIFF in the bytes of `?CreateRacers@BikeRace@@...`. That sample includes GUIManagerCore.h before BikeRace.cpp, and BikeRace's register allocation is sensitive to the declarations before it (Wave 8). The other 85 units were IDENTICAL or name-only. The diff is work/naming/w17_m3_blocked.diff. |
 | `UnknownTexturePalette` (TextureMap.h) | `ColorMapper` | blocked: 148 units, 3 DIFF and 3 COMPILE-FAIL. Terrain.cpp's `Render3D` swaps the order of its `g_terrainRender3DTicks` and `g_terrainPrepareGeometryTicks` references, ManagedTextureGroup.cpp's `DrawSelection` grows 4 bytes before its `__ftol` calls, and BikeRaceNearMisses' CreateRacers changes as above. PCTextureMap.cpp, PCTextureMapNearMisses.cpp and TextureClone.cpp read `colorMapper->indexFrom555`/`entries` and would need Quantize.h. The new BikeRaceNearMisses object is identical to the one from the CursorAnimation attempt, so CreateRacers reacts to one struct fewer, not to which struct. The diff is work/naming/w17_m4_blocked.diff. |
-| `UnknownTimer` (TextureMapManager.h) | `PeakHold` | blocked: [TEXTURE_HISTORY_TIMER](TEXTURE_HISTORY_TIMER.md) records that both the alias and the moved view changed strict Scene::ReadLight from 2102 to 2065 matching positions. Retried 2026-11-25 (histories typed `PeakHold`, TextureHistoryTimer.cpp dropped as a duplicate of PeakHold.cpp's constructor): ReadLight stays strict, but Terrain.cpp (Terrain.h already includes PeakHold.h) loses the view's declarations and strict `Terrain::Render3D` (0x00506220) leaves its declaration-count window. With k typedefs prepended it is strict at k = 2..5 and 8, not at k = 0, 1, 6 or 7. BikeRace::CreateRacers also flips. Probe: work/tmp-audit/render3d.sh. |
+| `UnknownTimer` (TextureMapManager.h) | `PeakHold` | merged 2026-11-28 with the OptionProcs.h and soultree-surface folds ("Three deferred views retired"). Earlier: [TEXTURE_HISTORY_TIMER](TEXTURE_HISTORY_TIMER.md) records that both the alias and the moved view changed strict Scene::ReadLight from 2102 to 2065 matching positions. Retried 2026-11-25 (histories typed `PeakHold`, TextureHistoryTimer.cpp dropped as a duplicate of PeakHold.cpp's constructor): ReadLight stays strict, but Terrain.cpp (Terrain.h already includes PeakHold.h) loses the view's declarations and strict `Terrain::Render3D` (0x00506220) leaves its declaration-count window. With k typedefs prepended it is strict at k = 2..5 and 8, not at k = 0, 1, 6 or 7. BikeRace::CreateRacers also flips. Probe: work/tmp-audit/render3d.sh. Alone it still moves CreateRacers (13394); with the other two folds every window holds. |
 | `UnknownGuiControl` (GUIManager.h) | `UIControl` | blocked: the view's +0x210/+0x214 (acceptedCharacters, caretRect) are UIEditBox fields, and `LeaveHover`/`KillFocus` take `int` in UIControl and its six overrides but the view in GUIUser. |
 | `UnknownEcoTrackGame` (EcoSystem.h) | `TrackGame` | blocked: TrackGame's display is a PCVideoCard. The view's +0x28 colorKeyFormat is element 5 of `VideoCard::field_0x14[16]` and +0x1c0 capabilityBits is inside `PCVideoCard::field_0x1c0[]`, so the PCVideoCard fields must be split first. The EcoSystem units would also need TrackGame.h. |
 | `UnknownSoultreeNodeView` (bringup, D3DIMSoulTreeNearMisses) | `SoultreeObject` | blocked: the view takes and returns Vector3 by pointer where SoultreeObject uses `Vec3&` and returns Vec3, so the call sites would need conversions. Its comment also records that more declarations in D3DIMSoulTree.h change SceneManager.cpp 0x004eb570. |
@@ -4593,7 +4592,7 @@ finds every edited file still CRLF.
 | `EcoTrackGameView`, `EcoVideoCardView` (EcoSystem.h) | `TrackGame` (TrackGame.h), `Game::renderTarget` (`RenderTarget` / `PCRenderTarget`) | 2 | The view's `display` at game +0x10 is not the video card: Game keeps the PCVideoCard at +0x0c (TextureMapManager 0x005116c4 `mov eax, [edx+0xc]`, then `[eax+ebx*4+0x14]` textureKindCost) and the render target at +0x10 (LoadModel 0x00456231 `mov edx, [ecx+0x10]`; 0x00456234 `test byte [edx+0x1c0], 8`; 0x00456256 `mov edi, [edx+0x28]`). So +0x28 is RenderTarget::surfacePixelFormat, the format the other texture loaders take from the target, and +0x1c0 is PCRenderTarget::triTextureCaps (D3DDEVICEDESC7 dpcTriCaps at +0x1a0, dwTextureCaps +0x20; bit 8 is D3DPTEXTURECAPS_TRANSPARENCY, the colour-key support "KeyColorTrees" needs). VideoCard::textureKindCost[16] (+0x14..+0x53) was never in conflict and keeps its bounds; PCVideoCard::driverColorKeyCaps (DDCAPS dwCKeyCaps) is not read here. The other members are Game's (+0x38 debugOverlay, +0x2d0 bladeRenderer, slots 20/22 GetRegistryInt/GetRegistryFlag, both int) and PCGame's (+0x54c..+0x554 magFilter/minFilter/mipFilter). EcoSystem.cpp includes TrackGame.h and reads `g_TrackGame->...` without casts; the two colour-key tests cast the render target to PCRenderTarget, as PCTextureMap.cpp does. EcoSystem.h drops the views and its now-unused TrackGameGlobal.h include. No mangled name changes. All 46 EcoSystem.cpp calibration rows stay exact, the four near misses are unchanged (BuildCollisionObjects 1105/1153, GenerateObjects 366/3316, Render3D 3714/3967, ReadEst 561/2629), and the 75 rows of the other EcoSystem.h includers (EventManager, NationalRace, QuarryStuntEvent) stay exact. |
 | `WreckerParticleView`, `WreckerParticleManagerView` (Wrecker.h) | `Particle`, `ParticleManager` (krusty2/effects/ParticleManager.h) | 2 | Wrecker+0x11c is the ParticleManager that Bike's loader hands over (Bike.cpp already casts the same pointer to ParticleManager* for its emitters; RTTI ParticleManager COL 0x0055e0b0, vtable 0x00555d10). Every view offset was ParticleManager's: +0x2c activeCount, +0x30 visibleCount, +0x40 particles (0x48-byte Particle: position +0, velocity +0x38) and +0x1f98 gravity. EmitProbeTrail 0x00531da0 calls AddParticle 0x004baa50 directly, so wrecker.cpp's link alias is gone. The Vector3/ParticleVec3 split stays as reinterpret_casts at the crossings. Every wrecker.cpp function is unchanged (Spray 1606/1624, EmitProbeTrail 634/634, Bike::CreateWrecker 1516/1516). |
 | `NetKeepAliveView` (NetThread.h) | `NetworkInterface::ResendPending(float)` (Net.h) | 2 | The receive thread computes `fild; fmul 0.001; fstp dword [esp]` and calls 0x004acc50 at 0x004af809. Game::Tick pushes its clamped frame time (`fst [ebp-4]` ... `push [ebp-4]`) to Update 0x004acde0 at 0x004687d1, and Update and DispatchMessages forward that dword unchanged. So the original parameter is float along the whole chain: Update, DispatchMessages, ResendPending, FlushHeldMessages, NetPendingList::ResendExpired and NetFile::Update are now `(float elapsed)`. ResendPending's `mov ebp, [esp+0x14]` is VC6 seeding the uninitialised lostPlayer from the argument slot, and it stays 73/73. ResendExpired must take float too, because an int parameter adds `__ftol`. |
-| `GameHiResMeterView` (Game.h) | stays (deferred) | - | The global at 0x0056c470 points at the HiResMeter 0x0067b468, and the view has the same layout (counterUsable +0x2c). Retyping the global and deleting the view keeps Game.cpp identical. It moves ManagedTextureGroup::DrawSelection 0x0050ef70 off 1834/1834: 1029 with a forward declaration in Game.h, 1025 with Game.h including HiResMeter.h, and 1828 with the extern in HiResMeter.h. It also moves FillFileList and CreateRacers, though pairing with DialogUIAnimView restores those two. DrawSelection's headers hold no other view to pair with, so the note sits in Game.h. |
+| `GameHiResMeterView` (Game.h) | stays (deferred) | - | The global at 0x0056c470 points at the HiResMeter 0x0067b468, and the view has the same layout (counterUsable +0x2c). Retyping the global and deleting the view keeps Game.cpp identical. It moves ManagedTextureGroup::DrawSelection 0x0050ef70 off 1834/1834: 1029 with a forward declaration in Game.h, 1025 with Game.h including HiResMeter.h, and 1828 with the extern in HiResMeter.h. It also moves FillFileList and CreateRacers, though pairing with DialogUIAnimView restores those two. DrawSelection's headers hold no other view to pair with, so the note sits in Game.h. Rechecked 2026-11-28 against the PeakHold fold in TextureMapManager.h (DrawSelection's only other edited header): with the fold included after GameObject.h, after BlockAllocator.h or in place of UnknownTimer, DrawSelection is 1029 for the HiResMeter.h extern and Game.h forward declarations (standalone, `extern class`, or in Game.h's forward-declaration list), and 1025 when Game.h includes HiResMeter.h. With the extern in Game.cpp it is 1828 and AddCircuitRow drops to 747. Paired with DialogUIAnimView (extern in HiResMeter.h) FillFileList returns to 2258 but CreateRacers stays at 13394. |
 | `BikeWheel` (Bike.h) | `Tire` (tire/Tire.h) | 1 | Bike+0x5f0/+0x5f4 are the two wheels LoadBike builds through Tire::Tire 0x00512f10 (RTTI Tire : CollisionObject(+0xb8), MovingPart, CollisionPoint); every BikeWheel field had a Tire member at the same offset (clang layout dump). Conflicting names took Tire's: contactLoad->surfaceGrip, loadWeight->blendWeight, w_0x16c->contactState, nodePosition->wheelCenter, driveForceMagnitude->driveMagnitude, aux/secondaryAux/primaryAux->engine/rotatingShock/inlineShock, groundPoint/groundNormal->surfacePosition/surfaceNormal. Bike's Vec3 math casts Tire's CollisionVec3 members at the use sites. One mangled name changes (UpdateDriveShare@BikeWheel -> UpdateDriveShare@Tire, 0x00513f90), so Group2_VehicleWheel's forwarder goes. Proof over 139 units identical apart from that name and labels. |
 | `BikeRaceKrustyBikeView` (BikeRace.h) | `KrustyBike` (vehicle/KrustyBikeCore.h) | 1 | BikeRace+0x38/+0x3c/+0x40 hold the bikes CreateRacers builds with the KrustyBike constructor 0x0048fa60 (0x1638 bytes; the view's slots were KrustyBike's, vtable 0x00554548 at object_offset 0, GameObject through the vbptr at +4), and every view field had a KrustyBike member at the same offset (clang layout dump). Conflicting names took the canonical ones: heading->bodyForward, restarted->respawnPending, startPosition/startDirection->respawnPosition/respawnHeading, recorderId->netId, messageDelay->clockOffset, finished->hasFinished, recordStateTimer->recordState.timer, bikeView->race, receivedStates->states (KbBikeNetState: state->its KbBikeMessage base, messageFlags->timeReceived, fresh->fullState). Unresolved: BikeRace matches message racerIndex against +0x734 (`aiKind`, was netIndex) and the RacerSlot racerIndex against +0x11c0 (`loaderKind`, was aiMessageIndex), which does not fit KbBikeMessage+0x54 being the +0x11c0 copy. Type differences are cast at the use sites (D3DIMSoultreeObject model nodes, CollisionObject wheels, RaceStatusNode status node, BikeRace race for forceHighLod, Vector3& and int& raw copies, unsigned lapCount/aiKind, char loaderKind). StartFollowing's body moved to BikeRace.cpp. NextBike and the constructor change mangled names, so the game_build.json constructor alias goes. Proof over 26 units identical apart from those names, labels, one fixture's __LINE__ values and the accepted CreateRacers window (retail's 13400 order; pins updated). |
 | `RadarGatePose`, `RadarGateObjectView`, `RadarGateEventView` (TrackOverlay.h) | `RaceGatePose`, `RaceGateObject`, `RaceGateEvent` (new RaceGateEvent.h) | 2 | Both read the Baja/Enduro gate event at TrackGame+0x560 (the demo never allocates it): +0xac count, +0xd8 poses, +0x420 entries. BikeRace.h's records move to RaceGateEvent.h, which TrackOverlay.h also includes. Name conflicts: currentGate/nextGate -> lapGate/nextLapGate (0x00404df0, TrackGameViewOwner), halfWidth -> width (BikeRace's node width), position -> center; the radar's drawEnabled (+0x30) and the 0x23-entry pose array join the shared records. Proof over 22 units identical. |
@@ -4691,14 +4690,62 @@ Left, each with a one-line note at its definition:
   or symbol names them.
 - `UnknownEventPlayerMessage`: one local view over several DirectPlay message
   types.
-- `UnknownOpt*Settings` (OptionProcs.h): duplicates of TrackGame.h's
-  `TrackGameInterfaceOptions`, `-SoundOptions`, `-GraphicsOptions`,
-  `-ControlOptions` and `-GarageOptions` (same sizes and offsets). Folding
-  them, with forward declarations in OptionProcs.h, kept every object to
-  name-only changes, but it moved CreateRacers to 13394/13428. The fold was
-  reverted rather than padded.
-- `UnknownTimer` (TextureMapManager.h): the same type as PeakHold
-  (0x004cb670/0x004cb690/0x004cb6b0). It was not retried here because earlier
-  fold attempts moved the ReadLight and Render3D windows.
+- `UnknownOpt*Settings` (OptionProcs.h) and `UnknownTimer`
+  (TextureMapManager.h): each fold alone moved CreateRacers to 13394/13428.
+  Both landed together with the soultree-surface fold; see "Three deferred
+  views retired" below.
 - `UnknownVisibilityStatic`: it lives in VisibilityQuadTree.cpp, which this
   pass did not edit.
+
+## Three deferred views retired (2026-11-28)
+
+Five deferred views were tried as separate retirements: A `UnknownOpt*Settings`
+(OptionProcs.h), B `ModifierSoultreeSurfaceView` (MorphBastardModifier.h), C
+`GameHiResMeterView` (Game.h), D `DialogUIAnimView` (DlgProcs.h) and E
+`UnknownTimer` (TextureMapManager.h). Each one alone keeps its own units to
+name-only changes, but A, B, C and D each move at least one of the six
+declaration-count windows. A, B and E landed together. All 259 objects are
+identical to the previous build apart from symbol names, `$L`/`$T`/`$SG`
+and goto-label counters, and the order of RTTI type-descriptor COMDATs in
+DlgProcs.obj and BikeRace.obj. E alone also reorders those COMDATs.
+TextureHistoryTimer.obj is gone. Render3D 3173, FillFileList 2258,
+AddCircuitRow 756, CreateRacers 13400/13428, ReadLight 2102 and DrawSelection
+1834 are unchanged.
+
+| Old | New | Tier | Evidence |
+|---|---|---|---|
+| `UnknownOptGameSettings`, `UnknownOptSoundSettings`, `UnknownOptGraphicsSettings`, `UnknownOptControlSettings`, `UnknownOptGarageSettings` (OptionProcs.h); `Unknown{Game,Sound,Graphics,Control,Garage}SettingsOf` | `TrackGameInterfaceOptions`, `TrackGameSoundOptions`, `TrackGameGraphicsOptions`, `TrackGameControlOptions`, `TrackGameGarageOptions` (TrackGame.h); `InterfaceOptionsOf`, `SoundOptionsOf`, `GraphicsOptionsOf`, `ControlOptionsOf`, `GarageOptionsOf` | 2 | `0x004b4280` copies TrackGame +0xc24, +0xf98, +0xfc4, +0xfe0 and +0x1550 into the `g_Edited*Settings` globals with `rep movsd`, and each view had the TrackGame block's size and offsets. OptionProcs.h forward-declares the five TrackGame types. The members take TrackGame.h's names (for example showGauges -> instrumentOverlayOn, inGameSoundEffects -> soundOn, resolutionRow -> displayMode, the seven control sliders -> `responseSliders[0..6]`, curveRows -> `garageCurveChoice`). Five global names change. |
+| `ModifierSoultreeSurfaceView`, `MorphBastardVertex`, `MorphBastardFace`, `MorphBastardMeshGroup`, `MorphBastardMeshPair` (MorphBastardModifier.h); SoultreeSurface `materialCount`/`materialIndices` | `SoultreeSurface`, `SoultreeVertex`, `unsigned short` indices, `SoultreeVertexGroup` (D3DIMSoulTree.h); `SoultreeMaterialList materials` (`count`, `indices`) | 2 | The modifiers' slot 27 receives the surface D3DIMSoultreeObject draws (`TransformVertexGroups`, `DrawCurrentLod`), which passed `SoultreeSurface*` through a cast. Every view member sat at a SoultreeSurface member of the same offset. CopyMesh 0x004a5290 copies +0x20/+0x24 as one 8-byte value (it reloads meshCopy between the two stores at 0x004a538d), so the pair is a `SoultreeMaterialList` (grouping tier 2, names tier 3). GhostMod and TransparencyMod drop their MorphBastardModifier.h include. Four mangled names change. |
+| `UnknownTimer` (TextureMapManager.h), TextureHistoryTimer.cpp | `PeakHold` (PeakHold.h) | 2 | The same 12-byte type (0x004cb670/0x004cb690/0x004cb6b0). TextureMapManager.h includes PeakHold.h, ManagedTextureGroup calls `Record`/`Peak`, and the duplicate constructor provider, its calibration row and the two link aliases are gone ([TEXTURE_HISTORY_TIMER](TEXTURE_HISTORY_TIMER.md)). |
+
+Mangled names:
+
+- `?g_EditedGameSettings@@3UUnknownOptGameSettings@@A` -> `?g_EditedGameSettings@@3UTrackGameInterfaceOptions@@A`
+- `?g_EditedSoundSettings@@3UUnknownOptSoundSettings@@A` -> `?g_EditedSoundSettings@@3UTrackGameSoundOptions@@A`
+- `?g_EditedGraphicsSettings@@3UUnknownOptGraphicsSettings@@A` -> `?g_EditedGraphicsSettings@@3UTrackGameGraphicsOptions@@A`
+- `?g_EditedControlSettings@@3UUnknownOptControlSettings@@A` -> `?g_EditedControlSettings@@3UTrackGameControlOptions@@A`
+- `?g_EditedGarageSettings@@3UUnknownOptGarageSettings@@A` -> `?g_EditedGarageSettings@@3UTrackGameGarageOptions@@A`
+- `?ModifyMesh@{GhostMod1,TransparencyMod,MorphBastardModifier}@@UAEXPAVD3DIMSoultreeObject@@PAUModifierSoultreeSurfaceView@@PAPAU3@@Z` -> `...PAUSoultreeSurface@@PAPAU3@@Z`
+- `?CopyMesh@MorphBastardModifier@@QAEXPAUModifierSoultreeSurfaceView@@@Z` -> `?CopyMesh@MorphBastardModifier@@QAEXPAUSoultreeSurface@@@Z`
+- `??0UnknownTimer@@QAE@H@Z` -> `??0PeakHold@@QAE@I@Z`; `?RecordSample@UnknownTimer@@QAEXH@Z` -> `?Record@PeakHold@@QAEXH@Z`; `?LargestRecentSample@UnknownTimer@@QAEHXZ` -> `?Peak@PeakHold@@QAEHXZ`
+
+Windows (Render3D, FillFileList, AddCircuitRow, CreateRacers, ReadLight,
+DrawSelection; a dash is unchanged):
+
+| Set | Result |
+|---|---|
+| A | CreateRacers 13394 |
+| B | CreateRacers 13394 |
+| C (extern in HiResMeter.h) | FillFileList 2254, CreateRacers 13394, DrawSelection 1828 |
+| D | FillFileList 2254, CreateRacers 13394 |
+| E | - |
+| AB, AD, BE, ABE, ADE | - |
+| AE | CreateRacers 13394 |
+| BD, DE | FillFileList 2254, CreateRacers 13394 |
+| ABD, ABDE | CreateRacers 13394 |
+| BDE | FillFileList 2254 |
+| any set with C | DrawSelection 1828 or 1029 |
+
+ABE and ADE are the largest sets that hold every window; ABE retires more and
+was kept. C and D stay deferred with notes at their definitions. The other C
+spellings are in the `GameHiResMeterView` row above.

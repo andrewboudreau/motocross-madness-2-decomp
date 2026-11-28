@@ -4,6 +4,7 @@
 
 #include "ContainerList.h"
 #include "GameObject.h"
+#include "PeakHold.h"
 
 class ManagedTexture;
 class TextureMap;
@@ -37,21 +38,6 @@ int CompareTexturesByUnhappiness(const void* first, const void* second);
 
 // 0x0050d800 (cdecl): fits a size list's planned levels into `budget` texels.
 int FitTexturesToBudget(ContainerList<ManagedTexture*>* list, int budget);
-
-// Interval timer (PCVideoCard.cpp; constructor 0x004cb670 records the
-// current time and the interval), 12 bytes. The same type as PeakHold.h's
-// PeakHold (0x004cb670/0x004cb690/0x004cb6b0); the fold is deferred because
-// it moved the declaration-count windows.
-class UnknownTimer {
-public:
-    explicit UnknownTimer(int interval);
-    int LargestRecentSample();              // 0x004cb690: the largest recent sample
-    void RecordSample(int sample);   // 0x004cb6b0: records a sample
-
-    int timerStart;                           // +0x00 start time
-    int peakSample;                           // +0x04 largest recent sample
-    int timerInterval;                        // +0x08 interval
-};
 
 class CacheTexture;
 class PCRenderTarget;
@@ -106,9 +92,9 @@ public:
     int textureCursor;                        // +0x1c8 debug key cursor (textures)
     int placePasses;                          // +0x1cc PlaceTextures calls in the last repack
     int texelsBlitted;                        // +0x1d0 "TexMem Blted" (x bytes/pixel); CacheTexture adds each blit rect's area
-    UnknownTimer texelsBlittedHistory;        // +0x1d4 samples of +0x1d0; its largest is "TexMem Blted"'s peak
-    UnknownTimer blitTimeHistory;             // +0x1e0 samples of now - +0x250; its largest is "BltTime"'s (%d)
-    UnknownTimer texturesBlittedHistory;      // +0x1ec samples of the blitted count; "Textures Blted %d (%d)"
+    PeakHold texelsBlittedHistory;            // +0x1d4 peak of +0x1d0 (5000 hold); "TexMem Blted"'s peak
+    PeakHold blitTimeHistory;                 // +0x1e0 peak of now - +0x250; "BltTime"'s (%d)
+    PeakHold texturesBlittedHistory;          // +0x1ec peak of the blitted count; "Textures Blted %d (%d)"
     void* gdiObject;                          // +0x1f8 GDI object (DeleteObject)
     int requestedBySize[9];                   // +0x1fc per size level; "Size Requested Granted" column 1
     int grantedBySize[9];                     // +0x220 per planned level; "Size Requested Granted" column 2

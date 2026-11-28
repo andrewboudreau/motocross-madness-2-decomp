@@ -681,7 +681,7 @@ void MultiPlayerDlg::EnableReadyControls() {
             EnableGroup(0x514, 1);
         EnableGroup(0x3e8, 1);
     } else {
-        if (BikeClassOf(((UnknownOptGarageSettings*)g_TrackGame->mode.garageOptions)->engineSize) >
+        if (BikeClassOf(((TrackGameGarageOptions*)g_TrackGame->mode.garageOptions)->engineSize) >
                 g_TrackGame->mode.raceSettings.maxBikeClass &&
             g_LobbyLocalReady)
             ReportReadyCleared(1);
@@ -1973,7 +1973,7 @@ void MPBikeRiderDlg::HandleEvent(DialogEvent* event) {
         list->AddRow("500cc 2-stroke", BikeClassOf(g_BikeClassEngineSizes[3]), 0);
         list->AddRow("600cc 4-stroke", BikeClassOf(g_BikeClassEngineSizes[4]), 0);
         list->SelectRowByData(
-            BikeClassOf(((UnknownOptGarageSettings*)g_TrackGame->mode.garageOptions)->engineSize));
+            BikeClassOf(((TrackGameGarageOptions*)g_TrackGame->mode.garageOptions)->engineSize));
         g_TrackGame->LoadResourceString(0x146a, format, 0x80);
         list = static_cast<UIDropDownList*>(FindControl("LargestOpponentDropDown", 6))->listPart;
         list->RemoveAllRows();
@@ -2192,7 +2192,7 @@ void MPBikeRiderDlg::ApplyLargestOpponentClass() {
     if (!g_TrackGame->network->isHost) {
         UIListBox* list = static_cast<UIDropDownList*>(FindControl("LargestOpponentDropDown", 6))->listPart;
         list->SelectRowByData(g_TrackGame->mode.raceSettings.maxBikeClass);
-        if (BikeClassOf(((UnknownOptGarageSettings*)g_TrackGame->mode.garageOptions)->engineSize) >
+        if (BikeClassOf(((TrackGameGarageOptions*)g_TrackGame->mode.garageOptions)->engineSize) >
                 g_TrackGame->mode.raceSettings.maxBikeClass &&
             g_LobbyLocalReady)
             static_cast<MultiPlayerDlg*>(parentDialog)->ReportReadyCleared(1);

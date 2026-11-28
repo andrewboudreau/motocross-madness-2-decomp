@@ -3,7 +3,7 @@
     "src/reconstructed/ManagedTextureGroup.cpp": {
       "sections": 83,
       "relocations": 511,
-      "sha256": "ca73d9ff1eeba511fac22b48be8ad7c491bc0fc1f0af7801a9adeba4dbd710f1"
+      "sha256": "ebcf210387b9a640c7db66a2bfda7b680b4a907d50c4db752133b601bb9abc0e"
     },
     "src/reconstructed/SceneManager.cpp": {
       "sections": 335,

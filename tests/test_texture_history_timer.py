@@ -1,4 +1,4 @@
-"""Existing texture timer view, complete constructor and actual clock closure."""
+"""The texture group's embedded PeakHold members, constructor and actual clock closure."""
 from pathlib import Path
 import sys,subprocess,os,json,hashlib,tempfile,unittest,struct
 from unittest.mock import patch
@@ -23,7 +23,7 @@ class TextureHistoryTimerTests(unittest.TestCase):
    self.assertEqual(hashlib.sha256(Path(os.environ['MCM2_EXE']).read_bytes()).hexdigest(),'31fde4cc686a5ee89ef9095b90235325b195596867ecacefe511263e1509b874')
    clock=extract((R/'src/reconstructed/PCGame.cpp').read_text(),'unsigned int ReadClock()')
    (P/'clock.cpp').write_text('#include <windows.h>\n#include <mmsystem.h>\n'+clock+'\n')
-   items=[('provider',R/'src/reconstructed/TextureHistoryTimer.cpp'),('peak',R/'src/reconstructed/PeakHold.cpp'),('pcgame',R/'src/reconstructed/PCGame.cpp'),('clock',P/'clock.cpp'),('fixture',R/'tests/fixtures/texture_history_timer.cpp'),('managed',R/'src/reconstructed/ManagedTextureGroup.cpp'),('manager',R/'src/reconstructed/TextureMapManager.cpp')];objects={}
+   items=[('peak',R/'src/reconstructed/PeakHold.cpp'),('pcgame',R/'src/reconstructed/PCGame.cpp'),('clock',P/'clock.cpp'),('fixture',R/'tests/fixtures/texture_history_timer.cpp'),('managed',R/'src/reconstructed/ManagedTextureGroup.cpp'),('manager',R/'src/reconstructed/TextureMapManager.cpp')];objects={}
    for name,source in items:
     cmd=[sys.executable,str(R/'tools/compile.py'),str(source),'-o',str(P/(name+'-native.obj')),'--vc6-root',str(VC),'--profile','vc6_o2_mt']
     if name=='fixture':cmd+=['--include',str(T/'src/reconstructed'),'--extra','/Od']
@@ -47,19 +47,18 @@ class TextureHistoryTimerTests(unittest.TestCase):
    col=struct.unpack('<I',image.bytes_at_va(0x5583bc,4))[0]
    words=struct.unpack('<5I',image.bytes_at_va(col,20));self.assertEqual(words[1],0)
    self.assertEqual(image.bytes_at_va(words[3]+8,80).split(b'\0')[0],b'.?AVManagedTextureGroup@@')
-   for name,symbol,va,size,binding in [('provider','??0UnknownTimer@@QAE@H@Z',0x4cb670,30,T/'src/reconstructed/TextureHistoryTimer.bindings.json'),('peak','??0PeakHold',0x4cb670,30,R/'src/reconstructed/PeakHold.bindings.json'),('peak','?Peak@PeakHold',0x4cb690,28,R/'src/reconstructed/PeakHold.bindings.json'),('peak','?Record@PeakHold',0x4cb6b0,43,R/'src/reconstructed/PeakHold.bindings.json'),('pcgame','?ReadClock@@YAIXZ',0x4bfa80,29,R/'src/reconstructed/PCGame.bindings.json'),('clock','?ReadClock@@YAIXZ',0x4bfa80,29,R/'src/reconstructed/PCGame.bindings.json'),('managed','??0ManagedTextureGroup',0x50bed0,996,R/'src/reconstructed/ManagedTextureGroup.bindings.json'),('manager','?CreateGroup@TextureMapManager',0x511180,264,R/'src/reconstructed/TextureMapManager.bindings.json')]:
+   for name,symbol,va,size,binding in [('peak','??0PeakHold',0x4cb670,30,R/'src/reconstructed/PeakHold.bindings.json'),('peak','?Peak@PeakHold',0x4cb690,28,R/'src/reconstructed/PeakHold.bindings.json'),('peak','?Record@PeakHold',0x4cb6b0,43,R/'src/reconstructed/PeakHold.bindings.json'),('pcgame','?ReadClock@@YAIXZ',0x4bfa80,29,R/'src/reconstructed/PCGame.bindings.json'),('clock','?ReadClock@@YAIXZ',0x4bfa80,29,R/'src/reconstructed/PCGame.bindings.json'),('managed','??0ManagedTextureGroup',0x50bed0,996,R/'src/reconstructed/ManagedTextureGroup.bindings.json'),('manager','?CreateGroup@TextureMapManager',0x511180,264,R/'src/reconstructed/TextureMapManager.bindings.json')]:
     proof=compare(image,objects[name],symbol,va,size,binding);assert proof['strict_exact'],proof;proofs.append(dict(object=name,symbol=symbol,va=hex(va),size=size,strict=True))
    def function(obj,symbol):
     s=obj.find_symbol(symbol);raw,size,rels=obj.symbol_extent(s);return raw.hex(),[(r.virtual_address-s.value,r.type,obj.symbol_by_index[r.symbol_index].name)for r in rels]
    assert function(objects['clock'],'?ReadClock@@YAIXZ')==function(objects['pcgame'],'?ReadClock@@YAIXZ')
-   o=objects['provider'];assert [(s.name,s.raw_size)for s in o.sections if not s.name.startswith('.debug')]==[('.drectve',40),('.text',32)]
-   assert [s.name for s in o.symbols if s.storage_class==2 and s.section_number==0]==['?ReadClock@@YAIXZ']
+   o=objects['peak'];assert [s.name for s in o.symbols if s.storage_class==2 and s.section_number==0]==['?ReadClock@@YAIXZ']
    linker=find_child_ci(find_vc6_bin(VC),'link.exe');lib=find_child_ci(infer_vc98_root(VC),'lib');exe=P/'timer.exe'
-   result=subprocess.run([str(linker),'/nologo','/subsystem:console','/out:'+str(exe),'/libpath:'+str(lib),str(P/'provider-native.obj'),str(P/'clock-native.obj'),str(P/'fixture-native.obj'),'kernel32.lib','winmm.lib'],capture_output=True,text=True,encoding='latin1',env={**os.environ,'PYTHONPATH':str(ROOT)});assert result.returncode==0,result.stdout+result.stderr
+   result=subprocess.run([str(linker),'/nologo','/subsystem:console','/out:'+str(exe),'/libpath:'+str(lib),str(P/'peak-native.obj'),str(P/'clock-native.obj'),str(P/'fixture-native.obj'),'kernel32.lib','winmm.lib'],capture_output=True,text=True,encoding='latin1',env={**os.environ,'PYTHONPATH':str(ROOT)});assert result.returncode==0,result.stdout+result.stderr
    result=subprocess.run([str(exe)],capture_output=True,text=True,timeout=30);print(result.stdout+result.stderr);assert result.returncode==0,result.returncode;assert result.stdout.strip()=='Texture timer: 3072 actual clock cases, 1024 exact write AV; 128 platform boundary cases, 96 throws'
 
-   self.assertEqual(len(proofs),8)
-   self.assertEqual([(r.virtual_address-objects['managed'].find_symbol('??0ManagedTextureGroup').value,r.type) for r in objects['managed'].symbol_extent(objects['managed'].find_symbol('??0ManagedTextureGroup'))[2] if objects['managed'].symbol_by_index[r.symbol_index].name=='??0UnknownTimer@@QAE@H@Z'],[(392,20),(408,20),(424,20)])
+   self.assertEqual(len(proofs),7)
+   self.assertEqual([(r.virtual_address-objects['managed'].find_symbol('??0ManagedTextureGroup').value,r.type) for r in objects['managed'].symbol_extent(objects['managed'].find_symbol('??0ManagedTextureGroup'))[2] if objects['managed'].symbol_by_index[r.symbol_index].name=='??0PeakHold@@QAE@I@Z'],[(392,20),(408,20),(424,20)])
    pins=json.loads((ROOT/'tests/fixtures/texture_history_timer_objects.json').read_text())['objects']
    for index,source in enumerate(pins):
     objpath=P/('whole%d.obj'%index)
@@ -68,6 +67,6 @@ class TextureHistoryTimerTests(unittest.TestCase):
     with patch.object(views,'FILENAMES',FILENAMES):rows=views.whole_object(CoffObject(objpath),(ROOT,))
     actual=dict(sections=len(rows),relocations=sum(len(z[-1])for z in rows),sha256=hashlib.sha256(json.dumps(rows,separators=(',',':')).encode()).hexdigest())
     self.assertEqual(actual,pins[source])
-   print('8 complete strict checks; three old objects; real WinMM and controlled platform boundaries')
+   print('7 complete strict checks; three old objects; real WinMM and controlled platform boundaries')
 
 if __name__=="__main__":unittest.main()
