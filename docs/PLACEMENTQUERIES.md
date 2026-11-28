@@ -51,6 +51,6 @@ Source forms that mattered:
 
 ```bash
 python3 tools/compile.py --compiler vc6 --vc6-root "$VC6_ROOT" src/reconstructed/PlacementQueries.cpp -o work/PlacementQueries.obj
-python3 tools/match.py --exe "$MCM2_EXE" --target-va 0x004b0b80 --target-size 619 --obj work/PlacementQueries.obj --symbol '?ClampToPlacementSquare@@YAXPAVCollisionObject@@PAVPlacementProbe@@PBUCollisionVec3@@MHHH2PAU3@3@Z' --bindings src/reconstructed/PlacementQueries.bindings.json
+python3 tools/match.py --exe "$MCM2_EXE" --target-va 0x004b0b80 --target-size 619 --obj work/PlacementQueries.obj --symbol '?ClampToPlacementSquare@@YAXPAVCollisionObject@@PAVTerrain@@PBUCollisionVec3@@MHHH2PAU3@3@Z' --bindings src/reconstructed/PlacementQueries.bindings.json
 python3 tools/run_calibration.py --exe "$MCM2_EXE" --compiler vc6 --vc6-root "$VC6_ROOT"
 ```

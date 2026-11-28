@@ -31,7 +31,7 @@ struct RaceGateObject {
     int drawEnabled;  // +0x30  RadarOverlay skips the gate while it is 0
     unsigned char field_0x34[0x50 - 0x34];
     float width;  // +0x50  BuildNodeList passes it as AppendNode's scale (the node's width); the radar draws it as a half width
-    int height;  // +0x54 BuildNodeList passes it as AppendNode's height
+    float height;  // +0x54 BuildNodeList passes it as AppendNode's height (RaceGate::height, a float)
     RaceGateMarker* marker;  // +0x58  SelectLapGates (0x00404df0) flags it; skipped while null
 };
 

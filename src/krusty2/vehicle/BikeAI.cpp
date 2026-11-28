@@ -1593,10 +1593,10 @@ int KrustyBike::SimulateAIFrame(float dt)
     linearSpeed = BikeAILength(velocity);
     turnRate = 0.0f;
 
-    ((InlineShock*)frontWheel->inlineShock)->ClampAndStep(-lookAheadFrontTravel, 0,
-        ((InlineShock*)frontWheel->inlineShock)->axis * -lookAheadFrontTravel);
-    ((RotatingShock*)rearWheel->rotatingShock)->length = lookAheadRearTravel;
-    ((RotatingShock*)rearWheel->rotatingShock)->ClampAndStep(lookAheadRearTravel, 0);
+    frontWheel->inlineShock->ClampAndStep(-lookAheadFrontTravel, 0,
+        frontWheel->inlineShock->axis * -lookAheadFrontTravel);
+    rearWheel->rotatingShock->length = lookAheadRearTravel;
+    rearWheel->rotatingShock->ClampAndStep(lookAheadRearTravel, 0);
     if (!airborne)
         anyWheelInContact = 1;
     else

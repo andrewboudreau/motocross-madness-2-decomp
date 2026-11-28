@@ -135,11 +135,11 @@ class WheelAttachmentTests(unittest.TestCase):
             starts=['static inline void AxisAngleMatrix(']+['void SoultreeObject::'+name+'(' for name,_,_ in HELPERS]
             helper.write_text('#include "math/Math3D.h"\n#include <math.h>\n'+'\n'.join(definition(text,s)for s in starts)+'\n')
             matrix=output/'matrix.cpp';matrix.write_text('#include "math/Math3D.h"\n'+definition((ROOT/MATRIX).read_text(),'void MatrixMultiply(')+'\n')
-            layout=output/'layout.cpp';layout.write_text('#include <stddef.h>\n#include "TireAttachmentViews.h"\n#include "vehicle/Vehicle.h"\n'
+            layout=output/'layout.cpp';layout.write_text('#include <stddef.h>\n#include "Suspension.h"\n#include "vehicle/Vehicle.h"\n'
                 'typedef char Layout[(sizeof(VehicleWheel)==0x2c0 && offsetof(VehicleWheel,primaryAux)==0x2b0 && offsetof(VehicleWheel,secondaryAux)==0x2ac && '
-                'sizeof(CollisionVec3)==sizeof(Vec3) && sizeof(CollisionMatrix4)==sizeof(Matrix4) && offsetof(TireAttachA,node)==0x44 && '
-                'offsetof(TireAttachA,position)==0x98 && offsetof(TireAttachA,direction)==0xc0 && offsetof(TireAttachB,restMatrix)==4 && '
-                'offsetof(TireAttachB,node)==0x44 && offsetof(TireAttachB,position)==0x98 && offsetof(TireAttachB,scale)==0xc8 && offsetof(TireAttachB,axis)==0xd4)?1:-1];\n')
+                'sizeof(ShockVec3)==sizeof(Vec3) && offsetof(InlineShock,node)==0x44 && '
+                'offsetof(InlineShock,length)==0x98 && offsetof(InlineShock,axis)==0xc0 && offsetof(RotatingShock,matrix)==4 && '
+                'offsetof(RotatingShock,node)==0x44 && offsetof(RotatingShock,length)==0x98 && offsetof(RotatingShock,armLength)==0xc8 && offsetof(RotatingShock,rotationAxis)==0xd4)?1:-1];\n')
             jobs=[(s,ROOT/s)for s in (SOURCE,SAMPLE,CANONICAL,TREE,MATRIX,POSITION,'src/krusty2/vehicle/Vehicle.cpp','tests/fixtures/wheel_attachment_compare.cpp')]
             jobs += [('helpers',helper),('matrix',matrix),('layout',layout)]
             paths={};objects={}

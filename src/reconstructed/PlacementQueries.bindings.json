@@ -1,7 +1,7 @@
 {
   "?PlacementSphereBlocked@@YAHPAUCollisionVec3@@MPAVCollisionObject@@HHHH@Z": "0x004b08f0",
   "?PointInPlacementSquare@@YAHPBUCollisionVec3@@MMMMPAM111@Z": "0x004b0ac0",
-  "?ClampToPlacementSquare@@YAXPAVCollisionObject@@PAVPlacementProbe@@PBUCollisionVec3@@MHHH2PAU3@3@Z": "0x004b0b80",
+  "?ClampToPlacementSquare@@YAXPAVCollisionObject@@PAVTerrain@@PBUCollisionVec3@@MHHH2PAU3@3@Z": "0x004b0b80",
   "?BeginQuery@QuadTree@@QAEHMMMM@Z": "0x004dd270",
   "?NextObject@QuadTree@@QAEPAVQuadTreeObject@@XZ": "0x004dd540",
   "?EndQuery@QuadTree@@QAEXXZ": "0x004dd770",

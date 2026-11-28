@@ -7,12 +7,11 @@ all four call relocations resolved. No caller changes, forwarding wrapper,
 linker aliases or special compiler flags are involved.
 
 The existing `Tire::UpdateAttachment()` sample is another source view of the
-same retail body. Its body stays unchanged in `src/krusty2/tire/Tire.cpp`.
-Only the two existing attachment-field class declarations move verbatim to
-`src/reconstructed/TireAttachmentViews.h`; the sample header includes that
-shared declaration. This does not promote the rest of Tire, its constructors,
-its provisional MovingPart declaration or the suspension hierarchy. Semantic
-field/method names and original TU/header ownership remain provisional.
+same retail body; its body stays in `src/krusty2/tire/Tire.cpp`. Both read the
+attachments as the real `InlineShock` and `RotatingShock` classes
+(`src/reconstructed/Suspension.h`). This does not promote the rest of Tire, its
+constructors or its provisional MovingPart declaration. Semantic field/method
+names and original TU/header ownership remain provisional.
 
 ## Identity, receiver and complete behavior
 
@@ -36,26 +35,26 @@ array entry directly into ECX at `0x40cd9e` and calls this body at `0x40cda1`.
 The complete 160-byte AddWheel and 486-byte slot41 are independently strict;
 this operation never consumes the secondary contact pointer.
 
-The body prioritizes `primaryAux` (`+0x2b0`). With this attachment it computes
-`-position * direction`, then passes the resulting vector by value to its scene
-node. Only when that pointer is null does it inspect `secondaryAux` (`+0x2ac`),
-compute `position / scale`, and test whether the quotient is finite. A finite
-quotient causes the node's rest matrix to be restored and then rotated about
-the attachment's axis. Both-null does nothing. The decoded reads and writes,
-including fault order, are retained without added validation or cleanup.
+The body prioritizes `primaryAux` (`+0x2b0`), an InlineShock. With it, it computes
+`-length * axis`, then passes the resulting vector by value to the shock's scene
+node. Only when that pointer is null does it inspect `secondaryAux` (`+0x2ac`), a
+RotatingShock, compute `length / armLength`, and test whether the quotient is
+finite. A finite quotient restores the node's matrix from the shock's
+MovingPart matrix and then rotates it about `rotationAxis`. Both-null does
+nothing. The decoded reads and writes, including fault order, are retained
+without added validation or cleanup.
 
-Shared provisional attachment views preserve the observed fields:
+The fields read are members of the shock classes:
 
-| View | Relevant offsets |
+| Class | Relevant offsets |
 | --- | --- |
-| Inline attachment | node `0x44`, position `0x98`, direction `0xc0` |
-| Rotating attachment | rest matrix `0x04`, node `0x44`, position `0x98`, scale `0xc8`, axis `0xd4` |
+| InlineShock | `MovingPart::node` `0x44`, `Shock::length` `0x98`, `axis` `0xc0` |
+| RotatingShock | `MovingPart::matrix` `0x04`, `MovingPart::node` `0x44`, `Shock::length` `0x98`, `armLength` `0xc8`, `rotationAxis` `0xd4` |
 
-The new body casts only these existing integer/pointer fields and compatible
-three-float/64-byte matrix views at the real scene-method boundary. Compiler
-checks protect their field offsets, sizes, the wheel's `0x2c0` extent and both
-attachment-pointer offsets. These checks do not equate all provisional fields
-with a complete original C++ class.
+The body casts the wheel's integer attachment fields to those classes and the
+three-float `ShockVec3` axis to `Vec3` at the scene-method boundary. Compiler
+checks protect these offsets, the wheel's `0x2c0` extent and both
+attachment-pointer offsets.
 
 ## Real source dependencies
 

@@ -6,6 +6,7 @@
 #include "Track.h"
 
 #include "DebugAlloc.h"
+#include "BikeRaceNode.h"
 #include "GameUiHelpers.h"
 #include "TextureMap.h"
 #include "../krusty2/math/FastMath.h"
@@ -93,17 +94,9 @@ int Track::FreeNodeArray(FileStream* stream, TrackNode** nodes, int count)
 // scales the probe extents through a vector pointer (one base register).
 // A shared `goto fail`, block-scoped counters or per-field scaling move the
 // frame and registers off retail's.
-// The start / finish probe the loader fills (bikerace.cpp's 0x3c-byte gate).
-struct TrackProbe {
-    Vec3 centre;                    // +0x00
-    Vec3 direction;                 // +0x0c
-    Vec3 halfExtents;               // +0x18
-    float width;                    // +0x24, as BikeRaceNode.h
-    float height;                   // +0x28 RaceGate::height; 150 after loading
-    TrackPos pos;                   // +0x2c
-};
-
-static inline void ScaleVec3(Vec3* v, float scale)
+// The start / finish probes the loader fills are BikeRace's startProbe and
+// finishProbe, RaceGates (bikerace.cpp's 0x3c-byte gate, BikeRaceNode.h).
+static inline void ScaleVec3(Vector3* v, float scale)
 {
     v->x *= scale;
     v->y *= scale;
@@ -256,10 +249,10 @@ int Track::LoadTrack(FileStream* stream, void* start, void* finish, int* hasStar
             nodes[index]->links[slot] = (TrackNode*)target;
         } else if (chunk == 15) {
             *hasStart = 1;
-            TrackProbe* probe = (TrackProbe*)start;
-            stream->Read(&probe->centre.x, 4, 1);
-            stream->Read(&probe->centre.y, 4, 1);
-            stream->Read(&probe->centre.z, 4, 1);
+            RaceGate* probe = (RaceGate*)start;
+            stream->Read(&probe->center.x, 4, 1);
+            stream->Read(&probe->center.y, 4, 1);
+            stream->Read(&probe->center.z, 4, 1);
             stream->Read(&probe->direction.x, 4, 1);
             stream->Read(&probe->direction.y, 4, 1);
             stream->Read(&probe->direction.z, 4, 1);
@@ -269,15 +262,15 @@ int Track::LoadTrack(FileStream* stream, void* start, void* finish, int* hasStar
             stream->Read(&probe->width, 4, 1);
             ScaleVec3(&probe->halfExtents, scale);
             probe->width *= scale;
-            probe->centre.x = probe->centre.x * scale + offsetX;
-            probe->centre.y *= scale;
-            probe->centre.z = probe->centre.z * scale + offsetZ;
+            probe->center.x = probe->center.x * scale + offsetX;
+            probe->center.y *= scale;
+            probe->center.z = probe->center.z * scale + offsetZ;
         } else if (chunk == 16) {
             *hasFinish = 1;
-            TrackProbe* probe = (TrackProbe*)finish;
-            stream->Read(&probe->centre.x, 4, 1);
-            stream->Read(&probe->centre.y, 4, 1);
-            stream->Read(&probe->centre.z, 4, 1);
+            RaceGate* probe = (RaceGate*)finish;
+            stream->Read(&probe->center.x, 4, 1);
+            stream->Read(&probe->center.y, 4, 1);
+            stream->Read(&probe->center.z, 4, 1);
             stream->Read(&probe->direction.x, 4, 1);
             stream->Read(&probe->direction.y, 4, 1);
             stream->Read(&probe->direction.z, 4, 1);
@@ -287,9 +280,9 @@ int Track::LoadTrack(FileStream* stream, void* start, void* finish, int* hasStar
             stream->Read(&probe->width, 4, 1);
             ScaleVec3(&probe->halfExtents, scale);
             probe->width *= scale;
-            probe->centre.x = probe->centre.x * scale + offsetX;
-            probe->centre.y *= scale;
-            probe->centre.z = probe->centre.z * scale + offsetZ;
+            probe->center.x = probe->center.x * scale + offsetX;
+            probe->center.y *= scale;
+            probe->center.z = probe->center.z * scale + offsetZ;
         }
         stream->Read(&chunk, 1, 1);
     }
@@ -305,14 +298,14 @@ int Track::LoadTrack(FileStream* stream, void* start, void* finish, int* hasStar
     startNode = nodes[0];
     DebugFree(nodes, __FILE__, 315);
     if (*hasStart) {
-        TrackProbe* probe = (TrackProbe*)start;
+        RaceGate* probe = (RaceGate*)start;
         probe->height = 150.0f;
-        ClosestPointOnTrack(*(Vector3*)&probe->centre, &probe->pos, 0);
+        ClosestPointOnTrack(probe->center, &probe->trackPos, 0);
     }
     if (*hasFinish) {
-        TrackProbe* probe = (TrackProbe*)finish;
+        RaceGate* probe = (RaceGate*)finish;
         probe->height = 150.0f;
-        ClosestPointOnTrack(*(Vector3*)&probe->centre, &probe->pos, 0);
+        ClosestPointOnTrack(probe->center, &probe->trackPos, 0);
     }
     {
         TrackPos from;

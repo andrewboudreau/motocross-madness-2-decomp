@@ -35,33 +35,26 @@
 #include "../collision/CollisionPoint.h"
 
 #include "../../reconstructed/MovingPart.h"
-class TireNode;
 
+// The two shock kinds the dtor releases (rotatingShock/inlineShock): RTTI InlineShock and
+// RotatingShock (src/reconstructed/Suspension.h), dtors 0x004f9f80 and 0x004fa8a0.
+// UpdateAttachment 0x00515660 poses the shock's MovingPart::node (+0x44) from Shock::length
+// (+0x98): along InlineShock::axis (+0xc0), or by length / RotatingShock::armLength (+0xc8)
+// about rotationAxis (+0xd4) from MovingPart::matrix (+0x04). UpdateShock 0x00513c70 reads
+// Shock::extending (+0x54), ratio (+0x70) and stepDisplacement (+0x80) around
+// InlineShock::SolveContact 0x004fa400 and RotatingShock::SolveContact 0x004fac60; the
+// caller's dt and velocity slots are dead after the call and hold its `active` and `load` outputs.
+class InlineShock;
+class RotatingShock;
 
-// Provisional stand-ins for the two heap objects the dtor releases (rotatingShock/inlineShock).
-// Their dtors are 0x004fa8a0 and 0x004f9f80 (both in the scene-graph range); tier 3.
-// 0x00515660 reads both: +0x44 is a scene node and +0x98 a joint value. A keeps a
-// direction at +0xc0 and drives the node's position along it; B keeps a rest matrix at
-// +0x04, a rotation axis at +0xd4 and divides +0x98 by +0xc8 for the angle.
-class TireNode;
-// 0x00513c70 (UpdateShock) reads +0x54 (an "extending" flag copied to shockExtending),
-// +0x70 (a ratio tested against zero) and adds the vector at +0x80 to the contact's
-// world position after the shock solve: InlineShock::SolveContact 0x004fa400 and
-// RotatingShock::SolveContact 0x004fac60 (src/reconstructed/Suspension.h).
-// The solves are declared as in Suspension.h; the caller's dt and velocity slots are
-// dead after the call and hold its `active` and `load` outputs.
-#include "../../reconstructed/TireAttachmentViews.h"
-
-// Provisional area-local stand-ins for two scene-side classes only known by their calls.
-class TireNode {                                       // scene node, MovingPart::sceneNode
+// SoultreeObject::LocalToWorldDirection (0x004fd5c0) spelled with an explicit result pointer:
+// UpdateSuspensionProbe passes a named local as the hidden return buffer and copies from the
+// returned pointer. Spelled by value (Vec3 SoultreeObject::LocalToWorldDirection(const Vec3&))
+// its frame slots and operand order move, so this one call keeps the view (link alias in
+// config/game_build.json); the node's other calls go to SoultreeObject directly. Tier 3.
+class TireNode {
 public:
-    void GetPositionIn(TireNode* parent, CollisionVec3* out);                        // world position
-    void GetLocalBounds(CollisionVec3* a, CollisionVec3* b);                          // extents, b.y = wheel radius
-    CollisionVec3* LocalToWorldDirection(CollisionVec3* out, const CollisionVec3* in);       // rotate a direction
-    void RotateAbout(float x, float y, float z, float angle);                      // 0x004fcce0
-    void SetPosition(CollisionVec3 position);                                      // 0x004fc630
-    void SetLocalMatrix(const CollisionMatrix4* m);                                // 0x004fca30
-    void Rotate(CollisionVec3 axis, float angle);                                  // 0x004fceb0
+    CollisionVec3* LocalToWorldDirection(CollisionVec3* out, const CollisionVec3* in);
 };
 class Terrain;                                         // broadphase/Terrain.h (arg 1 of 0x00514550)
 
@@ -232,8 +225,8 @@ public:
     float driveStrength;  // +0x2a0 ctor arg a10; ApplyDrive 0x00514170 scales the push by it
     float leanCos;  // +0x2a4 1.0 default; Bike stores its leanCos, InlineShock::Retract divides by it
     TireAux* engine;  // +0x2a8 Vehicle calls EngineGearbox::DriveForce on it, Bike's loader stores engineState; UpdateRoll scales the roll angle by its throttle in (0, 1)
-    TireAttachB* rotatingShock;             // +0x2ac RotatingShock (SolveContact 0x004fac60); released by the dtor when inlineShock is null
-    TireAttachA* inlineShock;               // +0x2b0 InlineShock (SolveContact 0x004fa400); released first (dtor 0x004f9f80)
+    RotatingShock* rotatingShock;           // +0x2ac SolveContact 0x004fac60; released by the dtor (0x004fa8a0) when inlineShock is null
+    InlineShock* inlineShock;               // +0x2b0 SolveContact 0x004fa400; released first (dtor 0x004f9f80)
     float slipThreshold;  // +0x2b4 ctor arg a7; UpdateDriveShare 0x00513f90 compares slipSpeed with it
     float driveShare;  // +0x2b8 UpdateDriveShare 0x00513f90: drive share (1.0 otherwise)
     float driveShareComplement;  // +0x2bc UpdateDriveShare: 1 - driveShare; UpdateRoll scales driveDistance by it

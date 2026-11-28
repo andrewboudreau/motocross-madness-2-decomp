@@ -39,12 +39,11 @@
 // The placement area queries in src/reconstructed/PlacementQueries.cpp, which has no
 // header (it declares its own partial CollisionObject view).  CollisionVec3 is three
 // floats, as Vec3.
-class PlacementProbe;
 int PlacementSphereBlocked(CollisionVec3* point, float radius, CollisionObject* self, int ownerA,
                            int ownerB, int testObjects, int testVegetation);       // 0x004b08f0
 int PointInPlacementSquare(const CollisionVec3* point, float x, float z, float size, float scale,
                            float* minX, float* maxX, float* minZ, float* maxZ);    // 0x004b0ac0
-void ClampToPlacementSquare(CollisionObject* object, PlacementProbe* probe,
+void ClampToPlacementSquare(CollisionObject* object, Terrain* terrain,
                             const CollisionVec3* center, float scale, int clamp, int unused6,
                             int unused7, const CollisionVec3* target, CollisionVec3* position,
                             CollisionVec3* offset);                                  // 0x004b0b80
@@ -289,7 +288,7 @@ int FindObjectPlacement(CollisionObject* body, Terrain* terrain, Vec3* position,
             } else if (useAreaTest == 0) {
                 *outForward = *referenceDir;
             }
-            ClampToPlacementSquare(body, (PlacementProbe*)terrain, (CollisionVec3*)position,
+            ClampToPlacementSquare(body, terrain, (CollisionVec3*)position,
                                    terrainScale, useAreaTest, limit1, limit2,
                                    (const CollisionVec3*)targetPoint, (CollisionVec3*)outPosition,
                                    (CollisionVec3*)outForward);
@@ -297,7 +296,7 @@ int FindObjectPlacement(CollisionObject* body, Terrain* terrain, Vec3* position,
     } else if (targetPoint) {
         *outForward = *targetPoint - *bestPt;
         PlacementNormalizeInPlace(outForward);
-        ClampToPlacementSquare(body, (PlacementProbe*)terrain, (CollisionVec3*)position,
+        ClampToPlacementSquare(body, terrain, (CollisionVec3*)position,
                                terrainScale, useAreaTest, limit1, limit2,
                                (const CollisionVec3*)targetPoint, (CollisionVec3*)outPosition,
                                (CollisionVec3*)outForward);

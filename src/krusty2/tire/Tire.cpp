@@ -1,6 +1,8 @@
 // Tire.cpp -- Tire (CollisionObject + MovingPart + CollisionPoint), see Tire.h.
 #include "Tire.h"
 #include "broadphase/Terrain.h"
+#include "../../reconstructed/Suspension.h"
+#include "core/SoultreeObject.h"
 #include "math/Vec3.h"
 #include <float.h>
 #include <math.h>
@@ -632,7 +634,7 @@ void Tire::UpdateSuspensionProbe(Terrain* terrain, const CollisionVec3* position
 {
     CollisionVec3& origin = wheelCenter;                 // wheel centre in world space
 
-    ((TireNode*)MovingPart::node)->GetPositionIn(0, &origin);
+    MovingPart::node->GetPositionIn(0, (Vec3*)&origin);
     this->CollisionPoint::surfacePosition = origin;
     terrain->QueryGround(reinterpret_cast<TerrainVec3*>(&this->CollisionPoint::surfacePosition),
                          reinterpret_cast<TerrainVec3*>(&this->CollisionPoint::surfaceNormal), 0,
@@ -851,13 +853,13 @@ Tire::Tire(void* name, int root, float rollFriction_, float sideFriction_, int f
            float blendWeight_, int track)
     : CollisionObject(1), MovingPart((const char*)name, (SoultreeObject*)root, steer), CollisionPoint(sideFriction_, track)
 {
-    CollisionVec3 boundsCenter;
-    CollisionVec3 halfExtent;
-    ((TireNode*)MovingPart::node)->GetLocalBounds(&boundsCenter, &halfExtent);
+    Vec3 boundsCenter;
+    Vec3 halfExtent;
+    MovingPart::node->GetLocalBounds(&boundsCenter, &halfExtent);
     wheelRadius = halfExtent.y;
     invWheelRadius = 1.0f / halfExtent.y;
     rollAngle = 0.0f;
-    ((TireNode*)MovingPart::node)->GetPositionIn(0, &wheelCenter);
+    MovingPart::node->GetPositionIn(0, (Vec3*)&wheelCenter);
     slipVector = kVec3Zero;
     inContact = 0;
     bodyPosition = kVec3Zero;
@@ -903,29 +905,29 @@ void Tire::SetRollDistance(float distance)
 {
     rollAngle = distance * invWheelRadius;
     if (_finite(rollAngle))
-        ((TireNode*)MovingPart::node)->RotateAbout(1.0f, 0.0f, 0.0f, rollAngle);
+        MovingPart::node->RotateAbout(1.0f, 0.0f, 0.0f, rollAngle);
 }
 
 // 0x005135b0
 void Tire::ApplyRollAngle()
 {
     if (_finite(rollAngle))
-        ((TireNode*)MovingPart::node)->RotateAbout(1.0f, 0.0f, 0.0f, rollAngle);
+        MovingPart::node->RotateAbout(1.0f, 0.0f, 0.0f, rollAngle);
 }
 
 // 0x00515660
 void Tire::UpdateAttachment()
 {
-    if (TireAttachA* slider = inlineShock) {
-        float offset = -slider->position;
-        slider->node->SetPosition(TireVec3(offset * slider->direction.x,
-                                           offset * slider->direction.y,
-                                           offset * slider->direction.z));
-    } else if (TireAttachB* hinge = rotatingShock) {
-        float angle = hinge->position / hinge->scale;
+    if (InlineShock* slider = inlineShock) {
+        float offset = -slider->length;
+        slider->node->SetPositionVec3(Vec3(offset * slider->axis.x,
+                                           offset * slider->axis.y,
+                                           offset * slider->axis.z));
+    } else if (RotatingShock* hinge = rotatingShock) {
+        float angle = hinge->length / hinge->armLength;
         if (_finite(angle)) {
-            hinge->node->SetLocalMatrix(&hinge->restMatrix);
-            hinge->node->Rotate(hinge->axis, angle);
+            hinge->node->SetLocalMatrix(&hinge->matrix);
+            hinge->node->Rotate(*(const Vec3*)&hinge->rotationAxis, angle);
         }
     }
 }
@@ -1183,12 +1185,14 @@ void Tire::UpdateShock(float dt, int pointsTouching, int crashed, const Collisio
     float depth;
     int active;
     float load;
-    if (TireAttachA* slider = inlineShock) {
+    if (InlineShock* slider = inlineShock) {
         if (inContact) {
             depth = CollisionPoint::penetration;
             if (depth != 0.0f || slider->ratio != 0.0f) {
-                slider->SolveContact(dt, velocity, &this->CollisionPoint::rotationalVelocity, &wheelCenter,
-                                     &this->CollisionPoint::surfaceNormal, depth, &load, &active);
+                slider->SolveContact(dt, (const ShockVec3*)velocity,
+                                     (const ShockVec3*)&this->CollisionPoint::rotationalVelocity,
+                                     (const ShockVec3*)&wheelCenter,
+                                     (const ShockVec3*)&this->CollisionPoint::surfaceNormal, depth, &load, &active);
                 shockExtending = inlineShock->extending;
                 if (active || crashed)
                     CollisionPoint::inContact = 1;
@@ -1207,17 +1211,20 @@ void Tire::UpdateShock(float dt, int pointsTouching, int crashed, const Collisio
         shockExtending = 0;
         CollisionPoint::inContact = 0;
         return;
-    } else if (TireAttachB* hinge = rotatingShock) {
+    } else if (RotatingShock* hinge = rotatingShock) {
         if (inContact) {
             depth = CollisionPoint::penetration;
             if (depth != 0.0f || hinge->ratio != 0.0f) {
-                hinge->SolveContact(dt, &sideAxis, axisB, &wheelCenter, &this->CollisionPoint::surfaceNormal,
-                                    velocity, &this->CollisionPoint::rotationalVelocity, depth, &load, &active);
+                hinge->SolveContact(dt, (const ShockVec3*)&sideAxis, (const ShockVec3*)axisB,
+                                    (const ShockVec3*)&wheelCenter,
+                                    (const ShockVec3*)&this->CollisionPoint::surfaceNormal,
+                                    (const ShockVec3*)velocity,
+                                    (const ShockVec3*)&this->CollisionPoint::rotationalVelocity, depth, &load, &active);
                 shockExtending = rotatingShock->extending;
                 if (active || crashed)
                     CollisionPoint::inContact = 1;
                 CollisionPoint::penetration = load;
-                TireAddIn(CollisionPoint::worldPosition, rotatingShock->stepDisplacement);
+                TireAddIn(CollisionPoint::worldPosition, *(const CollisionVec3*)&rotatingShock->stepDisplacement);
                 if (active)
                     CollisionPoint::surfacePosition = TireSum(TireTimes(load, CollisionPoint::surfaceNormal), CollisionPoint::worldPosition);
                 else

@@ -1030,12 +1030,12 @@ void Bike::ApplyLaunchImpulse(float arg)
     impulse = impulse * arg * 5.0f;
     impulse = BikeMin(impulse, 10000.0f);
     if (rear->shockEngaged && rear->tangentSpeed > 30.0f) {
-        ((RotatingShock*)rear->rotatingShock)->impulseScale = impulse;
+        rear->rotatingShock->impulseScale = impulse;
         return;
     }
     Tire* front = frontWheel;
     if (front->shockEngaged && front->tangentSpeed > 30.0f)
-        ((InlineShock*)front->inlineShock)->impulseScale = impulse;
+        front->inlineShock->impulseScale = impulse;
 }
 
 void Bike::UpdateLocalCenterOfMass()

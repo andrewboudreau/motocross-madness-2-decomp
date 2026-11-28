@@ -41,12 +41,6 @@ public:
 // 0x004394f0 (CollisionObject.cpp): whether the sphere touches the object.
 int SphereTouchesObject(const CollisionVec3* center, float radius, float radiusSq, CollisionObject* object);
 
-// The ground probe (0x00507c10, thiscall, ret 0x10).
-class PlacementProbe {
-public:
-    void QueryGround(const CollisionVec3* point, CollisionVec3* normal, int one, unsigned char* flag);
-};
-
 // The type ids are compared as unsigned bytes: retail loads 0xff with
 // `mov bl, 0xff`, where a signed char -1 gives `or bl, 0xff`.
 static char s_typeIdsReady;                                  // 0x00688774
@@ -144,7 +138,7 @@ int PointInPlacementSquare(const CollisionVec3* point, float x, float z, float s
 // (steeper than 45 degrees) the coordinate is pushed by `scale` * 10 away
 // from that edge. `offset` gets `*target - *position`. `object` and the
 // sixth and seventh arguments are unused.
-void ClampToPlacementSquare(CollisionObject* object, PlacementProbe* probe, const CollisionVec3* center,
+void ClampToPlacementSquare(CollisionObject* object, Terrain* terrain, const CollisionVec3* center,
                             float scale, int clamp, int unused6, int unused7, const CollisionVec3* target,
                             CollisionVec3* position, CollisionVec3* offset)
 {
@@ -168,12 +162,12 @@ void ClampToPlacementSquare(CollisionObject* object, PlacementProbe* probe, cons
     float step = scale * 10.0f;
     if (step + minX > position->x) {
         CollisionVec3 probePoint = *position;
-        reinterpret_cast<Terrain*>(probe)->QueryGround(reinterpret_cast<TerrainVec3*>(&probePoint), reinterpret_cast<TerrainVec3*>(&normal), 1, 0);
+        terrain->QueryGround(reinterpret_cast<TerrainVec3*>(&probePoint), reinterpret_cast<TerrainVec3*>(&normal), 1, 0);
         if (normal.y < 0.707f)
             position->x = step + position->x;
     } else if (maxX - step < position->x) {
         CollisionVec3 probePoint = *position;
-        reinterpret_cast<Terrain*>(probe)->QueryGround(reinterpret_cast<TerrainVec3*>(&probePoint), reinterpret_cast<TerrainVec3*>(&normal), 1, 0);
+        terrain->QueryGround(reinterpret_cast<TerrainVec3*>(&probePoint), reinterpret_cast<TerrainVec3*>(&normal), 1, 0);
         if (normal.y < 0.707f)
             position->x = position->x - step;
     }
@@ -184,12 +178,12 @@ void ClampToPlacementSquare(CollisionObject* object, PlacementProbe* probe, cons
         position->z = maxZ - margin;
     if (step + minZ > position->z) {
         CollisionVec3 probePoint = *position;
-        reinterpret_cast<Terrain*>(probe)->QueryGround(reinterpret_cast<TerrainVec3*>(&probePoint), reinterpret_cast<TerrainVec3*>(&normal), 1, 0);
+        terrain->QueryGround(reinterpret_cast<TerrainVec3*>(&probePoint), reinterpret_cast<TerrainVec3*>(&normal), 1, 0);
         if (normal.y < 0.707f)
             position->z = step + position->z;
     } else if (maxZ - step < position->z) {
         CollisionVec3 probePoint = *position;
-        reinterpret_cast<Terrain*>(probe)->QueryGround(reinterpret_cast<TerrainVec3*>(&probePoint), reinterpret_cast<TerrainVec3*>(&normal), 1, 0);
+        terrain->QueryGround(reinterpret_cast<TerrainVec3*>(&probePoint), reinterpret_cast<TerrainVec3*>(&normal), 1, 0);
         if (normal.y < 0.707f)
             position->z = position->z - step;
     }

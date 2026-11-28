@@ -1355,7 +1355,7 @@ int BikeRace::SetPaused(int value) {
 
 // 0x0041d0d0
 int BikeRace::AppendNode(int index, RaceGatePose* source,
-                         RaceGate*** tail, float scale, int height) {
+                         RaceGate*** tail, float scale, float height) {
     RaceGate* node =
         (RaceGate*)DebugCalloc(1, sizeof(RaceGate), __FILE__, 0x840);
     if (node == 0) {

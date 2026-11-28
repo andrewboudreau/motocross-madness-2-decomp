@@ -16,7 +16,8 @@ class SoultreeObject;   // core/SoultreeObject.h
 
 class Terrain;
 
-// One probe point (32 bytes), see AddProbePoint / Step.
+// One probe point (32 bytes), see AddProbePoint / Step. A genuine record, not a view:
+// AddProbePoint 0x0043c7f0 DebugReallocs probes (+0x104) by 0x20 per point and stores node, point and hit.
 struct ConstraintProbe {
     Vec3 localPoint;    // +0x00 point in the owner node's space
     SoultreeObject* node;  // +0x0c owner node

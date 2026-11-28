@@ -6,7 +6,7 @@
 #include <float.h>
 #include <stddef.h>
 #include "vehicle/Vehicle.h"
-#include "TireAttachmentViews.h"
+#include "Suspension.h"
 static BYTE referenceSpace[0x800000]={1};
 struct World { BYTE wheel[0x2e0]; BYTE slider[0x120]; BYTE hinge[0x120]; BYTE nodes[3][0x400]; };
 static World world,initial;
@@ -17,8 +17,8 @@ static Scenario scenario;
 static BYTE* pages;static int checks;
 static SoultreeObject* Node(int i){return (SoultreeObject*)(world.nodes[i]+16);}
 static VehicleWheel* Wheel(){return scenario.invalid==1?0:(VehicleWheel*)(world.wheel+16);}
-static TireAttachA* Slider(){return scenario.alias==1?(TireAttachA*)((BYTE*)Node(0)-8):(TireAttachA*)(world.slider+16);}
-static TireAttachB* Hinge(){return scenario.alias==2?(TireAttachB*)((BYTE*)Node(0)+0xb4):(TireAttachB*)(world.hinge+16);}
+static InlineShock* Slider(){return scenario.alias==1?(InlineShock*)((BYTE*)Node(0)-8):(InlineShock*)(world.slider+16);}
+static RotatingShock* Hinge(){return scenario.alias==2?(RotatingShock*)((BYTE*)Node(0)+0xb4):(RotatingShock*)(world.hinge+16);}
 static float Bits(DWORD bits){float value;memcpy(&value,&bits,4);return value;}
 static void Identity(Matrix4& m){memset(&m,0,sizeof(m));m._11=m._22=m._33=m._44=1;}
 static float Value(int i){static const DWORD edges[]={0,0x80000000,0x3f800000,0xbf800000,0x3eaaaaab,0x00800000,1,0x7f7fffff,0x7f800000,0xff800000,0x7fc12345,0x7f812345,0x41200000,0xc0400000,0x3f000000,0x40000000};
@@ -29,18 +29,18 @@ static void Prepare(){
  memset(&world,0x6b,sizeof(world));DWORD old;VirtualProtect(pages,8192,PAGE_READWRITE,&old);memset(pages,0x59,8192);
  for(int i=0;i<3;i++){SoultreeObject*n=Node(i);Identity(n->localMatrix);Identity(n->worldMatrix);n->parent=0;n->firstChild=0;n->nextSibling=0;n->prevSibling=0;n->worldValid=(scenario.caches>>i)&1;n->subtreeDirty=0;n->localMatrix._41=i+7;n->localMatrix._42=i+8;n->localMatrix._43=i+9;}
  Node(0)->parent=Node(1);Node(0)->firstChild=Node(2);Node(2)->parent=Node(0);
- TireAttachA*a=Slider();TireAttachB*b=Hinge();a->node=(TireNode*)Node(0);a->position=Value(0);a->direction.x=Value(1);a->direction.y=Value(2);a->direction.z=Value(3);
- b->node=(TireNode*)Node(0);b->position=Value(4);b->scale=Value(5);b->axis.x=1;b->axis.y=scenario.seed&1?0:0.5f;b->axis.z=scenario.seed&2?0:0.25f;
+ InlineShock*a=Slider();RotatingShock*b=Hinge();a->node=Node(0);a->length=Value(0);a->axis.x=Value(1);a->axis.y=Value(2);a->axis.z=Value(3);
+ b->node=Node(0);b->length=Value(4);b->armLength=Value(5);b->rotationAxis.x=1;b->rotationAxis.y=scenario.seed&1?0:0.5f;b->rotationAxis.z=scenario.seed&2?0:0.25f;
  Matrix4 rest;Identity(rest);rest._41=7;rest._42=8;rest._43=9;
  if(scenario.family==3){rest._11=.5f;rest._12=.25f;rest._23=-.5f;rest._31=.125f;}
- memcpy(&b->restMatrix,&rest,64);
+ memcpy(&b->matrix,&rest,64);
  VehicleWheel*w=(VehicleWheel*)(world.wheel+16);w->primaryAux=(scenario.mode==1||scenario.mode==3)?(int)a:0;w->secondaryAux=(scenario.mode==2||scenario.mode==3)?(int)b:0;
  if(scenario.invalid==2)w->primaryAux=1;if(scenario.invalid==3){w->primaryAux=0;w->secondaryAux=1;}
  if(scenario.invalid==4)a->node=0;if(scenario.invalid==5)b->node=0;
  if(scenario.guardRole){BYTE* dest=pages+4096-scenario.cut;
   if(scenario.guardRole==1){memcpy(dest,a,sizeof(*a));w->primaryAux=(int)dest;}
   if(scenario.guardRole==2){memcpy(dest,b,sizeof(*b));w->primaryAux=0;w->secondaryAux=(int)dest;}
-  if(scenario.guardRole==3){memcpy(dest,Node(0),sizeof(SoultreeObject));a->node=(TireNode*)dest;b->node=(TireNode*)dest;((SoultreeObject*)dest)->parent=0;((SoultreeObject*)dest)->firstChild=0;}
+  if(scenario.guardRole==3){memcpy(dest,Node(0),sizeof(SoultreeObject));a->node=(SoultreeObject*)dest;b->node=(SoultreeObject*)dest;((SoultreeObject*)dest)->parent=0;((SoultreeObject*)dest)->firstChild=0;}
  }
  VirtualProtect(pages+4096,4096,PAGE_NOACCESS,&old);initial=world;
 }
@@ -63,7 +63,7 @@ static int MapReference(const char* path){DWORD old;BYTE*mapped=(BYTE*)0x400000;
  for(int n=0;n<pe->FileHeader.NumberOfSections;++n){IMAGE_SECTION_HEADER&s=sections[n];if(s.PointerToRawData>(DWORD)size||s.SizeOfRawData>(DWORD)size-s.PointerToRawData||s.VirtualAddress>pe->OptionalHeader.SizeOfImage||s.SizeOfRawData>pe->OptionalHeader.SizeOfImage-s.VirtualAddress)return 0;memcpy(mapped+s.VirtualAddress,raw+s.PointerToRawData,s.SizeOfRawData);}free(raw);return FlushInstructionCache(GetCurrentProcess(),0,0)!=0;
 }
 int main(int argc,char**argv){if(argc!=2||!MapReference(argv[1]))return 1;pages=(BYTE*)VirtualAlloc(0,8192,MEM_RESERVE|MEM_COMMIT,PAGE_READWRITE);if(!pages)return 2;
- if(sizeof(VehicleWheel)!=0x2c0||offsetof(VehicleWheel,primaryAux)!=0x2b0||offsetof(VehicleWheel,secondaryAux)!=0x2ac||offsetof(TireAttachA,position)!=0x98||offsetof(TireAttachB,axis)!=0xd4)return 3;
+ if(sizeof(VehicleWheel)!=0x2c0||offsetof(VehicleWheel,primaryAux)!=0x2b0||offsetof(VehicleWheel,secondaryAux)!=0x2ac||offsetof(InlineShock,length)!=0x98||offsetof(RotatingShock,rotationAxis)!=0xd4)return 3;
  unsigned rc[]={_RC_NEAR,_RC_DOWN,_RC_UP,_RC_CHOP},pc[]={_PC_24,_PC_53,_PC_64};int seed,mode,family,cache,r,p;
  for(seed=0;seed<24;seed++)for(mode=0;mode<4;mode++)for(family=0;family<4;family++)for(cache=0;cache<8;cache++)for(r=0;r<4;r++)for(p=0;p<3;p++){
  Reset();scenario.seed=seed;scenario.mode=mode;scenario.family=family;scenario.caches=cache;scenario.rc=rc[r];scenario.pc=pc[p];Compare();}
@@ -83,7 +83,7 @@ int main(int argc,char**argv){if(argc!=2||!MapReference(argv[1]))return 1;pages=
  Reset();scenario.mode=2;scenario.family=1;scenario.seed=4;scenario.invalid=5;Compare();
  if(observed.exception||memcmp(&world,&initial,sizeof(world)))return 32;
  Reset();scenario.mode=2;scenario.seed=25;Compare();
- if(observed.exception||memcmp(&Node(0)->localMatrix,&Hinge()->restMatrix,64)||Node(0)->worldValid||Node(2)->worldValid||Node(1)->subtreeDirty!=1)return 33;
+ if(observed.exception||memcmp(&Node(0)->localMatrix,&Hinge()->matrix,64)||Node(0)->worldValid||Node(2)->worldValid||Node(1)->subtreeDirty!=1)return 33;
  // Matrix/cache updates precede an inaccessible rotation-axis argument read.
  Reset();scenario.mode=2;scenario.seed=15;scenario.guardRole=2;scenario.cut=0xd8;Compare();
  if(observed.exception!=EXCEPTION_ACCESS_VIOLATION||observed.kind||observed.address!=(DWORD)(pages+4096)||Node(0)->localMatrix._41!=7||Node(0)->localMatrix._42!=8||Node(0)->localMatrix._43!=9||Node(0)->worldValid||Node(1)->subtreeDirty!=1)return 34;

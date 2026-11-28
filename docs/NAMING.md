@@ -2969,7 +2969,7 @@ tools/static_check.py passes.
 | UnknownScenePhysicsBody (SceneManager.cpp) | `field_0x04` | `vbptr` | 2 | Retail ctor 0x005037c0 stores the vbtable 0x557ff8 to [esi+4] (0x005037fb) under the most-derived flag; SoultreePhysicsBaseObject : virtual GameObject keeps its vbptr at +4 (SoultreePhysicsBaseObjectCore.h lines 6 and 174). Declaration only. |
 | UnknownPodiumSoultree (EventManager.h) | `field_0x290` | `materialTable` | 2 | UnknownPodiumSoultree is a D3DIMSoultreeObject view (its methods bind to D3DIMSoultreeObject::SetUseLighting 0x004444c0 and ReplaceMaterialTexture 0x00444c70, SoultreeObject::SetPosition/SetAxesPtr); D3DIMSoulTree.h:307 names +0x290 materialTable. The podium code reads entry [0]'s +0x2c (SoultreeMaterial::textureName) and passes it as ReplaceMaterialTexture's name. |
 | Overlay (Overlay.h) | `field_0x40` | `pixelFormat` | 2 | Overlay::Attach 0x004b5f50 copies renderContext->surfacePixelFormat (RenderTarget+0x28) into it (0x004b5f9e); ctor 0. Nothing in Overlay's code reads it. |
-| TrackProbe (Track.cpp) | `field_0x28` | `height` | 2 | TrackProbe is the start/finish probe Track::LoadTrack fills; BikeRace passes &startProbe/&finishProbe, declared RaceGate (BikeRaceCore.h:136). RaceGate names +0x00 center, +0x0c direction, +0x18 halfExtents and +0x24 width (all agree with TrackProbe), and +0x28 height, read as a float by GameUiHelpers' crossing test. LoadTrack stores 150.0f. |
+| TrackProbe (Track.cpp) | `field_0x28` | `height` | 2 | TrackProbe is the start/finish probe Track::LoadTrack fills; BikeRace passes &startProbe/&finishProbe, declared RaceGate (BikeRaceCore.h:136). RaceGate names +0x00 center, +0x0c direction, +0x18 halfExtents and +0x24 width (all agree with TrackProbe), and +0x28 height, read as a float by GameUiHelpers' crossing test. LoadTrack stores 150.0f. TrackProbe is now RaceGate itself ("Tire, placement and track probe views retired"). |
 | VCRFileEntry (VCRfile.h) | `field_0x00` | `isOpen` | 3 | Readers decide the role: Load/Open claim an entry only when !field && !size; Close 0x00525000 acts only when it is set, then clears it and the position (0x0052502d). Nothing in retail sets it nonzero, so the name rests on the readers' intent. |
 | NetFileChunk (Net.h) | `field_0x00` | `header` | 2 | NetFile::SendNextChunk 0x004ab1b0 sends the struct through Send(0xcf) -> SendRaw 0x004ad280, which writes the type byte at data+0 (the sequence at +2 when guaranteed); HandleReceivedMessage dispatches on that byte (0xcf) before casting the buffer. Same name as the other message structs' +0x00 (BikeRace.h, DlgProcs.h, SelectGamePicProcs.h, TrackOverlay.h). |
 | NetFileHeader (Net.h) | `field_0x00` | `messageHeader` | 2 | The 0xcd message HandleReceivedMessage casts from the received buffer after dispatching on its byte 0: the message header. Named messageHeader, not header, because the struct is NetFileHeader and its users name their pointer `header` (NetThread.cpp:206, BeginReceive's parameter). |
@@ -3006,7 +3006,7 @@ tools/static_check.py passes.
 | CarProceduralSensorContact (CarProceduralNearMisses.cpp) | `field_0x08` | `normal` | 2 | The bringup view of the same struct already names +0x08 normal (CollisionBoxResult normal); the samples Tick copies it into its local normal. |
 | MorphBastardFace (MorphBastardModifier.h) | `field_0x00` | `vertexIndices` | 2 | The element of SoultreeSurface+0x1c, unsigned short* indices (three per face); CopyMesh 0x004a5290 allocates faceCount of them and memcpy's them. |
 | MovingPart (MovingPart.h) | `field_0x44` | `ownerRef` | 2 | The MovingPart views in Tire.h and Suspension.h name +0x44 ownerRef (ctor argument). The ctor parameter field_0x44_ becomes ownerRef_ to avoid a self-assignment. |
-| TireAttachB (TireAttachmentViews.h) | `field_0x00` | `vtable` | 2 | The RotatingShock is a polymorphic Shock (slot 0 Reset), so +0x00 is its vptr; G3ShockView names the same offset vtable. No uses. |
+| TireAttachB (TireAttachmentViews.h) | `field_0x00` | `vtable` | 2 | The RotatingShock is a polymorphic Shock (slot 0 Reset), so +0x00 is its vptr; G3ShockView names the same offset vtable. No uses. TireAttachB is now RotatingShock ("Tire, placement and track probe views retired"). |
 
 #### Terrain, collision, soultree and shadow (group B2)
 
@@ -4801,3 +4801,38 @@ Left unnamed, with the reasons:
 - Excluded because a concurrent patch owns the headers: the tire,
   suspension, shock and VehicleWheel headers and the probe declarations
   (ConstraintMethodCollisionModel.h).
+
+## Tire, placement and track probe views retired (2026-11-28)
+
+TireAttachmentViews.h is gone. Each fold was checked against a full baseline
+build: all 259 compiled objects differ only in symbol names and `$L`/`$T`/`$SG`
+or `$search$`/`$next$` label counters. link-aliases.obj loses the ten retired
+aliases, and the linked mcm2.exe differs only in its PE timestamp. Render3D 3173,
+FillFileList 2258, AddCircuitRow 756, CreateRacers 13400/13428, ReadLight 2102
+and DrawSelection 1834 are unchanged. No member was added.
+
+| Old | New | Tier | Evidence |
+|---|---|---|---|
+| `TireAttachA` (TireAttachmentViews.h): `node`, `extending`, `ratio`, `stepDisplacement`, `position`, `direction`; type of `Tire::inlineShock` (+0x2b0) | `InlineShock` (Suspension.h): `MovingPart::node` (+0x44), `Shock::extending`/`ratio`/`stepDisplacement`, `Shock::length` (+0x98), `axis` (+0xc0) | 2 | UpdateShock 0x00513c70 calls `InlineShock::SolveContact` 0x004fa400 on +0x2b0 and reads +0x54, +0x70 and +0x80..+0x88; the view's destructor was 0x004f9f80, InlineShock's. UpdateAttachment 0x00515660 reads +0x44, +0x98 and +0xc0..+0xc8 as those members. The view's names were link aliases of the Shock.cpp bodies. |
+| `TireAttachB`: `vtable`, `restMatrix`, `node`, the same Shock fields, `position`, `scale`, `axis`; type of `Tire::rotatingShock` (+0x2ac) | `RotatingShock`: the Shock vptr, `MovingPart::matrix` (+0x04), `MovingPart::node`, the Shock members, `Shock::length`, `armLength` (+0xc8), `rotationAxis` (+0xd4) | 2 | UpdateShock calls `RotatingShock::SolveContact` 0x004fac60 on +0x2ac; the destructor was 0x004fa8a0. UpdateAttachment's `lea +4` (SetLocalMatrix 0x004fca30), `fdiv +0xc8` and +0xd4 axis (Rotate 0x004fceb0) match. |
+| `TireNode` members `SetPosition`, `GetPositionIn`, `SetLocalMatrix`, `RotateAbout`, `Rotate`, `GetLocalBounds` (Tire.h) | `SoultreeObject::SetPositionVec3` 0x004fc630, `GetPositionIn` 0x004fc9a0, `SetLocalMatrix` 0x004fca30, `RotateAbout` 0x004fcce0, `Rotate` 0x004fceb0, `GetLocalBounds` 0x004fe0a0, called through `MovingPart::node` | 2 | MovingPart+0x44 is the shock's and tire's SoultreeObject; each member was a link alias of the soultree.cpp body with the same arguments and `ret`. |
+| `TireNode::LocalToWorldDirection` | kept | 3 | Its result-pointer spelling stays a link alias of `SoultreeObject::LocalToWorldDirection` 0x004fd5c0. The by-value call moves UpdateSuspensionProbe's frame slots and operand order (two spellings tried), so it stays a near-view with a note at its definition. |
+| `PlacementProbe` (PlacementQueries.cpp, ObjectPlacement.cpp) | `Terrain` (broadphase/Terrain.h) | 2 | ClampToPlacementSquare 0x004b0b80 calls `Terrain::QueryGround` 0x00507c10 four times on that argument, and FindObjectPlacement passes its Terrain (the `SoultreeProbe` row above). |
+| `TrackProbe` (Track.cpp) | `RaceGate` (BikeRaceNode.h) | 2 | The start/finish records LoadTrack 0x00515ed0 fills are BikeRace's `startProbe`/`finishProbe`, declared RaceGate; every TrackProbe offset is a RaceGate member. LoadTrack keeps its `void*` parameters: a RaceGate* signature (a Track.h forward declaration) reorders BikeRace.obj's COMDATs. |
+| `RaceGate::height` `int`; `BikeRace::AppendNode(..., int height)`; `RaceGateEvent` +0x54 `int` | `float` | 1 | CrossesGate 0x0047b670 does `fcomp dword ptr [esi+0x28]` (0x0047b7af); LoadTrack stores 0x43160000 (150.0f). AppendNode 0x0041d0d0 only copies the dword (`mov [eax+0x28], ecx`), so the bytes don't change. |
+| `ConstraintProbe` (ConstraintMethodCollisionModel.h) | kept | 2 | A genuine 32-byte record: AddProbePoint 0x0043c7f0 DebugReallocs `probes` (+0x104) by `(count+1) << 5` and stores node, point and hit. There is a note at its definition. |
+
+Mangled names:
+
+- `??1TireAttachA@@QAE@XZ` -> `??1InlineShock@@QAE@XZ`
+- `??1TireAttachB@@QAE@XZ` -> `??1RotatingShock@@QAE@XZ`
+- `?SolveContact@TireAttachA@@QAEXMPBUCollisionVec3@@000MPAMPAH@Z` -> `?SolveContact@InlineShock@@QAEXMPBUShockVec3@@000MPAMPAH@Z`
+- `?SolveContact@TireAttachB@@QAEXMPBUCollisionVec3@@00000MPAMPAH@Z` -> `?SolveContact@RotatingShock@@QAEXMPBUShockVec3@@00000MPAMPAH@Z`
+- `?GetLocalBounds@TireNode@@QAEXPAUCollisionVec3@@0@Z` -> `?GetLocalBounds@SoultreeObject@@QAEXPAUVec3@@0@Z`
+- `?GetPositionIn@TireNode@@QAEXPAV1@PAUCollisionVec3@@@Z` -> `?GetPositionIn@SoultreeObject@@QAEXPAV1@PAUVec3@@@Z`
+- `?Rotate@TireNode@@QAEXUCollisionVec3@@M@Z` -> `?Rotate@SoultreeObject@@QAEXUVec3@@M@Z`
+- `?RotateAbout@TireNode@@QAEXMMMM@Z` -> `?RotateAbout@SoultreeObject@@QAEXMMMM@Z`
+- `?SetLocalMatrix@TireNode@@QAEXPBUCollisionMatrix4@@@Z` -> `?SetLocalMatrix@SoultreeObject@@QAEXPBUMatrix4@@@Z`
+- `?SetPosition@TireNode@@QAEXUCollisionVec3@@@Z` -> `?SetPositionVec3@SoultreeObject@@QAEXUVec3@@@Z`
+- `?ClampToPlacementSquare@@YAXPAVCollisionObject@@PAVPlacementProbe@@PBUCollisionVec3@@MHHH2PAU3@3@Z` -> `?ClampToPlacementSquare@@YAXPAVCollisionObject@@PAVTerrain@@PBUCollisionVec3@@MHHH2PAU3@3@Z`
+- `?AppendNode@BikeRace@@QAEHHPAURaceGatePose@@PAPAPAURaceGate@@MH@Z` -> `?AppendNode@BikeRace@@QAEHHPAURaceGatePose@@PAPAPAURaceGate@@MM@Z`
