@@ -4656,3 +4656,49 @@ No member was added and no mangled name changed. Evidence VAs are in
 | `SoultreeGlobals` (SoulTreePhysics.cpp): `sceneObject` | `TrackGame::sceneObject` (+0x574) | 2 | The slot 40 loaders read +0x574 (the wave row above already named it). |
 | `SoultreeStats` (SoultreeQuadTreeRenderer.cpp): `log`, `debugFlags & 4` | `Game::debugOverlay`, `Game::testKey` | 2 | Slot 14 0x00504570 reads +0x38; slot 23 0x005048d0 tests +0x2d4 bit 2. |
 | `VisibilityProfiler` (VisibilityQuadTree.h): `log` | `Game::debugOverlay` | 2 | PrepareGeometry 0x0052ef50 reads +0x38. |
+
+## Types of statics and globals named (2026-11-28)
+
+These are the wave 28 "types of statics or globals" group. A static's decorated
+name includes its type, so each rename was checked against a full baseline
+build. All 260 objects differ from the baseline only in symbol names (and
+compiler label numbers); sections, raw bytes and relocations are the same. The declaration-count
+windows are unchanged: Render3D 3173, FillFileList 2258, AddCircuitRow 756,
+CreateRacers 13400/13428, ReadLight 2102 and DrawSelection 1834.
+
+| Old | New | Tier | Evidence |
+|---|---|---|---|
+| `UnknownStatic65b478` (FontTextureManager.h) | `FontTextureManager` | 2 | All of its methods (0x004676a0..0x00467847) are in FontTextureManager.cpp. AddFont pushes that unit's `__FILE__` literal 0x0056b2fc (0x004676da, 0x0046771a). This is a unit name, so it is tier 2 at most. |
+| `UnknownSceneKeyword` (SceneManager.h) | `SceneKeyword` | 2 | `FindKeyword` 0x004e9980 scans {name, value} pairs with `_stricmp`. `s_lightTypes` pairs the scene file's light keywords ("VertexPoint", ...) with their values. |
+| `UnknownEcoDetailBand` (EcoSystem.h) | `EcoDetailLevel` | 2 | Every read indexes the table (0x0056a600 or 0x0056a740, picked by `bladeRenderer`; the pointer is at 0x0059af14) by `EcoSystem::detailLevel`. |
+| `UnknownCubeTextureMapping` (CubeDraw.h) | `CubeCellMapping` | 2 | `s_cellMappings` 0x0057ea10 holds one scale/offsetU/offsetV per cube cell. These are the arguments of `ManagedTexture::RemapTexCoordsIfMoved` 0x00510910. |
+| `UnknownBonusKey`, `g_UnknownBonusKeys` (Krusty3DObjects.h/.cpp) | `BonusAnimationKey`, `g_BonusAnimationKeys` (0x0056c820) | 2 | `BonusObjectManager::NextKey` 0x0048cad0 and its Tick interpolate between these keyframes. |
+| `UnknownBikeAIFilter` (BikeAI.cpp) | folded into `VehicleSmoother` (Vehicle.h) | 2 | Same 20-byte layout, and 0x00577ac0's initializer stores the same five fields in the constructor's order. BikeAIFilterStep is Vehicle.cpp's VehSmooth step. The 1/-1 starts became the constructor's new `minStart`/`maxStart` defaults, so the other constructor calls are unchanged. |
+
+Left, each with a one-line note at its definition:
+
+- `UnknownFontTextureManager`: its constructor 0x00467690 only calls the
+  list's, and its destructor 0x00467150 is implicit. Base and member cannot
+  be told apart, and either class could be the original FontTextureManager.
+- `UnknownLightEmitterTarget`: only LightEmitter's constructor writes +0x9c
+  (0), so no target class is established.
+- `UnknownFilterKeys` (0x00689940): only the constructor clears it, and no
+  SystemParametersInfoA call (0x004c9e25, 0x00520bee, 0x00521c2e, 0x0052ff0d,
+  0x0052ff86) uses it. SERIALKEYS is also 24 bytes, so FILTERKEYS would be
+  tier 3.
+- `UnknownKrustyUIVector`, `UnknownSoultreeStaticVector`: Vector3 wrappers
+  with an empty destructor, kept for retail's empty atexit handlers. No string
+  or symbol names them.
+- `UnknownEventPlayerMessage`: one local view over several DirectPlay message
+  types.
+- `UnknownOpt*Settings` (OptionProcs.h): duplicates of TrackGame.h's
+  `TrackGameInterfaceOptions`, `-SoundOptions`, `-GraphicsOptions`,
+  `-ControlOptions` and `-GarageOptions` (same sizes and offsets). Folding
+  them, with forward declarations in OptionProcs.h, kept every object to
+  name-only changes, but it moved CreateRacers to 13394/13428. The fold was
+  reverted rather than padded.
+- `UnknownTimer` (TextureMapManager.h): the same type as PeakHold
+  (0x004cb670/0x004cb690/0x004cb6b0). It was not retried here because earlier
+  fold attempts moved the ReadLight and Render3D windows.
+- `UnknownVisibilityStatic`: it lives in VisibilityQuadTree.cpp, which this
+  pass did not edit.

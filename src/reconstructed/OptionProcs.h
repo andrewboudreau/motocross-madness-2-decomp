@@ -13,7 +13,9 @@
 // +0x19d4; the sizes are its rep movsd counts) into this file's globals when
 // the options open, and back when they are accepted; the controls are bound
 // to the copies (their slot 54 keeps a pointer). Field roles are the control
-// names.
+// names. These five are TrackGame.h's TrackGameInterfaceOptions, -Sound-,
+// -Graphics-, -Control- and -GarageOptions; the fold is blocked because it
+// moved BikeRace.cpp's CreateRacers window (13400 -> 13394).
 struct UnknownOptGameSettings {               // 0x374 bytes (TrackGame+0xc24)
     int showGauges;                           // +0x00: GuagesCheckBox
     int showRaceStats;                        // +0x04: RaceStatsCheckBox

@@ -618,7 +618,8 @@ void ReflectAndNormalize(const Vector3* v, const Vector3* n, Vector3* out);
 
 // The vector type of the drawing function's local statics: their atexit
 // entries are the `ret` stubs 0x00442f40/0x00442f50/0x00442f60, so the type
-// has an (empty) destructor.
+// has an (empty) destructor. Name kept: no string or symbol names this
+// wrapper.
 struct UnknownSoultreeStaticVector : Vector3 {
     ~UnknownSoultreeStaticVector() {}
 };

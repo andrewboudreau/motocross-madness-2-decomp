@@ -178,7 +178,7 @@ unsigned int ReadClock();                     // 0x004bfa80
 int TestInputEvent(int control, int kind, const ControlEvent* event, int modifier); // 0x0043caa0
 
 // A detail band (0x20 bytes) of the two tables 0x0056a600 / 0x0056a740.
-struct UnknownEcoDetailBand {
+struct EcoDetailLevel {
     int geometryDistance;                     // 3D distance
     int fadeStartDistance;                    // fade start distance
     int modelFlags;                           // model flags

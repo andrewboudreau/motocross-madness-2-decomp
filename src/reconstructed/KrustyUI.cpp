@@ -60,7 +60,8 @@ static inline void KrustyUIAddLight(LightManager* lights, LightEmitter* light) {
 }
 
 // The garage scene's static vectors have an empty destructor: retail
-// registers six empty atexit handlers (0x00499920..0x00499970).
+// registers six empty atexit handlers (0x00499920..0x00499970). Name kept:
+// no string or symbol names this wrapper.
 struct UnknownKrustyUIVector : public Vector3 {
     ~UnknownKrustyUIVector() {}
     UnknownKrustyUIVector& operator=(const Vector3& v) {

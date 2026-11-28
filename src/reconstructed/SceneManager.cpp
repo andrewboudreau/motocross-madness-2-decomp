@@ -19,9 +19,9 @@ float FastInvSqrt(float x); // 0x00460c00
 
 // 0x004e9980: looks `name` up in a keyword table ended by an empty name.
 // Only SceneManager.cpp code (0x004eb602) calls it.
-int FindKeyword(int* out, const char* name, const UnknownSceneKeyword* table)
+int FindKeyword(int* out, const char* name, const SceneKeyword* table)
 {
-    const UnknownSceneKeyword* entry = table;
+    const SceneKeyword* entry = table;
     while (*entry->name != '\0') {
         if (_stricmp(name, entry->name) == 0) {
             *out = entry->value;
@@ -556,7 +556,7 @@ int Scene::ReadFlags(char* out, int count, const char* section, const char* key,
 }
 
 // The keywords of a light's "Type" (0x00572c28).
-static const UnknownSceneKeyword s_lightTypes[] = {
+static const SceneKeyword s_lightTypes[] = {
     {"Undefined", 0}, {"VertexPoint", 1}, {"ObjectPoint", 2}, {"PointNoise", 3},
     {"Directional", 4}, {"Spot", 5}, {"Ambient", 6}, {"AmbientNoise", 7}, {"", 0},
 };

@@ -168,7 +168,7 @@ struct SceneFog {
 typedef ResourceManager UnknownSceneResourceManager;
 
 // Name/value pair scanned by 0x004e9980.
-struct UnknownSceneKeyword {
+struct SceneKeyword {
     const char* name;
     int value;
 };
@@ -292,7 +292,7 @@ int AddResource(ResourceManager* manager, const char* name, const char* path);
 // 0x004f0390: counts the textures of the model file `path` into counts[0..3]
 // (0x004f00e0), loading them through `resources`; not reconstructed.
 int CountModelTextures(const char* path, UnknownSceneResourceManager* resources, unsigned long* counts);
-int FindKeyword(int* out, const char* name, const UnknownSceneKeyword* table); // 0x004e9980
+int FindKeyword(int* out, const char* name, const SceneKeyword* table); // 0x004e9980
 // 0x004f00e0: counts the texture by width (256, 128, 64 or 32) in counts[0..3];
 // "PROCEDURAL" textures count as 64.
 int CountTexture(SceneTextureRecord* texture, int* counts);

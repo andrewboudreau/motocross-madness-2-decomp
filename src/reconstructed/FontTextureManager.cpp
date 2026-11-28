@@ -10,18 +10,18 @@ UnknownFontTextureManager::UnknownFontTextureManager() {
 }
 
 // 0x004676a0
-UnknownStatic65b478::UnknownStatic65b478() {
+FontTextureManager::FontTextureManager() {
     firstNode = 0;
     nodeCount = 0;
 }
 
 // 0x004676b0
-UnknownStatic65b478::~UnknownStatic65b478() {
+FontTextureManager::~FontTextureManager() {
     DeleteFonts();
 }
 
 // 0x004676c0
-void UnknownStatic65b478::AddFont(FontTexture* font) {
+void FontTextureManager::AddFont(FontTexture* font) {
     FontTextureNode* last = 0;
     FontTextureNode* node;
 
@@ -38,7 +38,7 @@ void UnknownStatic65b478::AddFont(FontTexture* font) {
 // the font. Each branch of the unlink ends in its own `delete node`; VC6
 // merges the two into one tail, which keeps the delete's stack cleanup
 // apart from the release call's (retail's two `add esp, 4`).
-void UnknownStatic65b478::DeleteFont(FontTexture* font) {
+void FontTextureManager::DeleteFont(FontTexture* font) {
     FontTextureNode* previous = 0;
     FontTextureNode* node;
 
@@ -60,7 +60,7 @@ void UnknownStatic65b478::DeleteFont(FontTexture* font) {
 }
 
 // 0x004677c0
-void UnknownStatic65b478::DeleteFonts() {
+void FontTextureManager::DeleteFonts() {
     FontTextureNode* node;
 
     while ((node = firstNode) != 0) {
@@ -74,7 +74,7 @@ void UnknownStatic65b478::DeleteFonts() {
 // 0x004677f0: the node whose font is named `name`, or 0. Written as
 // `while (1)` with breaks, the `node != 0` test stays at the top of the
 // loop as in retail; a `while (node && ...)` condition is rotated.
-FontTextureNode* UnknownStatic65b478::FindFont(const char* name) {
+FontTextureNode* FontTextureManager::FindFont(const char* name) {
     FontTextureNode* node = firstNode;
 
     while (1) {

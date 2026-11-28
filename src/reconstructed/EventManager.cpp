@@ -49,7 +49,8 @@ static Vector3 kVec3ZAxis = Vector3(0.0f, 0.0f, 1.0f);
 
 // Network messages handled by slot 24 (the layout depends on the type).
 // For DPSYS_DESTROYPLAYERORGROUP the fields are DPMSG_DESTROYPLAYERORGROUP's
-// dwType, dwPlayerType and dpId.
+// dwType, dwPlayerType and dpId. Name kept: one view over several DirectPlay
+// message types.
 struct UnknownEventPlayerMessage {
     int header;                                    // +0x00: type (DPMSG dwType for system messages)
     int player;                                    // +0x04: player (types 0xcc and 0x8e)

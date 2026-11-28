@@ -7,7 +7,7 @@
     "src/reconstructed/EcoSystem.cpp": {
       "sections": 207,
       "relocations": 1143,
-      "sha256": "49fc07d2f55dac3c6b52ca3618c203cbdb0d2b993d9360f8cb1a9f17725cff0e"
+      "sha256": "aef1614d98979709470236b5121cebce2e26f6f5f8f7065cc5dab7ccc40615b7"
     },
     "src/reconstructed/LightEmitter.cpp": {
       "sections": 57,
@@ -17,7 +17,7 @@
     "src/reconstructed/SceneManager.cpp": {
       "sections": 335,
       "relocations": 1757,
-      "sha256": "4e23b57fb925650d53d548493a496d8d4149e731612f2df3440ef3851a46b921"
+      "sha256": "f953e2da19a9262f3858568c697c7598754859ff9e80c288e6397e5d2e324d36"
     },
     "src/reconstructed/KrustyUI.cpp": {
       "sections": 317,

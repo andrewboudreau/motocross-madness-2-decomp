@@ -10,7 +10,8 @@
 // Field and method names are provisional.
 
 // LightEmitter::linkedTarget (+0x9c); only these two helpers (both in this
-// file) are known.
+// file) are known. Name kept: only the constructor writes +0x9c (0), so no
+// target class is established.
 class UnknownLightEmitterTarget {
 public:
     void SetRgbColor(unsigned int color);           // 0x0049de70

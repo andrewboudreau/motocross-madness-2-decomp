@@ -61,7 +61,7 @@ That leaves 49 functions.
   have one entry), key colour, two textures, model vertices / indices /
   counts, UsePlanarLighting, BlendLODs, PercentBias and the collision
   definitions (0x24 bytes each) with their CollisionObjects.
-- Detail bands (`UnknownEcoDetailBand`, 0x20 bytes, ten per table): the
+- Detail levels (`EcoDetailLevel`, 0x20 bytes, ten per table): the
   3D and fade distances, model flags, billboard range and limit, and three
   render-state switches.
 

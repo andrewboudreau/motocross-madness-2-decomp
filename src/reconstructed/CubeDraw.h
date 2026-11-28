@@ -48,7 +48,7 @@ struct CubeLitVertex {
 
 // Per-cell ManagedTexture coordinate state (0x0057ea10, 96 entries): the
 // scale and u/v offsets 0x00510910 maps the cell's vertices from.
-struct UnknownCubeTextureMapping {
+struct CubeCellMapping {
     float scale;
     float offsetU;
     float offsetV;

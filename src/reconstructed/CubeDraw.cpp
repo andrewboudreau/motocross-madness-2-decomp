@@ -35,7 +35,7 @@ Vector3 s_facePoints[6][25];
 // 0x0057a210: two triangles per cell, 16 cells per face.
 CubeLitVertex s_cellVertices[6][16][6];
 // 0x0057ea10
-UnknownCubeTextureMapping s_cellMappings[6][16];
+CubeCellMapping s_cellMappings[6][16];
 // The cell arrays viewed flat: cell = face * 16 + i, whose first vertex is
 // cell * 6. Slot 14 indexes them this way (retail recomputes the addresses
 // from the cell and its first vertex instead of stepping pointers).

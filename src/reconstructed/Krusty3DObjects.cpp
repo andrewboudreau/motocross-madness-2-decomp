@@ -501,7 +501,7 @@ int NumberObjectManager::Render3D() {
 // ---------------------------------------------------------- BonusObjectManager
 
 // 0x0056c820: the bonus animation keys (times are frames / 15).
-static const UnknownBonusKey g_UnknownBonusKeys[7] = {
+static const BonusAnimationKey g_BonusAnimationKeys[7] = {
     {0, 0.0f, {0.0275f, 0.0275f, 0.0275f}, {0.0f, 8.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, 0.0f},
     {6, 0.4f, {2.78f, 2.78f, 2.78f}, {0.0f, 8.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, 0.0f},
     {8, 0.5333f, {2.09f, 2.09f, 2.09f}, {0.0f, 8.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, 0.0f},
@@ -513,7 +513,7 @@ static const UnknownBonusKey g_UnknownBonusKeys[7] = {
 
 // A key's vector built from its three floats.
 #define KEY_VECTOR(i, member) \
-    Vector3(g_UnknownBonusKeys[i].member[0], g_UnknownBonusKeys[i].member[1], g_UnknownBonusKeys[i].member[2])
+    Vector3(g_BonusAnimationKeys[i].member[0], g_BonusAnimationKeys[i].member[1], g_BonusAnimationKeys[i].member[2])
 
 // 0x0048c2b0
 BonusObjectManager::BonusObjectManager(int flags) : GameObject(flags) {
@@ -636,9 +636,9 @@ BonusObjectManager* BonusObjectManager::SetupCounter(void* context, const LightM
 // 0x0048cad0
 void BonusObjectManager::NextKey() {
     int i = ++currentKey;
-    keyDuration = g_UnknownBonusKeys[i + 1].time - g_UnknownBonusKeys[i].time;
-    keyAngle = g_UnknownBonusKeys[i].rotationAngle;
-    keyAngleChange = g_UnknownBonusKeys[i + 1].rotationAngle - keyAngle;
+    keyDuration = g_BonusAnimationKeys[i + 1].time - g_BonusAnimationKeys[i].time;
+    keyAngle = g_BonusAnimationKeys[i].rotationAngle;
+    keyAngleChange = g_BonusAnimationKeys[i + 1].rotationAngle - keyAngle;
     Vector3 next = KEY_VECTOR(i + 1, position);
     keyPosition = KEY_VECTOR(i, position);
     keyPositionChange = next - keyPosition;
@@ -679,10 +679,10 @@ int BonusObjectManager::Tick(float frameTime) {
         return 1;
     }
     elapsed += frameTime;
-    if (elapsed < g_UnknownBonusKeys[6].time) {
-        while (elapsed > g_UnknownBonusKeys[currentKey + 1].time)
+    if (elapsed < g_BonusAnimationKeys[6].time) {
+        while (elapsed > g_BonusAnimationKeys[currentKey + 1].time)
             NextKey();
-        float t = (elapsed - g_UnknownBonusKeys[currentKey].time) / keyDuration;
+        float t = (elapsed - g_BonusAnimationKeys[currentKey].time) / keyDuration;
         Vector3 position;
         raceView->localRacer->modelNode->GetPosition((Vec3*)&position);
         position += t * keyPositionChange + keyPosition;

@@ -115,7 +115,7 @@ public:
 
 // One 0x30-byte key of the bonus animation table at 0x0056c820 (seven
 // keys); plain floats, as the table is static data.
-struct UnknownBonusKey {
+struct BonusAnimationKey {
     int frame;                                // +0x00
     float time;                               // +0x04
     float scale[3];  // +0x8  NextKey interpolates keyScale from it (table: uniform 2.09, 1.99, ...)

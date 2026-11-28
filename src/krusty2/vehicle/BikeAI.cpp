@@ -38,28 +38,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-// 0x00577ac0, 20 bytes: a first-order smoothing filter used by 0x00413200:
+// 0x00577ac0, 20 bytes: a VehicleSmoother used by 0x00413200. Its
+// initializer stores the five fields in VehicleSmoother's constructor order,
+// and the step below is Vehicle.cpp's VehSmooth:
 // alpha = min(dt / timeConstant, 1); value += (target - value) * alpha.
-// The constructor's store order (value, timeConstant, max, min, alpha) is tier 1;
-// member roles are tier 3.
-struct UnknownBikeAIFilter {
-    float value;        // +0x00
-    float timeConstant; // +0x04
-    float alpha;        // +0x08
-    float maxValue;     // +0x0c
-    float minValue;     // +0x10
-
-    UnknownBikeAIFilter(float tc)
-    {
-        value = 0.0f;
-        timeConstant = tc;
-        maxValue = 1.0f;
-        minValue = -1.0f;
-        alpha = 1.0f;
-    }
-};
-
-UnknownBikeAIFilter g_BikeAIFilter_00577ac0(0.5f);
+VehicleSmoother g_BikeAIFilter_00577ac0(0.5f, 0.0f, 1.0f, -1.0f);
 
 // Statics with an empty constructor: their $E initializers are a jmp to a bare ret
 // (0x0040d0c0, 0x0040d0e0, 0x0040d100 here, 0x0040d1e0 after 0x0040d120 and
@@ -1402,14 +1385,14 @@ float g_BikeAISpeedTable_00566f74[3][200] = {
 };
 
 // One step of the filter at 0x00577ac0 towards `target`; returns the new value.
-inline float BikeAIFilterStep(UnknownBikeAIFilter* f, float dt, float target)
+inline float BikeAIFilterStep(VehicleSmoother* f, float dt, float target)
 {
     float step = f->timeConstant;
     if (dt < step)
         step = dt;
-    f->alpha = step / f->timeConstant;
-    f->value = (target - f->value) * f->alpha + f->value;
-    return f->value;
+    f->blendFactor = step / f->timeConstant;
+    f->smoothedValue = (target - f->smoothedValue) * f->blendFactor + f->smoothedValue;
+    return f->smoothedValue;
 }
 
 // The same step on a Vehicle smoother (Vehicle.cpp's VehSmooth), returning the new

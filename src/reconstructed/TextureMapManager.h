@@ -39,7 +39,9 @@ int CompareTexturesByUnhappiness(const void* first, const void* second);
 int FitTexturesToBudget(ContainerList<ManagedTexture*>* list, int budget);
 
 // Interval timer (PCVideoCard.cpp; constructor 0x004cb670 records the
-// current time and the interval), 12 bytes.
+// current time and the interval), 12 bytes. The same type as PeakHold.h's
+// PeakHold (0x004cb670/0x004cb690/0x004cb6b0); the fold is deferred because
+// it moved the declaration-count windows.
 class UnknownTimer {
 public:
     explicit UnknownTimer(int interval);

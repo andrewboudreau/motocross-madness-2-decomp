@@ -88,7 +88,8 @@ int ChooseJoystick(int useLast);                 // 0x004cd610: chooses the joys
 void FillPixelFormat(int format, void* pixelFormat);
 
 // 0x00689940: a FILTERKEYS-sized structure (24 bytes) cleared by the
-// constructor.
+// constructor. Name kept: no SystemParametersInfoA call uses it, and
+// SERIALKEYS is 24 bytes too, so FILTERKEYS is only a size match.
 struct UnknownFilterKeys {
     unsigned int size;
     unsigned int flags;

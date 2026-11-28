@@ -17,10 +17,10 @@ struct FontTextureNode {
 // The list. Game.cpp calls 0x004677c0 on the static object at 0x0065b478
 // on shutdown. Its constructor body is shared (identical code folding) with
 // other two-field constructors, e.g. TrackGame.h's 0x004676a0.
-class UnknownStatic65b478 {
+class FontTextureManager {
 public:
-    UnknownStatic65b478();                    // 0x004676a0
-    ~UnknownStatic65b478();                   // 0x004676b0: deletes every font
+    FontTextureManager();                    // 0x004676a0
+    ~FontTextureManager();                   // 0x004676b0: deletes every font
 
     void AddFont(FontTexture* font); // 0x004676c0: appends
     // 0x00467760: unlinks `font` and deletes it (through 0x00467280);
@@ -38,8 +38,9 @@ public:
 // (the object is 8 bytes; its destruction guard byte follows at
 // 0x0065b480), but has its own out-of-line constructor 0x00467690, which
 // only calls the list's. Its destructor (0x00467150, in FontTexture.cpp's
-// code) is the implicit one.
-class UnknownFontTextureManager : public UnknownStatic65b478 {
+// code) is the implicit one. Name kept: base or member cannot be told apart
+// here, and either class could be the original FontTextureManager.
+class UnknownFontTextureManager : public FontTextureManager {
 public:
     UnknownFontTextureManager();              // 0x00467690
 };

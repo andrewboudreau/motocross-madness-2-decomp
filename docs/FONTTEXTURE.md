@@ -19,8 +19,8 @@ RTTI `Palette8 : BaseObject` (vtable `0x00555aa4`), `FontTexture`
   `0x0065b480`), the FontTexture constructor, destructors, accessors and the
   loader `0x004673d0`. The CharacterCell destructor pair is emitted only in
   the TU that builds a CharacterCell (the loader). Which class owns the static
-  object is not established; Game.h's `g_UnknownStatic65b478` names the same
-  address.
+  object is not established. Its type, `UnknownFontTextureManager`, derives
+  from the list class `FontTextureManager`.
 - `FontTextureManager.cpp`: the manager list's constructors, destructor,
   append, removal, clear and search by name (`0x00467690..0x00467847`).
 

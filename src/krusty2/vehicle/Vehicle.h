@@ -151,13 +151,16 @@ struct VehicleImpactEvent {          // argument of slots 18..20 (provisional)
 // smoothed value.
 // 0x14 bytes: LoadVehicle allocates two with `new(__FILE__, 0x19d/0x1a0)` and fills all five
 // fields inline (no EH state, so the constructor is inline and calls nothing).
+// BikeAI.cpp's file-static smoother at 0x00577ac0 stores the same five fields
+// in the same order, with 1 and -1 as the starting minimum and maximum.
 struct VehicleSmoother {
-    VehicleSmoother(float tc, float value = 0.0f)
+    VehicleSmoother(float tc, float value = 0.0f, float minStart = 3.402823466e+38f,
+                    float maxStart = -3.402823466e+38f)
     {
         smoothedValue = value;
         timeConstant = tc;
-        minValue = 3.402823466e+38f;
-        maxValue = -3.402823466e+38f;
+        minValue = minStart;
+        maxValue = maxStart;
         blendFactor = 1.0f;
     }
     // Bike's loader re-arms the two smoothers in place: the value is reset; a given time

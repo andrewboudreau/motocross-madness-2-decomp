@@ -43,17 +43,17 @@ static int s_geometryDrawn;                  // 0x0059af04: geometry objects dra
 static int s_billboardsDrawn;                // 0x0059af08: billboards drawn ("Rendered 2D %d")
 static int g_UnknownGlobal59af0c;             // 0x0059af0c: geometry blocks alive
 int g_UnknownGlobal59af10;                    // 0x0059af10: textures preloaded (BaseQuarryEvent::LoadEventObjects reads it)
-UnknownEcoDetailBand* g_UnknownGlobal59af14; // 0x0059af14: the detail band table (Render3D and TestDistance read it)
+EcoDetailLevel* g_UnknownGlobal59af14; // 0x0059af14: the detail band table (Render3D and TestDistance read it)
 
 // The detail bands, by level: 0x0056a600 for the 1555 (software) path,
 // 0x0056a740 for 4444.
-static UnknownEcoDetailBand g_UnknownGlobal56a600[10] = {
+static EcoDetailLevel g_UnknownGlobal56a600[10] = {
     {0, 0, 1555, 256, 0, 0, 0, 0},   {0, 0, 1555, 256, 0, 0, 0, 0},   {0, 0, 1555, 256, 0, 0, 0, 0},
     {10, 10, 1555, 384, 0, 0, 0, 0}, {20, 20, 1555, 384, 0, 1, 0, 0}, {20, 20, 1555, 448, 0, 1, 1, 0},
     {30, 30, 1555, 512, 0, 1, 1, 0}, {40, 40, 1555, 512, 0, 1, 1, 0}, {75, 75, 1555, 640, 1, 1, 1, 0},
     {150, 75, 1555, 768, 1, 1, 1, 1},
 };
-static UnknownEcoDetailBand g_UnknownGlobal56a740[10] = {
+static EcoDetailLevel g_UnknownGlobal56a740[10] = {
     {20, 0, 4444, 256, 0, 1, 1, 1},   {35, 5, 4444, 256, 0, 1, 1, 1},   {45, 10, 4444, 320, 0, 1, 1, 1},
     {60, 20, 4444, 384, 0, 1, 1, 1},  {75, 30, 4444, 448, 1, 1, 1, 1},  {90, 40, 4444, 512, 1, 1, 1, 1},
     {105, 50, 4444, 576, 1, 1, 1, 1}, {120, 60, 4444, 640, 1, 1, 1, 1}, {135, 67, 4444, 768, 1, 1, 1, 1},
