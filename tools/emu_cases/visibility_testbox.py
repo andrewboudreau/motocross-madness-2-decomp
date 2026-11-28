@@ -10,8 +10,8 @@ import math
 
 RETAIL_VA = 0x0052f570
 SYMBOL = '?TestBox@VisibilityClipper@@QAEHPAVCamera@@PBM11PAH22@Z'
-SOURCE = 'src/bringup/Group4_Visibility.cpp'
-BINDINGS = {'_s_group4BoxCorners': 0x0068abc8}
+SOURCE = 'samples/physics/visibility/VisibilityTestBox.cpp'
+BINDINGS = {'_s_boxCorners': 0x0068abc8}
 PROBES = {0x0052f92a: 'first corner x fistp', 0x0052f9b8: 'corner loop fistp'}
 
 

@@ -1,6 +1,10 @@
-// Group3_TerrainPrepareGeometry.cpp -- bring-up body for Terrain's GameObject slot 12
-// (retail 0x00507610, 783 bytes).  Written from the decoded retail instruction flow so
-// the source-built game prepares its terrain; without it the base
+// TerrainPrepareGeometry.cpp -- Terrain's GameObject slot 12, Terrain::PrepareGeometry
+// (retail 0x00507610, 783 bytes) of D:\aardvark\VC\krusty2\Terrain.cpp (canonical source
+// src/krusty2/broadphase/Terrain.cpp, which does not define it).  Status: reviewed-nonexact.
+// The game build links it with /QIfist (config/game_build.json candidate_sources) in place
+// of the former src/bringup/Group3_TerrainPrepareGeometry.cpp copy.  Written from the
+// decoded retail instruction flow so the source-built game prepares its terrain; without
+// it the base
 // GameObject::PrepareGeometry runs, TestVisibility never marks any grid node and nothing
 // is drawn.  Statistics globals without a retail binding are stood in by file-local
 // storage.
@@ -21,9 +25,9 @@
 // Those counts were measured with FloatToInt as a plain `(int)` cast: with /QIfist it is
 // `fistp qword` plus a dword move (8 bytes shorter, one frame slot lower for the shared
 // t/stale/dirty slot), without it `__ftol` (truncation).  The game build compiles this
-// file with /QIfist (config/game_build.json bringup_flags), so FloatToInt rounds
+// file with /QIfist (config/game_build.json candidate_sources), so FloatToInt rounds
 // through FistpFloatToInt's FISTP under the current rounding mode as retail's helper does
-// (the focal length rounds to nearest instead of truncating).  It is the unit's only
+// (the focal length rounds to nearest instead of truncating).  It is the file's only
 // float-to-int conversion, and a focal length in pixels stays far inside int.  The
 // `push ebp; mov ebp,esp` frame is the asm helper's doing as well: every other
 // Terrain.cpp body matches without a frame pointer.  A pragma keeps it for this body.
@@ -33,11 +37,12 @@
 // assignment, and y/z divided through the member address rather than a pointer local.
 
 #include "broadphase/Terrain.h"
-#include "AgeManager.h"
-#include "Griddraw.h"
-#include "Grid1.h"
-#include "Camera.h"
-#include "../../samples/common/FistpFloatToInt.h"
+#include "../../../src/reconstructed/AgeManager.h"
+#include "../../../src/reconstructed/Griddraw.h"
+#include "../../../src/reconstructed/Grid1.h"
+#include "../../../src/reconstructed/Camera.h"
+#include "../../../src/reconstructed/RenderTarget.h"
+#include "../../common/FistpFloatToInt.h"
 
 unsigned int ReadClock();   // 0x004bfa80
 
@@ -111,7 +116,7 @@ int Terrain::PrepareGeometry()
     last = now;
 
     visibilityCamera = g_terrainToggle314 ? (int)&g_terrainSharedState
-                                          : (int)((TerrainHost*)renderContext)->sharedState;
+                                          : (int)((RenderTarget*)renderContext)->currentCamera;
 
     s_gridCounter66529c = 0;
     g_gridBoxTests = 0;

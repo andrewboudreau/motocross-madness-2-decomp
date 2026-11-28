@@ -22,7 +22,7 @@ from tools.emu_diff import _frame_token
 
 RETAIL_VA = 0x004bac60
 SYMBOL = '?Render3D@ParticleManager@@UAEHXZ'
-SOURCE = 'src/bringup/Group1_ParticleRender.cpp'
+SOURCE = 'samples/physics/effects/ParticleRender.cpp'
 
 COMPARE_DEPTH = 0x004bac20
 BINDINGS = {

@@ -18,7 +18,7 @@ import struct
 
 RETAIL_VA = 0x00507610
 SYMBOL = '?PrepareGeometry@Terrain@@UAEHXZ'
-SOURCE = 'src/bringup/Group3_TerrainPrepareGeometry.cpp'
+SOURCE = 'samples/physics/broadphase/TerrainPrepareGeometry.cpp'
 
 COMPUTE_RATIOS = 0x00507bb0
 EXTREME_EVERY = 25

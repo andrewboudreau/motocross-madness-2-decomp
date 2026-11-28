@@ -260,8 +260,8 @@ of the function (5289, no change).
 ## Not reconstructed
 
 - `0x004eab00` (slot 10, 958 bytes): its ebp frame and `fld; fistp` through
-  a pointer are an inlined `__asm` float-to-int helper. The bring-up body
-  (`src/bringup/Group4_SceneTick.cpp`) keeps the frame with a per-function
+  a pointer are an inlined `__asm` float-to-int helper. The candidate sample
+  (`samples/game/SceneTick.cpp`) keeps the frame with a per-function
   pragma (docs/GAME_BUILD.md#frame-pointer-units).
 - `0x004f17a0` lies after the player-record initializers that open
   SelectGamePicProcs.cpp.

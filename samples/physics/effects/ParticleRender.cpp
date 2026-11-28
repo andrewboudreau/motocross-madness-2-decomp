@@ -1,9 +1,13 @@
-// Group1_ParticleRender.cpp -- bring-up body for ParticleManager slot 14 (0x004bac60,
-// 2495 bytes, thiscall, no arguments, returns 1): the particle sprite renderer.
-// Written from the decoded retail function (D:\aardvark\VC\krusty2\Particles.cpp's
-// code range; ParticleManager.h records the slot).  Behaviour, in retail order:
+// ParticleRender.cpp -- ParticleManager::Render3D, slot 14 (0x004bac60, 2495 bytes, thiscall,
+// no arguments, returns 1): the particle sprite renderer, in D:\aardvark\VC\krusty2\Particles.cpp's
+// code range (canonical source src/krusty2/effects/Particles.cpp, which does not define it;
+// ParticleManager.h records the slot).  Status: reviewed-nonexact, written from the decoded
+// retail function.  The game build links it with /QIfist (config/game_build.json
+// candidate_sources) in place of the former src/bringup/Group1_ParticleRender.cpp copy.
+// Behaviour, in retail order:
 //
-//  1. Nothing when no particle is live or g_TrackGame+0x2d0 is set.
+//  1. Nothing when no particle is live or the game uses the Blade renderer
+//     (Game::bladeRenderer, g_TrackGame+0x2d0).
 //  2. The render target's camera gets an identity world matrix (a function static
 //     built once by IdentityMatrix 0x004a1410; Camera slot 30).
 //  3. Every live particle's position (y + 0.5) goes into the untransformed buffer
@@ -16,7 +20,7 @@
 //     +0x30 right) and sorted by depth (CompareParticleDepth 0x004bac20).
 //  5. The four sprite corners are lit by the manager's light manager (+0x2054,
 //     LightManager::LightVertices 0x0049e4a0) in a camera-aligned frame placed 100
-//     units in front of the scene camera (g_TrackGame+0x10 -> camera); the corner
+//     units in front of the scene camera (Game::renderTarget's camera); the corner
 //     colours keep only their rgb.
 //  6. Each visible particle becomes a screen-clipped quad in the 4000-vertex buffer
 //     (+0x1f8c): per-vertex fog in the specular alpha unless the device has table
@@ -30,9 +34,9 @@
 //     restored to 2 afterwards.
 //
 // Retail rounds the fog and fade alpha with an inline x87 fistp (0x004bb271,
-// 0x004bb2ab).  The game build compiles this unit with /QIfist (config/game_build.json
-// bringup_flags), so FistpFloatToInt's cast is a FISTP under the current rounding mode
-// (ties to even, not up); the two are the unit's only float-to-int conversions.  Only
+// 0x004bb2ab).  The game build compiles this file with /QIfist, so FistpFloatToInt's cast
+// is a FISTP under the current rounding mode (ties to even, not up); the two are the
+// file's only float-to-int conversions.  Only
 // the low byte of either result is kept (`<< 24`): the fog is clamped to [0, 1]; the
 // fade lies in [-0.5, 127] while age <= lifetime (ParticleManager::Tick retires a
 // particle once its age passes its lifetime), and leaving int would take an age of
@@ -50,13 +54,13 @@
 
 #include <math.h>
 
-#include "TrackGameGlobal.h"
+#include "../../../src/reconstructed/TrackGame.h"
 #include "effects/ParticleManager.h"
-#include "Camera.h"
-#include "PCRenderTarget.h"
-#include "TextureMap.h"
-#include "LightEmitter.h"   // LightManager
-#include "../../samples/common/FistpFloatToInt.h"
+#include "../../../src/reconstructed/Camera.h"
+#include "../../../src/reconstructed/PCRenderTarget.h"
+#include "../../../src/reconstructed/TextureMap.h"
+#include "../../../src/reconstructed/LightEmitter.h"   // LightManager
+#include "../../common/FistpFloatToInt.h"
 
 extern "C" void qsort(void* base, unsigned int num, unsigned int width,
                       int (*compare)(const void*, const void*));
@@ -67,54 +71,8 @@ float FastInvSqrt(float x);
 // 0x00689158 (defined in Particles.cpp).
 extern ParticleUVRect g_particleCellUVs[61];
 
-// IDirect3DVertexBuffer7 as slot 14 uses it (slots 3 Lock, 4 Unlock, 5 ProcessVertices).
-class Group1ParticleVertexBuffer {
-public:
-    virtual long __stdcall QueryInterface(void* iid, void** out) = 0;
-    virtual unsigned long __stdcall AddRef() = 0;
-    virtual unsigned long __stdcall Release() = 0;
-    virtual long __stdcall Lock(unsigned long flags, void** data, unsigned long* size) = 0;
-    virtual long __stdcall Unlock() = 0;
-    virtual long __stdcall ProcessVertices(unsigned long op, unsigned long destIndex,
-                                           unsigned long count,
-                                           Group1ParticleVertexBuffer* source,
-                                           unsigned long sourceIndex, void* device,
-                                           unsigned long flags) = 0;
-};
-
-// The 0x20-byte transformed-and-lit vertex (FVF 0x1c4: xyzrhw, diffuse, specular, tex1).
-struct Group1ParticleTLVertex {
-    float x, y, z, rhw;
-    unsigned int color;      // +0x10
-    unsigned int specular;   // +0x14 (fog in the alpha byte)
-    float u, v;              // +0x18, +0x1c
-};
-
-// The screen square slot 14 stores in Particle +0x24..+0x30.
-struct Group1ParticleRect {
-    float top, bottom, left, right;
-};
-
-// g_TrackGame as slot 14 reads it.
-struct Group1ParticleGame {
-    char field_0x00[0x10];
-    RenderTarget* renderTarget;    // +0x10 the scene render target (its camera lights the corners)
-    char field_0x14[0x2d0 - 0x14];
-    int hidden;                    // +0x2d0 nonzero: no particles are drawn
-};
-
-static inline Group1ParticleRect* Group1Rect(Particle* particle)
-{
-    return reinterpret_cast<Group1ParticleRect*>(particle->screenRect);
-}
-
-static inline unsigned int& Group1CornerColor(ParticleCornerVertex& corner)
-{
-    return corner.color;   // +0x10
-}
-
 // The normalize retail inlines twice: unit vectors are kept as they are.
-static inline Vector3 Group1Normalize(float x, float y, float z)
+static inline Vector3 ParticleFrameNormalize(float x, float y, float z)
 {
     float lengthSquared = z * z + (x * x + y * y);
     if (lengthSquared == 1.0f)
@@ -123,7 +81,7 @@ static inline Vector3 Group1Normalize(float x, float y, float z)
     return Vector3(scale * x, scale * y, scale * z);
 }
 
-static inline Vector3 Group1Cross(const Vector3& a, const Vector3& b)
+static inline Vector3 ParticleFrameCross(const Vector3& a, const Vector3& b)
 {
     return Vector3(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x);
 }
@@ -136,7 +94,7 @@ int ParticleManager::Render3D()
 {
     int i;
     unsigned int color = 0;
-    if (activeCount <= 0 || reinterpret_cast<Group1ParticleGame*>(g_TrackGame)->hidden)
+    if (activeCount <= 0 || g_TrackGame->bladeRenderer)
         return 1;
 
     static Matrix4 s_particleWorld = IdentityMatrix();
@@ -144,8 +102,8 @@ int ParticleManager::Render3D()
     target->currentCamera->SetWorldMatrix(&s_particleWorld);
 
     // 3. Positions in, transformed vertices out.
-    Group1ParticleVertexBuffer* source = (Group1ParticleVertexBuffer*)indexBufferObject;
-    Group1ParticleVertexBuffer* transformed = (Group1ParticleVertexBuffer*)vertexBuffer;
+    ParticleVertexBuffer* source = indexBufferObject;
+    ParticleVertexBuffer* transformed = vertexBuffer;
     char* data;
     source->Lock(1, (void**)&data, 0);
     for (i = 0; i < activeCount; i++) {
@@ -165,12 +123,12 @@ int ParticleManager::Render3D()
     visibleCount = 0;
     for (i = 0; i < activeCount; i++) {
         Particle* particle = particles[i];
-        Group1ParticleTLVertex* vertex = (Group1ParticleTLVertex*)particle->vertex;
+        ParticleCornerVertex* vertex = (ParticleCornerVertex*)particle->vertex;
         if (vertex->z > 1.0f || vertex->z < 0.0f)
             continue;
         Camera* camera = target->currentCamera;
         float half = camera->focalLength * particle->size * vertex->rhw;
-        Group1ParticleRect* rect = Group1Rect(particle);
+        ParticleScreenRect* rect = &particle->screenRect;
         rect->left = vertex->x - half;
         if (rect->left > (float)target->currentCamera->targetWidth)
             continue;
@@ -196,7 +154,7 @@ int ParticleManager::Render3D()
         vertexFog = 0;
 
     // 5. Light the corners in a frame 100 units in front of the scene camera.
-    Camera* scene = reinterpret_cast<Group1ParticleGame*>(g_TrackGame)->renderTarget->currentCamera;
+    Camera* scene = g_TrackGame->renderTarget->currentCamera;
     Vector3 scaled;
     scaled.x = scene->viewDirection.x * 100.0f;
     scaled.y = scene->viewDirection.y * 100.0f;
@@ -207,10 +165,10 @@ int ParticleManager::Render3D()
     Vector3 backward(-scene->viewDirection.x, -scene->viewDirection.y, -scene->viewDirection.z);
     Vector3 upward = scene->upDirection;
     // side = up x back; up' = back x side (up made perpendicular to the view).
-    Vector3 side = Group1Cross(upward, backward);
-    Vector3 perp = Group1Cross(backward, side);
-    Vector3 up = Group1Normalize(perp.x, perp.y, perp.z);
-    Vector3 back = Group1Normalize(backward.x, backward.y, backward.z);
+    Vector3 side = ParticleFrameCross(upward, backward);
+    Vector3 perp = ParticleFrameCross(backward, side);
+    Vector3 up = ParticleFrameNormalize(perp.x, perp.y, perp.z);
+    Vector3 back = ParticleFrameNormalize(backward.x, backward.y, backward.z);
     Matrix4 frame;
     frame.m[0][0] = up[1] * back[2] - up[2] * back[1];
     frame.m[0][1] = back[0] * up[2] - up[0] * back[2];
@@ -228,21 +186,20 @@ int ParticleManager::Render3D()
     frame.m[3][1] = lightY;
     frame.m[3][2] = lightZ;
     frame.m[3][3] = 1.0f;
-    reinterpret_cast<LightManager*>(lightManager)->LightVertices(&frame, 4, cornerNormals,
-                                                                 corners, 0xc, 0);
+    lightManager->LightVertices(&frame, 4, cornerNormals, corners, 0xc, 0);
     for (i = 0; i < 4; i++)
-        Group1CornerColor(corners[i]) &= 0xffffff;
+        corners[i].color &= 0xffffff;
 
     // 6. Quads.
     Camera* camera = target->currentCamera;
     float fogScale = 1.0f / (camera->farPlane - camera->nearPlane);
     unsigned int alpha = 0;
     unsigned int specular = 0;
-    Group1ParticleTLVertex* quads;
-    ((Group1ParticleVertexBuffer*)quadVertexBuffer)->Lock(1, (void**)&quads, 0);
+    ParticleCornerVertex* quads;
+    quadVertexBuffer->Lock(1, (void**)&quads, 0);
     for (i = 0; i < visibleCount; i++) {
         Particle* particle = visible[i];
-        Group1ParticleTLVertex* vertex = (Group1ParticleTLVertex*)particle->vertex;
+        ParticleCornerVertex* vertex = (ParticleCornerVertex*)particle->vertex;
         float z = vertex->z;
         float rhw = vertex->rhw;
         if (vertexFog) {
@@ -271,22 +228,22 @@ int ParticleManager::Render3D()
             color = particle->color | 0xff000000;
         }
 
-        Group1ParticleTLVertex* out = quads + i * 4;
+        ParticleCornerVertex* out = quads + i * 4;
         if (particle->flags & 0x800) {
             out[0].color = color;
             out[1].color = color;
             out[2].color = color;
             out[3].color = color;
         } else {
-            out[0].color = Group1CornerColor(corners[0]) | alpha;
-            out[1].color = Group1CornerColor(corners[1]) | alpha;
-            out[2].color = Group1CornerColor(corners[2]) | alpha;
-            out[3].color = Group1CornerColor(corners[3]) | alpha;
+            out[0].color = corners[0].color | alpha;
+            out[1].color = corners[1].color | alpha;
+            out[2].color = corners[2].color | alpha;
+            out[3].color = corners[3].color | alpha;
         }
 
         // Clip the square to the target and the cell's texture coordinates with it.
         const ParticleUVRect& cell = g_particleCellUVs[particle->frame];
-        Group1ParticleRect* rect = Group1Rect(particle);
+        ParticleScreenRect* rect = &particle->screenRect;
         float vTopLeft, vTopRight, vBottomRight, vBottomLeft;
         float uTopLeft, uTopRight, uBottomRight, uBottomLeft;
         if (rect->top < 0.0f) {
@@ -329,28 +286,28 @@ int ParticleManager::Render3D()
         }
 
         out[0].specular = specular;
-        out[0].u = uTopLeft;
-        out[0].v = vTopLeft;
+        out[0].tu = uTopLeft;
+        out[0].tv = vTopLeft;
         out[0].x = rect->left;
         out[0].y = rect->top;
         out[0].z = z;
         out[0].rhw = rhw;
-        out[1].u = uTopRight;
-        out[1].v = vTopRight;
+        out[1].tu = uTopRight;
+        out[1].tv = vTopRight;
         out[1].specular = specular;
         out[1].x = rect->right;
         out[1].y = rect->top;
         out[1].z = z;
         out[1].rhw = rhw;
-        out[2].v = vBottomRight;
-        out[2].u = uBottomRight;
+        out[2].tv = vBottomRight;
+        out[2].tu = uBottomRight;
         out[2].specular = specular;
         out[2].x = rect->right;
         out[2].y = rect->bottom;
         out[2].z = z;
         out[2].rhw = rhw;
-        out[3].u = uBottomLeft;
-        out[3].v = vBottomLeft;
+        out[3].tu = uBottomLeft;
+        out[3].tv = vBottomLeft;
         out[3].specular = specular;
         out[3].x = rect->left;
         out[3].y = rect->bottom;
@@ -358,7 +315,7 @@ int ParticleManager::Render3D()
         out[3].rhw = rhw;
     }
     transformed->Unlock();
-    ((Group1ParticleVertexBuffer*)quadVertexBuffer)->Unlock();
+    quadVertexBuffer->Unlock();
 
     // 7. Draw.
     ((TextureMap*)texture)->Bind();

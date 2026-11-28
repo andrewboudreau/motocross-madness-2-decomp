@@ -67,7 +67,7 @@ registration. The last five ranges (129 bytes) were:
 |---|---|---|
 | `0x00423ef0..0x00423f6d` | `GR_BitString::ReadBits`, called from the LZW decoder at `0x004a041a`, `0x004a043b`, `0x004a0461`, `0x004a05a3` ([BITSTRING_READ](BITSTRING_READ.md)) | in `src/reconstructed/GR_BitString.cpp`, not exact |
 | `0x00442f40`, `0x00442f50`, `0x00442f60` | a bare `ret` each: the atexit destructors of `DrawCurrentLod`'s function-local statics `viewPosition`, `viewDirection` and `eye`, whose type has an empty destructor. `DrawCurrentLod` pushes them to `atexit` (`0x00535430`) at `0x00441f2b`, `0x00441f0a` and `0x00441642` under guard `0x0057ef24` bits 4, 2 and 1 | calibration `_$E4`, `_$E3`, `_$E2` of `src/reconstructed/D3DIMSoulTree.cpp`, strict exact. The unit's object pushes the same symbols under the same guard bits |
-| `0x004bb620` | a bare `ret`: the atexit destructor of `ParticleManager::Render3D`'s `static Matrix4 s_particleWorld` (`0x006898f8`, guard `0x00689154` bit 1), pushed at `0x004bacbb` | calibration `_$E2` of `src/bringup/Group1_ParticleRender.cpp` (the linked `Render3D`, inline asm), strict exact; `Group1_ParticleRender.bindings.json` is new |
+| `0x004bb620` | a bare `ret`: the atexit destructor of `ParticleManager::Render3D`'s `static Matrix4 s_particleWorld` (`0x006898f8`, guard `0x00689154` bit 1), pushed at `0x004bacbb` | calibration `_$E2` of `samples/physics/effects/ParticleRender.cpp` (the linked `Render3D`, inline asm), strict exact; bindings in `ParticleRender.bindings.json` |
 
 None of the four stubs is padding: each is the target of a `push imm32`
 before a call to `atexit`, and each starts on a 16-byte boundary after
@@ -409,22 +409,22 @@ that `tools/build_game.py` links. This was checked on 2026-11-10 against
 | `0x00406ae0`, `0x0040c000` | 3, 1 | `src/krusty2/vehicle/Bike.cpp` (`SelectRiderPose`, `ComputeSlideAngle`) | `BikeFloatToInt` |
 | `0x00446f40` | 6 | `samples/physics/shadow/D3DIMSoultreeShadowNearMisses.cpp` (`/QIfist`) | `FistpFloatToInt` (`samples/common/FistpFloatToInt.h`) |
 | `0x00483d40` | 4 | `src/reconstructed/GridNode.cpp` (`GridRoundToInt`) | `X87FloatToInt`; its 4 other casts are retail `__ftol` calls; the whole body matches retail in 6000 emulated cases ([GAME_BUILD](GAME_BUILD.md#collision-and-terrain-bodies-checked-by-emulation)) |
-| `0x0048d1e0` | 2 | `src/bringup/Group4_ScoreBoard.cpp` (`/QIfist` bring-up) | `FistpFloatToInt` |
+| `0x0048d1e0` | 2 | `samples/race/BonusObjectManagerShowValue.cpp` (`/QIfist` candidate sample) | `FistpFloatToInt` |
 | `0x0048d780` | 1 | `samples/physics/bikeai/KrustyBikeTrickPick.cpp` (`/QIfist`) | `FistpFloatToInt` |
 | `0x0048e3e0` | 3 | `samples/physics/krustybike/KrustyBikeSelectRiderPose.cpp` (`/QIfist`) | `FistpFloatToIntChecked` (the steer value is unbounded) |
-| `0x0049e4a0`, `0x0049e6b0`, `0x0049f1c0`, `0x0049f8d0` | 3, 9, 9, 9 | `src/bringup/Group4_GridLighting.cpp` (`/QIfist` bring-up) | `FistpFloatToInt`; the light colours stay truncating casts, as retail's `__ftol`, in `Group4_GridLightColor.cpp` (no `/QIfist`); the facing value is stored as binary32 first, as retail's asm spill does (see [GAME_BUILD.md](GAME_BUILD.md#grid-lighting-workers)) |
+| `0x0049e4a0`, `0x0049e6b0`, `0x0049f1c0`, `0x0049f8d0` | 3, 9, 9, 9 | `samples/render/LightManagerLighting.cpp` (`/QIfist` candidate sample) | `FistpFloatToInt`; the light colours stay truncating casts, as retail's `__ftol`, in `samples/render/LightColorByte.cpp` (no `/QIfist`); the facing value is stored as binary32 first, as retail's asm spill does (see [GAME_BUILD.md](GAME_BUILD.md#grid-lighting-workers)) |
 | `0x004a8bf0`, `0x004a8c50` | 1, 2 | `samples/physics/motion/CharacterMotionStart.cpp`, `CharacterMotionBlend.cpp` | `FloatToInt` (`CharacterMotionFloatToInt.h`) |
 | `0x004a9050` | 4 | `samples/physics/motion/CharacterMotionFourPose.cpp` (`/QIfist /Op`) | `FistpFloatToInt` |
-| `0x004bac60` | 2 | `src/bringup/Group1_ParticleRender.cpp` (`/QIfist` bring-up) | `FistpFloatToInt` |
+| `0x004bac60` | 2 | `samples/physics/effects/ParticleRender.cpp` (`/QIfist` candidate sample) | `FistpFloatToInt` |
 | `0x004db8c0`, `0x004dc2b0` | 2, 2 | `samples/physics/shadow/ProjectedShadowNearMisses.cpp` (`/QIfist`) | `ProjectedShadowFloatToInt` |
-| `0x004eab00` | 1 | `src/bringup/Group4_SceneTick.cpp` (`/QIfist` bring-up) | `FistpFloatToInt` |
-| `0x00507610` | 1 | `src/bringup/Group3_TerrainPrepareGeometry.cpp` (`/QIfist` bring-up) | `FistpFloatToInt` |
+| `0x004eab00` | 1 | `samples/game/SceneTick.cpp` (`/QIfist` candidate sample) | `FistpFloatToInt` |
+| `0x00507610` | 1 | `samples/physics/broadphase/TerrainPrepareGeometry.cpp` (`/QIfist` candidate sample) | `FistpFloatToInt` |
 | `0x00507c10` | 2 | `src/krusty2/broadphase/Terrain.cpp` (`QueryGround`; the `QueryGround` views forward to it) | `FloatToInt`; the whole body matches retail in 6000 emulated cases after two repairs ([GAME_BUILD](GAME_BUILD.md#collision-and-terrain-bodies-checked-by-emulation)) |
 | `0x00509aa0` | 6 | `samples/physics/shadow/TerrainShadow.cpp` (`/QIfist`) | `FistpFloatToInt` |
 | `0x00518f30` | 1 | `src/reconstructed/TrackOverlay.cpp` (`NameOverlay::Tick`) | `X87FloatToInt`; the canonical unit has 18 retail-truncating `__ftol` casts, so it cannot take `/QIfist` |
 | `0x0051af00` | 2 | `samples/track/DropTextOverlaySetup.cpp` (`/QIfist`) | `FistpFloatToInt` |
-| `0x0051b070` | 1 | `src/bringup/Group4_DropTextOverlayTick.cpp` (`/QIfist` bring-up) | `FistpFloatToIntChecked` (`dropSeconds` may be near zero) |
-| `0x0052f570` | 6 | `src/bringup/Group4_Visibility.cpp` (`/QIfist` bring-up; Griddraw calls it directly) | `FistpFloatToIntChecked` (a corner near the eye plane can project outside `int`) |
+| `0x0051b070` | 1 | `samples/track/DropTextOverlayTick.cpp` (`/QIfist` candidate sample) | `FistpFloatToIntChecked` (`dropSeconds` may be near zero) |
+| `0x0052f570` | 6 | `samples/physics/visibility/VisibilityTestBox.cpp` (`/QIfist` candidate sample; Griddraw calls it directly) | `FistpFloatToIntChecked` (a corner near the eye plane can project outside `int`) |
 
 `BikeFloatToInt` corrects an `__ftol` truncation to nearest-even. It ignores
 the x87 rounding mode.

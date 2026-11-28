@@ -23,11 +23,17 @@ public:
 };
 
 // IDirect3DVertexBuffer7-shaped (slot 27 locks 0x1f8c with flags 1 and unlocks it; slot 14 does
-// the same with 0x1f88).  Slot 3 Lock(flags, &data, &size), slot 4 Unlock (tier 1 call shapes).
+// the same with 0x1f88).  Slot 3 Lock(flags, &data, &size), slot 4 Unlock, slot 5
+// ProcessVertices(op, destIndex, count, source, sourceIndex, device, flags), which slot 14
+// calls on 0x1f84 with 0x1f88 as the source (tier 1 call shapes).
 class ParticleVertexBuffer : public ParticleComObject {
 public:
     virtual long __stdcall Lock(unsigned long flags, void** data, unsigned long* size);
     virtual long __stdcall Unlock();
+    virtual long __stdcall ProcessVertices(unsigned long op, unsigned long destIndex,
+                                           unsigned long count, ParticleVertexBuffer* source,
+                                           unsigned long sourceIndex, void* device,
+                                           unsigned long flags);
 };
 
 // D3DVERTEXBUFFERDESC-shaped stack block passed to ParticleDirect3D slot 5 by slot 27:
@@ -81,7 +87,7 @@ class TextureMapManager;
 struct ParticleCornerVertex {
     float x, y, z;
     float rhw;                    // +0x0c
-    unsigned int color;           // +0x10 diffuse (Group1CornerColor)
+    unsigned int color;           // +0x10 diffuse (slot 14 keeps only its rgb after lighting)
     unsigned int specular;        // +0x14
     float tu, tv;                 // +0x18
 };
@@ -113,6 +119,12 @@ struct ParticleVec3 {
 
 inline ParticleVec3 operator*(float s, const ParticleVec3& v) { return ParticleVec3(s * v.x, s * v.y, s * v.z); }
 
+// The screen square slot 14 projects a particle to (Particle +0x24..+0x30; 0x004bae2f,
+// 0x004bae4f, 0x004badfa, 0x004bae19) and clips.
+struct ParticleScreenRect {
+    float top, bottom, left, right;
+};
+
 // First 12 bytes of a 0x20-byte vertex in the locked buffer (slot 14 stores x, y+0.5, z there).
 struct ParticleVertex {
     float x, y, z;
@@ -135,7 +147,7 @@ struct Particle {
     float lifetime;          // +0x18 slot 10 recycles the particle once age > lifetime
     float size;              // +0x1c grows by dt*growth every tick while flag 8 is set
     float growth;            // +0x20 see size
-    char screenRect[0x34 - 0x24];  // +0x24..+0x30 written by Render (projected corner values)
+    ParticleScreenRect screenRect;  // +0x24..+0x30 written by Render (the projected square)
     unsigned int flags;      // +0x34 bit 8: size grows, bit 4: velocity moves it, bit 0x10: gravity applies
     ParticleVec3 velocity;   // +0x38 added to position * dt (flag 4); gravity is added to it (flag 0x10)
     ParticleVertex* vertex;  // +0x44 Render points it into the locked vertex buffer (0x20 bytes per particle); the depth sort reads vertex->z

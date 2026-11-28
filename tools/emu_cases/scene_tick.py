@@ -24,7 +24,7 @@ import struct
 
 RETAIL_VA = 0x004eab00
 SYMBOL = '?Tick@Scene@@UAEHM@Z'
-SOURCE = 'src/bringup/Group4_SceneTick.cpp'
+SOURCE = 'samples/game/SceneTick.cpp'
 PROBES = {0x004eadf1: 'random set pick fistp', 0x004eabc9: 'remaining time compare'}
 
 VBOFF = 0x20

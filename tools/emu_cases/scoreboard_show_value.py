@@ -15,7 +15,7 @@ import struct
 
 RETAIL_VA = 0x0048d1e0
 SYMBOL = '?ShowValue@BonusObjectManager@@QAEXMM@Z'
-SOURCE = 'src/bringup/Group4_ScoreBoard.cpp'
+SOURCE = 'samples/race/BonusObjectManagerShowValue.cpp'
 PROBES = {0x0048d221: 'points fistp', 0x0048d33a: 'tenths fistp'}
 
 

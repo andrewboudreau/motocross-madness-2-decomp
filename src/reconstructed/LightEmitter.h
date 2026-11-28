@@ -86,8 +86,8 @@ public:
     // through Terrain+0xc40 with no colours). Not exact: it and its
     // three workers 0x0049e6b0, 0x0049f1c0 and 0x0049f8d0 (ebp frames) round
     // with an inlined `fld [tmp]; mov eax, [p]; fistp [eax]` helper that VC6
-    // only emits for inline assembly. The bodies are the /QIfist bring-up
-    // src/bringup/Group4_GridLighting.cpp.
+    // only emits for inline assembly. The bodies are the /QIfist candidate
+    // samples/render/LightManagerLighting.cpp.
     void LightVertices(void* matrix, int count, void* vertices, void* buffer,
                        int stride, void* colors);
 private:

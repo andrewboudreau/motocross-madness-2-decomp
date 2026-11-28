@@ -218,8 +218,8 @@ public:
                     GridNode** outNode, int* outX, int* outZ);
     // GameObject slot overrides (vtable 0x0055825c, tier 1 addresses).
     // Slot 14 (0x00506220): draws the height field (tier 3 role; see Terrain.cpp).
-    // Slot 12 (0x00507610): per-frame terrain preparation; best-guess body in
-    // src/bringup/Group3_TerrainPrepareGeometry.cpp (not byte-matched).
+    // Slot 12 (0x00507610): per-frame terrain preparation; /QIfist candidate body in
+    // samples/physics/broadphase/TerrainPrepareGeometry.cpp (not byte-matched).
     virtual int PrepareGeometry();
     virtual int Render3D();
     virtual int OnInputEvent(int a);                 // 0x00507920 returns 0

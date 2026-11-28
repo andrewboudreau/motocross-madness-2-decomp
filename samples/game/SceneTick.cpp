@@ -1,5 +1,8 @@
-// Bring-up (best-guess-unreviewed): Scene slot 10, 0x004eab00 (958 bytes,
-// ret 4), written from the retail disassembly. Not byte matched.
+// SceneTick.cpp -- Scene::Tick (slot 10, 0x004eab00, 958 bytes, ret 4) of
+// D:\aardvark\VC\krusty2\SceneManager.cpp (canonical source src/reconstructed/SceneManager.cpp,
+// which does not define it).  Status: reviewed-nonexact, written from the retail disassembly;
+// not byte matched.  The game build links it with /QIfist (config/game_build.json
+// candidate_sources) in place of the former src/bringup/Group4_SceneTick.cpp copy.
 //
 // Scene::Tick advances every "Animation<n>" entry of the scene's animation
 // table, then (unless holdAnimations is set) the "RandomSet<n>" picks, and
@@ -21,17 +24,18 @@
 // multiplies by the constant first (exact either way: the constant is a power of two).
 // Remaining: esi/edi swapped in the random-set loop, the isEnabled address CSE'd into the
 // Disable call, and the fistp helper's pointer argument.
-// Rounding: the game build compiles this unit with /QIfist (config/game_build.json
-// bringup_flags), so FistpFloatToInt's cast is a FISTP under the current rounding
-// mode, as retail's helper at 0x004eadf1; the pick is the unit's only float-to-int
-// conversion and lies in [-0.5, count - 0.5), inside int.
+// Rounding: the game build compiles this file with /QIfist (config/game_build.json
+// candidate_sources), so FistpFloatToInt's cast is a FISTP under the current rounding
+// mode, as retail's helper at 0x004eadf1; the pick is the file's only float-to-int
+// conversion and lies in [-0.5, count - 0.5), inside int.  Differentially tested with
+// tools/emu_cases/scene_tick.py (0 of 400 runs differ, 2026-11-28).
 #include <stdlib.h>
 
-#include "../reconstructed/TrackGame.h"
-#include "../reconstructed/SceneManager.h"
-#include "../krusty2/motion/CollisionCharacter.h"
-#include "../krusty2/motion/Motnctrl.h"
-#include "../../samples/common/FistpFloatToInt.h"
+#include "../../src/reconstructed/TrackGame.h"
+#include "../../src/reconstructed/SceneManager.h"
+#include "../../src/krusty2/motion/CollisionCharacter.h"
+#include "../../src/krusty2/motion/Motnctrl.h"
+#include "../common/FistpFloatToInt.h"
 
 // 0x004eab00
 // Retail's inline-asm fistp helper gives this function an EBP frame; the

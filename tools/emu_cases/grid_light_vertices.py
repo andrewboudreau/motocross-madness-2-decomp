@@ -1,6 +1,6 @@
 """LightManager::LightVertices 0x0049e4a0 and its three workers (tools/emu_diff.py case).
 
-Linked from src/bringup/Group4_GridLighting.cpp. The workers LightAny 0x0049e6b0, LightOne
+Linked from samples/render/LightManagerLighting.cpp. The workers LightAny 0x0049e6b0, LightOne
 0x0049f1c0 and LightAmbientPlusOne 0x0049f8d0 are kept from the object (PREFER_OBJECT), so
 the candidate run is the whole unit and the retail run is retail's four bodies. The LightManager
 (ECX) holds the light count (+0x2c), light pointers (+0x30), the three per-vertex term
@@ -14,7 +14,7 @@ The regrow path's DebugFree and DebugMalloc (0x004a2e60/0x004a2e20) are stubbed 
 retail entries, noting size, __FILE__ text and line; one run in ten fails the allocation,
 which clears the capacity and returns.
 
-Group4Vis_ColorByte (src/bringup/Group4_GridLightColor.cpp, a separate unit without
+LightingColorByte (samples/render/LightColorByte.cpp, a separate unit without
 /QIfist) is retail's inlined `fld; fmul 255.0f; call __ftol`; here it is a stub that
 computes the same truncation at the run's precision and is not logged, since retail has
 no call there.
@@ -24,7 +24,7 @@ import struct
 
 RETAIL_VA = 0x0049e4a0
 SYMBOL = '?LightVertices@LightManager@@QAEXPAXH00H0@Z'
-SOURCE = 'src/bringup/Group4_GridLighting.cpp'
+SOURCE = 'samples/render/LightManagerLighting.cpp'
 PREFER_OBJECT = {
     '?LightAny@LightManager@@AAEXPBUMatrix4@@HPAX1H@Z',
     '?LightOne@LightManager@@AAEXPBUMatrix4@@HPAX1H@Z',
@@ -33,7 +33,7 @@ PREFER_OBJECT = {
 # The first stub a run creates sits at emu_diff.STUB + 0x100; setup creates the colour stub first.
 COLOR_BYTE_STUB = 0x21000100
 BINDINGS = {
-    '?Group4Vis_ColorByte@@YAHM@Z': COLOR_BYTE_STUB,
+    '?LightingColorByte@@YAHM@Z': COLOR_BYTE_STUB,
     # the game build's link alias: the Vector3 view of retail's Vec3TransformNormal
     '?Vec3TransformNormal@@YAXPAUVector3@@U1@PBUMatrix4@@@Z': 0x0042a450,
 }
@@ -86,7 +86,7 @@ def color_byte(cx, ecx, args):
 
 
 def setup(ctx, seed):
-    assert ctx.stub('Group4Vis_ColorByte', ret=color_byte, nargs=1, log=False) == COLOR_BYTE_STUB
+    assert ctx.stub('LightingColorByte', ret=color_byte, nargs=1, log=False) == COLOR_BYTE_STUB
     r = random.Random(seed)
     malloc_fails = r.random() < 0.1
 

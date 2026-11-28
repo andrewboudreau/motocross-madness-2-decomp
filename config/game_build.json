@@ -306,66 +306,78 @@
       ],
       "reason": "DropTextOverlay::Setup 0x0051af00 replaces the Group4_Overlay bring-up copy. /QIfist turns FistpFloatToInt's cast into a FISTP under the current rounding mode, as retail's inline fistp helper at 0x0051af3e and 0x0051af64; screen coordinates stay in int range. Checked against the retail disassembly and differentially (tools/emu_cases/drop_text_setup.py); the parenthesised scale products keep retail's (size * scale) * x order, which VC6 otherwise reassociates (96 of 2000 runs differed at 24-bit precision, now 0 of 4000). The EBP frame retail's inline asm gives Setup comes from a #pragma optimize(\"y\", off) region in the source (docs/GAME_BUILD.md#frame-pointer-units). Differential review against retail (tools/emu_diff.py, re-run 2026-11-16): drop_text_setup 0x51af00 0 of 800 runs differ. Bytes nonexact.",
       "evidence": "docs/GAME_BUILD.md#inline-fistp-rounding-samples"
+    },
+    {
+      "path": "samples/track/DropTextOverlayTick.cpp",
+      "status": "reviewed-nonexact",
+      "extra_flags": [
+        "/QIfist"
+      ],
+      "reason": "DropTextOverlay::Tick 0x0051b070 (slot 10) replaces the Group4_DropTextOverlayTick bring-up copy; src/reconstructed/TrackOverlay.cpp does not define it. /QIfist turns FistpFloatToIntChecked's cast into a FISTP under the current rounding mode, as retail's inline fistp helper at 0x0051b0c3 rounds the drop height; it is the file's only float-to-int conversion, and the range check gives retail's 0x80000000 when dropSeconds near zero pushes the drop outside int. The EBP frame retail's inline asm gives Tick comes from a #pragma optimize(\"y\", off) region in the source (docs/GAME_BUILD.md#frame-pointer-units). Differential review against retail (tools/emu_diff.py drop_text_tick, 2026-11-28): 0 of 400 runs differ (53- and 24-bit precision). Bytes nonexact.",
+      "evidence": "docs/GAME_BUILD.md#inline-fistp-rounding-samples"
+    },
+    {
+      "path": "samples/game/SceneTick.cpp",
+      "status": "reviewed-nonexact",
+      "extra_flags": [
+        "/QIfist"
+      ],
+      "reason": "Scene::Tick 0x004eab00 (slot 10) replaces the Group4_SceneTick bring-up copy; src/reconstructed/SceneManager.cpp does not define it. /QIfist turns FistpFloatToInt's cast into a FISTP under the current rounding mode, as retail's inline fistp helper at 0x004eadf1 rounds the random-set pick; the value stays in [-0.5, count - 0.5) and it is the file's only float-to-int conversion. The EBP frame retail's inline asm gives Tick comes from a #pragma optimize(\"y\", off) region in the source (docs/GAME_BUILD.md#frame-pointer-units). Differential review against retail (tools/emu_diff.py scene_tick, 2026-11-28): 0 of 400 runs differ (53- and 24-bit precision). Bytes nonexact.",
+      "evidence": "docs/GAME_BUILD.md#inline-fistp-rounding-samples"
+    },
+    {
+      "path": "samples/race/BonusObjectManagerShowValue.cpp",
+      "status": "reviewed-nonexact",
+      "extra_flags": [
+        "/QIfist"
+      ],
+      "reason": "BonusObjectManager::ShowValue 0x0048d1e0 (the bonus counter's value display) replaces the Group4_ScoreBoard bring-up copy; src/reconstructed/Krusty3DObjects.cpp does not define it. /QIfist turns FistpFloatToInt's cast into a FISTP under the current rounding mode, as retail's inline fistp helper rounds the points and the multiplier tenths (0x0048d221, 0x0048d33a); both are small scores and the file's only float-to-int conversions. The EBP frame retail's inline asm gives ShowValue comes from a #pragma optimize(\"y\", off) region in the source, which also covers the static ShowBonusModel helper (no retail body of its own: retail expands it inside ShowValue). Differential review against retail (tools/emu_diff.py scoreboard_show_value, 2026-11-28): 0 of 400 runs differ (53- and 24-bit precision). Bytes nonexact.",
+      "evidence": "docs/GAME_BUILD.md#inline-fistp-rounding-samples"
+    },
+    {
+      "path": "samples/physics/visibility/VisibilityTestBox.cpp",
+      "status": "reviewed-nonexact",
+      "extra_flags": [
+        "/QIfist"
+      ],
+      "reason": "VisibilityClipper::TestBox 0x0052f570 replaces the Group4_Visibility bring-up copy; src/krusty2/visibility/VisibilityQuadTree.cpp, whose own casts truncate through __ftol as retail's do, does not define it, and Griddraw.cpp and D3DIMSoultreeShadow.cpp call it directly. /QIfist turns FistpFloatToIntChecked's cast into a FISTP under the current rounding mode, as retail's inline fistp helper rounds the projected screen rectangle (0x0052f92a .. 0x0052fa17); the range check gives retail's 0x80000000 when a corner near the eye plane projects outside int. No other float-to-int conversion in the file. The EBP frame retail's inline asm gives TestBox comes from a #pragma optimize(\"y\", off) region in the source (docs/GAME_BUILD.md#frame-pointer-units). Differential review against retail (tools/emu_diff.py visibility_testbox, 2026-11-28): 0 of 400 runs differ (53- and 24-bit precision). Bytes nonexact.",
+      "evidence": "docs/GAME_BUILD.md#inline-fistp-rounding-samples"
+    },
+    {
+      "path": "samples/physics/broadphase/TerrainPrepareGeometry.cpp",
+      "status": "reviewed-nonexact",
+      "extra_flags": [
+        "/QIfist"
+      ],
+      "reason": "Terrain::PrepareGeometry 0x00507610 (GameObject slot 12) replaces the Group3_TerrainPrepareGeometry bring-up copy; src/krusty2/broadphase/Terrain.cpp does not define it. /QIfist turns FistpFloatToInt's cast into a FISTP under the current rounding mode, as retail's inline fistp helper rounds the focal length (pixels, far inside int); it is the file's only float-to-int conversion. The EBP frame retail's inline asm gives it comes from a #pragma optimize(\"y\", off) region in the source (docs/GAME_BUILD.md#frame-pointer-units). Differential review against retail (tools/emu_diff.py terrain_prepare_geometry, 2026-11-28): 10 of 400 runs differ, as with the former bring-up object (byte-identical); the case's out-of-int focal lengths (every 25th case) are documented to differ and in-range focal lengths to differ in 0 runs (docs/GAME_BUILD.md#frame-pointer-units). Bytes nonexact.",
+      "evidence": "docs/GAME_BUILD.md#inline-fistp-rounding-samples"
+    },
+    {
+      "path": "samples/render/LightColorByte.cpp",
+      "status": "reviewed-nonexact",
+      "reason": "LightingColorByte, one light-colour channel times 255 truncated to int, has no retail body: retail's lighting workers (0x0049e6b0, 0x0049f1c0, 0x0049f8d0) inline it as `fld; fmul 255.0f; call __ftol` next to their inline-asm fistp roundings. samples/render/LightManagerLighting.cpp needs /QIfist for those roundings, which would also make this cast round, so the helper is its own file compiled without extra flags and keeps retail's truncation (tools/emu_cases/grid_light_vertices.py stubs it with the same truncation).",
+      "evidence": "docs/GAME_BUILD.md#grid-lighting-workers"
+    },
+    {
+      "path": "samples/render/LightManagerLighting.cpp",
+      "status": "reviewed-nonexact",
+      "extra_flags": [
+        "/QIfist"
+      ],
+      "reason": "LightManager::LightVertices 0x0049e4a0 and its private workers LightAny 0x0049e6b0, LightOne 0x0049f1c0 and LightAmbientPlusOne 0x0049f8d0 replace the Group4_GridLighting bring-up copies; src/reconstructed/LightEmitter.cpp, whose colour casts truncate through __ftol as retail's do, does not define them. /QIfist turns FistpFloatToInt's cast into a FISTP under the current rounding mode, as retail's inline fistp helper rounds the light terms; the terms are colour bytes times facing values and stay in int range. The truncating light-colour casts live in samples/render/LightColorByte.cpp, compiled without the flag. The facing values are stored as binary32 first, as retail spills them around its asm blocks. The EBP frame retail's inline asm gives each of the four comes from a #pragma optimize(\"y\", off) region in the source (docs/GAME_BUILD.md#frame-pointer-units). Differential review against retail (tools/emu_diff.py grid_light_vertices, 2026-11-28): 0 of 400 runs differ (53- and 24-bit precision). Bytes nonexact.",
+      "evidence": "docs/GAME_BUILD.md#grid-lighting-workers"
+    },
+    {
+      "path": "samples/physics/effects/ParticleRender.cpp",
+      "status": "reviewed-nonexact",
+      "extra_flags": [
+        "/QIfist"
+      ],
+      "reason": "ParticleManager::Render3D 0x004bac60 (slot 14) replaces the Group1_ParticleRender bring-up copy; src/krusty2/effects/Particles.cpp does not define it. /QIfist turns FistpFloatToInt's cast into a FISTP under the current rounding mode, as retail's inline fistp helper rounds the fog byte and the age fade (0x004bb271, 0x004bb2ab). Only the low byte of each result is kept and fog is clamped to 0..1, so the 64-bit FISTP store cannot change a kept bit; they are the file's only float-to-int conversions. The EBP frame retail's inline asm gives Render3D comes from a #pragma optimize(\"y\", off) region in the source (docs/GAME_BUILD.md#frame-pointer-units). Differential review against retail (tools/emu_diff.py particle_render3d, 2026-11-28): 0 of 400 runs differ (53- and 24-bit precision). Bytes nonexact.",
+      "evidence": "docs/GAME_BUILD.md#inline-fistp-rounding-samples"
     }
   ],
-  "bringup_flags": [
-    {
-      "path": "src/bringup/Group1_ParticleRender.cpp",
-      "extra_flags": [
-        "/QIfist"
-      ],
-      "reason": "Particle render 0x004bac60: the fog byte and the age fade go through retail's inline fistp helper. Only the low byte of each result is kept and fog is clamped to 0..1, so the 64-bit FISTP store cannot change a kept bit. No other float-to-int conversion in the unit. The EBP frame retail's inline asm gives Render3D comes from a #pragma optimize(\"y\", off) region in the source.",
-      "evidence": "docs/GAME_BUILD.md#bring-up-fistp-units"
-    },
-    {
-      "path": "src/bringup/Group3_TerrainPrepareGeometry.cpp",
-      "extra_flags": [
-        "/QIfist"
-      ],
-      "reason": "Terrain::PrepareGeometry 0x00507610: the focal length (pixels) goes through retail's inline fistp helper. It is the unit's only float-to-int conversion. The EBP frame retail's inline asm gives it comes from a #pragma optimize(\"y\", off) region in the source.",
-      "evidence": "docs/GAME_BUILD.md#bring-up-fistp-units"
-    },
-    {
-      "path": "src/bringup/Group4_GridLighting.cpp",
-      "extra_flags": [
-        "/QIfist"
-      ],
-      "reason": "LightVertices 0x0049e4a0 and its three workers round light terms with retail's inline fistp helper. The truncating light-colour casts live in Group4_GridLightColor.cpp, compiled without the flag; the terms are colour bytes times facing values and stay in int range. The facing values are stored as binary32 first, as retail spills them around its asm blocks; differential emulation against retail found no colour difference in 6000 runs at 53- and 24-bit precision. The EBP frame retail's inline asm gives each of the four comes from a #pragma optimize(\"y\", off) region in the source.",
-      "evidence": "docs/GAME_BUILD.md#bring-up-fistp-units"
-    },
-    {
-      "path": "src/bringup/Group4_DropTextOverlayTick.cpp",
-      "extra_flags": [
-        "/QIfist"
-      ],
-      "reason": "DropTextOverlay::Tick 0x0051b070 rounds the drop height with retail's inline fistp helper, through FistpFloatToIntChecked because dropSeconds may be near zero. The EBP frame retail's inline asm gives Tick comes from a #pragma optimize(\"y\", off) region in the source. ChatOverlay::Setup, frameless in retail and without a float-to-int conversion, matches in src/reconstructed/TrackOverlay.cpp without extra flags.",
-      "evidence": "docs/GAME_BUILD.md#bring-up-fistp-units"
-    },
-    {
-      "path": "src/bringup/Group4_SceneTick.cpp",
-      "extra_flags": [
-        "/QIfist"
-      ],
-      "reason": "Scene::Tick 0x004eab00 rounds the random pick with retail's inline fistp helper at 0x004eadf1; the value stays in [-0.5, count - 0.5). No other float-to-int conversion in the unit.",
-      "evidence": "docs/GAME_BUILD.md#bring-up-fistp-units"
-    },
-    {
-      "path": "src/bringup/Group4_ScoreBoard.cpp",
-      "extra_flags": [
-        "/QIfist"
-      ],
-      "reason": "ScoreBoard 0x0048d1e0 rounds the points and the multiplier tenths with retail's inline fistp helper (0x0048d221, 0x0048d33a); both are small scores. No other float-to-int conversion in the unit. The EBP frame retail's inline asm gives ShowValue comes from a #pragma optimize(\"y\", off) region in the source, which also covers the out-of-line Group4Ovl_ShowModel helper (no retail body of its own: retail expands it inside ShowValue).",
-      "evidence": "docs/GAME_BUILD.md#bring-up-fistp-units"
-    },
-    {
-      "path": "src/bringup/Group4_Visibility.cpp",
-      "extra_flags": [
-        "/QIfist"
-      ],
-      "reason": "TestBox 0x0052f570 rounds the projected screen rectangle with retail's inline fistp helper, through FistpFloatToIntChecked because a corner near the eye plane can project outside int. No other float-to-int conversion in the unit. The EBP frame retail's inline asm gives TestBox comes from a #pragma optimize(\"y\", off) region in the source.",
-      "evidence": "docs/GAME_BUILD.md#bring-up-fistp-units"
-    }
-  ],
+  "bringup_flags": [],
   "includes": [
     "src/krusty2",
     "src/reconstructed"

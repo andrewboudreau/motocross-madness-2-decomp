@@ -1,5 +1,10 @@
-// Bring-up definition (best-guess-unreviewed) of the terrain's vertex lighting
-// call, 0x0049e4a0 in LightEmitter.cpp (literal __FILE__ 0x0056ddf0).
+// LightManagerLighting.cpp -- LightManager::LightVertices (0x0049e4a0, ret 0x18) and its
+// three private workers LightAny 0x0049e6b0, LightOne 0x0049f1c0 and LightAmbientPlusOne
+// 0x0049f8d0, the terrain's vertex lighting, of D:\aardvark\VC\krusty2\LightEmitter.cpp
+// (literal __FILE__ 0x0056ddf0; canonical source src/reconstructed/LightEmitter.cpp, whose
+// own colour casts truncate through __ftol, does not define them).  Status:
+// reviewed-nonexact.  The game build links this file with /QIfist (config/game_build.json
+// candidate_sources) in place of the former src/bringup/Group4_GridLighting.cpp copy.
 //
 // LightManager::LightVertices (LightEmitter.h) is called by the terrain
 // through Terrain+0xc40, the particle renderer and D3DIMSoulTree. The three
@@ -10,10 +15,10 @@
 // Retail rounds light terms with an inlined x87 `fistp` (current rounding
 // mode, round-to-nearest-even) and converts the light colours with _ftol
 // (truncation); the `- 0.5f` sites are retail's own. The game build compiles
-// this unit with /QIfist (config/game_build.json bringup_flags), so
-// FistpFloatToInt's cast is a FISTP under the current rounding mode. The
-// truncating light-colour casts live in Group4_GridLightColor.cpp, compiled
-// without the flag, so every float-to-int conversion left here is a fistp site.
+// this file with /QIfist, so FistpFloatToInt's cast is a FISTP under the current
+// rounding mode. The truncating light-colour casts live in LightColorByte.cpp
+// next to it, compiled without the flag, so every float-to-int conversion left
+// here is a fistp site.
 // Range: each term is a colour byte (a light colour times 255, truncated) times
 // a facing value, the dot product of a vertex normal with a unit light vector
 // (point and positional lights normalise it; a directional light uses its
@@ -30,18 +35,18 @@
 // written inline (0x0042a450 adds z*m31 + y*m21 first, the inlined rotation in
 // 0x0049f8d0 adds x*m11 + z*m31 first), and each grouping rounds differently
 // in the last bit, which can move a colour by one.
-#include "LightEmitter.h"
-#include "Matrix4.h"
+#include "../../src/reconstructed/LightEmitter.h"
+#include "../../src/reconstructed/Matrix4.h"
 #include "core/DebugAlloc.h"
 #include "math/FastMath.h"
-#include "../../samples/common/FistpFloatToInt.h"
+#include "../common/FistpFloatToInt.h"
 
 // LightEmitter.h's lightType values the workers distinguish.
 enum {
-    kGroup4LightPoint = 1,        // position, per-vertex direction
-    kGroup4LightPositional = 2,   // position used as one direction
-    kGroup4LightDirectional = 4,  // lightDirection
-    kGroup4LightAmbient = 6       // constant colour
+    kLightPoint = 1,        // position, per-vertex direction
+    kLightPositional = 2,   // position used as one direction
+    kLightDirectional = 4,  // lightDirection
+    kLightAmbient = 6       // constant colour
 };
 
 // 0x0040ae30 (cdecl, (a.y*b.y + a.x*b.x) + a.z*b.z); config/game_build.json
@@ -61,30 +66,30 @@ struct Vector3Call : Vector3 {
 // Lit vertices are 0x20 bytes: position at +0, packed diffuse at +0x10.
 // Normals come from a separate pointer and stride (the terrain passes the
 // same buffer + 0xc with stride 0x20).
-static inline const Vector3* Group4Vis_VertexPosition(void* buffer, int i) {
+static inline const Vector3* LightingVertexPosition(void* buffer, int i) {
     return (const Vector3*)((char*)buffer + i * 0x20);
 }
-static inline unsigned int* Group4Vis_VertexDiffuse(void* buffer, int i) {
+static inline unsigned int* LightingVertexDiffuse(void* buffer, int i) {
     return (unsigned int*)((char*)buffer + i * 0x20 + 0x10);
 }
-static inline const Vector3* Group4Vis_VertexNormal(void* normals, int stride, int i) {
+static inline const Vector3* LightingVertexNormal(void* normals, int stride, int i) {
     return (const Vector3*)((char*)normals + i * stride);
 }
 
-static inline int Group4Vis_Clamp255(int value) {
+static inline int LightingClamp255(int value) {
     return value < 0xff ? value : 0xff;
 }
 
 // Opaque packed colour; the red term is or-ed with 0xffffff00 first, so an
 // in-range red gives alpha 0xff.
-static inline unsigned int Group4Vis_PackOpaque(int r, int g, int b) {
+static inline unsigned int LightingPackOpaque(int r, int g, int b) {
     return (((r | 0xffffff00) << 8 | g) << 8) | b;
 }
 
-// __forceinline here and on Group4Vis_TransformPointAny: 0x0049e6b0 expands
+// __forceinline here and on LightingTransformPointAny: 0x0049e6b0 expands
 // both at every site, but its later sites fall outside VC6's per-function
 // inline budget (docs/VC6_INLINE_BUDGET.md) and would otherwise be calls.
-static __forceinline float Group4Vis_Dot(const Vector3& a, const Vector3* b) {
+static __forceinline float LightingDot(const Vector3& a, const Vector3* b) {
     return a.z * b->z + (a.x * b->x + a.y * b->y);
 }
 
@@ -95,28 +100,28 @@ static __forceinline float Group4Vis_Dot(const Vector3& a, const Vector3* b) {
 // exact ties such as 63 * 1.0000000477 - 0.5 by one (0.6f/0.8f axis normals
 // under 53-bit precision). The memcpy gives the binary32 copy (see
 // FistpFloatToInt.h).
-static inline float Group4Vis_Binary32(float value) {
+static inline float LightingBinary32(float value) {
     float stored;
     memcpy(&stored, &value, sizeof(stored));
     return stored;
 }
 
 // Retail's inline fistp helper (FISTP under the current rounding mode).
-static inline int Group4Vis_Round(float value) {
+static inline int LightingRound(float value) {
     int result;
     FistpFloatToInt(&result, value);
     return result;
 }
 
 // One channel of a light's colour scaled to 0..255 (retail: _ftol of
-// colour * 255, inlined). Defined in Group4_GridLightColor.cpp, which is
-// compiled without /QIfist so the cast keeps retail's truncation.
-int Group4Vis_ColorByte(float channel);
+// colour * 255, inlined). Defined in LightColorByte.cpp, which is compiled
+// without /QIfist so the cast keeps retail's truncation.
+int LightingColorByte(float channel);
 
 // Retail fills the per-vertex sums sixteen ints at a time, entering the first
 // block through a jump table on the remainder (Duff's device; the stores run
 // from the block's last int down to its first).
-static inline void Group4Vis_Fill(int* p, int value, int n) {
+static inline void LightingFill(int* p, int value, int n) {
     if (n > 0) {
         do {
             switch (n) {
@@ -156,7 +161,7 @@ static inline void Group4Vis_Fill(int* p, int value, int n) {
 // with (z*m31 + y*m21) + x*m11 and (y*m22 + x*m12) + z*m32. Each grouping
 // rounds differently in the last bit, and at the 24-bit precision Direct3D
 // sets that can move a colour by one, so they are spelled out.
-static inline void Group4Vis_InvertRigid(Matrix4& m) {
+static inline void LightingInvertRigid(Matrix4& m) {
     float t;
     t = m._12;
     m._12 = m._21;
@@ -174,7 +179,7 @@ static inline void Group4Vis_InvertRigid(Matrix4& m) {
     m._42 = y;
     m._43 = z;
 }
-static inline void Group4Vis_InvertRigidOne(Matrix4& m) {
+static inline void LightingInvertRigidOne(Matrix4& m) {
     float t;
     t = m._12;
     m._12 = m._21;
@@ -197,12 +202,12 @@ static inline void Group4Vis_InvertRigidOne(Matrix4& m) {
 // first, as for a by-value argument). Retail's groupings again: 0x0049e6b0
 // sums the second column as (y*m22 + z*m32) + x*m12, the other two workers as
 // (y*m22 + x*m12) + z*m32.
-static __forceinline void Group4Vis_TransformPointAny(Vector3* out, Vector3 v, const Matrix4& m) {
+static __forceinline void LightingTransformPointAny(Vector3* out, Vector3 v, const Matrix4& m) {
     out->x = ((v.z * m._31 + v.y * m._21) + v.x * m._11) + m._41;
     out->y = ((v.y * m._22 + v.z * m._32) + v.x * m._12) + m._42;
     out->z = ((v.z * m._33 + v.y * m._23) + v.x * m._13) + m._43;
 }
-static inline void Group4Vis_TransformPoint(Vector3* out, Vector3 v, const Matrix4& m) {
+static inline void LightingTransformPoint(Vector3* out, Vector3 v, const Matrix4& m) {
     out->x = ((v.z * m._31 + v.y * m._21) + v.x * m._11) + m._41;
     out->y = ((v.y * m._22 + v.x * m._12) + v.z * m._32) + m._42;
     out->z = ((v.z * m._33 + v.y * m._23) + v.x * m._13) + m._43;
@@ -211,13 +216,13 @@ static inline void Group4Vis_TransformPoint(Vector3* out, Vector3 v, const Matri
 // The normalisations retail skips when the squared length is exactly 1. The
 // first scales through 0x005015b0, the second through Vector3's out-of-line
 // constructor (both appear in retail).
-static inline Vector3 Group4Vis_NormalizedByScaleCall(const Vector3& v) {
+static inline Vector3 LightingNormalizedByScaleCall(const Vector3& v) {
     float lengthSquared = Vec3Dot(&v, &v);
     if (lengthSquared == 1.0f)
         return v;
     return Vec3ScaleCall(v, FastInvSqrt(lengthSquared));
 }
-static inline Vector3 Group4Vis_NormalizedByConstructor(const Vector3& v) {
+static inline Vector3 LightingNormalizedByConstructor(const Vector3& v) {
     float lengthSquared = Vec3Dot(&v, &v);
     if (lengthSquared == 1.0f)
         return v;
@@ -238,75 +243,75 @@ void LightManager::LightAny(const Matrix4* matrix, int count, void* normals, voi
     Matrix4 inverse = *matrix;
     int i;
     int light;
-    Group4Vis_InvertRigid(inverse);
+    LightingInvertRigid(inverse);
 
     for (light = 0; light < manager->lightCount; light++) {
-        if (manager->lights[light]->lightType == kGroup4LightAmbient)
+        if (manager->lights[light]->lightType == kLightAmbient)
             break;
     }
     if (light != manager->lightCount) {
         LightEmitter* ambient = manager->lights[light];
-        int ambientR = Group4Vis_ColorByte(ambient->ambientRGBA[0]);
-        int ambientG = Group4Vis_ColorByte(ambient->ambientRGBA[1]);
-        int ambientB = Group4Vis_ColorByte(ambient->ambientRGBA[2]);
-        Group4Vis_Fill(manager->vertexRed, ambientR, count);
-        Group4Vis_Fill(manager->vertexGreen, ambientG, count);
-        Group4Vis_Fill(manager->vertexBlue, ambientB, count);
+        int ambientR = LightingColorByte(ambient->ambientRGBA[0]);
+        int ambientG = LightingColorByte(ambient->ambientRGBA[1]);
+        int ambientB = LightingColorByte(ambient->ambientRGBA[2]);
+        LightingFill(manager->vertexRed, ambientR, count);
+        LightingFill(manager->vertexGreen, ambientG, count);
+        LightingFill(manager->vertexBlue, ambientB, count);
     } else {
-        Group4Vis_Fill(manager->vertexRed, 0, count);
-        Group4Vis_Fill(manager->vertexGreen, 0, count);
-        Group4Vis_Fill(manager->vertexBlue, 0, count);
+        LightingFill(manager->vertexRed, 0, count);
+        LightingFill(manager->vertexGreen, 0, count);
+        LightingFill(manager->vertexBlue, 0, count);
     }
 
     for (light = 0; light < manager->lightCount; light++) {
         LightEmitter* emitter = manager->lights[light];
-        int r = Group4Vis_ColorByte(emitter->ambientRGBA[0]);
-        int g = Group4Vis_ColorByte(emitter->ambientRGBA[1]);
-        int b = Group4Vis_ColorByte(emitter->ambientRGBA[2]);
+        int r = LightingColorByte(emitter->ambientRGBA[0]);
+        int g = LightingColorByte(emitter->ambientRGBA[1]);
+        int b = LightingColorByte(emitter->ambientRGBA[2]);
         switch (emitter->lightType) {
-        case kGroup4LightDirectional: {
+        case kLightDirectional: {
             Vector3 direction;
             Vec3TransformNormal(&direction, -emitter->lightDirection, &inverse);
             for (i = 0; i < count; i++) {
-                float dot = Vec3Dot(Group4Vis_VertexNormal(normals, stride, i), &direction);
-                float facing = Group4Vis_Binary32(dot);
+                float dot = Vec3Dot(LightingVertexNormal(normals, stride, i), &direction);
+                float facing = LightingBinary32(dot);
                 if (dot > 0.0f) {
-                    manager->vertexRed[i] += Group4Vis_Round((float)r * facing);
-                    manager->vertexGreen[i] += Group4Vis_Round((float)g * facing);
-                    manager->vertexBlue[i] += Group4Vis_Round((float)b * facing);
+                    manager->vertexRed[i] += LightingRound((float)r * facing);
+                    manager->vertexGreen[i] += LightingRound((float)g * facing);
+                    manager->vertexBlue[i] += LightingRound((float)b * facing);
                 }
             }
             break;
         }
-        case kGroup4LightPositional: {
+        case kLightPositional: {
             Vector3 position;
-            Group4Vis_TransformPointAny(&position, emitter->lightPosition, inverse);
-            position = Group4Vis_NormalizedByScaleCall(position);
+            LightingTransformPointAny(&position, emitter->lightPosition, inverse);
+            position = LightingNormalizedByScaleCall(position);
             for (i = 0; i < count; i++) {
-                float dot = Group4Vis_Dot(position, Group4Vis_VertexNormal(normals, stride, i));
-                float facing = Group4Vis_Binary32(dot);
+                float dot = LightingDot(position, LightingVertexNormal(normals, stride, i));
+                float facing = LightingBinary32(dot);
                 if (dot > 0.0f) {
-                    manager->vertexRed[i] += Group4Vis_Round((float)r * facing);
-                    manager->vertexGreen[i] += Group4Vis_Round((float)g * facing);
-                    manager->vertexBlue[i] += Group4Vis_Round((float)b * facing);
+                    manager->vertexRed[i] += LightingRound((float)r * facing);
+                    manager->vertexGreen[i] += LightingRound((float)g * facing);
+                    manager->vertexBlue[i] += LightingRound((float)b * facing);
                 }
             }
             break;
         }
-        case kGroup4LightPoint: {
+        case kLightPoint: {
             Vector3 position;
-            Group4Vis_TransformPointAny(&position, emitter->lightPosition, inverse);
+            LightingTransformPointAny(&position, emitter->lightPosition, inverse);
             for (i = 0; i < count; i++) {
-                const Vector3* vertex = Group4Vis_VertexPosition(buffer, i);
-                Vector3 direction = Group4Vis_NormalizedByScaleCall(
+                const Vector3* vertex = LightingVertexPosition(buffer, i);
+                Vector3 direction = LightingNormalizedByScaleCall(
                     Vector3Call(position.x - vertex->x, position.y - vertex->y,
                                 position.z - vertex->z));
-                float dot = Group4Vis_Dot(direction, Group4Vis_VertexNormal(normals, stride, i));
-                float facing = Group4Vis_Binary32(dot);
+                float dot = LightingDot(direction, LightingVertexNormal(normals, stride, i));
+                float facing = LightingBinary32(dot);
                 if (dot > 0.0f) {
-                    manager->vertexRed[i] += Group4Vis_Round((float)r * facing);
-                    manager->vertexGreen[i] += Group4Vis_Round((float)g * facing);
-                    manager->vertexBlue[i] += Group4Vis_Round((float)b * facing);
+                    manager->vertexRed[i] += LightingRound((float)r * facing);
+                    manager->vertexGreen[i] += LightingRound((float)g * facing);
+                    manager->vertexBlue[i] += LightingRound((float)b * facing);
                 }
             }
             break;
@@ -315,9 +320,9 @@ void LightManager::LightAny(const Matrix4* matrix, int count, void* normals, voi
     }
 
     for (i = 0; i < count; i++) {
-        *Group4Vis_VertexDiffuse(buffer, i) = Group4Vis_PackOpaque(
-            Group4Vis_Clamp255(manager->vertexRed[i]), Group4Vis_Clamp255(manager->vertexGreen[i]),
-            Group4Vis_Clamp255(manager->vertexBlue[i]));
+        *LightingVertexDiffuse(buffer, i) = LightingPackOpaque(
+            LightingClamp255(manager->vertexRed[i]), LightingClamp255(manager->vertexGreen[i]),
+            LightingClamp255(manager->vertexBlue[i]));
     }
 }
 
@@ -330,70 +335,70 @@ void LightManager::LightOne(const Matrix4* matrix, int count, void* normals, voi
     LightManager* manager = this;
     LightEmitter* emitter = manager->lights[0];
     int i;
-    int r = Group4Vis_ColorByte(emitter->ambientRGBA[0]);
-    int g = Group4Vis_ColorByte(emitter->ambientRGBA[1]);
-    int b = Group4Vis_ColorByte(emitter->ambientRGBA[2]);
+    int r = LightingColorByte(emitter->ambientRGBA[0]);
+    int g = LightingColorByte(emitter->ambientRGBA[1]);
+    int b = LightingColorByte(emitter->ambientRGBA[2]);
     switch (emitter->lightType) {
-    case kGroup4LightPoint: {
+    case kLightPoint: {
         Matrix4 inverse = *matrix;
         Vector3 position;
-        Group4Vis_InvertRigidOne(inverse);
-        Group4Vis_TransformPoint(&position, emitter->lightPosition, inverse);
+        LightingInvertRigidOne(inverse);
+        LightingTransformPoint(&position, emitter->lightPosition, inverse);
         for (i = 0; i < count; i++) {
-            const Vector3* vertex = Group4Vis_VertexPosition(buffer, i);
-            Vector3 direction = Group4Vis_NormalizedByScaleCall(Vector3(
+            const Vector3* vertex = LightingVertexPosition(buffer, i);
+            Vector3 direction = LightingNormalizedByScaleCall(Vector3(
                 position.x - vertex->x, position.y - vertex->y, position.z - vertex->z));
-            float dot = Group4Vis_Dot(direction, Group4Vis_VertexNormal(normals, stride, i));
-            float facing = Group4Vis_Binary32(dot);
+            float dot = LightingDot(direction, LightingVertexNormal(normals, stride, i));
+            float facing = LightingBinary32(dot);
             if (dot > 0.0f) {
-                *Group4Vis_VertexDiffuse(buffer, i) =
-                    Group4Vis_PackOpaque(Group4Vis_Round((float)r * facing - 0.5f),
-                                         Group4Vis_Round((float)g * facing - 0.5f),
-                                         Group4Vis_Round((float)b * facing - 0.5f));
+                *LightingVertexDiffuse(buffer, i) =
+                    LightingPackOpaque(LightingRound((float)r * facing - 0.5f),
+                                         LightingRound((float)g * facing - 0.5f),
+                                         LightingRound((float)b * facing - 0.5f));
             }
         }
         break;
     }
-    case kGroup4LightPositional: {
+    case kLightPositional: {
         Matrix4 inverse = *matrix;
         Vector3 position;
-        Group4Vis_InvertRigidOne(inverse);
-        Group4Vis_TransformPoint(&position, emitter->lightPosition, inverse);
-        position = Group4Vis_NormalizedByScaleCall(position);
+        LightingInvertRigidOne(inverse);
+        LightingTransformPoint(&position, emitter->lightPosition, inverse);
+        position = LightingNormalizedByScaleCall(position);
         for (i = 0; i < count; i++) {
-            float dot = Group4Vis_Dot(position, Group4Vis_VertexNormal(normals, stride, i));
-            float facing = Group4Vis_Binary32(dot);
+            float dot = LightingDot(position, LightingVertexNormal(normals, stride, i));
+            float facing = LightingBinary32(dot);
             if (dot > 0.0f) {
-                *Group4Vis_VertexDiffuse(buffer, i) =
-                    Group4Vis_PackOpaque(Group4Vis_Round((float)r * facing - 0.5f),
-                                         Group4Vis_Round((float)g * facing - 0.5f),
-                                         Group4Vis_Round((float)b * facing - 0.5f));
+                *LightingVertexDiffuse(buffer, i) =
+                    LightingPackOpaque(LightingRound((float)r * facing - 0.5f),
+                                         LightingRound((float)g * facing - 0.5f),
+                                         LightingRound((float)b * facing - 0.5f));
             }
         }
         break;
     }
-    case kGroup4LightDirectional: {
+    case kLightDirectional: {
         Matrix4 inverse = *matrix;
         Vector3 direction;
-        Group4Vis_InvertRigidOne(inverse);
+        LightingInvertRigidOne(inverse);
         Vec3TransformNormal(&direction, -emitter->lightDirection, &inverse);
         float red = (float)r;
         float green = (float)g;
         float blue = (float)b;
         for (i = 0; i < count; i++) {
             float facing =
-                Group4Vis_Binary32(Vec3Dot(Group4Vis_VertexNormal(normals, stride, i), &direction));
-            *Group4Vis_VertexDiffuse(buffer, i) =
-                Group4Vis_PackOpaque(Group4Vis_Round(red * facing - 0.5f),
-                                     Group4Vis_Round(green * facing - 0.5f),
-                                     Group4Vis_Round(blue * facing - 0.5f));
+                LightingBinary32(Vec3Dot(LightingVertexNormal(normals, stride, i), &direction));
+            *LightingVertexDiffuse(buffer, i) =
+                LightingPackOpaque(LightingRound(red * facing - 0.5f),
+                                     LightingRound(green * facing - 0.5f),
+                                     LightingRound(blue * facing - 0.5f));
         }
         break;
     }
-    case kGroup4LightAmbient: {
-        unsigned int color = Group4Vis_PackOpaque(r, g, b);
+    case kLightAmbient: {
+        unsigned int color = LightingPackOpaque(r, g, b);
         for (i = 0; i < count; i++)
-            *Group4Vis_VertexDiffuse(buffer, i) = color;
+            *LightingVertexDiffuse(buffer, i) = color;
         break;
     }
     }
@@ -403,24 +408,24 @@ void LightManager::LightOne(const Matrix4* matrix, int count, void* normals, voi
 // the vertex faces it (`dot` > 0), otherwise the ambient colour alone. When a
 // colour array is pending (storeVertexColors) the clamped sums are kept per vertex
 // too. __forceinline: retail expands it in each of the three loops.
-static __forceinline void Group4Vis_LightOverAmbient(LightManager* manager, void* buffer, int i,
+static __forceinline void LightingOverAmbient(LightManager* manager, void* buffer, int i,
                                                     float dot, int r, int g, int b,
                                                     int ambientR, int ambientG, int ambientB,
                                                     unsigned int ambientColor) {
-    float facing = Group4Vis_Binary32(dot);
+    float facing = LightingBinary32(dot);
     if (dot > 0.0f) {
-        int red = Group4Vis_Round((float)r * facing) + ambientR;
-        int green = Group4Vis_Round((float)g * facing) + ambientG;
-        int blue = Group4Vis_Round((float)b * facing) + ambientB;
-        *Group4Vis_VertexDiffuse(buffer, i) = Group4Vis_PackOpaque(
-            Group4Vis_Clamp255(red), Group4Vis_Clamp255(green), Group4Vis_Clamp255(blue));
+        int red = LightingRound((float)r * facing) + ambientR;
+        int green = LightingRound((float)g * facing) + ambientG;
+        int blue = LightingRound((float)b * facing) + ambientB;
+        *LightingVertexDiffuse(buffer, i) = LightingPackOpaque(
+            LightingClamp255(red), LightingClamp255(green), LightingClamp255(blue));
         if (manager->storeVertexColors) {
-            manager->vertexRed[i] = Group4Vis_Clamp255(red);
-            manager->vertexGreen[i] = Group4Vis_Clamp255(green);
-            manager->vertexBlue[i] = Group4Vis_Clamp255(blue);
+            manager->vertexRed[i] = LightingClamp255(red);
+            manager->vertexGreen[i] = LightingClamp255(green);
+            manager->vertexBlue[i] = LightingClamp255(blue);
         }
     } else {
-        *Group4Vis_VertexDiffuse(buffer, i) = ambientColor;
+        *LightingVertexDiffuse(buffer, i) = ambientColor;
         if (manager->storeVertexColors) {
             manager->vertexRed[i] = ambientR;
             manager->vertexGreen[i] = ambientG;
@@ -441,28 +446,28 @@ void LightManager::LightAmbientPlusOne(const Matrix4* matrix, int count, void* n
     unsigned int ambientColor;
     int other;
     int r, g, b;
-    Group4Vis_InvertRigid(inverse);
+    LightingInvertRigid(inverse);
     // Without an ambient light `other` and the colours stay unset (retail
     // reads an unrelated stack value as the index); the caller rules that out.
     for (i = 0; i < manager->lightCount; i++) {
-        if (manager->lights[i]->lightType == kGroup4LightAmbient) {
+        if (manager->lights[i]->lightType == kLightAmbient) {
             LightEmitter* ambient = manager->lights[i];
-            ambientR = Group4Vis_ColorByte(ambient->ambientRGBA[0]);
-            ambientG = Group4Vis_ColorByte(ambient->ambientRGBA[1]);
-            ambientB = Group4Vis_ColorByte(ambient->ambientRGBA[2]);
-            ambientColor = Group4Vis_PackOpaque(ambientR, ambientG, ambientB);
+            ambientR = LightingColorByte(ambient->ambientRGBA[0]);
+            ambientG = LightingColorByte(ambient->ambientRGBA[1]);
+            ambientB = LightingColorByte(ambient->ambientRGBA[2]);
+            ambientColor = LightingPackOpaque(ambientR, ambientG, ambientB);
             other = 1 - i;
             LightEmitter* emitter = manager->lights[other];
-            r = Group4Vis_ColorByte(emitter->ambientRGBA[0]);
-            g = Group4Vis_ColorByte(emitter->ambientRGBA[1]);
-            b = Group4Vis_ColorByte(emitter->ambientRGBA[2]);
+            r = LightingColorByte(emitter->ambientRGBA[0]);
+            g = LightingColorByte(emitter->ambientRGBA[1]);
+            b = LightingColorByte(emitter->ambientRGBA[2]);
             break;
         }
     }
 
     LightEmitter* emitter = manager->lights[other];
     switch (emitter->lightType) {
-    case kGroup4LightDirectional: {
+    case kLightDirectional: {
         // Retail inlines the negation and the rotation here, grouping each
         // component as (x*m1j + z*m3j) + y*m2j, (z*m32 + y*m22) + x*m12 and
         // (z*m33 + y*m23) + x*m13.
@@ -474,32 +479,32 @@ void LightManager::LightAmbientPlusOne(const Matrix4* matrix, int count, void* n
         toLight.y = (z * inverse._32 + y * inverse._22) + x * inverse._12;
         toLight.z = (z * inverse._33 + y * inverse._23) + x * inverse._13;
         for (i = 0; i < count; i++) {
-            float dot = Group4Vis_Dot(toLight, Group4Vis_VertexNormal(normals, stride, i));
-            Group4Vis_LightOverAmbient(manager, buffer, i, dot, r, g, b, ambientR, ambientG,
+            float dot = LightingDot(toLight, LightingVertexNormal(normals, stride, i));
+            LightingOverAmbient(manager, buffer, i, dot, r, g, b, ambientR, ambientG,
                                        ambientB, ambientColor);
         }
         break;
     }
-    case kGroup4LightPositional: {
+    case kLightPositional: {
         Vector3 toLight;
-        Group4Vis_TransformPoint(&toLight, emitter->lightPosition, inverse);
-        toLight = Group4Vis_NormalizedByConstructor(toLight);
+        LightingTransformPoint(&toLight, emitter->lightPosition, inverse);
+        toLight = LightingNormalizedByConstructor(toLight);
         for (i = 0; i < count; i++) {
-            float dot = Group4Vis_Dot(toLight, Group4Vis_VertexNormal(normals, stride, i));
-            Group4Vis_LightOverAmbient(manager, buffer, i, dot, r, g, b, ambientR, ambientG,
+            float dot = LightingDot(toLight, LightingVertexNormal(normals, stride, i));
+            LightingOverAmbient(manager, buffer, i, dot, r, g, b, ambientR, ambientG,
                                        ambientB, ambientColor);
         }
         break;
     }
-    case kGroup4LightPoint: {
+    case kLightPoint: {
         Vector3 position;
-        Group4Vis_TransformPoint(&position, emitter->lightPosition, inverse);
+        LightingTransformPoint(&position, emitter->lightPosition, inverse);
         for (i = 0; i < count; i++) {
-            const Vector3* vertex = Group4Vis_VertexPosition(buffer, i);
-            Vector3 toLight = Group4Vis_NormalizedByConstructor(
+            const Vector3* vertex = LightingVertexPosition(buffer, i);
+            Vector3 toLight = LightingNormalizedByConstructor(
                 Vector3(position.x - vertex->x, position.y - vertex->y, position.z - vertex->z));
-            float dot = Group4Vis_Dot(toLight, Group4Vis_VertexNormal(normals, stride, i));
-            Group4Vis_LightOverAmbient(manager, buffer, i, dot, r, g, b, ambientR, ambientG,
+            float dot = LightingDot(toLight, LightingVertexNormal(normals, stride, i));
+            LightingOverAmbient(manager, buffer, i, dot, r, g, b, ambientR, ambientG,
                                        ambientB, ambientColor);
         }
         break;
@@ -523,7 +528,7 @@ void LightManager::LightAmbientPlusOne(const Matrix4* matrix, int count, void* n
 // byte first; exact either way since 1/256 is a power of two; the parentheses
 // raise match_one 58 -> 60 aligned but the linked difflib score, then dominated by
 // the old X87FloatToInt emulation, read 0.458 vs 0.477 without). With the
-// Group4Vis_Round FISTP roundings (/QIfist) the body is 163 built vs 167 retail
+// LightingRound FISTP roundings (/QIfist) the body is 163 built vs 167 retail
 // instructions (masked 0.721); the rest is retail's ebp frame and its
 // fstp/fld/fistp-dword helper sequence, which comes from the inline-asm fistp.
 // Ruled out: `/ 256.0f`, `0.00390625f` (same code as `* (1.0f / 256.0f)`); a
@@ -556,8 +561,8 @@ void LightManager::LightVertices(void* matrix, int count, void* vertices, void* 
     const Matrix4* m = (const Matrix4*)matrix;
     if (manager->lightCount == 1)
         LightOne(m, count, vertices, buffer, stride);
-    else if (manager->lightCount == 2 && (manager->lights[0]->lightType == kGroup4LightAmbient ||
-                                          manager->lights[1]->lightType == kGroup4LightAmbient))
+    else if (manager->lightCount == 2 && (manager->lights[0]->lightType == kLightAmbient ||
+                                          manager->lights[1]->lightType == kLightAmbient))
         LightAmbientPlusOne(m, count, vertices, buffer, stride);
     else
         LightAny(m, count, vertices, buffer, stride);
@@ -568,12 +573,12 @@ void LightManager::LightVertices(void* matrix, int count, void* vertices, void* 
             // variable before the next (the colour array is the loop's pointer).
             int r, g, b;
             FistpFloatToInt(&r, ((float)manager->vertexRed[i] * (1.0f / 256.0f)) *
-                                    (float)((*Group4Vis_VertexDiffuse(colors, i) >> 16) & 0xff) - 0.5f);
+                                    (float)((*LightingVertexDiffuse(colors, i) >> 16) & 0xff) - 0.5f);
             FistpFloatToInt(&g, ((float)manager->vertexGreen[i] * (1.0f / 256.0f)) *
-                                    (float)((*Group4Vis_VertexDiffuse(colors, i) >> 8) & 0xff) - 0.5f);
+                                    (float)((*LightingVertexDiffuse(colors, i) >> 8) & 0xff) - 0.5f);
             FistpFloatToInt(&b, ((float)manager->vertexBlue[i] * (1.0f / 256.0f)) *
-                                    (float)(*Group4Vis_VertexDiffuse(colors, i) & 0xff) - 0.5f);
-            *Group4Vis_VertexDiffuse(buffer, i) = ((r << 8 | g) << 8) | b;
+                                    (float)(*LightingVertexDiffuse(colors, i) & 0xff) - 0.5f);
+            *LightingVertexDiffuse(buffer, i) = ((r << 8 | g) << 8) | b;
         }
     }
 }

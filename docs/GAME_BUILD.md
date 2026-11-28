@@ -36,8 +36,9 @@ conversion helper, which preserves the incoming rounding mode on a
 floating-point trap, and the ProjectedShadow near-miss file
 ([below](#projectedshadow-near-miss-bodies)), plus the fistp samples further
 down. Bring-up units under `src/bringup/` may take `/QIfist` (and
-no other flag) through a `bringup_flags` entry with a reason; see
-[Bring-up fistp units](#bring-up-fistp-units). The EBP frame of retail's
+no other flag) through a `bringup_flags` entry with a reason; none does now,
+because the former fistp bring-up bodies are `/QIfist` candidate samples (see
+[Bring-up fistp units](#bring-up-fistp-units)). The EBP frame of retail's
 fistp helper comes from a per-function pragma in the source, not a flag; see
 [Frame-pointer units](#frame-pointer-units). Every actual per-source command is recorded in the report. Other source
 files retain the default flags. Objects are ordered by source basename,
@@ -819,6 +820,24 @@ clearly more faithful, the game now links the sample's text:
     0x005135f0, `UpdateSuspensionProbe` 0x00514550) on the real `Tire`, and
     the other views are link aliases of strict-exact providers (the
     `link_aliases` table below).
+  - The eight `/QIfist` bring-up files (2026-11-28) are now candidate
+    samples, because no canonical unit defines their bodies and each body
+    needs the flag ([Bring-up fistp units](#bring-up-fistp-units)):
+    `Group1_ParticleRender.cpp` (`samples/physics/effects/ParticleRender.cpp`),
+    `Group3_TerrainPrepareGeometry.cpp`
+    (`samples/physics/broadphase/TerrainPrepareGeometry.cpp`),
+    `Group4_GridLighting.cpp` and `Group4_GridLightColor.cpp`
+    (`samples/render/LightManagerLighting.cpp`, `LightColorByte.cpp`),
+    `Group4_DropTextOverlayTick.cpp` (`samples/track/DropTextOverlayTick.cpp`),
+    `Group4_SceneTick.cpp` (`samples/game/SceneTick.cpp`),
+    `Group4_ScoreBoard.cpp` (`samples/race/BonusObjectManagerShowValue.cpp`)
+    and `Group4_Visibility.cpp`
+    (`samples/physics/visibility/VisibilityTestBox.cpp`). The function
+    bytes are the same as before. Render3D reaches `Game::renderTarget`,
+    `Game::bladeRenderer`, `ParticleCornerVertex` and the new
+    `ParticleVertexBuffer::ProcessVertices` and `ParticleScreenRect`
+    (ParticleManager.h) in place of its views. PrepareGeometry casts its
+    render context to `RenderTarget` for `currentCamera`.
 - `Group4_EcoBridges.cpp` lost its five forwarders, then its shared
   normal-distribution pointer, which `NormalDistribution.cpp` now defines.
 - The BikeRace near misses (`Create`, `CreateRacers`, `AimCamera`,
@@ -1148,10 +1167,10 @@ Two more bring-up bodies that rounded with `X87FloatToInt` moved into
 
 The bodies were removed from the former `src/bringup/Group3_KrustyBikeAISupport.cpp`
 and the former `src/bringup/Group4_Overlay.cpp`. `DropTextOverlay::Tick` (0x0051b070)
-stays a bring-up body, because `dropSeconds` near zero could push its
-drop outside `int`, where the 64-bit store would differ from retail's. It now
+stayed a bring-up body at first, because `dropSeconds` near zero could push its
+drop outside `int`, where the 64-bit store would differ from retail's. It
 rounds through the range-checked helper ([below](#bring-up-fistp-units)) and
-lives in `src/bringup/Group4_DropTextOverlayTick.cpp`
+is now the candidate sample `samples/track/DropTextOverlayTick.cpp`
 ([Frame-pointer units](#frame-pointer-units)).
 
 Both were checked against the retail disassembly. The trick pick keeps the
@@ -1177,24 +1196,27 @@ trick pick 0.804); the epilogue and the spill remain.
 
 ## Bring-up fistp units
 
-Bring-up bodies that are not candidate samples round through
-`FistpFloatToInt` too. Their units are compiled with `/QIfist` through
-`bringup_flags` in `config/game_build.json`. Each entry names one existing
-`src/bringup/*.cpp` file, gives `/QIfist`, and has a reason;
-`tools/build_game.py` rejects anything else. Bring-up units are compiled only
-by the game build (calibration and the physics runner do not see them), so
-the flag changes no scored calibration object. `src/bringup/X87FloatToInt.h`
-stays for the canonical and sample callers listed below.
+The bodies below were bring-up units compiled with `/QIfist` through
+`bringup_flags` in `config/game_build.json`. On 2026-11-28 they moved to
+`/QIfist` candidate samples (`candidate_sources`, status reviewed-nonexact,
+the reason citing each emu case); none of the canonical units defines them.
+Each sample compiles to the same function bytes as its former bring-up
+object, and its emu case differs in as many runs as before. `bringup_flags`
+remains for `src/bringup/*.cpp` files: each entry names one existing file,
+gives `/QIfist`, and has a reason; `tools/build_game.py` rejects anything
+else. The list is empty now. `src/bringup/X87FloatToInt.h` stays for the
+canonical and sample callers listed below.
 
 `/QIfist` applies to a whole translation unit, so each flagged unit was
 compiled without the flag and its `__ftol` calls were listed. In the flagged
-units, every `__ftol` call comes from a fistp site. Retail-truncating casts
+files, every `__ftol` call comes from a fistp site. Retail-truncating casts
 were moved out, not converted:
 
-- `Group4_GridLighting.cpp` light colours (`(int)(colour * 255)`, retail
-  `__ftol` at 0x0049e7b1 and the other worker sites) now live in
-  `Group4_GridLightColor.cpp`, which is compiled without the flag. They were
-  already called out of line before the split.
+- The `LightManager` workers' light colours (`(int)(colour * 255)`, retail
+  `__ftol` at 0x0049e7b1 and the other worker sites) live in
+  `samples/render/LightColorByte.cpp` (`LightingColorByte`), which is compiled
+  without the flag; the workers are in `samples/render/LightManagerLighting.cpp`.
+  They were already called out of line before the split.
 - `Character::ApplyFourMotionBlendAtPhase` left the KrustyBike bring-up (it is now the
   candidate sample described under [Four-pose motion blend](#four-pose-motion-blend)).
   The 15 and 3 `__ftol` truncations of 0x00492ad0 and 0x00493660, which retail also
@@ -1206,19 +1228,19 @@ or when only its low bits are kept. `FistpFloatToIntChecked` casts to
 `int`. It is used where no range argument holds. The range arguments
 (inference from the data flow) are written in each file's header comment.
 
-| VA | Function | Unit | Helper and range | Before | Now linked |
+| VA | Function | File | Helper and range | Before | Now linked |
 |---|---|---|---|---|---|
-| 0x0048d1e0 | `BonusObjectManager::ShowValue` | `Group4_ScoreBoard.cpp` | plain; small scores | 0.485 | 0.681 |
-| 0x0049e4a0 | `LightManager::LightVertices` | `Group4_GridLighting.cpp` | plain; colour bytes times facing values | 0.458 | 0.745 |
+| 0x0048d1e0 | `BonusObjectManager::ShowValue` | `samples/race/BonusObjectManagerShowValue.cpp` | plain; small scores | 0.485 | 0.681 |
+| 0x0049e4a0 | `LightManager::LightVertices` | `samples/render/LightManagerLighting.cpp` | plain; colour bytes times facing values | 0.458 | 0.745 |
 | 0x0049e6b0 | `LightAny` worker | same | same | 0.209 | 0.774 |
 | 0x0049f1c0 | `LightOne` worker | same | same | 0.168 | 0.705 |
 | 0x0049f8d0 | `LightAmbientPlusOne` worker | same | same | 0.206 | 0.714 |
 | 0x004a9050 | `Character::ApplyFourMotionBlendAtPhase` | `CharacterMotionFourPose.cpp` (sample, `/QIfist /Op`) | plain; frame index | 0.103 | 0.727 |
-| 0x004bac60 | `ParticleManager::Render3D` | `Group1_ParticleRender.cpp` | plain; only the low byte is kept | 0.608 | 0.675 |
-| 0x004eab00 | `Scene::Tick` | `Group4_SceneTick.cpp` | plain; [-0.5, count - 0.5) | 0.637 | 0.686 |
-| 0x00507610 | `Terrain::PrepareGeometry` | `Group3_TerrainPrepareGeometry.cpp` | plain; focal length in pixels | 0.781 | 0.929 |
-| 0x0051b070 | `DropTextOverlay::Tick` | `Group4_DropTextOverlayTick.cpp` | checked; `dropSeconds` may be near zero | 0.315 | 0.607 |
-| 0x0052f570 | `VisibilityClipper::TestBox` | `Group4_Visibility.cpp` | checked; a corner near the eye plane | 0.485 | 0.689 |
+| 0x004bac60 | `ParticleManager::Render3D` | `samples/physics/effects/ParticleRender.cpp` | plain; only the low byte is kept | 0.608 | 0.675 |
+| 0x004eab00 | `Scene::Tick` | `samples/game/SceneTick.cpp` | plain; [-0.5, count - 0.5) | 0.637 | 0.686 |
+| 0x00507610 | `Terrain::PrepareGeometry` | `samples/physics/broadphase/TerrainPrepareGeometry.cpp` | plain; focal length in pixels | 0.781 | 0.929 |
+| 0x0051b070 | `DropTextOverlay::Tick` | `samples/track/DropTextOverlayTick.cpp` | checked; `dropSeconds` may be near zero | 0.315 | 0.607 |
+| 0x0052f570 | `VisibilityClipper::TestBox` | `samples/physics/visibility/VisibilityTestBox.cpp` | checked; a corner near the eye plane | 0.485 | 0.689 |
 
 Scores are masked linked-body scores with `/QIfist` alone; the
 [Frame-pointer units](#frame-pointer-units) table gives them with the frame
@@ -1935,7 +1957,8 @@ needed a fix. The emu counts below are at 0x007f with seed 11.
 
 ### Grid lighting workers
 
-The three workers in `Group4_GridLighting.cpp` were rewritten from the
+The three workers in `samples/render/LightManagerLighting.cpp` (then
+`src/bringup/Group4_GridLighting.cpp`) were rewritten from the
 retail disassembly on 2026-11-11 (masked linked scores 0.236, 0.240 and
 0.213 before; the table gives the scores after). They are unbound, so they
 were scored against their retail VAs as above.
@@ -1953,11 +1976,11 @@ were scored against their retail VAs as above.
 - `LightAmbientPlusOne` has one vertex loop per light type and takes both
   lights' colours where the search finds the ambient light, as retail does.
 - The facing value is stored as binary32 before the colour multiplies
-  (`Group4Vis_Binary32`). Retail's inline-asm helper forces that value to
+  (`LightingBinary32`). Retail's inline-asm helper forces that value to
   memory (`fst [facing]`); under `/QIfist` VC6 would keep the unrounded
   register value. That changes exact ties by one, for example a 0.6/0.8 axis
   normal at 53-bit precision.
-- `Group4Vis_Dot` and `Group4Vis_TransformPointAny` are `__forceinline`.
+- `LightingDot` and `LightingTransformPointAny` are `__forceinline`.
   `LightAny` expands them at every site, but its later sites fall outside
   VC6's inline budget.
 
@@ -2032,15 +2055,15 @@ configured flags.
 
 | Unit | Function (retail VA) | Decision | Masked | Strict | Emu |
 |---|---|---|---|---|---|
-| `Group1_ParticleRender.cpp` | Render3D 0x004bac60 | pragma (was `/Oy-`, same bytes) | 0.675 -> 0.712 | 0.413 -> 0.446 | 0 / 2000 |
-| `Group3_TerrainPrepareGeometry.cpp` | PrepareGeometry 0x00507610 | pragma (was `/Oy-`) | 0.929 -> 0.979 | 0.777 -> 0.925 | 56 / 2000, all out of `int` (below) |
-| `Group4_GridLighting.cpp` | LightVertices 0x0049e4a0, LightAny 0x0049e6b0, LightOne 0x0049f1c0, LightAmbientPlusOne 0x0049f8d0 (one region) | pragma (was `/Oy-`) | 0.745 -> 0.752 -> 0.754, 0.774 -> 0.823, 0.705 -> 0.719, 0.714 -> 0.718 | 0.497 -> 0.639 -> 0.677, 0.345 -> 0.590, 0.302 -> 0.367, 0.293 -> 0.353 | 0 / 600 (third sweep) |
-| `Group4_DropTextOverlayTick.cpp` | DropTextOverlay::Tick 0x0051b070 | pragma (was `/Oy-`) | 0.607 -> 0.674 | 0.517 -> 0.587 | 0 / 2000 |
-| `Group4_ScoreBoard.cpp` | ShowValue 0x0048d1e0, with `Group4Ovl_ShowModel` (no retail body) | pragma (was `/Oy-`); then the show helper inline by reference and Normalize's length order | 0.681 -> 0.715 -> 0.867 | 0.334 -> 0.455 -> 0.608 | 0 / 4000 |
-| `Group4_Visibility.cpp` | TestBox 0x0052f570 | pragma (was `/Oy-`); then the outcode in the corner loop and per-use corner/viewport reads | 0.689 -> 0.697 -> 0.796 | 0.342 -> 0.443 -> 0.669 | 0 / 2000 |
+| `ParticleRender.cpp` (sample) | Render3D 0x004bac60 | pragma (was `/Oy-`, same bytes) | 0.675 -> 0.712 | 0.413 -> 0.446 | 0 / 2000 |
+| `TerrainPrepareGeometry.cpp` (sample) | PrepareGeometry 0x00507610 | pragma (was `/Oy-`) | 0.929 -> 0.979 | 0.777 -> 0.925 | 56 / 2000, all out of `int` (below) |
+| `LightManagerLighting.cpp` (sample) | LightVertices 0x0049e4a0, LightAny 0x0049e6b0, LightOne 0x0049f1c0, LightAmbientPlusOne 0x0049f8d0 (one region) | pragma (was `/Oy-`) | 0.745 -> 0.752 -> 0.754, 0.774 -> 0.823, 0.705 -> 0.719, 0.714 -> 0.718 | 0.497 -> 0.639 -> 0.677, 0.345 -> 0.590, 0.302 -> 0.367, 0.293 -> 0.353 | 0 / 600 (third sweep) |
+| `DropTextOverlayTick.cpp` (sample) | DropTextOverlay::Tick 0x0051b070 | pragma (was `/Oy-`) | 0.607 -> 0.674 | 0.517 -> 0.587 | 0 / 2000 |
+| `BonusObjectManagerShowValue.cpp` (sample) | ShowValue 0x0048d1e0, with `ShowBonusModel` (no retail body) | pragma (was `/Oy-`); then the show helper inline by reference and Normalize's length order | 0.681 -> 0.715 -> 0.867 | 0.334 -> 0.455 -> 0.608 | 0 / 4000 |
+| `VisibilityTestBox.cpp` (sample) | TestBox 0x0052f570 | pragma (was `/Oy-`); then the outcode in the corner loop and per-use corner/viewport reads | 0.689 -> 0.697 -> 0.796 | 0.342 -> 0.443 -> 0.669 | 0 / 2000 |
 | `DropTextOverlaySetup.cpp` (sample) | Setup 0x0051af00 | pragma (was `/Oy-`) | 0.632 -> 0.853 | 0.272 -> 0.701 | 0 / 2000 |
 | `CharacterMotionFourPose.cpp` (sample) | ApplyFourMotionBlendAtPhase | pragma (was `/Oy-`) | 0.727 -> 0.758 | 0.168 -> 0.414 | 0 / 3000 |
-| `Group4_SceneTick.cpp` | Scene::Tick 0x004eab00 | pragma; then per-use entry reads and the advance written out | 0.686 -> 0.701 -> 0.941 | 0.334 -> 0.363 -> 0.725 | 0 / 2000 |
+| `SceneTick.cpp` (sample) | Scene::Tick 0x004eab00 | pragma; then per-use entry reads and the advance written out | 0.686 -> 0.701 -> 0.941 | 0.334 -> 0.363 -> 0.725 | 0 / 2000 |
 | `KrustyBikeTrickPick.cpp` (sample) | PickTrick 0x0048d780 | pragma | 0.773 -> 0.804 | 0.599 -> 0.776 | 0 / 2000 |
 | `KrustyBikeSelectRiderPose.cpp` (sample) | SelectRiderPose 0x0048e3e0 | pragma; then clamp polarity, folded product, per-arm stores | 0.682 -> 0.729 -> 0.789 | 0.652 -> 0.686 -> 0.744 | 0 / 600 (third sweep) |
 | `CharacterMotionStart.cpp` (sample) | ApplyMotionAtPhase | pragma | 0.633 -> 0.667 | 0.200 -> 0.381 | 0 / 2000 |

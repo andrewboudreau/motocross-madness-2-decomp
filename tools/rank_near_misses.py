@@ -254,6 +254,16 @@ def physics_sources(root: Path) -> frozenset:
     return frozenset(out)
 
 
+@functools.lru_cache(maxsize=None)
+def game_build_candidates(root: Path) -> frozenset:
+    """Sample paths config/game_build.json links into the game (candidate_sources)."""
+    try:
+        spec = json.loads((root / 'config/game_build.json').read_text(encoding='utf-8'))
+    except (OSError, ValueError):
+        return frozenset()
+    return frozenset(c['path'] for c in spec.get('candidate_sources', []) if c.get('path'))
+
+
 def compile_one(root: Path, vc6_root: str, cpp: Path, obj: Path) -> str | None:
     cmd = [sys.executable, str(root / 'tools/compile.py'), '--compiler', 'vc6', '--vc6-root', vc6_root,
            '--profile', 'vc6_o2_mt', str(cpp), '-o', str(obj)]
@@ -262,7 +272,8 @@ def compile_one(root: Path, vc6_root: str, cpp: Path, obj: Path) -> str | None:
     rel = cpp.resolve().relative_to(root).as_posix()
     if 'krusty2' in rel or rel.startswith('samples/physics/') or cpp.resolve() in physics_sources(root):
         cmd += ['--include', str(root / 'src/krusty2')]
-    elif rel.startswith(('src/bringup/', 'src/reconstructed/')):  # the game build's include path (config/game_build.json)
+    elif rel.startswith(('src/bringup/', 'src/reconstructed/')) or rel in game_build_candidates(root):
+        # the game build's include path (config/game_build.json)
         cmd += ['--include', str(root / 'src/krusty2'), '--include', str(root / 'src/reconstructed')]
     env = dict(os.environ, PYTHONPATH=str(root))
     p = subprocess.run(cmd, capture_output=True, text=True, encoding='latin-1', env=env, cwd=root)

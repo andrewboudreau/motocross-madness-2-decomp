@@ -1,5 +1,10 @@
-// Bring-up definition (best-guess-unreviewed) for 0x0048d1e0, the bonus
-// counter's value display. KrustyBike.cpp reaches the object at
+// BonusObjectManagerShowValue.cpp -- BonusObjectManager::ShowValue (0x0048d1e0, 864 bytes
+// to padding, ret 8), the bonus counter's value display, of
+// D:\aardvark\VC\krusty2\Krusty3DObjects.cpp (canonical source
+// src/reconstructed/Krusty3DObjects.cpp, which does not define it).  Status:
+// reviewed-nonexact.  The game build links it with /QIfist (config/game_build.json
+// candidate_sources) in place of the former src/bringup/Group4_ScoreBoard.cpp copy.
+// KrustyBike.cpp reaches the object at
 // BikeRace+0xbc as KbScoreBoard (KrustyBikeTypes.h); it is the race's
 // BonusObjectManager (Krusty3DObjects.h declares the same address as
 // BonusObjectManager::ShowValue). The body is written from the decoded
@@ -14,9 +19,9 @@
 // last-bit difference in the squared eye distance under 53-bit precision (18 of
 // 2000 runs), fixed by building the vector in a local; now 0 of 6000 runs differ
 // under 53- and 24-bit precision.
-// Rounding: the game build compiles this unit with /QIfist (config/game_build.json
-// bringup_flags), so FistpFloatToInt's cast is a FISTP under the current rounding
-// mode, as retail's helper; these two are the unit's only float-to-int conversions.
+// Rounding: the game build compiles this file with /QIfist (config/game_build.json
+// candidate_sources), so FistpFloatToInt's cast is a FISTP under the current rounding
+// mode, as retail's helper; these two are the file's only float-to-int conversions.
 // Range (inference from the callers): `points` is one trick sequence's score, which
 // the caller (KrustyBike 0x00495ff0) converts to int itself after multiplying it by
 // the multiplier (>= 1), and the multiplier is a trick count plus 0.5, so both
@@ -30,11 +35,11 @@
 // zero vector (0.834, retail's 0x0067c308 belongs to Krusty3DObjects.cpp), scaling through
 // the reference (0.816), the y,x,z and x,y,z sum orders (0.816). Remaining: the asm fistp
 // helper, and retail's places = 5 block placed at the function end.
-#include "../reconstructed/BikeRaceCore.h"
-#include "../krusty2/vehicle/KrustyBikeCore.h"
-#include "../reconstructed/Krusty3DObjects.h"
-#include "../reconstructed/Camera.h"
-#include "../../samples/common/FistpFloatToInt.h"
+#include "../../src/reconstructed/BikeRaceCore.h"
+#include "../../src/krusty2/vehicle/KrustyBikeCore.h"
+#include "../../src/reconstructed/Krusty3DObjects.h"
+#include "../../src/reconstructed/Camera.h"
+#include "../common/FistpFloatToInt.h"
 
 float FastSqrt(float x); // 0x00460b50
 
@@ -44,7 +49,7 @@ float FastSqrt(float x); // 0x00460b50
 // frame pointer for it and its helper, which retail expands inside it
 // (docs/GAME_BUILD.md#frame-pointer-units).
 #pragma optimize("y", off)
-static inline void Group4Ovl_ShowModel(BonusObjectManager* self, D3DIMSoultreeObject*& model)
+static inline void ShowBonusModel(BonusObjectManager* self, D3DIMSoultreeObject*& model)
 {
     model->ClearFlag14c();
     model->subtreeDirty = 1;
@@ -68,12 +73,12 @@ void BonusObjectManager::ShowValue(float points, float multiplier)
     FistpFloatToInt(&remaining, points);
     remaining /= 100;
     self->shownDigits[0] = 0;
-    Group4Ovl_ShowModel(self, self->digitModels[0][0]);
+    ShowBonusModel(self, self->digitModels[0][0]);
     self->shownDigits[1] = 0;
-    Group4Ovl_ShowModel(self, self->digitModels[0][1]);
+    ShowBonusModel(self, self->digitModels[0][1]);
     for (place = 2; place < places; place++) {
         int digit = remaining % 10;
-        Group4Ovl_ShowModel(self, self->digitModels[digit][place]);
+        ShowBonusModel(self, self->digitModels[digit][place]);
         self->shownDigits[place] = digit;
         remaining /= 10;
     }
@@ -82,12 +87,12 @@ void BonusObjectManager::ShowValue(float points, float multiplier)
         FistpFloatToInt(&tenths, multiplier * 10.0f);
         for (place = 0; place < 2; place++) {
             int digit = tenths % 10;
-            Group4Ovl_ShowModel(self, self->fractionDigitModels[digit][place]);
+            ShowBonusModel(self, self->fractionDigitModels[digit][place]);
             self->shownFractionDigits[place] = digit;
             tenths /= 10;
         }
-        Group4Ovl_ShowModel(self, self->timesModel);
-        Group4Ovl_ShowModel(self, self->decimalPointModel);
+        ShowBonusModel(self, self->timesModel);
+        ShowBonusModel(self, self->decimalPointModel);
     }
     int resize = 0;
     self->NextKey();

@@ -1,13 +1,17 @@
-// Bring-up definitions (best-guess-unreviewed) for the visibility clipper
-// 0x00575a98 (VisibilityQuadTree.cpp's code range 0x0052f080..0x0052fdc0).
+// VisibilityTestBox.cpp -- VisibilityClipper::TestBox (0x0052f570, 1358 bytes to padding,
+// ret 0x1c) of the visibility clipper 0x00575a98, in VisibilityQuadTree.cpp's code range
+// 0x0052f080..0x0052fdc0 (canonical source src/krusty2/visibility/VisibilityQuadTree.cpp,
+// which does not define it; its own casts truncate through __ftol).  Status:
+// reviewed-nonexact.  The game build links it with /QIfist (config/game_build.json
+// candidate_sources) in place of the former src/bringup/Group4_Visibility.cpp copy.
 //
 //  * VisibilityClipper::TestBox (0x0052f570, ret 0x1c) written from the
 //    decoded retail function. Retail rounds the screen rectangle with an
 //    inline x87 fistp helper (current rounding mode, round-to-nearest-even;
-//    0x0052f92a .. 0x0052fa17).  The game build compiles this unit with
-//    /QIfist (config/game_build.json bringup_flags), so
-//    FistpFloatToIntChecked's cast is a FISTP under the current rounding mode;
-//    the six roundings are the unit's only float-to-int conversions.  The
+//    0x0052f92a .. 0x0052fa17).  The game build compiles this file with
+//    /QIfist, so FistpFloatToIntChecked's cast is a FISTP under the current
+//    rounding mode; the six roundings are the file's only float-to-int
+//    conversions.  The
 //    range check stays: a box corner near or behind the eye plane (small or
 //    negative w) projects outside int, or to an infinity or NaN when w is 0,
 //    where retail's 32-bit store gives 0x80000000 and a bare 64-bit store
@@ -25,7 +29,7 @@
 //    Retail's body has the EBP frame of its inline-asm helper, which a
 //    pragma keeps for TestBox (docs/GAME_BUILD.md#frame-pointer-units).
 //    Session 23 shapes (masked 0.656 -> 0.720 in tools/match_one terms):
-//    the corner outcode written out in the loop on s_group4BoxCorners[i]
+//    the corner outcode written out in the loop on s_boxCorners[i]
 //    (an inline taking floats by value copies w and x to temporaries; one
 //    taking the point keeps a corner pointer at .w, retail indexes from .y),
 //    one `code` shared by the centre and corner tests (retail's frame
@@ -40,13 +44,13 @@
 #include <math.h>
 
 #include "visibility/VisibilityQuadTree.h"
-#include "../reconstructed/Camera.h"
-#include "../../samples/common/FistpFloatToInt.h"
+#include "../../../src/reconstructed/Camera.h"
+#include "../../common/FistpFloatToInt.h"
 
 // The eight clip-space box corners (0x0068abc8, 8 x 0x20 bytes). TestBox
 // writes them and then turns the first two floats of each into screen
-// coordinates in place. Only TestBox touches them in this unit.
-static VisibilityClipPoint s_group4BoxCorners[8];
+// coordinates in place. Only TestBox touches them.
+static VisibilityClipPoint s_boxCorners[8];
 
 
 // 0x0052f570. Box (center +- extent) against the frustum of `matrix`
@@ -135,21 +139,21 @@ int VisibilityClipper::TestBox(Camera* camera, const float* matrix, const float*
         // Outcode against 0 <= x, y, z <= w: x 1/2, y 4/8, z 0x10/0x20 (below /
         // above), y first, compared with the double 0.0 at 0x005507e8.
         code = 0;
-        s_group4BoxCorners[i].w = px3[a] + py3[b] + pz3[c] + m[15];
-        s_group4BoxCorners[i].x = px0[a] + py0[b] + pz0[c] + m[12];
-        s_group4BoxCorners[i].y = px1[a] + py1[b] + pz1[c] + m[13];
-        s_group4BoxCorners[i].z = px2[a] + py2[b] + pz2[c] + m[14];
-        if (s_group4BoxCorners[i].y < 0.0)
+        s_boxCorners[i].w = px3[a] + py3[b] + pz3[c] + m[15];
+        s_boxCorners[i].x = px0[a] + py0[b] + pz0[c] + m[12];
+        s_boxCorners[i].y = px1[a] + py1[b] + pz1[c] + m[13];
+        s_boxCorners[i].z = px2[a] + py2[b] + pz2[c] + m[14];
+        if (s_boxCorners[i].y < 0.0)
             code = 4;
-        else if (s_group4BoxCorners[i].w - s_group4BoxCorners[i].y < 0.0)
+        else if (s_boxCorners[i].w - s_boxCorners[i].y < 0.0)
             code = 8;
-        if (s_group4BoxCorners[i].x < 0.0)
+        if (s_boxCorners[i].x < 0.0)
             code |= 1;
-        else if (s_group4BoxCorners[i].w - s_group4BoxCorners[i].x < 0.0)
+        else if (s_boxCorners[i].w - s_boxCorners[i].x < 0.0)
             code |= 2;
-        if (s_group4BoxCorners[i].z < 0.0)
+        if (s_boxCorners[i].z < 0.0)
             code |= 0x10;
-        else if (s_group4BoxCorners[i].w - s_group4BoxCorners[i].z < 0.0)
+        else if (s_boxCorners[i].w - s_boxCorners[i].z < 0.0)
             code |= 0x20;
         if (code == 0) {
             if (!screenRect && !cornersInside)
@@ -170,7 +174,7 @@ int VisibilityClipper::TestBox(Camera* camera, const float* matrix, const float*
     }
 
     if (screenRect) {
-        VisibilityClipPoint* corner = &s_group4BoxCorners[0];
+        VisibilityClipPoint* corner = &s_boxCorners[0];
         float inverse = 1.0f / corner->w;
         corner->x = (float)camera->viewport[2] * inverse * corner->x;
         corner->y = (float)camera->viewport[3] * inverse * corner->y;
@@ -179,7 +183,7 @@ int VisibilityClipper::TestBox(Camera* camera, const float* matrix, const float*
         screenRect[3] = screenRect[1];
         screenRect[2] = screenRect[0];
         for (i = 1; i < 8; i++) {
-            corner = &s_group4BoxCorners[i];
+            corner = &s_boxCorners[i];
             inverse = 1.0f / corner->w;
             corner->x = corner->x * ((float)camera->viewport[2] * inverse);
             corner->y = ((float)camera->viewport[3] * corner->y) * inverse;

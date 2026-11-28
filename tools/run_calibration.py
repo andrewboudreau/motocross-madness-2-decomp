@@ -27478,13 +27478,13 @@ CASES += [
     },
     {
         'name': 'ParticleManager::Render3D s_particleWorld atexit stub',
-        'bindings': 'src/bringup/Group1_ParticleRender.bindings.json',
-        'source': 'src/bringup/Group1_ParticleRender.cpp',
+        'bindings': 'samples/physics/effects/ParticleRender.bindings.json',
+        'source': 'samples/physics/effects/ParticleRender.cpp',
         'symbol': '_$E2',
         'target_va': '0x004bb620', 'target_size': 1,
         'includes': ['src/krusty2', 'src/reconstructed'],
         'reason': 'static s_particleWorld (Matrix4 0x006898f8, guard 0x00689154 bit 1): Render3D (0x004bac60, linked from '
-                  'this bring-up file) pushes 0x004bb620 at 0x004bacbb',
+                  'this /QIfist candidate sample) pushes 0x004bb620 at 0x004bacbb',
     },
 ]
 
