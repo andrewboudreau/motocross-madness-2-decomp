@@ -72,7 +72,7 @@ PARTIAL = (
     # Retiring the GridCamera, Grid1Camera and TerrainCamera views (Terrain.cpp
     # now includes Camera.h) renumbers it again ($L6325 -> $L6486); the body
     # bytes and the other 64 relocation records are identical.
-    ('?Load@Terrain@@', 2117, '7c41d9d7a2754d7bfa64bb40f6af0369f96451f5f639117563250b5fe564a5aa'),
+    ('?Load@Terrain@@', 2117, '2e77ea4c2ff6286cd84dc2a9bedb9a50172e105fb08209d1d6e5511c83678d1d'),
     # Intentional cell-conversion repair, verified at the actual first-cell
     # boundary in test_terrain_cell_conversion; full interpolation remains partial.
     # The sampler, dot and triangle provider names are now canonical, with

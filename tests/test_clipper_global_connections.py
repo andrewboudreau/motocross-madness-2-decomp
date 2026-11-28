@@ -1,4 +1,4 @@
-"""Six clipper declarations share a pointer import without inventing target storage."""
+"""Six clipper declarations share one pointer; only VisibilityQuadTree.cpp defines it."""
 import hashlib
 import json
 import os
@@ -16,6 +16,11 @@ from tools.run_calibration import CASES
 
 ROOT = Path(__file__).resolve().parents[1]
 CANONICAL = '?g_visibilityClipper@@3PAVVisibilityClipper@@A'
+# The cell 0x00575a98 lies in VisibilityQuadTree.cpp's .data (after its __FILE__
+# literal 0x00575a3c, before wrecker.cpp's 0x00575ab8), and its target 0x0068acd4
+# lies between the unit's kVec3XAxis and kVec3YAxis in .bss. The target's type
+# (an empty VisibilityClipper) is a best guess.
+DEFINER = 'src/krusty2/visibility/VisibilityQuadTree.cpp'
 SOURCES = (
     'src/reconstructed/CubeDraw.cpp',
     'src/reconstructed/FollowCamera.cpp',
@@ -124,7 +129,7 @@ class ClipperGlobalConnectionsTests(unittest.TestCase):
         self.assertGreaterEqual(0x68acd4, pe.image_base + target_section.virtual_address + target_section.raw_size)
         self.assertLess(0x68acd4, pe.image_base + target_section.virtual_address + target_section.virtual_size)
         # These no-op initializer bytes do not encode a receiver or target size.
-        # They remain evidence limits, not a basis for inventing singleton storage.
+        # They remain evidence limits: the target's type stays a best guess.
         self.assertEqual(pe.bytes_at_va(0x566570, 4), struct.pack('<I', 0x52f080))
         self.assertEqual(pe.bytes_at_va(0x52f080, 5), b'\xe9\x0b\0\0\0')
         self.assertEqual(pe.bytes_at_va(0x52f090, 1), b'\xc3')
@@ -148,7 +153,11 @@ class ClipperGlobalConnectionsTests(unittest.TestCase):
                 self.assertTrue(all(suffix in FILENAMES for _, suffix in filenames))
                 self.assertFalse(set(pins['renames']) & {symbol.name for symbol in obj.symbols})
                 occurrences = [symbol for symbol in obj.symbols if symbol.name == CANONICAL]
-                self.assertTrue(all(symbol.section_number == 0 and symbol.value == 0 for symbol in occurrences))
+                if source == DEFINER:
+                    self.assertEqual([(obj.section(symbol.section_number).name, symbol.value)
+                                      for symbol in occurrences], [('.data', 0)])
+                else:
+                    self.assertTrue(all(symbol.section_number == 0 and symbol.value == 0 for symbol in occurrences))
                 imports = [r for r in obj.relocations
                            if not obj.sections[r.section_number - 1].name.startswith('.debug')
                            and obj.symbol_by_index[r.symbol_index].name == CANONICAL]
@@ -194,7 +203,10 @@ class ClipperGlobalConnectionsTests(unittest.TestCase):
             # VisibilityQuadTree.cpp (88 -> 89 sections, 342 -> 395 relocations): the
             # sample's duplicate directive section disappears, and the exact Traverse
             # keeps one recursive call that the sample's cross-jump had merged.
-            self.assertEqual(sum(row['sections'] for row in pins['objects'].values()), 940)
+            # VisibilityQuadTree.cpp then took the pointer's definition from the
+            # Group1_Globals bring-up: one .data section and its relocation (89 -> 90,
+            # 395 -> 396).
+            self.assertEqual(sum(row['sections'] for row in pins['objects'].values()), 941)
             # The corrected camera loader adds its explicit first-cross call relocation.
             # QueryGround's emulation-found normal/height repairs drop one Terrain relocation.
             # The D3DIMSoultreeShadow slot 30 frame pragma takes ebp, so the shadow-point
@@ -202,7 +214,7 @@ class ClipperGlobalConnectionsTests(unittest.TestCase):
             # LoadTexturesAndCoords' promotion moves its COMDAT from the sample to CubeDraw.cpp
             # and the rewritten BuildFaceGeometry differs: three more relocations.
             # BuildFaceGeometry's own promotion keeps all 41 of its relocations.
-            self.assertEqual(sum(row['relocations'] for row in pins['objects'].values()), 4590)
+            self.assertEqual(sum(row['relocations'] for row in pins['objects'].values()), 4591)
         print('Clipper global:', strict, 'strict checks; 10 whole objects; 46 retail pointer loads; storage remains unresolved')
 
 

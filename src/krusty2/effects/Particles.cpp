@@ -20,7 +20,7 @@ static inline ParticleVec3 ParticleNormalize(const ParticleVec3& v)
 }
 
 // 0x00689158: sprite-cell corner texture coordinates (61 cells; this file's .bss).
-extern ParticleUVRect g_particleCellUVs[61];
+ParticleUVRect g_particleCellUVs[61];
 
 ParticleManager::ParticleManager(int flags) : GameObject(flags)
 {

@@ -188,12 +188,13 @@ exact or a documented near miss.
 ## Remaining uncertainty
 
 All type, member and function names are provisional. `GridTerrain`,
-`GridVisibilityClipper` and `GridAgeManager` are boundary views of classes
-reconstructed elsewhere, or not yet reconstructed, as are `GridRenderDevice`
-(Terrain+0x18, thiscall virtuals) and `GridGameSettings` (`0x0056e26c`). The
-node texture (GridNodeExtra+0x08) is the real `ManagedTexture` and the vertex
-lighting object (Terrain+0xc40) the real `LightManager`;
-only their called slots and touched fields are known. GridTerrain+0x2c is the
+`GridAgeManager` is a boundary view of a class reconstructed elsewhere, or
+not yet reconstructed, as are `GridRenderDevice` (Terrain+0x18, thiscall
+virtuals) and `GridGameSettings` (`0x0056e26c`). The frustum test is the
+real `VisibilityClipper::TestBox` (`0x0052f570`), the node texture
+(GridNodeExtra+0x08) the real `ManagedTexture` and the vertex lighting
+object (Terrain+0xc40) the real `LightManager`. Of the boundary views,
+only the called slots and touched fields are known. GridTerrain+0x2c is the
 canonical `GroundFogableObject` base, whose `FogVertices` (`0x00484f10`) fogs unlit vertices. The fifth argument of
 `0x00482dd0` is the originating cell (`0x00483200` compares it with cell
 addresses), not a flag. The shared row tables are written as per-TU statics

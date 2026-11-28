@@ -5,12 +5,14 @@
 // TrackGameViewOwner+0xdc (BikeRace.cpp 0x00422dec applies replay deltas
 // through 0x004a9aa0; 0x00420a91 hands it the recorder) and the owner itself
 // (DlgProcs.cpp 0x0042062a/0x004527ef pick the followed racer; KrustyBike.cpp
-// 0x0048db13/0x00497986 switch it). The picker 0x004a9d20 and the switch
-// 0x004a9e80 are near misses in samples/race/FollowRacerNearMisses.cpp.
+// 0x0048db13/0x00497986 switch it). The picker 0x004a9d20 is a near miss in
+// samples/race/FollowRacerNearMisses.cpp; the switch 0x004a9e80 is here.
 
 #include "BikeRace.h"
 #include "TrackGame.h"
 #include "../krusty2/vehicle/KrustyBikeCore.h"
+#include "RaceSound.h"
+#include "Krusty3DObjects.h"   // BonusObjectManager (the score board)
 
 // Replay angle delta step. Retail holds 0.0490873456f (0x0055534c), which is
 // 3.14159f / 64 exactly, not the correctly rounded pi / 64 that KrustyBike.cpp
@@ -51,6 +53,47 @@ void TagBall::ApplyReplayDelta(const TagBallStateDelta* delta,
 void TagBall::SetRecorder(KrustyVCR* vcr)
 {
     recorder = vcr;
+}
+
+// 0x004a9e80: switches the followed racer from `previous` to `racer`. The
+// previous racer banks its run (tagRun into totalTagRun, the best into
+// bestTagRun), both racers get their spawn protection for five seconds and
+// every other racer hears of it; the view's own racer taking over scores 2500.
+// Status: near miss (259/272, 77/78 instructions). After the best-run ternary
+// retail pushes the three arguments of the virtual call before the `fstp`
+// into +0x760; VC6 here stores after the first push. The forms tried are
+// listed in samples/race/FollowRacerNearMisses.cpp.
+void TrackGameViewOwner::SetFollowedRacer(KrustyBike* racer, KrustyBike* previous, int tell)
+{
+    if (previous) {
+        previous->totalTagRun += previous->tagRun;
+        // Compared through locals, as EventManager.cpp keeps the best run
+        // (retail fld best; fld run; fcompp at 0x4a9e9f).
+        float best = previous->bestTagRun;
+        float run = previous->tagRun;
+        previous->bestTagRun = best > run ? previous->bestTagRun : previous->tagRun;
+        previous->tagRun = 0.0f;
+        previous->SetSpawnProtection(1, 5.0f, 0);
+        if (ball)
+            ball->asleep = 0;
+    }
+    // +0xac is a float in the bike race owner (TrackGame.h).
+    *(float*)&gateCount = 5.0f;
+    // Retail reads raceView from +0x34 afresh at every use (0x4a9f0d,
+    // 0x4a9f1f, 0x4a9f46, 0x4a9f68).
+    if (tell)
+        raceView->localRacer->SendFollowedRacer(racer, false);
+    if (racer) {
+        raceView->raceSound->PlayItSound();
+        racer->SetSpawnProtection(1, 5.0f, 0);
+    }
+    AnnounceFollowedRacer(racer, previous);
+    if (racer == raceView->localRacer && previous && previous != racer) {
+        racer->score += 2500.0f;
+        if (raceView->scoreBoard)
+            raceView->scoreBoard->ShowValue(2500.0f, 1.0f);
+    }
+    followedRacer = racer;
 }
 
 // 0x004a9f90: every other racer hears about the new and the previous racer,

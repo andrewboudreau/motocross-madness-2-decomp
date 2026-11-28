@@ -183,8 +183,9 @@ check one function at a time on random and edge inputs, not integrated play.
    second under RDP or a disconnected session, as retail does; the EULA must
    be accepted by the user; registry values must exist.
 6. **Placeholder globals and guessed initial values** (C that they exist, P
-   for effect): `g_visibilityClipper` is an empty static (retail gives no
-   size or owner, see `CLIPPER_GLOBAL_CONNECTIONS.md`); the KrustyBike stall thresholds
+   for effect): `g_visibilityClipper` (defined in `VisibilityQuadTree.cpp`)
+   points at an empty static (retail gives no size or type, see
+   `CLIPPER_GLOBAL_CONNECTIONS.md`); the KrustyBike stall thresholds
    and trick tables are file-local copies; `k = 0` in `DrawCurrentLod`.
    `audit_bindings.py` lists 47 `data/unknown` names no object defines and 63
    placeholders (CRT helpers only, benign).

@@ -1,7 +1,7 @@
 """UIDropDownList::LayoutParts 0x0047a400, the drop-down list's part layout (tools/emu_diff.py
 case, call-record/replay mode).
 
-The linked body is src/bringup/Group2_UIDialogResource.cpp. The list's six parts (button
+The linked body is src/reconstructed/GameUi.cpp. The list's six parts (button
 +0x1ec, list backgrounds +0x1f0/+0x1f4/+0x1f8, list +0x1fc, scroll bar +0x200) are random
 objects with a fake vtable (Disable is slot 4). The button has a state image whose first
 frame width is random, or none (then the button rectangle is empty and the button is
@@ -16,7 +16,7 @@ import struct
 
 RETAIL_VA = 0x0047a400
 SYMBOL = '?LayoutParts@UIDropDownList@@QAEXXZ'
-SOURCE = 'src/bringup/Group2_UIDialogResource.cpp'
+SOURCE = 'src/reconstructed/GameUi.cpp'
 FPCWS = (0x027f,)   # integer only
 PROBES = {0x0047a433: 'image', 0x0047a454: 'no image', 0x0047a53d: 'disable', 0x0047a7a3: 'select colour'}
 

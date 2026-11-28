@@ -66,13 +66,6 @@ struct GridGameSettings {
     int mipFilter;
 };
 
-// Boundary view of VisibilityClipper (src/krusty2/visibility): 0x0052f570
-// tests a box (centre, half extents) against the camera frustum.
-class GridVisibilityClipper {
-public:
-    int TestBox(Camera* camera, const float* matrix, const float* center, const float* extent,
-                int* screenRect, int* cornersInside, int* unused);  // 0x0052f570 (ret 0x1c)
-};
 #include "../krusty2/visibility/VisibilityClipperGlobal.h"   // 0x00575a98
 
 // Boundary view of Terrain (RTTI .?AVTerrain@@; reconstructed in

@@ -37,7 +37,7 @@
     "src/reconstructed/Griddraw.cpp": {
       "sections": 100,
       "relocations": 615,
-      "sha256": "83c91d58923940cbe69e89a0e13878a0f938af6007bf52be9e07ad50a253d049"
+      "sha256": "d4a700462e987b786592c615272dd58181280caa4cc18974222c1e259e5aa265"
     },
     "src/krusty2/shadow/D3DIMSoultreeShadow.cpp": {
       "sections": 47,
@@ -45,9 +45,9 @@
       "sha256": "8c642be7c9723d7305acee7d84059eb27fbf4615f8da5a5672514c07df50a6d1"
     },
     "src/krusty2/visibility/VisibilityQuadTree.cpp": {
-      "sections": 89,
-      "relocations": 395,
-      "sha256": "c054f7ec1507e2f79db23ae835e1130e9e092142e61f7c8ad5aba4226a033ca8"
+      "sections": 90,
+      "relocations": 396,
+      "sha256": "cf9e8b1e20e8156d054e5269feb879c1b92a5ae80373707c08922401d6ab133b"
     },
     "samples/physics/shadow/D3DIMSoultreeShadowNearMisses.cpp": {
       "sections": 7,

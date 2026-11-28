@@ -1,7 +1,7 @@
 """UIDialog::ReadDialogResource 0x0046a920, the dialog resource (.dtm) parser (tools/emu_diff.py
 case, call-record/replay mode).
 
-The linked body is src/bringup/Group2_UIDialogResource.cpp. The resource is an INI-like
+The linked body is src/reconstructed/GameUi.cpp. The resource is an INI-like
 parameter block (ParameterBlock: GetSectionNames 0x004b8240, SelectSection 0x004b78f0,
 GetString 0x004b7ec0, GetInt 0x004b7f10, GetFloat 0x004b7f40), modelled from a synthetic
 resource: section names joined by '?' and split by the real Tokenizer (ctor 0x00515dc0
@@ -28,7 +28,7 @@ import struct
 
 RETAIL_VA = 0x0046a920
 SYMBOL = '?ReadDialogResource@UIDialog@@QAEHPAXH@Z'
-SOURCE = 'src/bringup/Group2_UIDialogResource.cpp'
+SOURCE = 'src/reconstructed/GameUi.cpp'
 PROBES = {0x0046b5f7: 'background file', 0x0046b697: 'parent background', 0x0046ddd9: 'set text',
           0x0046b460: 'popup align', 0x0046b888: 'dialog font', 0x0046b955: 'palette', 0x0046bc1f: 'anim file',
           0x0046bd39: 'entry sound', 0x0046bda9: 'new sound', 0x0046bec1: 'xywh', 0x0046c03e: 'button',

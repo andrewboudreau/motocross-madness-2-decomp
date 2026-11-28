@@ -14,7 +14,7 @@
   "?FastSqrt@@YAMM@Z": "0x00460b50",
   "?GetVertex@GridVertexCache@@QAEHHH@Z": "0x0047de90",
   "?Reset@GridVertexCache@@QAEXPAVDrawableGridNode@@@Z": "0x0047de20",
-  "?TestBox@GridVisibilityClipper@@QAEHPAVCamera@@PBM11PAH22@Z": "0x0052f570",
+  "?TestBox@VisibilityClipper@@QAEHPAVCamera@@PBM11PAH22@Z": "0x0052f570",
   "?Register@AgeManager@@QAEXPAUAgeEntry@@P6AHPAXH@Z1HH@Z": "0x00401050",
   "?Unregister@AgeManager@@QAEXPAUAgeEntry@@@Z": "0x004010d0",
   "?MarkUsed@AgeManager@@QAEXPAUAgeEntry@@@Z": "0x00401250",

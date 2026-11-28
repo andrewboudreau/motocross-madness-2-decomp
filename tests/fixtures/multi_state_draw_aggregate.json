@@ -1,8 +1,8 @@
 {
   "source": "samples/ui/GameUiNearMisses.cpp",
   "baseline": "52cb3235bf1da9693869baa528340ac6a1743558",
-  "sections": 734,
+  "sections": 733,
   "relocations": 3914,
-  "sha256": "4236a95fdea9c301bdf5ae701baa0b2b18fb46b01251ecebbb4d089b268c3f72",
+  "sha256": "a5cb6e4ee9a073340453f3a982ceeaf3ad297c519d95018257aec62508ee101a",
   "scope": "Full nondebug contents; portable pin normalizes only enumerated source filenames as test_edit_box_draw.complete_object. Same-path before/after proof has no exclusions."
 }

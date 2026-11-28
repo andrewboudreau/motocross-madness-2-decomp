@@ -19,9 +19,9 @@
 //    the corners and the projection under 24-bit precision (333 of 2000
 //    runs) from VC6's reassociation of the sums and products; with the
 //    split arrays and the parenthesised x scale 0 of 6000 runs differ under
-//    53- and 24-bit precision.  Griddraw.h's and D3DIMSoultreeShadow.cpp's views
-//    of the clipper forward here (Group2_GridVisibilityTestBox.cpp,
-//    Group1_ShadowClipper.cpp), as retail has a single function.
+//    53- and 24-bit precision.  Griddraw.cpp and D3DIMSoultreeShadow.cpp call
+//    this body directly (their former clipper views forwarded here), as
+//    retail has a single function.
 //    Retail's body has the EBP frame of its inline-asm helper, which a
 //    pragma keeps for TestBox (docs/GAME_BUILD.md#frame-pointer-units).
 //    Session 23 shapes (masked 0.656 -> 0.720 in tools/match_one terms):

@@ -20,9 +20,9 @@
       "sha256": "064052b332cd10e6dde69ae798a49fed5468a9f866404a083cf2ce72d8414b48"
     },
     "src/krusty2/visibility/VisibilityQuadTree.cpp": {
-      "sections": 89,
-      "relocations": 395,
-      "sha256": "f4a8d922db1bb62e2dad586e5b53323b4031622d740c5f72fabae8fdfcd1f45e"
+      "sections": 90,
+      "relocations": 396,
+      "sha256": "d1cbc046d96b94c0a45e50dc1942e198c3f951e89989d22db8469ff8f3c9eaa9"
     }
   },
   "inventory": [

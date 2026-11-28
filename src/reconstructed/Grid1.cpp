@@ -73,6 +73,15 @@ int EvictBlockTexture(void* owner, int block)
     return 1;
 }
 
+// The texture use table RecordTextureUse fills (Grid1.h). Retail places the
+// sizes at 0x0065b65c and the textures at 0x0066047c, 0x4e20 bytes apart.
+// 5000 entries each (strong inference from the layout): the sizes table fills
+// its 0x4e20-byte gap exactly, and 5000 texture pointers end at 0x0066529c.
+// Retail never bounds-checks the count.
+int g_gridTextureSizes[5000];          // 0x0065b65c
+ManagedTexture* g_gridTextures[5000];  // 0x0066047c
+int g_gridTextureCount;                // 0x0068a2ec
+
 // 0x0066529c: textures the nodes built for themselves (slot 3).
 int g_grid1OwnTextureCount;
 

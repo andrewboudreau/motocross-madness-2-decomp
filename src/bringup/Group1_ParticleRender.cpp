@@ -64,7 +64,7 @@ extern "C" void qsort(void* base, unsigned int num, unsigned int width,
 // 0x00460c00 (math/FastMath.h).
 float FastInvSqrt(float x);
 
-// 0x00689158 (Group1_Globals.cpp).
+// 0x00689158 (defined in Particles.cpp).
 extern ParticleUVRect g_particleCellUVs[61];
 
 // IDirect3DVertexBuffer7 as slot 14 uses it (slots 3 Lock, 4 Unlock, 5 ProcessVertices).

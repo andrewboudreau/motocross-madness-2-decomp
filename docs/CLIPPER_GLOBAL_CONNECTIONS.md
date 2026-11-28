@@ -3,8 +3,15 @@
 Six provisional pointer declarations now use the existing
 `VisibilityClipper* g_visibilityClipper` declaration. They all refer to the
 same retail pointer cell at `0x00575a98`. This removes six duplicate unresolved
-names; it does **not** supply that cell, its pointed-to object, or another
-clipper method.
+names; it does not add another clipper method.
+
+`VisibilityQuadTree.cpp` defines the cell, which it took from the retired
+`src/bringup/Group1_Globals.cpp`. The cell lies in that unit's `.data`, after
+its `__FILE__` literal (0x00575a3c) and before wrecker.cpp's (0x00575ab8). Its
+target 0x0068acd4 lies between the unit's `kVec3XAxis` and `kVec3YAxis` in
+`.bss`. The definition points it at an empty file-static `VisibilityClipper`.
+That type is a best guess: retail gives the object no size, and no method reads
+its fields. The unit's object gains one `.data` section and one relocation.
 
 The retired pointer types are `D3DIMShadowClipper`, `CubeVisibilityClipperView`,
 `EcoVisibilityClipperView`, `FollowCameraVisibilityClipperView`,
@@ -28,8 +35,9 @@ This establishes the direct pointer loads and receiver bits; it does not
 exclude arbitrary indirect writes.
 
 Calls already using the canonical clipper methods keep their existing
-boundaries. Griddraw's calls to the remaining provisional `TestBox` declaration
-(`GridVisibilityClipper`) retain explicit casts at the call site. There are no new method
+boundaries. Griddraw's three box tests now call `VisibilityClipper::TestBox`
+directly; the `GridVisibilityClipper` view and its forwarding bring-up are
+gone, and Griddraw.obj changes only those three relocations' symbol name. There are no new method
 joins, wrappers, pointer adjustments or copied object storage. The complete
 object comparison checks those casts generate the same instructions and call
 destinations.

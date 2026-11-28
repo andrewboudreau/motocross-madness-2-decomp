@@ -803,6 +803,15 @@ clearly more faithful, the game now links the sample's text:
     shadow forwarders are link aliases (the `link_aliases` table below).
     `Group5_ShadowBridges.cpp` keeps only `ShadowFillTriangle` 0x00461e60
     and its edge set-up, which no unit owns yet.
+  - `Group3_FollowedRacer.cpp` (`SetFollowedRacer` is in `FollowRacer.cpp`)
+  - `Group2_UIDialogResource.cpp` (`ReadDialogResource` and `LayoutParts`
+    are in `GameUi.cpp`)
+  - `Group2_GridVisibilityTestBox.cpp` (Griddraw calls
+    `VisibilityClipper::TestBox` itself)
+  - `Group1_Globals.cpp`. Its storage moved to the units that use it:
+    `Grid1.cpp` (texture use tables), `Griddraw.cpp` (`g_gridBoxTests`),
+    `Particles.cpp` (`g_particleCellUVs`) and `VisibilityQuadTree.cpp`
+    (`g_visibilityClipper` and `g_visibilityBoxVertices`).
 - `Group4_EcoBridges.cpp` lost its five forwarders, then its shared
   normal-distribution pointer, which `NormalDistribution.cpp` now defines.
 - The BikeRace near misses (`Create`, `CreateRacers`, `AimCamera`,
@@ -969,7 +978,7 @@ masked scores from `linked_accuracy.py`, before and after.
 | VA | Function | Provider | Before | After | Built/retail insns |
 |---|---|---|---|---|---|
 | 0x00481de0 | `DrawableGridNode::WalkVisibilityQuadrants` | Griddraw | 0.725 | 0.733 | 499/500 |
-| 0x004a9e80 | `KbPlayer::SetFollowedRacer` | Group3_FollowedRacer | 0.735 | 0.987 | 78/78 |
+| 0x004a9e80 | `TrackGameViewOwner::SetFollowedRacer` | FollowRacer | 0.735 | 0.987 | 78/78 |
 | 0x00423ef0 | `GR_BitString::ReadBits` | BitStringRead | 0.218 | 0.505 | 50/45 |
 | 0x004a1b00 | `TransformPoints` | Group0_Math | 0.275 | 0.336 | 67/76 |
 | 0x004d0d40 | `Convert555To8Fast` | Group0_Pixtrans | 0.369 | 0.418 | 51/83 |
@@ -985,7 +994,7 @@ masked scores from `linked_accuracy.py`, before and after.
   not set `changed`.
 - **SetFollowedRacer.** The race view at +0x34 is reread at every use, as retail
   does, and the best run is compared through locals. Only the known
-  `fstp` scheduling difference is left (samples/race/FollowRacerNearMisses.cpp).
+  `fstp` scheduling difference is left. The body is in src/reconstructed/FollowRacer.cpp; the forms tried are listed in samples/race/FollowRacerNearMisses.cpp.
 - **ReadBits, TransformPoints, Convert555To8Fast.** No behaviour difference
   was found. The source now has retail's shape where C++ can express it:
   - ReadBits uses one result accumulator and no unreachable shift masks;
@@ -1558,7 +1567,7 @@ both control words. These agreed with retail in every run (runs in brackets):
   0x00415640, `BuildStatusList` 0x004e5d00, `PCLastRaceDlg::PayOutRace`
   0x004d8c40, `TrackGameViewOwner::PickFollowedRacer` 0x004a9d20 and
   `KrustyBike::SelectRiderPose` 0x0048e3e0 (600 each),
-  `TrackGameMode::ResetDefaults` 0x00522440 (200), `KbPlayer::SetFollowedRacer`
+  `TrackGameMode::ResetDefaults` 0x00522440 (200), `TrackGameViewOwner::SetFollowedRacer`
   0x004a9e80 (100).
 - Cameras and input: `Camera::UpdateMatrices` 0x0042ee30 (120),
   `FollowCamera::Tick` 0x00465c20 (160), `ProcessCameraInput` 0x00463a30

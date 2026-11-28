@@ -4,9 +4,9 @@
   },
   "objects": {
     "src/reconstructed/FollowRacer.cpp": {
-      "sections": 7,
-      "relocations": 17,
-      "sha256": "2c9ff2d948512f685f663fdbdb546ee6011b75ec02505c91df2460a5611bd8f8"
+      "sections": 9,
+      "relocations": 22,
+      "sha256": "40c900a41118c5ced58297a0edd8d7a7cd28662276851a8c617e7426a2a274af"
     },
     "samples/race/FollowRacerNearMisses.cpp": {
       "sections": 11,

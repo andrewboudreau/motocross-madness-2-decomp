@@ -8,8 +8,6 @@
 #ifndef KRUSTYBIKE_TYPES_H
 #define KRUSTYBIKE_TYPES_H
 
-struct KbSession;
-struct KbPlayer;
 struct KbBody;
 struct KbSink;
 struct KbChild;
@@ -214,22 +212,7 @@ extern int g_kbPadActive;   // 0x0067C3AC
 struct KbAnim;
 
 
-// Session object at TrackGame+0x570 (eventManager); 0x0045D2B0 returns the local player record (tier 3 names).
-struct KbMessage;
-struct KbMsgSink { void ReplaceHeadMessage(KbMessage* m); };
-struct KbSession { KbPlayer* FindRaceMode(); KbMsgSink* FindTextQueue(); };
 class Vehicle;
-// View of the race view owner (TrackGameViewOwner, src/reconstructed/TrackGame.h); the names
-// follow that view.  In the tag event (type 4) followedRacer is the racer who is IT.
-struct KbPlayer {
-    char pad_0x0000[0xA8];
-    Vehicle* followedRacer;  // +0xa8 TrackGameViewOwner::followedRacer
-    char pad_0x00AC[0x30];
-    Vehicle* ball;           // +0xdc TrackGameViewOwner::ball (the tag ball; "FREE BALL!" while set)
-    // 0x004A9E80 (TrackGameViewOwner::SetFollowedRacer): follows racer after previous; previous
-    // is a vehicle (tested and read at +0x75c); tell sends message 0x87 through SendFollowedRacer.
-    void SetFollowedRacer(Vehicle* racer, Vehicle* previous, int tell);
-};
 // Bounds/collision body at Vehicle::collisionObject (canonical: CollisionObject::TestMeshBounds).
 struct KbBody { int TestMeshBounds(KbBody* other); };
 

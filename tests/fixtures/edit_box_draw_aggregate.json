@@ -1,8 +1,8 @@
 {
   "source": "samples/ui/GameUiNearMisses.cpp",
   "baseline": "5c439bb",
-  "sections": 734,
+  "sections": 733,
   "relocations": 3914,
-  "sha256": "4236a95fdea9c301bdf5ae701baa0b2b18fb46b01251ecebbb4d089b268c3f72",
+  "sha256": "a5cb6e4ee9a073340453f3a982ceeaf3ad297c519d95018257aec62508ee101a",
   "scope": "All nondebug sections, public offsets, flags, bytes, relocations and addends. Only three verified source filenames normalize checkout prefix/include path spelling for this portable pin; actual same-path before/after equality uses no exclusions."
 }

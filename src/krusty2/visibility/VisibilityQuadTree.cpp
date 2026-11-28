@@ -18,9 +18,21 @@ PeakHold g_visibilityTickStat(5000);        // 0x0068ab90
 
 #include "math/Math3D.h"
 
+// 0x00575a98 (initialized .data) holds 0x0068acd4, the address of a .bss
+// object no method reads fields from (docs/CLIPPER_GLOBAL_CONNECTIONS.md).
+// Best guess: that object is the second empty static (its CRT initializer
+// 0x0052f080 is a bare return), a VisibilityClipper. The class has no
+// constructor, so this definition does not reproduce that initializer.
+static VisibilityClipper s_visibilityClipperObject;
+VisibilityClipper* g_visibilityClipper = &s_visibilityClipperObject;
+
 // Installed for CollisionObject broad-phase queries; g_pQuadTree is the
 // separate active traversal context at 0x00689b78. Names are provisional.
 QuadTree* g_collisionQuadTree;  // 0x0068aba4
+
+// The debug box strip DrawBox emits (VisibilityQuadTree.h); the constructor
+// resets each vertex's colour to 0x2000ffff.
+VisibilityBoxVertex g_visibilityBoxVertices[16];   // 0x0068a768
 
 // Debug toggles and the frozen camera snapshot (slot 23).  Names tier 3.
 extern int g_visibilityDebugDraw;          // 0x0068ab9c toggled by key 0x44 in slot 23; gates slot 14

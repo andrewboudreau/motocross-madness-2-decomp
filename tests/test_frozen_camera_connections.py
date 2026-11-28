@@ -59,7 +59,7 @@ class FrozenCameraConnectionsTests(unittest.TestCase):
             rows, filenames = view(consumer, normalize_paths=(ROOT,))
             self.assertEqual([name for _, name in filenames], [SOURCE])
             self.assertEqual(pin(rows), expected['after'])
-            self.assertEqual((len(rows), sum(len(row[3]) for row in rows)), (89, 395))
+            self.assertEqual((len(rows), sum(len(row[3]) for row in rows)), (90, 396))
             indexed = {row[0]: row for row in rows}
             added = ('named', ((DTOR, 0),))
             destructor = indexed[added]
@@ -78,7 +78,7 @@ class FrozenCameraConnectionsTests(unittest.TestCase):
             del indexed[added]
             original = sorted(indexed.values(), key=lambda row: repr(row[0]))
             self.assertEqual(pin(original), expected['before_joined'])
-            self.assertEqual((len(original), sum(len(row[3]) for row in original)), (88, 394))
+            self.assertEqual((len(original), sum(len(row[3]) for row in original)), (89, 395))
             bindings = ROOT/Path(SOURCE).with_suffix('.bindings.json')
             targets = json.loads((ROOT/'src/krusty2/visibility/targets.json').read_text())
             selected = [target for target in targets if target.get('source') == 'VisibilityQuadTree.cpp']
@@ -106,7 +106,9 @@ class FrozenCameraConnectionsTests(unittest.TestCase):
             self.assertFalse(set(expected['renames']) & imported)
             glob = consumer.find_symbol(GLOBAL)
             bss = consumer.section(glob.section_number)
-            self.assertEqual((glob.value, bss.name, bss.raw_size, bss.raw_ptr), (64, '.bss', 620, 0))
+            # The unit also defines the clipper's empty target object and the 16-vertex
+            # debug box strip (0x208 bytes) that the Group1_Globals bring-up held.
+            self.assertEqual((glob.value, bss.name, bss.raw_size, bss.raw_ptr), (592, '.bss', 1148, 0))
             self.assertTrue(bss.characteristics & 0x80000000)
             self.assertLessEqual(glob.value+0x220, bss.raw_size)
             crt = next(s for s in consumer.sections if s.name == '.CRT$XCU')
@@ -168,7 +170,7 @@ class FrozenCameraConnectionsTests(unittest.TestCase):
         }.items():
             self.assertEqual(instructions[va], expected_ins)
         self.assertEqual(strict, 45)
-        print('Frozen camera: 45 strict checks; 88 old sections/394 relocations; '
+        print('Frozen camera: 45 strict checks; 89 old sections/395 relocations; '
               'one exact implicit destructor; actual CRT/storage/primary-layout proof')
 
 

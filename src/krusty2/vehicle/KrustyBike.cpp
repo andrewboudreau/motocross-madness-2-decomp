@@ -189,15 +189,18 @@ int KrustyBike::ResolveSubstepCollisions(int steps)
     lastCollisionType = 0;
     if (isGhost) return steps;
     if (g_TrackGame->mode.raceSettings.eventType == 4) {
-        KbPlayer* raceMode = reinterpret_cast<KbPlayer*>(reinterpret_cast<EventManager*>(
-            g_TrackGame->eventManager)->FindRaceMode());
+        TrackGameViewOwner* raceMode = reinterpret_cast<EventManager*>(
+            g_TrackGame->eventManager)->FindRaceMode();
         if (this != raceMode->followedRacer && this == race->localRacer) {
             Vehicle* followed = raceMode->followedRacer;
             if (followed) {
                 if (collisionObject->TestMeshBounds(followed->collisionObject))
                     SendFollowedRacer(this, 1);
             } else if (raceMode->ball) {
-                if (collisionObject->TestMeshBounds(raceMode->ball->collisionObject)) {
+                // The tag ball is a soultree physics object: its collision
+                // object is the base's +0x128.
+                if (collisionObject->TestMeshBounds(
+                        reinterpret_cast<SoultreePhysicsBaseObject*>(raceMode->ball)->collisionObject)) {
                     if (g_TrackGame->network->isHost)
                         raceMode->SetFollowedRacer(this, 0, 1);
                     else
@@ -1550,14 +1553,15 @@ int KrustyBike::FindPlacement(int respawn, Vec3* outPosition, Vec3* outForward, 
                            hit, 6.0f, 8, heading, 0, !respawnPending, outPosition, outForward, outUp, outKeepPlacement);
     }
     case 4: {
-        KbPlayer* tagRacer = (KbPlayer*)g_TrackGame->tagEvent;
+        TrackGameViewOwner* tagRacer = g_TrackGame->tagEvent;
         const Vec3* target = 0;
         const Vec3* heading = 0;
-        if (tagRacer->ball) target = &tagRacer->ball->position;
+        // The tag ball's position is its soultree physics base's +0x0c.
+        if (tagRacer->ball) target = &reinterpret_cast<SoultreePhysicsBaseObject*>(tagRacer->ball)->position;
         else if (tagRacer->followedRacer == this) { *outForward = bodyForward; heading = &bodyForward; }
         else target = &tagRacer->followedRacer->position;
         float radius = 9.0f;
-        if (((KbPlayer*)g_TrackGame->tagEvent)->followedRacer != this)
+        if (g_TrackGame->tagEvent->followedRacer != this)
             radius = 3.0f;
         return FindObjectPlacement(collisionObject, terrain, &position, terrainScale, flag, lim, lim,
                            hit, radius, 8, heading, target, !respawnPending, outPosition, outForward, outUp,
@@ -3449,8 +3453,8 @@ int KrustyBike::Tick(float dt)
             SendStateDelta(dt, 0);
     }
     if (g_TrackGame->mode.raceSettings.eventType == 4) {
-        KbPlayer* raceMode = reinterpret_cast<KbPlayer*>(reinterpret_cast<EventManager*>(
-            g_TrackGame->eventManager)->FindRaceMode());
+        TrackGameViewOwner* raceMode = reinterpret_cast<EventManager*>(
+            g_TrackGame->eventManager)->FindRaceMode();
         if (raceMode->ball && raceMode->followedRacer == this && crashState) {
             if (g_TrackGame->network->isHost)
                 raceMode->SetFollowedRacer(0, this, 1);

@@ -1,8 +1,8 @@
 # FollowRacer (followed-racer and tag ball helpers)
 
-Canonical reconstruction: `src/reconstructed/FollowRacer.*` (3 exact). The
-two remaining functions are near misses in
-`samples/race/FollowRacerNearMisses.*`. The unit has no RTTI, vtable or
+Canonical reconstruction: `src/reconstructed/FollowRacer.*` (3 exact, and
+the switch `0x004a9e80` as a near miss). The picker `0x004a9d20` is a near
+miss in `samples/race/FollowRacerNearMisses.*`. The unit has no RTTI, vtable or
 `__FILE__` literal; the file name and every function name are ours (tier 3).
 
 ## Extent
@@ -16,7 +16,7 @@ functions, all `thiscall`:
 | `0x004a9aa0` | 617 | tag ball (TrackGameViewOwner+0xdc) | exact |
 | `0x004a9d10` | 13 | tag ball | exact |
 | `0x004a9d20` | 340 | TrackGameViewOwner | near miss, 20% |
-| `0x004a9e80` | 272 | TrackGameViewOwner | near miss, 95% |
+| `0x004a9e80` | 272 | TrackGameViewOwner | near miss, 95% (FollowRacer.cpp) |
 | `0x004a9f90` | 113 | TrackGameViewOwner | exact |
 
 Callers (confirmed xrefs): BikeRace.cpp `0x00422dec` applies replay deltas
@@ -72,7 +72,7 @@ provisional (proximity only).
   across `rand()`, as the retail instructions do. Complete behavioral evidence
   and the explicit correction to the old partial fingerprint are recorded in
   [the picker review](FOLLOWED_RACER_PICKER.md). It remains nonexact.
-- `0x004a9e80` (272 B, 95%): one scheduling difference. Retail pushes the
+- `0x004a9e80` (272 B, 95%, in FollowRacer.cpp): one scheduling difference. Retail pushes the
   three arguments of the first slot-50 call before the `fstp` into +0x760;
   VC6 here stores after the first push. The if/else, max-helper,
   local-result, int-zero, double-literal and statement-order forms move the
@@ -91,8 +91,8 @@ entries. Shared headers touched for this unit: `RaceView.h`
 view +0xbc), `TrackGame.h` (ball fields +0x10a/+0x708, the method
 declarations, view owner +0xac as an int/float union) and `BikeRace.h`
 (`TagBallStateDelta`, `VcrFollowRecord`, the ball state's
-float fields). The racer's slot 50 is viewed by a struct local to the
-near-miss sample: 50 placeholder slots in `RaceView.h` flipped a register
+float fields). The racer's slot 50 is KrustyBike::SetSpawnProtection
+(KrustyBikeCore.h). An earlier view of it as 50 placeholder slots in `RaceView.h` flipped a register
 choice in TrackGame slot 1 (`0x00520ab0`, header-content chaos; removing
 `EventKbScoreBoardView` flipped it too), and the +0xac float on its own turned
 the StatsOverlay race panel's `%d` (`0x0051a560`) into a float load.

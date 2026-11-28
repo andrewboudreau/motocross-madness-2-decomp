@@ -4,6 +4,7 @@
 #include "TrackGameGlobal.h"
 #include "Griddraw.h"
 #include "Camera.h"
+#include "../krusty2/visibility/VisibilityClipper.h"
 
 #include <float.h>
 #include <string.h>
@@ -58,7 +59,7 @@ int g_gridQuadOrder[16] = {
 extern int g_gridDrawMemory;      // bytes held by node vertex buffers
 extern int g_gridDrawFrameCount;  // top-level node visits
 extern int g_gridDrawMemoryPeak;  // 0x0068a2fc, high-water mark of g_gridDrawMemory
-extern int g_gridBoxTests;        // 0x0068a084, box tests this frame
+int g_gridBoxTests;               // 0x0068a084, box tests this frame
 float FastSqrt(float x);         // 0x00460b50
 
 int g_gridSize = 1 << (g_gridLevels - 1);               // 0x0067a684 ($E 0x0047ddb0)
@@ -1482,7 +1483,7 @@ int DrawableGridNode::TestBlockFrustum(int block)
     boxCenter[0] = (block % 4) * size + data->gridMinX * terrain->gridCellSize + half;
     boxCenter[2] = (block / 4) * size + data->gridMinZ * terrain->gridCellSize + half;
     boxCenter[1] = ((GridBlockRange*)data->blockRanges)[block].centerY;
-    int visible = reinterpret_cast<GridVisibilityClipper*>(g_visibilityClipper)->TestBox(terrain->camera, terrain->camera->screenMatrix[0].m[0],
+    int visible = g_visibilityClipper->TestBox(terrain->camera, terrain->camera->screenMatrix[0].m[0],
                                                boxCenter, boxExtent, 0, 0, 0);
     if (visible)
         data->visibleBlockMask |= 1 << block;
@@ -1587,7 +1588,7 @@ int DrawableGridNode::WalkVisibilityQuadrants(void* stream, void* screenMatrix, 
     int j;
     if (size > 1) {
         g_gridBoxTests++;
-        visible = reinterpret_cast<GridVisibilityClipper*>(g_visibilityClipper)->TestBox(terrain->renderer->camera, (float*)screenMatrix, center, extent, 0, &corners, 0);
+        visible = g_visibilityClipper->TestBox(terrain->renderer->camera, (float*)screenMatrix, center, extent, 0, &corners, 0);
         if (corners != 8)
             corners = 0;
         if (size == 16) {
@@ -1657,7 +1658,7 @@ int DrawableGridNode::WalkVisibilityQuadrants(void* stream, void* screenMatrix, 
                     } else {
                         int dummy;
                         g_gridBoxTests++;
-                        if (reinterpret_cast<GridVisibilityClipper*>(g_visibilityClipper)->TestBox(terrain->renderer->camera, (float*)screenMatrix, &child->center.x,
+                        if (g_visibilityClipper->TestBox(terrain->renderer->camera, (float*)screenMatrix, &child->center.x,
                                                          &child->extent.x, 0, 0, &dummy)) {
                             if (child->childMask != 0x1fffff) {
                                 child->childMask = 0x1fffff;

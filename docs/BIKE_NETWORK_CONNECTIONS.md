@@ -40,10 +40,8 @@ TrackGame constructs EventManager and stores its primary pointer at `+0x570`.
 FindRaceMode reads the existing event-owner pointers in the order supercross,
 quarry, baja/enduro, national, then tag, and returns the selected raw pointer.
 The bike uses only the established owner fields at `+0xa8` and `+0xdc`.
-The returned pointer is explicitly converted to the existing KbPlayer field
-view. These boundaries do not identify all of KbPlayer, KbSession or KbGameCfg
-with the canonical classes, nor do they establish equivalence of their other
-provisional declarations.
+The returned pointer is the TrackGameViewOwner itself (`followedRacer` +0xa8,
+`ball` +0xdc); the KbPlayer field view it was once converted to is retired.
 
 ## Preservation and native checks
 

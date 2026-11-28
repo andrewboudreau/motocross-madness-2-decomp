@@ -1,6 +1,6 @@
-"""KbPlayer::SetFollowedRacer 0x004a9e80 = TrackGameViewOwner::SetFollowedRacer(racer, previous, tell) (emu_diff case).
+"""TrackGameViewOwner::SetFollowedRacer(racer, previous, tell) 0x004a9e80 (emu_diff case).
 
-The linked body is the bring-up copy (src/bringup/Group3_FollowedRacer.cpp). Offsets from the
+The linked body is in src/reconstructed/FollowRacer.cpp. Offsets from the
 retail body: the owner's race view +0x34 (re-read at every use; its localRacer +0x38,
 raceSound +0x44, scoreBoard +0xbc), followedRacer +0xa8, the 5.0f store +0xac, ball +0xdc
 (its +0x10a byte cleared); on the bikes tagRun +0x75c, bestTagRun +0x760, totalTagRun +0x764,
@@ -17,8 +17,8 @@ import math
 import random
 
 RETAIL_VA = 0x004a9e80
-SYMBOL = '?SetFollowedRacer@KbPlayer@@QAEXPAVVehicle@@0H@Z'
-SOURCE = 'src/bringup/Group3_FollowedRacer.cpp'
+SYMBOL = '?SetFollowedRacer@TrackGameViewOwner@@QAEXPAVKrustyBike@@0H@Z'
+SOURCE = 'src/reconstructed/FollowRacer.cpp'
 PROBES = {0x004a9e8d: 'previous', 0x004a9ebc: 'run is best', 0x004a9ef0: 'ball', 0x004a9f0d: 'tell',
           0x004a9f1f: 'racer', 0x004a9f56: 'score bonus', 0x004a9f75: 'scoreboard'}
 

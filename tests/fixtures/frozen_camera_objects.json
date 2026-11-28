@@ -7,13 +7,13 @@
     "?g_frozenCamera@@3UVisibilityCamera@@A": "?g_frozenCamera@@3VPCCamera@@A"
   },
   "before_joined": {
-    "sections": 88,
-    "relocations": 394,
-    "sha256": "98440a43d390fdfeff6f38e846b7bec5be34e74600acdbcdbc8afae5eb70b85d"
-  },
-  "after": {
     "sections": 89,
     "relocations": 395,
-    "sha256": "c054f7ec1507e2f79db23ae835e1130e9e092142e61f7c8ad5aba4226a033ca8"
+    "sha256": "4e8bc66925eb255e733f2f14066c7bbcb9d90712c7386aea1f450151d298eca3"
+  },
+  "after": {
+    "sections": 90,
+    "relocations": 396,
+    "sha256": "cf9e8b1e20e8156d054e5269feb879c1b92a5ae80373707c08922401d6ab133b"
   }
 }
