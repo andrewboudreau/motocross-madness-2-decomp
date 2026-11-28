@@ -174,9 +174,10 @@ Near misses (in `src/reconstructed/DlgProcs.cpp`, retail order, each with a
   Retail's unwind map (FuncInfo `0x00560770`) gives both arrays `[ebp-0x5ac]`
   in states 1 and 0xc. No source shape or optimisation flag tried makes VC6 SP3
   share two EH-tracked arrays; only /GX- does, by dropping their states.
-- SPBikeRiderDlg slot 10 `0x0044fae0`, 1181 of 1235 bytes: only the
-  scheduling of the by-value vector copies for the camera call differs
-  (no argument spelling changes it; a Vector3 copy constructor is worse).
+- SPBikeRiderDlg slot 10 `0x0044fae0` is exact (1235/1235) since
+  2026-11-28: a `(float)` cast on each D3DRMVectorRotate angle (no code; one
+  IL unit per arm) places each LookAt copy's `mov edi, esp` late as in retail.
+  The notes below record the forms tried before.
 - SPRaceInfoDlg and MPRaceInfoDlg slot 29 (`0x004507a0`, `0x004513a0`):
   register use inside the per-racer loops differs.
 
@@ -241,7 +242,8 @@ epilogue), which `break` merged into one (tools/reference_diff.py, session
 apart as in retail; aligned instructions 1293 -> 1342 (regmasked hunks 44 ->
 37), strict unchanged because the frame still differs.
 
-SPBikeRiderDlg::Tick (0x0044fae0, 1235 bytes, 1181 match): the same flow and
+SPBikeRiderDlg::Tick (0x0044fae0, 1235 bytes, 1181 match before the angle
+casts above made it exact): the same flow and
 x87 code; only the scheduling of the by-value Vector3 copies passed to the
 camera's slot 29 differs (retail takes `edi = esp` after the camera and vtable
 loads and loads z before storing y). A pointer, reference, `this->`, explicit

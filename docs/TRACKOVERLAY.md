@@ -351,6 +351,12 @@ the two differences; named squares `zz`/`xx` in either order; in-place
 `dz *= dz; dx *= dx;`. A named `xx = dx * dx` used in the sum gives 1143
 like the bracketed form; the helper called with the two differences
 written in the call gives 1139 with 5 differing instructions.
+Session 26 (all 1129 unless noted): an extra unused dy difference, the
+differences as one Vector3 (all three or only x/z set), `Vector3 d =
+position; d.x -= ...; d.z -= ...;` (393). Probe reads of `outside` (one to
+three extra uses) move its int-to-float slot to 0x24 or 0x20, never to
+retail's 0x18; extra reads of `x` change nothing. frame_layout reports
+retail as if `x` had one more use, but no natural use was found.
 
 ### CollectRacers `0x0051d730` (exact)
 

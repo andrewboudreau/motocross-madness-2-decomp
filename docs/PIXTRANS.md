@@ -250,8 +250,7 @@ orders (48), pixel types and 1..33 dead locals leave it at 280 or worse;
 earlier: every pixel declaration order, a lower-row pointer, a 1555 bitfield
 struct and an inline AddPixel1555 helper.
 
-Halve8 (0x004cee30, 1133 bytes; candidate 1133, 1121 of 1125 masked bytes,
-1129 of 1133 strict): the palette-index halver. The search for the magenta
+Halve8 (0x004cee30, 1133 bytes; candidate 1133, 1129 of 1133 strict): the palette-index halver. The search for the magenta
 entry, both block loops, the key test and the >= 2 rule match, and nested ifs
 reproduce retail's single `return 0` block. The keyed and plain loops are an
 if/else with one `return 1` after it: with a `return 1` after the keyed loop
@@ -277,7 +276,14 @@ expression, `from[(sourceStride + 1)]`, `(from + sourceStride)[1]` and `*(from
 (eax) and width (edx) at the keyed x loop's exit, both carried into the y
 loop's head. Session 15: a `stride` copy of sourceStride for the keyed branch
 is propagated back to the argument (1129); an end-pointer x loop (`to < end`)
-loses retail's width down-counter (225).
+loses retail's width down-counter (225). Session 26 (all strict now that
+`ColorMapper::GetColors` 0x004de270 is bound in Pixtrans.bindings.json, so
+the score is 1129 of 1133 strict, not 1121 of 1125 masked): the other
+declaration orders of count/red/green/blue (1127-1129), `from += 2` in the
+for step or at the end of the body, swapping `from`/`to` or the latch
+statements, `count > 1` for `count >= 2` (1129), the four entry copies
+declared in the y loop (1089), the four entry indices declared together
+(224), the `key == -1` arm written first (152).
 
 DitherConvert (0x004cf2a0, 1759 bytes; candidate 1745, 276 strict, 534 of 566
 aligned, 0.954 masked): the Floyd-Steinberg ditherer behind the dithered

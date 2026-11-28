@@ -759,9 +759,9 @@ int PCCentralBikeRiderDlg::OnControlRelease(ControlEvent* event, InputButtonStat
     return UIDialog::OnControlRelease(event, entry);
 }
 
-// 0x004d72c0: as SPBikeRiderDlg slot 10 (dlgprocs.cpp 0x0044fae0). Not exact (1237 of
-// 1291 bytes: only the scheduling of the by-value Vector3 copies for the camera call
-// differs; docs/PROCIRCUIT.md forms tried)
+// 0x004d72c0: as SPBikeRiderDlg slot 10 (dlgprocs.cpp 0x0044fae0). The (float) casts on
+// the rotation angles emit nothing; without them each LookAt copy's `mov edi, esp` is
+// scheduled early (1237/1291). Inferred from the bytes; docs/PROCIRCUIT.md.
 int PCCentralBikeRiderDlg::Tick(float frameTime)
 {
     if (dialogBackground)
@@ -774,7 +774,7 @@ int PCCentralBikeRiderDlg::Tick(float frameTime)
         viewEye.y += (pointer->pointerPosition.y - guiUser->pointerY) * 0.1f;
         viewEye.y = __max(1.0f, __min(viewEye.y, 10.0f));
         offset = VectorDifference(viewEye, g_TrackGame->ui->garageFocus);
-        D3DRMVectorRotate(&turned, &offset, (Vector3*)&kVec3YAxis, dx * 0.015707964f);
+        D3DRMVectorRotate(&turned, &offset, (Vector3*)&kVec3YAxis, (float)(dx * 0.015707964f));
         float distance = viewDistance;
         turned *= distance;
         viewEye = VectorSum(turned, g_TrackGame->ui->garageFocus);
@@ -784,7 +784,7 @@ int PCCentralBikeRiderDlg::Tick(float frameTime)
         static_cast<UIMultiState*>(FindControl("ChkAutoRotate", 2))->SetCurrentState(0);
     } else if (!previewDragged) {
         offset = VectorDifference(viewEye, g_TrackGame->ui->garageFocus);
-        D3DRMVectorRotate(&turned, &offset, (Vector3*)&kVec3YAxis, frameTime * 0.39269909f);
+        D3DRMVectorRotate(&turned, &offset, (Vector3*)&kVec3YAxis, (float)(frameTime * 0.39269909f));
         turned *= viewDistance;
         viewEye = VectorSum(turned, g_TrackGame->ui->garageFocus);
         g_TrackGame->ui->garageCamera->SetFrame(&viewEye, 0, 0, 0, 0);

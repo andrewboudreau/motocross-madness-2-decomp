@@ -1,5 +1,5 @@
-// TextService.cpp (see TextService.h). 0x0050b080, 0x0050b400, 0x0050b700
-// and 0x0050ba00 are near misses (see their status comments).
+// TextService.cpp (see TextService.h). 0x0050b080, 0x0050b400 and 0x0050b700
+// are near misses (see their status comments).
 
 #include <string.h>
 
@@ -22,6 +22,20 @@
         strncpy(dest, source, copied);                                             \
         (dest)[copied] = 0;                                                        \
     }
+
+// A rectangle's extent. The layout's cell sizes go through these inline
+// helpers: written out in place, VC6 schedules two of LayoutText's vertex
+// stores one instruction away from retail's (inferred from the bytes; the
+// helpers declared but unused change nothing). As Rectangle2D members they
+// give the same code here, but the extra declarations in Rectangle2D.h move
+// BikeRace::CreateRacers (0x00419970) in an unrelated unit.
+static inline float RectWidth(const Rectangle2D& r) {
+    return r.bottomRight.x - r.topLeft.x;
+}
+
+static inline float RectHeight(const Rectangle2D& r) {
+    return r.bottomRight.y - r.topLeft.y;
+}
 
 // 0x0050ac30
 TextService::TextService(unsigned int count, float x, float y, float width, float height)
@@ -131,8 +145,8 @@ int TextService::DrawTextInto(TextureMap* texture, int x, int y, const char* tex
             cell = character->GetRect();
             unsigned int srcX = (unsigned int)(fontWidth * cell.topLeft.x);
             unsigned int srcY = (unsigned int)(fontHeight * cell.topLeft.y);
-            unsigned int glyphWidth = (unsigned int)((cell.bottomRight.x - cell.topLeft.x) * fontWidth);
-            unsigned int glyphHeight = (unsigned int)((cell.bottomRight.y - cell.topLeft.y) * fontHeight);
+            unsigned int glyphWidth = (unsigned int)(RectWidth(cell) * fontWidth);
+            unsigned int glyphHeight = (unsigned int)(RectHeight(cell) * fontHeight);
             if (px + glyphWidth >= width) {
                 px = x;
                 py += glyphHeight;
@@ -184,8 +198,8 @@ int TextService::DrawText4444(TextureMap* texture, int x, int y, const char* tex
             cell = character->GetRect();
             unsigned int srcX = (unsigned int)(fontWidth * cell.topLeft.x);
             unsigned int srcY = (unsigned int)(fontHeight * cell.topLeft.y);
-            unsigned int glyphWidth = (unsigned int)((cell.bottomRight.x - cell.topLeft.x) * fontWidth);
-            unsigned int glyphHeight = (unsigned int)((cell.bottomRight.y - cell.topLeft.y) * fontHeight);
+            unsigned int glyphWidth = (unsigned int)(RectWidth(cell) * fontWidth);
+            unsigned int glyphHeight = (unsigned int)(RectHeight(cell) * fontHeight);
             if (px + glyphWidth >= width) {
                 px = x;
                 py += glyphHeight;
@@ -237,8 +251,8 @@ int TextService::DrawText1555(TextureMap* texture, int x, int y, const char* tex
             cell = character->GetRect();
             unsigned int srcX = (unsigned int)(fontWidth * cell.topLeft.x);
             unsigned int srcY = (unsigned int)(fontHeight * cell.topLeft.y);
-            unsigned int glyphWidth = (unsigned int)((cell.bottomRight.x - cell.topLeft.x) * fontWidth);
-            unsigned int glyphHeight = (unsigned int)((cell.bottomRight.y - cell.topLeft.y) * fontHeight);
+            unsigned int glyphWidth = (unsigned int)(RectWidth(cell) * fontWidth);
+            unsigned int glyphHeight = (unsigned int)(RectHeight(cell) * fontHeight);
             if (px + glyphWidth >= width) {
                 px = x;
                 py += glyphHeight;
@@ -263,10 +277,7 @@ int TextService::DrawText1555(TextureMap* texture, int x, int y, const char* tex
     return end;
 }
 
-// 0x0050ba00. Not exact (770 of 802 bytes: VC6 schedules the v3.sx and v5.sx stores
-// one instruction away from retail's;
-// docs/TEXTSERVICE.md forms tried)
-// Cell rectangles are in texture coordinates of a 255-texel
+// 0x0050ba00. Cell rectangles are in texture coordinates of a 255-texel
 // font texture.
 void* TextService::LayoutText(const OverlayRect* rect, const char* text,
                                      unsigned int color, int* count) {
@@ -282,13 +293,13 @@ void* TextService::LayoutText(const OverlayRect* rect, const char* text,
         CharacterCell* character = currentFont->FindCell(text[i]);
         if (character) {
             cell = character->GetRect();
-            float height = (cell.bottomRight.y - cell.topLeft.y) * 255.0f;
-            float width = (cell.bottomRight.x - cell.topLeft.x) * 255.0f;
+            float height = RectHeight(cell) * 255.0f;
+            float width = RectWidth(cell) * 255.0f;
             float top = cell.topLeft.y * 255.0f;
             float left = cell.topLeft.x * 255.0f;
             size.SetCorners(left, top, left + width, top + height);
-            float right = size.bottomRight.x - size.topLeft.x + x;
-            float bottom = size.bottomRight.y - size.topLeft.y + y;
+            float right = RectWidth(size) + x;
+            float bottom = RectHeight(size) + y;
 
             vertices[i * 6 + 0].sx = x;
             vertices[i * 6 + 0].sy = y;

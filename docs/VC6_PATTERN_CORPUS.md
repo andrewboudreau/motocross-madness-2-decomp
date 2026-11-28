@@ -128,8 +128,11 @@ Exact examples:
 - TreeBoxOverlap `0x00428c20`: the `sub esp, 0x40` for MatrixMultiply moves above a copy into a static matrix and the inline InvertRigid.
 
 In both, the copy it passes writes a member or a global. Camera::UpdateMatrices
-`0x0042ee30` (camera) needs the same move over a copy whose destination is
-a stack argument slot (`mov edi, esp`). TerrainShadow slot 28 `0x005097d0`
+`0x0042ee30` (camera, exact) has the same move over a copy whose destination is
+a stack argument slot (`mov edi, esp`): the `sub` fills the delay slot after
+`mov edi, esp` when the block before the call holds one more IL unit, here a
+no-op `(float)` cast on a float product argument of the earlier call
+(docs/CAMERA_UPDATE.md). Size such a gap with the probe-store ruler first. TerrainShadow slot 28 `0x005097d0`
 (exact) has that case: in both matrix arms the `sub esp, 0x40` for
 MatrixMultiply's first matrix (0x005098f2) sits above the `rep movsd` of the
 camera matrix into the second argument's slot, set up by `mov edi, esp` at
@@ -310,12 +313,13 @@ makes it the newer leaf, which loads first (docs/VC6_OPERAND_ORDER.md 1.2).
 
 Rows checked with `tools/x87_slips.py` (s14). The rows below are not
 operand form: no x87 rule applies, so they need a different lever.
-- Camera `0x0042ee30`: `sub esp` against the copy placement (section 4).
 - FollowCamera `0x00465c20`: `lea` differences.
 - EcoSystem `0x00456890`: an `fmul` scheduled after integer moves.
 - EcoSystem `0x00457ed0`: the cylinder height load is scheduled earlier.
-- TextService `0x0050ba00`: store scheduling (`0x0050ade0`, the register
-  choice, is exact through a named offset in `EArray::operator[]`).
+- TextService `0x0050ba00` (now exact): store scheduling; the cell extents
+  read through inline helpers (`RectWidth(cell)`) give retail's order
+  (`0x0050ade0`, the register choice, is exact through a named offset in
+  `EArray::operator[]`).
 - D3DIMSoulTree `0x00443aa0`: sum term order, row 1 (see its sample).
 
 D3DIMSoulTree `0x00440f30` has two swaps of stored frame words, which are

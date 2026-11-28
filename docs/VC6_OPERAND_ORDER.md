@@ -909,8 +909,9 @@ try on similar code. None is a rule.
 - **Not moved:** in PCJoystickDevice `0x004c3790` and FileStream `0x004618e0`,
   retail's eax→ecx→edx scratch-register rotation starts one step later than
   VC6's. No form tried shifted it. In VC6 SP3, two arrays whose element type has
-  a destructor never share a stack slot, but retail's 0x0044b200 shares one. The
-  `sub esp` before `rep movsd` in Camera `0x0042ee30` was not reproduced either.
+  a destructor never share a stack slot, but retail's 0x0044b200 shares one. (The
+  `sub esp` before `rep movsd` in Camera `0x0042ee30` is reproduced by one extra
+  IL unit, a `(float)` cast; docs/CAMERA_UPDATE.md.)
 - **Assignment inside an x87 compare.** In Griddraw `0x00481b30`,
   `if ((d = a - b) > 0.0f) r = d * d;` compares a copy (`fld st(0) ; fcomp [c]`)
   and keeps `d` on the stack for the product; the same difference written as a

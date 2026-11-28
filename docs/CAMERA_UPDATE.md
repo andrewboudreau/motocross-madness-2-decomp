@@ -2,12 +2,11 @@
 
 ## Functional build review
 
-[Camera.cpp](../src/reconstructed/Camera.cpp) holds the complete nonexact
+[Camera.cpp](../src/reconstructed/Camera.cpp) holds the strict-exact
 `Camera::UpdateMatrices` body at `0x0042ee30`, between `0x0042eb10` and
 `0x0042f090` as in retail. Its full 492-byte extent ends
-at `0x0042f01b`, before four padding bytes. VC6 emits 492 bytes with 487
-matching positions: one stack-allocation instruction is scheduled on the
-other side of a projection-matrix copy. The source body is unchanged.
+at `0x0042f01b`, before four padding bytes; VC6 emits all 492 bytes as retail
+(calibration case "Camera slot 28 matrices").
 The semantic name is inferred from behavior. The test links a validation unit
 holding only this definition (`tools/unit_source.py`).
 
@@ -40,9 +39,18 @@ constitutes rendering or gameplay testing.
 
 Only the private validation fixture maps retail bytes and redirects decoded
 calls. The production build uses the C++ candidate and existing C++ providers.
-Camera.cpp carries a `// Not exact` status comment on it.
+The fix: the radian field of view passed to ProjectionMatrix carries a
+`(float)` cast, `(float)(fieldOfView * 0.017453290f)`, the same cast the
+half-angle in the focal-length line needs. It emits nothing, but it adds one
+IL unit before the first MatrixMult, and that unit is what moves the
+`sub esp, 0x40` into the slot after `mov edi, esp` (a one-store probe anywhere
+between the ProjectionMatrix call and the first MatrixMult does the same, two
+do not). `(float)((float)viewport[2] / viewport[3])` for the aspect also
+gives 492; the field-of-view cast was kept because the function writes the
+same cast on the other field-of-view product. The cast is inferred from the
+bytes.
 
-## Forms tried
+## Forms tried before the fix
 
 Camera::UpdateMatrices (0x0042ee30, 492 bytes, 487/492): one
 scheduling difference: retail emits `sub esp, 0x40` before the `rep movsd`
@@ -74,6 +82,26 @@ store lands there instead of the `sub esp, 0x40`. Not moved (487 or worse):
 dropping the viewport stores, `viewMatrix` as the second operand, one to
 eight member stores before, between or after the two products, the product
 declared and then assigned, and a named result.
+2026-11-28 block-length ruler: the function is one basic block, and exactly
+one extra IL unit before the first product (a single `g_probe[0] = 100;` store
+at the top, after the view matrix, after IdentityMatrix, between any two
+viewport stores or right before the product) gives retail's schedule with
+every other instruction identical; 2..29 stores do not. So retail's block is
+one unit longer before that point, not a different shape. Forms that cost no
+unit (487): viewport copies (`(3, 0) = (0, 0)`, `(3, 1) = (3, 0)`, `(1, 1) =
+-(0, 0)`), a `float half` local, `Matrix4 viewportScale;` then assigned, a
+`Matrix4*` to it, the viewport matrix from an inline helper (as a local),
+`(float)viewport[3]`, a DegreesToRadians(float) helper in the projection, an
+aspect helper over (unsigned, unsigned), (float, unsigned), (float, float) or
+a divide helper. Too far: a `float aspect` local (two units, 321), `float fov`
+(157), DegreesToRadians in tan (427), an (int, int) aspect helper (both
+products hoist but the unsigned conversions change, 164), extra (2, 2) or
+(3, 3) stores (emit code, 314) and the helper as the call argument (38).
+
+2026-11-28, also 487: `/ (float)viewport[3]`, both viewport reads cast, a
+`Matrix4&` alias of the projection (for the assignment or the product).
+Worse: named `aspect` or `fov` locals (149-321) and a `viewportScale(2, 2)`
+store (311).
 
 ```powershell
 $env:VC6_ROOT = (Resolve-Path work/vc6sp3-disc).Path

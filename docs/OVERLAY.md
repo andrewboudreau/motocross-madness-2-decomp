@@ -72,21 +72,21 @@ forward × right. The first cross product's fld/fmul operand order needs an
 first argument, with z stored through the member (all three stores through
 the reference give 675/690, none 659/690).
 
-Slot 28 sits in `Camera.cpp` between `0x0042eb10` and `0x0042f090` and is not exact:
+Slot 28 sits in `Camera.cpp` between `0x0042eb10` and `0x0042f090` and is exact:
 
-- Slot 28 `0x0042ee30` (492 bytes, 487/492) rebuilds the matrices: view =
+- Slot 28 `0x0042ee30` (492 bytes, exact) rebuilds the matrices: view =
   `ViewMatrix(+0x170, +0x17c, +0x188, +0x194)`, projection =
   `ProjectionMatrix(+0x1bc, +0x1c0, fov +0x16c in degrees, width / height)`,
   +0x12c = `MatrixMult(viewport, projection)` with the viewport scale (0.5,
   −0.5, offset 0.5, 0.5), +0xec = that times the view, and +0x198 = half
   the viewport width / tan(fov / 2) (a float; Camera.h now types +0xec as
-  two matrices). Only the position of one `sub esp, 0x40` against a
-  `rep movsd` differs. The half angle needs a `float` cast: VC6 folds
-  `fov * 0.5f * k` into one constant, retail multiplies twice.
+  two matrices). The half angle needs a `float` cast: VC6 folds
+  `fov * 0.5f * k` into one constant, retail multiplies twice. The radian
+  field of view passed to ProjectionMatrix carries the same cast; without
+  it one `sub esp, 0x40` lands after a `rep movsd` (487/492).
 
-The unchanged complete candidate is admitted to the functional source build
-after [native state, call-contract and source-provider integration checks](CAMERA_UPDATE.md#functional-build-review).
-It remains nonexact; rendering and gameplay still require runtime validation.
+The body is in the functional source build after [native state, call-contract and source-provider integration checks](CAMERA_UPDATE.md#functional-build-review).
+Rendering and gameplay still require runtime validation.
 
 ## Function names
 

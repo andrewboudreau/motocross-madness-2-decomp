@@ -224,3 +224,7 @@ Session 25 for 0x004aced0 (all 361, or the known 232/197 families): six
 spellings of the `from` test times four pointer spellings with data/type
 read through MessageAt (96 forms), 0..7 dead initialised locals and a
 named player local for RemovePlayer.
+2026-11-28: the system-message block as a static inline
+`HandleSystemMessage(NetworkInterface*, NetMessage*, char*)` helper, with the
+pointer, the sender or both passed in, and the name buffer inside or outside
+it: 361, 232, 197 or 82; none moves the `from` load ahead of the `lea`.

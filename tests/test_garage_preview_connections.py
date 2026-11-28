@@ -158,7 +158,7 @@ class GaragePreviewConnectionsTests(unittest.TestCase):
                         resolved = match_object(obj, symbol, va, b'', bindings)
                     self.assertEqual(resolved['digest'], digest, key)
                     partial_count += 1
-            self.assertEqual((strict_count, partial_count), (363, 4))
+            self.assertEqual((strict_count, partial_count), (366, 4))
             compiler = Path(os.environ['VC6_ROOT'])
             linker = find_child_ci(find_vc6_bin(compiler), 'link.exe')
             libraries = find_child_ci(infer_vc98_root(compiler), 'lib')
@@ -170,7 +170,7 @@ class GaragePreviewConnectionsTests(unittest.TestCase):
             result = subprocess.run([str(executable)], capture_output=True, text=True, timeout=30)
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             self.assertIn('Garage painter: 192 resource, normal cleanup and exception lifetime cases passed', result.stdout)
-            print('363 strict checks, four complete partial fingerprints; ' + result.stdout.strip())
+            print('366 strict checks, four complete partial fingerprints; ' + result.stdout.strip())
 
 
 if __name__ == '__main__':

@@ -61,13 +61,21 @@ game build's four bring-up copies (`Group0_PCLastRaceDlg.cpp`,
 - The race payout `0x004d8c40` (427/883).
 - The slot 29 of PCBailoutDlg `0x004d8fc0` (836/882) and PCBunnyDlg
   `0x004d9860` (1068/1122): prologue scheduling differs.
-- PCCentralBikeRiderDlg slot 10 `0x004d72c0`, 1237 of 1291 bytes: only
-  the scheduling of the by-value vector copies for the camera call differs.
 
 Exact in the unit but not registered: `0x004d59a0` (its reload order flips
 with unrelated declarations) and `0x004d6fc0`.
 
-Also exact: PCCentralBikeRiderDlg slot 29 `0x004d6770` and `0x004d7900`.
+Also exact: PCCentralBikeRiderDlg slot 29 `0x004d6770` and `0x004d7900`,
+and slot 10 `0x004d72c0` (1291 bytes): both D3DRMVectorRotate angles carry a
+`(float)` cast, `(float)(dx * 0.015707964f)` and
+`(float)(frameTime * 0.39269909f)`, the idiom Camera::UpdateMatrices uses on
+its field-of-view products. The casts emit nothing; without them (1237/1291)
+the `mov edi, esp` of each by-value LookAt copy is scheduled right after the
+`sub esp, 0xc` instead of after the vtable and source loads. One dead probe
+store in the block has the same effect, so the gap was one IL unit per arm.
+The same two casts make SPBikeRiderDlg slot 10 (DlgProcs.cpp `0x0044fae0`,
+1181 -> 1235/1235) and MPBikeRiderDlg slot 10 (SelectGamePicProcs.cpp
+`0x004f8820`, 1214 -> 1268/1268) exact; those units are not changed here.
 The `UnknownProCircuitSkinned` view is the same object as DlgProcs.h's
 `DialogSoultreeObjectView`; one should eventually replace the other.
 
@@ -141,14 +149,18 @@ PCBunnyDlg::HandleEvent (0x004d9860, 1122 bytes, 1068 match): the
   a cash-and-shortfall setter) are all worse than the locals form in the
   same standalone unit (485 or less against its 586).
 PCCentralBikeRiderDlg::Tick (0x004d72c0, 1291 bytes, 1237
-  match): as SPBikeRiderDlg slot 10 (DlgProcs.cpp), only the
-  scheduling of the by-value Vector3 copies for the camera call differs.
+  match before the angle casts; exact now): as SPBikeRiderDlg slot 10 (DlgProcs.cpp), only the
+  scheduling of the by-value Vector3 copies for the camera call differed.
   kVec3YAxis is this unit's own copy at 0x00689b28 (ProCircuitProcs.cpp's
   `$E` vector, as in the canonical bindings); the sample had bound
   ProCircuit.cpp's 0x00689ae8 (1125).
   Session 19: code-free separators between the copies (`if (0) {}`, `if (0)`
   around a statement, a zero-trip for, `while (0)`, `switch (0)`, a switch
-  on a member) all stay 1237.
+  on a member) all stay 1237. 2026-11-28, also 1237: `Vector3(viewTarget)`,
+  `(Vector3)viewTarget`, a target local, a const focus reference, pointer or
+  NULL casts on the SetFrame arguments, a PCCamera cast of the camera, a named
+  VectorSum result, a void or `v.x = v.x * s` operator*=, `(float)distance`.
+  One rotation angle cast alone fixes one arm (1264).
 
 0x004d8fc0 prologue, unchanged at 836 (2026-11; 0x004d9860 shares it):
 the circuit as `ProCircuit*&`, `ProCircuit* const&`, a `ProCircuit**` slot

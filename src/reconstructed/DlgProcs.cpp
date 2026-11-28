@@ -1470,8 +1470,9 @@ void SPBikeRiderDlg::MarkPendingRelease()
     UIDialog::MarkPendingRelease();
 }
 
-// 0x0044fae0. Not exact (1181 of 1235 bytes: only the scheduling of the by-value
-// Vector3 copy passed to the camera's LookAt differs; docs/DIALOGPROCS.md forms tried).
+// 0x0044fae0. The (float) casts on the rotation angles emit nothing; without them
+// each LookAt copy's `mov edi, esp` is scheduled early (1181/1235). Inferred from
+// the bytes, as ProCircuitProcs 0x004d72c0; docs/DIALOGPROCS.md.
 // Turns the bike view (dragged with the pointer, else slowly by
 // itself), animates the previews and now and then plays a rider idle motion.
 int SPBikeRiderDlg::Tick(float frameTime) {
@@ -1486,7 +1487,7 @@ int SPBikeRiderDlg::Tick(float frameTime) {
         viewEye.y = __max(1.0f, __min(viewEye.y, 10.0f));
         offset = VectorDifference(viewEye, g_TrackGame->ui->garageFocus);
         // pi/200 radians per pointer pixel.
-        D3DRMVectorRotate(&turned, &offset, (Vector3*)&kVec3YAxis, dx * 0.015707964f);
+        D3DRMVectorRotate(&turned, &offset, (Vector3*)&kVec3YAxis, (float)(dx * 0.015707964f));
         float distance = viewDistance;
         turned *= distance;
         viewEye = VectorSum(turned, g_TrackGame->ui->garageFocus);
@@ -1497,7 +1498,7 @@ int SPBikeRiderDlg::Tick(float frameTime) {
     } else if (!previewDragged) {
         // Auto rotation: pi/8 radians per second.
         offset = VectorDifference(viewEye, g_TrackGame->ui->garageFocus);
-        D3DRMVectorRotate(&turned, &offset, (Vector3*)&kVec3YAxis, frameTime * 0.39269909f);
+        D3DRMVectorRotate(&turned, &offset, (Vector3*)&kVec3YAxis, (float)(frameTime * 0.39269909f));
         turned *= viewDistance;
         viewEye = VectorSum(turned, g_TrackGame->ui->garageFocus);
         g_TrackGame->ui->garageCamera->SetFrame(&viewEye, 0, 0, 0, 0);

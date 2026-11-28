@@ -332,12 +332,12 @@ int Camera::OnActivate() {
 // frame, the field of view (degrees) and the viewport, the viewport-scaled
 // projection (+0x12c), its product with the view (+0xec) and the projection
 // scale +0x198.
-// Not exact (487 of 492 bytes: retail emits `sub esp, 0x40` before the
-// `rep movsd` that copies the projection for the first MatrixMult, VC6 after;
-// docs/CAMERA_UPDATE.md lists the forms tried).
+// The (float) cast on the radian field of view, as on the half angle below, emits
+// nothing; without it the first MatrixMult's `sub esp, 0x40` follows the projection
+// copy (487/492). Inferred from the bytes; docs/CAMERA_UPDATE.md.
 void Camera::UpdateMatrices() {
     viewMatrix = ViewMatrix(eyePosition, viewDirection, upDirection, roll);
-    projectionMatrix = ProjectionMatrix(nearPlane, farPlane, fieldOfView * 0.017453290f,
+    projectionMatrix = ProjectionMatrix(nearPlane, farPlane, (float)(fieldOfView * 0.017453290f),
                                         (float)viewport[2] / viewport[3]);
     Matrix4 viewportScale = IdentityMatrix();
     viewportScale(0, 0) = 0.5f;

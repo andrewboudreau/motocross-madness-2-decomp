@@ -19,15 +19,14 @@ RenderTarget; `0x0050b080`, `0x0050b400` and `0x0050b700` blit text into
 (RTTI, vtable `0x00556f78`) and Rectangle2D's two points and
 `operator=` (`0x004e8c20`).
 
-Exact: 7 calibration cases (constructor, destructor, select font, set
-font, factory, draw, and the out-of-line `CharacterCell::GetRect`, which
-the blitters' calls make the unit emit). Select font `0x0050ade0` closed from 117/125 when
+Exact: 8 calibration cases (constructor, destructor, select font, set
+font, factory, layout, draw, and the out-of-line `CharacterCell::GetRect`,
+which the blitters' calls make the unit emit). Select font `0x0050ade0` closed from 117/125 when
 `EArray::operator[]` named its offset (`unsigned int offset = index -
 m_base;`): retail forms the offset in eax with the array in ecx, which the
 direct `m_data[index - m_base]` does not; no other EArray.h includer
 changes. Near misses, in TextService.cpp in retail order with `// Not exact`
-status comments: the layout `0x0050ba00` (store scheduling) and the three
-blitters (register and stack-slot assignment); see
+status comments: the three blitters (register and stack-slot assignment); see
 [Near misses: forms tried](#near-misses-forms-tried). The game build linked
 the same bodies from `src/bringup/Group2_OverlayText.cpp`, now removed.
 
@@ -61,8 +60,19 @@ declared before srcY or srcX is worse: 39, 51), and the row offsets are formed i
 Pointer-walking rows, fully indexed rows, top-of-function declarations,
 signed coordinates and inline pitch expressions are all further off.
 
-LayoutText (0x0050ba00, 802 bytes): 770 of 802; only the
-scheduling of two stores (v3.sx and v5.sx) differs. Writing through a
+LayoutText (0x0050ba00, 802 bytes) is exact: the glyph cell's extents are
+read through inline helpers (`RectWidth(cell) * 255.0f`,
+`RectHeight(cell) * 255.0f`), which moves the two slipped stores to retail's
+places. A k-store ruler first showed that retail's block behaves as if it
+held one more IL tuple before the vertex stores (one dead store before the
+vertex-2 block fixed the v5.sx slip); the inlined accessor supplies it
+without code. The helpers declared but unused, or used only for the layout
+rectangle's `right`/`bottom`, give 770. As `Rectangle2D::Width()`/`Height()`
+members the function is exact too, but the two member declarations in
+Rectangle2D.h move BikeRace::CreateRacers (0x00419970, 13400 -> 13394), so
+they are file-local in TextService.cpp. The blitters use them as well
+(unchanged scores). Forms tried before, at 770:
+only the scheduling of two stores (v3.sx and v5.sx) differed. Writing through a
 vertex pointer, other vertex orders, field orders and an inline vertex
 setter are further off (all 720 orders of the six vertex blocks swept
 with tools/sweep_variants.py: 652..718 against 770 for the kept order).

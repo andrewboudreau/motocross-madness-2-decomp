@@ -74,7 +74,7 @@ class CameraUpdateBehaviorTests(unittest.TestCase):
                     self.assertEqual(entry.function_size, 492)
                     report = compare(retail, candidate, SYMBOL, 0x42ee30, 492,
                                      ROOT / 'src/reconstructed/Camera.bindings.json')
-                    self.assertEqual(report['strict_match']['matching_positions'], 487)
+                    self.assertEqual(report['strict_match']['matching_positions'], 492)
             executable = output / 'camera.exe'
             mapping = output / 'camera.map'
             result = subprocess.run([str(linker), '/nologo', '/subsystem:console', '/base:0x100000',

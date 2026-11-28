@@ -80,8 +80,9 @@ Near misses, in the unit in retail order with a `// Not exact` status comment
 (they moved in from a sample and two bring-up copies; all three agree with
 retail under `tools/emu_diff.py`, 400 runs each where a case exists):
 - The bike and rider lists `0x004f8220` (110/840): registers differ.
-- MPBikeRiderDlg slot 10 `0x004f8820` (1214/1268): only the scheduling of the by-value
-  vector copies for the camera call differs.
+- MPBikeRiderDlg slot 10 `0x004f8820` is exact (1268/1268) with a `(float)` cast on each
+  D3DRMVectorRotate angle, as DlgProcs `0x0044fae0` and ProCircuitProcs `0x004d72c0`;
+  without them the by-value LookAt copies are scheduled early (1214).
 - The lobby start message `0x004f2340` (933/2120, 2148 compiled): the same flow,
   calls and frame size. Registers differ: retail keeps the racer total in
   memory and the bike, rider and name arrays in registers. VC6 here keeps

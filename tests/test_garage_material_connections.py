@@ -202,7 +202,7 @@ class GarageMaterialConnectionsTests(unittest.TestCase):
             self.assertEqual(result.returncode, 0, result.stdout+result.stderr)
             self.assertEqual(result.stdout.strip(),
                              'ReplaceMaterialTexture: 11589 cases, 69 AV, 1080 scripted throws')
-        self.assertEqual(strict, 136)
+        self.assertEqual(strict, 138)
         print('%d strict checks; three whole objects; three calls; %s' % (strict, result.stdout.strip()))
 
 

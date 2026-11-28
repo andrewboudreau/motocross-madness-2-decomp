@@ -34,11 +34,11 @@ PROVIDERS = {
 # cast `this` to int. These complete hashes were captured in a private baseline
 # with ONLY that required UIDialog* correction, before changing race calls.
 # They are not a claim that the unmodified old aggregate compiled.
+# SPBikeRiderDlg::Tick 0x44fae0 left this list when it became exact (the
+# rotation-angle casts); its strict case is in run_calibration.py.
 PARTIAL = (
     ('?HandleEvent@MainDlg@@UAEXPAUDialogEvent@@@Z', 0x44b200, 5232, 5292, 962,
      '4f2334f0bd2edbfafdf8407310fa2ce13d0bb565421560f8fd89870f0ad5f509'),
-    ('?Tick@SPBikeRiderDlg@@UAEHM@Z', 0x44fae0, 1235, 1235, 1181,
-     '029e1fc3e324db9c22cefe24cd69e7331f5b04d4f90ea443f4fb607d6d10edc7'),
     ('?HandleEvent@SPRaceInfoDlg@@UAEXPAUDialogEvent@@@Z', 0x4507a0, 1652, 1652, 589,
      'febd987a86806c1f4273fcf7ecee9ac54bd1b30f8702a3b5052c685f7ba21745'),
     ('?HandleEvent@MPRaceInfoDlg@@UAEXPAUDialogEvent@@@Z', 0x4513a0, 2004, 2004, 595,
@@ -151,7 +151,7 @@ class RaceControlConnectionsTests(unittest.TestCase):
             for case in cases:
                 self.assertTrue(compare(retail, objects[case['source']], case['symbol'],
                     int(case['target_va'], 0), case['target_size'], ROOT / case['bindings'])['strict_exact'], case)
-            self.assertEqual(len(cases), 208)
+            self.assertEqual(len(cases), 209)
             bindings_path = ROOT / 'src/reconstructed/DlgProcs.bindings.json'
             bindings = {key: int(value, 0) for key, value in json.loads(bindings_path.read_text()).items()}
             obj = objects[SOURCES[2]]
@@ -174,7 +174,7 @@ class RaceControlConnectionsTests(unittest.TestCase):
             result = subprocess.run([str(executable)], capture_output=True, text=True, timeout=30)
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             self.assertIn('Race control: 993 exact-provider route and pause cases passed', result.stdout)
-            print('208 strict comparisons and four complete partial fingerprints preserved; ' + result.stdout.strip())
+            print('209 strict comparisons and three complete partial fingerprints preserved; ' + result.stdout.strip())
 
 
 if __name__ == '__main__':

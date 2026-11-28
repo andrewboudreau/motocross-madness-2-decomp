@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 2, b 103, c 70, total 175. The three class (a) functions of the
+Counts: a 2, b 99, c 69, total 170. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -130,6 +130,20 @@ distance; sizeFactor = width / (CameraZoom(camera) * frameWidth);`), so the came
 precedes `fst [esi + 0x1ec]` as in retail. VC6 does not move a load above an earlier
 store; when retail loads before a store, the load must already come first in the source.
 KrustyUI `0x004988a0` was already exact in src/reconstructed/KrustyUI.cpp (stale row).
+Camera::UpdateMatrices `0x0042ee30` (class c, 487/492) is exact too, in
+src/reconstructed/Camera.cpp: the radian field of view passed to ProjectionMatrix carries
+a `(float)` cast, as the half angle of the focal length already does. The cast emits
+nothing but is one more IL unit before the first MatrixMult, which moves its
+`sub esp, 0x40` into the slot after `mov edi, esp` as in retail. The probe-store ruler
+(k dead stores to an extern int array: one store anywhere between the ProjectionMatrix call and
+the product gives retail's order, two do not) sized the gap at exactly one unit; when a
+scheduling-only row needs k units, look for no-op casts and conversions first.
+PCCentralBikeRiderDlg::Tick `0x004d72c0` (class b, 1237/1291) is exact by the same idiom, in
+src/reconstructed/ProCircuitProcs.cpp: each D3DRMVectorRotate angle carries a `(float)` cast
+(`(float)(dx * 0.015707964f)`, `(float)(frameTime * 0.39269909f)`), which places the
+`mov edi, esp` of the by-value LookAt copy after the loads as in retail; one cast fixes one
+arm. The two casts also make DlgProcs `0x0044fae0` and SelectGamePicProcs `0x004f8820`
+exact (1235/1235, 1268/1268) with the same two casts.
 Two broad scans on 2026-11-11 closed no row. Dead initialised `int` locals (0..40) at
 function top, over about 45 rows: no row improved. Single extra compiler flags on top of
 `vc6_o2_mt`, over about 57 rows with gaps up to 15 bytes: `/Z7` dropped or replaced by
@@ -245,12 +259,20 @@ way; the difference showed only in the next arm, whose temporaries start one rot
 later when the argument's store is the inline's first statement. When an arm is one step
 off and nothing in it moves, look at the statement order of an inline expanded in the arm
 before it, even if that arm already matches.
+TextService::LayoutText `0x0050ba00` (class b, 770/802) is exact too, in TextService.cpp:
+the glyph cell's extents go through file-local inline helpers (`RectWidth(cell) * 255.0f`),
+not `(cell.bottomRight.x - cell.topLeft.x) * 255.0f`. Two vertex stores slipped one place
+in VC6's scheduling window; a dead-store ruler showed retail's block holds one more IL
+tuple ahead of the vertex stores, and the inlined accessor supplies it without code (the
+helpers declared but unused change nothing). As Rectangle2D members the function is exact
+too, but the header's two extra declarations move BikeRace::CreateRacers. When a long
+store run is scheduled one slot off and the ruler says one tuple is missing, look for an
+accessor the original probably called.
 
 | TU | VA | score | class | what differs |
 |---|---|---|---|---|
 | audio/PCAudio | `0x004bdc00` | 91/483 | b | retail extent 483; `while (1)` gives retail's top-tested queue loop (155 insns); left: retail ebp=audio, ebx=&cs then loaded, edi=&sound cs, ready/bytes spilled (frame 0xc vs 8) |
 | audio/PCAudio | `0x004be910` | 108/158 | c | 6 code diffs: retail adds `mov [esp + N], edx`; retail adds `mov [esp + N], edx` |
-| camera/Camera | `0x0042ee30` | 487/492 | c | `sub esp, 0x40` emitted after the `rep movsd` that copies the projection argument (retail before it) in the first MatrixMult; argument copies, viewport temporaries and declaration forms do not move it. The slot after `mov edi, esp` takes a nearby independent instruction (a lone viewport store lands there), but no store placement puts the `sub` in it |
 | camera/FollowCamera | `0x00462ee0` | 511/564 | c | constructor: the post-call copies match; VC6 fills the +0x29c vector copy's load-delay slot with the +0x274/+0x2dc zero stores where retail uses +0x2e4/+0x276 (28 positions of the pair and 29 of the copy tried) |
 | camera/FollowCamera | `0x00463a30` | 903/4042 | b | slot 45 (keyboard/joystick controls), 138 code diffs; aligned instruction ratio 0.937 (src/reconstructed/FollowCamera.cpp) |
 | camera/FollowCamera | `0x004650e0` | 519/1014 | b | frame 0x18c as retail (second cross product normalised straight from the call); retail keeps the first product's components in memory temporaries and reads them for the second; branch targets of the two `je` tests. Ruled out (2026-11-11): every inline side-cross spelling (Vec3 constructor, member stores, named float temporaries, operator[], by-value or out-reference helper) keeps the components in x87 registers (514-518); /Op reaches 553 but the sibling FollowCamera::Tick drops 3659 -> 293 under it, so it is not the original flag |
@@ -288,9 +310,9 @@ before it, even if that arm already matches.
 | krusty2/collision/CollisionObject | `0x00436af0` | 809/852 | c | same size, frame and registers; the zero-vector and contactCount stores are scheduled into the neighbouring rotation/call setup in another order |
 | krusty2/collision/CollisionObject | `0x00436e50` | 2109/2205 | b | HullVsModel: same instructions as retail; the x87 tail of the inlined product (rel._43/_44) is scheduled after the first SweptBoxOverlap pushes. 2026-11-14 probe: the interleave shifts with the number of instructions in the block before the tail, period 80; retail behaves as if the block held 2..6 fewer before scheduling. Helper spellings, statement positions and debug flags tried (source header) do not remove any |
 | krusty2/collision/CollisionObject | `0x004376f0` | 695/707 | c | HullVsModelSwept: mean as ModelVsHull; the enabled test nests outside the element-pointer local and call, which fixes the loop's loads and the mean copy registers. Left: the schedule of the first by-value box copy (`mov edx, esp` placement); locals for the box pointer or copies of its vectors do not move it |
-| krusty2/collision/CollisionObject | `0x00437c20` | 712/716 | c | ModelVsHull: frame and slots match; mean written per component with `s` assigned inside the x product; the enabled test nests outside the element-pointer local and call (fixes the second push schedule and the mean copy registers). Left: one push schedule before 0x424730 (`push ecx` before `add eax, 4`); a box-pointer local or a half-extents pointer local does not move it; nor does reshaping the CollisionInvertRigid inline (float temporaries 183, row struct assignment 244, three row locals 220, unused locals unchanged) |
+| krusty2/collision/CollisionObject | `0x00437c20` | 712/716 | c | ModelVsHull: frame and slots match; mean written per component with `s` assigned inside the x product; the enabled test nests outside the element-pointer local and call (fixes the second push schedule and the mean copy registers). Left: one push schedule before 0x424730 (`push ecx` before `add eax, 4`); a box-pointer local or a half-extents pointer local does not move it; nor does reshaping the CollisionInvertRigid inline (float temporaries 183, row struct assignment 244, three row locals 220, unused locals unchanged); 2026-11-28: dead probe stores after the rel MatrixMultiply, k = 1..12, never align (pdiff 2..8), so the push order is not a block-count effect there |
 | krusty2/collision/CollisionObject | `0x00437ef0` | 857/906 | c | ModelVsHullSwept: frame 0x7c matches; mean and nested enabled test as ModelVsHull. Left: scheduling of the two box copies and one push; assignment after declaration, component-wise copies and the reversed declaration order do not move it |
-| krusty2/collision/CollisionObject | `0x00438280` | 705/710 | c | ModelVsModel: as ModelVsHull, with the same per-component mean; an element-pointer local before the call fixes the mean copy registers. Left: one by-value copy schedule (`sub esp, 0xc` placement) |
+| krusty2/collision/CollisionObject | `0x00438280` | 705/710 | c | ModelVsModel: as ModelVsHull, with the same per-component mean; an element-pointer local before the call fixes the mean copy registers. Left: one by-value copy schedule (`sub esp, 0xc` placement); 2026-11-28: dead probe stores at three anchors give no k with an aligned schedule |
 | krusty2/collision/CollisionObject | `0x00438550` | 734/783 | c | ModelVsModelSwept keeps the last contact (no averaging); an element-pointer local before the call fixes the loop registers. Left: scheduling of the two box copies (as 0x00437ef0); assignment after declaration, component-wise copies and the reversed declaration order do not move it |
 | krusty2/collision/CollisionObject | `0x00434eb0` | 1666/1885 | b | UpdateModelBounds: call pattern, size and frame match (named `lo`, `continue`, inverse pointer, guarded do-while); retail clears i before the guard, ax/az slots swapped, minBound/maxBound among the temporaries |
 | krusty2/collision/CollisionObject | `0x00435830` | 902/1684 | b | SetTransform: per-element term order of the hull case's inline 4x4 product (retail 3,2,1,4 / 1,3,4,2 / ...; arena ordering, see VC6_OPERAND_ORDER.md 3.2; ~40 element-pointer, reference and bracketing forms recorded at the helper); frame 0x30 both |
@@ -385,13 +407,12 @@ before it, even if that arm already matches.
 | render/TextureChannelDifference | `0x004cb330` | 35/629 (candidate 620) | b | Corrected full cold-tail extent; complete native-reviewed candidate. See DISPLAY_SURFACE_HELPERS.md. |
 | render/Pixtrans | `0x004cdf10` | 110/636 (candidate 628) | b | 182/203 aligned with `top = sourceRow + x * 2`; VC6 forms the lower row as `top + sourceStride` in edx where retail biases it to the alpha byte (+3) and spills it |
 | render/Pixtrans | `0x004ce420` | 280/458 | b | frame 0x10 and the x loop match; VC6 loads `source` into ebp at entry (ebp pushed before the height guard) and forms the next source row in ebp where retail uses eax and copies it at the row head; first pixel's zero extension in ecx (retail edi) |
-| render/Pixtrans | `0x004cee30` | 1121/1125 masked | b | after the keyed x loop retail reloads the source stride before the width |
+| render/Pixtrans | `0x004cee30` | 1129/1133 | b | after the keyed x loop retail reloads the source stride before the width |
 | render/Pixtrans | `0x004cf2a0` | 276/1759 (candidate 1745) | b | 534/566 aligned; abs() intrinsic, out-parameter quantize and y-derived row pointers; ebp push placement, y loop pointer setup order and the rotated loop entry differ |
 | render/ResourceManager | `0x004e9030` | 100/804 | b | 5 code diffs, all from retail homing `archive` in the `new` temporary's slot: `mov [esp+0x14], ebx` after the EH state reset and `mov eax, [esp+0x14]` for the success return (the 6 missing bytes) |
 | render/TextService | `0x0050b080` | 530/890 | b | 30 differing instructions: w and v trade esi and a stack slot; row offsets in other registers |
 | render/TextService | `0x0050b400` | 398/758 | b | 31 differing instructions: w and v trade esi and a stack slot; row offsets in other registers |
 | render/TextService | `0x0050b700` | 398/758 | b | 31 differing instructions: w and v trade esi and a stack slot; row offsets in other registers |
-| render/TextService | `0x0050ba00` | 770/802 | b | scheduling of the v3.sx and v5.sx stores |
 | render/Tgafile | `0x00512990` | 354/982 (masked) | c | 49 code diffs |
 | track/SceneManager | `0x004edfe0` | 5289/5335 | b | instruction stream aligned, frame 0xcfc as retail (sound scalars local to the sound block, `automatic` local to the keyFramed block); left: the low scalar slots 4..0x20 (retail puts the random-set spill in fps's home at 8 and keeps i alone at 0x10; here the spill shares i's home at 4 and fps sits at 0x1c) and the [base + index] order of the two motionCount reads at the motions allocation |
 | track/Track | `0x00517340` | 57/655 (masked) | b | 44 code diffs: retail lacks `mov [esp + N], 0`; `add esp, 0x24` vs `add esp, 0x20`; frame 0x24 vs 0x20 |
@@ -400,7 +421,6 @@ before it, even if that arm already matches.
 | track/TrackOverlay | `0x0051c4f0` | 334/520 (masked) | b | 13 code diffs: `mov ecx, [esp + N]` vs `mov eax, [esp + N]`; retail adds `fld [esp + N] ; faddp st(2)`; slots differ |
 | track/TrackOverlay | `0x0051c720` | 249/962 (masked) | b | 10 code diffs: `mov [ebp + N], ecx ; fstp [ebx + 0x1dc]~` vs `mov [ebx + 0x1bc], ecx`; retail adds `fstp [esi] ; fild [esp + N]`; frame 0x74 vs 0x8c, slot order differs |
 | ui/DlgProcs | `0x0044b200` | 925/5232 | b | references match retail since ButModem returns from its loop (three array destructor calls); left: frame 0xc64 vs 0x6c4 (the two ConnectionInfoType[5] arrays get separate slots) and retail's `edi = 1` in the MenuMulti block |
-| ui/DlgProcs | `0x0044fae0` | 1181/1235 | b | 8 code diffs: retail lacks `mov edi, esp`; retail adds `mov edi, esp`; slots differ |
 | ui/DlgProcs | `0x004507a0` | 589/1668 | c | 32 code diffs: retail computes `lea eax,[TrackGame+0x570]` in each loop test and reloads eventManager through it at the body top; VC6 here reuses the loaded pointer; a reference-returning accessor, `++i`, a reversed test, `(&em)[0]` and `field_0x50 + i` all compile the same; so do (2026-11-11, in the Group2 bring-up) inline `EventManager*&`/by-value manager, entry and count helpers in the test, the body or both, and a `while` loop |
 | ui/DlgProcs | `0x004513a0` | 595/2004 | c | first loop: retail reloads EventManager for the +0x04 sprintf arg, VC6 here reuses it; `continue`, `EventManager* const&` alias, entry reference/pointer, TrackGame local, `(int)` cast and `(field_0x50 + i)->` all give 595 |
 | ui/GUIManager | `0x00486170` | 280/896 | b | 52 code diffs: retail lacks `xor ebx, ebx`; `cmp ecx, ebx` vs `xor ebx, ebx`; frame 0xa4 vs 0xb0, slot order differs |
@@ -414,13 +434,11 @@ before it, even if that arm already matches.
 | ui/GameUi | `0x00478e10` | 231/303 | c | frame and head are retail's (the area is tested in place, no RECT copy); the opaque-result tail differs as in UIButton slot 28 `0x004734c0`; the same exposed-flag probe gives 318/329 (flag and format stores swapped), not applied |
 | ui/GameUi | `0x0047a400` | 887/962 | c | the area bottom written from the list gives retail's store order; VC6 forms it with `lea edx, [edi + edx - 2]` (retail adds the scroll bottom's `sub eax, 2` value) and swaps ebx/edi, shifting later scratch registers |
 | ui/GameUi | `0x0047b490` | 120/220 | c | the key pixel kept in the red term's variable stays in a register and the row counter spills into the key's slot as retail; VC6 ORs green and blue first where retail ORs red and green first, saves edi in the prologue (retail inside the row loop) and steps the row with one lea |
-| ui/ProCircuitProcs | `0x004d72c0` | 1237/1291 | b | as DlgProcs `0x0044fae0`: only the scheduling of the by-value Vector3 copies for the camera call (`mov edi, esp` placement) differs; kVec3YAxis now bound to this unit's 0x00689b28 |
 | ui/ProCircuitProcs | `0x004d8c40` | 427/886 | c | 15 code diffs: retail lacks `mov edx, [esi + 8]`; retail lacks `mov ebx, [esi + 0x14]` |
 | ui/ProCircuitProcs | `0x004d8fc0` | 836/882 | c | 12 instruction diffs: retail loads the message kind into ecx before the circuit (VC6 here: circuit first, kind in eax) and stores the fee member first with other registers |
 | ui/ProCircuitProcs | `0x004d9860` | 1068/1122 | c | 13 instruction diffs: the prologue and init-store differences of `0x004d8fc0` |
 | ui/SelectGamePicProcs | `0x004f2340` | 933/2148 | b | retail keeps the racer total in memory and bikes/riders/names in edi/ebx/ebp, and tests `start` through the ax of the message.start store; `if (message.start)` and `!= 0` are inert |
 | ui/SelectGamePicProcs | `0x004f8220` | 110/840 | b | 57 code diffs: `xor ebp, ebp` vs `xor edi, edi`; `mov [esp + N], ebp ; mov [esp + N], ebp` vs `mov [esp + N], edi ; mov [esp + N], edi`; slot order differs |
-| ui/SelectGamePicProcs | `0x004f8820` | 1214/1268 | b | 8 code diffs: retail lacks `mov edi, esp`; retail adds `mov edi, esp`; slots differ |
 
 ## Declaration-shift scan of class (c)
 

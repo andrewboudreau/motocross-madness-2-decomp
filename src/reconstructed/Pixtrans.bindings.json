@@ -60,5 +60,6 @@
   "?AverageColor@@YAHPAXHHHHPAVColorMapper@@@Z": "0x004d24d0",
   "?PixelFormatBytesPerPixel@@YAHH@Z": "0x00511970",
   "?g_ditherCapacity@@3HA": "0x00689a6c",
-  "?g_ditherRows@@3PAPAHA": "0x00689a70"
+  "?g_ditherRows@@3PAPAHA": "0x00689a70",
+  "?GetColors@ColorMapper@@QAEPAEXZ": "0x004de270"
 }
