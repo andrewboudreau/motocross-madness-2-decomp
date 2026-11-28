@@ -10,6 +10,8 @@
 
 #include "DebugAlloc.h"
 #include "TextureMap.h"
+#include "ManagedTexture.h"
+#include "LightEmitter.h"
 #include "D3DConstants.h"
 
 // Per-TU vector constants (tier 2, the shape documented in docs/LZW.md):

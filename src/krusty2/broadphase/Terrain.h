@@ -126,16 +126,12 @@ struct TerrainQualityEntry {
 extern TerrainQualityEntry* g_pTerrainQualityTable;             // 0x0068a32c
 extern int g_terrainQualityValue;                               // 0x0057471c (Terrain.cpp .data)
 
-// PROVISIONAL: GameObject::renderContext points at a host object whose +8 member points at a 0x220
-// byte block that 0x00508850 copies to 0x0068a090.
-// Tier 2: retail constructs this global with 0x004bed80 (PCCamera(int), argument 1) and registers
-// the 0x004624d0 destructor stub (a tail jump to ~Camera), so it is a PCCamera (0x220 bytes);
-// the stand-in keeps the ctor/dtor external and the words as an opaque copyable block.
-struct TerrainSharedState {
-    int words[0x88];
-    explicit TerrainSharedState(int flags);   // 0x004bed80 (PCCamera)
-    ~TerrainSharedState();                    // 0x004624d0
-};
+// GameObject::renderContext points at a host object whose +8 member points at a 0x220-byte
+// camera that 0x00508850 copies to 0x0068a090.
+// Tier 2: retail constructs that global with 0x004bed80 (PCCamera(int), argument 1) and registers
+// the compiler-generated ~PCCamera 0x004624d0 (a tail jump to ~Camera), so it is a PCCamera
+// (0x220 bytes).
+class PCCamera;
 
 // The timer's identity and layout are already reconstructed in PeakHold.h.
 // Keep the local alias for the unknown roles of these ten Terrain timers.
@@ -163,9 +159,9 @@ struct TerrainDisplay {
 struct TerrainHost {
     int vtable;
     TerrainDisplay* display;                                    // +0x04
-    TerrainSharedState* sharedState;  // +0x08 pointer to the 0x220-byte block copied to g_terrainSharedState by slot 23
+    PCCamera* sharedState;            // +0x08 the 0x220-byte camera slot 23 copies to g_terrainSharedState
 };
-extern TerrainSharedState g_terrainSharedState;                 // 0x0068a090
+extern PCCamera g_terrainSharedState;                           // 0x0068a090
 extern int g_terrainToggle314;                                  // 0x0068a314
 extern int g_terrainToggle718;                                  // 0x00574718
 

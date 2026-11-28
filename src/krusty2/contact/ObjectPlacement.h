@@ -8,13 +8,13 @@
 #include "math/Math3D.h"
 
 class CollisionObject;
-struct SoultreeProbe;
+class Terrain;
 
 // 0x004b0df0, cdecl, 17 stack args (tier 1).  groundMask is an unsigned char (the base
 // caller zero-extends it with mov al, tier 1); referenceDir and targetPoint are nullable
 // Vec3 pointers (0x4b17f1 and 0x4b1c72 dereference targetPoint, tier 1).  Parameter roles:
 // see ObjectPlacement.cpp (tier 3).
-int FindObjectPlacement(CollisionObject* body, SoultreeProbe* terrain, Vec3* position,
+int FindObjectPlacement(CollisionObject* body, Terrain* terrain, Vec3* position,
                         float terrainScale, int useAreaTest, int limit1, int limit2,
                         int allowObjectTest, float radiusStep, unsigned char groundMask,
                         const Vec3* referenceDir, const Vec3* targetPoint, int refinePair,

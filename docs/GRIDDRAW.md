@@ -188,10 +188,11 @@ exact or a documented near miss.
 ## Remaining uncertainty
 
 All type, member and function names are provisional. `GridTerrain`,
-`GridVisibilityClipper`, `GridAgeManager` and
-`GridVertexSink` are boundary views of classes reconstructed elsewhere, or
-not yet reconstructed, as are `GridRenderDevice` (Terrain+0x18, thiscall
-virtuals), `GridManagedTexture` (`0x00510910`) and `GridGameSettings` (`0x0056e26c`);
+`GridVisibilityClipper` and `GridAgeManager` are boundary views of classes
+reconstructed elsewhere, or not yet reconstructed, as are `GridRenderDevice`
+(Terrain+0x18, thiscall virtuals) and `GridGameSettings` (`0x0056e26c`). The
+node texture (GridNodeExtra+0x08) is the real `ManagedTexture` and the vertex
+lighting object (Terrain+0xc40) the real `LightManager`;
 only their called slots and touched fields are known. GridTerrain+0x2c is the
 canonical `GroundFogableObject` base, whose `FogVertices` (`0x00484f10`) fogs unlit vertices. The fifth argument of
 `0x00482dd0` is the originating cell (`0x00483200` compares it with cell

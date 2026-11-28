@@ -34,6 +34,8 @@ public:
     void RemoveFromQuadtree();                 // thiscall, plain ret: releases the inQuadtree entry
 };
 
+struct Vector3;
+
 // RTTI .?AVD3DIMSoultreeObject@@ : SoultreeObject (plain inheritance).
 class D3DIMSoultreeObject : public SoultreeObject {
 public:
@@ -42,7 +44,7 @@ public:
     char pad_0x290[0x2d4 - 0x290];
     int visible;                      // +0x2d4 D3DIMSoulTree.h's name; set to 1 by slot 12 before SelectLod. Tier 2
     void TransformVertexGroups(int lod);  // 0x00440d40, ret 4 (src/reconstructed D3DIMSoulTree.h)
-    void SelectLod(int center, int extents);  // 0x00443de0, ret 8: null bounds pick the node's own
+    void SelectLod(Vector3* center, Vector3* extents);  // 0x00443de0 (D3DIMSoulTree.cpp), ret 8: null bounds pick the node's own
 };
 
 // Debug allocator iterator over a GameObject tree: heap allocated, 0x94 bytes

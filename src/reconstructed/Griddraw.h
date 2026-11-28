@@ -17,6 +17,8 @@
 class FileStream;
 struct GridVertex;
 class Camera;
+class ManagedTexture;
+class LightManager;
 
 // The grid caches share AgeManager's 0x14-byte manager and entry records.
 // Eviction receives owner and context; callbacks may ignore the second value.
@@ -53,35 +55,6 @@ public:
     Camera* camera;                            // +0x08 the camera the box test takes (0x00481de0)
 };
 
-// Boundary view of ManagedTexture (src/reconstructed binds 0x00510910 as
-// ManagedTexture::RemapTexCoordsIfMoved): bit 0 of +0x68 enables the texture
-// coordinate update that 0x00510910 applies to a vertex range.
-class GridManagedTexture {
-public:
-    int RemapTexCoordsIfMoved(float* scale, float* offsetU, float* offsetV, float* u, float* v, int count,
-                              unsigned int stride);  // 0x00510910 (ret 0x1c)
-    unsigned char field_0x00[0x04];                 // +0x00 vfptr (BaseObject)
-    int refCount;                               // +0x04 BaseObject refCount
-    void* nextTexture;                          // +0x08 TextureMap nextTexture
-    void* previousTexture;                      // +0x0c TextureMap previousTexture
-    void* ownerManager;                         // +0x10 TextureMap ownerManager
-    int textureWidth;                           // +0x14 TextureMap textureWidth
-    int textureHeight;                          // +0x18 TextureMap textureHeight
-    int minimumMipSize;                         // +0x1c TextureMap minimumMipSize
-    int mapFormat;                              // +0x20 TextureMap mapFormat
-    int mipCount;                               // +0x24 TextureMap mipCount
-    void* sourcePalette;                        // +0x28 TextureMap sourcePalette
-    void* colorMapper;                          // +0x2c TextureMap colorMapper
-    int usesColorKey;                           // +0x30 TextureMap usesColorKey
-    int colorKeyValue;                          // +0x34 TextureMap colorKeyValue
-    int colorKeyHighValue;                      // +0x38 TextureMap colorKeyHighValue
-    int averageColor;                           // +0x3c TextureMap averageColor
-    unsigned char field_0x40[0x44 - 0x40];
-    int statePairCount;                         // +0x44 TextureMap statePairCount
-    unsigned char statePairs[0x68 - 0x48];      // +0x48 TextureMap statePairs (TextureRenderState[4]; bytes kept)
-    unsigned char mapFlags;  // +0x68  TextureMap.h mapFlags; bit 0 (ManagedTexture) enables the texture coordinate remap
-};
-
 // The game object at 0x0056e26c as this file sees it (other views name it
 // TrackGame). +0x2d0 disables terrain drawing; +0x550/+0x554 are the
 // texture-stage values restored after a close-up draw.
@@ -91,14 +64,6 @@ struct GridGameSettings {
     unsigned char field_0x2d4[0x550 - 0x2d4];
     int minFilter;
     int mipFilter;
-};
-
-// Object at Terrain+0xc40; 0x0049e4a0 is called with (&Terrain+0xc44, count,
-// buffer + 0xc, buffer, 0x20, 0) after a node rebuilds its vertex buffer.
-class GridVertexSink {
-public:
-    void LightVertices(void* matrix, int count, void* vertices, void* buffer,
-                       int stride, int flags);  // 0x0049e4a0
 };
 
 // Boundary view of VisibilityClipper (src/krusty2/visibility): 0x0052f570
@@ -165,7 +130,8 @@ struct GridTerrain {
     unsigned char field_0xc35[3];
     int childTableOffset;                     // +0xc38 stream offset of the child tables
     int detailTexture;  // +0xC3C  Terrain::Load's 0x0050a590 texture (testnoise.tga); set -> 0x00480c90 writes detail coordinates
-    GridVertexSink* vertexSink;                // +0xc40
+    LightManager* vertexSink;                  // +0xc40 LightVertices 0x0049e4a0 gets (&transform, count, buffer + 0xc, buffer, 0x20, 0)
+                                               // after a node rebuilds its vertex buffer
     float transform[16];                       // +0xc44 transform
     int textureAgeManager;  // +0xC84  Grid1.h's Grid1Terrain view: the node texture AgeManager
     AgeManager* ageManager;                    // +0xc88
@@ -283,7 +249,7 @@ struct GridBlockRecord {
 struct GridNodeExtra {
     int byteCount;                             // +0x00 byte count read from the stream
     void* data;                                // +0x04 DebugMalloc'd, byteCount bytes
-    GridManagedTexture* texture;               // +0x08 tested before slot 4(-1)
+    ManagedTexture* texture;                   // +0x08 tested before slot 4(-1); TextureMap+0x68 bit 0 enables the coordinate remap (0x00510910)
     int textureReference;  // +0xC  stream header; Grid1NodeExtra packs own bit and texture table index
     int builtTexture;                          // +0x10 Grid1.h's builtTexture: the node texture BuildNodeTexture takes from Terrain's pool
     unsigned char ageEntry[0x28 - 0x14]; // +0x14: Grid1.h AgeEntry ageEntry (bytes kept)

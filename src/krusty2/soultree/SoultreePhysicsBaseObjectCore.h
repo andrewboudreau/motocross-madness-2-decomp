@@ -29,14 +29,7 @@ class SoultreeObject;
 class SoultreeContact;    // elements of the collisionPoints array
 class CollisionObject;    // pointed to by collisionObject (collision/CollisionObject.h (src/krusty2))
 struct SoultreeLight; // defined in SoulTreePhysics.cpp (slot 21)
-// Object probed for ray hits (terrain); only the members the base uses are modelled.
-struct SoultreeProbe {
-    char pad_0x00[0x40];
-    float worldScale;              // +0x40 copied to terrainScale by slot 2
-    // thiscall, callee pops 6 args
-    int CastSegment(const Vec3* from, const Vec3* to, Vec3* out, int a, int b,
-                  int c);
-};
+class Terrain;            // broadphase/Terrain.h: the object probed for ray hits (terrain)
 class Scene;  // SceneManager.h
 class SoultreeAttachTarget;
 class SoultreeAttachment; // 40-byte records in the attachments array
@@ -246,8 +239,9 @@ public:
     float lastStepTime;  // +0x1e8 Vehicle slot 49: lastStepTime = stepTime after each sub-step
     int maxStepsPerFrame;  // +0x1ec slot 2's a13; slot 9 clamps the number of sub-steps to it
     Scene* track;  // +0x1f0 slot 2's a11: the event Scene; slot 18 reads its environment's generateDust by the contact material id
-    SoultreeProbe* terrain;         // +0x1f4 tier 2: slot 2 stores a6 here and reads float +0x40 from it;
-                                        // slot 21 calls thiscall 0x00506e90 on it; passed as 'obj' to 0x004b0df0
+    Terrain* terrain;               // +0x1f4 tier 2: slot 2 stores a6 here and reads Terrain::gridCellSize (+0x40) from it;
+                                        // slot 21 calls Terrain::CastSegment 0x00506e90 on it; passed to FindObjectPlacement 0x004b0df0.
+                                        // QuarryStuntEvent's loader stores its event Terrain here.
     float terrainScale;                  // +0x1f8 fld/fmul in KrustyBike slot 12 (0x0048de20), tier 1
     char inShadow;  // +0x1fc slot 21: last result of the line-of-sight probe from the attachments' centre (+1.5 up) toward shadowLight; when the result flips, type-1/4 attachments are retinted 0x40/0x80 (blocked) or 0xff and flag 0x800 toggled
     SoultreeLight* shadowLight;    // +0x200 tier 3: light (kind 2 or 4) picked from the node list by slot 21; shadow probe target

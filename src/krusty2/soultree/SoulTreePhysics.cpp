@@ -16,6 +16,7 @@
 #include "soultree/SoultreePhysicsObject.h"
 #include "soultree/SoultreePhysicsCharacter.h"
 #include "collision/CollisionPoint.h"
+#include "broadphase/Terrain.h"      // Terrain::CastSegment 0x00506e90, gridCellSize +0x40
 
 #define g_Zero kVec3Zero
 
@@ -684,9 +685,10 @@ void SoultreePhysicsBaseObject::UpdateAttachmentEffects()
         if (light->kind == 2) {
             Vec3 to = pos + Vec3(light->lightDirX * -3000.0f, light->lightDirY * -3000.0f,
                                  light->lightDirZ * -3000.0f);
-            hit = terrain->CastSegment(&pos, &to, &out, 0, 0, 0);
+            hit = terrain->CastSegment((TerrainVec3*)&pos, (TerrainVec3*)&to, (TerrainVec3*)&out, 0, 0, 0);
         } else {
-            hit = terrain->CastSegment(&pos, &light->lightPosition, &out, 0, 0, 0);
+            hit = terrain->CastSegment((TerrainVec3*)&pos, (TerrainVec3*)&light->lightPosition, (TerrainVec3*)&out,
+                                       0, 0, 0);
         }
         if (hit != (unsigned char)inShadow) {
             for (int i = 0; i < attachmentCount; i++) {
@@ -802,7 +804,7 @@ GameObject* SoultreePhysicsBaseObject::InitializePhysics(int renderContext, int 
 {
     restContactThreshold = restThreshold;
     particleManager = (GameObject*)linkedObject;
-    terrain = (SoultreeProbe*)terrainProbe;
+    terrain = (Terrain*)terrainProbe;
     baseWeight = weight;
     track = trackObject;
     fixedStepTime = fixedStep;
@@ -815,7 +817,7 @@ GameObject* SoultreePhysicsBaseObject::InitializePhysics(int renderContext, int 
     respawnHeading = startForward;
     groundProbeMask = probeMask;
     if (terrainProbe)
-        terrainScale = ((SoultreeProbe*)terrainProbe)->worldScale;
+        terrainScale = ((Terrain*)terrainProbe)->gridCellSize;
     collisionPointCapacity = contactCapacity;
     if (contactCapacity > 0) {
         collisionPoints = new(SP_FILE, 0x202) SoultreeContact*[contactCapacity];
@@ -1052,7 +1054,7 @@ void SoultreePhysicsBaseObject::UpdateRestState()
 // from its owner node, counts the penetrating ones into *activeCount and returns nonzero
 // when it ran (first argument zero: nothing done).  Parameter names tier 3.
 int SoultreeRefreshContacts(int enabled, int* activeCount, int count, SoultreeContact** contacts,
-                            SoultreeProbe* terrain, Vec3* center, int mode, float radius);
+                            Terrain* terrain, Vec3* center, int mode, float radius);
 
 // Per-frame update: skipped while asleep (asleep); otherwise slot 9 splits dt into
 // fixed steps, slot 30 clears the contact flags, slot 39 handles a pending reset, the

@@ -82,14 +82,24 @@ public:
     LightEmitter* FindLightOfType(int type);        // 0x004a0190: first light of `type`
     // 0x0049e4a0 lights `count` vertices: it grows the per-vertex
     // red/green/blue arrays, picks a worker by light count and type, then
-    // scales the optional colour array by the results (Griddraw.h's
-    // GridVertexSink is this function seen from the terrain). Not
-    // reconstructed: it and its
+    // scales the optional colour array by the results (the terrain calls it
+    // through Terrain+0xc40 with no colours). Not exact: it and its
     // three workers 0x0049e6b0, 0x0049f1c0 and 0x0049f8d0 (ebp frames) round
     // with an inlined `fld [tmp]; mov eax, [p]; fistp [eax]` helper that VC6
-    // only emits for inline assembly.
+    // only emits for inline assembly. The bodies are the /QIfist bring-up
+    // src/bringup/Group4_GridLighting.cpp.
     void LightVertices(void* matrix, int count, void* vertices, void* buffer,
                        int stride, void* colors);
+private:
+    // Retail calls the workers as thiscall on the LightManager with the five
+    // leading arguments (`mov ecx, esi` before each call).
+    void LightAny(const Matrix4* matrix, int count, void* normals, void* buffer,
+                  int stride);  // 0x0049e6b0
+    void LightOne(const Matrix4* matrix, int count, void* normals, void* buffer,
+                  int stride);  // 0x0049f1c0
+    void LightAmbientPlusOne(const Matrix4* matrix, int count, void* normals, void* buffer,
+                             int stride);  // 0x0049f8d0
+public:
 
     int lightCount;                         // light count
     LightEmitter* lights[50];               // +0x30

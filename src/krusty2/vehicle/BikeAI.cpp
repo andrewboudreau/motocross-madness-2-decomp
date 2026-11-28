@@ -1808,10 +1808,10 @@ int KrustyBike::UpdateAIRacingLine(float dt)
                 dir.x = rand() * (1.0f / 32768.0f);
                 dir.z = rand() * (1.0f / 32768.0f);
                 dir.y = 0.0f;
-                dir = BikeAINormalizeInline(dir) * 444.0f * terrain->worldScale;
-                roamTarget.x = terrain->worldScale * 666.66f + dir.x;
+                dir = BikeAINormalizeInline(dir) * 444.0f * terrain->gridCellSize;
+                roamTarget.x = terrain->gridCellSize * 666.66f + dir.x;
                 roamTarget.y = 0.0f;
-                roamTarget.z = terrain->worldScale * 666.66f + dir.z;
+                roamTarget.z = terrain->gridCellSize * 666.66f + dir.z;
             } else {
                 aiPath.points[0] = roamTarget;
             }

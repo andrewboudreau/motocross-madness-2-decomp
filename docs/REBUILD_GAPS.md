@@ -867,7 +867,7 @@ Vtables, RTTI and EH tables are skipped. Binding evidence: 3,035 bindings,
   .bss. Now `int g_terrainQualityValue = 1;` in `Terrain.cpp`.
 - Fixed: `g_terrainShadowClipper` (0x00575a98). Retail has one pointer, the
   same one `g_visibilityClipper` names, initialised to 0x0068acd4. The bring-up
-  copy in `Group6_TerrainShadow.cpp` was a second global with a dynamic
+  copy in `Group6_TerrainShadow.cpp` (since retired) was a second global with a dynamic
   initializer (zero in the load image). The sample now calls
   `g_visibilityClipper` itself, so neither the copy nor an alias remains.
 - Size checks: `s_g3TrickFrame` (128 B, which reaches into `s_kbTimeTo60Armed`)

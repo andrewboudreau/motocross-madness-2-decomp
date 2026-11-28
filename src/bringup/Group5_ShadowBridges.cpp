@@ -1,27 +1,13 @@
-// Group5 bring-up definitions (best-guess, link frontier). Not strict matches.
+// Group5 bring-up definition (best-guess, link frontier). Not a strict match.
 //
-// ProjectedShadow.h names the shadow pass's providers with its own tier-3
-// views (ShadowMatrix*, ShadowFillTriangle).
-// Where the retail VA already has a definition under its owner's name, the
-// view forwards to it:
-//   0x004a1410 ShadowMatrixIdentity     -> IdentityMatrix
-//   0x004a1860 ShadowMatrixMultiply     -> MatrixMult
-// 0x00461e60 (the triangle rasteriser) has no definition yet and is
-// written out here.
+// 0x00461e60, the triangle rasteriser ProjectedShadow.h declares as
+// ShadowFillTriangle, and its edge set-up 0x00461d60. Both are inline assembly
+// in retail, after FileStream's code (0x00460d10..0x00461d57) with no
+// __FILE__ or RTTI to name their unit, so they stay here. The two matrix
+// forwarders this file also held are link aliases now (config/game_build.json):
+// ShadowMatrixIdentity is IdentityMatrix 0x004a1410 and nothing calls
+// ShadowMatrixMultiply.
 #include "shadow/ProjectedShadow.h"
-#include "D3DIMSoulTree.h"   // TransformPoints 0x004a1b00 and MatrixUtil.h
-
-ShadowMatrix ShadowMatrixIdentity()
-{
-    Matrix4 identity = IdentityMatrix();
-    return *reinterpret_cast<ShadowMatrix*>(&identity);
-}
-
-ShadowMatrix ShadowMatrixMultiply(ShadowMatrix a, ShadowMatrix b)
-{
-    Matrix4 product = MatrixMult(*reinterpret_cast<Matrix4*>(&a), *reinterpret_cast<Matrix4*>(&b));
-    return *reinterpret_cast<ShadowMatrix*>(&product);
-}
 
 // 0x00461d60 (thiscall, ret 0xc): one edge of the triangle, stepped one row
 // at a time with an integer error term (0x1c bytes).

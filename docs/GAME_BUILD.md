@@ -795,6 +795,14 @@ clearly more faithful, the game now links the sample's text:
   - `Group6_KrustyBikeCtor.cpp`
   - `Group3_KrustyUIShadow.cpp`
   - `Group0_SoultreeBridge.cpp` and `Group0_SoultreeBridge.h`
+  - `Group5_D3DIMForwarders.cpp`, `Group5_GridManagedTexture.cpp`,
+    `Group5_LightManagerLightVertices.cpp`, `Group1_SoultreeProbe.cpp`,
+    `Group1_TerrainSharedState.cpp` and `Group6_TerrainShadow.cpp`
+    (2026-11-28): their views are the real `D3DIMSoultreeObject`,
+    `ManagedTexture`, `LightManager`, `Terrain` and `PCCamera`, and the
+    shadow forwarders are link aliases (the `link_aliases` table below).
+    `Group5_ShadowBridges.cpp` keeps only `ShadowFillTriangle` 0x00461e60
+    and its edge set-up, which no unit owns yet.
 - `Group4_EcoBridges.cpp` lost its five forwarders, then its shared
   normal-distribution pointer, which `NormalDistribution.cpp` now defines.
 - The BikeRace near misses (`Create`, `CreateRacers`, `AimCamera`,
@@ -916,6 +924,11 @@ body was unregistered:
   | 0x004b9dc0 | `VehicleImpactSink::SetPosition(Vec3)` | `SparkParticleEmitter::SetPosition` | body in `Group3_VehicleStubs.cpp` |
   | 0x005087b0 | `Vec3Normalize(CollisionVec3*, const CollisionVec3*)` | `Vec3Normalize(const Vec3&)` (Math3D.cpp) | body in `Group0_Math.cpp` |
   | 0x004fd660 | `SoultreeObject::LocalToWorldPoint(const Vector3&)` | `SoultreeObject::LocalToWorldPoint(const Vec3&)` (soultree.cpp) | `Group4_SoultreeBridge.cpp`, `Group4_SoultreeReal.cpp` |
+  | 0x004a1410 | `ShadowMatrixIdentity()` (ProjectedShadow.h), `TerrainMatrixIdentityInto(ShadowMatrix*)` (TerrainShadow sample) | `IdentityMatrix()` (MatrixUtil.cpp, 71/71) | forwarders in `Group5_ShadowBridges.cpp`, `Group6_TerrainShadow.cpp` |
+  | 0x004a1860 | `TerrainMatrixMultiplyInto(ShadowMatrix*, ShadowMatrix, ShadowMatrix)` (TerrainShadow sample) | `MatrixMult(Matrix4, Matrix4)` (MatrixUtil.cpp, 123/123) | forwarder in `Group6_TerrainShadow.cpp` |
+  | 0x00421cb0 / 0x00421d00 | `TerrainShadowSum` / `TerrainShadowDifference` (TerrainShadow sample) | `Vec3AddCall` / `Vec3SubtractCall` (VectorCalls.cpp, 69/69 each) | forwarders in `Group6_TerrainShadow.cpp` |
+  | 0x00404e60 | `TerrainShadowVecCall::TerrainShadowVecCall(float, float, float)` (TerrainShadow sample) | `Vec3Call::Vec3Call` (BoundingBoxTreeQuery.cpp, 25/25) | body in `Group6_TerrainShadow.cpp` |
+  | 0x00506e90 | `TerrainShadowCaster::CastSegment` (TerrainShadow sample) | `Terrain::CastSegment` (Terrain.cpp, 1654/1654) | forwarder in `Group6_TerrainShadow.cpp` |
 
   (wrecker.cpp now calls `ParticleManager::AddParticle` 0x004baa50 itself,
   so its `WreckerParticleManagerView` alias is gone.) The two
@@ -927,7 +940,11 @@ body was unregistered:
   strict-exact `Vec3` body (168/168) and copied the result back; both are thiscall with a hidden
   result pointer and one reference to a 12-byte vector. The argument dwords and
   the `ret` count agree, and neither side adjusts `this`. Every linked score
-  is unchanged. An alias binds a call to the code at one retail address. It
+  is unchanged. The 2026-11-28 shadow rows are the same shape: each view
+  forwarded to (or, for the constructor, restated) its strict-exact provider,
+  with the same cdecl or thiscall argument dwords, hidden result pointer
+  returned in eax and `ret` count. The sample's views stay so its near misses
+  keep their bytes. An alias binds a call to the code at one retail address. It
   does not prove that the receivers have the same class: the `Vec3` setter
   receiver is still unresolved
   ([particle emitters](PARTICLE_EMITTER_CONNECTIONS.md#excluded-mixed-receiver)).
@@ -1168,7 +1185,7 @@ or when only its low bits are kept. `FistpFloatToIntChecked` casts to
 | VA | Function | Unit | Helper and range | Before | Now linked |
 |---|---|---|---|---|---|
 | 0x0048d1e0 | `BonusObjectManager::ShowValue` | `Group4_ScoreBoard.cpp` | plain; small scores | 0.485 | 0.681 |
-| 0x0049e4a0 | `GridVertexSink::LightVertices` | `Group4_GridLighting.cpp` | plain; colour bytes times facing values | 0.458 | 0.745 |
+| 0x0049e4a0 | `LightManager::LightVertices` | `Group4_GridLighting.cpp` | plain; colour bytes times facing values | 0.458 | 0.745 |
 | 0x0049e6b0 | `LightAny` worker | same | same | 0.209 | 0.774 |
 | 0x0049f1c0 | `LightOne` worker | same | same | 0.168 | 0.705 |
 | 0x0049f8d0 | `LightAmbientPlusOne` worker | same | same | 0.206 | 0.714 |
@@ -1554,7 +1571,7 @@ both control words. These agreed with retail in every run (runs in brackets):
   `GridNode::FindLeaf` 0x00484d70, `GridVertexCache::GetVertex`
   0x0047de90, `D3DIMSoultreeObject::GetVertexCount` 0x00444fe0 (600 each),
   `DrawableGridNode::WalkVisibilityQuadrants` 0x00481de0 (400),
-  `GridVertexSink::LightVertices` 0x0049e4a0 with its three workers linked
+  `LightManager::LightVertices` 0x0049e4a0 with its three workers linked
   (600).
 - Network and overlays: `ReceiveMessages` 0x004af8e0 and
   `HandleReceivedMessage` 0x004afa90 (600 each),

@@ -83,7 +83,7 @@ static inline Vec3 PlacementRescale(const Vec3& v, float lenSq)
     return *Vec3ScaleCall(&t, &v, inv);
 }
 
-int FindObjectPlacement(CollisionObject* body, SoultreeProbe* terrain, Vec3* position,
+int FindObjectPlacement(CollisionObject* body, Terrain* terrain, Vec3* position,
                         float terrainScale, int useAreaTest, int limit1, int limit2,
                         int allowObjectTest, float radiusStep, unsigned char groundMask,
                         const Vec3* referenceDir, const Vec3* targetPoint, int refinePair,
@@ -111,7 +111,7 @@ int FindObjectPlacement(CollisionObject* body, SoultreeProbe* terrain, Vec3* pos
 
         if (firstPass) {
             centerPt = *position;
-            ((Terrain*)terrain)->QueryGround((TerrainVec3*)&centerPt, (TerrainVec3*)&centerOut, 1, &centerHit);
+            terrain->QueryGround((TerrainVec3*)&centerPt, (TerrainVec3*)&centerOut, 1, &centerHit);
             centerHit &= groundMask;
         }
 
@@ -186,7 +186,7 @@ int FindObjectPlacement(CollisionObject* body, SoultreeProbe* terrain, Vec3* pos
         else if (PlacementSphereBlocked((CollisionVec3*)&plusAPt, margin, body, limit1, limit2, 1, 0))
             plusAHit = 1;
         else {
-            ((Terrain*)terrain)->QueryGround((TerrainVec3*)&plusAPt, (TerrainVec3*)&plusAOut, 1, &plusAHit);
+            terrain->QueryGround((TerrainVec3*)&plusAPt, (TerrainVec3*)&plusAOut, 1, &plusAHit);
             plusAHit &= groundMask;
         }
 
@@ -196,7 +196,7 @@ int FindObjectPlacement(CollisionObject* body, SoultreeProbe* terrain, Vec3* pos
         else if (PlacementSphereBlocked((CollisionVec3*)&minusAPt, margin, body, limit1, limit2, 1, 0))
             minusAHit = 1;
         else {
-            ((Terrain*)terrain)->QueryGround((TerrainVec3*)&minusAPt, (TerrainVec3*)&minusAOut, 1, &minusAHit);
+            terrain->QueryGround((TerrainVec3*)&minusAPt, (TerrainVec3*)&minusAOut, 1, &minusAHit);
             minusAHit &= groundMask;
         }
 
@@ -206,7 +206,7 @@ int FindObjectPlacement(CollisionObject* body, SoultreeProbe* terrain, Vec3* pos
         else if (PlacementSphereBlocked((CollisionVec3*)&plusCPt, margin, body, limit1, limit2, 1, 0))
             plusCHit = 1;
         else {
-            ((Terrain*)terrain)->QueryGround((TerrainVec3*)&plusCPt, (TerrainVec3*)&plusCOut, 1, &plusCHit);
+            terrain->QueryGround((TerrainVec3*)&plusCPt, (TerrainVec3*)&plusCOut, 1, &plusCHit);
             plusCHit &= groundMask;
         }
 
@@ -216,7 +216,7 @@ int FindObjectPlacement(CollisionObject* body, SoultreeProbe* terrain, Vec3* pos
         else if (PlacementSphereBlocked((CollisionVec3*)&minusCPt, margin, body, limit1, limit2, 1, 0))
             minusCHit = 1;
         else {
-            ((Terrain*)terrain)->QueryGround((TerrainVec3*)&minusCPt, (TerrainVec3*)&minusCOut, 1, &minusCHit);
+            terrain->QueryGround((TerrainVec3*)&minusCPt, (TerrainVec3*)&minusCOut, 1, &minusCHit);
             minusCHit &= groundMask;
         }
 

@@ -49,7 +49,14 @@
     "?g_ObstacleDebugLine@@3PAUVec3@@A": "?g_ObstacleDebugLine@@3PAUVector3@@A",
     "?g_ObstacleDebugLowerLine@@3PAUVec3@@A": "?g_ObstacleDebugLowerLine@@3PAUVector3@@A",
     "?g_ObstacleDebugLeftLine@@3PAUVec3@@A": "?g_ObstacleDebugLeftLine@@3PAUVector3@@A",
-    "?g_ObstacleDebugRightLine@@3PAUVec3@@A": "?g_ObstacleDebugRightLine@@3PAUVector3@@A"
+    "?g_ObstacleDebugRightLine@@3PAUVec3@@A": "?g_ObstacleDebugRightLine@@3PAUVector3@@A",
+    "?ShadowMatrixIdentity@@YA?AUShadowMatrix@@XZ": "?IdentityMatrix@@YA?AUMatrix4@@XZ",
+    "?TerrainMatrixIdentityInto@@YAPAUShadowMatrix@@PAU1@@Z": "?IdentityMatrix@@YA?AUMatrix4@@XZ",
+    "?TerrainMatrixMultiplyInto@@YAPAUShadowMatrix@@PAU1@U1@1@Z": "?MatrixMult@@YA?AUMatrix4@@U1@0@Z",
+    "?TerrainShadowSum@@YA?AUTerrainShadowVec@@ABU1@0@Z": "?Vec3AddCall@@YAPAUVec3@@PAU1@PBU1@1@Z",
+    "?TerrainShadowDifference@@YA?AUTerrainShadowVec@@ABU1@0@Z": "?Vec3SubtractCall@@YAPAUVec3@@PAU1@PBU1@1@Z",
+    "??0TerrainShadowVecCall@@QAE@MMM@Z": "??0Vec3Call@@QAE@MMM@Z",
+    "?CastSegment@TerrainShadowCaster@@QAEHPBUTerrainShadowVec@@0PAU2@PAPAVDrawableGridNode@@HH@Z": "?CastSegment@Terrain@@QAEHPBUTerrainVec3@@0PAU2@PAPAVGridNode@@PAH3@Z"
   },
   "included_sources": [
     {

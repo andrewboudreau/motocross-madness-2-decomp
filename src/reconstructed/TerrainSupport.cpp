@@ -5,11 +5,12 @@
 #include "Griddraw.h"
 #include "ManagedTexture.h"
 #include "TextureMapManager.h"
+#include "PCCamera.h"
 
 // File-scope statics.  retail's first code in this TU is their dynamic initialisers
 // (0x00505490.. : the camera ctor + atexit, then ten 5000-tick PeakHolds in 0x20-byte
 // thunk/body pairs).  owner: Terrain.cpp bracket start.
-TerrainSharedState g_terrainSharedState(1);   // 0x0068a090 (PCCamera, tier 2)
+PCCamera g_terrainSharedState(1);   // 0x0068a090 (tier 2)
 TerrainPeakHold g_terrainAgeTime0Peak(5000);   // 0x0068a008
 TerrainPeakHold g_terrainAgeTime1Peak(5000);   // 0x0068a038
 TerrainPeakHold g_terrainSetupPeak(5000);   // 0x0068a2e0

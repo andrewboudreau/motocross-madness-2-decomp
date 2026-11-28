@@ -1,12 +1,11 @@
 // Bring-up definition (best-guess-unreviewed) of the terrain's vertex lighting
 // call, 0x0049e4a0 in LightEmitter.cpp (literal __FILE__ 0x0056ddf0).
 //
-// Griddraw.h's GridVertexSink is the terrain's view of the LightManager at
-// Terrain+0xc40 (LightEmitter.h, LightManager::LightVertices). Only the
-// GridVertexSink name is referenced, so this unit defines it and treats
-// `this` as the LightManager. The three workers 0x0049e6b0 (any lights),
-// 0x0049f1c0 (one light) and 0x0049f8d0 (ambient plus one light) are
-// unit-private helpers here; nothing else calls them.
+// LightManager::LightVertices (LightEmitter.h) is called by the terrain
+// through Terrain+0xc40, the particle renderer and D3DIMSoulTree. The three
+// workers 0x0049e6b0 (any lights), 0x0049f1c0 (one light) and 0x0049f8d0
+// (ambient plus one light) are private LightManager members; nothing else
+// calls them.
 //
 // Retail rounds light terms with an inlined x87 `fistp` (current rounding
 // mode, round-to-nearest-even) and converts the light colours with _ftol
@@ -36,25 +35,6 @@
 #include "core/DebugAlloc.h"
 #include "math/FastMath.h"
 #include "../../samples/common/FistpFloatToInt.h"
-
-// Griddraw.h's boundary declaration (same class key and signature, so the
-// definition mangles as ?LightVertices@GridVertexSink@@QAEXPAXH00HH@Z). The
-// last argument is the optional colour array the results modulate.
-class GridVertexSink {
-public:
-    void LightVertices(void* matrix, int count, void* vertices, void* buffer,
-                       int stride, int flags);  // 0x0049e4a0
-
-private:
-    // Retail calls the workers as thiscall on the LightManager with the five
-    // leading arguments (`mov ecx, esi` before each call).
-    void LightAny(const Matrix4* matrix, int count, void* normals, void* buffer,
-                  int stride);  // 0x0049e6b0
-    void LightOne(const Matrix4* matrix, int count, void* normals, void* buffer,
-                  int stride);  // 0x0049f1c0
-    void LightAmbientPlusOne(const Matrix4* matrix, int count, void* normals, void* buffer,
-                             int stride);  // 0x0049f8d0
-};
 
 // LightEmitter.h's lightType values the workers distinguish.
 enum {
@@ -252,9 +232,9 @@ static inline Vector3 Group4Vis_NormalizedByConstructor(const Vector3& v) {
 // Retail's inline-asm fistp helper gives each function below an EBP frame; the
 // pragma keeps the frame pointer for them (docs/GAME_BUILD.md#frame-pointer-units).
 #pragma optimize("y", off)
-void GridVertexSink::LightAny(const Matrix4* matrix, int count, void* normals, void* buffer,
+void LightManager::LightAny(const Matrix4* matrix, int count, void* normals, void* buffer,
                               int stride) {
-    LightManager* manager = reinterpret_cast<LightManager*>(this);
+    LightManager* manager = this;
     Matrix4 inverse = *matrix;
     int i;
     int light;
@@ -345,9 +325,9 @@ void GridVertexSink::LightAny(const Matrix4* matrix, int count, void* normals, v
 // per-vertex sums are left alone). Point and positional lights leave
 // back-facing vertices unwritten; a directional light writes every vertex,
 // back-facing ones with negative terms (retail does not clamp them).
-void GridVertexSink::LightOne(const Matrix4* matrix, int count, void* normals, void* buffer,
+void LightManager::LightOne(const Matrix4* matrix, int count, void* normals, void* buffer,
                               int stride) {
-    LightManager* manager = reinterpret_cast<LightManager*>(this);
+    LightManager* manager = this;
     LightEmitter* emitter = manager->lights[0];
     int i;
     int r = Group4Vis_ColorByte(emitter->ambientRGBA[0]);
@@ -452,9 +432,9 @@ static __forceinline void Group4Vis_LightOverAmbient(LightManager* manager, void
 // 0x0049f8d0: two lights, one of them ambient (the caller guarantees it).
 // The colours of both are taken where the search finds the ambient one; each
 // light type then has its own vertex loop, as in retail.
-void GridVertexSink::LightAmbientPlusOne(const Matrix4* matrix, int count, void* normals,
+void LightManager::LightAmbientPlusOne(const Matrix4* matrix, int count, void* normals,
                                          void* buffer, int stride) {
-    LightManager* manager = reinterpret_cast<LightManager*>(this);
+    LightManager* manager = this;
     Matrix4 inverse = *matrix;
     int i;
     int ambientR, ambientG, ambientB;
@@ -529,7 +509,7 @@ void GridVertexSink::LightAmbientPlusOne(const Matrix4* matrix, int count, void*
 
 // 0x0049e4a0 (ret 0x18). Lights `count` vertices of `buffer` (normals at
 // `vertices` + i * stride) under the object transform `matrix`, growing the
-// per-vertex colour sums first. With a colour array (`flags`, the same
+// per-vertex colour sums first. With a colour array (`colors`, the same
 // 0x20-byte vertex layout) each vertex's diffuse becomes that colour scaled
 // by the per-vertex sums / 256.
 // Audited against retail for the linked game (2026-11-11): the +0x114 flag, the
@@ -551,10 +531,9 @@ void GridVertexSink::LightAmbientPlusOne(const Matrix4* matrix, int count, void*
 // each channel rounded into its variable makes the colour array the loop's induction
 // pointer, as retail (0.728 -> 0.731 masked); VC6 still CSEs the three colour loads
 // that retail's asm fistp stores keep apart.
-void GridVertexSink::LightVertices(void* matrix, int count, void* vertices, void* buffer, int stride,
-                                   int flags) {
-    LightManager* manager = reinterpret_cast<LightManager*>(this);
-    void* colors = (void*)flags;
+void LightManager::LightVertices(void* matrix, int count, void* vertices, void* buffer, int stride,
+                                 void* colors) {
+    LightManager* manager = this;
     if (colors)
         manager->storeVertexColors = 1;
     else

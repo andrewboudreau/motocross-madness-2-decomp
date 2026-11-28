@@ -1,8 +1,8 @@
-"""GridVertexSink::LightVertices 0x0049e4a0 and its three workers (tools/emu_diff.py case).
+"""LightManager::LightVertices 0x0049e4a0 and its three workers (tools/emu_diff.py case).
 
 Linked from src/bringup/Group4_GridLighting.cpp. The workers LightAny 0x0049e6b0, LightOne
 0x0049f1c0 and LightAmbientPlusOne 0x0049f8d0 are kept from the object (PREFER_OBJECT), so
-the candidate run is the whole unit and the retail run is retail's four bodies. The sink
+the candidate run is the whole unit and the retail run is retail's four bodies. The LightManager
 (ECX) holds the light count (+0x2c), light pointers (+0x30), the three per-vertex term
 arrays (+0xf8/+0xfc/+0x100) and their capacity (+0x110); a light is type (+0x2c), colour
 (+0x54), position (+0x64) and direction (+0x70). Scenes: identity, rigid and non-rigid
@@ -23,12 +23,12 @@ import random
 import struct
 
 RETAIL_VA = 0x0049e4a0
-SYMBOL = '?LightVertices@GridVertexSink@@QAEXPAXH00HH@Z'
+SYMBOL = '?LightVertices@LightManager@@QAEXPAXH00H0@Z'
 SOURCE = 'src/bringup/Group4_GridLighting.cpp'
 PREFER_OBJECT = {
-    '?LightAny@GridVertexSink@@AAEXPBUMatrix4@@HPAX1H@Z',
-    '?LightOne@GridVertexSink@@AAEXPBUMatrix4@@HPAX1H@Z',
-    '?LightAmbientPlusOne@GridVertexSink@@AAEXPBUMatrix4@@HPAX1H@Z',
+    '?LightAny@LightManager@@AAEXPBUMatrix4@@HPAX1H@Z',
+    '?LightOne@LightManager@@AAEXPBUMatrix4@@HPAX1H@Z',
+    '?LightAmbientPlusOne@LightManager@@AAEXPBUMatrix4@@HPAX1H@Z',
 }
 # The first stub a run creates sits at emu_diff.STUB + 0x100; setup creates the colour stub first.
 COLOR_BYTE_STUB = 0x21000100

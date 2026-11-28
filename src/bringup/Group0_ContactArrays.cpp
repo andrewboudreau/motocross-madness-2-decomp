@@ -13,7 +13,6 @@
 
 class SoultreeContact;
 struct VehicleContact;
-struct SoultreeProbe;
 class Terrain;   // broadphase/Terrain.h; the contact refresh queries its ground
 
 // The exact bodies (src/krusty2/collision/CollisionPoint.cpp, strict exact in calibration).
@@ -33,17 +32,17 @@ int SoultreeMergeContacts(int count, CollisionPoint** points, const CollisionVec
 // else 1. `terrain` is the Terrain the ground query runs on.
 // ---------------------------------------------------------------------------
 int SoultreeRefreshContacts(int enabled, int* activeCount, int count, SoultreeContact** contacts,
-                            SoultreeProbe* terrain, Vec3* center, int mode, float radius)
+                            Terrain* terrain, Vec3* center, int mode, float radius)
 {
     return SoultreeRefreshContacts((void*)enabled, activeCount, count, (CollisionPoint**)contacts,
-                                   (Terrain*)terrain, (CollisionVec3*)center, mode, radius);
+                                   terrain, (CollisionVec3*)center, mode, radius);
 }
 
 int __cdecl VehContactsA(int enabled, int* activeCount, int count, VehicleContact** contacts,
-                         SoultreeProbe* terrain, Vec3* center, int mode, float radius)
+                         Terrain* terrain, Vec3* center, int mode, float radius)
 {
     return SoultreeRefreshContacts((void*)enabled, activeCount, count, (CollisionPoint**)contacts,
-                                   (Terrain*)terrain, (CollisionVec3*)center, mode, radius);
+                                   terrain, (CollisionVec3*)center, mode, radius);
 }
 
 // ---------------------------------------------------------------------------

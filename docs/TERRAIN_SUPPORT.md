@@ -9,9 +9,12 @@ The camera initializer at `0x00505490` passes 1 and object `0x0068a090` to
 `0x004bed80`; the registration at `0x005054a0` passes its shutdown wrapper to
 CRT atexit. That wrapper selects `0x004624d0`. These callees agree with the
 separately reconstructed PCCamera constructor/destructor, including canonical
-Camera/ShadowCamera binding evidence. TerrainSharedState remains an explicit
-opaque boundary view because the physics and canonical camera headers have
-not been consolidated into one linked class hierarchy.
+Camera/ShadowCamera binding evidence. The global is declared as that
+`PCCamera` (`PCCamera g_terrainSharedState(1)`); the compiler-generated
+`~PCCamera` this unit emits is the 5-byte `jmp ~Camera` at `0x004624d0`
+(strict exact). Terrain slot 23 copies the camera with `rep movsd` of 0x88
+dwords, vptr included, so `Terrain.cpp` writes it as a `memcpy` of
+`sizeof(PCCamera)`.
 
 The ten timer bodies each pass 5000 to `0x004cb670` on the distinct objects
 listed in TerrainSupport.bindings.json. The callee is the independently

@@ -14,6 +14,7 @@
 #include "../../reconstructed/Gridbase.h"
 #include "../../reconstructed/Grid1.h"
 #include "../../reconstructed/Camera.h"
+#include "../../reconstructed/PCCamera.h"
 
 struct Vec3;
 float Vec3DotCall(const Vec3* a, const Vec3* b);
@@ -702,7 +703,8 @@ int Terrain::OnControlPress(ControlEvent* event, InputButtonState*)
     if (TestInputEvent(0x43, 0, event, 0x80)) {
         g_terrainToggle314 = 1 - g_terrainToggle314;
         if (g_terrainToggle314)
-            g_terrainSharedState = *((TerrainHost*)renderContext)->sharedState;
+            // rep movsd of 0x88 dwords, vptr included: a byte copy of the camera.
+            memcpy(&g_terrainSharedState, ((TerrainHost*)renderContext)->sharedState, sizeof(PCCamera));
         return 1;
     }
     if (TestInputEvent(2, 0, event, 0x80)) {

@@ -551,7 +551,7 @@ int BaseQuarryEvent::LoadEventObjects(LoadProgressFn progress) {
             if (caster->physics) {
                 Terrain* terrain = eventTerrain;
                 SoultreePhysicsObject* physics = caster->physicsObject;
-                physics->terrain = (SoultreeProbe*)terrain;
+                physics->terrain = terrain;
                 if (terrain)
                     physics->terrainScale = terrain->gridCellSize;
                 caster->physicsObject->collisionObject->SnapPlacement();

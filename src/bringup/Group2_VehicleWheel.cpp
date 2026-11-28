@@ -23,7 +23,7 @@
 class SteeringControl;
 class Scene;
 class Vehicle;
-struct SoultreeProbe;
+class Terrain;
 
 // ---------------------------------------------------------------------------------------
 // Providers for the names Tire.cpp declares.
@@ -115,7 +115,7 @@ struct VehicleWheel {
     void UpdateDriveShare(Vehicle* owner);
     void ApplyDrive(float share, float stepTime, int forward, float mass, float* speed, Vec3* torque,
                     Vec3* force);
-    void UpdateSuspensionProbe(SoultreeProbe* world, const Vec3* velocity, float angle,
+    void UpdateSuspensionProbe(Terrain* world, const Vec3* velocity, float angle,
                                float radiusScale, float yaw, const Vec3* forward, const Vec3* up,
                                SoultreeObject* node);
 
@@ -171,11 +171,11 @@ void VehicleWheel::ApplyDrive(float share, float stepTime, int forward, float ma
                              (CollisionVec3*)force);
 }
 
-void VehicleWheel::UpdateSuspensionProbe(SoultreeProbe* world, const Vec3* velocity, float angle,
+void VehicleWheel::UpdateSuspensionProbe(Terrain* world, const Vec3* velocity, float angle,
                                          float radiusScale, float yaw, const Vec3* forward,
                                          const Vec3* up, SoultreeObject* node)   // 0x00514550
 {
-    AsTire(this)->UpdateSuspensionProbe((Terrain*)world, (const CollisionVec3*)velocity, angle,
+    AsTire(this)->UpdateSuspensionProbe(world, (const CollisionVec3*)velocity, angle,
                                         radiusScale, yaw, (const CollisionVec3*)forward,
                                         (const CollisionVec3*)up, (TireNode*)node);
 }
