@@ -83,11 +83,12 @@ zero-initialized storage.
     Shift bits 0 and 1, Ctrl 2 and 3, Alt 4 and 5, the grave key 7. PCKeyboardDevice slot 4 (`0x004c4520`) maps a control to a key and asks
   slot 5. Slot 5 (`0x004c4570`) tests a key with a modifier and copies its
   entry; it matches only as one `&&` condition sharing the failure return.
-  Slot 5's return type is contradictory across callers. KeyboardDevice
-  tests the full eax, so it is `int`. FollowCamera slot 56 returns it
-  unconverted as `bool`, and KrustyBikeCamera overrides slot 56 as `bool`.
-  ControlInterface types the keyboard as `KeyboardDevice*`, and FollowCamera
-  reads it through a separate `bool` view (`FollowCameraKeyboardDeviceView`).
+  Slot 5 returns `int`: KeyboardDevice tests the full eax. FollowCamera
+  slots 55 and 56 (0x00464ea0, 0x00464ec0) return it with no conversion
+  code, so they are declared with a one-byte non-`bool` return (`unsigned
+  char`; a `bool` return would add neg/sbb/neg), and KrustyBikeCamera's
+  overrides follow. FollowCamera calls the keyboard through
+  ControlInterface's `KeyboardDevice*` directly.
 - **MouseDevice** (`0x0048a2d0`): `PCInputDevice(1)`, two binding lists at
   +0x2b0 and four button entries at +0x260. Slot 0 (`0x0048a4c0`) drops
   bindings by id. PCMouseDevice implements the rest:

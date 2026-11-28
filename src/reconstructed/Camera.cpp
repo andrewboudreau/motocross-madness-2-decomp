@@ -108,7 +108,7 @@ int Camera::UpdateViewport() {
     ((float*)viewport)[5] = 1.0f;
     if (!owner->SetViewport(viewport))
         return 0;
-    heightWidthRatio = (float)(unsigned int)viewport[3] / (float)(unsigned int)viewport[2];
+    heightWidthRatio = (float)viewport[3] / (float)viewport[2];
     projectionChangeFrames = Owner()->frameModulus + 1;
     viewportClearFrames = Owner()->frameModulus + 1;
     return 1;
@@ -157,10 +157,10 @@ int Camera::Tick(float frameTime) {
         }
         if (widthKeysEnabled) {
             if (g_TrackGame->controlInterface->IsDeviceButtonDown(0xd2, 0, 0x3f, 0) &&
-                (unsigned int)viewport[2] < (unsigned int)targetWidth)
+                viewport[2] < (unsigned int)targetWidth)
                 SetViewportWidth(-1, 2, 0);
             if (g_TrackGame->controlInterface->IsDeviceButtonDown(0xd3, 0, 0x3f, 0) &&
-                (unsigned int)viewport[2] > 0x20)
+                viewport[2] > 0x20)
                 SetViewportWidth(1, -2, 0);
         }
         UpdateMatrices();
@@ -338,7 +338,7 @@ int Camera::OnActivate() {
 void Camera::UpdateMatrices() {
     viewMatrix = ViewMatrix(eyePosition, viewDirection, upDirection, roll);
     projectionMatrix = ProjectionMatrix(nearPlane, farPlane, fieldOfView * 0.017453290f,
-                                        (float)(unsigned int)viewport[2] / (unsigned int)viewport[3]);
+                                        (float)viewport[2] / viewport[3]);
     Matrix4 viewportScale = IdentityMatrix();
     viewportScale(0, 0) = 0.5f;
     viewportScale(1, 1) = -0.5f;
@@ -346,7 +346,7 @@ void Camera::UpdateMatrices() {
     viewportScale(3, 1) = 0.5f;
     screenMatrix[1] = MatrixMult(viewportScale, projectionMatrix);
     screenMatrix[0] = MatrixMult(screenMatrix[1], viewMatrix);
-    focalLength = (float)(unsigned int)viewport[2] * 0.5f / (float)tan((float)(fieldOfView * 0.5f) * 0.017453290f);
+    focalLength = (float)viewport[2] * 0.5f / (float)tan((float)(fieldOfView * 0.5f) * 0.017453290f);
 }
 
 // 0x0042f090: only when no child handled the GameObject search does it
@@ -371,10 +371,10 @@ int Camera::SetViewportWidth(int x, int width, int absolute) {
         viewport[0] += x;
         viewport[2] += width;
     }
-    viewport[3] = (int)((float)(unsigned int)viewport[2] * heightWidthRatio);
-    if ((unsigned int)viewport[3] > (unsigned int)targetHeight)
+    viewport[3] = (int)((float)viewport[2] * heightWidthRatio);
+    if (viewport[3] > (unsigned int)targetHeight)
         viewport[3] = targetHeight;
-    viewport[1] = (unsigned int)(targetHeight - viewport[3]) >> 1;
+    viewport[1] = (targetHeight - viewport[3]) >> 1;
     viewportClearFrames = projectionChangeFrames = Owner()->frameModulus + 1;
     return Owner()->SetViewport(viewport) != 0;
 }
@@ -385,9 +385,9 @@ int Camera::SetViewport(int x, int y, int width, int height) {
     viewport[2] = width;
     viewport[1] = y;
     viewport[3] = height;
-    if ((unsigned int)viewport[2] > (unsigned int)targetWidth)
+    if (viewport[2] > (unsigned int)targetWidth)
         viewport[2] = targetWidth;
-    if ((unsigned int)viewport[3] > (unsigned int)targetHeight)
+    if (viewport[3] > (unsigned int)targetHeight)
         viewport[3] = targetHeight;
     viewportClearFrames = projectionChangeFrames = Owner()->frameModulus + 1;
     return Owner()->SetViewport(viewport) != 0;

@@ -1,16 +1,16 @@
 {
-  "baseline": "Canonical src/reconstructed/FollowCamera.cpp (retail FollowCam.cpp) with the constructor in retail order, and the constructor's validation unit.",
+  "baseline": "Canonical src/reconstructed/FollowCamera.cpp (retail FollowCam.cpp) with the constructor in retail order, and the constructor's validation unit. FollowCamera slot 56 IsTargetViewHeld returns unsigned char (keyboard view retired): the old pins were reproduced first, and the objects are identical under only ?IsTargetViewHeld@FollowCamera@@UAE_NXZ -> UAEEXZ.",
   "filenames": [
     "src/reconstructed/FollowCamera.cpp"
   ],
   "aggregate": {
     "sections": 120,
     "relocations": 469,
-    "sha256": "af29dc7fdc342a817106c4a31ce56950caa87654bfc6fdddb82e9c844ab37f7c"
+    "sha256": "f338bc68dd70e9549aec793a1962d19d3c107208e4b9d9b82793f19ffb6d71ed"
   },
   "candidate": {
     "sections": 31,
     "relocations": 139,
-    "sha256": "f4ef7c25bb9aeb79cbdbadbc7cb08a219afe3f4b39f39b2af673c60a20ba86fa"
+    "sha256": "0d18a17948bc23d229fd6434e7422574edd6349ba7af71bcc034ec4fc0e142ee"
   }
 }

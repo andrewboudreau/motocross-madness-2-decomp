@@ -371,42 +371,6 @@ public:
     int saveReplay;                           // +0x2dbc saves a replay (EventManager 0x0045cdc0)
 };
 
-// Object returned by (TrackGame+0x56c)->+0x2c->0x00485df0. Unused: EventManager
-// calls UIDialog::EndDialog on it. Deleting the declaration moves
-// ProCircuitProcs.cpp AddCircuitRow (0x004d59a0) out of its declaration-count
-// window, so it stays until that function no longer depends on the count.
-class TrackGameUIDialogView {
-public:
-    void EndDialog(int value);    // 0x0046ff30 (EventManager 0x0045e710)
-    virtual void UnknownVirtualSlot0();
-    virtual void AddRef();
-    virtual void Release();
-    virtual void GetRefCount();
-    virtual void Disable();
-    virtual void Enable();
-    virtual void OnDisable();
-    virtual void OnEnable();
-    virtual void SetRenderContext();
-    virtual void PreTick();
-    virtual void Tick();
-    virtual void Step();
-    virtual void PrepareGeometry();
-    virtual void RenderPre3D();
-    virtual void Render3D();
-    virtual void RenderPost3D();
-    virtual void SetPaused();
-    virtual void OnDeactivate();
-    virtual void OnActivate();
-    virtual void OnInputEvent();
-    virtual void OnChar();
-    virtual void OnKeyDown();
-    virtual void OnControlRelease();
-    virtual void OnControlPress();
-    virtual void OnNetworkMessage();
-    virtual void AttachRenderContext();
-    virtual void MarkPendingRelease();
-};
-
 #include "SceneArchiveFinder.h"
 
 // Object at TrackGame+0x3338, deleted through its virtual destructor.

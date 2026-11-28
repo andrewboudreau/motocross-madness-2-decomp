@@ -66,7 +66,10 @@ PARTIAL = (
     # the body bytes and the other 64 relocation records are identical.
     # Tire.h/CollisionPoint.h's relative includes renumber it again; the body
     # bytes and the other 64 relocation records are identical.
-    ('?Load@Terrain@@', 2117, 'd57386f3d6aa4c4034333138de1f23ee50f54adf2b73770fa7937fc7135918e2'),
+    # Retiring the camera, visibility, keyboard and dialog views renumbers it again
+    # ($L6345 -> $L6325, still .text$x+0xb6); the body bytes and the other 64
+    # relocation records are identical.
+    ('?Load@Terrain@@', 2117, '562b456cd542c7935ba3408dc599b216629899851c03368ac2cfa9c927490b38'),
     # Intentional cell-conversion repair, verified at the actual first-cell
     # boundary in test_terrain_cell_conversion; full interpolation remains partial.
     # The sampler, dot and triangle provider names are now canonical, with

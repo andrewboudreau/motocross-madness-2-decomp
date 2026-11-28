@@ -97,7 +97,12 @@ public:
     float roll;                               // +0x194 roll, passed to the view matrix by slot 28
     float focalLength;                        // +0x198 half viewport width / tan(fov / 2) (slot 28)
     float displayAspect;                      // +0x19c display-mode width/height (0x0042e550)
-    int viewport[6];                          // +0x1a0 x, y, width, height, then min/max depth as floats (owner slot 14)
+    // +0x1a0 x, y, width, height, then min/max depth as floats (owner slot 14;
+    // the D3DVIEWPORT7 layout, whose first four members are DWORDs). Every
+    // reader converts, divides and compares the first four unsigned (fild
+    // with a zero high dword, shr, ja/jb); VisibilityClipper::TestBox
+    // 0x0052f570 alone clamps against the size with signed compares.
+    unsigned int viewport[6];
     float heightWidthRatio;                   // +0x1b8 height/width ratio (0x0042f0e0)
     float nearPlane;                          // +0x1bc g_DefaultNearPlane (1.0f); slot 28 passes it to 0x004a1460
     float farPlane;                           // +0x1c0 g_DefaultFarPlane (100000.0f); likewise

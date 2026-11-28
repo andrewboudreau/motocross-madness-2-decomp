@@ -5,23 +5,6 @@ class KeyboardDevice;
 class JoystickDevice;
 class MouseDevice;
 
-// FollowCamera's view of the keyboard at ControlInterface+0x34. FollowCamera
-// slots 55 and 56 call slot 5 with 0x38 and 0x2a (DirectInput left Alt and
-// left Shift) and return its result unconverted (slot 55 as a one-byte
-// unsigned char, slot 56 as bool; KrustyBikeCamera's override of slot 56 is
-// bool), while KeyboardDevice's own callers test the
-// full eax (int). The two declarations cannot be one type, so FollowCamera
-// reads the member through this view.
-class FollowCameraKeyboardDeviceView {
-public:
-    virtual void RemoveBindings();
-    virtual void UnknownVirtualSlot1();
-    virtual void CreateDevice();
-    virtual void DetectSubtype();
-    virtual void IsControlDown();
-    virtual bool IsButtonDown(int key, int modifier, void* entry);
-};
-
 // 0x3c-byte binding of a control to an input device (not polymorphic). The
 // joystick lists at JoystickDevice+0x4fc hold pointers to these, and
 // JoystickDevice::0x00489a20 stores the device at +0x00. Its helpers sit

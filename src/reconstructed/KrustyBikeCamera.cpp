@@ -141,7 +141,7 @@ unsigned char KrustyBikeCamera::IsLookBackHeld() {
 // 0x004980a0: input 0x0a (unless +0x38c) clears +0x391/+0x392 when absent;
 // outside state 7 it also needs the bike's +0x108, its axis below -2 and no
 // +0x735 in vehicle mode.
-bool KrustyBikeCamera::IsTargetViewHeld() {
+unsigned char KrustyBikeCamera::IsTargetViewHeld() {
     bool pressed;
     if (!targetCaster && g_TrackGame->controlInterface->IsControlDown(0x0A, 0x3F)) {
         pressed = true;

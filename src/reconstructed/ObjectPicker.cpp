@@ -1,5 +1,6 @@
 #include "ObjectPicker.h"
 
+#include "Camera.h"
 #include "ControlInterface.h"
 #include "DebugAlloc.h"
 #include "GUIManager.h"
@@ -40,7 +41,7 @@ ObjectPicker::~ObjectPicker() {
 
 // 0x004b0500
 int ObjectPicker::PickAt(int x, int y) {
-    PickerCameraView* camera;
+    Camera* camera;
     Vector3 direction;
     Vector3 position;
     Vector3 segment[2];
@@ -51,18 +52,18 @@ int ObjectPicker::PickAt(int x, int y) {
 
     lastPickX = x;
     lastPickY = y;
-    camera = (PickerCameraView*)((RenderTarget*)renderContext)->currentCamera;
+    camera = ((RenderTarget*)renderContext)->currentCamera;
     position = camera->eyePosition;
-    u = (float)x - camera->viewportX - camera->viewportWidth / 2;
-    v = (float)y - (((RenderTarget*)renderContext)->targetHeight - camera->viewportY - camera->viewportHeight) -
-        camera->viewportHeight / 2;
+    u = (float)x - camera->viewport[0] - camera->viewport[2] / 2;
+    v = (float)y - (((RenderTarget*)renderContext)->targetHeight - camera->viewport[1] - camera->viewport[3]) -
+        camera->viewport[3] / 2;
     w = camera->focalLength;
-    direction.x = u * camera->viewMatrix[0][0] + v * camera->viewMatrix[0][1] + w * camera->viewMatrix[0][2] +
-                  camera->viewMatrix[0][3];
-    direction.y = u * camera->viewMatrix[1][0] + v * camera->viewMatrix[1][1] + w * camera->viewMatrix[1][2] +
-                  camera->viewMatrix[1][3];
-    direction.z = u * camera->viewMatrix[2][0] + v * camera->viewMatrix[2][1] + w * camera->viewMatrix[2][2] +
-                  camera->viewMatrix[2][3];
+    direction.x = u * camera->viewMatrix.m[0][0] + v * camera->viewMatrix.m[0][1] + w * camera->viewMatrix.m[0][2] +
+                  camera->viewMatrix.m[0][3];
+    direction.y = u * camera->viewMatrix.m[1][0] + v * camera->viewMatrix.m[1][1] + w * camera->viewMatrix.m[1][2] +
+                  camera->viewMatrix.m[1][3];
+    direction.z = u * camera->viewMatrix.m[2][0] + v * camera->viewMatrix.m[2][1] + w * camera->viewMatrix.m[2][2] +
+                  camera->viewMatrix.m[2][3];
     length = direction.z * direction.z + (direction.x * direction.x + direction.y * direction.y);
     if (length == 0.0f) {
         direction = kVec3Zero;
@@ -103,10 +104,10 @@ ObjectPicker* ObjectPicker::Create(void* target, TextureMapManager* textures,
         pickCursor = cursor;
     } else {
         cursorBindingX = new(__FILE__, 59)
-            ControlBinding(0.0f, (float)((PickerCameraView*)((RenderTarget*)renderContext)->currentCamera)->cursorRangeX,
+            ControlBinding(0.0f, (float)((RenderTarget*)renderContext)->currentCamera->targetWidth,
                                   0.0f, g_TrackGame->controlInterface->NextBindingId(), 0, 0.1f);
         cursorBindingY = new(__FILE__, 60)
-            ControlBinding(0.0f, (float)((PickerCameraView*)((RenderTarget*)renderContext)->currentCamera)->cursorRangeY,
+            ControlBinding(0.0f, (float)((RenderTarget*)renderContext)->currentCamera->targetHeight,
                                   0.0f, g_TrackGame->controlInterface->NextBindingId(), 1, 0.1f);
         if (g_TrackGame->controlInterface->mouse) {
             g_TrackGame->controlInterface->mouse->AttachBinding(cursorBindingX);

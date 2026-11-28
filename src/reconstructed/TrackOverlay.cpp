@@ -145,13 +145,13 @@ int InstrumentOverlay::Render3D()
         Target()->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, 0, 0);
         RenderTarget* owner = Target();
         if (owner->currentCamera->viewportClearFrames) {
-            dial.originX = (int)((unsigned int)owner->currentCamera->viewport[2] * screenRect.left / 640.0f
-                                           + (unsigned int)owner->currentCamera->viewport[0]);
-            dial.originY = (int)((unsigned int)owner->currentCamera->viewport[3] * screenRect.top / 480.0f
-                                           + (unsigned int)owner->currentCamera->viewport[1]);
-            dial.centerX = (int)(((unsigned int)owner->currentCamera->viewport[2] / 640.0f) * 64.0f + dial.originX);
-            dial.centerY = (int)(((unsigned int)owner->currentCamera->viewport[3] / 480.0f) * 85.0f + dial.originY);
-            dial.length = ((unsigned int)owner->currentCamera->viewport[2] / 640.0f) * 45.0f;
+            dial.originX = (int)(owner->currentCamera->viewport[2] * screenRect.left / 640.0f
+                                           + owner->currentCamera->viewport[0]);
+            dial.originY = (int)(owner->currentCamera->viewport[3] * screenRect.top / 480.0f
+                                           + owner->currentCamera->viewport[1]);
+            dial.centerX = (int)((owner->currentCamera->viewport[2] / 640.0f) * 64.0f + dial.originX);
+            dial.centerY = (int)((owner->currentCamera->viewport[3] / 480.0f) * 85.0f + dial.originY);
+            dial.length = (owner->currentCamera->viewport[2] / 640.0f) * 45.0f;
             dial.value = 0.0f;
             dial.maximum = 100.0f;
             dial.firstSweepValue = 50.0f;

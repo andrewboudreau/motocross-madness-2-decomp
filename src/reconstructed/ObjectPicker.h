@@ -15,29 +15,6 @@ class GameCursor;
 class TextureMapManager;
 struct ControlBinding;
 
-// The camera fields the pick ray reads (RenderTarget+0x08): the
-// camera-to-world rows of the matrix at +0xac, the position, the image
-// plane distance and the viewport (x, y, width, height). The pick ray divides
-// the viewport unsigned (shr), while Camera.h declares it `int viewport[6]`.
-struct PickerCameraView {
-    unsigned char field_0x000[0xac];
-    float viewMatrix[3][4];                   // +0x0ac
-    unsigned char field_0x0dc[0x170 - 0xdc];
-    Vector3 eyePosition;                      // +0x170 (Camera::eyePosition)
-    Vector3 viewDirection;                    // +0x17c Camera viewDirection
-    Vector3 upDirection;                      // +0x188 Camera upDirection
-    float roll;                               // +0x194 Camera roll
-    float focalLength;                        // +0x198
-    int displayAspect;
-    unsigned int viewportX;                   // +0x1a0 viewport x
-    unsigned int viewportY;                   // +0x1a4 viewport y
-    unsigned int viewportWidth;               // +0x1a8 viewport width
-    unsigned int viewportHeight;              // +0x1ac viewport height
-    unsigned char field_0x1b0[0x1c4 - 0x1b0];
-    int cursorRangeX;                         // +0x1c4 cursor x range
-    int cursorRangeY;                         // +0x1c8 cursor y range
-};
-
 // Use the complete shared collision class: size 0xb8, QuadTreeObject at +0,
 // GraphicsTest/GameObject at +0xc. The probe accesses +0x68 and +0x88.
 #include "../krusty2/collision/CollisionObject.h"

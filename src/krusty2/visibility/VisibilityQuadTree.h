@@ -14,10 +14,11 @@
 #include "broadphase/Quadtree.h"
 #include "core/GameObject.h"
 
-// The view/camera object stored at GameObject::renderContext (set by GameObject slot 8, which
-// Setup() calls with its first argument).  Tier 3 stand-in: only the pieces the slots below
-// touch are declared.  Slot 7 (+0x1c) is called with (0, 1, 1) and (0, 4, 1) by slot 14 and
-// field +0x08 is read as the camera record.
+// GameObject::renderContext (set by GameObject slot 8, which Setup() calls with its first
+// argument) is the RenderTarget (reconstructed/RenderTarget.h): slot 14 calls its slot 7
+// SetTextureStageState (+0x1c) with (0, 1, 1) and (0, 4, 1) and reads its +0x08 currentCamera
+// as the camera record below.
+class RenderTarget;
 class VisibilityRenderer;
 
 struct VisibilityCamera {
@@ -47,21 +48,6 @@ struct VisibilityCamera {
     float farPlane;     // +0x1c0 Camera.h: far clip (100000.0f); compared with a bounding sphere's near depth in 0x0052fbb0 (far limit)
     char field_0x1c4[0x5c];
 };   // 0x220 bytes: slot 23 copies this much (0x88 dwords) into g_frozenCamera
-
-class VisibilityView {
-public:
-    virtual void UnknownVirtualSlot0();
-    virtual void BeginScene();
-    virtual void EndScene();
-    virtual void Blit();
-    virtual void LockSurface();
-    virtual void UnlockSurface();
-    virtual void GetTextureStageState();
-    // +0x1c: RenderTarget slot 7; the debug draw (0x0052e3b0) passes (0, D3DTSS_COLOROP/ALPHAOP, D3DTOP_DISABLE).
-    virtual void SetTextureStageState(int stage, int type, int value);
-    char field_0x04[4];
-    VisibilityCamera* camera;   // +0x08
-};
 
 struct VisibilityResultList {
     QuadTreeResultLink* head;
@@ -174,7 +160,7 @@ public:
     // camera ground position (x, z) with the frustum camera record.
     int Query(float x, float z, VisibilityCamera* camera);
 
-    VisibilityView* View() const { return (VisibilityView*)renderContext; }
+    RenderTarget* View() const { return (RenderTarget*)renderContext; }
 
     virtual int PrepareGeometry();            // 0x0052ef50 (secondary vtable)
     virtual int Render3D();    // 0x0052e3b0

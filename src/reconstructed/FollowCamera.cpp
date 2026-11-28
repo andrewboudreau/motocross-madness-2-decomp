@@ -3,6 +3,7 @@
 #include "FollowCamera.h"
 
 #include "DebugAlloc.h"
+#include "KeyboardDevice.h"
 #include "TextureMap.h"
 #include "ResourceEntry.h"
 
@@ -778,8 +779,7 @@ void FollowCamera::RestoreCameraState() {}
 // 0x00464ea0 and 0x00464ec0: slot 5 of the interface behind the 0x0056e26c
 // object, with codes 0x38 and 0x2a.
 unsigned char FollowCamera::IsLookBackHeld() {
-    return ((FollowCameraKeyboardDeviceView*)g_TrackGame->controlInterface->keyboard)
-        ->IsButtonDown(0x38, 0x3F, 0);
+    return g_TrackGame->controlInterface->keyboard->IsButtonDown(0x38, 0x3F, 0);
 }
 
 // 0x00464ee0 and 0x00464f70: feed a vector into the +0x27c..+0x284 and
@@ -791,9 +791,8 @@ void FollowCamera::EaseTargetToward(const Vector3& value) {
     targetEaseZ->Set(value.z, rate);
 }
 
-bool FollowCamera::IsTargetViewHeld() {
-    return ((FollowCameraKeyboardDeviceView*)g_TrackGame->controlInterface->keyboard)
-        ->IsButtonDown(0x2A, 0x3F, 0);
+unsigned char FollowCamera::IsTargetViewHeld() {
+    return g_TrackGame->controlInterface->keyboard->IsButtonDown(0x2A, 0x3F, 0);
 }
 
 // 0x00465000: when enabled and not forced, a point the +0x288..+0x290 values

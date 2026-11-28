@@ -206,14 +206,14 @@ int VisibilityQuadTree::Render3D()
 {
     if (!g_visibilityDebugDraw)
         return 1;
-    VisibilityView* view = View();
-    VisibilityCamera* cam = view->camera;
+    RenderTarget* view = View();
+    VisibilityCamera* cam = (VisibilityCamera*)view->currentCamera;
     int x = (int)((cam->worldX - worldMinX - worldMinX) * quantScale);
     int z = (int)(cam->worldZ * quantScale);
     View()->SetTextureStageState(0, 1, 1);
     View()->SetTextureStageState(0, 4, 1);
     if (rootNode)
-        ((VisibilityQuadTreeNode*)rootNode)->DebugDraw(x, z, 0, 0, 0x4000, View()->camera);
+        ((VisibilityQuadTreeNode*)rootNode)->DebugDraw(x, z, 0, 0, 0x4000, (VisibilityCamera*)View()->currentCamera);
     return 1;
 }
 
@@ -291,7 +291,7 @@ int VisibilityQuadTree::OnControlPress(ControlEvent* a, InputButtonState* b)
     if (TestInputEvent(0x57, 0, a, 0x80)) {
         g_visibilityFreeze = 1 - g_visibilityFreeze;
         if (g_visibilityFreeze)
-            *reinterpret_cast<VisibilityCamera*>(&g_frozenCamera) = *View()->camera;
+            *reinterpret_cast<VisibilityCamera*>(&g_frozenCamera) = *(VisibilityCamera*)View()->currentCamera;
         return 1;
     }
     return 0;
@@ -305,7 +305,7 @@ int VisibilityQuadTree::PrepareGeometry()
     if (g_visibilityFreeze)
         cam = reinterpret_cast<VisibilityCamera*>(&g_frozenCamera);
     else
-        cam = View()->camera;
+        cam = (VisibilityCamera*)View()->currentCamera;
     Query(cam->worldX, cam->worldZ, cam);
     g_visibilityQueryTicks = ReadClock() - start;
     if (reinterpret_cast<VisibilityProfiler*>(g_TrackGame)->log) {

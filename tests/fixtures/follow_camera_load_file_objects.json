@@ -7,8 +7,8 @@
   "aggregate": {
     "sections": 120,
     "relocations": 469,
-    "sha256": "d25cdb56e0d71348f8f76437d3450c2ef723d833b71e1f6e03d6e28cb62f6fa5"
+    "sha256": "dafb0df08184dd1456ac9e01509ef51db5435547b311fc7ca38b24ac84f0d7a1"
   },
-  "note": "Candidate: the LoadCameraFile validation unit (same 9 sections and 37 relocations as the former standalone sample; only its normalised filename label changed). Aggregate: canonical src/reconstructed/FollowCamera.cpp.",
+  "note": "Candidate: the LoadCameraFile validation unit (same 9 sections and 37 relocations as the former standalone sample; only its normalised filename label changed). Aggregate: canonical src/reconstructed/FollowCamera.cpp. FollowCamera slot 56 IsTargetViewHeld returns unsigned char (keyboard view retired): the old pins were reproduced first, and the objects are identical under only ?IsTargetViewHeld@FollowCamera@@UAE_NXZ -> UAEEXZ.",
   "original_loader_raw_sha256": "7faa49b31e825e407e535a5e037a34dfd958455203d18300de47d26df6b39103"
 }

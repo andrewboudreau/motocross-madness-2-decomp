@@ -1163,26 +1163,6 @@ public:
     virtual void SetTextureBlend(int mode, int flag);              // +0x28
 };
 
-// Math3D views of the sphere / capsule payloads (same layouts as CollisionSphereShape and
-// CollisionCapsuleShape in CollisionObject.h).
-struct CollisionSphereView {
-    Vec3 center;
-    float radius;
-    float radiusSquared;
-    float radiusScale;      // +0x14
-    float centerScale;      // +0x18
-    Matrix4 transform;      // +0x1c
-};
-struct CollisionCapsuleView {
-    Vec3 p0;
-    Vec3 p1;
-    float radius;           // +0x18
-    float radiusSquared;
-    float radiusScale;
-    float endpointScale;
-    Matrix4 transform;      // +0x28
-};
-
 // 0x00434540 (slot 14 of the GraphicsTest table, this = the GraphicsTest subobject): the
 // collision debug overlay.  debugDrawMode 0 draws nothing, 5 adds the translucent bounding
 // sphere; hulls and models draw their trees, a polyline its segment tree, a sphere a wire
@@ -1218,26 +1198,26 @@ int CollisionObject::Render3D()
             break;
         case 4: {
             SetDrawColor(0xff, 0xff, 0xff);
-            CollisionSphereView* sphere = (CollisionSphereView*)shape;
-            center = sphere->center * sphere->centerScale;
-            DebugTransformPoint(&center, center, &sphere->transform);
+            CollisionSphereShape* sphere = (CollisionSphereShape*)shape;
+            center = *(Vec3*)&sphere->center * sphere->centerScale;
+            DebugTransformPoint(&center, center, (Matrix4*)&sphere->transform);
             DrawSphere(&center, sphere->radius * sphere->radiusScale, 8);
             break;
         }
         case 3: {
             SetDrawColor(0xff, 0xff, 0xff);
-            CollisionCapsuleView* capsule = (CollisionCapsuleView*)shape;
+            CollisionCapsuleShape* capsule = (CollisionCapsuleShape*)shape;
             Vec3 ends[2];
-            DebugTransformCapsuleStart(&ends[0], capsule->p0, &capsule->transform);
-            DebugTransformCapsuleEnd(&ends[1], &capsule->p1, &capsule->transform);
+            DebugTransformCapsuleStart(&ends[0], *(Vec3*)&capsule->p0, (Matrix4*)&capsule->transform);
+            DebugTransformCapsuleEnd(&ends[1], (Vec3*)&capsule->p1, (Matrix4*)&capsule->transform);
             DrawSphere(&ends[0], capsule->radius, 0x10);
-            DrawSphere(&ends[1], ((CollisionCapsuleView*)shape)->radius, 0x10);
+            DrawSphere(&ends[1], ((CollisionCapsuleShape*)shape)->radius, 0x10);
             Vec3 span = ends[1] - ends[0];
             CollisionVec3 axis = DebugNormalized(*(CollisionVec3*)&span);
             Vec3 step = span / 10.0f;
             for (int i = 0; i < 10; i++) {
                 Vec3 ring = ends[0] + step * (float)i;
-                DrawCircle(&ring, ((CollisionCapsuleView*)shape)->radius, (Vec3*)&axis, 0x20);
+                DrawCircle(&ring, ((CollisionCapsuleShape*)shape)->radius, (Vec3*)&axis, 0x20);
             }
             break;
         }

@@ -32,7 +32,7 @@ public:
     virtual Vector3 SelectFollowPoint(int a, bool flag, float dt);
     virtual void ClampPositionAboveGround(Vector3* point);
     virtual unsigned char IsLookBackHeld();
-    virtual bool IsTargetViewHeld();
+    virtual unsigned char IsTargetViewHeld();
     virtual void ShowCameraStateName();
     virtual void SaveCameraPreset();
     virtual void RestoreCameraPreset();

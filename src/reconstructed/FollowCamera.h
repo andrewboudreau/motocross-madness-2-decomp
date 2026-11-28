@@ -88,8 +88,12 @@ struct FollowCameraPoint {
 // Terrain::QueryGround 0x00507c10.
 class Terrain;
 // FollowCamera's view of ControlInterface's active joystick (+0x0c): slot 45
-// tests only the low byte of slot 4's result (JoystickDevice.h declares int),
-// as with FollowCameraKeyboardDeviceView. Slot 4 reads stick `index` into *x/*y.
+// 0x00463a30 tests only the low byte of slot 4's result (`test al,al` at
+// 0x00463d1b, 0x004641dc, 0x004647a6), while PCJoystickDevice::GetPovDirection
+// 0x004c3ba0 returns a full int (mov eax,1 / xor eax,eax) and JoystickDevice.h
+// declares int for it. No caller expression on an int result tests `al`, so
+// FollowCamera.cpp saw a one-byte declaration (tier 2). Slot 4 reads stick
+// `index` into *x/*y.
 class FollowCameraJoystickDeviceView {
 public:
     virtual void RemoveBindings();
@@ -157,13 +161,15 @@ public:
     // them for the head view (state 3).
     virtual void HideSubject();
     virtual void ShowSubject();
-    // A one-byte result: slot 10 tests `al`, and KrustyBikeCamera's override
-    // returns ControlInterface slot 2's int with no conversion code, which a
-    // bool return would add (neg/sbb/neg).  Slot 55 (tier 2): while held, Tick switches to
+    // One-byte results: slot 10 tests `al`, and KrustyBikeCamera's slot 55 and
+    // FollowCamera's slot 56 return an int (ControlInterface slot 2,
+    // KeyboardDevice slot 5) with no conversion code, which a bool return
+    // would add (neg/sbb/neg); both slots are typed alike (tier 3: any
+    // non-bool byte type gives these bytes).  Slot 55 (tier 2): while held, Tick switches to
     // state 6 and ApplyReverseViewPreset; slot 56 (tier 3): while held, state 7 and
     // LookAtTargetPoint, restoring the saved state on release.
     virtual unsigned char IsLookBackHeld();
-    virtual bool IsTargetViewHeld();
+    virtual unsigned char IsTargetViewHeld();
     // The argument is a float: FollowCamera slot 10 passes its frame time and
     // VehicleCamera's override caps it at 0.2.
     virtual Vector3 GetLeadTargetPoint(float dt) = 0;

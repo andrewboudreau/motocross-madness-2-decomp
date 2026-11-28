@@ -504,7 +504,7 @@ void BackgroundImage::MarkAllDirty() {
     Camera* camera = Target()->currentCamera;
     if (camera) {
         camera->projectionChangeFrames = Target()->frameModulus + 1;
-        if ((unsigned)Target()->currentCamera->viewport[3] < (unsigned)Target()->targetHeight)
+        if (Target()->currentCamera->viewport[3] < (unsigned)Target()->targetHeight)
             Target()->currentCamera->viewportClearFrames = Target()->frameModulus + 1;
     }
 }
