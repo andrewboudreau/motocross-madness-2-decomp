@@ -72,7 +72,7 @@ VisibilityQuadTreeNode::VisibilityQuadTreeNode()
 }
 
 // 0x0052d560
-int VisibilityQuadTree::Query(float x, float z, VisibilityCamera* camera)
+int VisibilityQuadTree::Query(float x, float z, Camera* camera)
 {
     if (stateFlags & 1)
         return 0;
@@ -97,7 +97,7 @@ int VisibilityQuadTree::Query(float x, float z, VisibilityCamera* camera)
 // box corners are inside and recursed into otherwise.
 __forceinline QuadTreeResultLink* VisibilityQuadTreeNode::VisitChild(
     int i, int x, int z, QuadTreeResultLink* tail, int nodeX, int nodeZ, int midX, int midZ,
-    int half, float centerX, float centerZ, float halfExtent, VisibilityCamera* camera,
+    int half, float centerX, float centerZ, float halfExtent, Camera* camera,
     VisibilityBoxVec* center, VisibilityBoxVec* extent, int* cornersInside)
 {
     if (!children[i])
@@ -106,7 +106,7 @@ __forceinline QuadTreeResultLink* VisibilityQuadTreeNode::VisitChild(
     extent->y = children[i]->yHalfExtent;
     center->x = (i & 2) ? centerX + halfExtent : centerX - halfExtent;
     center->z = (i & 1) ? centerZ + halfExtent : centerZ - halfExtent;
-    if (!g_visibilityClipper->TestBox(camera, (const float*)((char*)camera + 0xec), &center->x,
+    if (!g_visibilityClipper->TestBox(camera, camera->screenMatrix[0].m[0], &center->x,
                                       &extent->x, 0, cornersInside, 0))
         return tail;
     int childX = (i & 2) ? midX : nodeX;
@@ -121,7 +121,7 @@ __forceinline QuadTreeResultLink* VisibilityQuadTreeNode::VisitChild(
 // Back-to-front walk: the quadrant containing the query point is visited last.
 QuadTreeResultLink* VisibilityQuadTreeNode::Traverse(int x, int z, QuadTreeResultLink* tail,
                                                      int nodeX, int nodeZ, int size,
-                                                     VisibilityCamera* camera)
+                                                     Camera* camera)
 {
     int midX = nodeX + size;
     int midZ = nodeZ + size;
@@ -173,7 +173,7 @@ QuadTreeResultLink* VisibilityQuadTreeNode::Traverse(int x, int z, QuadTreeResul
 // 0x0052e1f0
 // Builds the 16-vertex line strip that traces the box (bottom square, one vertical edge, top
 // square, the remaining vertical edges) and draws it.
-void VisibilityQuadTreeNode::DrawBox(VisibilityRenderer* renderer, const float* center, const float* extent)
+void VisibilityQuadTreeNode::DrawBox(RenderTarget* renderer, const float* center, const float* extent)
 {
     VisibilityBoxVertex* strip = g_visibilityBoxVertices;
     float x0 = center[0] - extent[0];
@@ -198,7 +198,7 @@ void VisibilityQuadTreeNode::DrawBox(VisibilityRenderer* renderer, const float* 
     strip[13].x = x1; strip[13].y = y1; strip[13].z = z1;
     strip[14].x = x0; strip[14].y = y1; strip[14].z = z1;
     strip[15].x = x0; strip[15].y = y1; strip[15].z = z0;
-    renderer->DrawLineStrip(3, 0x1e2, strip, 16, 0);
+    renderer->DrawPrimitive(3, 0x1e2, (int)strip, 16, 0);
 }
 
 // 0x0052e3b0
@@ -207,13 +207,13 @@ int VisibilityQuadTree::Render3D()
     if (!g_visibilityDebugDraw)
         return 1;
     RenderTarget* view = View();
-    VisibilityCamera* cam = (VisibilityCamera*)view->currentCamera;
-    int x = (int)((cam->worldX - worldMinX - worldMinX) * quantScale);
-    int z = (int)(cam->worldZ * quantScale);
+    Camera* cam = view->currentCamera;
+    int x = (int)((cam->eyePosition.x - worldMinX - worldMinX) * quantScale);
+    int z = (int)(cam->eyePosition.z * quantScale);
     View()->SetTextureStageState(0, 1, 1);
     View()->SetTextureStageState(0, 4, 1);
     if (rootNode)
-        ((VisibilityQuadTreeNode*)rootNode)->DebugDraw(x, z, 0, 0, 0x4000, (VisibilityCamera*)View()->currentCamera);
+        ((VisibilityQuadTreeNode*)rootNode)->DebugDraw(x, z, 0, 0, 0x4000, View()->currentCamera);
     return 1;
 }
 
@@ -221,7 +221,7 @@ int VisibilityQuadTree::Render3D()
 // recurses unless it is completely inside.
 __forceinline void VisibilityQuadTreeNode::DrawChild(
     int i, int x, int z, int nodeX, int nodeZ, int midX, int midZ, int half, float centerX,
-    float centerZ, float halfExtent, VisibilityCamera* camera, VisibilityBoxVec* center, VisibilityBoxVec* extent, int* cornersInside)
+    float centerZ, float halfExtent, Camera* camera, VisibilityBoxVec* center, VisibilityBoxVec* extent, int* cornersInside)
 {
     if (!children[i])
         return;
@@ -229,10 +229,10 @@ __forceinline void VisibilityQuadTreeNode::DrawChild(
     extent->y = children[i]->yHalfExtent;
     center->x = (i & 2) ? centerX + halfExtent : centerX - halfExtent;
     center->z = (i & 1) ? centerZ + halfExtent : centerZ - halfExtent;
-    if (!g_visibilityClipper->TestBox(camera, (const float*)((char*)camera + 0xec), &center->x,
+    if (!g_visibilityClipper->TestBox(camera, camera->screenMatrix[0].m[0], &center->x,
                                       &extent->x, 0, cornersInside, 0))
         return;
-    DrawBox(camera->renderer, &center->x, &extent->x);
+    DrawBox(camera->Owner(), &center->x, &extent->x);
     if (*cornersInside != 8)
         ((VisibilityQuadTreeNode*)children[i])->DebugDraw(x, z, (i & 2) ? midX : nodeX,
                                                           (i & 1) ? midZ : nodeZ, half, camera);
@@ -241,7 +241,7 @@ __forceinline void VisibilityQuadTreeNode::DrawChild(
 // 0x0052e450
 // Same back-to-front walk as Traverse, drawing the box of every visible node.
 void VisibilityQuadTreeNode::DebugDraw(int x, int z, int nodeX, int nodeZ, int size,
-                                       VisibilityCamera* camera)
+                                       Camera* camera)
 {
     int midX = nodeX + size;
     int midZ = nodeZ + size;
@@ -291,7 +291,7 @@ int VisibilityQuadTree::OnControlPress(ControlEvent* a, InputButtonState* b)
     if (TestInputEvent(0x57, 0, a, 0x80)) {
         g_visibilityFreeze = 1 - g_visibilityFreeze;
         if (g_visibilityFreeze)
-            *reinterpret_cast<VisibilityCamera*>(&g_frozenCamera) = *(VisibilityCamera*)View()->currentCamera;
+            memcpy(&g_frozenCamera, View()->currentCamera, sizeof(g_frozenCamera));
         return 1;
     }
     return 0;
@@ -301,12 +301,12 @@ int VisibilityQuadTree::OnControlPress(ControlEvent* a, InputButtonState* b)
 int VisibilityQuadTree::PrepareGeometry()
 {
     unsigned int start = ReadClock();
-    VisibilityCamera* cam;
+    Camera* cam;
     if (g_visibilityFreeze)
-        cam = reinterpret_cast<VisibilityCamera*>(&g_frozenCamera);
+        cam = &g_frozenCamera;
     else
-        cam = (VisibilityCamera*)View()->currentCamera;
-    Query(cam->worldX, cam->worldZ, cam);
+        cam = View()->currentCamera;
+    Query(cam->eyePosition.x, cam->eyePosition.z, cam);
     g_visibilityQueryTicks = ReadClock() - start;
     if (reinterpret_cast<VisibilityProfiler*>(g_TrackGame)->log) {
         if (statsId < 0) {
@@ -364,7 +364,7 @@ void VisibilityClipper::TransformVectors(const VisibilityBoxVec* src, Visibility
 
 // 0x0052f140 (ret 0xc).  Compares a dot product against a threshold derived from the
 // camera record's float at +0x16c (10.0f at 0x00550780 and 0.00461538f at 0x00558e14).
-int VisibilityClipper::TestDot(const VisibilityCamera* camera, const VisibilityBoxVec* a,
+int VisibilityClipper::TestDot(const Camera* camera, const VisibilityBoxVec* a,
                                const VisibilityBoxVec* b)
 {
     float dot = a->y * b->y;
@@ -382,7 +382,7 @@ int VisibilityClipper::TestDot(const VisibilityCamera* camera, const VisibilityB
 // components newer than the matrix parameter's elements; the parenthesised x sum and the
 // second matrix name used by the row-0 terms of y and z give retail's order in every
 // product.
-void VisibilityClipper::ProjectVertices(const VisibilityCamera* camera, const VisibilityMatrix* m,
+void VisibilityClipper::ProjectVertices(const Camera* camera, const VisibilityMatrix* m,
                                         int count, const VisibilityVertex* v,
                                         VisibilityBoxVec* out, int* codes)
 {
@@ -418,9 +418,9 @@ void VisibilityClipper::ProjectVertices(const VisibilityCamera* camera, const Vi
             code |= 0x10;
         else if (clip.w - clip.z < 0.0)
             code |= 0x20;
-        out->x = camera->viewportWidth * clip.x * inv;
-        out->y = camera->viewportHeight * clip.y * inv;
-        out->z = camera->viewportHeight * clip.z * inv;
+        out->x = camera->viewport[2] * clip.x * inv;
+        out->y = camera->viewport[3] * clip.y * inv;
+        out->z = camera->viewport[3] * clip.z * inv;
         if (codes)
             *codes++ = code;
         v++;
@@ -432,7 +432,7 @@ void VisibilityClipper::ProjectVertices(const VisibilityCamera* camera, const Vi
 // x' < 0 / x' > w, y: 4 / 8, z: 0x10 / 0x20) and, when `screen` is given, the coordinates
 // scaled by the camera's viewport size (converted as unsigned values).  Returns 1 when the
 // point is inside.
-int VisibilityClipper::ProjectPoint(const VisibilityCamera* camera, const VisibilityMatrix* m,
+int VisibilityClipper::ProjectPoint(const Camera* camera, const VisibilityMatrix* m,
                                     const VisibilityBoxVec* p, VisibilityBoxVec* screen,
                                     unsigned int* outCode)
 {
@@ -468,9 +468,9 @@ int VisibilityClipper::ProjectPoint(const VisibilityCamera* camera, const Visibi
         code |= 0x20;
     if (screen) {
         float inv = 1.0f / c.w;
-        screen->x = camera->viewportWidth * inv * c.x;
-        screen->y = camera->viewportHeight * inv * c.y;
-        screen->z = camera->viewportHeight * inv * c.z;
+        screen->x = camera->viewport[2] * inv * c.x;
+        screen->y = camera->viewport[3] * inv * c.y;
+        screen->z = camera->viewport[3] * inv * c.z;
     }
     if (outCode)
         *outCode = code;
@@ -479,7 +479,7 @@ int VisibilityClipper::ProjectPoint(const VisibilityCamera* camera, const Visibi
 
 // 0x0052f4d0 (ret 0x18).  Gathers four points by index (12-byte stride) into a 4-point
 // polygon and culls it with CullPolygon.
-int VisibilityClipper::CullQuad(const VisibilityCamera* camera, const VisibilityBoxVec* points,
+int VisibilityClipper::CullQuad(const Camera* camera, const VisibilityBoxVec* points,
                                 int i0, int i1, int i2, int i3)
 {
     VisibilityCullPoint quad[4];
@@ -502,7 +502,7 @@ int VisibilityClipper::CullQuad(const VisibilityCamera* camera, const Visibility
 // camera's +0x1bc, or when the points' outcodes (|y| against z * +0x1b8, |x| against z) share
 // a bit, i.e. the polygon is entirely outside one frustum side; the second test is skipped
 // when the camera's +0x16c (a field of view in degrees, compared with 90.0) is above 90.
-int VisibilityClipper::CullPolygon(const VisibilityCamera* camera, VisibilityCullPoint* points,
+int VisibilityClipper::CullPolygon(const Camera* camera, VisibilityCullPoint* points,
                                    int count)
 {
     int i;
@@ -518,7 +518,7 @@ int VisibilityClipper::CullPolygon(const VisibilityCamera* camera, VisibilityCul
     if (camera->fieldOfView <= 90.0) {
         for (i = 0; i < count; i++) {
             unsigned int code = 0;
-            float slope = points[i].z * camera->aspectRatio;
+            float slope = points[i].z * camera->heightWidthRatio;
             if (slope < points[i].y)
                 code = 4;
             else if (-slope > points[i].y)
@@ -539,24 +539,24 @@ int VisibilityClipper::CullPolygon(const VisibilityCamera* camera, VisibilityCul
 }
 
 // 0x0052fbb0 (ret 0x14).  Sphere against the view frustum.  The camera supplies the depth
-// axis (+0xb4/+0xc4/+0xd4/+0xe4, a column of matrixB), the near/far limits (+0x1bc / +0x1c0)
-// and the side-plane scale (`side`: matrixC column 0); `m` gives x', y' and w.  Returns 0
+// axis (+0xb4/+0xc4/+0xd4/+0xe4, the view matrix's z column), the near/far limits (+0x1bc /
+// +0x1c0) and the side-plane scale (`side`: column 0 of screenMatrix[1]); `m` gives x', y' and w.  Returns 0
 // when the sphere is outside; `fullyInside`, when given, receives 1 only if the sphere crosses
 // no plane.  `side` is taken before the depth is computed: VC6 homes `depth` and `nearDepth`
 // in the dead camera/center argument slots in the order of the arguments' first use, and the
 // address of the side-plane column is the camera's first use (docs/VC6_FRAME_LAYOUT.md).
-int VisibilityClipper::SphereInFrustum(const VisibilityCamera* camera, const VisibilityMatrix* m,
+int VisibilityClipper::SphereInFrustum(const Camera* camera, const VisibilityMatrix* m,
                                        const VisibilityBoxVec* center, float radius,
                                        int* fullyInside)
 {
     int crosses = 0;
     float depth, nearDepth, spread, xHigh, xLow, yHigh, yLow;
     VisibilityClipPoint c;
-    const float* side = &camera->matrixC[0][0];
-    depth = center->y * camera->matrixB[1][0];
-    depth += center->z * camera->matrixB[2][0];
-    depth += center->x * camera->matrixB[0][0];
-    depth += camera->matrixB[3][0];
+    const float* side = camera->screenMatrix[1].m[0];
+    depth = center->y * camera->viewMatrix.m[1][2];
+    depth += center->z * camera->viewMatrix.m[2][2];
+    depth += center->x * camera->viewMatrix.m[0][2];
+    depth += camera->viewMatrix.m[3][2];
     nearDepth = depth - radius;
     if (nearDepth > camera->farPlane || depth + radius < camera->nearPlane) {
         if (fullyInside)

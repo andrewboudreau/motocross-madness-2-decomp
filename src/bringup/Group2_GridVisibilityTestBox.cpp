@@ -7,9 +7,8 @@
 // reject that zeroes the rect, the projection, the clamp to the viewport and the offset by
 // its origin).  This file used to carry a second, equivalent copy of that body with its own
 // corner array; it now forwards every argument unchanged, as Group1_ShadowClipper.cpp does
-// for D3DIMSoultreeShadow.cpp's view.  GridCamera and VisibilityCamera are the same camera
-// object (matrix at +0xec, viewport at +0x1a0..+0x1ac).  The seventh argument is an unused
-// pointer.  Griddraw.h keeps its own declaration: Terrain.cpp's exact Render3D reaches
+// for D3DIMSoultreeShadow.cpp's view.  The camera is the Camera (Camera.h; matrix at +0xec,
+// viewport at +0x1a0..+0x1ac).  The seventh argument is an unused pointer.  Griddraw.h keeps its own declaration: Terrain.cpp's exact Render3D reaches
 // Griddraw.h and is sensitive to its declaration count.
 //
 // The linked body rounds its six screen-rectangle values through FistpFloatToIntChecked
@@ -19,11 +18,11 @@
 #include "visibility/VisibilityClipper.h"
 
 // 0x0052f570
-int GridVisibilityClipper::TestBox(GridCamera* camera, const float* matrix, const float* center,
+int GridVisibilityClipper::TestBox(Camera* camera, const float* matrix, const float* center,
                                    const float* extent, int* screenRect, int* cornersInside,
                                    int* unused)
 {
     return reinterpret_cast<VisibilityClipper*>(this)->TestBox(
-        reinterpret_cast<VisibilityCamera*>(camera), matrix, center, extent, screenRect,
+        camera, matrix, center, extent, screenRect,
         cornersInside, unused);
 }

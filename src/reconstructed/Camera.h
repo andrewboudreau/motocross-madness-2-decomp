@@ -65,10 +65,10 @@ public:
     // 0x0042f210: the viewport as left/top/right/bottom.
     void GetViewportRect(CameraRect* rect);
 
-protected:
     // renderContext (GameObject +0x18) holds the camera's RenderTarget.
     RenderTarget* Owner() const { return static_cast<RenderTarget*>(renderContext); }
 
+protected:
     friend class RenderTarget;
     friend class PCRenderTarget;    // PCRenderTarget.cpp slot 12 clears the viewport (+0x1a0)
     friend class PCGame;           // slot 19 reattaches the camera (+0x18, +0x1a0)

@@ -74,15 +74,11 @@ struct Grid1Terrain {
 
 // Grid1.cpp's view of the host object at Terrain+0x18 (Terrain.h: its +8
 // is a PCCamera); slot 3 caps the stage at 2 for a root node while the
-// camera's +0x200 (Camera.h lastMoveDistance) exceeds 0.5.
-struct Grid1Camera {
-    unsigned char field_0x000[0x200];
-    float lastMoveDistance;                    // +0x200 Camera::lastMoveDistance
-};
+// camera's lastMoveDistance (+0x200) exceeds 0.5.
 struct Grid1RenderHost {
     int field_0x00;
     int targetDisplay;
-    Grid1Camera* camera;                       // +0x08
+    Camera* camera;                            // +0x08
 };
 
 class DrawableGridNodeSharedTextures : public DrawableGridNode {

@@ -45,7 +45,7 @@
   "?TerrainMatrixIdentityInto@@YAPAUShadowMatrix@@PAU1@@Z": "0x004a1410",
   "?TerrainMatrixMultiplyInto@@YAPAUShadowMatrix@@PAU1@U1@1@Z": "0x004a1860",
   "?CastSegment@TerrainShadowCaster@@QAEHPBUTerrainShadowVec@@0PAU2@PAPAVDrawableGridNode@@HH@Z": "0x00506e90",
-  "?ProjectVertices@VisibilityClipper@@QAEXPBUVisibilityCamera@@PBUVisibilityMatrix@@HPBUVisibilityVertex@@PAUVisibilityBoxVec@@PAH@Z": "0x0052f190",
+  "?ProjectVertices@VisibilityClipper@@QAEXPBVCamera@@PBUVisibilityMatrix@@HPBUVisibilityVertex@@PAUVisibilityBoxVec@@PAH@Z": "0x0052f190",
   "?IsShadowVisible@TerrainShadow@@UAEHXZ": "0x00508bc0",
   "?UpdateTexelSize@TerrainShadow@@UAEHXZ": "0x005097d0",
   "?BuildShadowVertices@TerrainShadow@@UAEXXZ": "0x00509aa0",

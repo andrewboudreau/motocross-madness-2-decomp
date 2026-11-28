@@ -227,7 +227,7 @@
   "_$E12": "0x00442ea0",
   "_$E14": "0x00442f00",
   "_$E15": "0x00442ef0",
-  "?TestBox@VisibilityClipper@@QAEHPAUVisibilityCamera@@PBM11PAH22@Z": "0x0052f570",
+  "?TestBox@VisibilityClipper@@QAEHPAVCamera@@PBM11PAH22@Z": "0x0052f570",
   "?g_visibilityClipper@@3PAVVisibilityClipper@@A": "0x00575a98",
   "?Vec3DotCall@@YAMPBUVec3@@0@Z": "0x0040ae30"
 }

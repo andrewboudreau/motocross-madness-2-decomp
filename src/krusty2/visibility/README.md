@@ -41,9 +41,10 @@ is in retail function order, each body under its address comment.
   loop-local pointer, the x sum parenthesised and a second name for the matrix in the
   row-0 terms of y and z.
 - Not done: TestBox 0x52f570 (1358 bytes, ebp frame with inline `fistp` rounding, excluded).
-- The verified debug walk uses a typed renderer pointer at camera+0x18. The partial
-  projection probe has a separate provisional `VisProjectionRecord`; its matrix-prefix
-  hypothesis is not asserted as part of VisibilityCamera.
+- The walks and the clipper take the actual `Camera` (reconstructed/Camera.h); the debug
+  walk draws through its render target at camera+0x18 (`Camera::Owner()`, RenderTarget
+  slot 16 DrawPrimitive). The partial projection probe has a separate provisional
+  `VisProjectionRecord`; its matrix-prefix hypothesis is not asserted as part of Camera.
 
 ## Relocation evidence
 

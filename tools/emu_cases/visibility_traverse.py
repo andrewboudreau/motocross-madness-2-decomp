@@ -22,7 +22,7 @@ from tools.emu_cases.quadtree_insert import (G_QUADTREE, POOL_ALLOC, TREE_SIZE, 
 from tools.emu_cases.segment_triangle_query import dot, unit
 
 RETAIL_VA = 0x0052d610
-SYMBOL = '?Traverse@VisibilityQuadTreeNode@@QAEPAUQuadTreeResultLink@@HHPAU2@HHHPAUVisibilityCamera@@@Z'
+SYMBOL = '?Traverse@VisibilityQuadTreeNode@@QAEPAUQuadTreeResultLink@@HHPAU2@HHHPAVCamera@@@Z'
 SOURCE = 'src/krusty2/visibility/VisibilityQuadTree.cpp'
 PROBES = {0x0052f570: 'TestBox', 0x0052d718: 'GatherNodes (first arm)', 0x0052d73b: 'recursion (first arm)',
           0x0052e19c: 'recursion (last arm)', 0x0052e1b9: 'item cell'}

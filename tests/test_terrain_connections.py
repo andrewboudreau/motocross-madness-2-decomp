@@ -69,7 +69,10 @@ PARTIAL = (
     # Retiring the camera, visibility, keyboard and dialog views renumbers it again
     # ($L6345 -> $L6325, still .text$x+0xb6); the body bytes and the other 64
     # relocation records are identical.
-    ('?Load@Terrain@@', 2117, '562b456cd542c7935ba3408dc599b216629899851c03368ac2cfa9c927490b38'),
+    # Retiring the GridCamera, Grid1Camera and TerrainCamera views (Terrain.cpp
+    # now includes Camera.h) renumbers it again ($L6325 -> $L6486); the body
+    # bytes and the other 64 relocation records are identical.
+    ('?Load@Terrain@@', 2117, '2847c43dcd88a06995547982417510d05ad736e155f4b0f61dc31bbdb710b051'),
     # Intentional cell-conversion repair, verified at the actual first-cell
     # boundary in test_terrain_cell_conversion; full interpolation remains partial.
     # The sampler, dot and triangle provider names are now canonical, with

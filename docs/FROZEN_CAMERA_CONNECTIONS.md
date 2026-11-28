@@ -2,10 +2,11 @@
 
 The camera snapshot at retail `0x0068a968` now uses the existing `PCCamera`
 constructor and implicit destructor. `VisibilityQuadTree.cpp` defines the actual
-`PCCamera` object and keeps explicit `VisibilityCamera` record casts at its two
-copy/query boundaries. The legacy record and all public query signatures remain
-unchanged. This connects two missing lifecycle names; it introduces no new storage
-or handwritten constructor/destructor implementation.
+`PCCamera` object; the control handler copies the current camera over it with a
+0x220-byte `memcpy` and the preparation method queries through it as a `Camera*`
+(the former `VisibilityCamera` record is retired; see docs/NAMING.md). This connects
+two missing lifecycle names; it introduces no new storage or handwritten
+constructor/destructor implementation.
 
 ## Identity and storage
 
@@ -13,7 +14,7 @@ The raw PCCamera complete-object locator at `0x0055e190` has object offset zero,
 type descriptor `0x00566b48` names `.?AVPCCamera@@`, and primary table `0x00555da4`
 points back to that locator. PCCamera, Camera, GameObject and BaseObject base
 records all have `mdisp=0`, `pdisp=-1`. Authentic VC6 layout checks establish
-`sizeof(PCCamera)==sizeof(VisibilityCamera)==0x220`, the context pointer at `+0x18`
+`sizeof(PCCamera)==sizeof(Camera)==0x220`, the context pointer at `+0x18`
 and eye position at `+0x170`. This supports the primary-pointer boundary without
 asserting that every provisional field or camera-like object has the same C++ type.
 

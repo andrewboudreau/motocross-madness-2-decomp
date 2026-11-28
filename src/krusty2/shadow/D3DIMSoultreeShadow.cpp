@@ -119,7 +119,7 @@ int D3DIMSoultreeShadow::IsShadowVisible()
         caster->GetSubtreeBounds((Vec3*)&center, (Vec3*)&extent);
         const D3DIMShadowMatrix4& view = *(const D3DIMShadowMatrix4*)&shadow->camera->screenMatrix[0];
         D3DIMShadowMatrixProduct(&m, local, view);
-        if (g_visibilityClipper->TestBox((VisibilityCamera*)shadow->camera, &m._11, &center.x,
+        if (g_visibilityClipper->TestBox(shadow->camera, &m._11, &center.x,
                                          &extent.x, 0, 0, 0))
             inShadowView = 1;
     }

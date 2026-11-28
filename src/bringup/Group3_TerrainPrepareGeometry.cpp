@@ -36,6 +36,7 @@
 #include "AgeManager.h"
 #include "Griddraw.h"
 #include "Grid1.h"
+#include "Camera.h"
 #include "../../samples/common/FistpFloatToInt.h"
 
 unsigned int ReadClock();   // 0x004bfa80
@@ -56,16 +57,10 @@ static int s_gridCounter68a088;
 static int s_gridTextureCountPeak;
 static int s_gridTextureEstimatePeak;
 
-// View of the visibility camera (a Camera, src/reconstructed/Camera.h: screenMatrix[0]
-// at +0xec, eyePosition at +0x170, focalLength at +0x198).  Terrain.h keeps the member
-// as an int, so the view stays local to this body.
-struct TerrainVisibilityCamera {
-    char pad_0x00[0xec];
-    char screenMatrix[0x170 - 0xec];
-    TerrainVec3 eyePosition;
-    char pad_0x17c[0x198 - 0x17c];
-    float focalLength;
-};
+// visibilityCamera is the Camera (Camera.h) whose eyePosition (+0x170), focalLength
+// (+0x198) and screenMatrix (+0xec) this body reads; Terrain.h keeps the member as an
+// int, so it is cast at each use.  The eye position is copied as the TerrainVec3 the
+// viewer position is.
 
 // The height field's root is a DrawableGridNode (Griddraw.h); retail re-reads the member
 // at every call, so this is a macro rather than a cached local.
@@ -145,8 +140,8 @@ int Terrain::PrepareGeometry()
     if (drawDistance != appliedDrawDistance)
         dirty = 1;
 
-    TerrainVisibilityCamera* camera = (TerrainVisibilityCamera*)visibilityCamera;
-    *(TerrainVec3*)viewerPosition = camera->eyePosition;
+    Camera* camera = (Camera*)visibilityCamera;
+    *(TerrainVec3*)viewerPosition = *(const TerrainVec3*)&camera->eyePosition;
     ((TerrainVec3*)viewerPosition)->x /= gridCellSize;
     ((TerrainVec3*)viewerPosition)->y /= gridCellSize;
     ((TerrainVec3*)viewerPosition)->z /= gridCellSize;
@@ -154,7 +149,7 @@ int Terrain::PrepareGeometry()
     appliedDrawDistance = drawDistance;
     ComputeRatios();
 
-    GridRoot()->TestVisibility(stream, ((TerrainVisibilityCamera*)visibilityCamera)->screenMatrix);
+    GridRoot()->TestVisibility(stream, ((Camera*)visibilityCamera)->screenMatrix);
     frameCount++;
     now = ReadClock();
     profileSetup = now - last;

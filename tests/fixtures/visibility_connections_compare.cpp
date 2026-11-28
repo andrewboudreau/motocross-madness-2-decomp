@@ -6,6 +6,7 @@
 #include <float.h>
 #include <stddef.h>
 #include "visibility/VisibilityQuadTree.h"
+#include "Camera.h"
 extern "C" int VisibilityCameraLayout();
 static BYTE referenceSpace[0x800000]={1};
 static int MapReference(const char* path) {
@@ -29,10 +30,11 @@ static int MapReference(const char* path) {
 
 typedef char Layout[(sizeof(VisibilityBoxVec)==12 && sizeof(VisibilityMatrix)==64 &&
     sizeof(VisibilityCullPoint)==16 && offsetof(VisibilityCullPoint,code)==12 &&
-    sizeof(VisibilityCamera)==0x220 && offsetof(VisibilityCamera,fieldOfView)==0x16c &&
-    offsetof(VisibilityCamera,viewportWidth)==0x1a8 && offsetof(VisibilityCamera,viewportHeight)==0x1ac &&
-    offsetof(VisibilityCamera,aspectRatio)==0x1b8 && offsetof(VisibilityCamera,nearPlane)==0x1bc)?1:-1];
-struct World { DWORD guard0[8]; VisibilityCamera camera; float data[128]; DWORD guard1[8]; };
+    sizeof(Camera)==0x220)?1:-1];
+// The clipper's camera is a Camera (abstract), held here as raw storage of its size; the
+// linked layout object checks the member offsets (VisibilityCameraLayout).
+struct World { DWORD guard0[8]; DWORD camera[sizeof(Camera)/4]; float data[128]; DWORD guard1[8]; };
+#define CAMERA(w) (*reinterpret_cast<Camera*>((w).camera))
 static DWORD initialStorage[(sizeof(World)+3)/4], worldStorage[(sizeof(World)+3)/4];
 #define initial (*reinterpret_cast<World*>(initialStorage))
 #define world (*reinterpret_cast<World*>(worldStorage))
@@ -66,11 +68,11 @@ static void Seed(unsigned seed) {
     if(seed&16)initial.data[14]=2;
     static const float fovs[]={10,77,90,91};
     static const DWORD widths[]={0,1,640,0x80000001};
-    initial.camera.fieldOfView=fovs[seed%4];
-    initial.camera.viewportWidth=widths[(seed/4)%4];
-    initial.camera.viewportHeight=widths[(seed/16)%4];
-    initial.camera.aspectRatio=(seed&1)?0.75f:1.25f;
-    initial.camera.nearPlane=(seed&2)?-1.0f:1.0f;
+    CAMERA(initial).fieldOfView=fovs[seed%4];
+    CAMERA(initial).viewport[2]=widths[(seed/4)%4];
+    CAMERA(initial).viewport[3]=widths[(seed/16)%4];
+    CAMERA(initial).heightWidthRatio=(seed&1)?0.75f:1.25f;
+    CAMERA(initial).nearPlane=(seed&2)?-1.0f:1.0f;
     // Include signed zero, denormal, infinity and NaN on a bounded subset.
     if(seed>=64) {
         static const DWORD edge[]={0,0x80000000,1,0x7f800000,0xff800000,0x7fc12345,0x7f812345,0x7f7fffff};
@@ -82,12 +84,12 @@ static void Run(int retail,int method,int output,int count,int fault,int roundin
     world=initial;memset(&actual,0,sizeof(actual));
     for(int i=0;i<4096;i++)page[i]=(BYTE)(i*17+5);
     VisibilityClipper* self=reinterpret_cast<VisibilityClipper*>(receiver?0:page+4096);
-    const VisibilityCamera* camera=&world.camera;
+    const Camera* camera=&CAMERA(world);
     const VisibilityMatrix* matrix=reinterpret_cast<VisibilityMatrix*>(world.data);
     const VisibilityBoxVec* input=reinterpret_cast<VisibilityBoxVec*>(world.data+32);
     VisibilityBoxVec* destination=reinterpret_cast<VisibilityBoxVec*>(world.data+output);
     unsigned* code=reinterpret_cast<unsigned*>(world.data+100);
-    if(output==120)destination=reinterpret_cast<VisibilityBoxVec*>(&world.camera.fieldOfView);
+    if(output==120)destination=reinterpret_cast<VisibilityBoxVec*>(&CAMERA(world).fieldOfView);
     if(output==121)code=reinterpret_cast<unsigned*>(destination);
     if(output==122)destination=0;
     if(output==123)code=0;
@@ -108,22 +110,22 @@ static void Run(int retail,int method,int output,int count,int fault,int roundin
             if(retail)f.address=0x52f0a0;
             (self->*f.fn)(input,destination,matrix,count);
         } else if(method==1) {
-            union { int(VisibilityClipper::*fn)(const VisibilityCamera*,const VisibilityBoxVec*,const VisibilityBoxVec*); DWORD address; } f;
+            union { int(VisibilityClipper::*fn)(const Camera*,const VisibilityBoxVec*,const VisibilityBoxVec*); DWORD address; } f;
             f.fn=&VisibilityClipper::TestDot;if(sizeof(f.fn)!=4)ExitProcess(11);
             if(retail)f.address=0x52f140;
             actual.result=(self->*f.fn)(camera,input,destination);
         } else if(method==2) {
-            union { int(VisibilityClipper::*fn)(const VisibilityCamera*,const VisibilityMatrix*,const VisibilityBoxVec*,VisibilityBoxVec*,unsigned*); DWORD address; } f;
+            union { int(VisibilityClipper::*fn)(const Camera*,const VisibilityMatrix*,const VisibilityBoxVec*,VisibilityBoxVec*,unsigned*); DWORD address; } f;
             f.fn=&VisibilityClipper::ProjectPoint;if(sizeof(f.fn)!=4)ExitProcess(11);
             if(retail)f.address=0x52f340;
             actual.result=(self->*f.fn)(camera,matrix,input,destination,code);
         } else if(method==3) {
-            union { int(VisibilityClipper::*fn)(const VisibilityCamera*,const VisibilityBoxVec*,int,int,int,int); DWORD address; } f;
+            union { int(VisibilityClipper::*fn)(const Camera*,const VisibilityBoxVec*,int,int,int,int); DWORD address; } f;
             f.fn=&VisibilityClipper::CullQuad;if(sizeof(f.fn)!=4)ExitProcess(11);
             if(retail)f.address=0x52f4d0;
             actual.result=(self->*f.fn)(camera,input,0,count&3,(count+1)&3,(count+2)&3);
         } else {
-            union { int(VisibilityClipper::*fn)(const VisibilityCamera*,VisibilityCullPoint*,int); DWORD address; } f;
+            union { int(VisibilityClipper::*fn)(const Camera*,VisibilityCullPoint*,int); DWORD address; } f;
             f.fn=&VisibilityClipper::CullPolygon;if(sizeof(f.fn)!=4)ExitProcess(11);
             if(retail)f.address=0x52fac0;
             actual.result=(self->*f.fn)(camera,reinterpret_cast<VisibilityCullPoint*>(const_cast<VisibilityBoxVec*>(input)),count);
@@ -171,7 +173,7 @@ int main(int argc,char**argv) {
         }
     // Independent identity/inside/outside and cull outcomes, beyond differential equality.
     Seed(0);for(int i=32;i<44;i++)initial.data[i]=0.25f;
-    initial.camera.viewportWidth=640;initial.camera.viewportHeight=480;
+    CAMERA(initial).viewport[2]=640;CAMERA(initial).viewport[3]=480;
     Check(0,48,1,0,_RC_NEAR,_PC_64,1);
     if(world.data[48]!=.25f||world.data[49]!=.25f||world.data[50]!=.25f)return 5;
     Check(2,48,1,0,_RC_NEAR,_PC_64,1);

@@ -3,6 +3,7 @@
 
 #include "TrackGameGlobal.h"
 #include "Griddraw.h"
+#include "Camera.h"
 
 #include <float.h>
 #include <string.h>
@@ -1479,7 +1480,7 @@ int DrawableGridNode::TestBlockFrustum(int block)
     boxCenter[0] = (block % 4) * size + data->gridMinX * terrain->gridCellSize + half;
     boxCenter[2] = (block / 4) * size + data->gridMinZ * terrain->gridCellSize + half;
     boxCenter[1] = ((GridBlockRange*)data->blockRanges)[block].centerY;
-    int visible = reinterpret_cast<GridVisibilityClipper*>(g_visibilityClipper)->TestBox(terrain->camera, terrain->camera->matrix,
+    int visible = reinterpret_cast<GridVisibilityClipper*>(g_visibilityClipper)->TestBox(terrain->camera, terrain->camera->screenMatrix[0].m[0],
                                                boxCenter, boxExtent, 0, 0, 0);
     if (visible)
         data->visibleBlockMask |= 1 << block;

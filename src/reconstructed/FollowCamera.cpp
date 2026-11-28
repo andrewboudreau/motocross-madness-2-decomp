@@ -268,7 +268,7 @@ void FollowCamera::SteerToKeepPointsOnScreen(float dt, bool blend, bool pitch) {
     for (int i = 0; i < pointCount; i++) {
         unsigned int code;
         if (!reinterpret_cast<VisibilityClipper*>(g_visibilityClipper)->ProjectPoint(
-                reinterpret_cast<const VisibilityCamera*>(this),
+                this,
                 reinterpret_cast<const VisibilityMatrix*>(screenMatrix),
                 reinterpret_cast<const VisibilityBoxVec*>(&points[i].position),
                 reinterpret_cast<VisibilityBoxVec*>(&points[i].screenPoint),

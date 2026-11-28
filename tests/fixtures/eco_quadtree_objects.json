@@ -12,7 +12,7 @@
     "src/reconstructed/EcoSystem.cpp": {
       "sections": 207,
       "relocations": 1143,
-      "sha256": "131a0f5bad9ad86e21422a2f704337fca13b30ed4e23ffc027172722021eeda3"
+      "sha256": "49fc07d2f55dac3c6b52ca3618c203cbdb0d2b993d9360f8cb1a9f17725cff0e"
     },
     "src/krusty2/broadphase/Quadtree.cpp": {
       "sections": 51,
@@ -22,7 +22,7 @@
     "src/krusty2/visibility/VisibilityQuadTree.cpp": {
       "sections": 89,
       "relocations": 395,
-      "sha256": "6c7384845798b6ae2ebc37f9824f68a5ae86e937f34c5cf27b4ad6e4f05ae843"
+      "sha256": "f4a8d922db1bb62e2dad586e5b53323b4031622d740c5f72fabae8fdfcd1f45e"
     }
   },
   "inventory": [

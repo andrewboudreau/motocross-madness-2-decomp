@@ -188,7 +188,7 @@ exact or a documented near miss.
 ## Remaining uncertainty
 
 All type, member and function names are provisional. `GridTerrain`,
-`GridCamera`, `GridVisibilityClipper`, `GridAgeManager` and
+`GridVisibilityClipper`, `GridAgeManager` and
 `GridVertexSink` are boundary views of classes reconstructed elsewhere, or
 not yet reconstructed, as are `GridRenderDevice` (Terrain+0x18, thiscall
 virtuals), `GridManagedTexture` (`0x00510910`) and `GridGameSettings` (`0x0056e26c`);

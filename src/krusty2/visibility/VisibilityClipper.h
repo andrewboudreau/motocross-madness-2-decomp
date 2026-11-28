@@ -1,7 +1,7 @@
 #ifndef VISIBILITY_CLIPPER_H
 #define VISIBILITY_CLIPPER_H
 
-struct VisibilityCamera;
+class Camera;
 struct VisibilityBoxVec;
 struct VisibilityMatrix;
 struct VisibilityVertex;
@@ -20,23 +20,23 @@ struct VisibilityCullPoint;
 //    (lea at 0x00443d74 and 0x004822f2), so it is a pointer.
 class VisibilityClipper {
 public:
-    int TestBox(VisibilityCamera* camera, const float* matrix, const float* center,
+    int TestBox(Camera* camera, const float* matrix, const float* center,
                 const float* extent, int* screenRect, int* cornersInside, int* unused);
     void TransformVectors(const VisibilityBoxVec* src, VisibilityBoxVec* dst,
                           const VisibilityMatrix* m, int count);               // 0x0052f0a0
-    int TestDot(const VisibilityCamera* camera, const VisibilityBoxVec* a,
+    int TestDot(const Camera* camera, const VisibilityBoxVec* a,
                 const VisibilityBoxVec* b);                                    // 0x0052f140
-    void ProjectVertices(const VisibilityCamera* camera, const VisibilityMatrix* m, int count,
+    void ProjectVertices(const Camera* camera, const VisibilityMatrix* m, int count,
                          const VisibilityVertex* vertices, VisibilityBoxVec* out,
                          int* codes);                                          // 0x0052f190
-    int ProjectPoint(const VisibilityCamera* camera, const VisibilityMatrix* m,
+    int ProjectPoint(const Camera* camera, const VisibilityMatrix* m,
                      const VisibilityBoxVec* p, VisibilityBoxVec* screen,
                      unsigned int* outCode);                                   // 0x0052f340
-    int CullQuad(const VisibilityCamera* camera, const VisibilityBoxVec* points, int i0,
+    int CullQuad(const Camera* camera, const VisibilityBoxVec* points, int i0,
                  int i1, int i2, int i3);                                      // 0x0052f4d0
-    int CullPolygon(const VisibilityCamera* camera, VisibilityCullPoint* points,
+    int CullPolygon(const Camera* camera, VisibilityCullPoint* points,
                     int count);                                                // 0x0052fac0
-    int SphereInFrustum(const VisibilityCamera* camera, const VisibilityMatrix* m,
+    int SphereInFrustum(const Camera* camera, const VisibilityMatrix* m,
                         const VisibilityBoxVec* center, float radius,
                         int* fullyInside);                                     // 0x0052fbb0
 };

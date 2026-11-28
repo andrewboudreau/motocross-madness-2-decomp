@@ -16,7 +16,7 @@
 
 class FileStream;
 struct GridVertex;
-struct GridCamera;
+class Camera;
 
 // The grid caches share AgeManager's 0x14-byte manager and entry records.
 // Eviction receives owner and context; callbacks may ignore the second value.
@@ -50,7 +50,7 @@ public:
                                      unsigned short* indices, int indexCount, int flags) = 0;
 
     void* targetDisplay;
-    GridCamera* camera;                        // +0x08 the camera the box test takes (0x00481de0)
+    Camera* camera;                            // +0x08 the camera the box test takes (0x00481de0)
 };
 
 // Boundary view of ManagedTexture (src/reconstructed binds 0x00510910 as
@@ -101,18 +101,11 @@ public:
                        int stride, int flags);  // 0x0049e4a0
 };
 
-// Boundary view of the camera at Terrain+0xc8c: its matrix at +0xec is
-// passed to the box test (see src/krusty2/visibility/VisibilityQuadTree.h).
-struct GridCamera {
-    unsigned char field_0x000[0xec];
-    float matrix[16];                          // +0xec
-};
-
 // Boundary view of VisibilityClipper (src/krusty2/visibility): 0x0052f570
 // tests a box (centre, half extents) against the camera frustum.
 class GridVisibilityClipper {
 public:
-    int TestBox(GridCamera* camera, const float* matrix, const float* center, const float* extent,
+    int TestBox(Camera* camera, const float* matrix, const float* center, const float* extent,
                 int* screenRect, int* cornersInside, int* unused);  // 0x0052f570 (ret 0x1c)
 };
 #include "../krusty2/visibility/VisibilityClipperGlobal.h"   // 0x00575a98
@@ -176,7 +169,7 @@ struct GridTerrain {
     float transform[16];                       // +0xc44 transform
     int textureAgeManager;  // +0xC84  Grid1.h's Grid1Terrain view: the node texture AgeManager
     AgeManager* ageManager;                    // +0xc88
-    GridCamera* camera;                        // +0xc8c
+    Camera* camera;                            // +0xc8c its screenMatrix[0] (+0xec) goes to the box test
     unsigned int detailAverageColor;            // +0xc90 Terrain detailAverageColor
     unsigned char field_0xc94[0xc9c - 0xc94];
     union {

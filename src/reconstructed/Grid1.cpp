@@ -3,6 +3,7 @@
 // See Grid1.h.
 
 #include "Grid1.h"
+#include "Camera.h"
 
 #include <string.h>
 

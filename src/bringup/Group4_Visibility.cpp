@@ -40,6 +40,7 @@
 #include <math.h>
 
 #include "visibility/VisibilityQuadTree.h"
+#include "../reconstructed/Camera.h"
 #include "../../samples/common/FistpFloatToInt.h"
 
 // The eight clip-space box corners (0x0068abc8, 8 x 0x20 bytes). TestBox
@@ -47,14 +48,6 @@
 // coordinates in place. Only TestBox touches them in this unit.
 static VisibilityClipPoint s_group4BoxCorners[8];
 
-// The viewport origin the screen rectangle is offset by (camera +0x1a0 /
-// +0x1a4, inside VisibilityCamera::field_0x17c).
-static inline int Group4Vis_ViewportX(const VisibilityCamera* camera) {
-    return *(const int*)((const char*)camera + 0x1a0);
-}
-static inline int Group4Vis_ViewportY(const VisibilityCamera* camera) {
-    return *(const int*)((const char*)camera + 0x1a4);
-}
 
 // 0x0052f570. Box (center +- extent) against the frustum of `matrix`
 // (row-major 4x4, row vector times matrix). Returns 0 when all eight corners
@@ -66,7 +59,7 @@ static inline int Group4Vis_ViewportY(const VisibilityCamera* camera) {
 // Retail's inline-asm fistp helper gives this function an EBP frame; the
 // pragma keeps the frame pointer for it alone (docs/GAME_BUILD.md#frame-pointer-units).
 #pragma optimize("y", off)
-int VisibilityClipper::TestBox(VisibilityCamera* camera, const float* matrix, const float* center,
+int VisibilityClipper::TestBox(Camera* camera, const float* matrix, const float* center,
                                const float* extent, int* screenRect, int* cornersInside, int* unused) {
     const float* m = matrix;
     unsigned int code = 0;
@@ -179,8 +172,8 @@ int VisibilityClipper::TestBox(VisibilityCamera* camera, const float* matrix, co
     if (screenRect) {
         VisibilityClipPoint* corner = &s_group4BoxCorners[0];
         float inverse = 1.0f / corner->w;
-        corner->x = (float)camera->viewportWidth * inverse * corner->x;
-        corner->y = (float)camera->viewportHeight * inverse * corner->y;
+        corner->x = (float)camera->viewport[2] * inverse * corner->x;
+        corner->y = (float)camera->viewport[3] * inverse * corner->y;
         FistpFloatToIntChecked(&screenRect[0], corner->x);
         FistpFloatToIntChecked(&screenRect[1], corner->y);
         screenRect[3] = screenRect[1];
@@ -188,8 +181,8 @@ int VisibilityClipper::TestBox(VisibilityCamera* camera, const float* matrix, co
         for (i = 1; i < 8; i++) {
             corner = &s_group4BoxCorners[i];
             inverse = 1.0f / corner->w;
-            corner->x = corner->x * ((float)camera->viewportWidth * inverse);
-            corner->y = ((float)camera->viewportHeight * corner->y) * inverse;
+            corner->x = corner->x * ((float)camera->viewport[2] * inverse);
+            corner->y = ((float)camera->viewport[3] * corner->y) * inverse;
             if ((float)screenRect[0] > corner->x)
                 FistpFloatToIntChecked(&screenRect[0], corner->x);
             else if ((float)screenRect[2] < corner->x)
@@ -202,13 +195,13 @@ int VisibilityClipper::TestBox(VisibilityCamera* camera, const float* matrix, co
         // Clamp to the viewport (signed compares, as retail) and offset by
         // its origin.
         screenRect[0] = screenRect[0] > 0 ? screenRect[0] : 0;
-        screenRect[2] = screenRect[2] < (int)camera->viewportWidth ? screenRect[2] : (int)camera->viewportWidth;
+        screenRect[2] = screenRect[2] < (int)camera->viewport[2] ? screenRect[2] : (int)camera->viewport[2];
         screenRect[1] = screenRect[1] > 0 ? screenRect[1] : 0;
-        screenRect[3] = screenRect[3] < (int)camera->viewportHeight ? screenRect[3] : (int)camera->viewportHeight;
-        screenRect[0] += Group4Vis_ViewportX(camera);
-        screenRect[2] += Group4Vis_ViewportX(camera);
-        screenRect[1] += Group4Vis_ViewportY(camera);
-        screenRect[3] += Group4Vis_ViewportY(camera);
+        screenRect[3] = screenRect[3] < (int)camera->viewport[3] ? screenRect[3] : (int)camera->viewport[3];
+        screenRect[0] += (int)camera->viewport[0];
+        screenRect[2] += (int)camera->viewport[0];
+        screenRect[1] += (int)camera->viewport[1];
+        screenRect[3] += (int)camera->viewport[1];
     }
     if (cornersInside)
         *cornersInside = inside;

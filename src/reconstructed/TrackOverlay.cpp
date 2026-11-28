@@ -404,7 +404,7 @@ int NameOverlay::Render3D()
         Vector3 screen;
         unsigned int outCode;
         if (reinterpret_cast<VisibilityClipper*>(g_visibilityClipper)->ProjectPoint(
-                reinterpret_cast<const VisibilityCamera*>(camera),
+                camera,
                 reinterpret_cast<const VisibilityMatrix*>(camera->screenMatrix),
                 reinterpret_cast<const VisibilityBoxVec*>(&head),
                 reinterpret_cast<VisibilityBoxVec*>(&screen),

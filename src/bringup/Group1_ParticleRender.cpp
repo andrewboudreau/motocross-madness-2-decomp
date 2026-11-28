@@ -103,34 +103,6 @@ struct Group1ParticleGame {
     int hidden;                    // +0x2d0 nonzero: no particles are drawn
 };
 
-// The camera fields slot 14 reads (Camera.h keeps them protected; same offsets).
-struct Group1ParticleCamera {
-    char field_0x000[0x2c];          // +0x00 GameObject
-    float worldMatrix[16];         // +0x2c Camera worldMatrix
-    float projectionMatrix[16];    // +0x6c Camera projectionMatrix
-    float viewMatrix[16];          // +0xac Camera viewMatrix
-    float screenMatrix[16];        // +0xec screen x view matrix (column 2 gives view depth)
-    char field_0x12c[0x16c - 0x12c]; // +0x12c Camera screenMatrix[1]
-    float fieldOfView;             // +0x16c Camera fieldOfView
-    Vector3 eyePosition;           // +0x170
-    Vector3 viewDirection;         // +0x17c
-    Vector3 upDirection;           // +0x188
-    char roll[0x198 - 0x194]; // +0x194: Camera::roll (bytes kept)
-    float focalLength;             // +0x198
-    float displayAspect;           // +0x19c Camera displayAspect
-    int viewport[6];               // +0x1a0 Camera viewport
-    float heightWidthRatio;        // +0x1b8 Camera heightWidthRatio
-    float nearPlane;               // +0x1bc
-    float farPlane;                // +0x1c0
-    int targetWidth;               // +0x1c4
-    int targetHeight;              // +0x1c8
-};
-
-static inline Group1ParticleCamera* Group1CameraView(Camera* camera)
-{
-    return reinterpret_cast<Group1ParticleCamera*>(camera);
-}
-
 static inline Group1ParticleRect* Group1Rect(Particle* particle)
 {
     return reinterpret_cast<Group1ParticleRect*>(particle->screenRect);
@@ -196,17 +168,17 @@ int ParticleManager::Render3D()
         Group1ParticleTLVertex* vertex = (Group1ParticleTLVertex*)particle->vertex;
         if (vertex->z > 1.0f || vertex->z < 0.0f)
             continue;
-        Group1ParticleCamera* camera = Group1CameraView(target->currentCamera);
+        Camera* camera = target->currentCamera;
         float half = camera->focalLength * particle->size * vertex->rhw;
         Group1ParticleRect* rect = Group1Rect(particle);
         rect->left = vertex->x - half;
-        if (rect->left > (float)Group1CameraView(target->currentCamera)->targetWidth)
+        if (rect->left > (float)target->currentCamera->targetWidth)
             continue;
         rect->right = half + vertex->x;
         if (rect->right < 0.0f)
             continue;
         rect->top = vertex->y - half;
-        if (rect->top > (float)Group1CameraView(target->currentCamera)->targetHeight)
+        if (rect->top > (float)target->currentCamera->targetHeight)
             continue;
         rect->bottom = half + vertex->y;
         if (rect->bottom < 0.0f)
@@ -224,8 +196,7 @@ int ParticleManager::Render3D()
         vertexFog = 0;
 
     // 5. Light the corners in a frame 100 units in front of the scene camera.
-    Group1ParticleCamera* scene =
-        Group1CameraView(reinterpret_cast<Group1ParticleGame*>(g_TrackGame)->renderTarget->currentCamera);
+    Camera* scene = reinterpret_cast<Group1ParticleGame*>(g_TrackGame)->renderTarget->currentCamera;
     Vector3 scaled;
     scaled.x = scene->viewDirection.x * 100.0f;
     scaled.y = scene->viewDirection.y * 100.0f;
@@ -263,7 +234,7 @@ int ParticleManager::Render3D()
         Group1CornerColor(corners[i]) &= 0xffffff;
 
     // 6. Quads.
-    Group1ParticleCamera* camera = Group1CameraView(target->currentCamera);
+    Camera* camera = target->currentCamera;
     float fogScale = 1.0f / (camera->farPlane - camera->nearPlane);
     unsigned int alpha = 0;
     unsigned int specular = 0;
@@ -275,7 +246,7 @@ int ParticleManager::Render3D()
         float z = vertex->z;
         float rhw = vertex->rhw;
         if (vertexFog) {
-            const float* m = camera->screenMatrix;
+            const float* m = camera->screenMatrix[0].m[0];
             float viewZ = m[10] * particle->position.z + m[6] * particle->position.y +
                           m[2] * particle->position.x + m[14];
             float fog = 1.0f - (viewZ - camera->nearPlane) * fogScale;

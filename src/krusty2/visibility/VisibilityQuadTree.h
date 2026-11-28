@@ -16,38 +16,17 @@
 
 // GameObject::renderContext (set by GameObject slot 8, which Setup() calls with its first
 // argument) is the RenderTarget (reconstructed/RenderTarget.h): slot 14 calls its slot 7
-// SetTextureStageState (+0x1c) with (0, 1, 1) and (0, 4, 1) and reads its +0x08 currentCamera
-// as the camera record below.
+// SetTextureStageState (+0x1c) with (0, 1, 1) and (0, 4, 1) and reads its +0x08 currentCamera.
+// The walks and the clipper take that Camera (reconstructed/Camera.h): fieldOfView (+0x16c),
+// eyePosition (+0x170; x and z start the query), the view matrix's z column (+0xb4, +0xc4,
+// +0xd4, +0xe4: SphereInFrustum's depth), screenMatrix[0] (+0xec, the box test's matrix) and
+// [1] (+0x12c), the viewport size (+0x1a8/+0x1ac, converted as unsigned values),
+// heightWidthRatio (+0x1b8) and the near and far planes (+0x1bc/+0x1c0).  The frozen copy
+// g_frozenCamera (0x0068a968) is a PCCamera built and destroyed by its constructor and
+// implicit destructor (initializers 0x0052d2f0/0x0052d310); slot 23 copies the whole
+// 0x220-byte object over it, vtable pointer included (0x88 dwords).
+class Camera;
 class RenderTarget;
-class VisibilityRenderer;
-
-struct VisibilityCamera {
-    // The frozen copy g_frozenCamera (0x0068a968) is built and destroyed by the
-    // PCCamera constructor/destructor (its initializers 0x0052d2f0/0x0052d310),
-    // so the record is a PCCamera (strong inference); the 0x220-byte copy in
-    // slot 23 includes its vtable pointer.
-    explicit VisibilityCamera(int flags);  // 0x004bed80
-    ~VisibilityCamera();                   // 0x004624d0
-    char field_0x00[0x18];
-    VisibilityRenderer* renderer; // +0x18 loaded by the verified debug walk
-    char field_0x1c[0x24];
-    char field_0x40[0x74];
-    float matrixB[4][4];          // +0xb4 second 4x4 (0x0052fbb0 reads +0xb4/+0xc4/+0xd4/+0xe4 as the columns of x/y/z/translation)
-    char field_0xf4[0x38];
-    float matrixC[4][4];          // +0x12c third 4x4 (0x0052fbb0)
-    float fieldOfView;  // +0x16c degrees (Camera.h: 77.0f; tested <= 90 in 0x0052fac0); compared with a dot product after (field - 10.0f) * 0.00461538f in 0x0052f140
-    float worldX;       // +0x170 passed first to VisibilityQuadTree::Query (made tree-relative there)
-    float worldY;       // +0x174 Camera eyePosition.y (eyePosition is +0x170..+0x178); not read here
-    float worldZ;       // +0x178 passed second to Query (multiplied by the tree's quantScale)
-    char field_0x17c[0x2c];
-    unsigned int viewportWidth;   // +0x1a8 converted as an unsigned value (fild qword) in 0x0052f340 / 0x0052f190
-    unsigned int viewportHeight;  // +0x1ac
-    char field_0x1b0[8];
-    float aspectRatio;  // +0x1b8 Camera.h: height/width ratio; multiplied by a point's z and compared with its y in 0x0052fac0 (y slope)
-    float nearPlane;    // +0x1bc Camera.h: near clip (1.0f); compared with a point's z in 0x0052fac0
-    float farPlane;     // +0x1c0 Camera.h: far clip (100000.0f); compared with a bounding sphere's near depth in 0x0052fbb0 (far limit)
-    char field_0x1c4[0x5c];
-};   // 0x220 bytes: slot 23 copies this much (0x88 dwords) into g_frozenCamera
 
 struct VisibilityResultList {
     QuadTreeResultLink* head;
@@ -87,31 +66,6 @@ struct VisibilityVertex {
 
 #include "VisibilityClipper.h"
 
-// Tier 3.  The renderer reached through camera + 0x18 (0x0052e450 loads it with
-// mov ecx,[edi+0x18]); DrawBox calls its virtual slot 16 (+0x40) with (3, 0x1e2, vertices,
-// 16, 0) and no explicit this, i.e. a thiscall: a 16-vertex line strip (type 3) of 0x20-byte
-// vertices whose position is the first three floats.
-class VisibilityRenderer {
-public:
-    virtual void UnknownVirtualSlot0();
-    virtual void BeginScene();
-    virtual void EndScene();
-    virtual void Blit();
-    virtual void LockSurface();
-    virtual void UnlockSurface();
-    virtual void GetTextureStageState();
-    virtual void SetTextureStageState();
-    virtual void SetRenderState();
-    virtual void GetRenderState();
-    virtual void SetTextureBlend();
-    virtual void ClearTexture();
-    virtual void Clear();
-    virtual void SupportsTextureFormat();
-    virtual void SetViewport();
-    virtual void DrawIndexedPrimitive();
-    virtual void DrawLineStrip(int primitiveType, int vertexFormat, void* vertices, int count, int flags);   // +0x40
-};
-
 struct VisibilityBoxVec {
     float x, y, z;
 };
@@ -126,24 +80,27 @@ public:
     // Returns the new tail.  Not virtual: a child that is completely inside the frustum is
     // gathered whole through QuadTreeNode slot 2 instead.
     QuadTreeResultLink* Traverse(int x, int z, QuadTreeResultLink* tail, int nodeX, int nodeZ,
-                                 int size, VisibilityCamera* camera);
+                                 int size, Camera* camera);
 
     __forceinline QuadTreeResultLink* VisitChild(int i, int x, int z, QuadTreeResultLink* tail,
                                                  int nodeX, int nodeZ, int midX, int midZ, int half,
                                                  float centerX, float centerZ, float halfExtent,
-                                                 VisibilityCamera* camera,
+                                                 Camera* camera,
                                                  VisibilityBoxVec* center, VisibilityBoxVec* extent, int* cornersInside);
 
     // Tier 3 name.  0x0052e450 (ret 0x18): the same walk as a debug draw (no result list).
-    void DebugDraw(int x, int z, int nodeX, int nodeZ, int size, VisibilityCamera* camera);
+    void DebugDraw(int x, int z, int nodeX, int nodeZ, int size, Camera* camera);
 
     __forceinline void DrawChild(int i, int x, int z, int nodeX, int nodeZ, int midX, int midZ,
                                  int half, float centerX, float centerZ, float halfExtent,
-                                 VisibilityCamera* camera, VisibilityBoxVec* center,
+                                 Camera* camera, VisibilityBoxVec* center,
                                  VisibilityBoxVec* extent, int* cornersInside);
 
-    // Tier 3 name.  0x0052e1f0 (ret 0xc): draws the box (center, half extents) of a node.
-    void DrawBox(VisibilityRenderer* renderer, const float* center, const float* extent);
+    // Tier 3 name.  0x0052e1f0 (ret 0xc): draws the box (center, half extents) of a node
+    // through the camera's render target (camera +0x18, loaded with mov ecx,[edi+0x18] in
+    // 0x0052e450): RenderTarget slot 16 (+0x40) DrawPrimitive with (3, 0x1e2, vertices,
+    // 16, 0), a 16-vertex line strip of 0x20-byte vertices.
+    void DrawBox(RenderTarget* renderer, const float* center, const float* extent);
     // No declared destructor: deleting 0x0052d530, core 0x0052d550 (a jmp to 0x004dd0c0).
 };
 
@@ -158,7 +115,7 @@ public:
 
     // Tier 3 name.  Retail 0x0052d560 (ret 0xc): starts a visibility query from the
     // camera ground position (x, z) with the frustum camera record.
-    int Query(float x, float z, VisibilityCamera* camera);
+    int Query(float x, float z, Camera* camera);
 
     RenderTarget* View() const { return (RenderTarget*)renderContext; }
 

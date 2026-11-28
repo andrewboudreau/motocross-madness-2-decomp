@@ -379,7 +379,7 @@ static inline TerrainShadowVec TerrainShadowAddCtorCall(const TerrainShadowVec& 
     maxX = TERRAIN_SHADOW_MAX(maxX, (cell)->gridX);                                                   \
     minZ = TERRAIN_SHADOW_MIN(minZ, (cell)->gridZ);                                                   \
     maxZ = TERRAIN_SHADOW_MAX(maxZ, (cell)->gridZ);                                                   \
-    g_visibilityClipper->ProjectVertices((VisibilityCamera*)TERRAIN_SHADOW_VIEWER()->currentCamera,      \
+    g_visibilityClipper->ProjectVertices(TERRAIN_SHADOW_VIEWER()->currentCamera,      \
         (VisibilityMatrix*)&TERRAIN_SHADOW_VIEWER()->currentCamera->screenMatrix[0], 1,                    \
         (VisibilityVertex*)&(hit), (VisibilityBoxVec*)&screen, &code);                                     \
     screenMinX = TERRAIN_SHADOW_MIN(screenMinX, screen.x);                                           \

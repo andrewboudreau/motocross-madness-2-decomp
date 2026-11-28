@@ -588,10 +588,9 @@ public:
 // camera, view matrix, box centre and half extent, screen rectangle,
 // corner count, and an unused last argument. Declared as
 // src/krusty2/visibility/VisibilityClipper.h does (the provider's names).
-struct VisibilityCamera;
 class VisibilityClipper {
 public:
-    int TestBox(VisibilityCamera* camera, const float* matrix, const float* center,
+    int TestBox(Camera* camera, const float* matrix, const float* center,
                 const float* extent, int* screenRect, int* cornersInside, int* unused);
 };
 extern VisibilityClipper* g_visibilityClipper;   // 0x00575a98
@@ -1425,7 +1424,7 @@ int D3DIMSoultreeObject::PrepareGeometry()
         view._42 = world.m[3][0] * projection.m[0][1] + world.m[3][1] * projection.m[1][1] + world.m[3][2] * projection.m[2][1] + world.m[3][3] * projection.m[3][1];
         view._43 = world.m[3][0] * projection.m[0][2] + world.m[3][1] * projection.m[1][2] + world.m[3][2] * projection.m[2][2] + world.m[3][3] * projection.m[3][2];
         view._44 = world.m[3][0] * projection.m[0][3] + world.m[3][1] * projection.m[1][3] + world.m[3][2] * projection.m[2][3] + world.m[3][3] * projection.m[3][3];
-        if (g_visibilityClipper->TestBox((VisibilityCamera*)((RenderTarget*)renderContext)->currentCamera,
+        if (g_visibilityClipper->TestBox(((RenderTarget*)renderContext)->currentCamera,
                                          view.m[0], &center.x, &extents.x, (int*)&screenRect, 0,
                                          &field_0x260)) {
             visible = 1;

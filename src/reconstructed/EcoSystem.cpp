@@ -1581,7 +1581,7 @@ int EcoSystem::PrepareGeometry() {
                 center.y = object->quantizedPosition.y * g_EcoSystem->unitsPerCoordinate + height;
                 center.z = object->quantizedPosition.z * g_EcoSystem->unitsPerCoordinate;
                 visible = g_visibilityClipper->SphereInFrustum(
-                    reinterpret_cast<const VisibilityCamera*>(ECO_VIEW->currentCamera),
+                    ECO_VIEW->currentCamera,
                     reinterpret_cast<const VisibilityMatrix*>(&ECO_VIEW->currentCamera->screenMatrix),
                     reinterpret_cast<const VisibilityBoxVec*>(&center), radius, 0);
             }

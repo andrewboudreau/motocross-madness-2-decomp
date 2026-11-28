@@ -207,7 +207,7 @@ class VisibilityConnectionsTests(unittest.TestCase):
             self.assertEqual(observed_sites, sites)
             extracted = out/'visibility.cpp'
             source = (ROOT/PROVIDER).read_text()
-            extracted.write_text('#include "visibility/VisibilityQuadTree.h"\n' +
+            extracted.write_text('#include "visibility/VisibilityQuadTree.h"\n#include "Camera.h"\n' +
                 '\n'.join(definition(source, 'VisibilityClipper::' + name) for name, _, _ in METHODS))
             provider_path, provider = compile_source(extracted, 'provider')
             for name, va, size in METHODS:
@@ -220,8 +220,8 @@ class VisibilityConnectionsTests(unittest.TestCase):
             self.assertEqual({s.name for s in provider.symbols if s.storage_class == 2 and s.section_number == 0},
                              {'__fltused'})
             self.assertFalse(any(s.name in ('.data', '.bss', '.CRT$XCU') and s.raw_size for s in provider.sections))
-            # Verify the actual Camera declaration independently from the provisional
-            # visibility record, including the real protected-field offsets.
+            # Verify the Camera declaration the clipper reads, including the real
+            # protected-field offsets.
             layout = out/'layout.cpp'
             layout.write_text('#include "Camera.h"\n#include <stddef.h>\n'
                 'class CameraLayout : public Camera { public: static int Check(){return '

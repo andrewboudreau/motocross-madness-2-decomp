@@ -323,7 +323,7 @@ void DrawableCube::MarkVisibleCells()
     for (int face = 0; face < 6; face++) {
         cubeObject->faces[face].visibleCells = 0;
         if (!reinterpret_cast<VisibilityClipper*>(g_visibilityClipper)->TestDot(
-                reinterpret_cast<const VisibilityCamera*>(((RenderTarget*)renderContext)->currentCamera),
+                ((RenderTarget*)renderContext)->currentCamera,
                 reinterpret_cast<const VisibilityBoxVec*>(&forward),
                 reinterpret_cast<const VisibilityBoxVec*>(&s_faceNormals[face])))
             continue;
@@ -339,7 +339,7 @@ void DrawableCube::MarkVisibleCells()
         for (int i = 0; i < 16; i++) {
             int corner = i + i / 4;
             if (reinterpret_cast<VisibilityClipper*>(g_visibilityClipper)->CullQuad(
-                    reinterpret_cast<const VisibilityCamera*>(((RenderTarget*)renderContext)->currentCamera),
+                    ((RenderTarget*)renderContext)->currentCamera,
                     reinterpret_cast<const VisibilityBoxVec*>(s_viewPoints), corner,
                     corner + 1, corner + 6, corner + 5))
                 cubeObject->faces[face].visibleCells |= 1 << i;

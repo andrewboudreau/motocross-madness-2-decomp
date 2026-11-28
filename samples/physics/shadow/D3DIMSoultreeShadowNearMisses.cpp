@@ -123,7 +123,7 @@ int D3DIMSoultreeShadow::NeedsShadowRender()
         const D3DIMShadowMatrix4& view = *(const D3DIMShadowMatrix4*)&camera->screenMatrix[0];
         D3DIMShadowMatrixProduct(&localToView, local, view);
         if (g_visibilityClipper->TestBox(
-                (VisibilityCamera*)host->currentCamera, &localToView._11, &center.x, &extent.x, 0, 0, 0))
+                host->currentCamera, &localToView._11, &center.x, &extent.x, 0, 0, 0))
             inCameraView = 1;
     }
     return inCameraView;

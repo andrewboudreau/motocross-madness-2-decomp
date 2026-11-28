@@ -13,6 +13,7 @@
 #include "../../reconstructed/Quantize.h"
 #include "../../reconstructed/Gridbase.h"
 #include "../../reconstructed/Grid1.h"
+#include "../../reconstructed/Camera.h"
 
 struct Vec3;
 float Vec3DotCall(const Vec3* a, const Vec3* b);
@@ -307,20 +308,6 @@ public:
     virtual long __stdcall Slot36(); virtual long __stdcall Slot37();
     virtual long __stdcall ValidateDevice(unsigned long* passes);                    // slot 38 (+0x98)
 };
-// The camera at the render target's +0x08 (slot 30 sets the world matrix, as in
-// D3DIMSoultreeShadow.cpp).
-class TerrainCamera {
-public:
-    virtual void Slot0(); virtual void Slot1(); virtual void Slot2(); virtual void Slot3();
-    virtual void Slot4(); virtual void Slot5(); virtual void Slot6(); virtual void Slot7();
-    virtual void Slot8(); virtual void Slot9(); virtual void Slot10(); virtual void Slot11();
-    virtual void Slot12(); virtual void Slot13(); virtual void Slot14(); virtual void Slot15();
-    virtual void Slot16(); virtual void Slot17(); virtual void Slot18(); virtual void Slot19();
-    virtual void Slot20(); virtual void Slot21(); virtual void Slot22(); virtual void Slot23();
-    virtual void Slot24(); virtual void Slot25(); virtual void Slot26(); virtual void Slot27();
-    virtual void Slot28(); virtual void Slot29();
-    virtual void SetWorldMatrix(const TerrainMatrix* m);                              // slot 30 (+0x78)
-};
 // The render target at GameObject::renderContext (PCRenderTarget; slot names as in
 // D3DIMSoultreeShadow.cpp).
 class TerrainRenderTarget {
@@ -332,7 +319,7 @@ public:
     virtual void SetRenderState(int state, int value, int force);        // slot 8
     virtual long GetRenderState(int state, int* value);                  // slot 9
     void* display;                                             // +0x04
-    TerrainCamera* camera;                                     // +0x08
+    Camera* camera;                                            // +0x08 (slot 30 SetWorldMatrix)
     char pad_0x0c[0x38 - 0x0c];
     int transformCount;                                        // +0x38 printed as "Total Transforms" (difference over the call)
     char pad_0x3c[0x44 - 0x3c];
@@ -453,7 +440,7 @@ int Terrain::Render3D()
     ((TerrainRenderTarget*)renderContext)->GetRenderState(4, &savedPerspective);
     int savedShade;
     ((TerrainRenderTarget*)renderContext)->GetRenderState(9, &savedShade);
-    ((TerrainRenderTarget*)renderContext)->camera->SetWorldMatrix(&transform);
+    ((TerrainRenderTarget*)renderContext)->camera->SetWorldMatrix((const Matrix4*)&transform);
     indicesDrawn = 0;
     verticesDrawn = 0;
     {

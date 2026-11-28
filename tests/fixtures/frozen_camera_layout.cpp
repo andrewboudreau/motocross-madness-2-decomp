@@ -3,9 +3,6 @@
 #include <stddef.h>
 
 typedef char ActualCameraSize[sizeof(PCCamera) == 0x220 ? 1 : -1];
-typedef char SnapshotViewSize[sizeof(VisibilityCamera) == 0x220 ? 1 : -1];
-typedef char ViewPosition[offsetof(VisibilityCamera, worldX) == 0x170 ? 1 : -1];
-typedef char ViewContext[offsetof(VisibilityCamera, renderer) == 0x18 ? 1 : -1];
 
 class CameraLayout : public PCCamera {
 public:
@@ -18,6 +15,6 @@ public:
     }
 };
 
-// Compile-only boundary proof: no camera or provisional record is constructed.
+// Compile-only boundary proof: no camera is constructed.
 Camera* FrozenCameraPrimary(PCCamera* camera) { return camera; }
 int FrozenCameraLayout() { return CameraLayout::Check(); }
